@@ -150,7 +150,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
                     try {
                         context.setDatabase(context.getWiki().getDatabase());
                         if (context.getWiki().checkPassword(susername, password, context))
-                            principal = new SimplePrincipal("xwiki:" + username);
+                            principal = new SimplePrincipal("xwiki:" + susername);
                     } catch (Exception e) {}
                 } finally {
                     context.setDatabase(db);
@@ -159,7 +159,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
 
             if (principal==null) {
                 if (context.getWiki().checkPassword(susername, password, context))
-                    principal = new SimplePrincipal(username);
+                    principal = new SimplePrincipal(susername);
             }
         }
         else {

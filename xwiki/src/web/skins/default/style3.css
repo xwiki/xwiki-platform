@@ -1,0 +1,16 @@
+/* Sahara StyleSheet */
+
+
+#xwikinav_footer, #xwikinav_header {
+ border-color: #BFA260;
+ background-color: #FFECBF;
+}
+
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #BFA260;
+ color: white;
+}
+
+#xwikilogo img {
+ background-image: url("logosahara.jpg");
+}

@@ -5,9 +5,13 @@
 <title> XPertNet . $!doc.web . $!doc.name</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 $!xwiki.getWebPreference("meta")
-<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  title="currentStyle" />
+<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  />
+<link href="$xwiki.getSkinFile("style1.css")" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 1" />
+<link href="$xwiki.getSkinFile("style2.css")" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 2" />
+<link href="$xwiki.getSkinFile("style3.css")" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 3" />
 <style type="text/css">
 $!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
 </style>
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
 </head>
 <body>

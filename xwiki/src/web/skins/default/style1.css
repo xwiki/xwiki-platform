@@ -1,0 +1,16 @@
+/* Blue StyleSheet */
+
+
+#xwikinav_footer, #xwikinav_header {
+ border-color: #5368A6;
+ background-color: #B6C5F2;
+}
+
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #5368A6;
+ color: white;
+}
+
+#xwikilogo img {
+ background-image: url("logobleu.jpg");
+}

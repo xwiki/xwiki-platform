@@ -1,0 +1,26 @@
+
+.left {
+  display: block;
+  position: relative;
+  float: left;
+  clear: left;
+  margin-top: 10px;
+  margin-right: 20px;
+  padding-left: 10px;
+  width: 200px;
+  border: 1px dashed #888888;
+}
+
+.center {
+  position: relative;
+  display: block;
+  margin-left: 220px;
+  margin-top: 10px;
+}
+
+
+.footer {
+  clear: both;
+  margin-bottom: 20px;
+}
+

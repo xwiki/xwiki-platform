@@ -1,0 +1,16 @@
+/* Bordeaux StyleSheet */
+
+
+#xwikinav_footer, #xwikinav_header {
+ border-color: #BF6060;
+ background-color: #FFBFBF;
+}
+
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #BF6060;
+ color: white;
+}
+
+#xwikilogo img {
+ background-image: url("logobordeaux.jpg");
+}

@@ -87,7 +87,7 @@ public class ViewEditAction extends XWikiAction
 
     public ActionForward parseTemplate(String template, XWikiContext context) throws IOException {
         HttpServletResponse response = context.getResponse();
-        response.setContentType("text/html");
+        response.setContentType("text/html; charset=iso8859-1");
         String content = context.getWiki().parseTemplate(template + ".vm", context);
         response.setContentLength(content.length());
         response.getWriter().write(content);
@@ -190,7 +190,7 @@ public class ViewEditAction extends XWikiAction
                 baseUrl = url.substring(0, url.indexOf("/bin/")) + "/bin/";
             }
 
-            servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
+            servlet.log("[DEBUG] ViewEditAction at perform(): Action is " + action);
             XWikiContext context = new XWikiContext();
             context.setBaseUrl(baseUrl);
             context.setServlet(servlet);

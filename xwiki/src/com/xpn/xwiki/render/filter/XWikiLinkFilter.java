@@ -74,7 +74,7 @@ import java.io.Writer;
 
 public class XWikiLinkFilter extends LocaleRegexTokenFilter {
 
-    private static Log log = LogFactory.getLog(LinkTestFilter.class);
+    private static Log log = LogFactory.getLog(XWikiLinkFilter.class);
 
 
     /**

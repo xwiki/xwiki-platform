@@ -1527,10 +1527,11 @@ public class XWiki implements XWikiNotificationInterface {
 
             if (log.isDebugEnabled()) {
                 if (result)
-                 log.debug("Password check for user " + username + " successfull");
+                 log.debug("(debug) Password check for user " + username + " successfull");
                 else
-                 log.debug("Password check for user " + username + " failed");
+                 log.debug("(debug) Password check for user " + username + " failed");
             }
+
             return result;
         } catch (Throwable e) {
             e.printStackTrace();

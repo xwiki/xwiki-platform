@@ -60,7 +60,7 @@ public class MyFormAuthentication extends AbstractAuthentication
      * The logger.
      */
     private static final Log LOGGER =
-        LogFactory.getLog(org.apache.cactus.client.authentication.FormAuthentication.class);
+        LogFactory.getLog(MyFormAuthentication.class);
 
     /**
      * The expected HTTP response status code when the authentication

@@ -38,7 +38,7 @@ import org.radeox.util.Service;
 import java.util.Iterator;
 
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine {
-    private static Log log = LogFactory.getLog(BaseRenderEngine.class);
+    private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
     private XWikiContext context;
 
     public XWikiRadeoxRenderEngine(XWikiContext context) {

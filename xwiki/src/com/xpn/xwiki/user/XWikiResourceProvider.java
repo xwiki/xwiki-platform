@@ -231,7 +231,8 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         }
 
         if (log.isDebugEnabled())
-         log.debug("Searching for matching rights for " + grouplist.size() + " groups: " + grouplist);
+         log.debug("Searching for matching rights for " + ((grouplist==null) ? "0" : "" + grouplist.size()) 
+                    + " groups: " + grouplist);
 
         if (grouplist!=null) {
             for (int i=0;i<grouplist.size();i++) {

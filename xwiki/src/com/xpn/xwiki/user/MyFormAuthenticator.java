@@ -143,7 +143,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
         Principal principal = null;
 
         if (username==null)
-         return null;
+            return null;
 
         // If we have the context then we are using direct mode
         // then we should specify the database
@@ -153,27 +153,30 @@ public class MyFormAuthenticator extends FormAuthenticator {
             if (username.indexOf(".")==-1)
                 susername = "XWiki." + username;
 
-            if (context.isVirtual()) {
-                String db = context.getDatabase();
-                try {
-                    // First we check in the main database
-                    try {
-                        context.setDatabase(context.getWiki().getDatabase());
-                        if (context.getWiki().checkPassword(susername, password, context))
-                            principal = new SimplePrincipal("xwiki:" + susername);
-                    } catch (Exception e) {}
-                } finally {
-                    context.setDatabase(db);
-                }
-            }
-
-            if (principal==null) {
+            // First we check in the local database
+            try {
                 if (context.getWiki().checkPassword(susername, password, context))
                     principal = new SimplePrincipal(susername);
+            } catch (Exception e) {}
+
+            if (context.isVirtual()) {
+                if (principal==null) {
+                    // Then we check in the main database
+                    String db = context.getDatabase();
+                    try {
+                        context.setDatabase(context.getWiki().getDatabase());
+                        try {
+                            if (context.getWiki().checkPassword(susername, password, context))
+                                principal = new SimplePrincipal("xwiki:" + susername);
+                        } catch (Exception e) {}
+                    } finally {
+                        context.setDatabase(db);
+                    }
+                }
             }
         }
         else {
-             principal = ((XWikiRealmAdapter)realm).authenticate(username, password, context);
+            principal = ((XWikiRealmAdapter)realm).authenticate(username, password, context);
         }
         return principal;
     }

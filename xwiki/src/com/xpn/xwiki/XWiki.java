@@ -134,7 +134,8 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public static String getServerWikiPage(String servername) {
-        return servername.substring(0,1).toUpperCase()
+        return "XWiki.XWikiServer"
+                  + servername.substring(0,1).toUpperCase()
                   + servername.substring(1);
     }
 

@@ -67,7 +67,8 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
 
     public Element toXML() {
         Element el = new DOMElement(getName());
-        el.setText(getValue().toString());
+        Object value = getValue();
+        el.setText( (value==null) ? "" : value.toString());
         return el;
     }
 

@@ -653,13 +653,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
           BaseObject object = (BaseObject) objects.get(i);
           result.append("|");
           for (Iterator it = fields.keySet().iterator();it.hasNext();) {
-              result.append("<nop>");
               result.append(display((String)it.next(), object, context));
               result.append("|");
           }
           result.append("\n");
       }
-      return result.toString();
+       result.append("\n");
+       return result.toString();
     }
 
 

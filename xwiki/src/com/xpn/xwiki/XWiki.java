@@ -854,9 +854,9 @@ public class XWiki implements XWikiNotificationInterface {
             return "Topic " + topic + " does not exist";
         }
         if (isForm)
-         return getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context);
+         return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
         else
-         return getRenderingEngine().renderDocument(doc, context);
+         return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
     }
 
 }

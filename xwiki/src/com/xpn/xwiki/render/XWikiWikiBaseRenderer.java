@@ -173,7 +173,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         content = preTagSubst.substitute(content);
 
         // PLUGIN: call startRenderingHandler at the start with the full content
-        content = plugins.startRenderingHandler(content, context);
+          content = plugins.startRenderingHandler(content, context);
 
         StringTokenizer tokens = new StringTokenizer(content,"\n");
         while(tokens.hasMoreTokens()) {

@@ -173,18 +173,62 @@ public class ViewEditTest extends ServletTest {
     public void endEditOk(WebResponse webResponse) {
         String result = webResponse.getText();
         assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+    }
+
+    public void testEditOk() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginEditObjectOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc, "Main.EditObjectOkTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        Utils.createDoc(hibstore, "Main", "EditObjectOkTest", bobject, bclass, context);
+        setUrl(webRequest, "edit", "EditObjectOkTest");
+        webRequest.addParameter("xpage", "editobject");
+    }
+
+    public void endEditObjectOk(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.EditObjectOkTest_nb\" value=\"1\"")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Main.EditObjectOkTest_0_first_name")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Ludovic")!=-1);
+    }
+
+    public void testEditObjectOk() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginEditClassOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc, "Main.EditClassOkTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        Utils.createDoc(hibstore, "Main", "EditClassOkTest", bobject, bclass, context);
+        setUrl(webRequest, "edit", "EditClassOkTest");
+        webRequest.addParameter("xpage", "editclass");
+    }
+
+    public void endEditClassOk(WebResponse webResponse) {
+        String result = webResponse.getText();
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
         assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
-        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.EditOkTest_nb\" value=\"1\"")!=-1);
-        assertTrue("Could not find object form value", result.indexOf("Main.EditOkTest_0_first_name")!=-1);
-        assertTrue("Could not find object form value", result.indexOf("Ludovic")!=-1);
     }
 
-    public void testEditOk() throws Throwable {
+    public void testEditClassOk() throws Throwable {
         launchTest();
     }
 
@@ -208,18 +252,8 @@ public class ViewEditTest extends ServletTest {
 
     public void endEditWithTemplateOk(WebResponse webResponse) {
         String result = webResponse.getText();
-        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
-        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
-        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.EditOkTestTemplate_nb\" value=\"1\"")!=-1);
-        assertTrue("Could not find object form value", result.indexOf("Main.EditOkTestTemplate_0_first_name")!=-1);
-        assertTrue("Could not find object form value", result.indexOf("Ludovic")!=-1);
+        assertTrue("Could not find WebHome Content", result.indexOf("Template content")!=-1);
         assertTrue("Could not find parent", result.indexOf("TestParentComesFromTemplate")!=-1);
-        assertTrue("Could not find Template content", result.indexOf("Template content")!=-1);
     }
 
     public void testEditWithTemplateNotOk() throws Throwable {

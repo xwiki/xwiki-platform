@@ -107,7 +107,6 @@ public class ViewEditAction extends XWikiAction
 
         // fetch action from mapping
         action = mapping.getName();
-
         // Test works with xwiki-test.cfg instead of xwiki.cfg
         String dbname = "xwiki";
         String url = XWiki.getRequestURL(request);
@@ -156,10 +155,8 @@ public class ViewEditAction extends XWikiAction
                 vcontext.put("cdoc", new Document(doc, context));
             }
             // forward to view template
-            if (xwiki.getSkin(context).equals("plain"))
-                return parseTemplate("plain", context);
-            else
-                return parseTemplate("view", context);
+            String page = getPage(request, "view");
+            return parseTemplate(page, context);
         }
         else if ( action.equals("inline")) {
             PrepareEditForm peform = (PrepareEditForm) form;
@@ -172,8 +169,9 @@ public class ViewEditAction extends XWikiAction
             // Set display context to 'view'
             context.put("display", "edit");
 
-            // forward to view template
-            return parseTemplate("inline", context);
+            // forward to inline template
+            String page = getPage(request, "inline");
+            return parseTemplate(page, context);
         }
         else if ( action.equals("edit") )
         {
@@ -185,7 +183,8 @@ public class ViewEditAction extends XWikiAction
             doc.readFromTemplateForEdit(peform, context);
 
             // forward to edit template
-            return parseTemplate("edit", context);
+            String page = getPage(request, "edit");
+            return parseTemplate(page, context);
         }
         else if ( action.equals("preview") )
         {
@@ -194,7 +193,9 @@ public class ViewEditAction extends XWikiAction
             vcontext.put("doc", new Document(doc2, context));
             vcontext.put("cdoc",  vcontext.get("doc"));
             doc2.readFromForm((EditForm)form, context);
-            return parseTemplate("preview", context);
+            // forward to view template
+            String page = getPage(request, "preview");
+            return parseTemplate(page, context);
         }
         else if (action.equals("save"))
         {
@@ -207,7 +208,8 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc, olddoc, context);
 
             // forward to view
-            response.sendRedirect(doc.getActionUrl("view",context));
+            String redirect = getRedirect(request, doc.getActionUrl("view",context));
+            response.sendRedirect(redirect);
             return null;
         }
         else if (action.equals("delete"))
@@ -215,9 +217,14 @@ public class ViewEditAction extends XWikiAction
                     String confirm = request.getParameter("confirm");
                     if ((confirm!=null)&&(confirm.equals("1"))) {
                       xwiki.deleteDocument(doc, context);
-                      return parseTemplate("deleted", context);
-                    } else
-                       return parseTemplate("delete", context);
+                      return parseTemplate(getPage(request, "deleted"), context);
+                    } else {
+                      String redirect = getRedirect(request, null);
+                      if (redirect==null)
+                       return parseTemplate(getPage(request, "delete"), context);
+                      else
+                        response.sendRedirect(redirect);
+                    }
                 }
         else if (action.equals("propupdate"))
         {
@@ -262,7 +269,8 @@ public class ViewEditAction extends XWikiAction
             }
             xwiki.flushCache();
             // forward to edit
-            response.sendRedirect(doc.getActionUrl("edit",context));
+            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+            response.sendRedirect(redirect);
             return null;
         }
         else if (action.equals("propadd"))
@@ -287,7 +295,8 @@ public class ViewEditAction extends XWikiAction
                 }
             }
             // forward to edit
-            response.sendRedirect(doc.getActionUrl("edit",context));
+            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+            response.sendRedirect(redirect);
             return null;
         }
         else if (action.equals("objectadd")) {
@@ -297,7 +306,8 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc, olddoc, context);
 
             // forward to edit
-            response.sendRedirect(doc.getActionUrl("edit",context));
+            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+            response.sendRedirect(redirect);
             return null;
         }
         else if (action.equals("objectremove")) {
@@ -312,7 +322,8 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc, olddoc, context);
 
             // forward to edit
-            response.sendRedirect(doc.getActionUrl("edit",context));
+            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+            response.sendRedirect(redirect);
             return null;
         }
         else if (action.equals("download"))
@@ -350,7 +361,7 @@ public class ViewEditAction extends XWikiAction
         }
         else if (action.equals("attach"))
         {
-            return parseTemplate("attach", context);
+            return parseTemplate(getPage(request, "attach"), context);
         }
         else if (action.equals("upload")) {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
@@ -430,7 +441,8 @@ public class ViewEditAction extends XWikiAction
 
             doc.deleteAttachment(attachment, context);
             // forward to attach page
-            response.sendRedirect(doc.getActionUrl("attach",context));
+            String redirect = getRedirect(request, doc.getActionUrl("attach",context));
+            response.sendRedirect(redirect);
             return null;
          }
          else if (action.equals("skin"))
@@ -470,6 +482,21 @@ public class ViewEditAction extends XWikiAction
         return null;
     }
 
+    public String getRedirect(HttpServletRequest request, String defaultRedirect) {
+        String redirect;
+        redirect = request.getParameter("xredirect");
+        if (redirect == null)
+         redirect = defaultRedirect;
+        return redirect;
+    }
+
+    public String getPage(HttpServletRequest request, String defaultpage) {
+        String page;
+        page = request.getParameter("xpage");
+        if (page == null)
+         page = defaultpage;
+        return page;
+    }
 
 
     private String getFileName(List filelist, String name) {

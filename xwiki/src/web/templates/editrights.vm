@@ -1,6 +1,11 @@
 #template("editheader.vm")
 <div id="xwikicontent">
-#set( $classes = $doc.getxWikiClasses())
+#if ( $request.getParameter("global").equals("1"))
+#set ($classname = "XWiki.XWikiGlobalRights")
+#else
+#set ($classname = "XWiki.XWikiRights")
+#end
+#set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$request.getRequestURI()?$request.getQueryString()")
 <script type="text/javascript">
 var currentfield = "";
@@ -12,47 +17,25 @@ function show(fieldname) {
 }
 </script>
 <div class="left">
-<h3>Object Editor</h3>
+<h3>Rights Editor</h3>
 <br />
-#foreach ($class in $classes)
-<b>$class.name</b><br />
+<a href="" onclick="showobjects('$class.name'); return false;">$class.name</a><br />
 <div id="class_${class.name}">
-
-#set( $props = $class.getProperties())
-#set( $i=0)
-#foreach( $prop in $props)
-#if ($i==0)
-#set($firstfield = $prop.name)
-#set ($i = 1)
-#end
-#end
 #foreach ($obj in $doc.getObjects($class.name))
-&nbsp;&nbsp;<a href="" onclick="show('${class.name}_${obj.number}'); return false;">${obj.number}: $doc.display($firstfield,$obj)</a><br />
+&nbsp;&nbsp;<a href="" onclick="show('${class.name}_${obj.number}'); return false;">
+$!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br />
 #end
 </div>
 <br /><br />
-#end
 </div>
 
 <div class="left">
-<h2>Add an Object</h2>
+<h2>Add a right entry</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
 <input type="hidden" name="xredirect" value="$redirect">
-<select name="classname" size="1">
-<option value="---">Select a class</option>
-#foreach ($classname in $xwiki.classList)
-<option value="$classname">$classname</option>
-#end
-</select>
-<input type="submit" value="Add Class" />
-</p>
-</form>
-<form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
-<p>
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="text" name="classname" size="20">
-<input type="submit" value="Add Class" />
+<input type="hidden" name="classname" value="$classname">
+<input type="submit" value="Add Right Entry" />
 </p>
 </form>
 </div>
@@ -60,24 +43,23 @@ function show(fieldname) {
 <div class="left">
 <br />
 <form id="update" method="post" action="$doc.getActionUrl("save")">
-<p>
 <input type="hidden" name="xredirect" value="$redirect">
-<input type="submit" value="Save Object Modifications" />
-</p>
+<input type="submit" value="Save Rights Modifications" />
 </div>
 
 <div class="center">
 
 <div id="intro">
-Welcome to the objects editor. Choose an object to edit or add an object to the class.
+Welcome to the rights editor. Choose a right entry to edit or add a new right entry:
 </div>
 
+
 #set ( $first = 1)
-#foreach($class in $classes)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <p>
 <input type="hidden" name="${class.name}_nb" value="$nb" />
 </p>
+
 #foreach($obj in $doc.getObjects($class.name))
 <div id="${class.name}_${obj.number}" style="display: #if ($first==1) block #else none #end;">
 #if ($first==1)
@@ -95,12 +77,11 @@ You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&class
 <table>
 #foreach($prop in $class.properties)
 <tr><td>$prop.prettyName</td>
-<td>$doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
+<td>$!doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 </td></tr>
 #end
 </table>
 </div>
- #end
 #end
 </div>
 </div>

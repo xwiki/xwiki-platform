@@ -1,0 +1,8 @@
+<div id="xwikinav_footer">
+<div class="xwikiactions">
+<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+</div>
+</div>
+#template("footer.vm")

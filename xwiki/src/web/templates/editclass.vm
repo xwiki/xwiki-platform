@@ -1,46 +1,79 @@
-<h2>Add a Class</h2>
-<form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
-<p>
-<select name="classname" size="1">
-<option value="---">Select a class</option>
-#foreach ($classname in $xwiki.classList)
-<option value="$classname">$classname</option>
+#template("editheader.vm")
+<div id="xwikicontent">
+#set( $class = $doc.getxWikiClass())
+#set( $redirect = "$request.getRequestURI()?$request.getQueryString()")
+<script type="text/javascript">
+var currentfield = "";
+function show(fieldname) {
+  if (currentfield!="")
+    document.getElementById("field_" + currentfield).style.display="none";
+  document.getElementById("field_" + fieldname).style.display="block";
+  currentfield = fieldname;
+}
+</script>
+<div class="left">
+<h3>Class Editor</h3>
+<br />
+#foreach ($field in $class.properties)
+<a href="" onclick="show('$field.name'); return false;">$field.prettyName</a><br />
 #end
-</select>
-<input type="submit" value="Add Class" />
-</p>
-</form>
-<form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
-<p>
-<input type="text" name="classname" size="30">
-<input type="submit" value="Add Class" />
-</p>
-</form>
-or<br />
-<h2>Class Description</h2>
+</div>
+
+<div class="left">
 <form id="propadd" method="post" action="$doc.getActionUrl("propadd")">
-<p>
+<p style="text-align: center">
+<input type="hidden" name="xredirect" value="$redirect">
 Name: <input type="text" name="propname" value="" size="20" />
+<br /><br />
 <select name="proptype" size="1">
 <option value="---">Select a class</option>
 #foreach($prop in $xwiki.metaclass.properties)
 <option value="$prop.name">$prop.prettyName</option>
 #end
 </select>
+<br /><br />
 <input type="submit" value="Add Property" />
 </p>
 </form>
+</div>
+
+<div class="left">
+<br />
 <form id="propupdate" method="post" action="$doc.getActionUrl("propupdate")">
+<p>
+<input type="hidden" name="xredirect" value="$redirect">
+<input type="submit" value="Save Class Modifications" />
+</p>
+</div>
+<div class="center">
+
+<div id="intro">
+Welcome to the class editor. Choose a field to edit or add a field to the class.
+</div>
+
+#set ( $first = 1)
+#foreach ($field in $class.properties)
+
+<div id="field_$field.name" style="display: #if ($first==1) block #else none #end;">
+#if ($first==1)
+<script type="text/javascript">
+currentfield = "field_$field.name";
+</script>
+#set ($first = 0)
+#end
+Edit field $field.prettyName <br />
+
 <table border="0">
-#foreach($prop in $doc.xWikiClass.properties)
-<tr><th>Property</th><th>$prop.prettyName</th></tr>
-#foreach ($classprop in $prop.xWikiClass.propertyNames)
-<tr><td>$prop.xWikiClass.get("$classprop").getPrettyName()</td>
-<td>$doc.displayEdit($prop.xWikiClass.get("$classprop"), "${prop.name}_" , $prop)
+#foreach ($classprop in $field.xWikiClass.propertyNames)
+<tr><td>$field.xWikiClass.get("$classprop").getPrettyName()</td>
+<td>$doc.displayEdit($field.xWikiClass.get("$classprop"), "${field.name}_" , $field)
 </td>
 </tr>
 #end
-#end
-<tr><td></td><td><input type="submit" value="Modify Class" /></td></tr>
 </table>
+</div>
+#end
 </form>
+</div>
+</div>
+#template("editfooter.vm")

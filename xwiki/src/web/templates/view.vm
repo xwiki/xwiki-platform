@@ -1,24 +1,13 @@
 #template("xwiki.vm")
 #template("httpheader.vm")
 #template("header.vm")
-#macro( versions )
-#foreach( $rev in $doc.recentRevisions )
-<a href="$viewurl?rev=$rev">$rev</a><span> | </span>
-#end
-#end
 <div id="xwikinav_header">
-<div class="xwikiactions">
-<a href="$editurl">$msg.get("edit")</a><span> | </span>
-<a href="$inlineurl">$msg.get("inline")</a><span> | </span>
-<a href="$attachurl">$msg.get("attach")</a><span> | </span>
-<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
-<a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
-#versions()
-</div>
-<div id="xwikiwebmenu">
+<div id="xwikiwebusermenu">
+<span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
 $!xwiki.getWebPreference("menu")
 </div>
 </div>
+#template("pagemenu.vm")
 #if($message)
 <div id="xwikimessage">
 $message
@@ -34,13 +23,5 @@ $cdoc.getRenderedContent()
 #end
 </div>
 <div id="xwikinav_footer">
-<div class="xwikiactions">
-<a href="$editurl">$msg.get("edit")</a><span> | </span>
-<a href="$inlineurl">$msg.get("inline")</a><span> | </span>
-<a href="$attachurl">$msg.get("attach")</a><span> | </span>
-<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
-<a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
-#versions()
-</div>
 </div>
 #template("footer.vm")

@@ -167,14 +167,16 @@ public class Document extends Api {
         for (Iterator it = map.keySet().iterator();it.hasNext();) {
             String name = (String) it.next();
             Vector objects = (Vector)map.get(name);
-            resultmap.put(name, getObjects(objects));
+            if (objects!=null)
+             resultmap.put(name, getObjects(objects));
         }
         return resultmap;
     }
 
     protected Vector getObjects(Vector objects) {
         Vector result = new Vector();
-
+        if (objects==null)
+         return result;
         for (int i=0;i<objects.size();i++) {
             BaseObject bobj = (BaseObject) objects.get(i);
             if (bobj!=null) {
@@ -190,7 +192,11 @@ public class Document extends Api {
     }
 
     public Object getObject(String classname, int nb) {
-         return new Object(doc.getObject(classname, nb), context);
+        BaseObject obj = doc.getObject(classname, nb);
+        if (obj==null)
+         return null;
+        else
+         return new Object(obj, context);
     }
 
     public String toXML() {
@@ -224,10 +230,14 @@ public class Document extends Api {
     }
 
     public String display(String fieldname, Object obj) {
-        return doc.display(fieldname, obj.getBaseObject(), context);
+       if (obj==null)
+         return "";
+       return doc.display(fieldname, obj.getBaseObject(), context);
     }
 
     public String display(String fieldname, String mode, Object obj) {
+        if (obj==null)
+         return "";
         return doc.display(fieldname, mode, obj.getBaseObject(), context);
     }
 
@@ -248,22 +258,32 @@ public class Document extends Api {
     }
 
     public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displayRendered(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
+        if ((pclass==null)||(object==null))
+         return "";
+        return doc.displayRendered(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayView(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+        if ((pclass==null)||(object==null))
+         return "";
          return doc.displayView(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayEdit(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+        if ((pclass==null)||(object==null))
+         return "";
          return doc.displayEdit(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayHidden(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+        if ((pclass==null)||(object==null))
+         return "";
          return doc.displayHidden(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displaySearch(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+        if ((pclass==null)||(object==null))
+         return "";
          return doc.displaySearch(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 

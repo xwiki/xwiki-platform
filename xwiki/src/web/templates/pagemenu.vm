@@ -1,0 +1,38 @@
+#macro( versions )
+#foreach( $rev in $doc.recentRevisions )
+<a href="$viewurl?rev=$rev">$rev</a><span class="sep"> | </span>
+#end
+#end
+<div id="xwikinav_sidebar">
+<div id="xwikiusermenutitle">$msg.get("usermenu")</div>
+<div id="xwikiusermenulinks">
+#if ($context.getUser().equals("XWiki.XWikiGuest"))
+<a href="../../view/XWiki/XWikiLogIn">$msg.get("login")</a><span class="sep"> | </span>
+#else
+<a href="../../view/XWiki/XWikiLogOut">$msg.get("logout")</a><span class="sep"> | </span>
+#set ($user = $context.getUser())
+#set ($userdoc = $xwiki.getDocument($user))
+<a href="../../view/${userdoc.web}/${userdoc.name}">$context.getUser()</a><span class="sep"> | </span>
+#end
+</div>
+<div id="xwikipagemenutitle">$msg.get("pagemenu")</div>
+<div id="xwikipagemenulinks">
+<a href="$attachurl">$msg.get("attachments") ($doc.getAttachmentList().size())</a><span class="sep"> | </span>
+<a href="$inlineurl">$msg.get("editinline")</a><span class="sep"> | </span>
+<a href="$editurl">$msg.get("editcontent")</a><span class="sep"> | </span>
+<a href="${editurl}?xpage=editrights">$msg.get("editrights")</a><span class="sep"> | </span>
+<a href="${editurl}?xpage=editobject">$msg.get("editobject")</a><span class="sep"> | </span>
+<a href="${editurl}?xpage=editclass">$msg.get("editclass")</a><span class="sep"> | </span>
+<a href="$deleteurl">$msg.get("delete")</a><span class="sep"> | </span>
+<a href="${viewurl}?raw=1">$msg.get("raw")</a><span class="sep"> | </span>
+#versions()
+</div>
+<div id="xwikiwebmenutitle">$msg.get("webmenu")</div>
+<div id="xwikiwebmenulinks">
+<a href="WebHome">$msg.get("space")</a><span class="sep"> | </span>
+<a href="../../view/${doc.web}/WebPreferences">$msg.get("webprefs")</a><span class="sep"> | </span>
+<a href="../../edit/${doc.web}/WebPreferences?xpage=editrights&global=1">$msg.get("webrights")</a><span class="sep"> | </span>
+<a href="../../view/XWiki/XWikPreferences">$msg.get("xwikiprefs")</a><span class="sep"> | </span>
+<a href="../../edit/XWiki/XWikiPreferences?xpage=editrights&global=1">$msg.get("xwikirights")</a><span class="sep"> | </span>
+</div>
+</div>

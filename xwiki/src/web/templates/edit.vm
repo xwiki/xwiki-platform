@@ -1,13 +1,4 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-<div id="xwikinav_header">
-<div class="xwikiactions">
-<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-</div>
-</div>
+#template("editheader.vm")
 <div id="xwikicontent">
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
 <p>
@@ -28,19 +19,6 @@ $xwiki.getTextArea($doc.content)
 <br/><br/>
 Parent:&nbsp;<input type="text" name="parent" value="$doc.getParent()" size="40" />
 </div>
-<div id="xwikiobject">
-#template("editobject.vm")
-</div>
 </form>
-<div id="xwikiclass">
-#template("editclass.vm")
 </div>
-</div>
-<div id="xwikinav_footer">
-<div class="xwikiactions">
-<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-</div>
-</div>
-#template("footer.vm")
+#template("editfooter.vm")

@@ -1,6 +1,8 @@
+
 .body {
     left: 0px;
     right: 0px;
+    width: 100%;
 }
 
 #xwikibanner, #xwikiheader, #xwikifooter {
@@ -38,19 +40,6 @@
 }
 
 
-#xwikinav_header, #xwikinav_footer {
-    position: relative;
-    display: block;
-    float: left;
-    clear: both;
-    width: 100%;
-    border-width: 0.4em 0em 0em;
-    border-style: solid;
-    border-color: #009255;
-    background-image:url(pixel_clair.gif);
-    background-repeat: no-repeat;
-}
-
 *, td, th, p, a, select {
     font-family: verdana;
     font-size: 10pt;
@@ -61,7 +50,6 @@
     float: left;
     clear: left;
     left: 0px;
-    repeat: no-repeat;
     background-image:url(horizontal.gif);
     background-repeat: no-repeat;
 }
@@ -141,24 +129,54 @@
     padding: 0px;
 }
 
-.xwikiactions {
-    top: 0px;
-    margin: 0px;
-    padding: 0px;
-    height: 1.4em;
-    left: 0px;
+
+#xwikicontent {
+    position: relative;
+    display: block;
+    clear: left;
+    left: 5px;
+    margin-right: 240px;
 }
 
-#xwikiwebmenu {
-    position: absolute;
+#xwikinav_footer {
+    position: relative;
+    display: block;
+    height: 2em;
+    margin: 0px;
+    padding: 0px;
+    float: left;
+    clear: both;
+    width: 100%;
+    border-width: 0.4em 0em 0em;
+    border-style: solid;
+    border-color: #009255;
+    background-color: #BDDE7B;
+    background-repeat: no-repeat;
+}
+
+#xwikinav_header {
+    position: relative;
+    display: block;
+    clear: both;
+    width: 100%;
+    height: 2em;
     right: 0px;
-    top: 0px;
+    border-width: 0.4em 0em 0em;
+    border-style: solid;
+    border-color: #009255;
+    background-color: #BDDE7B;
+    background-repeat: repeat;
+}
+
+
+.xwikiactions, #xwikiwebusermenu {
+    display: block;
     margin: 0px;
     padding: 0px;
     height: 1.4em;
 }
 
-.xwikiactions a, #xwikiwebmenu a {
+.xwikiactions a, #xwikiwebusermenu a {
     display: block;
     float: left;
     list-style-type: none;
@@ -176,70 +194,54 @@
     text-align: center;
 }
 
-.xwikiactions span, #xwikiwebmenu span {
+#xwikiwebusermenu span, .xwikiactions span {
     display: none;
 }
 
-.xwikiactions .inputfield {
-   position: relative;
-   top: 0.1em;
+#xwikinav_sidebar {
    display: block;
-   height: 1.8em;
-   padding: 0em;
-   background-image: none;
-   background-color: transparent;
-}
-
-.xwikiactions .inputbutton {
    position: relative;
-   top: 0.1em;
+   right: 10px;
+   top: 10px;
+   float: right;
+   border: 1px solid #BBBBBB;
+   padding-bottom: 10px;
+   margin-bottom: 30px;
+   width: 200px;
+}
+
+#xwikiusermenutitle, #xwikipagemenutitle, #xwikiwebmenutitle {
    display: block;
-   height: 1.8em;
-   padding: 0em;
-   background-image: none;
-   background-color: transparent;
+   float: left;
+   clear: left;
+   border-bottom: 1px solid;
+   margin: 5px;
+   padding-bottom: 3px;
+   text-align: left;
+   font-weight: bold;
+   font-size: 10px;
+   font-family: verdana;
 }
 
-.xwikiactions .inputfield input {
-    position: relative;
-    top: 0.1em;
-    padding: 0em;
-    height: 1.2em;
-    font-family: verdana;
-    font-size: 8pt;
+#xwikiusermenulinks, #xwikipagemenulinks, #xwikiwebmenulinks {
+   display: block;
+   float: left;
+   clear: left;
+   width: 100%;
+   margin-bottom: 15px;
 }
 
-.xwikiactions .inputbutton input {
-    position: relative;
-    top: -0.1em;
-    padding: 0em;
-    height: 1.9em;
-    font-family: verdana;
-    font-size: 8pt;
+.sep {
+   display: none;
 }
 
-
-#xwikicontent {
-    position: relative;
-    display: block;
-    float: left;
-    clear: both;
-    left: 6px;
-    right: 7px;
-    width: 100%;
-}
-
-
-#xwikinav, #xwikinav_header, #xwikinav_footer {
-    display: block;
-    float: left;
-    clear: both;
-    position: relative;
-    height: 2em;
-    margin: 0px;
-    padding: 0px;
-    background-image:url(pixel_clair.gif);
-    background-repeat: repeat;
+#xwikiusermenulinks a, #xwikipagemenulinks a, #xwikiwebmenulinks a {
+   display: block;
+   float: left;
+   clear: left;
+   margin-left: 10px;
+   font-size: 10px;
+   font-family: verdana;
 }
 
 
@@ -248,14 +250,12 @@
   background-color: inherit;
   font-weight: bold;
   font-size: 16px;
-  font-variant: uppercase;
 }
 
 .heading-1-1 {
   color: #000000;
   background-color: inherit;
   font-size: 15px;
-  font-variant: uppercase;
 }
 
 
@@ -263,14 +263,12 @@
   color: #000000;
   background-color: inherit;
   font-size: 13px;
-  font-variant: uppercase;
 }
 
 .heading-1-1-1-1 {
   color: #000000;
   background-color: inherit;
   font-size: 12px;
-  font-variant: uppercase;
 }
 
 
@@ -293,7 +291,6 @@
   font-size: 12px;
   line-height: 100%;
   white-space: pre;
-  overflow: -moz-scrollbars-horizontal;
   overflow-x: auto;
   width: 98%;
 }
@@ -344,8 +341,8 @@
   text-align: left;
   color: inherit;
   font-weight: bold;
-  background-color: #BBEE88;
-  background:##FFFF66;
+  background-color: #BDDE7B;
+  background: #FFFF66;
   color: #000000;
   padding: 2px;
 }
@@ -400,7 +397,7 @@ ol.HEBREW { list-style-type: hebrew; }
   margin-bottom: 10px;
   padding: 5px;
   text-align: center;
-  background-color: #BBEE88;
+  background-color: #BDDE7B;
 }
 
 .rssitemtitle {
@@ -410,3 +407,31 @@ ol.HEBREW { list-style-type: hebrew; }
 .rssitem {
   margin-bottom: 10px;
 }
+
+
+.left {
+  display: block;
+  position: relative;
+  float: left;
+  clear: left;
+  margin-top: 10px;
+  margin-right: 20px;
+  padding-left: 10px;
+  width: 200px;
+  border: 1px dashed #888888;
+}
+
+.center {
+  position: relative;
+  display: block;
+  margin-left: 220px;
+  margin-top: 10px;
+}
+
+
+.footer {
+  clear: both;
+  margin-bottom: 20px;
+}
+
+

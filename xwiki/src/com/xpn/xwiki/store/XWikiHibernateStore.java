@@ -241,12 +241,15 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         setTransaction(null, context);
 
         if (commit) {
-            transaction.commit();
+            if (transaction!=null)
+             transaction.commit();
         } else {
             // Don't commit the transaction, can be faster for read-only operations
-            transaction.rollback();
+            if (transaction!=null)
+             transaction.rollback();
         }
-        session.close();
+        if (session!=null)
+         session.close();
     }
 
 

@@ -1,18 +1,4 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-#macro( versions )
-#foreach( $rev in $doc.recentRevisions )
-<a href="$viewurl?rev=$rev">$rev</a><span> | </span>
-#end
-#end
-<div id="xwikinav_header">
-<div class="xwikiactions">
-<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-</div>
-</div>
+#template("editheader.vm")
 #if($message)
 <div id="xwikimessage">
 $message
@@ -29,11 +15,4 @@ $message
 $doc.getRenderedContent()
 </div>
 </form>
-<div id="xwikinav_footer">
-<div class="xwikiactions">
-<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-</div>
-</div>
-#template("footer.vm")
+#template("editfooter.vm")

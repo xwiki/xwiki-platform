@@ -825,7 +825,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         try {
             checkHibernate();
             beginTransaction();
-            StringBuffer sql = new StringBuffer("select doc.web, doc.name from XWikiSimpleDoc as doc");
+            StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name from XWikiSimpleDoc as doc");
             wheresql.trim();
             if (!wheresql.equals("")) {
                 if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))

@@ -227,7 +227,7 @@
 
         <mkdir dir="${test.reports.dir}" />
 
-        <cactus printsummary="yes" warfile="${release.warfile}" >
+        <cactus printsummary="yes" warfile="${release.warfile}" dir="${basedir}/test" fork="on" >
 
             <classpath>
                 <pathelement path="${classes.dir}" />

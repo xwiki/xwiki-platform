@@ -464,9 +464,11 @@ public class ViewEditAction extends XWikiAction
                   XWikiAttachment attachment = null;
                   List list = doc.getAttachmentList();
                   for (int i=0;i<list.size();i++) {
-                    attachment = (XWikiAttachment) list.get(i);
-                    if (attachment.getFilename().equals(filename))
+                    XWikiAttachment attachment2 = (XWikiAttachment) list.get(i);
+                    if (attachment2.getFilename().equals(filename)) {
+                       attachment = attachment2;
                        break;
+                    }
                   }
                   if (attachment!=null) {
                       // Sending the content of the attachment

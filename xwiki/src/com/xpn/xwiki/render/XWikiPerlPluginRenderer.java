@@ -36,7 +36,9 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
 
     private String perlpath;
     private String pluginspath;
+    private String classpath;
     private String javaserverport;
+    private int debug = 0;
     private int javaserverdebug;
     private int launchcounter = 0;
 
@@ -46,10 +48,12 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
     private static Hashtable perlProcesses = new Hashtable();
 
 
-    public XWikiPerlPluginRenderer(String perlpath, String pluginspath, String port, int debug) throws XWikiException {
+    public XWikiPerlPluginRenderer(String perlpath, String pluginspath, String classpath, String port, int debug) throws XWikiException {
         setPerlpath(perlpath);
         setPluginspath(pluginspath);
         setJavaserverport(port);
+        setClasspath(classpath);
+        setDebug(debug);
     }
 
     public XWikiPerlPluginThread getPerlThread() {
@@ -155,15 +159,6 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
     }
 
 
-    public String getPerlCommand() {
-        String os = System.getProperty("os.name");
-        if (os.toLowerCase().indexOf("windows")!=-1)
-          return "cmd.exe /c " + getPluginspath().substring(0,2) + " && cd "
-                               + getPluginspath().substring(2) + " && " + getPerlpath() + " perlplugins.pl 7890 true";
-        else
-          return "sh -c \"cd " + getPluginspath() + " && " + getPerlpath() + " perlplugins.pl 7890 true\"";
-    }
-
     public void startPerlEngine() throws XWikiException {
 
         Process perlProcess = getPerlProcess();
@@ -187,7 +182,7 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
 
         try {
             launchcounter++;
-            String[] command = { getPerlpath(), "perlplugins.pl", "7890", "true" };
+            String[] command = { getPerlpath(), "perlplugins.pl", getClasspath(), getJavaserverport(),  "" + getDebug() };
             File dir = new File(getPluginspath());
             perlProcess = Execute.launch(null, command, null, dir, true);
             setPerlProcess(perlProcess);
@@ -273,6 +268,22 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
             e.printStackTrace();
             return content;
         }
+    }
+
+    public String getClasspath() {
+        return classpath;
+    }
+
+    public void setClasspath(String classpath) {
+        this.classpath = classpath;
+    }
+
+    public int getDebug() {
+        return debug;
+    }
+
+    public void setDebug(int debug) {
+        this.debug = debug;
     }
 
 

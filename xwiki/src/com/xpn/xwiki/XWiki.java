@@ -55,7 +55,7 @@ public class XWiki {
     private HttpServlet servlet;
 
     public XWiki(String path, XWikiContext context) throws XWikiException {
-      this(path,context,null);
+        this(path,context,null);
     }
 
     public XWiki(String path, XWikiContext context, HttpServlet servlet) throws XWikiException {
@@ -131,8 +131,34 @@ public class XWiki {
             return param;
         }
     }
+
     public String ParamAsRealPath(String key, XWikiContext context) {
         return ParamAsRealPath(key);
+    }
+
+    public String ParamAsRealPathVerified(String param) {
+        String path;
+        File fpath;
+
+        path = Param(param);
+        if (path==null)
+            return null;
+
+        fpath = new File(path);
+        if (fpath.exists()) {
+            return path;
+        }
+
+        path = getRealPath(path);
+        if (path==null)
+            return null;
+
+        fpath = new File(path);
+        if (fpath.exists()) {
+            return path;
+        } else {
+        }
+        return null;
     }
 
 

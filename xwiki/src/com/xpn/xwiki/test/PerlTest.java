@@ -43,7 +43,8 @@ public class PerlTest extends TestCase {
         context.setWiki(xwiki);
         perlplugin = new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
                         xwiki.Param("xwiki.perl.pluginspath"),
-                        xwiki.Param("xwiki.perl.javaserverport", "7890"), 0);
+                        xwiki.Param("xwiki.perl.classespath"),
+                        xwiki.Param("xwiki.perl.javaserverport", "7891"), 0);
         wikiengine = xwiki.getRenderingEngine();
         wikirenderer = new XWikiWikiBaseRenderer();
         // perlplugin = (XWikiPerlPluginRenderer) wikiengine.getRenderer(XWikiPerlPluginRenderer.class.getName());

@@ -29,40 +29,50 @@ import com.xpn.xwiki.XWikiContext;
 
 import java.util.Vector;
 import java.util.Hashtable;
+import java.io.File;
 
 public class XWikiRenderingEngine {
 
     private Vector renderers = new Vector();
 
     public XWikiRenderingEngine(XWiki xwiki) throws XWikiException {
-      addRenderer(new XWikiJSPRenderer());
-      addRenderer(new XWikiVelocityRenderer());
-      addRenderer(new XWikiPluginRenderer());
-      if (xwiki.Param("xwiki.perl.active", "1").equals("1")) {
-          addRenderer(new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
-                        xwiki.ParamAsRealPath("xwiki.perl.pluginspath"),
+        addRenderer(new XWikiJSPRenderer());
+        addRenderer(new XWikiVelocityRenderer());
+        addRenderer(new XWikiPluginRenderer());
+        if (xwiki.Param("xwiki.perl.active", "1").equals("1")) {
+            boolean hasPerl = true;
+            String pluginspath = xwiki.ParamAsRealPathVerified("xwiki.perl.pluginspath");
+            if (pluginspath!=null) {
+
+                String classespath = xwiki.ParamAsRealPathVerified("xwiki.perl.classespath");
+                if (classespath==null)
+                    classespath = "../classes";
+
+                addRenderer(new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
+                        pluginspath, classespath,
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0));
-      }
-      renderers.add(new XWikiWikiBaseRenderer());
+            }
+        }
+        renderers.add(new XWikiWikiBaseRenderer());
     }
 
     public void addRenderer(XWikiRenderer renderer) {
-     renderers.add(renderer);
+        renderers.add(renderer);
     }
 
     public XWikiRenderer getRenderer(String name) {
-      for (int i=0;i<renderers.size();i++) {
-        XWikiRenderer renderer = (XWikiRenderer) renderers.elementAt(i);
-        if (renderer.getClass().getName().equals(name))
-            return renderer;
-      }
-      return null;
+        for (int i=0;i<renderers.size();i++) {
+            XWikiRenderer renderer = (XWikiRenderer) renderers.elementAt(i);
+            if (renderer.getClass().getName().equals(name))
+                return renderer;
+        }
+        return null;
     }
 
     public String renderDocument(XWikiDocInterface doc, XWikiContext context) {
-     String content = doc.getContent();
-     for (int i=0;i<renderers.size();i++)
-          content = ((XWikiRenderer)renderers.elementAt(i)).render(content, doc, context);
-     return content;
+        String content = doc.getContent();
+        for (int i=0;i<renderers.size();i++)
+            content = ((XWikiRenderer)renderers.elementAt(i)).render(content, doc, context);
+        return content;
     }
 }

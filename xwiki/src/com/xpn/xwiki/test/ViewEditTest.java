@@ -85,12 +85,14 @@ public class ViewEditTest extends ServletTestCase {
         doc1.setAuthor("VictorHugo");
         doc1.setParent("Main.WebHome");
 
-        if (bobject!=null)
-            doc1.setxWikiObject(bobject);
-        if (bclass!=null)
-            doc1.setxWikiClass(bclass);
         if (bobjects!=null)
             doc1.setxWikiObjects(bobjects);
+
+        if (bobject!=null)
+            doc1.setObject(doc1.getFullName(), 0, bobject);
+
+        if (bclass!=null)
+            doc1.setxWikiClass(bclass);
 
         hibstore.saveXWikiDoc(doc1);
     }

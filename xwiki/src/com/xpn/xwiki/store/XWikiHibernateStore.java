@@ -142,17 +142,12 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
             // TODO: handle the case when we delete a class or an object from a document
             BaseClass bclass = doc.getxWikiClass();
-            BaseObject bobject = doc.getxWikiObject();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
                 if (bclass.getFields().size()>0)
                  saveXWikiClass(bclass, false);
             }
-            if (bobject!=null) {
-                bobject.setName(doc.getFullName());
-                bobject.setxWikiClass(bclass);
-                saveXWikiObject(bobject, false);
-            }
+
             Iterator it = doc.getxWikiObjects().values().iterator();
             while (it.hasNext()) {
                 Vector objects = (Vector) it.next();
@@ -189,19 +184,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
-                BaseClass bclass = new BaseClass();
-                bclass.setName(doc.getFullName());
-                loadXWikiClass(bclass, false);
-                doc.setxWikiClass(bclass);
-                BaseObject bobject = new BaseObject();
-                bobject.setName(doc.getFullName());
-                bobject.setxWikiClass(bclass);
-                loadXWikiObject(bobject, false);
-                doc.setxWikiObject(bobject);
+            BaseClass bclass = new BaseClass();
+            bclass.setName(doc.getFullName());
+            loadXWikiClass(bclass, false);
+            doc.setxWikiClass(bclass);
 
             // Find the list of classes for which we have an object
-//            Query query = getSession().createQuery("select bobject.name, bobject.className from BaseObject as bobject where bobject.name = :name order by bobject.number");
-            Query query = getSession().createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name");
+            Query query = getSession().createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name order by bobject.number");
             query.setText("name", doc.getFullName());
             Iterator it = query.list().iterator();
             Map bclasses = new HashMap();
@@ -210,7 +199,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 String name = (String)result[0];
                 String classname = (String)result[1];
                 Integer nb = (Integer)result[2];
-                if ((!classname.equals(""))&&(!name.equals(classname))) {
+                if (!classname.equals("")) {
                     BaseClass objclass;
                     objclass = (BaseClass) bclasses.get(classname);
                     if (objclass==null) {

@@ -87,14 +87,11 @@ public interface XWikiDocInterface {
 
     public BaseClass getxWikiClass();
     public void setxWikiClass(BaseClass xWikiClass);
-    public BaseObject getxWikiObject();
-    public void setxWikiObject(BaseObject xWikiObject);
     public Map getxWikiObjects();
     public void setxWikiObjects(Map xWikiObject);
+    public BaseObject getxWikiObject();
     public void createNewObject(String classname, XWikiContext context) throws XWikiException;
-
     public void mergexWikiClass(XWikiDocInterface templatedoc);
-    public void mergexWikiObject(XWikiDocInterface templatedoc);
     public void mergexWikiObjects(XWikiDocInterface templatedoc);
 
     public boolean isFromCache() ;

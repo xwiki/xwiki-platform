@@ -67,7 +67,6 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     // Meta Data
     private BaseClass xWikiClass;
-    private BaseObject xWikiObject;
     private Map xWikiObjects = new HashMap();
 
     // Caching
@@ -378,23 +377,16 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.xWikiClass = xWikiClass;
     }
 
-    public BaseObject getxWikiObject() {
-        if (xWikiObject==null) {
-            xWikiObject = new BaseObject();
-        }
-        return xWikiObject;
-    }
-
-    public void setxWikiObject(BaseObject xWikiObject) {
-        this.xWikiObject = xWikiObject;
-    }
-
     public Map getxWikiObjects() {
         return xWikiObjects;
     }
 
     public void setxWikiObjects(Map xWikiObjects) {
         this.xWikiObjects = xWikiObjects;
+    }
+
+    public BaseObject getxWikiObject() {
+        return getObject(getFullName(),0);
     }
 
     public void createNewObject(String classname, XWikiContext context) throws XWikiException {
@@ -475,18 +467,6 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 setxWikiClass((BaseClass)tbclass.clone());
             } else {
                 getxWikiClass().merge((BaseClass)tbclass.clone());
-            }
-        }
-    }
-
-    public void mergexWikiObject(XWikiDocInterface templatedoc) {
-        BaseObject bobject = getxWikiObject();
-        BaseObject tbobject = templatedoc.getxWikiObject();
-        if (tbobject!=null) {
-            if (bobject==null) {
-                setxWikiObject((BaseObject)tbobject.clone());
-            } else {
-                getxWikiObject().merge((BaseObject)tbobject.clone());
             }
         }
     }
@@ -581,10 +561,6 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         String parent = eform.getParent();
         if (parent!=null)
             setParent(parent);
-        BaseClass bclass = getxWikiClass();
-        if (bclass!=null)
-            setxWikiObject((BaseObject)bclass.fromMap(eform.getObject("object_")));
-
         readFromTemplate(eform, context);
 
         Iterator itobj = getxWikiObjects().keySet().iterator();

@@ -266,7 +266,7 @@
         <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar.gz" />
         <delete file="${src.tarfile}" />
 
-        <tar compression="gzip" tarfile="${bin.tarfile}">
+        <tar compression="gzip" tarfile="${src.tarfile}">
             <tarfileset dir="CVS" prefix="CVS" />
             <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
             <tarfileset dir="${lib.dir}" prefix="lib" />

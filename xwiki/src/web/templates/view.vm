@@ -19,7 +19,7 @@ $message
 </div>
 #end
 <div id="content">
-$doc.getRenderedContent($context)
+$cdoc.getRenderedContent($context)
 </div>
 <div id="nav_footer">
 <div id="actions">

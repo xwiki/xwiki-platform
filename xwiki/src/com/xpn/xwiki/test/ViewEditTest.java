@@ -69,7 +69,11 @@ public class ViewEditTest extends ServletTestCase {
 
 
     private void setUrl(WebRequest webRequest, String action, String docname) {
-        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, "");
+        setUrl(webRequest, action, docname, "");
+    }
+
+    private void setUrl(WebRequest webRequest, String action, String docname, String query) {
+        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, query);
     }
 
 
@@ -173,6 +177,35 @@ public class ViewEditTest extends ServletTestCase {
             throw e.getRootCause();
         }
     }
+
+    public void beginViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "ViewRevOkTest");
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "ViewRevOkTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2);
+        doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
+        hibstore.saveXWikiDoc(doc2);
+        setUrl(webRequest, "view", "ViewRevOkTest", "rev=1.1");
+    }
+
+    public void endViewRevOk(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+    }
+
+    public void testViewRevOk() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+    }
+
 
     public void testSave() throws IOException, Throwable {
         try {

@@ -101,13 +101,18 @@ public class ViewEditAction extends XWikiAction
         context.setServlet(servlet);
         context.setRequest(request);
         context.setResponse(response);
+        context.setAction(this);
 
         XWiki xwiki = getXWiki(context, test);
         XWikiDocInterface doc;
         doc = xwiki.getDocumentFromPath(request.getPathInfo());
         context.put("doc", doc);
-        context.setAction(this);
+
+        // Objects available in Wiki Templates
+        // Document used in the template (always the latest version)
         session.setAttribute("doc", doc);
+        // Document used for the content (old version in case of revisions)
+        session.setAttribute("cdoc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);
 
@@ -121,6 +126,8 @@ public class ViewEditAction extends XWikiAction
             if (rev!=null) {
                 // Let's get the revision
                 doc = xwiki.getDocument(doc, rev);
+                context.put("doc", doc);
+                session.setAttribute("cdoc", doc);
             }
             // forward to view template
             return (mapping.findForward("view"));

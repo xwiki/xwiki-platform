@@ -6,24 +6,24 @@
 <a href="$viewurl?rev=$rev">$rev</a><span> | </span>
 #end
 #end
-<div id="nav_header">
-<div id="actions">
+<div id="xwikinav_header">
+<div class="xwikiactions">
 <a href="$editurl">$msg.get("edit")</a><span> | </span>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
 <a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
 #versions()
 </div>
-<div id="webmenu">
+<div id="xwikiwebmenu">
 $!xwiki.getWebPreference("menu", $context)
 </div>
 </div>
 #if($message)
-<div id="message">
+<div id="xwikimessage">
 $message
 </div>
 #end
-<div id="content">
+<div id="xwikicontent">
 #if ($request.getParameter("raw").equals("1"))
 <pre>
 $cdoc.getEscapedContent($context)
@@ -32,8 +32,8 @@ $cdoc.getEscapedContent($context)
 $cdoc.getRenderedContent($context)
 #end
 </div>
-<div id="nav_footer">
-<div id="actions">
+<div id="xwikinav_footer">
+<div class="xwikiactions">
 <a href="$editurl">$msg.get("edit")</a>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>

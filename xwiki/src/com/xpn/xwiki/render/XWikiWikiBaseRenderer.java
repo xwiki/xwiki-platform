@@ -55,11 +55,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
     public static void makeHeading(StringBuffer stringBuffer, String level, String text,  Util util) {
 
         String anchor = makeAnchor(text, util);
-        stringBuffer.append("<a name=\"");
-        stringBuffer.append(anchor);
-        stringBuffer.append("\" /><h");
+        stringBuffer.append("<h");
         stringBuffer.append(level);
-        stringBuffer.append(">");
+        stringBuffer.append(" id=\"");
+        stringBuffer.append(anchor);
+        stringBuffer.append("\" >");
         stringBuffer.append(text);
         stringBuffer.append("</h");
         stringBuffer.append(level);

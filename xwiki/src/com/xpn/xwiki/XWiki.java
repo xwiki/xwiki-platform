@@ -45,8 +45,8 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
 import org.apache.ecs.Filter;
+import org.apache.ecs.xhtml.textarea;
 import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.html.TextArea;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -326,7 +326,7 @@ public class XWiki implements XWikiNotificationInterface {
         filter.removeAttribute("'");
         String scontent = filter.process(content);
 
-        TextArea textarea = new TextArea();
+        textarea textarea = new textarea();
         textarea.setFilter(filter);
         textarea.setRows(20);
         textarea.setCols(80);

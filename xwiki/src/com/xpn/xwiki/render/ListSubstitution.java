@@ -113,7 +113,7 @@ public class ListSubstitution  extends WikiSubstitution {
 
     public String handleList(String line) {
        Util util = getUtil();
-       line = util.substitute("s/^\\s*$/<p> /o", line);
+       line = util.substitute("s/^\\s*$/<p \\/> /o", line);
        if (util.matched())
            finished = true;
        if (util.match("m/^(\\S+?)/", line))

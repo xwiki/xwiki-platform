@@ -24,18 +24,14 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.html.Input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.apache.ecs.xhtml.input;
 
 import java.util.Iterator;
 import java.util.List;
@@ -89,7 +85,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-       Input input = new Input();
+       input input = new input();
        PropertyInterface prop = (PropertyInterface) object.safeget(name);
        if (prop!=null) input.setValue(prop.toFormString());
 
@@ -99,7 +95,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Input input = new Input();
+        input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) input.setValue(prop.toFormString());
 
@@ -113,7 +109,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Input input = new Input();
+        input input = new input();
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) input.setValue(prop.toFormString());

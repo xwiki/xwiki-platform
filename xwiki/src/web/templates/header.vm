@@ -1,11 +1,11 @@
-<div id="banner">
-<div id="logo">
+<div id="xwikibanner">
+<div id="xwikilogo">
     <a href="../../view/Main/WebHome">
-      <img src="../../../skins/$skin/logo.gif">
+      <img src="../../../skins/$skin/logo.gif" alt="XPertNet" />
     </a>
   </div>
 
-<div id="title">
+<div id="xwikititle">
 #if ($doc.parent.length() > 0)
 <h1>$parent &gt; $!title</h1>
 #else
@@ -14,11 +14,11 @@
    <h2>$!subtitle</h2>
 </div>
 
-<div id="menus">
+<div id="xwikilinks">
   <div id="xwikimenu">
     $!xwiki.getXWikiPreference("menu", $context)
   </div>
-  <div id="version">
+  <div id="xwikiversion">
     <a href="../../view/Main/WebHome">XWiki Version $xwiki.version</a>
   </div>
 </div>

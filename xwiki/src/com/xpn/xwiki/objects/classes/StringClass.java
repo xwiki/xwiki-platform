@@ -23,13 +23,11 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.html.Input;
+import org.apache.ecs.xhtml.input;
 
 public class StringClass extends PropertyClass {
 
@@ -63,7 +61,7 @@ public class StringClass extends PropertyClass {
 
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Input input = new Input();
+        input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) input.setValue(prop.toFormString());
 

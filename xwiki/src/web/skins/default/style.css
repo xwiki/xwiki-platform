@@ -3,7 +3,7 @@
     right: 0px;
 }
 
-#banner, #header, #footer {
+#xwikibanner, #xwikiheader, #xwikifooter {
     position: relative;
     display: block;
     float: left;
@@ -12,7 +12,7 @@
     margin: 0px;
 }
 
-#nav_header, #nav_footer {
+#xwikinav_header, #xwikinav_footer {
     position: relative;
     display: block;
     float: left;
@@ -30,7 +30,7 @@
     font-size: 10pt;
 }
 
-#logo {
+#xwikilogo {
     position: relative;
     float: left;
     clear: left;
@@ -39,13 +39,13 @@
     background-image:url(horizontal.gif);
 }
 
-#logo img {
+#xwikilogo img {
     text-decoration: none;
     border: none;
 }
 
 
-#title {
+#xwikititle {
     position: relative;
     display: block;
     float: left;
@@ -55,25 +55,25 @@
     padding: 0px;
 }
 
-#title h1, #title h2, #title h3 {
+#xwikititle h1, #xwikititle h2, #xwikititle h3 {
     font-family: verdana;
 }
 
-#title h1 {
+#xwikititle h1 {
     margin: 5px;
     margin-left: 20px;
     padding: 0px;
     font-size:10pt;
 }
 
-#title h2 {
+#xwikititle h2 {
     top: 5px;
     margin: 5px;
     padding: 5px;
     font-size:8pt;
 }
 
-#title h3 {
+#xwikititle h3 {
     font-family: verdana;
     margin: 0px;
     padding: 0px;
@@ -82,7 +82,7 @@
     font-size:8pt;
 }
 
-#version {
+#xwikiversion {
     right: 0px;
     top: 5px;
     text-align: right;
@@ -97,7 +97,7 @@
     padding: 0px;
 }
 
-#version a, #xwikimenu a {
+#xwikiversion a, #xwikimenu a {
    color:#336699;
    text-decoration:none;
    font-family: verdana;
@@ -106,15 +106,15 @@
    margin: 0px;
 }
 
-#menus {
+#xwikilinks {
     float: right;
-    top: 0px:
+    top: 0px;
     right: 15px;
     margin: 0px;
     padding: 0px;
 }
 
-#actions {
+.xwikiactions {
     top: 0px;
     margin: 0px;
     padding: 0px;
@@ -122,7 +122,7 @@
     left: 0px;
 }
 
-#webmenu {
+#xwikiwebmenu {
     position: absolute;
     right: 0px;
     top: 0px;
@@ -131,7 +131,7 @@
     height: 1.4em;
 }
 
-#actions a, #webmenu a {
+.xwikiactions a, #xwikiwebmenu a {
     display: block;
     float: left;
     list-style-type: none;
@@ -149,11 +149,11 @@
     text-align: center;
 }
     
-#actions span, #webmenu span {
+.xwikiactions span, #xwikiwebmenu span {
     display: none;
 }
 
-#actions .inputfield {
+.xwikiactions .inputfield {
    position: relative;
    top: 0.1em;
    display: block;
@@ -163,7 +163,7 @@
    background-color: transparent;
 }
 
-#actions .inputbutton {
+.xwikiactions .inputbutton {
    position: relative;
    top: 0.1em;
    display: block;
@@ -173,7 +173,7 @@
    background-color: transparent;
 }
 
-#actions .inputfield input {
+.xwikiactions .inputfield input {
     position: relative;
     top: 0.1em;
     padding: 0em;
@@ -182,7 +182,7 @@
     font-size: 8pt;
 }
 
-#actions .inputbutton input {
+.xwikiactions .inputbutton input {
     position: relative;
     top: -0.1em;
     padding: 0em;
@@ -192,7 +192,7 @@
 }
 
 
-#content {
+#xwikicontent {
     position: relative;
     display: block;
     float: left;
@@ -203,7 +203,7 @@
 }
 
 
-#nav, #nav_header, #nav_footer {
+#xwikinav, #xwikinav_header, #xwikinav_footer {
     display: block;
     float: left;
     clear: both;

@@ -25,10 +25,10 @@ package com.xpn.xwiki.objects.classes;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.XWikiContext;
-import org.apache.ecs.html.Select;
-import org.apache.ecs.html.Option;
-import org.apache.ecs.html.Input;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.select;
+import org.apache.ecs.xhtml.option;
 import org.dom4j.Element;
 
 import java.util.*;
@@ -154,7 +154,7 @@ public abstract class ListClass extends PropertyClass {
 
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Input input = new Input();
+        input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) input.setValue(prop.toFormString());
 
@@ -176,7 +176,7 @@ public abstract class ListClass extends PropertyClass {
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         if (getDisplayType()=="input") {
-            Input input = new Input();
+            input input = new input();
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop!=null) input.setValue(prop.toFormString());
             input.setType("text");
@@ -184,7 +184,7 @@ public abstract class ListClass extends PropertyClass {
             input.setName(prefix + name);
             buffer.append(input.toString());
         } else {
-            Select select = new Select(prefix + name, 1);
+            select select = new select(prefix + name, 1);
             select.setMultiple(isMultiSelect());
             select.setSize(getSize());
 
@@ -204,7 +204,7 @@ public abstract class ListClass extends PropertyClass {
             // Add options from Set
             for (Iterator it=list.iterator();it.hasNext();) {
                 String value = it.next().toString();
-                Option option = new Option(value, value, value);
+                option option = new option(value, value);
                 if (selectlist.contains(value))
                     option.setSelected(true);
                 select.addElement(option);

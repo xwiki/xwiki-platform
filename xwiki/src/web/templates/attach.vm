@@ -6,8 +6,8 @@
 <a href="$viewurl?rev=$rev">$rev</a><span> | </span>
 #end
 #end
-<div id="nav_header">
-<div id="actions">
+<div id="xwikinav_header">
+<div class="xwikiactions">
 <a href="$editurl">$msg.get("edit")</a><span> | </span>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
@@ -15,11 +15,11 @@
 </div>
 </div>
 #if($message)
-<div id="message">
+<div id="xwikimessage">
 $message
 </div>
 #end
-<div id="content">
+<div id="xwikicontent">
 #set( $counter = 0)
 <table border="1">
 <tr><td>File</td><td>Version</td><td>Author</td><td>Size</td></tr>
@@ -29,15 +29,17 @@ $message
 #set( $counter = $counter + 1)
 #end
 </table>
-<hr>
+<hr />
 <form action="$uploadurl" enctype="multipart/form-data" method="post">
+<p>
 Choose a file to upload:
-<input type="file" name="filepath" value="" size="40">
-<input type="submit" value="Attach this file">
+<input type="file" name="filepath" value="" size="40" />
+<input type="submit" value="Attach this file" />
+</p>
 </form>
 </div>
-<div id="nav_footer">
-<div id="actions">
+<div id="xwikinav_footer">
+<div class="xwikiactions">
 <a href="$editurl">$msg.get("edit")</a>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>

@@ -25,10 +25,8 @@ package com.xpn.xwiki.objects.classes;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.XWikiContext;
-import org.apache.ecs.html.Input;
-import org.apache.ecs.html.Select;
-import org.apache.ecs.html.Option;
-import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.select;
+import org.apache.ecs.xhtml.option;
 
 public class BooleanClass extends PropertyClass {
 
@@ -72,16 +70,18 @@ public class BooleanClass extends PropertyClass {
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Select select = new Select(prefix + name, 1);
-        select.appendOption("1" , "1", "True" );
-        select.appendOption("0" , "0", "False");
+        select select = new select(prefix + name, 1);
+        option[] options = { new option("1" , "True" ), new option("0" , "False")};
 
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
         if (prop!=null) {
             int value = ((Integer)prop.getValue()).intValue();
-            select.selectOption(1-value);
+            if (value==1)
+                options[0].setSelected(true);
+            else
+                options[1].setSelected(true);
         }
-
+        select.addElement(options);
         buffer.append(select.toString());
     }
 

@@ -1,34 +1,36 @@
 #template("xwiki.vm")
 #template("httpheader.vm")
 #template("header.vm")
-<div id="nav_header">
-<div id="actions">
-<a href="$doc.getPreviewUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<div id="xwikinav_header">
+<div class="xwikiactions">
+<a href="$doc.getPreviewUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
 <span> | </span>
-<a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+<a href="$doc.getSaveUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
-<div id="content">
-<form name="edit" method="post" action="$doc.getPreviewUrl($context)">
-<input type="hidden" name="template" value="$!doc.getTemplate()">
-<div id="text">
+<div id="xwikicontent">
+<form id="edit" method="post" action="$doc.getPreviewUrl($context)">
+<p>
+<input type="hidden" name="template" value="$!doc.getTemplate()" />
+</p>
+<div id="xwikitext">
 $xwiki.getTextArea($doc.content)
-<br/><br />
-Parent:&nbsp;<input type="text" name="parent" value="$doc.getParent()" size="40">
+<br/><br/>
+Parent:&nbsp;<input type="text" name="parent" value="$doc.getParent()" size="40" />
 </div>
-<div id="object">
+<div id="xwikiobject">
 #template("editobject.vm")
 </div>
 </form>
-<div id="class">
+<div id="xwikiclass">
 #template("editclass.vm")
 </div>
 </div>
-<div id="nav_footer">
-<div id="actions">
-<a href="$doc.getPreviewUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<div id="xwikinav_footer">
+<div class="xwikiactions">
+<a href="$doc.getPreviewUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
 <span> | </span>
-<a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+<a href="$doc.getSaveUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 #template("footer.vm")

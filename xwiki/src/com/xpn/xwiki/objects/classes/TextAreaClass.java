@@ -23,10 +23,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.html.TextArea;
+import org.apache.ecs.xhtml.textarea;
 
 public class TextAreaClass extends StringClass {
 
@@ -55,7 +54,7 @@ public class TextAreaClass extends StringClass {
         return property;
     }
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        TextArea textarea = new TextArea();
+        textarea textarea = new textarea();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) textarea.addElement(prop.toFormString());
 

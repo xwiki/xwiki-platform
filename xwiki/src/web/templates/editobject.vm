@@ -1,10 +1,12 @@
 #foreach($objlist in $doc.xWikiObjects)
 #set( $class = $objlist.elementAt(0).xWikiClass)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
-<input type="hidden" name="${class.name}_nb" value="$nb">
-<br>
+<p>
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+</p>
+<br />
 <b>$class.name</b>
-<br>
+<br />
  <table>
  <tr>
   #foreach($prop in $class.properties)

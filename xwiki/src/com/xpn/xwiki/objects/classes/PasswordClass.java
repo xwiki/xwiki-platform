@@ -27,7 +27,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.html.Input;
+import org.apache.ecs.xhtml.input;
 
 public class PasswordClass extends StringClass {
     public PasswordClass(PropertyMetaClass wclass) {
@@ -61,7 +61,7 @@ public class PasswordClass extends StringClass {
     }
 
    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        Input input = new Input();
+        input input = new input();
         ElementInterface prop = object.safeget(name);
         if (prop!=null) input.setValue("********");
 

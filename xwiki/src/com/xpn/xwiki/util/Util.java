@@ -183,7 +183,7 @@ public class Util {
  }
 
     public static boolean isAlphaNumeric(String text) {
-        return StringUtils.isAlphanumeric(text);
+        return StringUtils.isAlphanumeric(text.replace('-','a'));
     }
 
 }

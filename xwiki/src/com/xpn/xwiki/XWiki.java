@@ -1023,7 +1023,7 @@ public class XWiki implements XWikiNotificationInterface {
             bclass.put("default_language", deflang_class);
         }
 
-        if (bclass.get("active")==null) {
+        if (bclass.get("yoca")==null) {
             needsUpdate = true;
             BooleanClass active_class = new BooleanClass();
             active_class.setName("active");
@@ -2006,7 +2006,9 @@ public class XWiki implements XWikiNotificationInterface {
             // Modify rights in user wiki
             context.setDatabase(wikiName);
             XWikiDocInterface wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
-            wikiprefdoc.setStringValue("XWiki.XWikiPreferences", "users", getDatabase() + ":" + wikiAdmin);
+            wikiprefdoc.setStringValue("XWiki.XWikiRights", "users", getDatabase() + ":" + wikiAdmin);
+            wikiprefdoc.setStringValue("XWiki.XWikiRights", "levels", "admin, edit");
+            wikiprefdoc.setIntValue("XWiki.XWikiRights", "allow", 1);
             saveDocument(wikiprefdoc, context);
             return 1;
         } catch (Exception e) {

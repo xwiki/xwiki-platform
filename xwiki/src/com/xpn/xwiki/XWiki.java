@@ -1288,8 +1288,18 @@ public class XWiki implements XWikiNotificationInterface {
         boolean needsAuth = false;
         String right = "edit";
 
-        if ((action.equals("logout"))||(action.equals("login"))||(action.equals("loginerror")))
+        if ((action.equals("logout"))||(action.equals("login"))||(action.equals("loginerror"))) {
+            user = checkAuth(context);
+            String username;
+            if (user==null)
+                username = "XWiki.XWikiGuest";
+            else
+                username = user.getName();
+
+            // Save the user
+            context.setUser(username);
             return true;
+        }
 
         if (action.equals("view")||(action.equals("plain")||(action.equals("raw"))))
             right = "view";

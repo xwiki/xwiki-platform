@@ -301,13 +301,9 @@ public class ViewEditAction extends XWikiAction
     }
 
     private ActionForward executeLogin(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
-        if (doc.isNew()) {
-            String page = getPage(request, "login");
-            parseTemplate(page, context);
-            return null;
-        } else {
-            return executeView(xwiki, doc, request, context, (VelocityContext) context.get("vcontext"));
-        }
+        String page = getPage(request, "login");
+        parseTemplate(page, context);
+        return null;
     }
 
 

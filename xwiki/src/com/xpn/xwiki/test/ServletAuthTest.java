@@ -30,9 +30,14 @@ import com.xpn.xwiki.test.smtp.SmtpMessage;
 import net.sf.hibernate.HibernateException;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
+import org.apache.cactus.client.authentication.Authentication;
+import org.apache.cactus.client.authentication.BasicAuthentication;
+import org.apache.cactus.client.authentication.FormAuthentication;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 
 public class ServletAuthTest extends ServletTest {
@@ -92,7 +97,77 @@ public class ServletAuthTest extends ServletTest {
         launchTest();
     }
 
-    public void beginAuth(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginAuthPage(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        context.setDatabase("xwikitest");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
+    }
+
+    public void endAuthPage(WebResponse webResponse) throws HibernateException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
+        } finally {
+            clientTearDown();
+        }
+
+    }
+
+    public void testAuthPage() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginAuthPage2(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        context.setDatabase("xwikitest");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","edit", true, true);
+        setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
+    }
+
+    public void endAuthPage2(WebResponse webResponse) throws HibernateException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
+        } finally {
+            clientTearDown();
+        }
+
+    }
+
+    public void testAuthPage2() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginAuthPage3(WebRequest webRequest) throws HibernateException, XWikiException {
+          XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+          context.setDatabase("xwikitest");
+          StoreHibernateTest.cleanUp(hibstore, context);
+          clientSetUp(hibstore);
+          updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","edit, view", true, true);
+          setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
+      }
+
+      public void endAuthPage3(WebResponse webResponse) throws HibernateException {
+          try {
+              assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+              assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
+          } finally {
+              clientTearDown();
+          }
+
+      }
+
+      public void testAuthPage3() throws Throwable {
+          launchTest();
+      }
+
+    public void beginBasicAuth(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
@@ -102,14 +177,45 @@ public class ServletAuthTest extends ServletTest {
         xwiki.createUser("LudovicDubost", map, "", "", context);
         updateRight("Main.WebHome", "XWiki.LudovicDubost", "", "view", true, false);
         setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
-        webRequest.addParameter("j_username", "LudovicDubost");
-        webRequest.addParameter("j_password", "toto");
-        webRequest.addParameter("j_rememberme", "true");
-        // Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
-        // webRequest.setAuthentication(auth);
+        Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
+        webRequest.setAuthentication(auth);
     }
 
-    public void endAuth(WebResponse webResponse) throws HibernateException {
+    public void endBasicAuth(WebResponse webResponse) throws HibernateException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            String result = webResponse.getText();
+            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        } finally {
+            clientTearDown();
+        }
+
+    }
+
+
+    // Deactivate the test until I know how to pass the parameters
+    /*public void testBasicAuth() throws Throwable {
+    launchTest();
+    }*/
+
+
+    public void beginFormAuth(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "WebHome", context);
+        HashMap map = new HashMap();
+        map.put("password", "toto");
+        xwiki.createUser("LudovicDubost", map, "", "", context);
+        updateRight("Main.WebHome", "XWiki.LudovicDubost", "", "view", true, false);
+        setUrl(webRequest, "view", "WebHome");
+
+        FormAuthentication auth = new FormAuthentication("LudovicDubost", "toto");
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        webRequest.setAuthentication(auth);
+    }
+
+    public void endFormAuth(WebResponse webResponse) throws HibernateException {
         try {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             String result = webResponse.getText();
@@ -121,12 +227,11 @@ public class ServletAuthTest extends ServletTest {
     }
 
     /*
-    // Deactivate the test until I know how to pass the parameters
-    public void testAuth() throws Throwable {
-    launchTest();
+    // I can't make FormAuthentication to work..
+    public void testFormAuth() throws Throwable {
+        launchTest();
     }
     */
-
 
     public void beginCreateUser(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());

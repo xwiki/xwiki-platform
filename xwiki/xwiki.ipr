@@ -133,8 +133,8 @@
         <root url="jar://$PROJECT_DIR$/lib/nekohtml-0.7.4.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/httpunit-1.5.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/junit.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cactus-1.5.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cactus-ant-1.5.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev20040402.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-ant-1.6dev20040402.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

@@ -75,6 +75,10 @@ public class UserTest extends TestCase {
 
     public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
+        xwiki = null;
+        context = null;
+        um = null;
+        am = null;
         System.gc();
     }
 

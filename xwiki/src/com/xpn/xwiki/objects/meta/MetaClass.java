@@ -43,6 +43,8 @@ public class MetaClass extends BaseClass {
         safeput(passwdclass.getName(), passwdclass);
         BooleanMetaClass booleanclass = new BooleanMetaClass();
         safeput(booleanclass.getName(), booleanclass);
+        StaticListMetaClass listclass = new StaticListMetaClass();
+        safeput(listclass.getName(), listclass);
 
     }
 

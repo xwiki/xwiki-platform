@@ -117,7 +117,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         try {
             name = getName(name);
             XWikiDocInterface doc = getDocument(name);
-            String passwd = doc.getObject("XWiki.XWikiUsers", 0).get("password").toString();
+            String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
             return (password.equals(passwd));
         } catch (Exception e) {
             e.printStackTrace();

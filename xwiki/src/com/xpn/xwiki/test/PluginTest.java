@@ -38,21 +38,9 @@ import net.sf.hibernate.HibernateException;
 
 public class PluginTest extends TestCase {
 
-    private static XWiki xwiki;
-    private static XWikiContext context;
-
-    public PluginTest() throws XWikiException {
-        context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-        xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin, com.xpn.xwiki.plugin.TablePlugin", context));
-        PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
-        pplugin.addPattern(":)","smile","no desc");
-        pplugin.addPattern(":-)","smile","no desc");
-        pplugin.addPattern("8-)","cool","no desc");
-        pplugin.addPattern("s/[bB]ug\\s+([0-9]+?)/http:\\/\\/bugzilla.xpertnet.biz\\/show_bug.cgi?id=$1/go","bugzilla link","no desc");
-    }
-
+    private XWiki xwiki;
+    private XWikiContext context;
+        
     public XWikiHibernateStore getHibStore() {
         XWikiStoreInterface store = xwiki.getStore();
         if (store instanceof XWikiCacheInterface)
@@ -63,7 +51,21 @@ public class PluginTest extends TestCase {
 
     public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
+        xwiki = null;
+        context = null;
         System.gc();
+    }
+
+    public void setUp() throws XWikiException {
+        context = new XWikiContext();
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
+        xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin, com.xpn.xwiki.plugin.TablePlugin", context));
+        PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
+        pplugin.addPattern(":)","smile","no desc");
+        pplugin.addPattern(":-)","smile","no desc");
+        pplugin.addPattern("8-)","cool","no desc");
+        pplugin.addPattern("s/[bB]ug\\s+([0-9]+?)/http:\\/\\/bugzilla.xpertnet.biz\\/show_bug.cgi?id=$1/go","bugzilla link","no desc");
     }
 
     public void testSmilies() throws XWikiException {

@@ -53,4 +53,6 @@ public interface XWikiStoreInterface {
     void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
     void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
     void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
+
+    void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
 }

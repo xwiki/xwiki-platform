@@ -5,10 +5,7 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.NumberProperty;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import junit.framework.TestCase;
 
@@ -41,19 +38,19 @@ public class ClassesTest extends TestCase {
         NumberClass pclass = new NumberClass();
         NumberProperty property;
         property = (NumberProperty)pclass.fromString("10");
-        assertEquals("Default type long not supported", property.getValue(), new Long("10"));
+        assertEquals("Default type long not supported", new Long("10"), property.getValue());
         pclass.setNumberType("integer");
         property = (NumberProperty)pclass.fromString("10");
-        assertEquals("Integer number not supported", property.getValue(), new Integer("10"));
+        assertEquals("Integer number not supported", new Integer("10"), property.getValue());
         pclass.setNumberType("long");
         property = (NumberProperty)pclass.fromString("10");
-        assertEquals("Long number not supported", property.getValue(), new Long("10"));
+        assertEquals("Long number not supported", new Long("10"), property.getValue());
         pclass.setNumberType("double");
         property = (NumberProperty)pclass.fromString("10.01");
-        assertEquals("Double number not supported", property.getValue(), new Double("10.01"));
+        assertEquals("Double number not supported", new Double("10.01"), property.getValue());
         pclass.setNumberType("float");
         property = (NumberProperty)pclass.fromString("10.01");
-        assertEquals("Float number not supported", property.getValue(), new Float("10.01"));
+        assertEquals("Float number not supported", new Float("10.01"), property.getValue());
     }
 
 
@@ -61,29 +58,68 @@ public class ClassesTest extends TestCase {
         StringClass pclass = new StringClass();
         StringProperty property;
         property = (StringProperty)pclass.fromString("Hello");
-        assertEquals("String not supported", property.getValue(), new String("Hello"));
+        assertEquals("String not supported", new String("Hello"), property.getValue());
     }
 
     public void testPassword() {
         PasswordClass pclass = new PasswordClass();
         StringProperty property;
         property = (StringProperty)pclass.fromString("Hello");
-        assertEquals("Password not supported", property.getValue(), new String("Hello"));
+        assertEquals("Password not supported",  new String("Hello"), property.getValue());
     }
 
     public void testTextArea() {
         TextAreaClass pclass = new TextAreaClass();
         StringProperty property;
         property = (StringProperty)pclass.fromString("Hello1\nHello2\nHello3\n");
-        assertEquals("TextArea not supported", property.getValue(), new String("Hello1\nHello2\nHello3\n"));
+        assertEquals("TextArea not supported", new String("Hello1\nHello2\nHello3\n"), property.getValue());
     }
 
     public void testBoolean() {
         BooleanClass pclass = new BooleanClass();
         IntegerProperty property;
         property = (IntegerProperty)pclass.fromString("1");
-        assertEquals("Boolean not supported", property.getValue(), new Integer(1));
+        assertEquals("Boolean not supported", new Integer(1), property.getValue());
     }
+
+    public void testStaticList() {
+        StaticListClass pclass = new StaticListClass();
+        StringProperty property;
+        property = (StringProperty)pclass.fromString("1");
+        assertEquals("StaticList failed on single value", "1", property.toText());
+        assertEquals("StaticList failed on single value", "1", property.toFormString());
+
+        property = (StringProperty)pclass.fromString("1|2");
+        assertEquals("StaticList failed on multiple value", "1|2", property.toText());
+        assertEquals("StaticList failed on multiple value", "1|2", property.toFormString());
+    }
+
+    public void testStaticMultiList() {
+        StaticListClass pclass = new StaticListClass();
+        pclass.setMultiSelect(true);
+        ListProperty property;
+        property = (ListProperty)pclass.fromString("1");
+        assertEquals("StaticList failed on single value", "1", property.toText());
+        assertEquals("StaticList failed on single value", "1", property.toFormString());
+
+        property = (ListProperty)pclass.fromString("1|2");
+        assertEquals("StaticList failed on multiple value", "1 2", property.toText());
+        assertEquals("StaticList failed on multiple value", "1|2", property.toFormString());
+    }
+
+    public void testRelationalStaticList() {
+            StaticListClass pclass = new StaticListClass();
+            pclass.setRelationalStorage(true);
+            pclass.setMultiSelect(true);
+
+            ListProperty property;
+            property = (ListProperty)pclass.fromString("1");
+            assertEquals("StaticList failed on single value", property.toText(), "1");
+            assertEquals("StaticList failed on single value", property.toFormString(), "1");
+            property = (ListProperty)pclass.fromString("1|2");
+            assertEquals("StaticList failed on multiple value", property.toText(), "1 2");
+            assertEquals("StaticList failed on multiple value", property.toFormString(), "1|2");
+        }
 
 
     public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected) {
@@ -105,14 +141,25 @@ public class ClassesTest extends TestCase {
       pclass.displaySearch(result,cname, "", obj, context);
     }
 
-    public void testDisplayers() throws XWikiException {
+    public void testBasicDisplayers() throws XWikiException {
         BaseObject obj = Utils.prepareObject();
         testDisplayer("age", obj, "33", "value=\'33\'");
         testDisplayer("first_name", obj, "Ludovic", "value=\'Ludovic\'");
         testDisplayer("last_name", obj, "von Dubost", "value=\'von Dubost\'");
         testDisplayer("password", obj, "********", "value=\'********\'");
         testDisplayer("comment", obj, "Hello1\nHello2\nHello3\n", "textarea");
+    }
+
+    public void testBooleanDisplayers() throws XWikiException {
+        BaseObject obj = Utils.prepareAdvancedObject();
         testDisplayer("driver", obj, "true", "<select");
+    }
+
+    public void testListDisplayers() throws XWikiException {
+        BaseObject obj = Utils.prepareAdvancedObject();
+        testDisplayer("category", obj, "1", "<select");
+        testDisplayer("category2", obj, "1 2", "multiple");
+        testDisplayer("category3", obj, "1 2", "multiple");
     }
 
     public void testObject() throws XWikiException {

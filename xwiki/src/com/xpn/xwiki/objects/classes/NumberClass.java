@@ -24,6 +24,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.Input;
@@ -31,18 +32,13 @@ import org.apache.ecs.html.Input;
 public class NumberClass  extends PropertyClass {
 
     public NumberClass(PropertyMetaClass wclass) {
-        setxWikiClass(wclass);
-        setName("number");
-        setPrettyName("Number");
+        super("number", "Number", wclass);
         setSize(30);
         setNumberType("long");
     }
 
     public NumberClass() {
-        setName("number");
-        setPrettyName("Number");
-        setSize(30);
-        setNumberType("long");
+        this(null);
     }
 
     public int getSize() {
@@ -92,8 +88,8 @@ public class NumberClass  extends PropertyClass {
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
 
-        ElementInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(formEncode(prop.toString()));
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop!=null) input.setValue(prop.toFormString());
 
         input.setType("text");
         input.setName(prefix + name);

@@ -36,7 +36,9 @@ import java.util.List;
 public class SearchTest extends TestCase {
 
     public XWikiHibernateStore store;
-    public static String hibpath = "hibernate-test.cfg.xml";
+    public String hibpath = "hibernate-test.cfg.xml";
+
+
     public XWikiHibernateStore getHibStore() {
         return (XWikiHibernateStore) getStore();
     }
@@ -49,9 +51,6 @@ public class SearchTest extends TestCase {
        return store;
    }
 
-
-    public SearchTest() throws XWikiException {
-    }
 
     public void setUp() throws HibernateException {
         XWikiHibernateStore hibstore = getHibStore();

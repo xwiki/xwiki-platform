@@ -23,6 +23,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -32,17 +33,17 @@ import org.apache.ecs.html.Input;
 
 public class StringClass extends PropertyClass {
 
-    public StringClass(PropertyMetaClass wclass) {
-        setxWikiClass(wclass);
-        setName("string");
-        setPrettyName("String");
+    public StringClass(String name, String prettyname, PropertyMetaClass wclass) {
+        super(name, prettyname, wclass);
         setSize(30);
     }
 
+    public StringClass(PropertyMetaClass wclass) {
+        this("string", "String", wclass);
+    }
+
     public StringClass() {
-        setName("string");
-        setPrettyName("String");
-        setSize(30);
+        this(null);
     }
 
     public int getSize() {
@@ -63,8 +64,8 @@ public class StringClass extends PropertyClass {
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
-        ElementInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(formEncode(prop.toString()));
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop!=null) input.setValue(prop.toFormString());
 
         input.setType("text");
         input.setName(prefix + name);

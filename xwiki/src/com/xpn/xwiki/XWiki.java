@@ -41,10 +41,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiCache;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.user.XWikiGroupProvider;
-import com.xpn.xwiki.user.XWikiUserProvider;
-import com.xpn.xwiki.user.XWikiResourceProvider;
-import com.xpn.xwiki.user.XWikiRealmAdapter;
+import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -688,7 +685,7 @@ public class XWiki implements XWikiNotificationInterface {
             return authenticator;
 
         try {
-            authenticator = new BasicAuthenticator();
+            authenticator = new MyBasicAuthenticator();
             realm = new XWikiRealmAdapter(this);
             SecurityConfig sconfig = new SecurityConfig(false);
             sconfig.setRealmName("XWiki");

@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -11,23 +11,28 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
+ * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
- *
+
  * Created by
  * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:37:09
+ * Date: 4 févr. 2004
+ * Time: 10:26:35
  */
 package com.xpn.xwiki.objects;
 
+import net.sf.hibernate.collection.PersistentCollection;
 
+import java.util.*;
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
+import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.filter.CharacterFilter;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
+// There is no difference..
+// This is just to get a different storage
+// mecanism from Hibernate
+public class DBStringListProperty extends ListProperty {
 }

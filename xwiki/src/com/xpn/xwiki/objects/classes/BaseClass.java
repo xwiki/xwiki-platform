@@ -43,10 +43,6 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         safeput(name, property);
     }
 
-    public String toString() {
-        return null;  //To change body of implemented methods use Options | File Templates.
-    }
-
     public BaseProperty fromString(String value) {
         return null;  //To change body of implemented methods use Options | File Templates.
     }

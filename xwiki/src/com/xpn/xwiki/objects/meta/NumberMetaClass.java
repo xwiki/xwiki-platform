@@ -25,6 +25,8 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 
 public class NumberMetaClass extends PropertyMetaClass {
 
@@ -34,10 +36,15 @@ public class NumberMetaClass extends PropertyMetaClass {
     setPrettyName("Number Class");
     setName(NumberClass.class.getName());
 
-    StringClass type_class = new StringClass(this);
+    StaticListClass type_class = new StaticListClass(this);
     type_class.setName("numberType");
     type_class.setPrettyName("Number Type");
-    type_class.setSize(20);
+    type_class.setValues("integer|long|float|double");
+    type_class.setRelationalStorage(false);
+    type_class.setDisplayType("select");
+    type_class.setMultiSelect(false);
+    type_class.setSize(1);
+    safeput("numberType", type_class);
 
     NumberClass size_class = new NumberClass(this);
     size_class.setName("size");

@@ -24,6 +24,7 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 
 public class PropertyMetaClass extends BaseClass {
 
@@ -33,11 +34,13 @@ public class PropertyMetaClass extends BaseClass {
         type_class.setName("classType");
         type_class.setPrettyName("Class Type");
         type_class.setSize(40);
+        type_class.setUnmodifiable(true);
         // This should not be touched
         // safeput("classType", type_class);
         StringClass name_class = new StringClass(this);
         name_class.setName("name");
         name_class.setPrettyName("Name");
+        name_class.setUnmodifiable(true);
         name_class.setSize(40);
         safeput("name", name_class);
         StringClass prettyname_class = new StringClass(this);
@@ -45,6 +48,12 @@ public class PropertyMetaClass extends BaseClass {
         prettyname_class.setPrettyName("Pretty Name");
         prettyname_class.setSize(40);
         safeput("prettyName", prettyname_class);
+
+        BooleanClass unmodif_class = new BooleanClass(this);
+        unmodif_class.setName("unmodifiable");
+        unmodif_class.setPrettyName("Unmodifiable");
+        unmodif_class.setDisplayType("yesno");
+        safeput("unmodifiable", unmodif_class);
 
     }
 }

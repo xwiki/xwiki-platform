@@ -33,14 +33,11 @@ import org.apache.ecs.xhtml.input;
 public class BooleanClass extends PropertyClass {
 
     public BooleanClass(PropertyMetaClass wclass) {
-        this();
-        setxWikiClass(wclass);
+        super("boolean", "Boolean", wclass);
     }
 
     public BooleanClass() {
-        setName("boolean");
-        setPrettyName("Boolean");
-        setDisplayType("truefalse");
+        this(null);
     }
 
     public String getDisplayType() {
@@ -76,8 +73,8 @@ public class BooleanClass extends PropertyClass {
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Select select = new Select(prefix + name, 1);
-        select.appendOption("True",1);
-        select.appendOption("False",0);
+        select.appendOption("1" , "1", "True" );
+        select.appendOption("0" , "0", "False");
 
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
         if (prop!=null) {
@@ -87,4 +84,5 @@ public class BooleanClass extends PropertyClass {
 
         buffer.append(select.toString());
     }
+
 }

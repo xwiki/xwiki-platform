@@ -55,7 +55,7 @@ import java.util.*;
 
 public class ViewEditTest extends ServletTestCase {
 
-    private static String hibpath = "hibernate-test.cfg.xml";
+    private String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() {
         flushCache();

@@ -27,10 +27,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.*;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import net.sf.hibernate.*;
@@ -43,6 +40,7 @@ import org.apache.commons.jrcs.rcs.Version;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -249,7 +247,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 }
             }
 
-            endTransaction(true);
+            endTransaction(false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_FILE,
@@ -338,16 +336,23 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 getSession().update(object);
 
-            Collection coll = object.getFields().values();
-            Iterator it = coll.iterator();
+            Iterator it = object.getFields().keySet().iterator();
             while (it.hasNext()) {
-                BaseProperty prop = (BaseProperty) it.next();
+                String key = (String) it.next();
+                BaseProperty prop = (BaseProperty) object.getFields().get(key);
+                if (!prop.getName().equals(key)) {
+                    Object[] args = { key, object.getName() };
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
+                            "Field {0} in object {1} has an invalid name", null, args);
+                }
                 saveXWikiProperty(prop, false);
             }
 
             if (bTransaction) {
                 endTransaction(true);
             }
+        } catch (XWikiException xe) {
+            throw xe;
         } catch (Exception e) {
             Object[] args = { object.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
@@ -356,7 +361,6 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
 
     }
-
 
     public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
         try {
@@ -385,13 +389,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 BaseProperty property = (BaseProperty) Class.forName(classType).newInstance();
                 property.setObject(object);
                 property.setName(name);
-                getSession().load(property, property);
+                loadXWikiProperty(property, false);
                 map.put(name, property);
             }
             object.setFields(map);
 
             if (bTransaction) {
-                endTransaction(true);
+                    endTransaction(false);
             }
         } catch (Exception e) {
             Object[] args = { object.getName() };
@@ -402,6 +406,30 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
+    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException
+    {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            getSession().load(property, (Serializable) property);
+
+            if (bTransaction) {
+                endTransaction(false);
+            }
+        }
+        catch (Exception e) {
+            BaseCollection obj = property.getObject();
+            Object[] args = { (obj!=null) ? obj.getName() : "unknown", property.getName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
+                    "Exception while saving property {1} of object {0}", e, args);
+
+        }
+    }
+
+
     public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException
     {
         try {
@@ -410,11 +438,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 beginTransaction();
             }
 
-            // I'm using a local transaction
-            // There might be implications to this for a wider transaction
+// I'm using a local transaction
+// There might be implications to this for a wider transaction
             Transaction ltransaction = getSession().beginTransaction();
 
-            // Use to chose what to delete
+// Use to chose what to delete
             boolean isSave = false;
             try
             {
@@ -423,25 +451,28 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 query.setString("name", property.getName());
                 if (query.uniqueResult()==null) {
                     isSave = true;
-                    getSession().save(property);
+                getSession().save(property);
                 }
                 else {
                     isSave = false;
                     getSession().update(property);
                 }
-
                 getSession().flush();
                 ltransaction.commit();
             } catch (Exception e) {
-                // This seems to have failed..
-                // This is an attempt to cleanup a potential mess
-                // This code is only called if the tables are in an incoherent state
-                // (Example: data in xwikiproperties and no data in xwikiintegers or vice-versa)
-                // TODO: verify of the code works with longer transactions
+// We can't clean-up ListProperties
+                if (property instanceof ListProperty)
+                    throw e;
+
+// This seems to have failed..
+// This is an attempt to cleanup a potential mess
+// This code is only called if the tables are in an incoherent state
+// (Example: data in xwikiproperties and no data in xwikiintegers or vice-versa)
+// TODO: verify of the code works with longer transactions
                 BaseProperty prop2;
-                // Depending on save/update there is too much data either
-                // in the BaseProperty table or in the inheritated property table
-                // We need to delete this data
+// Depending on save/update there is too much data either
+// in the BaseProperty table or in the inheritated property table
+// We need to delete this data
                 if (isSave)
                     prop2 = (BaseProperty) property;
                 else
@@ -451,15 +482,15 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 prop2.setObject(property.getObject());
                 ltransaction.rollback();
 
-                // We need to run the delete in a separate session
-                // This is not a problem since this is cleaning up
+// We need to run the delete in a separate session
+// This is not a problem since this is cleaning up
                 Session session2 = sessionFactory.openSession();
                 Transaction transaction2 = session2.beginTransaction();
                 session2.delete(prop2);
                 session2.flush();
 
-                // I don't understand why I can't run this in the general session
-                // This might make transactions fail
+// I don't understand why I can't run this in the general session
+// This might make transactions fail
                 if (!isSave)
                     session2.save(property);
                 transaction2.commit();
@@ -487,7 +518,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 beginTransaction();
             }
 
-            // Verify if the property already exists
+// Verify if the property already exists
             Query query = getSession().createQuery("select obj.id from BaseClass as obj where obj.id = :id");
             query.setInteger("id", bclass.getId());
             if (query.uniqueResult()==null)
@@ -524,7 +555,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 getSession().load(bclass, new Integer(bclass.getId()));
             }
             catch (ObjectNotFoundException e) {
-                // There is no class data saved
+// There is no class data saved
                 bclass = null;
                 return;
             }
@@ -563,11 +594,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 beginTransaction();
             }
 
-            // I'm using a local transaction
-            // There might be implications to this for a wider transaction
+// I'm using a local transaction
+// There might be implications to this for a wider transaction
             Transaction ltransaction = getSession().beginTransaction();
 
-            // Use to chose what to delete
+// Use to chose what to delete
             boolean isSave = false;
             try
             {
@@ -586,15 +617,15 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 getSession().flush();
                 ltransaction.commit();
             } catch (Exception e) {
-                // This seems to have failed..
-                // This is an attempt to cleanup a potential mess
-                // This code is only called if the tables are in an incoherent state
-                // (Example: data in xwikiproperties and no data in xwikiintegers or vice-versa)
-                // TODO: verify of the code works with longer transactions
+// This seems to have failed..
+// This is an attempt to cleanup a potential mess
+// This code is only called if the tables are in an incoherent state
+// (Example: data in xwikiproperties and no data in xwikiintegers or vice-versa)
+// TODO: verify of the code works with longer transactions
                 PropertyClass prop2;
-                // Depending on save/update there is too much data either
-                // in the BaseProperty table or in the inheritated property table
-                // We need to delete this data
+// Depending on save/update there is too much data either
+// in the BaseProperty table or in the inheritated property table
+// We need to delete this data
                 if (isSave)
                     prop2 = (PropertyClass) property;
                 else
@@ -604,15 +635,15 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 prop2.setObject(property.getObject());
                 ltransaction.rollback();
 
-                // We need to run the delete in a separate session
-                // This is not a problem since this is cleaning up
+// We need to run the delete in a separate session
+// This is not a problem since this is cleaning up
                 Session session2 = sessionFactory.openSession();
                 Transaction transaction2 = session2.beginTransaction();
                 session2.delete(prop2);
                 session2.flush();
 
-                // I don't understand why I can't run this in the general session
-                // This might make transactions fail
+// I don't understand why I can't run this in the general session
+// This might make transactions fail
                 if (!isSave)
                     session2.save(property);
                 transaction2.commit();
@@ -688,9 +719,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Query query = getSession().createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
             query.setLong("id", attachment.getId());
             if (query.uniqueResult()==null)
-             session.save(attachment);
+                session.save(attachment);
             else
-             session.update(attachment);
+                session.update(attachment);
 
             if (bTransaction)
                 endTransaction(true);
@@ -718,16 +749,16 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Query query = getSession().createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
             query.setLong("id", content.getId());
             if (query.uniqueResult()==null)
-             session.save(content);
+                session.save(content);
             else
-             session.update(content);
+                session.update(content);
 
             query = getSession().createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
             query.setLong("id", archive.getId());
             if (query.uniqueResult()==null)
-             session.save(archive);
+                session.save(archive);
             else
-             session.update(archive);
+                session.update(archive);
 
             if (bTransaction)
                 endTransaction(true);

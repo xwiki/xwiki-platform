@@ -31,14 +31,12 @@ import org.apache.ecs.html.Input;
 
 public class PasswordClass extends StringClass {
     public PasswordClass(PropertyMetaClass wclass) {
-        this();
+        super("password", "Password", wclass);
         setxWikiClass(wclass);
     }
 
     public PasswordClass() {
-        setName("textarea");
-        setPrettyName("Text Area");
-        setSize(40);
+        this(null);
     }
 
     public BaseProperty fromString(String value) {

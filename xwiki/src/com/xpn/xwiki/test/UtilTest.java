@@ -40,14 +40,8 @@ import net.sf.hibernate.HibernateException;
 
 public class UtilTest extends TestCase {
 
-    private static XWiki xwiki;
-    private static XWikiContext context;
-
-    public UtilTest() throws XWikiException {
-        context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-    }
+    private XWiki xwiki;
+    private XWikiContext context;
 
     public XWikiHibernateStore getHibStore() {
         XWikiStoreInterface store = xwiki.getStore();
@@ -57,13 +51,17 @@ public class UtilTest extends TestCase {
             return (XWikiHibernateStore) store;
     }
 
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
-        System.gc();
+    public void setUp() throws XWikiException {
+        context = new XWikiContext();
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
     }
 
-
-    public void setUp() {
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        xwiki = null;
+        context = null;
+        System.gc();
     }
 
     public void testTopicInfo() throws IOException {

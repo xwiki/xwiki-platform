@@ -24,11 +24,15 @@ package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.dom4j.dom.DOMDocument;
 
 import java.io.Serializable;
 
+import com.xpn.xwiki.test.Utils;
+
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;
+    private int id;
 
     public BaseCollection getObject() {
         return object;
@@ -38,13 +42,40 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         this.object = object;
     }
 
+    public boolean equals(Object el) {
+        // I hate this.. needed for hibernate to find the object
+        // when loading the collections..
+        if ((object==null)||((BaseProperty)el).getObject()==null) {
+            return (hashCode()==el.hashCode());
+        }
+
+        if (!super.equals(el))
+            return false;
+
+        return (getId()==((BaseProperty)el).getId());
+    }
+
     public int getId() {
-        return getObject().getId();
+        // I hate this.. needed for hibernate to find the object
+        // when loading the collections..
+        if (object==null)
+          return id;
+        else
+         return getObject().getId();
     }
 
     public void setId(int id) {
+        // I hate this.. needed for hibernate to find the object
+        // when loading the collections..
+        this.id = id;
     }
 
+    public int hashCode() {
+        // I hate this.. needed for hibernate to find the object
+        // when loading the collections..
+       return ("" + getId() + getName()).hashCode();
+    }
+    
     public String getClassType() {
         return getClass().getName();
     }
@@ -72,4 +103,11 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         return el;
     }
 
+    public String toFormString() {
+        return Utils.formEncode(toText());
+    }
+
+    public String toText() {
+        return getValue().toString();
+    }
 }

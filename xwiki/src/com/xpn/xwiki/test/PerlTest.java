@@ -41,7 +41,7 @@ public class PerlTest extends TestCase {
     XWikiWikiBaseRenderer wikirenderer;
     XWikiRenderingEngine wikiengine;
 
-    public PerlTest() throws XWikiException {
+    public void setUp() throws XWikiException {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
@@ -65,9 +65,13 @@ public class PerlTest extends TestCase {
 
     public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
+        xwiki = null;
+        context = null;
+        wikirenderer = null;
+        wikiengine = null;
         System.gc();
     }
-    
+
 
     protected void finalize() throws Throwable {
         super.finalize();

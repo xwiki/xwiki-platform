@@ -148,4 +148,8 @@ public class XWikiCache implements XWikiCacheInterface {
     public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
         store.loadAttachmentArchive(attachment, bTransaction);
     }
+
+    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
+        store.loadXWikiProperty(property, bTransaction);
+    }
 }

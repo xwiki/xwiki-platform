@@ -37,7 +37,7 @@ public abstract class NumberProperty extends BaseProperty {
         this.value = (Number)value;
     }
 
-    public String toString() {
+    public String toText() {
         Number nb = (Number)getValue();
         return (nb==null) ? "" : nb.toString();
     }

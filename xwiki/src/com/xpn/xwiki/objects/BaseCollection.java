@@ -112,6 +112,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public void setStringValue(String name, String value) {
         StringProperty property = new StringProperty();
+        property.setName(name);
         property.setValue(value);
         safeput(name, property);
     }
@@ -126,13 +127,13 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public void setIntValue(String name, int value) {
         NumberProperty property = new IntegerProperty();
+        property.setName(name);
         property.setValue(new Integer(value));
         safeput(name, property);
     }
 
-    /*
     public Set getSetValue(String name) {
-        SetProperty prop = (SetProperty)safeget(name);
+        ListProperty prop = (ListProperty)safeget(name);
         if (prop==null)
          return new HashSet();
         else
@@ -140,11 +141,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public void setSetValue(String name, Set value) {
-        SetProperty property = new SetProperty();
+        ListProperty property = new ListProperty();
         property.setValue(value);
         safeput(name, property);
     }
-    */
+
 
     public Map getFields() {
         return fields;
@@ -152,10 +153,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public void setFields(Map fields) {
         this.fields = fields;
-    }
-
-    public String toString() {
-        return getClass().getName();
     }
 
     public boolean equals(Object coll) {

@@ -34,7 +34,7 @@ import java.sql.PreparedStatement;
 
 public class StoreHibernateTest extends StoreTest {
 
-    public static String hibpath = "hibernate-test.cfg.xml";
+    public String hibpath = "hibernate-test.cfg.xml";
     public XWikiStoreInterface store;
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql) {
@@ -50,6 +50,9 @@ public class StoreHibernateTest extends StoreTest {
     public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
         hibstore.checkHibernate();
         hibstore.beginTransaction();
+        StoreHibernateTest.runSQL(hibstore, "drop database if exists xwikitest");
+        StoreHibernateTest.runSQL(hibstore, "create database xwikitest");
+                /*
         StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment_content");
@@ -65,6 +68,12 @@ public class StoreHibernateTest extends StoreTest {
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiclassesprop");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikistringclasses");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikinumberclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikibooleanclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikilists");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikilistitems");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikislistclasses");
+        */
+
         hibstore.endTransaction(true);
         hibstore.updateSchema();
     }
@@ -73,8 +82,9 @@ public class StoreHibernateTest extends StoreTest {
         cleanUp(getHibStore());
     }
 
-    public void cleanUp() throws HibernateException {
+    public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
+        store = null;
         System.gc();
     }
 

@@ -22,6 +22,15 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.dom4j.Element;
+import org.dom4j.Document;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+import java.io.StringWriter;
+import java.io.IOException;
+
 public abstract class BaseElement extends Object {
     private String name;
     private String prettyName;
@@ -56,13 +65,13 @@ public abstract class BaseElement extends Object {
 
         if (element.getPrettyName()==null) {
             if (getPrettyName()!=null)
-            return false;
+                return false;
         } else if (!element.getPrettyName().equals(getPrettyName()))
             return false;
 
         if (element.getClass()==null) {
             if (getClass()!=null)
-            return false;
+                return false;
         } else if (!(element.getClass().equals(this.getClass())))
             return false;
 
@@ -82,4 +91,24 @@ public abstract class BaseElement extends Object {
         return element;
     }
 
+    public abstract Element toXML();
+
+    public String toXMLString() {
+        Document doc = new DOMDocument();
+        doc.setRootElement(toXML());
+        OutputFormat outputFormat = new OutputFormat("", true);
+        StringWriter out = new StringWriter();
+        XMLWriter writer = new XMLWriter( out, outputFormat );
+        try {
+            writer.write(doc);
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public String toString() {
+        return toXMLString();
+    }
 }

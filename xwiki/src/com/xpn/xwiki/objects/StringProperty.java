@@ -39,7 +39,7 @@ public class StringProperty extends BaseProperty {
         this.value = (String)value;
     }
 
-    public String toString() {
+    public String toText() {
         String value = (String)getValue();
         if (value!=null)
          return value;

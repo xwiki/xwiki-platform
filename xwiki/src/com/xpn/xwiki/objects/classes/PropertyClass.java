@@ -24,11 +24,13 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.html.Input;
@@ -40,6 +42,17 @@ import java.util.List;
 
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
     private BaseClass object;
+
+    public PropertyClass() {
+    }
+
+    public PropertyClass(String name, String prettyname, PropertyMetaClass xWikiClass) {
+        super();
+        setName(name);
+        setPrettyName(prettyname);
+        setxWikiClass(xWikiClass);
+        setUnmodifiable(false);
+    }
 
     public BaseCollection getObject() {
             return object;
@@ -63,7 +76,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public String toString(BaseProperty property) {
-        return property.toString();  //To change body of implemented methods use Options | File Templates.
+        return property.toText();
     }
 
     public BaseProperty fromString(String value) {
@@ -75,16 +88,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return fromString(value);
     }
 
-    public String formEncode(String value) {
-        Filter filter = new CharacterFilter();
-        String svalue = filter.process(value);
-        return svalue;
-    }
-
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
        Input input = new Input();
-       ElementInterface prop = object.safeget(name);
-       if (prop!=null) input.setValue(formEncode(prop.toString()));
+       PropertyInterface prop = (PropertyInterface) object.safeget(name);
+       if (prop!=null) input.setValue(prop.toFormString());
 
        input.setType("hidden");
        input.setName(prefix + name);
@@ -93,8 +100,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
-        ElementInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(formEncode(prop.toString()));
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop!=null) input.setValue(prop.toFormString());
 
         input.setType("text");
         input.setName(prefix + name);
@@ -102,14 +109,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        buffer.append(object.safeget(name).toString());
+        buffer.append(((BaseProperty)object.safeget(name)).toText());
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
 
-        ElementInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(formEncode(prop.toString()));
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop!=null) input.setValue(prop.toFormString());
 
         input.setType("text");
         input.setName(prefix + name);
@@ -148,6 +155,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
       displayEdit(buffer, name, prefix, object, context);
       return buffer.toString();
     }
+
     public String displayEdit(String name, BaseCollection object, XWikiContext context) {
       return displayEdit(name, "", object, context);
     }
@@ -185,16 +193,6 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     public void setPrettyName(String prettyName) {
         setStringValue("prettyName", prettyName);
     }
-
-    /*
-    public String getType() {
-      return getStringValue("type");
-    }
-
-    public void setType(String type) {
-        setStringValue("type", type);
-    }
-    */
 
     public String getClassType() {
         return getClass().getName();
@@ -237,5 +235,23 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
          safeput(name, bprop);
         }
      }
+    }
+
+    public String toFormString() {
+        return toString();
+    }
+
+    public void initLazyCollections() {
+    }
+
+    public boolean isUnmodifiable() {
+        return (getIntValue("unmodifiable")==1);
+    }
+
+    public void setUnmodifiable(boolean unmodifiable) {
+        if (unmodifiable)
+         setIntValue("unmodifiable", 1);
+        else
+         setIntValue("unmodifiable", 0);
     }
 }

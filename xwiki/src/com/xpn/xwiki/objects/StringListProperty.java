@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -11,23 +11,23 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
+ * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
- *
+
  * Created by
  * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:37:09
+ * Date: 4 févr. 2004
+ * Time: 10:19:01
  */
 package com.xpn.xwiki.objects;
 
+import com.xpn.xwiki.objects.classes.ListClass;
 
+public class StringListProperty extends ListProperty {
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
+    public void setTextValue(String value) {
+        setList(ListClass.getListFromString(value));
+    }
+
 }

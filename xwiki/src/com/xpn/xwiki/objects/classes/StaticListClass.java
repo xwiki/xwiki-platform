@@ -11,23 +11,41 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
+ * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
- *
+
  * Created by
  * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:37:09
+ * Date: 1 févr. 2004
+ * Time: 21:51:06
  */
-package com.xpn.xwiki.objects;
+package com.xpn.xwiki.objects.classes;
 
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+import java.util.List;
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
+public class StaticListClass extends ListClass {
+
+    public StaticListClass(PropertyMetaClass wclass) {
+        super("staticlist", "Static List", wclass);
+    }
+
+    public StaticListClass() {
+        this(null);
+    }
+
+    public String getValues() {
+        return getStringValue("values");
+    }
+
+    public void setValues(String values) {
+        setStringValue("values", values);
+    }
+
+    public List getList() {
+        String values = (String) getValues();
+        return getListFromString(values);
+    }
 }

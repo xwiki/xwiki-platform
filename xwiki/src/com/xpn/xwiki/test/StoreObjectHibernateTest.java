@@ -2,9 +2,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -38,7 +36,7 @@ import java.util.List;
 public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public XWikiHibernateStore store;
-    public static String hibpath = "hibernate-test.cfg.xml";
+    public String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() throws HibernateException {
         StoreHibernateTest.cleanUp(getHibStore());
@@ -46,6 +44,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
+        store = null;
         System.gc();
     }
     
@@ -100,6 +99,13 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     public void testNumber(XWikiStoreInterface store) throws XWikiException {
         IntegerProperty prop = Utils.prepareIntegerProperty();
         store.saveXWikiProperty(prop, true);
+        IntegerProperty prop2 = new IntegerProperty();
+        prop2.setName(prop.getName());
+        prop2.setPrettyName(prop.getPrettyName());
+        prop2.setObject(prop.getObject());
+        store.loadXWikiProperty(prop2, true);
+        assertEquals("IntegerProperty is different", prop, prop2);
+
     }
 
 
@@ -118,6 +124,13 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     public void testString(XWikiStoreInterface store) throws XWikiException {
         StringProperty prop = Utils.prepareStringProperty();
         store.saveXWikiProperty(prop, true);
+        StringProperty prop2 = new StringProperty();
+        prop2.setName(prop.getName());
+        prop2.setPrettyName(prop.getPrettyName());
+        prop2.setObject(prop.getObject());
+        store.loadXWikiProperty(prop2, true);
+        assertEquals("StringProperty is different", prop, prop2);
+
     }
 
 
@@ -132,6 +145,52 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         testString(store);
     }
 
+    public void testStringList(XWikiStoreInterface store) throws XWikiException {
+        StringListProperty prop = Utils.prepareStringListProperty();
+        store.saveXWikiProperty(prop, true);
+        StringListProperty prop2 = new StringListProperty();
+        prop2.setName(prop.getName());
+        prop2.setPrettyName(prop.getPrettyName());
+        prop2.setObject(prop.getObject());
+        store.loadXWikiProperty(prop2, true);
+        assertEquals("StringListProperty is different", prop, prop2);
+
+    }
+
+
+    public void testStringListEmptyDatabase() throws XWikiException {
+        XWikiStoreInterface store = getStore();
+        testStringList(store);
+    }
+
+    public void testStringListUpdate() throws XWikiException {
+        XWikiStoreInterface store = getStore();
+        testStringList(store);
+        testStringList(store);
+    }
+
+    public void testDBStringList(XWikiStoreInterface store) throws XWikiException {
+        DBStringListProperty prop = Utils.prepareDBStringListProperty();
+        store.saveXWikiProperty(prop, true);
+        DBStringListProperty prop2 = new DBStringListProperty();
+        prop2.setName(prop.getName());
+        prop2.setPrettyName(prop.getPrettyName());
+        prop2.setObject(prop.getObject());
+        store.loadXWikiProperty(prop2, true);
+        assertEquals("DBStringListProperty is different", prop, prop2);
+    }
+
+
+    public void testDBStringListEmptyDatabase() throws XWikiException {
+        XWikiStoreInterface store = getStore();
+        testDBStringList(store);
+    }
+
+    public void testDBStringListUpdate() throws XWikiException {
+        XWikiStoreInterface store = getStore();
+        testDBStringList(store);
+        testDBStringList(store);
+    }
 
 
     public void testWriteObject(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
@@ -150,6 +209,8 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         // Verify object2
         Utils.assertProperty(object2, object, "first_name");
         Utils.assertProperty(object2, object, "age");
+
+        assertEquals("Object is different", object, object2);
     }
 
     public void testWriteObject()  throws  XWikiException {
@@ -165,6 +226,18 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         testReadObject(store, object);
     }
 
+    public void testWriteAdvancedObject()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteObject(store, object);
+    }
+
+    public void testReadWriteAdvancedObject()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteObject(store, object);
+        testReadObject(store, object);
+    }
 
 
     public void testWriteClass(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
@@ -182,6 +255,8 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         // Verify object2
         Utils.assertProperty(bclass2, bclass, "first_name");
         Utils.assertProperty(bclass2, bclass, "age");
+
+        assertEquals("Class is different", bclass, bclass2);
     }
 
     public void testWriteClass()  throws  XWikiException {
@@ -193,6 +268,19 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     public void testReadWriteClass()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
         BaseObject object = Utils.prepareObject();
+        testWriteClass(store, object.getxWikiClass());
+        testReadClass(store, object.getxWikiClass());
+    }
+
+     public void testWriteAdvancedClass()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteClass(store, object.getxWikiClass());
+    }
+
+    public void testReadWriteAdvancedClass()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
         testWriteClass(store, object.getxWikiClass());
         testReadClass(store, object.getxWikiClass());
     }

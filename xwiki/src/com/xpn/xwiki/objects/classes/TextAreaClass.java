@@ -23,6 +23,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.test.Utils;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
@@ -30,16 +31,15 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.TextArea;
 
 public class TextAreaClass extends StringClass {
+
     public TextAreaClass(PropertyMetaClass wclass) {
-        this();
-        setxWikiClass(wclass);
+        super("textarea", "Text Area", wclass);
+        setSize(40);
+        setRows(5);
     }
 
     public TextAreaClass() {
-        setName("textarea");
-        setPrettyName("Text Area");
-        setSize(40);
-        setRows(5);
+        this(null);
     }
 
     public int getRows() {
@@ -56,8 +56,8 @@ public class TextAreaClass extends StringClass {
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         TextArea textarea = new TextArea();
-        ElementInterface prop = object.safeget(name);
-        if (prop!=null) textarea.addElement(formEncode(prop.toString()));
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop!=null) textarea.addElement(prop.toFormString());
 
         textarea.setName(prefix + name);
         textarea.setCols(getSize());

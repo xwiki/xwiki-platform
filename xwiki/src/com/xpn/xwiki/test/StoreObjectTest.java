@@ -39,7 +39,7 @@ import java.text.ParseException;
 
 public abstract class StoreObjectTest extends TestCase {
 
-    public static String rcspath = "./rcs";
+    public String rcspath = "./rcs";
 
     public abstract XWikiStoreInterface getStore();
 
@@ -76,6 +76,21 @@ public abstract class StoreObjectTest extends TestCase {
         testReadObjectInDoc(store, object);
     }
 
+    public void testWriteAdvancedObjectInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteObjectInDoc(store, object);
+    }
+
+    public void testReadWriteAdvancedObjectInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteObjectInDoc(store, object);
+        testReadObjectInDoc(store, object);
+    }
+
+
+
     public void testWriteClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestClass");
         bclass.setName("Test.TestClass");
@@ -109,10 +124,23 @@ public abstract class StoreObjectTest extends TestCase {
         testReadClassInDoc(store, object.getxWikiClass());
     }
 
-   public void testVersionedObject() throws XWikiException {
-       XWikiStoreInterface store = getStore();
-       BaseObject bobject = Utils.prepareObject("Test.TestVersion");
-       Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+    public void testWriteAdvancedClassInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteClassInDoc(store, object.getxWikiClass());
+    }
+
+    public void testReadWriteAdvancedClassInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteClassInDoc(store, object.getxWikiClass());
+        testReadClassInDoc(store, object.getxWikiClass());
+    }
+
+
+    public void testVersionedObject(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+
+       Utils.createDoc(store, "Test", "TestVersion", object, object.getxWikiClass(), null);
        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
        doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
        BaseObject bobject1 = doc1.getxWikiObject();
@@ -131,17 +159,42 @@ public abstract class StoreObjectTest extends TestCase {
        assertEquals("Age should be 33", new Integer(33), bprop3.getValue());
    }
 
-    public void testXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+    public void testVersionedObject() throws XWikiException {
          XWikiStoreInterface store = getStore();
          BaseObject bobject = Utils.prepareObject("Test.TestVersion");
-         Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+         testVersionedObject(store, bobject);
+     }
+
+    public void testVersionedAdvancedObject() throws XWikiException {
+         XWikiStoreInterface store = getStore();
+         BaseObject bobject = Utils.prepareAdvancedObject("Test.TestVersion");
+         testVersionedObject(store, bobject);
+     }
+
+    public void testXML(XWikiStoreInterface store, BaseObject bobject) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+         XWikiSimpleDoc doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+         String xml0 = doc0.toXML();
          XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
          doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
-         String xml = doc1.toXML();
+         Utils.assertEquals(doc0, doc1);
+         String xml1 = doc1.toXML();
+         // Cannot test this because XML tags can be ordered differently
+         // assertEquals("XML is different", xml0, xml1);
          XWikiSimpleDoc doc2 = new XWikiSimpleDoc();
-         doc2.fromXML(xml);
+         doc2.fromXML(xml1);
          Utils.assertEquals(doc1, doc2);
      }
 
+    public void testXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+    XWikiStoreInterface store = getStore();
+    BaseObject bobject = Utils.prepareObject("Test.TestVersion");
+    testXML(store, bobject);
+    }
+
+    public void testAdvancedXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+    XWikiStoreInterface store = getStore();
+    BaseObject bobject = Utils.prepareAdvancedObject("Test.TestVersion");
+    testXML(store, bobject);
+    }
 
 }

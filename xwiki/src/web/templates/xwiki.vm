@@ -1,0 +1,5 @@
+#set($title="${doc.fullName}")
+#set($skin="default")
+#set($copyright="Copyright 2003,2004 (c) Ludovic Dubost")
+#set($viewurl=$doc.getViewUrl($context))
+#set($editurl=$doc.getEditUrl($context))

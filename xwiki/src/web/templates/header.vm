@@ -1,0 +1,16 @@
+<div id="banner">
+<div id="logo">
+    <a href="../">
+      <img src="/xwiki/skins/$skin/logo.gif">
+    </a>
+  </div>
+
+  <div id="version">
+    <a href="../">XWiki Version 0.1.1</a>
+  </div>
+
+<div id="title">
+   <h1>$!title</h1>
+   <h2>$!subtitle</h2>
+</div>
+</div>

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+<hibernate-mapping>
+    <!-- com.xpn.xwiki.doc.XWikiSimpleDoc root -->
+    <class name="com.xpn.xwiki.doc.XWikiSimpleDoc" table="xwikidoc">
+        <id name="id" type="long">
+           <column name="XWD_ID" not-null="true"/>
+           <generator class="assigned" />
+        </id>
+        <property name="name" type="string">
+            <column name="XWD_NAME" length="255" not-null="true"/>
+        </property>
+
+        <property name="date" type="timestamp">
+            <column name="XWD_DATE" not-null="true"/>
+        </property>
+
+        <property name="author" type="string">
+            <column name="XWD_AUTHOR" length="255"/>
+        </property>
+
+        <property name="web" type="string">
+            <column name="XWD_WEB" length="255" not-null="true"/>
+        </property>
+
+        <property name="content" type="string">
+            <column name="XWD_CONTENT" length="200000" not-null="true"/>
+        </property>
+
+        <property name="archive" type="string">
+            <column name="XWD_ARCHIVE" length="200000" not-null="true"/>
+        </property>
+
+        <property name="version" type="string">
+            <column name="XWD_VERSION" length="255" not-null="true"/>
+        </property>
+
+        <property name="parent" type="string">
+            <column name="XWD_PARENT" length="511"/>
+        </property>
+
+    </class>
+</hibernate-mapping>
+

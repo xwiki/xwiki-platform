@@ -1,0 +1,195 @@
+.body {
+    left: 0px;
+    right: 0px;
+}
+
+#banner, #header, #footer {
+    position: relative;
+    display: block;
+    float: left;
+    clear: both;
+    width: 100%;
+    margin: 0px;
+}
+
+#nav_header, #nav_footer {
+    position: relative;
+    display: block;
+    float: left;
+    clear: both;
+    width: 100%;
+    border-width: 0.4em 0em 0em;
+    border-style: solid;
+    border-color: #009255;
+    background-image:url(pixel_clair.gif);
+    background-repeat: repeat;
+}
+
+*, td, th, p, a, select {
+    font-family: verdana;
+    font-size: 10pt;
+}
+
+#logo {
+    position: relative;
+    float: left;
+    background-image:url(horizontal.gif);
+}
+
+#logo img {
+    text-decoration: none;
+    border: none;
+}
+
+#version {
+    position: relative;
+    float: right;
+    top: 5px;
+    right: 10px;
+}
+
+#version a {
+   color:#336699;
+   text-decoration:none;
+   font-family: verdana;
+   font-size:7pt;
+   z-index: 1;
+   padding: 0px;
+   margin: 0px;
+}
+
+#title {
+    position: relative;
+    display: block;
+    float: left;
+    top: 10px;
+    left: 200px;
+    right: 9px; 
+    margin: 0px;
+    padding: 0px;
+}
+
+#title h1, #title h2, #title h3 {
+    float: left;
+    display: block;
+    font-family: verdana;
+}
+
+#title h1 {
+    margin: 5px;
+    padding: 0px;
+    font-size:14pt;
+}
+
+#title h2 {
+    top: 5px;
+    margin: 5px;
+    padding: 5px;
+    font-size:10pt;
+}
+
+#title h3 {
+    position: relative;
+    font-family: verdana;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+    top: 1.5em;
+    right: 0px;
+    font-size:8pt;
+}
+
+
+#actions {
+    top: 0px;
+    margin: 0px;
+    padding: 0px;
+    height: 1.4em;
+    left: 0px;
+}
+
+
+#actions a {
+    display: block;
+    float: left;
+    list-style-type: none;
+    margin: 0.2em;
+    padding: 0.4em;
+    background-image: url(button_c.gif);
+    background-repeat: repeat-x;
+    background-color: #4A946B;
+    font-size: 11px;
+    font-weight: normal;
+    font-style: normal;
+    font-family: verdana;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+}
+    
+#actions span {
+    display: none;
+}
+
+#actions .inputfield {
+   position: relative;
+   top: 0.1em;
+   display: block;
+   height: 1.8em;
+   padding: 0em;
+   background-image: none;
+   background-color: transparent;
+}
+
+#actions .inputbutton {
+   position: relative;
+   top: 0.1em;
+   display: block;
+   height: 1.8em;
+   padding: 0em;
+   background-image: none;
+   background-color: transparent;
+}
+
+#actions .inputfield input {
+    position: relative;
+    top: 0.1em;
+    padding: 0em;
+    height: 1.2em;
+    font-family: verdana;
+    font-size: 8pt;
+}
+
+#actions .inputbutton input {
+    position: relative;
+    top: -0.1em;
+    padding: 0em;
+    height: 1.9em;
+    font-family: verdana;
+    font-size: 8pt;
+}
+
+
+#content {
+    position: relative;
+    display: block;
+    float: left;
+    clear: both;
+    left: 6px;
+    right: 7px;
+}
+
+
+#nav, #nav_header, #nav_footer {
+    display: block;
+    float: left;
+    clear: both;
+    position: relative;
+    height: 2em;
+    margin: 0px;
+    padding: 0px;
+    background-image:url(pixel_clair.gif);
+    background-repeat: repeat;
+}
+
+

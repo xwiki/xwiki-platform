@@ -1,0 +1,29 @@
+#parse("/templates/xwiki.vm")
+#parse("/templates/httpheader.vm")
+#parse("/templates/header.vm")
+#macro( versions )
+#foreach( $rev in $doc.recentRevisions )
+<a href="$viewurl?rev=$rev">$rev</a><span> | </span>
+#end
+#end
+<div id="nav_header">
+<div id="actions">
+<a href="$editurl">$msg.get("edit")</a><span> | </span>
+#versions()
+</div>
+</div>
+#if($message)
+<div id="message">
+$message
+</div>
+#end
+<div id="content">
+$doc.getRenderedContent($context)
+</div>
+<div id="nav_footer">
+<div id="actions">
+<a href="$editurl">$msg.get("edit")</a><span> | </span>
+#versions()
+</div>
+</div>
+#parse("/templates/footer.vm")

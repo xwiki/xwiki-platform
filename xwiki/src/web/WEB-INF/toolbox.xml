@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<toolbox>
+  <tool>
+     <key>toolLoader</key>
+     <class>org.apache.velocity.tools.generic.ToolLoader</class>
+  </tool>
+  <tool>
+     <key>link</key>
+     <class>org.apache.velocity.tools.struts.StrutsLinkTool</class>
+  </tool>
+  <tool>
+     <key>msg</key>
+     <class>org.apache.velocity.tools.struts.MessageTool</class>
+  </tool>
+  <tool>
+     <key>errors</key>
+     <class>org.apache.velocity.tools.struts.ErrorsTool</class>
+  </tool>
+  <tool>
+     <key>form</key>
+     <class>org.apache.velocity.tools.struts.FormTool</class>
+  </tool>
+</toolbox>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN"
+          "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<!--
+     This is a blank Struts configuration file based on the example application,
+     with commented examples of some items.
+
+     NOTE: If you have a generator tool to create the corresponding Java classes
+     for you, you could include the details in the "form-bean" declarations.  
+     Otherwise, you would only define the "form-bean" element itself, with the 
+     corresponding "name" and "type" attributes, as shown here.
+-->
+
+
+<struts-config>
+
+  <!-- ========== Data Source Configuration =============================== -->
+<!--
+  <data-sources>
+    <data-source
+       autoCommit="false"
+      description="Example Data Source Configuration"
+      driverClass="org.postgresql.Driver"
+         maxCount="4"
+         minCount="2"
+         password="mypassword"
+              url="jdbc:postgresql://localhost/mydatabase"
+             user="myusername"
+    />
+  </data-sources>
+-->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+    <!-- XWiki Struts Application --> 
+    
+    <form-bean name="EditForm"
+               type="com.xpn.xwiki.web.EditForm"/>
+
+  </form-beans>
+
+
+  <!-- ========== Global Forward Definitions ============================== -->
+  <global-forwards>
+
+    <!-- Forward to view -->
+     <forward
+        name="start"
+        path="/view/Main/WebHome"/>
+
+  </global-forwards>
+
+
+  <!-- ========== Action Mapping Definitions ============================== -->
+  <action-mappings>
+
+    <!-- XWiki Struts Application with Velocity --> 
+    <action path="/view/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="view"
+            scope="request">
+        <forward name="view" path="/templates/view.vm"/>
+    </action>
+
+    <action path="/edit/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="edit"
+            scope="request">
+        <forward name="edit" path="/templates/edit.vm"/>
+    </action>
+
+    <action path="/preview/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="preview"
+            scope="request">
+        <forward name="preview" path="/templates/preview.vm"/>
+    </action>
+
+    <action path="/save/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="save"
+            scope="request">
+        <forward name="save" path="/templates/save.vm"/>
+    </action>
+
+  </action-mappings>
+
+  <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"
+        debug="0" contentType="text/html" />
+
+</struts-config>

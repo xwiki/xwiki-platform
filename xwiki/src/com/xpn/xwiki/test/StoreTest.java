@@ -36,7 +36,7 @@ import net.sf.hibernate.impl.SessionImpl;
 import net.sf.hibernate.HibernateException;
 
 
-public class StoreTest extends TestCase {
+public abstract class StoreTest extends TestCase {
 
     public static String name = "WebHome";
     public static String name2 = "Globals";
@@ -50,42 +50,8 @@ public class StoreTest extends TestCase {
     public static String version2 = "1.2";
 
     public static String rcspath = "./rcs";
-    public static String hibpath = "hibernate-test.cfg.xml";
 
-    public static void runSQL(XWikiHibernateStore hibstore, String sql) {
-           try {
-               Connection connection = ((SessionImpl)hibstore.getSession()).connection();
-               PreparedStatement ps = connection.prepareStatement(sql);
-               ps.execute();
-           } catch (Exception e) {
-               e.printStackTrace();
-           }
-       }
-
-    public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
-        File file = new File(rcspath + "/" + web + "/" + name + ".txt");
-        file.delete();
-        file = new File(rcspath + "/" + web + "/" + name + ".txt,v");
-        file.delete();
-        file = new File(rcspath + "/" + web + "/" + name2 + ".txt");
-        file.delete();
-        file = new File(rcspath + "/" + web + "/" + name2 + ".txt,v");
-        file.delete();
-
-        hibstore.checkHibernate();
-        hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "drop table xwikidoc");
-        hibstore.endTransaction(true);
-    }
-
-    public void setUp() throws HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        cleanUp(hibstore);
-    }
-
-    public void tearDown() {
-       // clean();
-    }
+    public abstract XWikiStoreInterface getStore();
 
     public void testStandardReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
@@ -94,7 +60,7 @@ public class StoreTest extends TestCase {
         doc1.setParent(parent);
         store.saveXWikiDoc(doc1);
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
-        store.loadXWikiDoc(doc2);
+        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
         String content2 = doc2.getContent();
         assertEquals(content1,content2);
         assertEquals(doc2.getVersion(), version);
@@ -104,7 +70,7 @@ public class StoreTest extends TestCase {
         doc2.setAuthor(author2);
         store.saveXWikiDoc(doc2);
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
-        store.loadXWikiDoc(doc3);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
         String content3b = doc3.getContent();
         assertEquals(content3,content3b);
         assertEquals(doc3.getAuthor(), author2);
@@ -175,58 +141,31 @@ public class StoreTest extends TestCase {
 
 
 
-    public void testRCSStandardReadWrite() throws XWikiException {
+    public void testStandardReadWrite() throws XWikiException {
         setStandardData();
-        XWikiStoreInterface rcsstore = new XWikiRCSFileStore(rcspath);
-        testStandardReadWrite(rcsstore, web, name);
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, web, name);
     }
 
-    public void testHibernateStandardReadWrite() throws XWikiException {
+    public void testVersionedReadWrite() throws XWikiException {
         setStandardData();
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
-        testStandardReadWrite(hibstore, web, name);
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, web, name);
+        testVersionedReadWrite(store, web, name);
     }
 
-    public void testRCSVersionedReadWrite() throws XWikiException {
-        setStandardData();
-        XWikiStoreInterface rcsstore = new XWikiRCSFileStore(rcspath);
-        testStandardReadWrite(rcsstore, web, name);
-        testVersionedReadWrite(rcsstore, web, name);
-    }
-
-    public void testHibernateVersionedReadWrite() throws XWikiException {
-        setStandardData();
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
-        testStandardReadWrite(hibstore, web, name);
-        testVersionedReadWrite(hibstore, web, name);
-    }
-
-    public void testRCSMediumReadWrite() throws XWikiException {
+    public void testMediumReadWrite() throws XWikiException {
         setMediumData();
-        XWikiStoreInterface rcsstore = new XWikiRCSFileStore(rcspath);
-        testStandardReadWrite(rcsstore, web, name);
-        testVersionedReadWrite(rcsstore, web, name);
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, web, name);
+        testVersionedReadWrite(store, web, name);
     }
 
-    public void testHibernateMediumReadWrite() throws XWikiException {
-        setMediumData();
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
-        testStandardReadWrite(hibstore, web, name);
-        testVersionedReadWrite(hibstore, web, name);
-    }
-
-    public void testRCSBigVersionedReadWrite() throws XWikiException, IOException {
+    public void testBigVersionedReadWrite() throws XWikiException, IOException {
         setBigData();
-        XWikiStoreInterface rcsstore = new XWikiRCSFileStore(rcspath);
-        testStandardReadWrite(rcsstore, web, name2);
-        testVersionedReadWrite(rcsstore, web, name2);
-    }
-
-    public void testHibernateBigVersionedReadWrite() throws XWikiException, IOException {
-        setBigData();
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
-        testStandardReadWrite(hibstore, web, name2);
-        testVersionedReadWrite(hibstore, web, name2);
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, web, name2);
+        testVersionedReadWrite(store, web, name2);
     }
 
 }

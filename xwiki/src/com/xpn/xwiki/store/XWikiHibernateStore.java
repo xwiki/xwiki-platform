@@ -166,7 +166,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
-    public void loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
         try {
@@ -179,7 +179,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             } catch (ObjectNotFoundException e)
             { // No document
                 doc.setNew(true);
-                return;
+                return doc;
             }
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
@@ -220,9 +220,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_FILE,
                     "Exception while reading document {0}", e, args);
         }
+        return doc;
     }
 
-    public void loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         try {
             doc.setStore(this);
@@ -247,6 +248,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION,
                     "Exception while reading document {0} version {1}", e, args);
         }
+        return doc;
     }
 
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
@@ -267,10 +269,6 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
                     "Exception while reading document {0} revisions", e, args);
         }
-    }
-
-    public XWikiDocCacheInterface newDocCache() {
-        return null;  //To change body of implemented methods use Options | File Templates.
     }
 
     public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {

@@ -33,6 +33,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
@@ -66,6 +67,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private BaseClass xWikiClass;
     private BaseObject xWikiObject;
     private Map xWikiObjects = new HashMap();
+
+    // Caching
+    private boolean fromCache = false;
 
     public long getId() {
         if (id==0) {
@@ -411,7 +415,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         XWiki xwiki = (XWiki) context.getWiki();
         BaseClass objclass = new BaseClass();
         objclass.setName(classname);
-        ((XWikiHibernateStore)xwiki.getStore()).loadXWikiClass(objclass, true);
+        ((XWikiStoreInterface)xwiki.getStore()).loadXWikiClass(objclass, true);
         BaseObject object = new BaseObject();
         object.setName(getFullName());
         object.setxWikiClass(objclass);
@@ -508,4 +512,12 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             type = "view";
            return display(fieldname, type, context);
         }
+
+    public boolean isFromCache() {
+        return fromCache;
+    }
+
+    public void setFromCache(boolean fromCache) {
+        this.fromCache = fromCache;
+    }
 }

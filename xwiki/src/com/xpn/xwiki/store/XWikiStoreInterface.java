@@ -25,17 +25,23 @@ package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import org.apache.commons.jrcs.rcs.Version;
 
 import java.util.List;
 
 public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException;
-    public void loadXWikiDoc(XWikiDocInterface doc) throws XWikiException;
-    public void loadXWikiDoc(XWikiDocInterface doc, String version) throws XWikiException;
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException;
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version) throws XWikiException;
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException;
-    public XWikiDocCacheInterface newDocCache();
     public List getClassList() throws XWikiException;
     public List searchDocuments(String wheresql) throws XWikiException;
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException;
+
+    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException;
+    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException;
+    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
+    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
 }

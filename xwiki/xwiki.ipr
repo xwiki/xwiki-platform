@@ -141,9 +141,11 @@
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate-2.1/doc/api" />
+        <root url="file://C:/dev/java/oscache/docs/api" />
       </JAVADOC>
       <SOURCES>
         <root url="file://C:/dev/java/hibernate-2.1/src" />
+        <root url="file://C:/dev/java/oscache/src/core/java" />
       </SOURCES>
     </library>
     <library name="Perl">

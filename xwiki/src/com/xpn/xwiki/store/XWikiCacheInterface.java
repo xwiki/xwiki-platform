@@ -29,5 +29,8 @@ package com.xpn.xwiki.store;
  * Time: 14:40:17
  * To change this template use Options | File Templates.
  */
-public interface XWikiDocCacheInterface {
+public interface XWikiCacheInterface extends XWikiStoreInterface {
+    public XWikiStoreInterface getStore();
+    public void setStore(XWikiStoreInterface store);
+    public void flushCache();
 }

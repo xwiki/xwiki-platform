@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiException;
 import net.sf.hibernate.HibernateException;
 import java.util.List;
@@ -45,18 +46,18 @@ public class StoreObjectTest extends TestCase {
     public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
         hibstore.checkHibernate();
         hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "drop table xwikidoc");
-        StoreTest.runSQL(hibstore, "drop table xwikiobjects");
-        StoreTest.runSQL(hibstore, "drop table xwikiproperties");
-        StoreTest.runSQL(hibstore, "drop table xwikiintegers");
-        StoreTest.runSQL(hibstore, "drop table xwikifloats");
-        StoreTest.runSQL(hibstore, "drop table xwikilongs");
-        StoreTest.runSQL(hibstore, "drop table xwikidoubles");
-        StoreTest.runSQL(hibstore, "drop table xwikistrings");
-        StoreTest.runSQL(hibstore, "drop table xwikiclasses");
-        StoreTest.runSQL(hibstore, "drop table xwikiclassesprop");
-        StoreTest.runSQL(hibstore, "drop table xwikistringclasses");
-        StoreTest.runSQL(hibstore, "drop table xwikinumberclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiobjects");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiproperties");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiintegers");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikifloats");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikilongs");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoubles");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikistrings");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclassesprop");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikistringclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikinumberclasses");
         hibstore.endTransaction(true);
         hibstore.updateSchema();
     }
@@ -82,7 +83,7 @@ public class StoreObjectTest extends TestCase {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         testNumber(hibstore);
         hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "delete from xwikiproperties");
+        StoreHibernateTest.runSQL(hibstore, "delete from xwikiproperties");
         hibstore.endTransaction(true);
         testNumber(hibstore);
     }
@@ -91,8 +92,8 @@ public class StoreObjectTest extends TestCase {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         testNumber(hibstore);
         hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "delete from xwikiintegers");
-        StoreTest.runSQL(hibstore, "delete from xwikilongs");
+        StoreHibernateTest.runSQL(hibstore, "delete from xwikiintegers");
+        StoreHibernateTest.runSQL(hibstore, "delete from xwikilongs");
         hibstore.endTransaction(true);
         testNumber(hibstore);
     }
@@ -118,7 +119,7 @@ public class StoreObjectTest extends TestCase {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         testString(hibstore);
         hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "delete from xwikiproperties");
+        StoreHibernateTest.runSQL(hibstore, "delete from xwikiproperties");
         hibstore.endTransaction(true);
         testString(hibstore);
     }
@@ -127,7 +128,7 @@ public class StoreObjectTest extends TestCase {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         testString(hibstore);
         hibstore.beginTransaction();
-        StoreTest.runSQL(hibstore, "delete from xwikistrings");
+        StoreHibernateTest.runSQL(hibstore, "delete from xwikistrings");
         hibstore.endTransaction(true);
         testString(hibstore);
     }
@@ -203,7 +204,7 @@ public class StoreObjectTest extends TestCase {
     }
 
     public void testSearchClass() throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
         List list = hibstore.getClassList();
         assertTrue("No result", (list.size()==0) );
         testWriteClass();

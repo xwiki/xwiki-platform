@@ -26,6 +26,8 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.jrcs.rcs.*;
 import java.io.*;
@@ -108,7 +110,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         }
     }
 
-    public void loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
         try {
@@ -136,9 +138,10 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_FILE,
                     "Exception while reading document {0}", e, args);
         }
+        return doc;
     }
 
-    public void loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         try {
             doc.setStore(this);
@@ -168,6 +171,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_VERSION,
                     "Exception while reading document {0} version {1}", e, args);
         }
+        return doc;
     }
 
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
@@ -204,10 +208,6 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                     "Exception while reading document {0} revisions", e, args);
         }
-    }
-
-    public XWikiDocCacheInterface newDocCache() {
-        return new XWikiRCSDocCache();
     }
 
     public String getFullContent(XWikiDocInterface doc) {
@@ -293,6 +293,26 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
+    }
+
+    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
+           throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                   "Exception while searching: not implemented");
+    }
+
+    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
+    }
+
+    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
+    }
+
+    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
                 "Exception while searching: not implemented");
     }

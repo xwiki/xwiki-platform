@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import net.sf.hibernate.HibernateException;
 
 import java.util.List;
@@ -41,10 +42,10 @@ public class SearchTest extends TestCase {
 
     public void setUp() throws HibernateException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        StoreTest.cleanUp(hibstore);
+        StoreHibernateTest.cleanUp(hibstore);
     }
 
-    public void testSearch(XWikiHibernateStore hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
+    public void testSearch(XWikiStoreInterface hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
         List lresult = hibstore.searchDocuments(wheresql);
         String[] result = {};
         result = (String[]) lresult.toArray(result);
@@ -56,7 +57,7 @@ public class SearchTest extends TestCase {
     }
 
     public void testSearch() throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
         testSearch(hibstore, "", new String[] {} );
         testSearch(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {} );
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", "WebHome");

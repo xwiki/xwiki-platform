@@ -80,22 +80,21 @@ public interface XWikiDocInterface {
     public XWikiStoreInterface getStore();
     public void setStore(XWikiStoreInterface store);
 
+    public String getActionUrl(String action, XWikiContext context);
+
     public BaseClass getxWikiClass();
     public void setxWikiClass(BaseClass xWikiClass);
     public BaseObject getxWikiObject();
     public void setxWikiObject(BaseObject xWikiObject);
-
     public Map getxWikiObjects();
     public void setxWikiObjects(Map xWikiObject);
     public void createNewObject(String classname, XWikiContext context) throws XWikiException;
 
-    public XWikiDocCacheInterface getDocCache();
-    public void setDocCache(XWikiDocCacheInterface doccache);
-
-    public String getActionUrl(String action, XWikiContext context);
-
     public void mergexWikiClass(XWikiDocInterface templatedoc);
     public void mergexWikiObject(XWikiDocInterface templatedoc);
     public void mergexWikiObjects(XWikiDocInterface templatedoc);
+
+    public boolean isFromCache() ;
+    public void setFromCache(boolean fromCache);
 
 }

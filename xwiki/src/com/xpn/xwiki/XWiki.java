@@ -24,6 +24,8 @@
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCache;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -47,6 +49,7 @@ public class XWiki {
     private boolean test = false;
 
     public XWiki(String path, XWikiContext context) throws XWikiException {
+      XWikiStoreInterface basestore;
       config = new XWikiConfig(path);
       String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
       try {
@@ -56,7 +59,7 @@ public class XWiki {
          Object[] args = new Object[2] ;
          args[0] = this;
          args[1] = context;
-         store = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
+         basestore = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
         }
         catch (InvocationTargetException e)
         {
@@ -70,6 +73,14 @@ public class XWiki {
                                       XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
                                       "Cannot load store class {0}",e, args);
         }
+
+        // Check if we need to use the cache store..
+        boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
+        if (!nocache)
+         store = new XWikiCache(basestore);
+        else
+         store = basestore;
+
         renderingEngine = new XWikiRenderingEngine(this);
         context.setWiki(this);
     }
@@ -108,7 +119,7 @@ public class XWiki {
 
     public XWikiDocInterface getDocument(XWikiDocInterface doc) throws XWikiException {
         try {
-            store.loadXWikiDoc(doc);
+            doc = store.loadXWikiDoc(doc);
         }  catch (XWikiException e) {
             // TODO: log error for document that does not exist.
         }
@@ -213,7 +224,6 @@ public class XWiki {
     }
 
     public String getWebCopyright(XWikiContext context) {
-        // TODO: implement a cache for the documents
         try {
          XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
          return doc.getxWikiObject().get("webcopyright").toString();
@@ -222,4 +232,38 @@ public class XWiki {
         }
     }
 
+    public String getXWikiPreference(String prefname, XWikiContext context) {
+        try {
+         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+         return doc.getxWikiObject().get(prefname).toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String getWebPreference(String prefname, XWikiContext context) {
+        try {
+         XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
+         XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
+         return doc.getxWikiObject().get(prefname).toString();
+        } catch (Exception e) {
+            return getXWikiPreference(prefname, context);
+        }
+    }
+
+    public String getUserPreference(String prefname, XWikiContext context) {
+        try {
+         // XWikiUser user = (XWikiUser) context.get("user");
+         // return user.getPreference(prefname, context);
+            return getWebPreference(prefname, context);
+        } catch (Exception e) {
+            return getWebPreference(prefname, context);
+        }
+    }
+
+        public void flushCache() {
+            if (store instanceof XWikiCacheInterface) {
+                ((XWikiCacheInterface)store).flushCache();
+            }
+        }
 }

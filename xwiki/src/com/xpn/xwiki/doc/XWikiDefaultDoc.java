@@ -27,7 +27,7 @@ import com.xpn.xwiki.store.*;
 
 public abstract class XWikiDefaultDoc implements XWikiDocInterface {
   private XWikiStoreInterface store;
-  private XWikiDocCacheInterface docCache;
+  private XWikiCacheInterface docCache;
 
     public XWikiStoreInterface getStore() {
         return store;
@@ -35,16 +35,5 @@ public abstract class XWikiDefaultDoc implements XWikiDocInterface {
 
     public void setStore(XWikiStoreInterface store) {
         this.store = store;
-    }
-
-    public XWikiDocCacheInterface getDocCache() {
-        if ((docCache==null)&&(store!=null)) {
-            docCache = store.newDocCache();
-        }
-        return docCache;
-    }
-
-    public void setDocCache(XWikiDocCacheInterface docCache) {
-        this.docCache = docCache;
     }
 }

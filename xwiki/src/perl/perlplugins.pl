@@ -20,14 +20,20 @@ use TWiki::Func;
 
 my $perlplugin;
 
+# Reading Arguments
+my $port = $ARGV[1];
+print "Port is: $port\n";
+my $classpath = $ARGV[0];
+print "Classpath is: $classpath\n";
+
 # Java requirements;
 use Inline (
 	JAVA => 'STUDY',
 	SHARED_JVM => 1,
-	PORT => 7890,
+	PORT => $ARGV[1],
 	DEBUG => 1,
 	STUDY => ["com.xpn.xwiki.render.XWikiPerlPluginCaller"],
-	CLASSPATH => "../classes",
+	CLASSPATH => $ARGV[0],
 	AUTOSTUDY => "1",
 ) ;
 
@@ -50,17 +56,19 @@ sub render {
  return $content;
  };
 
+ if ($@) {
  my $error = $@;
- $error =~ s/\&/&amp;/go;
- $error =~ s/\</&lt;/go;
- $error =~ s/\>/&gt;/go;
- $content .= " " . $error . " ";
+  $error =~ s/\&/&amp;/go;
+  $error =~ s/\</&lt;/go;
+  $error =~ s/\>/&gt;/go;
+  $content .= " " . $error . " ";
+ }
 
  return $content;
-} 
+}
 
 print "Starting perl server\n";
-$perlplugin = com::xpn::xwiki::render::XWikiPerlPluginCaller->new();
+$perlplugin = com::xpn::xwiki::render::XWikiPerlPluginCaller->new($port);
 &TWiki::initialize( "", "ludovic", "WebHome", "", "" );
 
 

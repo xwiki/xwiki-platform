@@ -35,12 +35,15 @@ import java.util.StringTokenizer;
 
 public class XWikiWikiBaseRenderer implements XWikiRenderer {
     private boolean removePre = true;
+    private boolean renderWiki = true;
 
     public XWikiWikiBaseRenderer() {
     }
 
-    public XWikiWikiBaseRenderer(boolean removePre) {
+    public XWikiWikiBaseRenderer(boolean renderWiki, boolean removePre) {
         this.setRemovePre(removePre);
+        this.setRenderWiki(renderWiki);
+
     }
 
     public static String makeAnchor(String text, Util util) {
@@ -139,13 +142,15 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         XWikiPluginManager plugins = xwiki.getPluginManager();
 
         // Call it again after plugins..
-        handleInternalTags(content, doc, context);
+        if (renderWiki)
+         handleInternalTags(content, doc, context);
 
         // PLUGIN: call startRenderingHandler at the start with the full content
         content = plugins.commonTagsHandler(content, context);
 
         // Call it again after plugins..
-        handleInternalTags(content, doc, context);
+        if (renderWiki)
+          handleInternalTags(content, doc, context);
         return content;
     }
 
@@ -159,9 +164,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         XWiki xwiki = context.getWiki();
         XWikiPluginManager plugins = xwiki.getPluginManager();
 
-        content = util.substitute("s/\\r//go", content);
-        content = util.substitute("s/\\\\\\n//go", content);
-        content = util.substitute("s/(\\|$)/$1 /", content);
+        if (renderWiki) {
+          content = util.substitute("s/\\r//go", content);
+          content = util.substitute("s/\\\\\\n//go", content);
+          content = util.substitute("s/(\\|$)/$1 /", content);
+        }
 
         // Initialization of input and output omitted
         StringBuffer output = new StringBuffer();
@@ -175,7 +182,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         content = preTagSubst.substitute(content);
 
         // PLUGIN: call startRenderingHandler at the start with the full content
-          content = plugins.startRenderingHandler(content, context);
+        content = plugins.startRenderingHandler(content, context);
 
         StringTokenizer tokens = new StringTokenizer(content,"\n");
         while(tokens.hasMoreTokens()) {
@@ -183,17 +190,20 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
 
             // Changing state..
             if (util.match("m|{pre}|i", line)) {
-                line = util.substitute("s/{pre}//i", line);
+                if (renderWiki)
+                  line = util.substitute("s/{pre}//i", line);
                 insidePRE = true;
             }
             if (util.match("m|{/pre}|i", line)) {
-                line = util.substitute("s/{\\/pre}//i", line);
+                if (renderWiki)
+                  line = util.substitute("s/{\\/pre}//i", line);
                 insidePRE = false;
             }
 
             if (insidePRE || insideVERBATIM) {
                 if (insideVERBATIM) {
-                    line = handleVERBATIM(line, util);
+                    if (renderWiki)
+                      line = handleVERBATIM(line, util);
                 }
 
                 // PLUGIN: call insidePREHandler with the current line
@@ -202,11 +212,14 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
             else {
                 // PLUGIN: call insidePREHandler with the current line
                 line = plugins.outsidePREHandler(line, context);
-                line = handleHeadings(line, util);
-                line = handleHR(line, util);
-                line = handleEmphasis(line, util);
-                line = handleWikiNames(line, util, context);
-                line = handleList(ls, output, line, util);
+                if (renderWiki) {
+                   line = handleHeadings(line, util);
+                   line = handleHR(line, util);
+                   line = handleEmphasis(line, util);
+                   line = handleWikiNames(line, util, context);
+                   line = handleList(ls, output, line, util);
+                }
+
                 if (line!=null) {
                     // continue other substitutions
                 }
@@ -216,7 +229,8 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
             output.append("\n");
             }
         }
-        ls.dumpCurrentList(output, true);
+        if (renderWiki)
+          ls.dumpCurrentList(output, true);
 
         // PLUGIN: call endRenderingHandler at the end with the full content
         output.append(plugins.endRenderingHandler("", context));
@@ -280,6 +294,14 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
 
     public void setRemovePre(boolean removePre) {
         this.removePre = removePre;
+    }
+
+    public boolean isRenderWiki() {
+        return renderWiki;
+    }
+
+    public void setRenderWiki(boolean renderWiki) {
+        this.renderWiki = renderWiki;
     }
 
 

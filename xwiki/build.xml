@@ -150,6 +150,7 @@
         <include name="**/*.vm" />
         <include name="**/*.cfg" />
         <include name="**/*.txt" />
+        <include name="META-INF/services/com.*" />
         <exclude name="web/**" />
         <exclude name="perl/**" />
         <exclude name="${src.dir}/web.xml" />

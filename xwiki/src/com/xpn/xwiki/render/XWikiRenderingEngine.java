@@ -55,8 +55,13 @@ public class XWikiRenderingEngine {
 
         // The first should not removePre
         // The last one should removePre
-        renderers.add(new XWikiRadeoxRenderer(true));
-        // renderers.add(new XWikiWikiBaseRenderer(true));
+        renderers.add(new XWikiRadeoxRenderer(false));
+
+        if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
+           renderers.add(new XWikiWikiBaseRenderer(true, true));
+        } else {
+           renderers.add(new XWikiWikiBaseRenderer(false, true));
+        }
     }
 
     public void addRenderer(XWikiRenderer renderer) {

@@ -61,7 +61,7 @@ public class PluginTest extends TestCase {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
-        xwiki.getRenderingEngine().addRenderer(new XWikiWikiBaseRenderer(true));
+        // xwiki.getRenderingEngine().addRenderer(new XWikiWikiBaseRenderer(false, true));
         xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin, com.xpn.xwiki.plugin.TablePlugin", context));
         PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
         pplugin.addPattern(":)","smile","no desc");

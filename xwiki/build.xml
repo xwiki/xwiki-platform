@@ -136,6 +136,17 @@
                 dir="${src.dir}/perl" />
         </copy>
 
+        <copy todir="${build.dir}/web">
+            <fileset includes="jspRedirector.jsp"
+                dir="test" />
+        </copy>
+
+        <copy todir="${build.dir}/web/WEB-INF/classes">
+            <fileset dir="${build.dir}/web/WEB-INF">
+            <include name="hibernate*.cfg.xml" />
+            </fileset>
+        </copy>
+
         <javac srcdir="${src.dir}"
             destdir="${classes.dir}"
             classpath="${libs}"
@@ -154,39 +165,32 @@
             debug="on" optimize="on" deprecation="on">
             <include name="**/test/*.java" />
         </javac>
-
-        <copy todir="${build.dir}/web">
-            <fileset includes="jspRedirector.jsp"
-                dir="test" />
-        </copy>
     </target>
 
 
-        <target name="test" depends="release, tests">
-            <delete dir="${test.reports.dir}" />
-            <mkdir dir="${test.reports.dir}" />
+    <target name="test" depends="release, tests">
+        <mkdir dir="${test.reports.dir}" />
 
-            <junit printsummary="yes" dir="${basedir}/test" fork="on" >
+        <junit printsummary="yes" dir="${basedir}/test" fork="on" >
 
-                <classpath>
-                    <pathelement path="${classes.dir}" />
-                    <pathelement path="${libs}" />
-                </classpath>
-                <formatter type="plain" />
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="plain" />
 
-                <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
-                <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.StoreTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
-                <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
-            </junit>
-        </target>
+            <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
+            <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
+        </junit>
+    </target>
 
     <target name="servertest" depends="release, tests">
-        <delete dir="${test.reports.dir}" />
         <mkdir dir="${test.reports.dir}" />
 
         <cactus printsummary="yes" dir="${basedir}/test"

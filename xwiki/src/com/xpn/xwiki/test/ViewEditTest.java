@@ -7,6 +7,7 @@ import org.apache.cactus.WebResponse;
 import org.apache.struts.action.ActionServlet;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import net.sf.hibernate.HibernateException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -48,7 +50,7 @@ import com.xpn.xwiki.objects.StringProperty;
 
 public class ViewEditTest extends ServletTestCase {
 
-    public static String hibpath = "hibernate-test.cfg.xml";
+    private static String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() {};
     public void cleanUp() {};
@@ -88,8 +90,20 @@ public class ViewEditTest extends ServletTestCase {
         webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, "");
     }
 
+
+    public String getHibpath() {
+        if (config==null)
+            return hibpath;
+
+        ServletContext context = config.getServletContext();
+        if (context!=null)
+            return context.getRealPath(hibpath);
+        else
+            return hibpath;
+    }
+
     public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         setUrl(webRequest, "view", "ViewNotOkTest");
     }
@@ -106,7 +120,7 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     public void beginViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         createDoc(hibstore, "ViewOkTest");
         setUrl(webRequest, "view", "ViewOkTest");
@@ -130,7 +144,7 @@ public class ViewEditTest extends ServletTestCase {
      }
 
      public void beginSave(WebRequest webRequest) throws HibernateException, XWikiException {
-         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
          com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
          setUrl(webRequest, "save", "SaveTest");
          webRequest.addParameter("content","Hello1Hello2Hello3");
@@ -142,7 +156,7 @@ public class ViewEditTest extends ServletTestCase {
          // Verify return
         assertTrue("Saving returned exception", result.indexOf("Exception")==-1);
 
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "SaveTest");
         hibstore.loadXWikiDoc(doc2);
         String content2 = doc2.getContent();
@@ -157,7 +171,7 @@ public class ViewEditTest extends ServletTestCase {
      }
 
      public void beginAddProp(WebRequest webRequest, Class cclass) throws HibernateException, XWikiException {
-         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
          com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
          createDoc(hibstore, "PropAddTest");
          setUrl(webRequest, "propadd", "PropAddTest");
@@ -169,7 +183,7 @@ public class ViewEditTest extends ServletTestCase {
         String result = webResponse.getText();
          // Verify return
         assertTrue("Adding Property " + cclass.getName() + " returned exception", result.indexOf("Exception")==-1);
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropAddTest");
         hibstore.loadXWikiDoc(doc2);
         BaseClass bclass = doc2.getxWikiClass();
@@ -209,7 +223,7 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     public void beginAddClass(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         BaseObject bobject = ObjectTest.prepareObject();
         createDoc(hibstore, "PropAddClassClass", bobject, bobject.getxWikiClass());
@@ -222,7 +236,7 @@ public class ViewEditTest extends ServletTestCase {
        String result = webResponse.getText();
         // Verify return
        assertTrue("Adding Class returned exception", result.indexOf("Exception")==-1);
-       XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+       XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropAddClass");
        hibstore.loadXWikiDoc(doc2);
        Map bobjects = doc2.getxWikiObjects();
@@ -245,7 +259,7 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     public void beginUpdateClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         BaseObject bobject = ObjectTest.prepareObject();
         createDoc(hibstore, "PropUpdateClassClass", bobject, bobject.getxWikiClass());
@@ -264,7 +278,7 @@ public class ViewEditTest extends ServletTestCase {
        String result = webResponse.getText();
         // Verify return
        assertTrue("Updated Class returned exception", result.indexOf("Exception")==-1);
-       XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+       XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropUpdateClass");
        hibstore.loadXWikiDoc(doc2);
        Map bobjects = doc2.getxWikiObjects();
@@ -287,6 +301,4 @@ public class ViewEditTest extends ServletTestCase {
        String name = ((StringProperty)bobject.safeget("name")).getValue();
        assertEquals("Updated Class name property value is incorrect", "john", name);
     }
-
-
 }

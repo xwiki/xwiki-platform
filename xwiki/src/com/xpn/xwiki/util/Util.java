@@ -34,10 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 public class Util {
@@ -146,4 +143,11 @@ public class Util {
         return fullname.substring(0, i);
     }
 
+    public Vector split (String pattern,
+			     String text) {
+	Vector results = new Vector();
+	getP5util().split ((Collection) results,pattern,text);
+	return results;
+    }
+    
 }

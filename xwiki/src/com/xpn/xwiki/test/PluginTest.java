@@ -41,7 +41,7 @@ public class PluginTest extends TestCase {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
-        xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin", context));
+        xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin, com.xpn.xwiki.plugin.TablePlugin", context));
         PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
         pplugin.addPattern(":)","smile","no desc");
         pplugin.addPattern(":-)","smile","no desc");
@@ -76,6 +76,16 @@ public class PluginTest extends TestCase {
         XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
         RenderTest.renderTest(wikibase, "Hello 1\n%PATTERNS%\nHello 2",
                 "smile", false, context);
+    }
+
+    public void testTablePlugin() throws XWikiException {
+        XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
+        RenderTest.renderTest(wikibase, "Hello 1\n| a | b |c |\n| d | e | f |\nHello 2",
+                "<table", false, context);
+        RenderTest.renderTest(wikibase, "Hello 1\n| a | b | c |\n| d | e | f |\nHello 2",
+                "DDDDDD", false, context);
+        RenderTest.renderTest(wikibase, "Hello 1\n%TABLE{ headerbg=\"#EEEEEE\" }%\n| a | b | c |\n| d | e | f |\nHello 2",
+                "EEEEEE", false, context);
     }
 
 }

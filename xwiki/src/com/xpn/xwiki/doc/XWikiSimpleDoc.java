@@ -320,6 +320,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String[] getRecentRevisions() throws XWikiException {
+        try {
         Version[] revisions = getStore().getXWikiDocVersions(this);
         int length = 5;
         if (revisions.length<5)
@@ -330,6 +331,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             recentrevs[i-1
                     ] = revisions[revisions.length-i].toString();
         return recentrevs;
+        } catch (Exception e) {
+            return new String[0];
+        }
     }
 
     public Archive getRCSArchive() {

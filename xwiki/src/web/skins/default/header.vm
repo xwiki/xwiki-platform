@@ -19,7 +19,7 @@
     $!xwiki.getXWikiPreference("menu", $context)
   </div>
   <div id="version">
-    <a href="../../view/Main/WebHome">XWiki Version $xwiki.version</a>
+    <a href="../../view/Main/WebHome">XWiki Version $xwiki.version ($skin)</a>
   </div>
 </div>
 

@@ -431,7 +431,7 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
             XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
-            return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
+            return ((BaseProperty)doc.getObject("XWiki.XWikiPreferences", 0).get(prefname)).getValue().toString();
         } catch (Exception e) {
             return getXWikiPreference(prefname, context);
         }
@@ -443,7 +443,7 @@ public class XWiki implements XWikiNotificationInterface {
             // return user.getPreference(prefname, context);
             return getWebPreference(prefname, context);
         } catch (Exception e) {
-            return getWebPreference(prefname, context);
+            return getXWikiPreference(prefname, context);
         }
     }
 

@@ -186,6 +186,7 @@ public abstract class ListClass extends PropertyClass {
         } else {
             Select select = new Select(prefix + name, 1);
             select.setMultiple(isMultiSelect());
+            select.setSize(getSize());
 
             List list = getList(context);
             List selectlist;

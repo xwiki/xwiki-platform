@@ -108,6 +108,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public BaseClass getxWikiClass(XWikiContext context) {
         String name = getClassName();
         try {
+            if ((context==null)||(context.getWiki()==null))
+                return null;
             XWikiDocInterface doc = context.getWiki().getDocument(name, context);
          if (doc==null)
           return null;

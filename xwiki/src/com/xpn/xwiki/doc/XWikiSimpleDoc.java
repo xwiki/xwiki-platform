@@ -1037,7 +1037,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                             objclass = bclass;
                         else
                             objclass = obj.getxWikiClass(context);
-                        docel.add(obj.toXML(bclass));
+                        docel.add(obj.toXML(objclass));
                     }
                 }
             }

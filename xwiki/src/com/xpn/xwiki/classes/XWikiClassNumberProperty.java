@@ -24,6 +24,7 @@
 package com.xpn.xwiki.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class XWikiClassNumberProperty  extends XWikiClassProperty {
 
@@ -34,34 +35,90 @@ public class XWikiClassNumberProperty  extends XWikiClassProperty {
     public static final int TYPE_DOUBLE = 3;
     */
 
-    public XWikiClassNumberProperty() {
+    public XWikiClassNumberProperty(XWikiClass wclass) {
+        setxWikiClass(wclass);
+        setType("numberclass");
         setSize(30);
+        setNumberType("long");
     }
 
+    public XWikiClassNumberProperty() {
+        setType("numberclass");
+        setSize(30);
+        setNumberType("long");
+    }
+
+    public XWikiClass getxWikiClass() {
+        XWikiMetaClass wclass = (XWikiMetaClass)super.getxWikiClass();
+        if (wclass==null) {
+          wclass = new XWikiMetaClass();
+
+        XWikiClassStringProperty type_class = new XWikiClassStringProperty(wclass);
+        type_class.setSize(20);
+        XWikiClassNumberProperty size_class = new XWikiClassNumberProperty(wclass);
+        size_class.setSize(5);
+        size_class.setNumberType("integer");
+        wclass.put("number_type", type_class);
+        wclass.put("size", size_class);
+        setxWikiClass(wclass);
+        }
+        return wclass;
+    }
+
+
+
     public int getSize() {
-        return ((XWikiObjectNumberProperty)get("size")).getValue().intValue();
+        try {
+            return ((XWikiObjectNumberProperty)get("size")).getValue().intValue();
+        } catch (Exception e) {
+            // This should not happen
+            return 30;
+        }
     }
 
     public void setSize(int size) {
         XWikiObjectNumberProperty property = new XWikiObjectNumberProperty();
         property.setValue(new Integer(size));
-        put("size", property);
+        try {
+            put("size", property);
+        } catch (XWikiException e) {
+            // This should never happen because size has been declared in the meta-class
+        };
     }
 
     public String getNumberType() {
-        return ((XWikiObjectStringProperty)get("number_type")).getValue();
+        try {
+            return ((XWikiObjectStringProperty)get("number_type")).getValue();
+        } catch (Exception e) {
+            return "long";
+        }
     }
 
     public void setNumberType(String ntype) {
         XWikiObjectStringProperty property = new XWikiObjectStringProperty();
         property.setValue(ntype);
-        put("number_type", property);
+        try {
+            put("number_type", property);
+        } catch (XWikiException e) {
+            // This should never happen because number_type has been declared in the meta-class
+        }
     }
 
 
     public XWikiObjectProperty fromString(String value) {
-        XWikiObjectStringProperty property = new XWikiObjectStringProperty();
-        property.setValue(value);
+        XWikiObjectNumberProperty property = new XWikiObjectNumberProperty();
+        String ntype = getNumberType();
+        Number nvalue;
+        if (ntype.equals("integer")) {
+          nvalue = new Integer(value);
+        } else if (ntype.equals("float")) {
+          nvalue = new Float(value);
+        } else if (ntype.equals("double")) {
+          nvalue = new Double(value);
+        } else {
+          nvalue = new Long(value);
+        }
+        property.setValue(nvalue);
         property.setPropertyClass(this);
         return property;
     }

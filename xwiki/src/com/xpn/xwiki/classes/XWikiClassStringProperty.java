@@ -23,21 +23,52 @@
 package com.xpn.xwiki.classes;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class XWikiClassStringProperty extends XWikiClassProperty {
 
-    public XWikiClassStringProperty() {
+    public XWikiClassStringProperty(XWikiClass wclass) {
+        setxWikiClass(wclass);
+        setType("stringclass");
         setSize(30);
     }
 
+    public XWikiClassStringProperty() {
+        setType("stringclass");
+        setSize(30);
+    }
+
+    public XWikiClass getxWikiClass() {
+        XWikiMetaClass wclass = (XWikiMetaClass)super.getxWikiClass();
+        if (wclass==null) {
+          wclass = new XWikiMetaClass();
+
+        XWikiClassNumberProperty size_class = new XWikiClassNumberProperty(wclass);
+        size_class.setSize(5);
+        size_class.setNumberType("integer");
+        wclass.put("size", size_class);
+        setxWikiClass(wclass);
+        }
+        return wclass;
+    }
+
+
     public int getSize() {
-        return ((XWikiObjectNumberProperty)get("size")).getValue().intValue();
+        try {
+            return ((XWikiObjectNumberProperty)get("size")).getValue().intValue();
+        } catch (Exception e) {
+            return 30;
+        }
     }
 
     public void setSize(int size) {
         XWikiObjectNumberProperty property = new XWikiObjectNumberProperty();
         property.setValue(new Integer(size));
-        put("size", property);
+        try {
+            put("size", property);
+        } catch (XWikiException e) {
+            // This should not happen
+        }
     }
 
     public XWikiObjectProperty fromString(String value) {

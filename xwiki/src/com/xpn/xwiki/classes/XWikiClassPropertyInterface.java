@@ -25,7 +25,7 @@ package com.xpn.xwiki.classes;
 
 import com.xpn.xwiki.XWikiContext;
 
-public interface XWikiClassPropertyInterface extends XWikiObjectInterface {
+public interface XWikiClassPropertyInterface extends XWikiObjectInterface, XWikiObjectPropertyInterface {
     public String toString(XWikiObjectProperty property);
     public XWikiObjectProperty fromString(String value);
     public void displayHidden(StringBuffer buffer, String name, XWikiObject object, XWikiContext context);

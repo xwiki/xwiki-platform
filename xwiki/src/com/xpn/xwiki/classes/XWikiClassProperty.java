@@ -25,6 +25,8 @@ package com.xpn.xwiki.classes;
 import com.xpn.xwiki.XWikiContext;
 
 public abstract class XWikiClassProperty extends XWikiObject implements XWikiClassPropertyInterface {
+    private String name;
+
 
     public String toString(XWikiObjectProperty property) {
         return property.toString();  //To change body of implemented methods use Options | File Templates.
@@ -40,6 +42,14 @@ public abstract class XWikiClassProperty extends XWikiObject implements XWikiCla
     }
 
     public void displayEdit(StringBuffer buffer, String name, XWikiObject object, XWikiContext context) {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

@@ -11,24 +11,21 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
+ * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
- *
+
  * Created by
  * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:51:16
+ * Date: 19 déc. 2003
+ * Time: 18:49:14
  */
 package com.xpn.xwiki.classes;
 
 import com.xpn.xwiki.XWikiException;
 
-import java.util.HashMap;
-import java.util.Map;
+public class XWikiMetaClass extends XWikiClass {
 
-
-public class XWikiClass extends XWikiObject implements XWikiClassInterface {
     public XWikiObjectPropertyInterface get(String name) {
         return (XWikiObjectPropertyInterface)fields.get(name);
     }

@@ -22,10 +22,12 @@
  */
 package com.xpn.xwiki.classes;
 
-public interface XWikiObjectInterface {
-    public XWikiObjectPropertyInterface get(String name);
-    public XWikiClass getXWikiClass();
-    public void setXwikiClass(XWikiClass xWikiClass);
+import com.xpn.xwiki.XWikiException;
 
-    void put(String name,XWikiObjectPropertyInterface property);
+public interface XWikiObjectInterface {
+    public XWikiObjectPropertyInterface get(String name) throws XWikiException;
+    public XWikiClass getxWikiClass();
+    public void setxWikiClass(XWikiClass xWikiClass);
+
+    void put(String name,XWikiObjectPropertyInterface property) throws XWikiException;
 }

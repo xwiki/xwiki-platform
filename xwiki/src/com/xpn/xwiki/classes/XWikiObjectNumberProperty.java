@@ -25,6 +25,10 @@ package com.xpn.xwiki.classes;
 public class XWikiObjectNumberProperty extends XWikiObjectProperty {
     private Number value;
 
+    public XWikiObjectNumberProperty() {
+        setType("number");
+    }
+
     public Number getValue() {
         return value;
     }

@@ -24,28 +24,41 @@ package com.xpn.xwiki.classes;
 
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 import javax.mail.internet.ParameterList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XWikiObject implements XWikiObjectInterface {
+public class XWikiObject extends XWikiObjectProperty implements XWikiObjectInterface {
     private XWikiClass xWikiClass;
-    private Map fields;
+    protected Map fields = new HashMap();
 
-    public XWikiObjectPropertyInterface get(String name) {
+
+    public void checkField(String name) throws XWikiException {
+        if (getxWikiClass().get(name)==null) {
+            Object[] args = { name, getxWikiClass().getName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
+                    "Field {0} does not exist in class {1}", null, args);
+        }
+    }
+
+    public XWikiObjectPropertyInterface get(String name) throws XWikiException {
+        checkField(name);
         return (XWikiObjectPropertyInterface) fields.get(name);
     }
 
-    public void put(String name,XWikiObjectPropertyInterface property) {
+    public void put(String name,XWikiObjectPropertyInterface property) throws XWikiException {
+        checkField(name);
         fields.put(name, property);
     }
 
-    public XWikiClass getXWikiClass() {
+
+    public XWikiClass getxWikiClass() {
         return xWikiClass;
     }
 
-    public void setXwikiClass(XWikiClass xWikiClass) {
+    public void setxWikiClass(XWikiClass xWikiClass) {
         this.xWikiClass = xWikiClass;
     }
 

@@ -25,6 +25,11 @@ package com.xpn.xwiki.classes;
 public class XWikiObjectStringProperty extends XWikiObjectProperty {
     private String value;
 
+
+    public XWikiObjectStringProperty() {
+        setType("string");
+    }
+
     public String getValue() {
         return value;
     }

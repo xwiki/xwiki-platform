@@ -11,13 +11,13 @@ $message
 </div>
 #end
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
+<p>
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 #foreach($class in $doc.xWikiClasses)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
-<p>
 <input type="hidden" name="${class.name}_nb" value="$nb" />
-</p>
 #end
+</p>
 <div id="xwikicontent">
 $doc.getRenderedContent()
 </div>

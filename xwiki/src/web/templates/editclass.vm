@@ -4,6 +4,7 @@
 #set( $class = $doc.getxWikiClass())
 #set( $redirect = $xwiki.getRequestURL())
 <script type="text/javascript">
+<!--
 var currentfield = "";
 function show(fieldname) {
   if (currentfield!="")
@@ -11,6 +12,7 @@ function show(fieldname) {
   document.getElementById("field_" + fieldname).style.display="block";
   currentfield = fieldname;
 }
+// -->
 </script>
 <div class="left">
 <h3>Class Editor</h3>
@@ -23,7 +25,7 @@ function show(fieldname) {
 <div class="left">
 <form id="propadd" method="post" action="$doc.getActionUrl("propadd")">
 <p style="text-align: center">
-<input type="hidden" name="xredirect" value="$redirect" />
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 Name: <input type="text" name="propname" value="" size="20" />
 <br /><br />
 <select name="proptype" size="1">
@@ -42,7 +44,7 @@ Name: <input type="text" name="propname" value="" size="20" />
 <br />
 <form id="propupdate" method="post" action="$doc.getActionUrl("propupdate")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect" />
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="submit" value="Save Class" />
 </p>
 </div>
@@ -59,7 +61,9 @@ Welcome to the class editor. Choose a field to edit or add a field to the class.
 <div id="field_$field.name" style="display: #if ($first==1) block #else none #end;">
 #if ($first==1)
 <script type="text/javascript">
+<!--
 currentfield = "$field.name";
+// -->
 </script>
 #set ($first = 0)
 #end

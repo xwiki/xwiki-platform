@@ -9,6 +9,7 @@
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = $xwiki.getRequestURL())
 <script type="text/javascript">
+<!--
 var currentfield = "";
 function show(fieldname) {
   if (currentfield!="")
@@ -16,6 +17,7 @@ function show(fieldname) {
   document.getElementById(fieldname).style.display="block";
   currentfield = fieldname;
 }
+// -->
 </script>
 <div class="left">
 <h3>Rights Editor</h3>
@@ -34,7 +36,7 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 <h2>Add a right entry</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect" />
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="hidden" name="classname" value="$classname" />
 <input type="submit" value="Add Right Entry" />
 </p>
@@ -44,8 +46,10 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 <div class="left">
 <br />
 <form id="update" method="post" action="$doc.getActionUrl("save")">
-<input type="hidden" name="xredirect" value="$redirect" />
+<p>
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="submit" value="Save Rights" />
+</p>
 </div>
 
 <div class="center">
@@ -65,13 +69,15 @@ Welcome to the rights editor. Choose a right entry to edit or add a new right en
 <div id="${class.name}_${obj.number}" style="display: #if ($first==1) block #else none #end;">
 #if ($first==1)
 <script type="text/javascript">
+<!--
 currentfield = "${class.name}_${obj.number}";
+// -->
 </script>
 #set ($first = 0)
 #end
 
 
-You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&classid=${obj.number}&xredirect=$redirect"
+You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=$xwiki.getFormEncoded($redirect)"
     onclick="return confirm('$msg.get("confirmobjectremove")')">
     remove this object</a><br /><br /><br />
 
@@ -84,6 +90,7 @@ You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&class
 </table>
 </div>
 #end
+</form>
 </div>
 </div>
 #template("editfooter.vm")

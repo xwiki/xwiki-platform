@@ -30,6 +30,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.tools.struts.MessageTool;
 import org.apache.velocity.tools.view.context.ChainedContext;
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.tools.VelocityFormatter;
 
 import javax.servlet.ServletContext;
 import javax.servlet.Servlet;
@@ -58,6 +59,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
     public static VelocityContext prepareContext(XWikiContext context) {
         VelocityContext vcontext = new VelocityContext();
+        vcontext.put("formatter", new VelocityFormatter(vcontext));
         vcontext.put("xwiki", new XWiki(context.getWiki(), context));
         vcontext.put("request", context.getRequest());
         vcontext.put("response", context.getResponse());

@@ -39,6 +39,7 @@ import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.tools.VelocityFormatter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -578,19 +579,19 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("edit")) {
-                result.append("<pre>");
+                result.append("{pre}");
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                result.append("</pre>");
+                result.append("{/pre}");
             }
             else if (type.equals("hidden")) {
-                result.append("<pre>");
+                result.append("{pre}");
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                result.append("</pre>");
+                result.append("{/pre}");
             }
             else if (type.equals("search")) {
-                result.append("<pre>");
+                result.append("{pre}");
                 pclass.displaySearch(result, fieldname, prefix, obj, context);
-                result.append("</pre>");
+                result.append("{/pre}");
             }
             else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -643,6 +644,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       StringBuffer result = new StringBuffer();
       XWikiVelocityRenderer renderer = new XWikiVelocityRenderer();
       VelocityContext vcontext = new VelocityContext();
+      vcontext.put("formatter", new VelocityFormatter(vcontext));
       for (Iterator it = fields.values().iterator();it.hasNext();) {
           PropertyClass pclass = (PropertyClass) it.next();
           vcontext.put(pclass.getName(), pclass.getPrettyName());
@@ -1034,6 +1036,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void renameProperties(String className, Map fieldsToRename) {
         Vector objects = getObjects(className);
+        if (objects==null)
+            return;
         for (int j=0;j<objects.size();j++) {
             BaseObject bobject = (BaseObject) objects.get(j);
             if (bobject==null)

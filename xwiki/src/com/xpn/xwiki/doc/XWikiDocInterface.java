@@ -145,4 +145,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void setObjectsToRemove(ArrayList objectsToRemove);
     List getxWikiClasses();
 
+    String display(String fieldname, String type, BaseObject obj, XWikiContext context);
+
 }

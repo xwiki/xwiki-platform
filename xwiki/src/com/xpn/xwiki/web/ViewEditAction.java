@@ -431,7 +431,7 @@ public class ViewEditAction extends XWikiAction
                 String path = request.getPathInfo();
                 String filename = path.substring(path.lastIndexOf("/")+1);
 
-                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                BaseObject object = doc.getObject("XWiki.XWikiSkinClass", 0);
                 String content = null;
                 if (object!=null) {
                     content = object.getStringValue(filename);

@@ -20,15 +20,15 @@ public class PreTagSubstitution extends WikiSubstitution {
 
     public PreTagSubstitution(com.xpn.xwiki.util.Util util, boolean removepre) {
         super(util);
-        setPattern("<pre>.*?</pre>", Perl5Compiler.CASE_INSENSITIVE_MASK | Perl5Compiler.SINGLELINE_MASK);
+        setPattern("{pre}.*?{/pre}", Perl5Compiler.CASE_INSENSITIVE_MASK | Perl5Compiler.SINGLELINE_MASK);
         setRemovePre(removepre);
     }
 
     public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern) {
         String content = matchResult.group(0);
         if (isRemovePre()) {
-           content = getUtil().substitute("s/<pre>//ig", content);
-           content = getUtil().substitute("s/<\\/pre>//ig", content);
+           content = getUtil().substitute("s/{pre}//ig", content);
+           content = getUtil().substitute("s/{\\/pre}//ig", content);
         }
         getList().add(content);
         stringBuffer.append("%_" + counter + "_%");

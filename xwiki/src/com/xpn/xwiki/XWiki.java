@@ -496,7 +496,7 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface doc = getDocument(skin, context);
             if (!doc.isNew()) {
-                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                BaseObject object = doc.getObject("XWiki.XWikiSkinClass", 0);
                 if (object!=null) {
                     String content = object.getStringValue(template);
                     if ((content!=null)&&(!content.equals(""))) {
@@ -533,7 +533,7 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface doc = getDocument(skin, context);
             if (!doc.isNew()) {
-                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                BaseObject object = doc.getObject("XWiki.XWikiSkinClass", 0);
                 if (object!=null) {
                     String content = object.getStringValue(filename);
                     if ((content!=null)&&(!content.equals(""))) {
@@ -1071,11 +1071,11 @@ public class XWiki implements XWikiNotificationInterface {
                 if (database!=null)
                     context.setDatabase(database);
 
-                return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
+                return "{pre}" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "{/pre}";
             }
             else {
                 // We stay in the context included document
-                return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
+                return "{pre}" + getRenderingEngine().renderDocument(doc, context) + "{/pre}";
             }
         } finally {
             if (database!=null)

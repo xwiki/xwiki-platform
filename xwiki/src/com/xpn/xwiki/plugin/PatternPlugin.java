@@ -90,7 +90,7 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
     public String getPatternList() {
         CharacterFilter filter = new CharacterFilter();
         StringBuffer list = new StringBuffer();
-        list.append("<pre>\n");
+        list.append("{pre}\n");
         list.append("<table border=1>");
         list.append("<tr><td><strong>Pattern</strong></td>");
         list.append("<td><strong>Result</strong></td><td><strong>Description</strong></td></tr>");
@@ -104,7 +104,7 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
             list.append("</td></tr>");
         }
         list.append("</table>");
-        list.append("\n<pre>");
+        list.append("\n{/pre}");
         return list.toString();
     }
 

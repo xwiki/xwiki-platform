@@ -161,29 +161,29 @@ public abstract class RenderTest extends TestCase {
          XWikiRenderer wikibase = getXWikiRenderer();
 
         // Test formatting
-        renderTest(wikibase, "<pre>This is a text with *strong* text</pre>",
+        renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "<pre>\nThis is a text with *strong* text\n</pre>",
+        renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "This is a text with<pre> *strong* </pre>text\n",
+        renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "---+ Title <pre>\n*strong*\n</pre>",
+        renderTest(wikibase, "---+ Title {pre}\n*strong*\n{/pre}",
                  "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
-        renderTest(wikibase, "   * Item <pre>*strong*</pre>",
+        renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
                  "<li> Item *strong*</li>", false, context);
-        renderTest(wikibase, "This is a text with<pre> *one* </pre>and<pre> *two* </pre>items\n",
+        renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
                 "This is a text with *one* and *two* items", false, context);
-        renderTest(wikibase, "<PrE>This is a text with *strong* text</PrE>",
+        renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "<PrE>\nThis is a text with *strong* text\n</PrE>",
+        renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "This is a text with<PrE> *strong* </PrE>text\n",
+        renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
                 "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "---+ Title <PrE>\n*strong*\n</PrE>",
+        renderTest(wikibase, "---+ Title {pre}\n*strong*\n{/pre}",
                  "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
-        renderTest(wikibase, "   * Item <PrE>*strong*</PrE>",
+        renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
                  "<li> Item *strong*</li>", false, context);
-        renderTest(wikibase, "This is a text with<PrE> *one* </PrE>and<PrE> *two* </PrE>items\n",
+        renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
                 "This is a text with *one* and *two* items", false, context);
 
     }

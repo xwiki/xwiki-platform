@@ -51,29 +51,29 @@ public class RadeoxRenderTest  extends RenderTest {
     public void testWikiBasePreRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         // Test formatting
-        renderTest(wikibase, "<pre>This is a text with *strong* text</pre>",
+        renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "<pre>\nThis is a text with *strong* text\n</pre>",
+        renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "This is a text with<pre> *strong* </pre>text\n",
+        renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "1 Title <pre>\n*strong*\n</pre>",
+        renderTest(wikibase, "1 Title {pre}\n*strong*\n{/pre}",
         "<h3 class=\"heading-1\">Title \n*strong*\n</h3>", false, context);
-        renderTest(wikibase, "   * Item <pre>*strong*</pre>",
+        renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
         "<li>Item *strong*</li>", false, context);
-        renderTest(wikibase, "This is a text with<pre> *one* </pre>and<pre> *two* </pre>items\n",
+        renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
         "This is a text with *one* and *two* items", false, context);
-        renderTest(wikibase, "<PrE>This is a text with *strong* text</PrE>",
+        renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "<PrE>\nThis is a text with *strong* text\n</PrE>",
+        renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "This is a text with<PrE> *strong* </PrE>text\n",
+        renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
         "This is a text with *strong* text", false, context);
-        renderTest(wikibase, "1 Title <PrE>\n*strong*\n</PrE>",
+        renderTest(wikibase, "1 Title {pre}\n*strong*\n{/pre}",
         "<h3 class=\"heading-1\">Title \n*strong*\n</h3>", false, context);
-        renderTest(wikibase, "   * Item <PrE>*strong*</PrE>",
+        renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
         "<li>Item *strong*</li>", false, context);
-        renderTest(wikibase, "This is a text with<PrE> *one* </PrE>and<PrE> *two* </PrE>items\n",
+        renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
         "This is a text with *one* and *two* items", false, context);
     }
 
@@ -90,6 +90,7 @@ public class RadeoxRenderTest  extends RenderTest {
     }
 
     public void testWikiBaseLinkRenderer() throws XWikiException {
+        Utils.createDoc(getHibStore(), "Main", "WebHome", context);
         XWikiRenderer wikibase = getXWikiRenderer();
         XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
         context.put("doc", doc);
@@ -98,8 +99,25 @@ public class RadeoxRenderTest  extends RenderTest {
                 "Main/WebHome", false, context);
         renderTest(wikibase, "Test link: [Web Home]",
                 "Web Home</a>", false, context);
-        renderTest(wikibase, "Test link: http://www.ludovic.org/",
+        renderTest(wikibase, "Test link: [Web Home]",
+                "WebHome", false, context);
+        renderTest(wikibase, "Test link: [Web Home2]",
+                "Web Home2</a>", false, context);
+        renderTest(wikibase, "Test link: [Web Home2]",
+                "WebHome2?parent=", false, context);
+        renderTest(wikibase, "Test link: [WebHome|Other Text]",
+                "Other Text</a>", false, context);
+        renderTest(wikibase, "Test link: [WebHome|Other Text]",
+                "WebHome", false, context);
+         renderTest(wikibase, "Test link: http://www.ludovic.org/",
                 "<a href=\"http://www.ludovic.org/\">", false, context);
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
                 "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);    }
+
+
+       public void testHTMLCodeRenderer() throws XWikiException {
+        XWikiRenderer wikibase = getXWikiRenderer();
+        renderTest(wikibase, "{code}\n<html>\n{code}",
+                "&#60;html&#62;", false, context);
+       }
 }

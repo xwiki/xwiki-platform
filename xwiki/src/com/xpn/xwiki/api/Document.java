@@ -166,6 +166,10 @@ public class Document {
         return doc.display(fieldname, obj, context);
     }
 
+    public String display(String fieldname, String mode, BaseObject obj) {
+        return doc.display(fieldname, mode, obj, context);
+    }
+
     public String display(String fieldname) {
         return doc.display(fieldname, context);
     }

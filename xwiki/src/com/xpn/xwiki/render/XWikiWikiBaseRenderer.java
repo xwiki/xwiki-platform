@@ -172,7 +172,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         // Start by handling all tags (plugins + internal)
         content = handleAllTags(content, doc, context);
 
-        // Remove the content that is inside "<pre>"
+        // Remove the content that is inside "{pre}"
         PreTagSubstitution preTagSubst = new PreTagSubstitution(util, isRemovePre());
         content = preTagSubst.substitute(content);
 
@@ -184,12 +184,12 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
             line = tokens.nextToken();
 
             // Changing state..
-            if (util.match("m|<pre>|i", line)) {
-                line = util.substitute("s/<pre>//i", line);
+            if (util.match("m|{pre}|i", line)) {
+                line = util.substitute("s/{pre}//i", line);
                 insidePRE = true;
             }
-            if (util.match("m|</pre>|i", line)) {
-                line = util.substitute("s/<\\/pre>//i", line);
+            if (util.match("m|{/pre}|i", line)) {
+                line = util.substitute("s/{\\/pre}//i", line);
                 insidePRE = false;
             }
 
@@ -235,7 +235,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         line = util.substitute("s/\\&/&amp;/go", line);
         line = util.substitute("s/\\</&amp;/go", line);
         line = util.substitute("s/\\>/&amp;/go", line);
-        line = util.substitute("s/\\&lt;pre\\&gt;/<pre>/go", line);
+        line = util.substitute("s/\\&lt;pre\\&gt;/{pre}/go", line);
         return line;
     }
 

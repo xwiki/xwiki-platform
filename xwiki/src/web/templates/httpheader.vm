@@ -7,7 +7,7 @@
 $!xwiki.getWebPreference("meta")
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  title="currentStyle" />
 <style type="text/css">
-$!doc.display("style", $doc.getObject("XWiki.XWikiHTML",0))
+$!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
 </style>
 </head>
 <body>

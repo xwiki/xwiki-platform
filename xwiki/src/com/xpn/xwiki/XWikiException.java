@@ -40,11 +40,12 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_CLASSES = 7;
     public static final int MODULE_XWIKI_USER = 8;
     public static final int MODULE_XWIKI_ACCESS = 9;
-    public static final int MODULE_XWIKI_APP = 10;
+    public static final int MODULE_XWIKI_APP = 11;
 
     // Error list
     public static final int ERROR_XWIKI_UNKNOWN = 0;
     public static final int ERROR_XWIKI_NOT_IMPLEMENTED = 1;
+    public static final int ERROR_XWIKI_DOES_NOT_EXIST = 2;
 
     // Config
     public static final int ERROR_XWIKI_CONFIG_FILENOTFOUND = 1001;
@@ -96,8 +97,8 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
 
-    public static final int ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST = 10001;
-    public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 10002;
+    public static final int ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST = 11001;
+    public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 11002;
 
 
     private int module;

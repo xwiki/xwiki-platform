@@ -120,9 +120,22 @@ public class XWiki implements XWikiNotificationInterface {
             }
 
             // Check if this appname exists in the Database
+            String serverwikipage = getServerWikiPage(servername);
+            XWikiDocInterface doc = xwiki.getDocument(serverwikipage, context);
+            if (doc.isNew()) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI,
+                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                        "This wiki does not exist");
+            }
+
             context.setDatabase(appname);
         }
         return xwiki;
+    }
+
+    public static String getServerWikiPage(String servername) {
+        return servername.substring(0,1).toUpperCase()
+                  + servername.substring(1);
     }
 
 

@@ -1876,6 +1876,7 @@ public class XWiki implements XWikiNotificationInterface {
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
                 serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
+                serverdoc.setParent("XWiki.XWikiServerClass");
                 saveDocument(serverdoc, context);
             } else {
                 // If we are not allowed to continue if server page already exists

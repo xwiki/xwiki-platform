@@ -538,7 +538,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         try {
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
-            PropertyClass pclass = (PropertyClass) getxWikiClass().get(fieldname);
+            PropertyClass pclass = (PropertyClass) obj.getxWikiClass().get(fieldname);
             String prefix = obj.getxWikiClass().getName() + "_" + obj.getNumber() + "_";
 
             if (type.equals("view")) {

@@ -1,4 +1,7 @@
 <opensymphony-access>
+  <provider class="com.xpn.xwiki.user.XWikiResourceProvider">
+      <property name="realm">default</property>
+  </provider>
   <provider class="com.opensymphony.module.access.provider.osuser.OSUserUserProvider">
     <property name="realm">default</property>
   </provider>

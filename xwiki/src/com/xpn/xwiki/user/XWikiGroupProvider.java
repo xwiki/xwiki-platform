@@ -62,11 +62,16 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
 
     public boolean handles(String name) {
+        if (super.handles(name))
+            return true;
         try {
             name = getName(name);
             List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
                     + " and obj.className in ('XWiki.XWikiUsers','XWiki.XWikiGroups') and obj.name = '" + name + "'");
-            return (list.size()>0);
+            boolean result = (list.size()>0);
+            if (result)
+                getHandledNames().add(name);
+            return result;
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;

@@ -26,6 +26,8 @@ package com.xpn.xwiki;
 import com.opensymphony.user.User;
 import com.opensymphony.user.UserManager;
 import com.opensymphony.user.adapter.catalina.OSUserRealm;
+import com.opensymphony.module.access.AccessManager;
+import com.opensymphony.module.access.NotFoundException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.notify.PropertyChangedRule;
@@ -33,10 +35,7 @@ import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -45,6 +44,7 @@ import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.XWikiGroupProvider;
 import com.xpn.xwiki.user.XWikiUserProvider;
+import com.xpn.xwiki.user.XWikiResourceProvider;
 import com.xpn.xwiki.util.Util;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -75,6 +75,7 @@ public class XWiki implements XWikiNotificationInterface {
     private XWikiNotificationManager notificationManager;
 
     private UserManager usermanager;
+    private AccessManager accessmanager;
     private Authenticator authenticator;
     private SecurityRealmInterface realm;
 
@@ -140,11 +141,12 @@ public class XWiki implements XWikiNotificationInterface {
         // Make sure these classes exists
         getUserClass();
         getGroupClass();
+        getRightsClass();
+        getGlobalRightsClass();
 
         // Initialize User Manager
-        usermanager = UserManager.getInstance();
-        ((XWikiUserProvider) usermanager.getProfileProviders().toArray()[0]).setxWiki(this);
-        ((XWikiGroupProvider) usermanager.getAccessProviders().toArray()[0]).setxWiki(this);
+        initUserManager();
+        initAccessManager();
     }
 
     public String getVersion() {
@@ -557,11 +559,86 @@ public class XWiki implements XWikiNotificationInterface {
         return bclass;
     }
 
-    public UserManager getUserManager() {
+
+    public BaseClass getRightsClass(String pagename) throws XWikiException {
+        XWikiDocInterface doc;
+        boolean needsUpdate = false;
+
+        try {
+            doc = getDocument("XWiki." + pagename );
+        } catch (Exception e) {
+            doc = new XWikiSimpleDoc();
+            doc.setWeb("XWiki");
+            doc.setName(pagename);
+        }
+        BaseClass bclass = doc.getxWikiClass();
+        bclass.setName("XWiki." + pagename);
+        if (bclass.get("users")==null) {
+            needsUpdate = true;
+            StringClass users_class = new StringClass();
+            users_class.setName("users");
+            users_class.setPrettyName("Users");
+            users_class.setSize(80);
+            users_class.setObject(bclass);
+            bclass.put("Users", users_class);
+        }
+        if (bclass.get("groups")==null) {
+            needsUpdate = true;
+            StringClass groups_class = new StringClass();
+            groups_class.setName("groups");
+            groups_class.setPrettyName("Groups");
+            groups_class.setSize(80);
+            groups_class.setObject(bclass);
+            bclass.put("groups", groups_class);
+        }
+        if (bclass.get("levels")==null) {
+            needsUpdate = true;
+            StringClass levels_class = new StringClass();
+            levels_class.setName("levels");
+            levels_class.setPrettyName("Access Levels");
+            levels_class.setSize(80);
+            levels_class.setObject(bclass);
+            bclass.put("levels", levels_class);
+        }
+        if (bclass.get("allow")==null) {
+            needsUpdate = true;
+            NumberClass allow_class = new NumberClass();
+            allow_class.setName("allow");
+            allow_class.setPrettyName("Allow/Deny");
+            allow_class.setSize(2);
+            allow_class.setNumberType("integer");
+            allow_class.setObject(bclass);
+            bclass.put("allow", allow_class);
+        }
+
+        String content = doc.getContent();
+        if ((content==null)||(content.equals("")))
+            doc.setContent("---+ XWiki " + pagename);
+
+        if (needsUpdate)
+            saveDocument(doc);
+        return bclass;
+    }
+
+    public BaseClass getRightsClass() throws XWikiException {
+        return getRightsClass("XWikiRights");
+    }
+
+    public BaseClass getGlobalRightsClass() throws XWikiException {
+        return getRightsClass("XWikiGlobalRights");
+    }
+
+    public void initUserManager() {
         UserManager um = UserManager.getInstance();
         ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setxWiki(this);
         ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setxWiki(this);
-        return um;
+        setUsermanager(um);
+    }
+
+    public void initAccessManager() {
+        AccessManager am = AccessManager.getInstance();
+       ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setxWiki(this);
+       setAccessmanager(am);
     }
 
     public int createUser(XWikiContext context) throws XWikiException {
@@ -661,15 +738,20 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public boolean checkAccess(String action, XWikiDocInterface doc, XWikiContext context)
-                    throws XWikiException {
+            throws XWikiException, NotFoundException {
+        Principal user = null;
         boolean needsAuth = false;
-        if (action.equals("view")) {
-            needsAuth = getXWikiPreference("authenticate_view", context).toLowerCase().equals("yes");
-        } else {
-            needsAuth = getXWikiPreference("authenticate_edit", context).toLowerCase().equals("yes");
-        }
+        String right = "edit";
+
+        if (action.equals("view"))
+            right = "view";
+
+        needsAuth = getXWikiPreference("authenticate_" + right, context).toLowerCase().equals("yes");
+        if (!needsAuth)
+            needsAuth = getWebPreference("authenticate_" + right, context).toLowerCase().equals("yes");
+
         if (needsAuth) {
-            Principal user = checkAuth(context);
+            user = checkAuth(context);
             if (user==null) {
                 return false;
             }
@@ -677,9 +759,28 @@ public class XWiki implements XWikiNotificationInterface {
             context.put("user", user);
         }
 
-        // Now we can verify the rights
+        String username = user.getName();
+        if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), "deny" + right))
+            return false;
+        if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), right))
+            return true;
+        return false;
+    }
 
-        return true;
+    public UserManager getUsermanager() {
+        return usermanager;
+    }
+
+    public void setUsermanager(UserManager usermanager) {
+        this.usermanager = usermanager;
+    }
+
+    public AccessManager getAccessmanager() {
+        return accessmanager;
+    }
+
+    public void setAccessmanager(AccessManager accessmanager) {
+        this.accessmanager = accessmanager;
     }
 
 

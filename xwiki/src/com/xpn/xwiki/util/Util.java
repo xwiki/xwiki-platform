@@ -141,4 +141,9 @@ public class Util {
         return map2;
     }
 
+    public static String getWeb(String fullname) {
+        int i = fullname.lastIndexOf(".");
+        return fullname.substring(0, i);
+    }
+
 }

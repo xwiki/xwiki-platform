@@ -27,13 +27,12 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class XWikiBaseProvider {
 
     private XWiki xWiki;
+    private Set handledNames = new HashSet();
     private static Map propertySets;
 
     public XWiki getxWiki() {
@@ -75,8 +74,13 @@ public class XWikiBaseProvider {
         return true;
     }
 
+    public boolean handles(String name) {
+        return (getHandledNames().contains(name));
+    }
+
     public void flushCaches() {
         getxWiki().flushCache();
+        setHandledNames(new HashSet());
     }
 
 
@@ -105,5 +109,13 @@ public class XWikiBaseProvider {
         } catch (XWikiException e) {
             return false;
         }
+    }
+
+    public Set getHandledNames() {
+        return handledNames;
+    }
+
+    public void setHandledNames(Set handledNames) {
+        this.handledNames = handledNames;
     }
 }

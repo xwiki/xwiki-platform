@@ -29,9 +29,15 @@ import com.opensymphony.module.access.entities.Acl_I;
 import com.opensymphony.module.access.entities.Resource_I;
 import com.opensymphony.module.access.provider.ResourceProvider;
 import com.opensymphony.module.propertyset.PropertySet;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.List;
+import java.util.Vector;
 
 public class XWikiResourceProvider extends XWikiBaseProvider implements ResourceProvider {
 
@@ -41,11 +47,27 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
     }
 
     public String getRealm() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "default";
     }
 
+    // Any existing document can have access rights
     public boolean handles(String name) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (name.equals("default"))
+         return true;
+
+        if (super.handles(name))
+                return true;
+        try {
+            name = getName(name);
+            List list = getxWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'");
+            boolean result = (list.size()>0);
+            if (result)
+                getHandledNames().add(name);
+            return result;
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public ArrayList getAcls() throws NotFoundException {
@@ -85,11 +107,14 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
     }
 
     public ArrayList getResources() throws NotFoundException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        // This should not be implemented..
+        // There are too many resources
+        return null;
     }
 
     public String getUserAccessLevels(String userId, String resourceKey) throws NotFoundException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        // This seems to imply hierachical levels..
+        return null;
     }
 
     public String getUserAccessLevels(String userId, String resourceKey, boolean checkGroups) throws NotFoundException {
@@ -125,7 +150,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
     }
 
     public boolean groupHasAccessLevel(String groupId, String resourceKey, String accessLevel) throws NotFoundException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return hasAccessLevel(groupId, resourceKey, accessLevel, false);
     }
 
     public void updateGroupAccessLevels(String groupId, String resourceKey, String accessLevel) throws NotFoundException, ImmutableException {
@@ -136,7 +161,76 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    public boolean checkRight(String name, XWikiDocInterface doc, String accessLevel, boolean user, boolean allow, boolean global) throws XWikiException {
+         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
+         String fieldName = user ? "users" : "groups";
+
+         Vector vobj = doc.getObjects(className);
+         if (vobj==null)
+             return false;
+         else {
+             for (int i=0;i<vobj.size();i++) {
+                BaseObject bobj = (BaseObject) vobj.get(i);
+                String users = bobj.getStringValue(fieldName);
+                String levels = bobj.getStringValue("levels");
+                boolean allowdeny = (bobj.getIntValue("allow")==1);
+                if ((allowdeny == allow)
+                    &&(users.indexOf(name)!=-1)
+                    &&(levels.indexOf(accessLevel)!=-1))
+                 return true;
+            }
+            return false;
+        }
+    }
+
     public boolean userHasAccessLevel(String userId, String resourceKey, String accessLevel) throws NotFoundException {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return hasAccessLevel(userId, resourceKey, accessLevel, true);
+    }
+
+    public boolean hasAccessLevel(String name, String resourceKey, String accessLevel, boolean user) throws NotFoundException {
+        boolean deny = false;
+        boolean allow = false;
+
+        try {
+            // Verify XWiki super user
+            XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences");
+            allow = checkRight(name, xwikidoc , "admin", true, true, true);
+            if (allow) return true;
+
+            // Verify Web super user
+            String web = Util.getWeb(resourceKey);
+            XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences");
+            allow = checkRight(name, webdoc , "admin", true, true, true);
+            if (allow) return true;
+
+            // First check if this document is denied to the specific user
+            XWikiDocInterface doc = getxWiki().getDocument(resourceKey);
+            deny = checkRight(name, doc, accessLevel, true, false, false);
+            if (deny) return false;
+
+            allow = checkRight(name, doc , accessLevel, true, true, false);
+            if (allow) return true;
+
+
+            deny =  checkRight(name, webdoc, accessLevel, true, false, true);
+            if (deny) return false;
+
+            allow = checkRight(name, webdoc , accessLevel, true, true, true);
+            if (allow) return true;
+
+            // Check if XWiki is denied
+            deny = checkRight(name, xwikidoc , accessLevel, true, false, true);
+            if (deny) return false;
+
+            allow = checkRight(name, xwikidoc , accessLevel, true, true, true);
+            if (allow) return true;
+
+            // Document was neither allowed, neither denied
+            // Default is denied..
+            return false;
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

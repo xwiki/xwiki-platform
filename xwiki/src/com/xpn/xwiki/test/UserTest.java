@@ -2,10 +2,13 @@
 package com.xpn.xwiki.test;
 
 import com.opensymphony.user.*;
+import com.opensymphony.module.access.AccessManager;
+import com.opensymphony.module.access.NotFoundException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiCacheInterface;
@@ -13,6 +16,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.XWikiGroupProvider;
 import com.xpn.xwiki.user.XWikiUserProvider;
+import com.xpn.xwiki.user.XWikiResourceProvider;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 
@@ -46,7 +50,8 @@ public class UserTest extends TestCase {
     private static XWiki xwiki;
     private static XWikiContext context;
     private static UserManager um;
-    
+    private static AccessManager am;
+
     public UserTest() throws XWikiException {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
@@ -66,7 +71,12 @@ public class UserTest extends TestCase {
         StoreHibernateTest.cleanUp(getHibStore());
         um = UserManager.getInstance();
         getUserProvider(um).setxWiki(xwiki);
+        getUserProvider(um).flushCaches();
         getGroupProvider(um).setxWiki(xwiki);
+        getGroupProvider(um).flushCaches();
+        am = AccessManager.getInstance();
+        getResourceProvider(am).setxWiki(xwiki);
+        getResourceProvider(am).flushCaches();
         xwiki.flushCache();
     }
 
@@ -99,12 +109,37 @@ public class UserTest extends TestCase {
         xwiki.saveDocument(doc);
     }
 
+    public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
+        XWikiDocInterface doc = xwiki.getDocument(fullname);
+        BaseObject bobj = new BaseObject();
+        bobj.setName(fullname);
+        BaseClass bclass;
+        if (global)
+            bclass = xwiki.getGlobalRightsClass();
+        else
+            bclass = xwiki.getRightsClass();
+        bobj.setxWikiClass(bclass);
+        bobj.setStringValue("users", user);
+        bobj.setStringValue("groups", group);
+        bobj.setStringValue("levels", level);
+        if (allow)
+            bobj.setIntValue("allow", 1);
+        else
+            bobj.setIntValue("allow", 0);
+        doc.setObject(bclass.getName(), 0, bobj);
+        xwiki.saveDocument(doc);
+    }
+
     public XWikiUserProvider getUserProvider(UserManager um) {
         return (XWikiUserProvider) um.getProfileProviders().toArray()[0];
     }
 
     public XWikiGroupProvider getGroupProvider(UserManager um) {
         return (XWikiGroupProvider) um.getAccessProviders().toArray()[0];
+    }
+
+    public XWikiResourceProvider getResourceProvider(AccessManager am) {
+        return (XWikiResourceProvider) am.getResourceProviders().toArray()[0];
     }
 
     public void testUserList() throws XWikiException, ImmutableException, DuplicateEntityException {
@@ -206,4 +241,20 @@ public class UserTest extends TestCase {
         assertFalse("This should fail", user.inGroup(group2));
         assertTrue("This should work", user2.inGroup(group2));
     }
+
+    public void testUserAccessRead()  throws XWikiException, NotFoundException {
+        prepareData();
+        assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
+        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view", true, false);
+        assertTrue("View Access should be granted",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
+        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view,edit", true,false);
+        assertTrue("Edit Access should be granted",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "edit"));
+        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view", false, false);
+        assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
+    }
+
 }

@@ -26,6 +26,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebRequest;
 import org.apache.struts.action.ActionServlet;
@@ -36,6 +38,8 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.Vector;
+
+import net.sf.hibernate.HibernateException;
 
 
 public abstract class ServletTest extends ServletTestCase {
@@ -48,6 +52,14 @@ public abstract class ServletTest extends ServletTestCase {
         flushCache();
     };
 
+    public XWikiHibernateStore getHibStore() {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
+    }
+
     public void cleanUp() {
     };
 
@@ -56,13 +68,23 @@ public abstract class ServletTest extends ServletTestCase {
         context.setWiki(xwiki);
     }
 
+    public void clientTearDown() throws HibernateException {
+        getHibStore().shutdownHibernate(context);
+        xwiki = null;
+        context = null;
+        System.gc();
+    }
 
     public static void setUrl(WebRequest webRequest, String action, String docname) {
         setUrl(webRequest, action, docname, "");
     }
 
     public static void setUrl(WebRequest webRequest, String action, String docname, String query) {
-        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, query);
+        setUrl(webRequest, action, "Main", docname, query);
+    }
+
+    public static void setUrl(WebRequest webRequest, String action, String web, String docname, String query) {
+        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/" + web + "/" + docname, query);
     }
 
     public static void setVirtualUrl(WebRequest webRequest, String host, String appname, String action, String docname, String query) {

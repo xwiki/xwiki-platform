@@ -1,4 +1,3 @@
-#end
 #foreach($objlist in $doc.xWikiObjects)
 #set( $class = $objlist.elementAt(0).xWikiClass)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))

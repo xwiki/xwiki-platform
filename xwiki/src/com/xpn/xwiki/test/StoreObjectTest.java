@@ -45,6 +45,7 @@ public class StoreObjectTest extends TestCase {
     public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
         hibstore.checkHibernate();
         hibstore.beginTransaction();
+        StoreTest.runSQL(hibstore, "drop table xwikidoc");
         StoreTest.runSQL(hibstore, "drop table xwikiobjects");
         StoreTest.runSQL(hibstore, "drop table xwikiproperties");
         StoreTest.runSQL(hibstore, "drop table xwikiintegers");
@@ -57,6 +58,7 @@ public class StoreObjectTest extends TestCase {
         StoreTest.runSQL(hibstore, "drop table xwikistringclasses");
         StoreTest.runSQL(hibstore, "drop table xwikinumberclasses");
         hibstore.endTransaction(true);
+        hibstore.updateSchema();
     }
 
     public void testNumber(XWikiHibernateStore hibstore) throws XWikiException {
@@ -183,8 +185,8 @@ public class StoreObjectTest extends TestCase {
         hibstore.loadXWikiClass(bclass2, true);
 
         // Verify object2
-        assertProperty(bclass2, bclass, "nameclass");
-        assertProperty(bclass2, bclass, "ageclass");
+        assertProperty(bclass2, bclass, "name");
+        assertProperty(bclass2, bclass, "age");
     }
 
     public void testWriteClass()  throws HibernateException, XWikiException {

@@ -192,7 +192,7 @@ public class ViewEditAction extends XWikiAction
                 BaseObject baseobject = (BaseObject)doc.getxWikiObjects().get(name);
                 BaseClass baseclass = baseobject.getxWikiClass();
                 BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_"));
-                newobject.setName(name);
+                newobject.setName(doc.getFullName());
                 doc.getxWikiObjects().put(name, newobject);
             }
             return (mapping.findForward("preview"));
@@ -232,7 +232,7 @@ public class ViewEditAction extends XWikiAction
                 BaseObject baseobject = (BaseObject)doc.getxWikiObjects().get(name);
                 BaseClass baseclass = baseobject.getxWikiClass();
                 BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_"));
-                newobject.setName(name);
+                newobject.setName(doc.getFullName());
                 doc.getxWikiObjects().put(name, newobject);
             }
             xwiki.saveDocument(doc);

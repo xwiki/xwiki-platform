@@ -62,13 +62,14 @@ public class ObjectTest extends TestCase {
         // Prepare class definition
         BaseClass bclass = new BaseClass();
         StringClass sclass = new StringClass();
-        sclass.setName("nameclass");
+        sclass.setName("name");
         sclass.setObject(bclass);
         NumberClass nclass = new NumberClass();
-        nclass.setName("ageclass");
+        nclass.setName("age");
         nclass.setObject(bclass);
-        bclass.put("nameclass", sclass);
-        bclass.put("ageclass", nclass);
+        nclass.setNumberType("integer");
+        bclass.put("name", sclass);
+        bclass.put("age", nclass);
         bclass.setName("Main.TestObject2");
 
         // Prepare object
@@ -168,15 +169,15 @@ public class ObjectTest extends TestCase {
          assertTrue("Equals did not detect missing age field", !object.equals(object2));
 
          object2 = (BaseObject)object.clone();
-         object.getxWikiClass().safeget("ageclass").setName("titi");
+         object.getxWikiClass().safeget("age").setName("titi");
          assertTrue("Equals did not detect different class property name", !object.equals(object2));
 
          object2 = (BaseObject)object.clone();
-         ((NumberClass)object.getxWikiClass().safeget("ageclass")).setSize(1);
+         ((NumberClass)object.getxWikiClass().safeget("age")).setSize(1);
          assertTrue("Equals did not detect different class property size", !object.equals(object2));
 
          object2 = (BaseObject)object.clone();
-         object.getxWikiClass().getFields().remove("ageclass");
+         object.getxWikiClass().getFields().remove("age");
          assertTrue("Equals did not detect different null class", !object.equals(object2));
 
          object2 = (BaseObject)object.clone();

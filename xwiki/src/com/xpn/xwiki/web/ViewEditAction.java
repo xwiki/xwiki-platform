@@ -146,6 +146,13 @@ public class ViewEditAction extends XWikiAction
             return (mapping.findForward("view"));
         }
         else if ( action.equals("inline")) {
+            PrepareEditForm peform = (PrepareEditForm) form;
+            String parent = peform.getParent();
+            if (parent!=null)
+                doc.setParent(parent);
+
+            doc.readFromTemplateForEdit(peform, context);
+
             // Set display context to 'view'
             context.put("display", "edit");
 

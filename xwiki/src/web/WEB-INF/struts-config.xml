@@ -38,6 +38,8 @@
   <!-- XWiki Struts Application -->
     <form-bean name="edit"
                  type="com.xpn.xwiki.web.PrepareEditForm"/>
+    <form-bean name="inline"
+                 type="com.xpn.xwiki.web.PrepareEditForm"/>
     <form-bean name="preview"
                type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="save"

@@ -26,6 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import org.perl.inline.java.InlineJavaPerlCaller;
+import org.apache.tools.ant.taskdefs.Execute;
 
 import java.io.*;
 import java.util.Hashtable;
@@ -186,7 +187,9 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
 
         try {
             launchcounter++;
-            perlProcess = Runtime.getRuntime().exec(getPerlCommand());
+            String[] command = { getPerlpath(), "perlplugins.pl", "7890", "true" };
+            File dir = new File(getPluginspath());
+            perlProcess = Execute.launch(null, command, null, dir, true);
             setPerlProcess(perlProcess);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PERLPLUGINS, XWikiException.ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION,

@@ -4,8 +4,7 @@
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/build/xwiki" />
     <output-test url="file://$MODULE_DIR$/build/xwiki_test" />
-    <content url="file://$MODULE_DIR$/src/perl" />
-    <content url="file://$MODULE_DIR$/src/web" />
+    <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="java version &quot;1.3.1_08&quot;" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="xwikibase" />

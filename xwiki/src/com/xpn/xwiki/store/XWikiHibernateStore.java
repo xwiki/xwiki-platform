@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.*;
@@ -140,13 +141,16 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 getSession().update(doc);
 
-            // TODO: handle the case when we delete a class or an object from a document
             BaseClass bclass = doc.getxWikiClass();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
                 if (bclass.getFields().size()>0)
                  saveXWikiClass(bclass, false);
+            } else {
+                // TODO: Remove existing class
             }
+
+            // TODO: Delete all objects for which we don't have a name in the Map..
 
             Iterator it = doc.getxWikiObjects().values().iterator();
             while (it.hasNext()) {
@@ -155,6 +159,12 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     BaseObject obj = (BaseObject)objects.get(i);
                     saveXWikiObject(obj, false);
                 }
+                // Delete all objects of this class that have a bigger ID
+                String squery = "from BaseObject as bobject where bobject.name = '" + doc.getFullName()
+                                + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
+                                + "' and bobject.number >= " + objects.size();
+                int result = getSession().delete(squery);
+                System.err.println("Deleted " + result + " instances");
             }
 
             endTransaction(true);
@@ -426,9 +436,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
         }
         catch (Exception e) {
-            Object[] args = { property.getObject().getName() };
+            BaseCollection obj = property.getObject();
+            Object[] args = { (obj!=null) ? obj.getName() : "unknown", property.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while saving object {0}", e, args);
+                    "Exception while saving property {1} of object {0}", e, args);
 
         }
     }

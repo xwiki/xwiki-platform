@@ -58,4 +58,11 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         return property;
     }
 
+    public Object getValue() {
+        return null;
+    }
+
+    public void setValue(Object value) {
+    }
+
 }

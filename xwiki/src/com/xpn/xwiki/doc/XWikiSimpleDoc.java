@@ -122,7 +122,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.name = name;
         this.date = new Date();
         this.parent = "";
-        this.content = "";
+        this.content = "\n";
         this.format = "";
         this.author = "";
         this.archive = null;
@@ -326,6 +326,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getArchive() throws XWikiException {
+        if ((content==null)||(content.equals("")))
+            setContent("\n");
         if (archive==null)
             updateArchive(content);
         if (archive==null)
@@ -438,6 +440,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void addObject(String classname, BaseObject object) {
+        setObject(classname, getObjects(classname).size(), object);
     }
 
     public void setObject(String classname, int nb, BaseObject object) {

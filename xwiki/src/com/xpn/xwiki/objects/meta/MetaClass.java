@@ -27,10 +27,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.ElementInterface;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.*;
 
 public class MetaClass extends BaseClass {
 
@@ -49,7 +46,11 @@ public class MetaClass extends BaseClass {
     }
 
     public void safeput(String name, ElementInterface property) {
-        super.safeput("meta" + name, property);    //To change body of overriden methods use Options | File Templates.
+        super.safeput("meta" + name, property);
+        if (property instanceof PropertyClass) {
+         ((PropertyClass)property).setObject(this);
+         ((BaseProperty)property).setName(name);
+        }
     }
 
     public ElementInterface safeget(String name) {

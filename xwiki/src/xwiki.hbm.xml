@@ -82,6 +82,31 @@
             </property>
 
         </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.PasswordClass" table="xwikistringclasses">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.TextAreaClass" table="xwikistringclasses">
+                    <key>
+                        <column name="XWS_ID"  />
+                        <column name="XWS_NAME"  />
+                    </key>
+                    <property name="size" type="integer">
+                        <column name="XWS_SIZE" />
+                    </property>
+                    <property name="rows" type="integer">
+                        <column name="XWS_ROWS" />
+                    </property>
+        </joined-subclass>
+
     </class>
 
     <class name="com.xpn.xwiki.objects.classes.BaseClass" table="xwikiclasses">

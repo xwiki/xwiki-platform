@@ -1,0 +1,5 @@
+<opensymphony-user>
+ <provider class="com.xpn.xwiki.user.XWikiUserProvider" />
+ <provider class="com.xpn.xwiki.user.XWikiGroupProvider" />
+</opensymphony-user>
+

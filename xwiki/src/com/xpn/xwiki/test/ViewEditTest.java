@@ -450,9 +450,9 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Updated Class should have age property", bobject.safeget("age"));
         assertNotNull("Updated Class should have name property", bobject.safeget("name"));
 
-        Number age = ((NumberProperty)bobject.safeget("age")).getValue();
+        Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
         assertEquals("Updated Class age property value is incorrect", new Integer(12), age);
-        String name = ((StringProperty)bobject.safeget("name")).getValue();
+        String name = (String)((StringProperty)bobject.safeget("name")).getValue();
         assertEquals("Updated Class name property value is incorrect", "john", name);
     }
 }

@@ -33,6 +33,7 @@ import java.io.Serializable;
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;
     private Map fields = new HashMap();
+    private String className;
 
 
     public int getId() {
@@ -46,10 +47,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         if (xWikiClass!=null)
          return xWikiClass.getName();
         else
-         return "";
+         return (className == null) ? "" : className;
     }
 
     public void setClassName(String name) {
+        className = name;
     }
 
     public Object[] getProperties() {
@@ -81,6 +83,10 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public void safeput(String name,ElementInterface property) {
         getFields().put(name, property);
+        if (property instanceof BaseProperty) {
+         ((BaseProperty)property).setObject(this);
+         ((BaseProperty)property).setName(name);
+        }
     }
 
     public void put(String name,ElementInterface property) throws XWikiException {
@@ -98,7 +104,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public String getStringValue(String name) {
-        return ((StringProperty)safeget(name)).getValue();
+        StringProperty prop = (StringProperty)safeget(name);
+        if (prop==null)
+         return "";
+        else
+         return (String)prop.getValue();
     }
 
     public void setStringValue(String name, String value) {
@@ -108,7 +118,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public int getIntValue(String name) {
-        return ((NumberProperty)safeget(name)).getValue().intValue();
+        NumberProperty prop = (NumberProperty)safeget(name);
+        if (prop==null)
+         return 0;
+        else
+         return ((Number)prop.getValue()).intValue();
     }
 
     public void setIntValue(String name, int value) {

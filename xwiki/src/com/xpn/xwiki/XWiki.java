@@ -30,6 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
@@ -112,7 +113,7 @@ public class XWiki implements XWikiNotificationInterface {
         setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
         // Add a notification rule if the preference property plugin is modified
         getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
-                            new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
+                new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
     }
 
     public String getVersion() {
@@ -187,6 +188,10 @@ public class XWiki implements XWikiNotificationInterface {
 
     public XWikiStoreInterface getStore() {
         return store;
+    }
+
+    public void saveDocument(XWikiDocInterface doc) throws XWikiException {
+        getStore().saveXWikiDoc(doc);
     }
 
     public void saveDocument(XWikiDocInterface doc, XWikiDocInterface olddoc, XWikiContext context) throws XWikiException {
@@ -410,5 +415,90 @@ public class XWiki implements XWikiNotificationInterface {
         if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
             setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
         }
+    }
+
+    public BaseClass getUserClass() throws XWikiException {
+        XWikiDocInterface doc;
+        boolean needsUpdate = false;
+
+        try {
+            doc = getDocument("XWiki.XWikiUsers");
+        } catch (Exception e) {
+            doc = new XWikiSimpleDoc();
+            doc.setWeb("XWiki");
+            doc.setName("XWikiUsers");
+        }
+        BaseClass bclass = doc.getxWikiClass();
+        bclass.setName("XWiki.XWikiUsers");
+        if (bclass.get("fullname")==null) {
+            needsUpdate = true;
+            StringClass first_name_class = new StringClass();
+            first_name_class.setSize(20);
+            first_name_class.setObject(bclass);
+            bclass.put("fullname", first_name_class);
+        }
+
+        if (bclass.get("email")==null) {
+            needsUpdate = true;
+            StringClass email_class = new StringClass();
+            email_class.setSize(20);
+            email_class.setObject(bclass);
+            bclass.put("email", email_class);
+        }
+
+        if (bclass.get("password")==null) {
+            needsUpdate = true;
+            PasswordClass passwd_class = new PasswordClass();
+            passwd_class.setSize(10);
+            passwd_class.setObject(bclass);
+            bclass.put("password", passwd_class);
+        }
+
+        if (bclass.get("comment")==null) {
+            needsUpdate = true;
+            TextAreaClass comment_class = new TextAreaClass();
+            comment_class.setSize(80);
+            comment_class.setRows(10);
+            comment_class.setObject(bclass);
+            bclass.put("comment", comment_class);
+        }
+
+        String content = doc.getContent();
+        if ((content==null)||(content.equals("")))
+         doc.setContent("---+ XWiki Users");
+
+        if (needsUpdate)
+         saveDocument(doc);
+        return bclass;
+    }
+
+    public BaseClass getGroupClass() throws XWikiException {
+        XWikiDocInterface doc;
+        boolean needsUpdate = false;
+
+        try {
+            doc = getDocument("XWiki.XWikiGroups");
+        } catch (Exception e) {
+            doc = new XWikiSimpleDoc();
+            doc.setWeb("XWiki");
+            doc.setName("XWikiGroups");
+        }
+        BaseClass bclass = doc.getxWikiClass();
+        bclass.setName("XWiki.XWikiGroups");
+        if (bclass.get("member")==null) {
+            needsUpdate = true;
+            StringClass member_class = new StringClass();
+            member_class.setSize(30);
+            member_class.setObject(bclass);
+            bclass.put("member", member_class);
+        }
+
+        String content = doc.getContent();
+        if ((content==null)||(content.equals("")))
+         doc.setContent("---+ XWiki Groups");
+
+        if (needsUpdate)
+         saveDocument(doc);
+        return bclass;
     }
 }

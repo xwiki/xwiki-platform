@@ -1,0 +1,3 @@
+<propertysets>
+ <propertyset name="xwiki" class="com.xpn.xwiki.user.XWikiPropertySet" />
+</propertysets>

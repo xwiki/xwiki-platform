@@ -109,4 +109,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException;
 
     public Object clone();
+
+    void addObject(String classname, BaseObject object);
 }

@@ -92,7 +92,10 @@
     </taskdef>
 
     <target name="prepare">
-        <buildnumber file="src/web/WEB-INF/version.properties" />
+        <propertyfile file="src/web/WEB-INF/version.properties" >
+	<entry key="build.number" type="int" value="1" operation="+" />
+ 	</propertyfile>
+        <property file="src/web/WEB-INF/version.properties" />
     <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <mkdir dir="${build.dir}" />

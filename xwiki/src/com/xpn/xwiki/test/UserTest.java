@@ -52,6 +52,8 @@ public class UserTest extends TestCase {
     private UserManager um;
     private AccessManager am;
 
+    public static boolean inTest = false;
+
     public XWikiHibernateStore getHibStore() {
         XWikiStoreInterface store = xwiki.getStore();
         if (store instanceof XWikiCacheInterface)
@@ -64,6 +66,8 @@ public class UserTest extends TestCase {
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
+        xwiki.initAccessManager();
+        xwiki.initUserManager();
         context.setWiki(xwiki);
         StoreHibernateTest.cleanUp(getHibStore(), context);
         um = xwiki.getUsermanager();
@@ -249,6 +253,7 @@ public class UserTest extends TestCase {
         String docname = "XWiki.TestDoc";
         prepareData();
         xwiki.flushCache();
+        inTest = true;
         assertTrue("View Access should be allowed",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);

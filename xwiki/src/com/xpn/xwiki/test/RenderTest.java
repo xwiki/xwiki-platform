@@ -32,19 +32,17 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
 
-import java.util.ArrayList;
+public abstract class RenderTest extends TestCase {
 
+    public XWiki xwiki;
+    public XWikiContext context;
 
-public class RenderTest extends TestCase {
-
-    private XWiki xwiki;
-    private XWikiContext context;
+    public abstract XWikiRenderer getXWikiRenderer();
 
     public XWikiHibernateStore getHibStore() {
         XWikiStoreInterface store = xwiki.getStore();
@@ -116,7 +114,7 @@ public class RenderTest extends TestCase {
 
 
     public void testWikiBaseHeadingRenderer() throws XWikiException {
-        XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+        XWikiRenderer wikibase = getXWikiRenderer();
         // Test <hr>
         renderTest(wikibase, "Hello 1\n---\nHello 2",
                 "Hello 1\n<hr />\nHello 2", true, context);
@@ -128,7 +126,7 @@ public class RenderTest extends TestCase {
     }
 
     public void testWikiBaseFormattingRenderer() throws XWikiException {
-         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiRenderer wikibase = getXWikiRenderer();
 
         // Test formatting
         renderTest(wikibase, "Hello 1\nThis is a text with *strong* text\nHello 2",
@@ -160,7 +158,7 @@ public class RenderTest extends TestCase {
     }
 
     public void testWikiBasePreRenderer() throws XWikiException {
-         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiRenderer wikibase = getXWikiRenderer();
 
         // Test formatting
         renderTest(wikibase, "<pre>This is a text with *strong* text</pre>",
@@ -191,7 +189,7 @@ public class RenderTest extends TestCase {
     }
 
     public void testWikiBaseTabListRenderer() throws XWikiException {
-         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiRenderer wikibase = getXWikiRenderer();
          renderTest(wikibase, "\t* List1",
                 "<ul><li> List1</li>\n</ul>\n", true, context);
          renderTest(wikibase, "\t* List1\n\t* List2",
@@ -202,7 +200,7 @@ public class RenderTest extends TestCase {
     }
 
     public void testWikiBaseSpaceListRenderer() throws XWikiException {
-         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiRenderer wikibase = getXWikiRenderer();
          renderTest(wikibase, "   * List1",
                 "<ul><li> List1</li>\n</ul>", true, context);
          renderTest(wikibase, "   * List1\n   * List2",
@@ -213,7 +211,7 @@ public class RenderTest extends TestCase {
     }
 
     public void testWikiBaseLinkRenderer() throws XWikiException {
-         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiRenderer wikibase = getXWikiRenderer();
          XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
          context.put("doc", doc);
 
@@ -223,59 +221,15 @@ public class RenderTest extends TestCase {
                 "Main/WebHome", false, context);
          renderTest(wikibase, "Test link: Main.WebHome",
                 "Main/WebHome", false, context);
-     /*    renderTest(wikibase, "Test link: [[Web Home]]",
+
+         String sclass = this.getClass().getName();
+         if (sclass.indexOf("WikiWikiBaseRenderTest")==-1) {
+            renderTest(wikibase, "Test link: [[Web Home]]",
                "WebHome</a>", false, context);
-         renderTest(wikibase, "Test link: [[http://link/][WebHome]]",
+            renderTest(wikibase, "Test link: [[http://link/][WebHome]]",
                "<a href=\"http://link\">WebHome</a>", false, context);
-     */
+         }
     }
 
-    public void testVelocityRenderer() throws XWikiException {
-        XWikiRenderer wikibase = new XWikiVelocityRenderer();
-
-        renderTest(wikibase, "#set( $foo = \"Velocity\" )\nHello $foo World!",
-                "Hello Velocity World!", true, context);
-        renderTest(wikibase, "Test: #include( \"view.pm\" )",
-                "Test: #include", false, context);
-        renderTest(wikibase, "Test: #INCLUDE( \"view.pm\" )",
-                "Test: #INCLUDE", false, context);
-
-        renderTest(wikibase, "#set( $count = 0 )\n#if ( $count == 1)\nHello1\n#else\nHello2\n#end\n",
-                "Hello2", true, context);
-    }
-
-    public void testRenderingEngine() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
-        renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
-                " <strong>Hello2</strong> ", true, context);
-    }
-
-
-    public void testInclude(String text, String result) throws XWikiException {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = getStore();
-
-        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "WebHome");
-        doc1.setContent("This is the topic name: $doc.name");
-        doc1.setAuthor(Utils.author);
-        doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1, context);
-
-        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "IncludeTest");
-        context.put("doc", doc2);
-        renderTest(wikiengine, text, result, false, context);
-    }
-
-    public void testIncludeTopic() throws XWikiException {
-        testInclude("#includeTopic(\"Test.WebHome\")", "Test/WebHome");
-    }
-
-    public void testIncludeForm() throws XWikiException {
-        testInclude( "#includeForm(\"Test.WebHome\")", "Test/IncludeTest");
-    }
-
-    public void testIncludeFromOtherDatabase() throws XWikiException {
-        testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")", "XWiki Users");
-    }
 
 }

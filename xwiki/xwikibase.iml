@@ -27,6 +27,7 @@
     <orderEntry type="library" name="Tomcat 4.1" level="application" />
     <orderEntry type="library" name="OSUser" level="project" />
     <orderEntry type="library" name="TomCat 4.1" level="project" />
+    <orderEntry type="library" name="Radeox" level="project" />
   </component>
 </module>
 

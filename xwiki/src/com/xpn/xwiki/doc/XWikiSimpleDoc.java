@@ -36,6 +36,7 @@ import com.xpn.xwiki.web.PrepareEditForm;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
 import org.apache.ecs.filter.CharacterFilter;
@@ -312,7 +313,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         url.append("view");
         url.append("/");
         String parent = getParent();
-        parent = parent.replace('.', '/');
+        parent = StringUtils.replace(parent, ".","/", 1);
         url.append(parent);
         return url.toString();
     }

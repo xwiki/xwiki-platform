@@ -350,15 +350,15 @@ public class Utils {
     }
 
 
-    public static void setStringValue(String className, String propname, String propvalue, XWikiContext context) throws XWikiException {
+    public static void setStringValue(String docName, String propname, String propvalue, XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
-        XWikiDocInterface doc = xwiki.getDocument(className, context);
+        XWikiDocInterface doc = xwiki.getDocument(docName, context);
         BaseClass bclass = doc.getxWikiClass();
         if (bclass==null) {
             bclass = new BaseClass();
         }
 
-        bclass.setName(className);
+        bclass.setName(docName);
         StringClass propclass = new StringClass();
         propclass.setName(propname);
         propclass.setPrettyName(propname);
@@ -367,7 +367,38 @@ public class Utils {
         bclass.getFields().put(propname, propclass);
         doc.setxWikiClass(bclass);
         BaseObject bobject = new BaseObject();
-        bobject.setName(className);
+        bobject.setName(docName);
+        bobject.setxWikiClass(bclass);
+        bobject.setStringValue(propname, propvalue);
+        doc.addObject(docName, bobject);
+        xwiki.saveDocument(doc, context);
+    }
+
+    public static void setStringValue(String docName, String className, String propname, String propvalue, XWikiContext context) throws XWikiException {
+        if (docName.equals(className)) {
+            setStringValue(docName, propname, propvalue, context);
+            return;
+        }
+
+        XWiki xwiki = context.getWiki();
+        XWikiDocInterface classdoc = xwiki.getDocument(className, context);
+        BaseClass bclass = classdoc.getxWikiClass();
+        if (bclass==null) {
+                    bclass = new BaseClass();
+        }
+        bclass.setName(className);
+        StringClass propclass = new StringClass();
+        propclass.setName(propname);
+        propclass.setPrettyName(propname);
+        propclass.setSize(80);
+        propclass.setObject(bclass);
+        bclass.getFields().put(propname, propclass);
+        classdoc.setxWikiClass(bclass);
+        xwiki.saveDocument(classdoc, context);
+
+        XWikiDocInterface doc = xwiki.getDocument(docName, context);
+        BaseObject bobject = new BaseObject();
+        bobject.setName(docName);
         bobject.setxWikiClass(bclass);
         bobject.setStringValue(propname, propvalue);
         doc.addObject(className, bobject);

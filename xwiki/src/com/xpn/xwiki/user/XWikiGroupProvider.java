@@ -50,7 +50,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiGroups", 0, obj);
                 getxWiki().saveDocument(doc, context);
-                getPropertySets().put(name, doc);
+                getPropertySets().put(getFullName(name), doc);
                 return true;
             } else
                 return false;

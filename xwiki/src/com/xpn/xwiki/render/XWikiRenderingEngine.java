@@ -51,7 +51,11 @@ public class XWikiRenderingEngine {
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0));
             }
         }
-        renderers.add(new XWikiWikiBaseRenderer());
+
+        // The first should not removePre
+        // The last one should removePre
+        renderers.add(new XWikiRadeoxRenderer(false));
+        renderers.add(new XWikiWikiBaseRenderer(true));
     }
 
     public void addRenderer(XWikiRenderer renderer) {

@@ -86,8 +86,6 @@ public class PluginTest extends TestCase {
                 "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
         RenderTest.renderTest(wikibase, "hello Bug 234 end",
                 "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
-        RenderTest.renderTest(wikibase, "hello [bug 234] end",
-                "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
     }
 
     public void testPatternsTag() throws XWikiException {

@@ -313,6 +313,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_FILE,
                     "Exception while saving document {0}", e, args);
+        } finally {
+            try {
+                  endTransaction(context, false);
+            } catch (Exception e) {}
         }
 
     }
@@ -381,6 +385,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_FILE,
                     "Exception while reading document {0}", e, args);
+        } finally {
+            try {
+                  endTransaction(context, false);
+            } catch (Exception e) {}
         }
         return doc;
     }
@@ -501,6 +509,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
                     "Exception while saving object {0}", e, args);
 
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -546,6 +559,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                     "Exception while loading object {0}", e, args);
 
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
 
     }
@@ -569,6 +587,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { object.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_OBJECT,
                     "Exception while deleting object {0}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -595,6 +618,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                     "Exception while saving property {1} of object {0}", e, args);
 
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -677,6 +705,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                     "Exception while saving property {1} of object {0}", e, args);
 
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -721,6 +754,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { bclass.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_CLASS,
                     "Exception while saving class {0}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -766,6 +804,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { bclass.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS,
                     "Exception while loading class {0}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -844,6 +887,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS,
                     "Exception while saving class {0}", e, args);
 
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -870,6 +918,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT,
                     "Exception while searching attachments for documents {0}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -895,6 +948,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST,
                     "Exception while saving attachments attachment list of document {0}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -921,6 +979,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachments for attachment {0} of document {1}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -960,6 +1023,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachment {0} of document {1}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
 
     }
@@ -985,6 +1053,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                     "Exception while loading attachment {0} of document {1}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -1010,6 +1083,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
                     "Exception while loading attachment {0} of document {1}", e, args);
+        } finally {
+            try {
+                  if (bTransaction)
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -1036,6 +1114,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         catch (Exception e) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                     "Exception while searching class list", e);
+        } finally {
+            try {
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -1065,6 +1147,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { sql };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                     "Exception while searching documents with sql {0}", e, args);
+        } finally {
+            try {
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -1103,6 +1189,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Object[] args = { wheresql };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                     "Exception while searching documents with sql {0}", e, args);
+        } finally {
+            try {
+                   endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 

@@ -58,7 +58,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
                 obj.setxWikiClass(bclass);
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiUsers", 0, obj);
-                getPropertySets().put(name, doc);
+                getPropertySets().put(getFullName(name), doc);
                 getxWiki().saveDocument(doc, context);
                 return true;
             } else

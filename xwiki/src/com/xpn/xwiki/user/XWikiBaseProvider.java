@@ -54,17 +54,32 @@ public class XWikiBaseProvider {
     }
 
     public String getName(String name) {
+        String database = null;
+        int i0 = name.indexOf(":");
+        if (i0!=-1) {
+             database = name.substring(0,i0);
+             name = name.substring(i0+1);
+             context.setDatabase(database);
+             return name;
+        }
+
+        context.setDatabase(null);
         if (name.startsWith("XWiki."))
             return name;
         else
             return "XWiki." + name;
     }
 
+    public String getFullName(String name) {
+        return context.getDatabase() + ":" + name;
+    }
+
     public XWikiDocInterface getDocument(String name) {
         XWikiDocInterface doc = null;
         try {
+            name = getName(name);
             doc = getxWiki().getDocument(name, context);
-            getPropertySets().put(name, doc);
+            getPropertySets().put(getFullName(name), doc);
             return doc;
         } catch (XWikiException e) {
             return null;
@@ -87,7 +102,6 @@ public class XWikiBaseProvider {
 
 
     public boolean load(String name, Entity.Accessor accessor) {
-        name = getName(name);
         XWikiDocInterface doc = getDocument(name);
         accessor.setMutable(true);
         return (doc!=null);
@@ -101,7 +115,7 @@ public class XWikiBaseProvider {
 
     public boolean store(String name, Entity.Accessor accessor) {
         name = getName(name);
-        XWikiDocInterface doc = (XWikiDocInterface) getPropertySets().get(name);
+        XWikiDocInterface doc = (XWikiDocInterface) getPropertySets().get(getFullName(name));
         if (doc==null)
             return false;
 

@@ -51,6 +51,7 @@ import org.apache.ecs.xhtml.textarea;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.apache.commons.lang.StringUtils;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -537,7 +538,7 @@ public class XWiki implements XWikiNotificationInterface {
                 if (object!=null) {
                     String content = object.getStringValue(filename);
                     if ((content!=null)&&(!content.equals(""))) {
-                        return "../../skin/" + skin.replace('.','/') + "/" + filename;
+                        return "../../skin/" + StringUtils.replace(skin, ".","/", 1) + "/" + filename;
                     }
                 }
 
@@ -552,7 +553,7 @@ public class XWiki implements XWikiNotificationInterface {
                 }
 
                 if (attachment!=null) {
-                    return "../../skin/" + skin.replace('.','/') + "/" + attachment.getFilename();
+                    return "../../skin/" + StringUtils.replace(skin, ".","/", 1) + "/" + attachment.getFilename();
                 }
 
             }
@@ -975,7 +976,7 @@ public class XWiki implements XWikiNotificationInterface {
         if (user==null)
             username = "XWiki.XWikiGuest";
         else
-            username = user.getName();
+            username = "XWiki." + user.getName();
 
         // Save the user
         context.put("user", username);
@@ -983,7 +984,15 @@ public class XWiki implements XWikiNotificationInterface {
         // Check Rights
         try {
             // Verify access rights and return if ok
-            if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), right))
+            String docname;
+            if (context.getDatabase()!=null) {
+              docname = context.getDatabase() + ":" + doc.getFullName();
+              username = context.getDatabase() + ":" + username;
+            }
+            else
+              docname = doc.getFullName();
+
+            if (getAccessmanager().userHasAccessLevel(username, docname, right))
                 return true;
         } catch (NotFoundException e) {
             // This should not happen..

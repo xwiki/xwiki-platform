@@ -202,6 +202,9 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         boolean allow_found = false;
         boolean deny_found = false;
         try {
+            // Make sure we remove the database name and set the context
+            name = getName(name);
+
             // Verify XWiki super user
             XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences", context);
             try {
@@ -218,6 +221,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             } catch (NotFoundException e) {}
 
             // First check if this document is denied to the specific user
+            resourceKey = getName(resourceKey);
             XWikiDocInterface doc = getxWiki().getDocument(resourceKey, context);
             try {
                 deny = checkRight(name, doc, accessLevel, true, false, false);

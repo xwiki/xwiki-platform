@@ -262,6 +262,20 @@
         <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
       </SOURCES>
     </library>
+    <library name="Radeox">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/asm.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/groovy.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/asm-util.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/radeox.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/radeox/docs/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/radeox/src" />
+      </SOURCES>
+    </library>
   </component>
   <component name="uidesigner-configuration">
     <option name="INSTRUMENT_CLASSES" value="true" />

@@ -27,6 +27,7 @@
     </orderEntry>
     <orderEntry type="library" name="OSUser" level="project" />
     <orderEntry type="library" name="TomCat 4.1" level="project" />
+    <orderEntry type="library" name="Radeox" level="project" />
   </component>
   <component name="WebModuleBuildComponent">
     <setting name="EXPLODED_URL" value="file://$MODULE_DIR$/release/xwiki/web" />
@@ -109,6 +110,12 @@
           <option name="value" value="1" />
         </key>
         <value predicate="dependencyModule" moduleName="xwikibase" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="12" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Radeox" />
       </pairs>
     </orderEntriesWatcher>
     <order-entry-info>
@@ -205,6 +212,15 @@
       <info>
         <key>
           <option name="value" value="1" />
+        </key>
+        <value>
+          <setting name="copy" value="false" />
+          <setting name="URI" value="" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="12" />
         </key>
         <value>
           <setting name="copy" value="false" />

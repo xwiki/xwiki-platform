@@ -42,7 +42,7 @@ public class XWiki {
          Document newdoc = new Document(doc, context);
          return newdoc;
      }
-
+    
      public Document getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
          XWikiDocInterface doc = xwiki.getDocument(web, fullname, context);
          if (xwiki.checkAccess("view", doc, context)==false) {

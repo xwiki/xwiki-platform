@@ -59,6 +59,7 @@ public class ViewEditTest extends ServletTestCase {
 
     private String hibpath = "hibernate-test.cfg.xml";
     public XWikiContext context = new XWikiContext();
+    public XWiki xwiki;
 
     public void setUp() {
         flushCache();
@@ -68,7 +69,8 @@ public class ViewEditTest extends ServletTestCase {
     };
 
     public void clientSetUp(XWikiStoreInterface store) throws XWikiException {
-        context.setDatabase("xwikitest");
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
     }
 
 
@@ -81,7 +83,7 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     private void setVirtualUrl(WebRequest webRequest, String host, String appname, String action, String docname, String query) {
-        webRequest.setURL(host + ":9080", "/" + appname , "/bin", "/" + action + "/Main/" + docname, query);
+        webRequest.setURL(host + ":9080", "/" + appname , "/testbin", "/" + action + "/Main/" + docname, query);
     }
 
     public String getHibpath() {
@@ -184,6 +186,67 @@ public class ViewEditTest extends ServletTestCase {
             throw e.getRootCause();
         }
     }
+
+
+
+     public void beginViewGetDocument(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        Utils.createDoc(hibstore, "Main", "ViewGetDocumentContent", context);
+        String content = Utils.content1;
+        Utils.content1 = "test\n$xwiki.getDocument(\"Main.ViewGetDocumentContent\").getContent()\ntest\n";
+        Utils.createDoc(hibstore, "Main", "ViewGetDocument", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "ViewGetDocument");
+    }
+
+    public void endViewGetDocument(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find content in result:\n" + result, result.indexOf("Hello")!=-1);
+    }
+
+    public void testViewGetDocument() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+    }
+
+
+    public void beginViewDocumentLink(WebRequest webRequest) throws HibernateException, XWikiException {
+       XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+       StoreHibernateTest.cleanUp(hibstore, context);
+       // Utils.createDoc(hibstore, "Main", "ViewDocumentTestLinkTest", context);
+       String content = Utils.content1;
+       Utils.content1 = "[Main.ViewDocumentLink]";
+       Utils.createDoc(hibstore, "Main", "ViewDocumentLink", context);
+       Utils.content1 = content;
+       setUrl(webRequest, "view", "ViewDocumentLink");
+   }
+
+   public void endViewDocumentLink(WebResponse webResponse) {
+       String result = webResponse.getText();
+       assertTrue("Could not find content in result:\n" + result, result.indexOf("<a href")!=-1);
+   }
+
+   public void testViewDocumentLink() throws IOException, Throwable {
+       try {
+           ActionServlet servlet = new ActionServlet();
+           servlet.init(config);
+           servlet.service(request, response);
+           cleanSession(session);
+       } catch (ServletException e) {
+           e.getRootCause().printStackTrace();
+           throw e.getRootCause();
+       }
+   }
+
+
 
         public void beginEditOk(WebRequest webRequest) throws HibernateException, XWikiException {
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -954,7 +1017,10 @@ public class ViewEditTest extends ServletTestCase {
     public void beginVirtualViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
         Utils.createDoc(hibstore, "Main", "VirtualViewOkTest", context);
+        Utils.createDoc(hibstore, "XWiki", "XWikiServerXwikitest", context);
+        Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest", "view", "VirtualViewOkTest", "");
     }
 

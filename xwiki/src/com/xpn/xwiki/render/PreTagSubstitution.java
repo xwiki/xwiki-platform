@@ -16,16 +16,20 @@ import java.util.List;
 public class PreTagSubstitution extends WikiSubstitution {
     private int counter = 0;
     private List list = new ArrayList();
+    private boolean removePre = false;
 
-    public PreTagSubstitution(com.xpn.xwiki.util.Util util) {
+    public PreTagSubstitution(com.xpn.xwiki.util.Util util, boolean removepre) {
         super(util);
         setPattern("<pre>.*?</pre>", Perl5Compiler.CASE_INSENSITIVE_MASK | Perl5Compiler.SINGLELINE_MASK);
+        setRemovePre(removepre);
     }
 
     public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern) {
         String content = matchResult.group(0);
-        content = getUtil().substitute("s/<pre>//ig", content);
-        content = getUtil().substitute("s/<\\/pre>//ig", content);
+        if (isRemovePre()) {
+           content = getUtil().substitute("s/<pre>//ig", content);
+           content = getUtil().substitute("s/<\\/pre>//ig", content);
+        }
         getList().add(content);
         stringBuffer.append("%_" + counter + "_%");
         counter++;
@@ -43,6 +47,14 @@ public class PreTagSubstitution extends WikiSubstitution {
         for (int i=0;i<list.size();i++)
             content = StringUtils.replace(content, "%_" + i + "_%", (String) list.get(i));
          return content;
+    }
+
+    public boolean isRemovePre() {
+        return removePre;
+    }
+
+    public void setRemovePre(boolean remove) {
+        this.removePre = remove;
     }
 
 }

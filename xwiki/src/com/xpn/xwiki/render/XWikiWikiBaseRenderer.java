@@ -36,9 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XWikiWikiBaseRenderer implements XWikiRenderer {
-
+    private boolean removePre = true;
 
     public XWikiWikiBaseRenderer() {
+    }
+
+    public XWikiWikiBaseRenderer(boolean removePre) {
+        this.setRemovePre(removePre);
     }
 
     public static String makeAnchor(String text, Util util) {
@@ -169,7 +173,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         content = handleAllTags(content, doc, context);
 
         // Remove the content that is inside "<pre>"
-        PreTagSubstitution preTagSubst = new PreTagSubstitution(util);
+        PreTagSubstitution preTagSubst = new PreTagSubstitution(util, isRemovePre());
         content = preTagSubst.substitute(content);
 
         // PLUGIN: call startRenderingHandler at the start with the full content
@@ -272,6 +276,13 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         return line;
     }
 
+    public boolean isRemovePre() {
+        return removePre;
+    }
+
+    public void setRemovePre(boolean removePre) {
+        this.removePre = removePre;
+    }
 
 
 }

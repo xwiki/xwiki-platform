@@ -108,8 +108,8 @@ public class PerlTest extends TestCase {
 
     public void testWikiEngine(int nb) throws XWikiException {
         for (int i=0;i<nb;i++) {
-            RenderTest.renderTest(wikiengine, "Hello 1\n---\nHello 2",
-                    "Hello 1\n<hr />\nHello 2", true, context);
+            RenderTest.renderTest(wikiengine, "Hello 1\n----\nHello 2",
+                    "Hello 1\n<hr class=\"line\"/>\nHello 2", true, context);
         }
     }
 

@@ -17,6 +17,7 @@
 * root folder of this distribution.
 -->
 
+
 <project name="XWiki Content and Application Management Framework"
     default="release"
     basedir="." >
@@ -37,6 +38,8 @@
     <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
     <property name="release.dir"  value="${basedir}/release" />
     <property name="dist.dir" value="${basedir}/dist" />
+
+    <property name="test.reports.dir" value="${basedir}/test/reports" />
 
     <property name="doc.dir"   value="${basedir}/doc" />
     <property name="javadoc.dir"   value="${doc.dir}/api" />
@@ -73,6 +76,19 @@
     <property name="libs"
         value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.tests}" />
 
+    <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
+
+    <!-- Define the Cactus tasks -->
+    <taskdef resource="cactus.tasks">
+        <classpath>
+            <pathelement location="${lib.dir}/cactus-1.5.jar"/>
+            <pathelement location="${lib.dir}/cactus-ant-1.5.jar"/>
+            <pathelement location="${lib.dir}/commons-httpclient-2.0-rc2.jar"/>
+            <pathelement location="${lib.dir}/commons-logging.jar"/>
+            <pathelement location="${lib.dir}/aspectjrt-1.1.1.jar"/>
+        </classpath>
+    </taskdef>
+
     <target name="prepare">
         <mkdir dir="${build.dir}" />
         <mkdir dir="${classes.dir}" />
@@ -84,6 +100,7 @@
         <delete dir="${build.dir}" />
         <delete dir="${release.dir}" />
         <delete dir="${dist.dir}" />
+        <delete dir="${test.reports.dir}" />
     </target>
 
     <patternset id="non.java.sources">
@@ -114,12 +131,6 @@
                 dir="${src.dir}/web" />
         </copy>
 
-        <copy todir="${build.dir}/web/WEB-INF">
-            <fileset includes="web.xml"
-                dir="${src.dir}" />
-        </copy>
-
-
         <copy todir="${build.dir}/web/WEB-INF/perl">
             <fileset includes="**"
                 dir="${src.dir}/perl" />
@@ -135,6 +146,7 @@
 
     </target>
 
+
     <target name="tests" depends="prepare,xwiki">
         <javac srcdir="${src.dir}"
             destdir="${classes.dir}"
@@ -142,25 +154,58 @@
             debug="on" optimize="on" deprecation="on">
             <include name="**/test/*.java" />
         </javac>
+
+        <copy todir="${build.dir}/web">
+            <fileset includes="jspRedirector.jsp"
+                dir="test" />
+        </copy>
     </target>
 
-    <target name="test" depends="tests">
-        <junit printsummary="yes" dir="${basedir}/test" fork="on">
+
+        <target name="test" depends="release, tests">
+            <delete dir="${test.reports.dir}" />
+            <mkdir dir="${test.reports.dir}" />
+
+            <junit printsummary="yes" dir="${basedir}/test" fork="on" >
+
+                <classpath>
+                    <pathelement path="${classes.dir}" />
+                    <pathelement path="${libs}" />
+                </classpath>
+                <formatter type="plain" />
+
+                <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
+                <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.StoreTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
+                <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
+            </junit>
+        </target>
+
+    <target name="servertest" depends="release, tests">
+        <delete dir="${test.reports.dir}" />
+        <mkdir dir="${test.reports.dir}" />
+
+        <cactus printsummary="yes" dir="${basedir}/test"
+            warfile="${release.warfile}" >
+
             <classpath>
                 <pathelement path="${classes.dir}" />
                 <pathelement path="${libs}" />
             </classpath>
             <formatter type="plain" />
-            <test name="${pkg}.test.UtilTest" haltonfailure="no"/>
-            <test name="${pkg}.test.RenderTest" haltonfailure="no" />
-            <test name="${pkg}.test.PerlTest" haltonfailure="no" />
-            <test name="${pkg}.test.ObjectTest" haltonfailure="no" />
-            <test name="${pkg}.test.ClassesTest" haltonfailure="no" />
-            <test name="${pkg}.test.StoreTest" haltonfailure="no" />
-            <test name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
-            <test name="${pkg}.test.SearchTest" haltonfailure="no" />
-            <test name="${pkg}.test.ViewEditTest" haltonfailure="no" />
-        </junit>
+
+            <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
+            <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />
+
+            <containerset>
+                <tomcat4x dir="${tomcat4x.home}" port="9080"
+                    todir="${test.reports.dir}"/>
+            </containerset>
+        </cactus>
     </target>
 
     <target name="javadoc" depends="xwiki">
@@ -179,9 +224,14 @@
         </javadoc>
     </target>
 
-    <target name="release" depends="xwiki, test, javadoc">
+    <target name="release" depends="xwiki, javadoc">
         <mkdir dir="${release.dir}" />
-        <property name="war" value="${release.dir}/xwiki-${version}.war" />
+        <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
+            <exclude name="**/web.xml" />
+            <fileset dir="${basedir}" includes="doc/**"  />
+            <lib dir="${basedir}/lib" />
+        </war>
+
     </target>
 
     <target name="bin.dist" depends="release">

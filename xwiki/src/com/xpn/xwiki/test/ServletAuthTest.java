@@ -101,7 +101,7 @@ public class ServletAuthTest extends ServletTest {
         Utils.createDoc(hibstore, "Main", "WebHome", context);
         HashMap map = new HashMap();
         map.put("password", "toto");
-        xwiki.createUser("LudovicDubost", map, context);
+        xwiki.createUser("LudovicDubost", map, "", "", context);
         updateRight("Main.WebHome", "XWiki.LudovicDubost", "", "view", true, false);
         setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
         webRequest.addParameter("j_username", "LudovicDubost");

@@ -163,4 +163,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
 
     XWikiAttachment getAttachment(String filename);
+
+    int getIntValue(String className, String objName);
+    String getStringValue(String className, String objName);
 }

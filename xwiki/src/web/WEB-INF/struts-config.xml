@@ -64,7 +64,7 @@
 
      <forward name="login" path="/templates/login.vm"/>
      <forward name="accessdenied" path="/templates/accessdenied.vm"/>
-
+     <forward name="userinactive" path="/templates/userinactive.vm"/>
   </global-forwards>
 
 

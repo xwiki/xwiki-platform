@@ -1,3 +1,4 @@
+#set($showactions=1)
 #template("editheader.vm")
 <div id="xwikicontent">
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">

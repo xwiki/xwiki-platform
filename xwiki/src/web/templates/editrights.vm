@@ -1,3 +1,4 @@
+#set($showactions=0)
 #template("editheader.vm")
 <div id="xwikicontent">
 #if ( $request.getParameter("global").equals("1"))

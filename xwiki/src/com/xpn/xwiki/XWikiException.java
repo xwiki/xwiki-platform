@@ -26,7 +26,11 @@ import net.sf.hibernate.JDBCException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.io.PrintStream;
 import java.text.MessageFormat;
+
+import org.apache.velocity.exception.MethodInvocationException;
 
 public class XWikiException extends Exception {
     private int module;
@@ -96,6 +100,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3235;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3350;
 
+    public static final int ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION = 4001;
 
     public static final int ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION = 6001;
     public static final int ERROR_XWIKI_PERLPLUGIN_START = 6002;
@@ -120,6 +125,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 11002;
     public static final int ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND = 11003;
     public static final int ERROR_XWIKI_APP_CREATE_USER = 11004;
+    public static final int ERROR_XWIKI_APP_VALIDATE_USER = 11005;
 
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {
@@ -180,46 +186,89 @@ public class XWikiException extends Exception {
 
     public String getMessage()
     {
-        String str = "Error number " + getCode() + " in " + getModuleName() + ": ";
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("Error number ");
+        buffer.append(getCode());
+        buffer.append(" in ");
+        buffer.append(getModuleName());
+        buffer.append(": ");
 
         if (message!=null)
         {
             if (args==null)
-                str += message;
+                buffer.append(message);
             else
             {
                 MessageFormat msgFormat = new MessageFormat (message);
                 try
                 {
-                    str += msgFormat.format(args);
+                    buffer.append(msgFormat.format(args));
                 }
                 catch (Exception e)
                 {
-                    str += "Cannot format message " + message + " with args ";
+                    buffer.append("Cannot format message " + message + " with args ");
                     for (int i = 0; i< args.length ; i++)
                     {
                         if (i!=0)
-                            str += ",";
-                        str += args[i];
+                            buffer.append(",");
+                        buffer.append(args[i]);
                     }
                 }
             }
         }
-        str += "\n";
+
         if (exception!=null) {
-            if (exception instanceof net.sf.hibernate.JDBCException) {
-                str += exception.getMessage() + ":\n";
-                str += getStackStrace(((JDBCException)exception).getSQLException());
-            }
-            else {
-                str += exception.getMessage() + "\n";
-                str += getStackStrace(exception);
-            }
+             buffer.append("\nWrapped Exception: ");
+             buffer.append(exception.getMessage());
         }
-        return str;
+        return buffer.toString();
     }
 
-    public String getStackStrace(Throwable e) {
+    public String getFullMessage()
+    {
+        StringBuffer buffer = new StringBuffer(getMessage());
+        buffer.append("\n");
+        buffer.append(getStackTraceAsString());
+        return buffer.toString();
+    }
+
+    public void printStackTrace(PrintWriter s) {
+        super.printStackTrace(s);
+        if (exception!=null) {
+            s.write("\n\nWrapped Exception:\n\n");
+            if (exception instanceof net.sf.hibernate.JDBCException) {
+                (((JDBCException)exception).getSQLException()).printStackTrace(s);
+            } else if (exception instanceof MethodInvocationException) {
+                (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+            } else {
+                exception.printStackTrace(s);
+            }
+        }
+    }
+
+    public void printStackTrace(PrintStream s) {
+        super.printStackTrace(s);
+        if (exception!=null) {
+            s.print("\n\nWrapped Exception:\n\n");
+            if (exception instanceof net.sf.hibernate.JDBCException) {
+                (((JDBCException)exception).getSQLException()).printStackTrace(s);
+            } else if (exception instanceof MethodInvocationException) {
+                (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+            } else {
+                exception.printStackTrace(s);
+            }
+        }
+    }
+
+    public String getStackTraceAsString() {
+        StringWriter swriter = new StringWriter();
+        PrintWriter pwriter = new PrintWriter(swriter);
+        printStackTrace(pwriter);
+        pwriter.flush();
+        return swriter.getBuffer().toString();
+    }
+
+    public String getStackTraceAsString(Throwable e) {
         StringWriter swriter = new StringWriter();
         PrintWriter pwriter = new PrintWriter(swriter);
         e.printStackTrace(pwriter);

@@ -170,6 +170,10 @@ public class XWiki extends Api {
         // TODO: We might need to send a notification email here.
     }
 
+    public int validateUser() throws XWikiException {
+        return xwiki.validateUser(context);
+    }
+    
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {
         if (checkProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);

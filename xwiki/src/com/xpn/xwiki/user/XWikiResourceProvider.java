@@ -210,9 +210,9 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                     boolean result = checkRight(group, doc, accessLevel, false, allow, global);
                     if (result)
                         return true;
-                    else
-                        found = true;
-                } catch (Exception e) {
+                } catch (NotFoundException e) {
+                }
+                catch (Exception e) {
                     // This should not happen
                     e.printStackTrace();
                 }

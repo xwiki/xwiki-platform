@@ -1,0 +1,29 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div id="xwikiwebusermenu">
+<span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+<div id="xwikicontent">
+#if ($cause == "disabled")
+Your account has been disabled. Please contact the administrator if you think this is a problem.
+#else
+Your account is not yet active, because your email has not yet been confirmed.
+<br />
+You should have received an email with a link to confirm your email address.
+You can also copy-paste the activation code in the same email in the following field.
+<br />
+<form action="../../view/XWiki/RegisterNewUserConfirmation" method="get">
+<input type="hidden" name="xwikiname" value="$context.user" />
+<input type="text" name="validkey" size="16" />
+<input type="submit" value="Confirm Account" />
+</form>
+#end
+
+</div>
+<div id="xwikinav_footer">
+</div>
+#template("footer.vm")

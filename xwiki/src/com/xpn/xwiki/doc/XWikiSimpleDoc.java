@@ -1120,4 +1120,15 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
         return null;
     }
+
+    public int getIntValue(String className, String objName) {
+        BaseObject obj = getObject(className, 0);
+        return obj.getIntValue(objName);
+    }
+
+    public String getStringValue(String className, String objName) {
+        BaseObject obj = getObject(className, 0);
+        return obj.getStringValue(objName);
+    }
+
 }

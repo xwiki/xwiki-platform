@@ -200,64 +200,76 @@ public class ViewEditAction extends XWikiAction
         vcontext = XWikiVelocityRenderer.prepareContext(context);
 
         try {
-        // From there we will try to catch any exceptions and show a nice page
+            // From there we will try to catch any exceptions and show a nice page
 
-        XWikiDocInterface doc = null;
+            XWikiDocInterface doc = null;
 
-        doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
-        context.put("doc", doc);
+            doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
+            context.put("doc", doc);
 
-        vcontext.put("doc", new Document(doc, context));
-        vcontext.put("cdoc",  vcontext.get("doc"));
+            vcontext.put("doc", new Document(doc, context));
+            vcontext.put("cdoc",  vcontext.get("doc"));
 
-        if (xwiki.checkAccess(action, doc, context)==false) {
-            return parseTemplate(getPage(request, "accessdenied"), context);
-        }
+            if (xwiki.checkAccess(action, doc, context)==false) {
+                return parseTemplate(getPage(request, "accessdenied"), context);
+            }
 
-        // Determine what to do
-        if (action.equals("view"))
-            return executeView(xwiki, doc, request, context, vcontext);
-        else if ( action.equals("inline"))
-            return executeInline(doc, form, request, context);
-        else if ( action.equals("edit") )
-            return executeEdit(doc, form, request, context);
-        else if ( action.equals("preview"))
-            return executePreview(doc, form, request, context, vcontext);
-        else if (action.equals("save"))
-            return executeSave(xwiki, doc, form, request, response, context);
-        else if (action.equals("delete"))
-            return executeDelete(xwiki, doc, request, response, context);
-        else if (action.equals("propupdate"))
-            return executePropertyUpdate(xwiki, doc, form, request, response, context);
-        else if (action.equals("propadd"))
-            return executePropertyAdd(xwiki, doc, form, request, response, context);
-        else if (action.equals("objectadd"))
-            return executeObjectAdd(xwiki, doc, form, request, response, context);
-        else if (action.equals("objectremove"))
-            return executeObjectRemove(xwiki, doc, form, request, response, context);
-        else if (action.equals("download"))
-            return executeDownload(doc, request, response, context);
-        else if (action.equals("attach"))
-            return parseTemplate(getPage(request, "attach"), context);
-        else if (action.equals("upload"))
-            return executeUpload(xwiki, doc, request, response, context);
-        else if (action.equals("delattachment"))
-            return executeDeleteAttachment(doc, request, response, context);
-        else if (action.equals("skin"))
-            return executeSkin(xwiki, doc, request, response, context);
-        else if (action.equals("login"))
-            return executeLogin(xwiki, doc, request, response, context);
-        else if (action.equals("loginerror"))
-            return parseTemplate(getPage(request, "login"), context);
-        else if (action.equals("logout"))
-            return executeLogout(xwiki, request, response, context);
+            String checkactivefield = xwiki.getXWikiPreference("auth_active_check", context);
+            if (checkactivefield.equals("1")) {
+                String username = context.getUser();
+                XWikiDocInterface userdoc = xwiki.getDocument(username, context);
+                int active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
+
+                if (active==0) {
+                    return parseTemplate(getPage(request, "userinactive"), context);
+                }
+            }
+
+
+            // Determine what to do
+            if (action.equals("view"))
+                return executeView(xwiki, doc, request, context, vcontext);
+            else if ( action.equals("inline"))
+                return executeInline(doc, form, request, context);
+            else if ( action.equals("edit") )
+                return executeEdit(doc, form, request, context);
+            else if ( action.equals("preview"))
+                return executePreview(doc, form, request, context, vcontext);
+            else if (action.equals("save"))
+                return executeSave(xwiki, doc, form, request, response, context);
+            else if (action.equals("delete"))
+                return executeDelete(xwiki, doc, request, response, context);
+            else if (action.equals("propupdate"))
+                return executePropertyUpdate(xwiki, doc, form, request, response, context);
+            else if (action.equals("propadd"))
+                return executePropertyAdd(xwiki, doc, form, request, response, context);
+            else if (action.equals("objectadd"))
+                return executeObjectAdd(xwiki, doc, form, request, response, context);
+            else if (action.equals("objectremove"))
+                return executeObjectRemove(xwiki, doc, form, request, response, context);
+            else if (action.equals("download"))
+                return executeDownload(doc, request, response, context);
+            else if (action.equals("attach"))
+                return parseTemplate(getPage(request, "attach"), context);
+            else if (action.equals("upload"))
+                return executeUpload(xwiki, doc, request, response, context);
+            else if (action.equals("delattachment"))
+                return executeDeleteAttachment(doc, request, response, context);
+            else if (action.equals("skin"))
+                return executeSkin(xwiki, doc, request, response, context);
+            else if (action.equals("login"))
+                return executeLogin(xwiki, doc, request, response, context);
+            else if (action.equals("loginerror"))
+                return parseTemplate(getPage(request, "login"), context);
+            else if (action.equals("logout"))
+                return executeLogout(xwiki, request, response, context);
         } catch (Throwable e) {
             vcontext.put("exp", e);
             return parseTemplate(getPage(request, "exception"), context);
         }
 
-       // Let's redirect to an error page here..
-       return null;
+        // Let's redirect to an error page here..
+        return null;
     }
 
     private ActionForward executeLogout(XWiki xwiki, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
@@ -268,9 +280,9 @@ public class ViewEditAction extends XWikiAction
 
     private ActionForward executeLogin(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
         if (doc.isNew()) {
-         String page = getPage(request, "login");
-         parseTemplate(page, context);
-         return null;
+            String page = getPage(request, "login");
+            parseTemplate(page, context);
+            return null;
         } else {
             return executeView(xwiki, doc, request, context, (VelocityContext) context.get("vcontext"));
         }

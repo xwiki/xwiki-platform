@@ -23,6 +23,7 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.security.XWikiSecurityManager;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
@@ -108,7 +109,19 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error while parsing velocity page " + name + ": " + e.getMessage();
+            Object[] args =  { name };
+
+            String title;
+            String text;
+
+            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
+                                                        "Error while parsing velocity page {0}", e, args);
+            title = xe.getMessage();
+            text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
+
+            return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
+                    + title + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre>\n"
+                    + text + "</div></pre>";
         }
     }
 }

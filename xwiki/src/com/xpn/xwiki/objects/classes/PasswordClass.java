@@ -65,7 +65,7 @@ public class PasswordClass extends StringClass {
         ElementInterface prop = object.safeget(name);
         if (prop!=null) input.setValue("********");
 
-        input.setType("text");
+        input.setType("password");
         input.setName(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());

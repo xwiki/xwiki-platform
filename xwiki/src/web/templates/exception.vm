@@ -12,7 +12,7 @@ A problem occured while trying to server your request. Please contact the suppor
 <br /><br />
 Detailed information:<br />
 <pre>
-$xwiki.printStrackTrace($exp)
+$exp.getFullMessage()
 </pre>
 </div>
 <div id="xwikinav_footer">

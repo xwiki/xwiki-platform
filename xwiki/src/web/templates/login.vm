@@ -22,7 +22,7 @@ $message
 <td><input type="password" name="j_password" value="" /></td>
 </tr>
 <tr><td>Remember Me</td>
-<td><input type="checkbox" name="j_rememberme" value="true" /></td>
+<td><input type="checkbox" name="j_rememberme" value="true" checked /></td>
 </tr>
 <tr>
 <td colspan="2"><input type="Submit" value="Log-in"/></td>

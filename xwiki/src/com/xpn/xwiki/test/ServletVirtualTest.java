@@ -112,7 +112,7 @@ public class ServletVirtualTest extends ServletTest {
         // Create User in the virtual wiki database
         HashMap map = new HashMap();
         map.put("password", "toto");
-        xwiki.createUser("LudovicDubost", map, context);
+        xwiki.createUser("LudovicDubost", map, "", "", context);
 
         // Setup Authentication rights
         Utils.createDoc(hibstore, "Main", "VirtualAuthTest", context);
@@ -153,7 +153,7 @@ public class ServletVirtualTest extends ServletTest {
         // Create User in the main wiki database
         HashMap map = new HashMap();
         map.put("password", "toto");
-        xwiki.createUser("LudovicDubost", map, context);
+        xwiki.createUser("LudovicDubost", map, "", "", context);
 
         context.setDatabase("xwikitest2");
         StoreHibernateTest.cleanUp(hibstore, context);

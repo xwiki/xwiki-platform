@@ -372,8 +372,13 @@ public class XWiki implements XWikiNotificationInterface {
                 name = fullname.substring(i1+1);
             } else {
                 server = null;
-                web = fullname.substring(0,i1);
-                name = fullname.substring(i1+1);
+                if (i1==-1) {
+                 web = "XWiki";
+                 name = fullname;
+                } else {
+                  web = fullname.substring(0,i1);
+                  name = fullname.substring(i1+1);
+                }
             }
 
             if (name.equals(""))
@@ -443,20 +448,20 @@ public class XWiki implements XWikiNotificationInterface {
         this.metaclass = metaclass;
     }
 
-    public String getFormEncoded(String content) {
+    public static String getFormEncoded(String content) {
         Filter filter = new CharacterFilter();
         filter.removeAttribute("'");
         String scontent = filter.process(content);
         return scontent;
     }
 
-    public String getXMLEncoded(String content) {
+    public static String getXMLEncoded(String content) {
         Filter filter = new CharacterFilter();
         String scontent = filter.process(content);
         return scontent;
     }
 
-    public String getTextArea(String content) {
+    public static String getTextArea(String content) {
         Filter filter = new CharacterFilter();
         filter.removeAttribute("'");
         String scontent = filter.process(content);
@@ -927,34 +932,78 @@ public class XWiki implements XWikiNotificationInterface {
         return createUser(false, context);
     }
 
+    public int validateUser(XWikiContext context) throws XWikiException {
+       try {
+          HttpServletRequest request = (HttpServletRequest) context.getRequest();
+          String xwikiname = request.getParameter("xwikiname");
+          String validkey = request.getParameter("validkey");
+
+          if (xwikiname.indexOf(".")==-1)
+               xwikiname = "XWiki." + xwikiname;
+
+          XWikiDocInterface docuser = getDocument(xwikiname, context);
+          BaseObject userobj = docuser.getObject("XWiki.XWikiUsers", 0);
+          String validkey2 = userobj.getStringValue("validkey");
+
+          if ((!validkey2.equals("")&&(validkey2.equals(validkey)))) {
+              userobj.setIntValue("active", 1);
+              saveDocument(docuser, context);
+              return 0;
+          } else
+           return -1;
+       } catch (Exception e) {
+           e.printStackTrace();
+           throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_VALIDATE_USER,
+                                  "Exception while validating user", e, null);
+       }
+    }
+
     public int createUser(boolean withValidation, XWikiContext context) throws XWikiException {
         try {
         HttpServletRequest request = (HttpServletRequest) context.getRequest();
         Map map = Util.getObject(request, "register");
+        String content = "#includeForm(\"XWiki.XWikiUserTemplate\")";
         String xwikiname = request.getParameter("xwikiname");
         String password2 = request.getParameter("register2_password");
         String password = ((String[])map.get("password"))[0];
         String email = ((String[])map.get("email"))[0];
+        String template = request.getParameter("template");
+        String parent = request.getParameter("parent");
+        String validkey = null;
 
         if (!password.equals(password2)) {
             // TODO: throw wrong password exception
             return -1;
         }
 
+        if ((template!=null)&&(!template.equals(""))) {
+                XWikiDocInterface tdoc = getDocument(template, context);
+                if ((!tdoc.isNew()))
+                  content = tdoc.getContent();
+            }
+
+        if ((parent==null)||(parent.equals(""))) {
+            parent = "XWiki.XWikiUsers";
+        }
+
         if (withValidation) {
             map.put("active", "0");
-            String validkey = generateValidationKey(16);
+            validkey = generateValidationKey(16);
             map.put("validkey", validkey);
-
-            // Send the validation email
-            sendValidationEmail(email, validkey, context);
 
         } else {
             // Mark user active
             map.put("active", "1");
         }
 
-        return createUser(xwikiname, map, context);
+          int result = createUser(xwikiname, map, parent, content, context);
+
+          if ((result>0)&&(withValidation)) {
+            // Send the validation email
+            sendValidationEmail(xwikiname, email, validkey, context);
+          }
+
+          return result;
         } catch (XWikiException e) {
             e.printStackTrace();
             throw e;
@@ -965,7 +1014,7 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
-    public void sendValidationEmail(String email, String validkey, XWikiContext context) throws XWikiException {
+    public void sendValidationEmail(String xwikiname, String email, String validkey, XWikiContext context) throws XWikiException {
      String sender;
      String content;
 
@@ -984,6 +1033,7 @@ public class XWiki implements XWikiNotificationInterface {
         vcontext.put("validkey", validkey);
         vcontext.put("email", email);
         vcontext.put("sender", sender);
+        vcontext.put("xwikiname", xwikiname);
         content = parseContent(content, context);
     } catch (Exception e) {
         throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
@@ -1056,20 +1106,33 @@ public class XWiki implements XWikiNotificationInterface {
         return RandomStringUtils.randomAlphanumeric(16);
     }
 
-    public int createUser(String xwikiname, Map map, XWikiContext context) throws XWikiException {
+    public int createUser(String xwikiname, Map map, String parent, String content, XWikiContext context) throws XWikiException {
         BaseClass baseclass = getUserClass(context);
+        BaseClass rclass = getRightsClass(context);
 
         try {
             // TODO: Verify existing user
             XWikiDocInterface doc = getDocument("XWiki." + xwikiname, context);
             if (!doc.isNew()) {
                 // TODO: throws Exception
-                return 0;
+                return -3;
             }
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map);
             newobject.setName("XWiki." + xwikiname);
             doc.addObject(baseclass.getName(), newobject);
+            doc.setParent(parent);
+            doc.setContent(content);
+
+            // Add protection to the page
+            BaseObject newrightsobject = (BaseObject) rclass.newObject();
+            newrightsobject.setClassName(rclass.getName());
+            newrightsobject.setName("XWiki." + xwikiname);
+            newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
+            newrightsobject.setStringValue("levels", "view, edit");
+            newrightsobject.setIntValue("allow", 1);
+            doc.addObject(rclass.getName(), newrightsobject);
+
             saveDocument(doc, null, context);
             return 1;
         }

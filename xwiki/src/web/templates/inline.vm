@@ -1,3 +1,9 @@
+#set($showactions=1)
+#macro(editactions)
+<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#end
 #template("editheader.vm")
 #if($message)
 <div id="xwikimessage">

@@ -1,11 +1,16 @@
+#macro(editactions $showactions)
+#if ($showactions==1)
+<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#end
+#end
 #template("xwiki.vm")
 #template("httpheader.vm")
 #template("header.vm")
 <div id="xwikinav_header">
 <div class="xwikiactions">
-<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#editactions($showactions)
 </div>
 </div>
 #template("pagemenu.vm")

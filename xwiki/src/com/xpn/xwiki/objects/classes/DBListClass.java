@@ -49,10 +49,10 @@ public class DBListClass extends ListClass {
     }
 
     public String getSql() {
-        return getStringValue("sql");
+        return getLargeStringValue("sql");
     }
 
     public void setSql(String sql) {
-        setStringValue("sql", sql);
+        setLargeStringValue("sql", sql);
     }
 }

@@ -71,7 +71,7 @@
         value="${lib.dir}/ant.jar" />
 
     <property name="libs.inlinejava"
-        value="${lib.dir}/InlineJavaServer2.jar;${lib.dir}/InlineJavaUser.jar" />
+        value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
     <property name="libs.osuser"
             value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar" />

@@ -47,7 +47,7 @@ public class XWikiAction extends Action {
 
         if (xwiki == null) {
             String path = servlet.getServletContext().getRealPath(xwikicfg);
-            xwiki = new XWiki(path, context);
+            xwiki = new XWiki(path, context, servlet);
             servlet.getServletContext().setAttribute(xwikiname, xwiki);
         }
         context.setWiki(xwiki);

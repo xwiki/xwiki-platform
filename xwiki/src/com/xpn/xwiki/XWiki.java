@@ -48,61 +48,87 @@ public class XWiki {
     private XWikiRenderingEngine renderingEngine;
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
+    private String version = null;
+    private HttpServlet servlet;
 
     public XWiki(String path, XWikiContext context) throws XWikiException {
-      XWikiStoreInterface basestore;
-      config = new XWikiConfig(path);
-      String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
-      try {
-         Class[] classes = new Class[2];
-         classes[0] = this.getClass();
-         classes[1] = context.getClass();
-         Object[] args = new Object[2] ;
-         args[0] = this;
-         args[1] = context;
-         basestore = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
+      this(path,context,null);
+    }
+
+    public XWiki(String path, XWikiContext context, HttpServlet servlet) throws XWikiException {
+        setServlet(servlet);
+        XWikiStoreInterface basestore;
+        config = new XWikiConfig(path);
+        String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
+        try {
+            Class[] classes = new Class[2];
+            classes[0] = this.getClass();
+            classes[1] = context.getClass();
+            Object[] args = new Object[2] ;
+            args[0] = this;
+            args[1] = context;
+            basestore = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
         }
         catch (InvocationTargetException e)
         {
-         Object[] args = { storeclass };
-         throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                                  XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                                  "Cannot load store class {0}",e.getTargetException(), args);
+            Object[] args = { storeclass };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load store class {0}",e.getTargetException(), args);
         } catch (Exception e) {
-          Object[] args = { storeclass };
-             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                                      XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                                      "Cannot load store class {0}",e, args);
+            Object[] args = { storeclass };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load store class {0}",e, args);
         }
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache)
-         store = new XWikiCache(basestore);
+            store = new XWikiCache(basestore);
         else
-         store = basestore;
+            store = basestore;
 
         renderingEngine = new XWikiRenderingEngine(this);
-        context.setWiki(this);
+    }
+
+    public String getVersion() {
+        if (version==null) {
+            version = Param("xwiki.version",  "");
+            String bnb = null;
+            try {
+                XWikiConfig vprop = new XWikiConfig(getRealPath("WEB-INF/version.properties"));
+                bnb = vprop.getProperty("build.number");
+            } catch (Exception e) {}
+            if (bnb!=null)
+                version = version + "." + bnb;            
+        }
+        return version;
     }
 
     public XWikiConfig getConfig() {
         return config;
     }
 
+    public String getRealPath(String path) {
+        return servlet.getServletContext().getRealPath(path);
+    }
+
     public String Param(String key) {
         return getConfig().getProperty(key);
     }
 
+    public String ParamAsRealPath(String key) {
+        String param = Param(key);
+        try {
+
+            return getRealPath(param);
+        } catch (Exception e) {
+            return param;
+        }
+    }
     public String ParamAsRealPath(String key, XWikiContext context) {
-        String path = getConfig().getProperty(key);
-        if (context==null)
-         return path;
-        HttpServlet servlet = context.getServlet();
-        if (servlet==null)
-            return path;
-        else
-            return servlet.getServletContext().getRealPath(path);
+        return ParamAsRealPath(key);
     }
 
 
@@ -137,7 +163,7 @@ public class XWiki {
         String web = fullname.substring(0,i1);
         String name = fullname.substring(i1+1);
         if (name.equals(""))
-         name = "WebHome";
+            name = "WebHome";
         return getDocument(web,name);
     }
 
@@ -147,7 +173,7 @@ public class XWiki {
         String web = path.substring(i1+1,i2);
         String name = path.substring(i2+1);
         if (name.equals(""))
-         name = "WebHome";
+            name = "WebHome";
         return getDocument(web,name);
     }
 
@@ -193,24 +219,24 @@ public class XWiki {
     }
 
     public List getClassList() throws XWikiException {
-     return store.getClassList();
+        return store.getClassList();
     }
     /*
     public String[] getClassList() throws XWikiException {
-      List list = store.getClassList();
-      String[] array = new String[list.size()];
-      for (int i=0;i<list.size();i++)
-         array[i] = (String)list.get(i);
-      return array;
+    List list = store.getClassList();
+    String[] array = new String[list.size()];
+    for (int i=0;i<list.size();i++)
+    array[i] = (String)list.get(i);
+    return array;
     }
     */
 
     public List searchDocuments(String wheresql) throws XWikiException {
-      return store.searchDocuments(wheresql);
+        return store.searchDocuments(wheresql);
     }
 
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-      return store.searchDocuments(wheresql, nb, start);
+        return store.searchDocuments(wheresql, nb, start);
     }
 
     public boolean isTest() {
@@ -225,9 +251,9 @@ public class XWiki {
         try {
             String skin = getSkin(context);
             String path = "/skins/" + skin + "/" + template;
-            File file = new File(context.getAction().getRealPath(path));
+            File file = new File(getRealPath(path));
             if (file.exists())
-              return path;
+                return path;
         } catch (Exception e) {
         }
         return "/templates/" + template;
@@ -235,15 +261,15 @@ public class XWiki {
 
     public String getSkin(XWikiContext context) {
         try {
-         // Try to get it from context
-         String skin = (String) context.get("skin");
-         if (skin!=null)
-          return skin;
+            // Try to get it from context
+            String skin = (String) context.get("skin");
+            if (skin!=null)
+                return skin;
 
-         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-         skin = doc.getxWikiObject().get("skin").toString();
-         context.put("skin",skin);
-         return skin;
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            skin = doc.getxWikiObject().get("skin").toString();
+            context.put("skin",skin);
+            return skin;
         } catch (Exception e) {
             context.put("skin","default");
             return "default";
@@ -252,8 +278,8 @@ public class XWiki {
 
     public String getWebCopyright(XWikiContext context) {
         try {
-         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-         return doc.getxWikiObject().get("webcopyright").toString();
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            return doc.getxWikiObject().get("webcopyright").toString();
         } catch (Exception e) {
             return "Copyright 2003,2004 (c) Ludovic Dubost";
         }
@@ -261,8 +287,8 @@ public class XWiki {
 
     public String getXWikiPreference(String prefname, XWikiContext context) {
         try {
-         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-         return doc.getxWikiObject().get(prefname).toString();
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            return doc.getxWikiObject().get(prefname).toString();
         } catch (Exception e) {
             return "";
         }
@@ -270,9 +296,9 @@ public class XWiki {
 
     public String getWebPreference(String prefname, XWikiContext context) {
         try {
-         XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
-         XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
-         return doc.getxWikiObject().get(prefname).toString();
+            XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
+            XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
+            return doc.getxWikiObject().get(prefname).toString();
         } catch (Exception e) {
             return getXWikiPreference(prefname, context);
         }
@@ -280,17 +306,25 @@ public class XWiki {
 
     public String getUserPreference(String prefname, XWikiContext context) {
         try {
-         // XWikiUser user = (XWikiUser) context.get("user");
-         // return user.getPreference(prefname, context);
+            // XWikiUser user = (XWikiUser) context.get("user");
+            // return user.getPreference(prefname, context);
             return getWebPreference(prefname, context);
         } catch (Exception e) {
             return getWebPreference(prefname, context);
         }
     }
 
-        public void flushCache() {
-            if (store instanceof XWikiCacheInterface) {
-                ((XWikiCacheInterface)store).flushCache();
-            }
+    public void flushCache() {
+        if (store instanceof XWikiCacheInterface) {
+            ((XWikiCacheInterface)store).flushCache();
         }
+    }
+
+    public HttpServlet getServlet() {
+        return servlet;
+    }
+
+    public void setServlet(HttpServlet servlet) {
+        this.servlet = servlet;
+    }
 }

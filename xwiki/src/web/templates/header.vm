@@ -6,7 +6,7 @@
   </div>
 
   <div id="version">
-    <a href="../../view/Main/WebHome">XWiki Version 0.1.11</a>
+    <a href="../../view/Main/WebHome">XWiki Version $xwiki.version</a>
   </div>
 
 <div id="title">

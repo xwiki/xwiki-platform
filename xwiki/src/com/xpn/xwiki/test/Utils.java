@@ -394,16 +394,17 @@ public class Utils {
         BaseClass bclass = doc.getxWikiClass();
         if (bclass==null) {
             bclass = new BaseClass();
+            bclass.setName(docName);
         }
-
-        bclass.setName(docName);
-        StringClass propclass = new StringClass();
-        propclass.setName(propname);
-        propclass.setPrettyName(propname);
-        propclass.setSize(80);
-        propclass.setObject(bclass);
-        bclass.addField(propname, propclass);
-        doc.setxWikiClass(bclass);
+        if (bclass.getField(propname)==null) {
+            StringClass propclass = new StringClass();
+            propclass.setName(propname);
+            propclass.setPrettyName(propname);
+            propclass.setSize(80);
+            propclass.setObject(bclass);
+            bclass.addField(propname, propclass);
+            doc.setxWikiClass(bclass);
+        }
 
         BaseObject bobject = doc.getxWikiObject();
         if (bobject==null) {
@@ -426,18 +427,19 @@ public class Utils {
         XWikiDocInterface classdoc = xwiki.getDocument(className, context);
         BaseClass bclass = classdoc.getxWikiClass();
         if (bclass==null) {
-                    bclass = new BaseClass();
+            bclass = new BaseClass();
+            bclass.setName(className);
         }
-        bclass.setName(className);
-        StringClass propclass = new StringClass();
-        propclass.setName(propname);
-        propclass.setPrettyName(propname);
-        propclass.setSize(80);
-        propclass.setObject(bclass);
-        bclass.addField(propname, propclass);
-        classdoc.setxWikiClass(bclass);
-        xwiki.saveDocument(classdoc, context);
-
+        if (bclass.getField(propname)==null) {
+            StringClass propclass = new StringClass();
+            propclass.setName(propname);
+            propclass.setPrettyName(propname);
+            propclass.setSize(80);
+            propclass.setObject(bclass);
+            bclass.addField(propname, propclass);
+            classdoc.setxWikiClass(bclass);
+            xwiki.saveDocument(classdoc, context);
+        }
         XWikiDocInterface doc = xwiki.getDocument(docName, context);
         BaseObject bobject = doc.getObject(className, 0);
         if (bobject==null) {
@@ -456,18 +458,18 @@ public class Utils {
         BaseClass bclass = doc.getxWikiClass();
         if (bclass==null) {
             bclass = new BaseClass();
+            bclass.setName(docName);
         }
-
-        bclass.setName(docName);
-        NumberClass propclass = new NumberClass();
-        propclass.setName(propname);
-        propclass.setNumberType("integer");
-        propclass.setPrettyName(propname);
-        propclass.setSize(5);
-        propclass.setObject(bclass);
-        bclass.addField(propname, propclass);
-        doc.setxWikiClass(bclass);
-
+        if (bclass.getField(propname)==null) {
+            NumberClass propclass = new NumberClass();
+            propclass.setName(propname);
+            propclass.setNumberType("integer");
+            propclass.setPrettyName(propname);
+            propclass.setSize(5);
+            propclass.setObject(bclass);
+            bclass.addField(propname, propclass);
+            doc.setxWikiClass(bclass);
+        }
         BaseObject bobject = doc.getxWikiObject();
         if (bobject==null) {
           bobject = new BaseObject();
@@ -490,17 +492,19 @@ public class Utils {
         BaseClass bclass = classdoc.getxWikiClass();
         if (bclass==null) {
                     bclass = new BaseClass();
+                    bclass.setName(className);
         }
-        bclass.setName(className);
-        NumberClass propclass = new NumberClass();
-        propclass.setName(propname);
-        propclass.setNumberType("integer");
-        propclass.setPrettyName(propname);
-        propclass.setSize(5);
-        propclass.setObject(bclass);
-        bclass.addField(propname, propclass);
-        classdoc.setxWikiClass(bclass);
-        xwiki.saveDocument(classdoc, context);
+        if (bclass.getField(propname)==null) {
+          NumberClass propclass = new NumberClass();
+          propclass.setName(propname);
+          propclass.setNumberType("integer");
+          propclass.setPrettyName(propname);
+          propclass.setSize(5);
+          propclass.setObject(bclass);
+          bclass.addField(propname, propclass);
+          classdoc.setxWikiClass(bclass);
+          xwiki.saveDocument(classdoc, context);
+        }
 
         XWikiDocInterface doc = xwiki.getDocument(docName, context);
         BaseObject bobject = doc.getObject(className, 0);

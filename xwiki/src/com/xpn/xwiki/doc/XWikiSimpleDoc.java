@@ -891,6 +891,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         doc.setTemplate(getTemplate());
         doc.setWeb(getWeb());
         doc.setParent(getParent());
+        doc.setDefaultLanguage(getDefaultLanguage());
+        doc.setLanguage(getLanguage());
+        doc.setTranslation(getTranslation());
         doc.setxWikiClass((BaseClass)getxWikiClass().clone());
         doc.mergexWikiObjects(this);
         return doc;
@@ -905,6 +908,18 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                  return false;
 
         if (!getAuthor().equals(doc.getAuthor()))
+                 return false;
+
+        if (!getParent().equals(doc.getParent()))
+                 return false;
+
+        if (!getDefaultLanguage().equals(doc.getDefaultLanguage()))
+                 return false;
+
+        if (!getLanguage().equals(doc.getLanguage()))
+                 return false;
+
+        if (getTranslation()!=doc.getTranslation())
                  return false;
 
         if (getDate().getTime() != doc.getDate().getTime())

@@ -36,6 +36,7 @@ import org.apache.cactus.client.authentication.BasicAuthentication;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 
 public class ServletVirtualTest extends ServletTest {
@@ -243,11 +244,21 @@ public class ServletVirtualTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Result: $xwiki.createNewWiki(\"xwikitest2\", \"localhost\", \"XWiki.LudovicDubost\", \"xwikitest\", true)";
+        Utils.content1 += "\n$context.context.nbdocs\n";
         Utils.createDoc(hibstore, "Main", "CreateNewWikiTest", context);
         Utils.content1 = content;
 
         // In order for createUser to work, we need programming right
         Utils.createDoc(hibstore, "Test", "CreateNewWikiTestDoc", context);
+        // Let's put a few documents
+        for (int i=1;i<25;i++) {
+         Utils.createDoc(hibstore,"Main", "CreateNewWikiTestDoc" + i, context);
+
+         // Let's add a german translation
+         XWikiDocInterface doc = xwiki.getDocument("Main.CreateNewWikiTestDoc" + i, context);
+         doc.setLanguage("de");
+         xwiki.saveDocument(doc, context);
+        }
 
         Utils.createDoc(hibstore, "XWiki", "LudovicDubost", context);
         Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "email", "ludovic@xwiki.org", context);
@@ -268,13 +279,22 @@ public class ServletVirtualTest extends ServletTest {
 
     public void endCreateNewWiki(WebResponse webResponse) throws HibernateException, XWikiException {
         try {
-            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
-            String result = webResponse.getText();
-            assertTrue("Response code is not correct", result.indexOf("Result: 1")!=-1 );
-
             context.setDatabase("xwikitest2");
             XWikiDocInterface doc = xwiki.getDocument("Test.CreateNewWikiTestDoc", context);
             assertTrue("Document in new wiki should exist", !doc.isNew());
+
+            for (int i=1;i<25;i++) {
+             doc = xwiki.getDocument("Main.CreateNewWikiTestDoc" + i, context);
+             assertTrue("Document " + i + " in new wiki should exist", !doc.isNew());
+             List tlist = doc.getTranslationList(context);
+             assertEquals("Document " + i + " has a german version", tlist.size(), 1);
+             String language = (String) tlist.get(0);
+             assertEquals("Document " + i + " has a german version", language, "de");
+            }
+
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            String result = webResponse.getText();
+            assertTrue("Response code is not correct", result.indexOf("Result: 1")!=-1 );
 
         } finally {
             clientTearDown();

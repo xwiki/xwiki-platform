@@ -1831,6 +1831,9 @@ public class XWiki implements XWikiNotificationInterface {
             context.setDatabase(sourceWiki);
             XWikiDocInterface sdoc = getDocument(docname, context);
             if (!sdoc.isNew()) {
+                if (log.isInfoEnabled())
+                    log.info("Copying document: " + docname + "(default) to wiki " + targetWiki);
+
                 context.setDatabase(targetWiki);
                 XWikiDocInterface tdoc = getDocument(docname, context);
                 // There is already an existing document
@@ -1842,33 +1845,62 @@ public class XWiki implements XWikiNotificationInterface {
                 tdoc.setVersion("1.1");
                 tdoc.setRCSArchive(null);
                 saveDocument(tdoc, context);
+
+                // Now we need to copy the translations
+                context.setDatabase(sourceWiki);
+                List tlist = sdoc.getTranslationList(context);
+                for (int i=0;i<tlist.size();i++) {
+                    String language = (String) tlist.get(i);
+                    XWikiDocInterface stdoc = sdoc.getTranslatedDocument(language, context);
+                    if (log.isInfoEnabled())
+                        log.info("Copying document: " + docname + "(" + language + ") to wiki " + targetWiki);
+
+                    context.setDatabase(targetWiki);
+                    XWikiDocInterface ttdoc = tdoc.getTranslatedDocument(language, context);
+
+                    // There is already an existing document
+                    if (ttdoc != tdoc)
+                        return false;
+
+                    ttdoc = (XWikiDocInterface) stdoc.clone();
+                    // forget past versions
+                    ttdoc.setVersion("1.1");
+                    ttdoc.setRCSArchive(null);
+                    saveDocument(ttdoc, context);
+                }
             }
-        return true;
+            return true;
         } finally {
             context.setDatabase(db);
         }
     }
 
-    public void copyWikiWeb(String web, String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
+    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
         String db = context.getDatabase();
+        int nb = 0;
         try {
             String sql = "";
             if (web!=null)
                 sql = "where doc.web = '" + web + "'";
 
+            context.setDatabase(sourceWiki);
             List list = searchDocuments(sql, context);
+            if (log.isInfoEnabled())
+             log.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
+
             for (Iterator it=list.iterator();it.hasNext();) {
                 String docname = (String) it.next();
                 copyDocument(docname, sourceWiki, targetWiki, context);
+                nb++;
             }
-
+            return nb;
         } finally {
             context.setDatabase(db);
         }
     }
 
-    public void copyWiki(String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
-        copyWikiWeb(null, sourceWiki, targetWiki, context);
+    public int copyWiki(String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
+        return copyWikiWeb(null, sourceWiki, targetWiki, context);
     }
 
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist, XWikiContext context) throws XWikiException {
@@ -1944,7 +1976,9 @@ public class XWiki implements XWikiNotificationInterface {
 
 
             // Copy base wiki
-            copyWiki(baseWikiName, wikiName, context);
+            int nb = copyWiki(baseWikiName, wikiName, context);
+            // Save the number of docs copied in the context
+            context.put("nbdocs", new Integer(nb));
 
             // Create user page in his wiki
             copyDocument(wikiAdmin, getDatabase(), wikiName, context);

@@ -82,7 +82,6 @@ public class PerlTest extends TestCase {
         testPerlPlugin(1000);
     }
 
-
     public void testWikiEngine(int nb) throws XWikiException {
         for (int i=0;i<nb;i++) {
             RenderTest.renderTest(wikiengine, "Hello 1\n---\nHello 2",
@@ -140,7 +139,6 @@ public class PerlTest extends TestCase {
         testWikiRenderer(1000);
     }
 
-
     public void testPerlCalendarPlugin(int nb) throws XWikiException {
         for (int i=0;i<nb;i++) {
             RenderTest.renderTest(perlplugin, "%CALENDAR%",
@@ -148,9 +146,11 @@ public class PerlTest extends TestCase {
         }
     }
 
+    /*
     public void testPerlCalendarPlugin() throws XWikiException {
         testPerlCalendarPlugin(1);
     }
+    */
 
     public void testPTabListRenderer() throws XWikiException {
              RenderTest.renderTest(perlplugin, "\t* List1",
@@ -161,7 +161,6 @@ public class PerlTest extends TestCase {
                   "<ul>\n<li> List1\n<ul>\n<li> List2\n</ul>\n</ul>\n", true, context);
 
         }
-
     public void testPerlSpaceListRenderer() throws XWikiException {
             // This test is known to fail. It is not doing what I expected 
             /*

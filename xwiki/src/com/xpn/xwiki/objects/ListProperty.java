@@ -143,4 +143,12 @@ public class ListProperty extends BaseProperty {
         return el;
     }
 
+    // This is important.. Otherwise we can get a stackoverflow calling toXML()
+    public String toString() {
+        if ((getList() instanceof PersistentCollection)
+               &&(!((PersistentCollection)getList()).wasInitialized()))
+              return "";
+        return toXMLString();
+    }
+
 }

@@ -29,9 +29,7 @@
 
     <!-- The following line is used to read the version -->
     <property file="src/web/WEB-INF/xwiki.cfg" />
-    <buildnumber file="src/web/WEB-INF/version.properties" />
 
-    <property name="version" value="${xwiki.version}.${build.number}" />
 
     <property name="app.name" value="xwiki" />
     <property name="pkg"  value="com.xpn.xwiki" />
@@ -81,7 +79,6 @@
     <property name="libs"
         value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.tests}" />
 
-    <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
 
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
@@ -95,6 +92,9 @@
     </taskdef>
 
     <target name="prepare">
+        <buildnumber file="src/web/WEB-INF/version.properties" />
+    <property name="version" value="${xwiki.version}.${build.number}" />
+        <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <mkdir dir="${build.dir}" />
         <mkdir dir="${classes.dir}" />
         <mkdir dir="${release.dir}" />

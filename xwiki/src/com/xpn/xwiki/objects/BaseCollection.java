@@ -27,9 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;
@@ -131,6 +129,21 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         property.setValue(new Integer(value));
         safeput(name, property);
     }
+
+    public Set getSetValue(String name) {
+        SetProperty prop = (SetProperty)safeget(name);
+        if (prop==null)
+         return new HashSet();
+        else
+         return (Set)prop.getValue();
+    }
+
+    public void setSetValue(String name, Set value) {
+        SetProperty property = new SetProperty();
+        property.setValue(value);
+        safeput(name, property);
+    }
+
 
     public Map getFields() {
         return fields;

@@ -54,11 +54,11 @@ public class NumberClass  extends PropertyClass {
     }
 
     public String getNumberType() {
-        return getStringValue("number_type");
+        return getStringValue("numberType");
     }
 
     public void setNumberType(String ntype) {
-        setStringValue("number_type", ntype);
+        setStringValue("numberType", ntype);
     }
 
 
@@ -87,18 +87,6 @@ public class NumberClass  extends PropertyClass {
         property.setValue(nvalue);
         // property.setPropertyClass(this);
         return property;
-    }
-
-    public void displayHidden(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
-        super.displayHidden(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
-    }
-
-    public void displaySearch(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
-        super.displaySearch(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
-    }
-
-    public void displayView(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
-        super.displayView(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {

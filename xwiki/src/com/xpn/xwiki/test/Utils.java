@@ -181,12 +181,18 @@ public class Utils {
          comment_class.setSize(80);
          comment_class.setRows(10);
          comment_class.setObject(wclass);
+         BooleanClass boolean_class = new BooleanClass();
+         boolean_class.setName("driver");
+         boolean_class.setPrettyName("Driver License ?");
+         boolean_class.setDisplayType("truefalse");
+         boolean_class.setObject(wclass);
 
          wclass.put("first_name", first_name_class);
          wclass.put("last_name", last_name_class);
          wclass.put("age", age_class);
          wclass.put("password", passwd_class);
          wclass.put("comment", comment_class);
+         wclass.put("driver", boolean_class);
          wclass.setName(name);
 
          BaseObject object = new BaseObject();
@@ -197,6 +203,7 @@ public class Utils {
          object.put("age", age_class.fromString("33"));
          object.put("password", passwd_class.fromString("sesame"));
          object.put("comment",comment_class.fromString("Hello1\nHello2\nHello3\n"));
+         object.put("driver", boolean_class.fromString("1"));
          return object;
      }
 

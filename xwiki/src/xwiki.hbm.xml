@@ -163,6 +163,16 @@
             </property>
         </joined-subclass>
 
+        <joined-subclass name="com.xpn.xwiki.objects.classes.BooleanClass" table="xwikibooleanclasses">
+            <key>
+                <column name="XWN_ID"  />
+                <column name="XWN_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWN_DISPLAYTYPE" length="20" />
+            </property>
+        </joined-subclass>
+
     </class>
 
     <class name="com.xpn.xwiki.objects.classes.BaseClass" table="xwikiclasses">

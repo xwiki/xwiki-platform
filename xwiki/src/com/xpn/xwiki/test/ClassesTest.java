@@ -8,6 +8,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.classes.*;
 import junit.framework.TestCase;
 
@@ -77,6 +78,14 @@ public class ClassesTest extends TestCase {
         assertEquals("TextArea not supported", property.getValue(), new String("Hello1\nHello2\nHello3\n"));
     }
 
+    public void testBoolean() {
+        BooleanClass pclass = new BooleanClass();
+        IntegerProperty property;
+        property = (IntegerProperty)pclass.fromString("1");
+        assertEquals("Boolean not supported", property.getValue(), new Integer(1));
+    }
+
+
     public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected) {
       XWikiContext context = new XWikiContext();
       StringBuffer result = new StringBuffer();
@@ -84,7 +93,7 @@ public class ClassesTest extends TestCase {
       pclass.displayView(result,cname, "", obj, context);
       assertEquals("Class " + cname + " view displayer not correct:\n" +
                     "Expected: " + viewexpected + "\nResult: " + result,
-                    result.toString().toLowerCase(),viewexpected.toLowerCase());
+                    viewexpected.toLowerCase(), result.toString().toLowerCase());
 
       result = new StringBuffer();
       pclass.displayEdit(result,cname, "", obj, context);
@@ -96,13 +105,14 @@ public class ClassesTest extends TestCase {
       pclass.displaySearch(result,cname, "", obj, context);
     }
 
-    public void testNumberDisplayers() throws XWikiException {
+    public void testDisplayers() throws XWikiException {
         BaseObject obj = Utils.prepareObject();
         testDisplayer("age", obj, "33", "value=\'33\'");
         testDisplayer("first_name", obj, "Ludovic", "value=\'Ludovic\'");
         testDisplayer("last_name", obj, "von Dubost", "value=\'von Dubost\'");
         testDisplayer("password", obj, "********", "value=\'********\'");
         testDisplayer("comment", obj, "Hello1\nHello2\nHello3\n", "textarea");
+        testDisplayer("driver", obj, "true", "<select");
     }
 
     public void testObject() throws XWikiException {

@@ -34,6 +34,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import net.sf.hibernate.*;
+import net.sf.hibernate.impl.SessionFactoryImpl;
 import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.apache.commons.jrcs.rcs.Archive;
@@ -85,6 +86,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     public void shutdownHibernate() throws HibernateException {
         if (session!=null) {
             session.close();
+        }
+        if (sessionFactory!=null) {
+            ((SessionFactoryImpl)sessionFactory).getConnectionProvider().close();
         }
     }
 

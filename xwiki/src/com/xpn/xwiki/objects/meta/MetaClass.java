@@ -41,6 +41,8 @@ public class MetaClass extends BaseClass {
         safeput(textareaclass.getName(), textareaclass);
         PasswordMetaClass passwdclass = new PasswordMetaClass();
         safeput(passwdclass.getName(), passwdclass);
+        BooleanMetaClass booleanclass = new BooleanMetaClass();
+        safeput(booleanclass.getName(), booleanclass);
 
     }
 

@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -17,39 +17,32 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 22 déc. 2003
- * Time: 09:19:06
+ * Date: 2 févr. 2004
+ * Time: 17:18:12
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.BaseCollection;
 
-public class NumberMetaClass extends PropertyMetaClass {
+public class BooleanMetaClass extends PropertyMetaClass {
 
-  public NumberMetaClass() {
-    super();
-    // setType("numbermetaclass");
-    setPrettyName("Number Class");
-    setName(NumberClass.class.getName());
+    public BooleanMetaClass() {
+        super();
+        setPrettyName("Boolean Class");
+        setName(BooleanClass.class.getName());
 
-    StringClass type_class = new StringClass(this);
-    type_class.setName("numberType");
-    type_class.setPrettyName("Number Type");
-    type_class.setSize(20);
+        StringClass type_class = new StringClass(this);
+        type_class.setName("displayType");
+        type_class.setPrettyName("Display Type");
+        type_class.setSize(20);
+        safeput("displayType", type_class);
+    }
 
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
+    public BaseCollection newObject() {
+        return new BooleanClass();
+    }
 
-    safeput("numberType", type_class);
-    safeput("size", size_class);
-  }
-
-  public BaseCollection newObject() {
-        return new NumberClass();
-  }
 }

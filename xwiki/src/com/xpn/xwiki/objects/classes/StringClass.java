@@ -60,17 +60,6 @@ public class StringClass extends PropertyClass {
         return property;
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displayHidden(buffer, name, prefix, object, context);
-    }
-
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displaySearch(buffer, name, prefix, object, context);
-    }
-
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displayView(buffer, name, prefix, object, context);
-    }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();

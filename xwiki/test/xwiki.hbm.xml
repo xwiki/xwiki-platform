@@ -87,7 +87,7 @@
             <column name="XWA_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
-        
+
         <property name="content" type="binary">
             <column name="XWA_CONTENT" length="4000000" not-null="true"/>
         </property>
@@ -161,6 +161,16 @@
             </property>
             <property name="rows" type="integer">
                 <column name="XWS_ROWS" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.BooleanClass" table="xwikibooleanclasses">
+            <key>
+                <column name="XWN_ID"  />
+                <column name="XWN_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWN_DISPLAYTYPE" length="20" />
             </property>
         </joined-subclass>
 

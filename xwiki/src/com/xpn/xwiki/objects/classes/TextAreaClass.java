@@ -54,18 +54,6 @@ public class TextAreaClass extends StringClass {
         return super.fromString(value);
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displayHidden(buffer, name, prefix, object, context);
-    }
-
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displaySearch(buffer, name, prefix, object, context);
-    }
-
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displayView(buffer, name, prefix, object, context);
-    }
-
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         TextArea textarea = new TextArea();
         ElementInterface prop = object.safeget(name);

@@ -8,7 +8,6 @@
   </component>
   <component name="CheckinPanelState">
     <Excluded key="$PROJECT_DIR$/test/xwiki.cfg" />
-    <Excluded key="$PROJECT_DIR$/src/web" />
     <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/xwiki-test.cfg" />
     <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/xwiki.cfg" />
   </component>
@@ -78,7 +77,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented document cache&#10;Refactored store tests with heritage&#10;Added getXWikiPreference and getWebPreference" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented Inline editing" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />

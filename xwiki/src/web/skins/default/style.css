@@ -22,7 +22,7 @@
     border-style: solid;
     border-color: #009255;
     background-image:url(pixel_clair.gif);
-    background-repeat: repeat;
+    background-repeat: no-repeat;
 }
 
 *, td, th, p, a, select {
@@ -35,8 +35,9 @@
     float: left;
     clear: left;
     left: 0px;
-
+    repeat:
     background-image:url(horizontal.gif);
+    background-repeat: repeat-y;
 }
 
 #xwikilogo img {
@@ -148,7 +149,7 @@
     text-decoration: none;
     text-align: center;
 }
-    
+
 .xwikiactions span, #xwikiwebmenu span {
     display: none;
 }

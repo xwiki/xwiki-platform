@@ -160,6 +160,9 @@
             <column name="XWO_ID" not-null="true" />
             <generator class="assigned" />
         </id>
+        <property name="number" type="integer">
+            <column name="XWO_NUMBER" not-null="false" />
+        </property>
         <property name="name" type="string">
             <column name="XWO_NAME" not-null="true" length="255"/>
         </property>
@@ -167,6 +170,7 @@
             <column name="XWO_CLASSNAME" not-null="true" length="255"/>
         </property>
     </class>
+
 
 </hibernate-mapping>
 

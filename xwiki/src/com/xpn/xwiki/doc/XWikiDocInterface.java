@@ -24,12 +24,15 @@ package com.xpn.xwiki.doc;
 
 import org.apache.commons.jrcs.rcs.*;
 import com.xpn.xwiki.*;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.*;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Vector;
 import java.io.FileNotFoundException;
 
 public interface XWikiDocInterface {
@@ -96,5 +99,21 @@ public interface XWikiDocInterface {
 
     public boolean isFromCache() ;
     public void setFromCache(boolean fromCache);
+
+    int getObjectNumbers(String classname);
+
+    Vector getObjects(String classname);
+
+    void setObjects(String classname, Vector objects);
+
+    BaseObject getObject(String classname, int nb);
+
+    void setObject(String classname, int nb, BaseObject object);
+
+    void readFromForm(EditForm eform, XWikiContext context) throws XWikiException;
+
+    void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException;
+
+    void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException;
 
 }

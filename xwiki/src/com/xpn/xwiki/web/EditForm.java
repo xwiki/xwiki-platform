@@ -85,14 +85,21 @@ public class EditForm extends ActionForm
         this.name = name;
     }
 
+    public int getObjectNumbers(String prefix) {
+        String nb = request.getParameter(prefix + "_nb");
+        if ((nb==null)||(nb.equals("")))
+         return 0;
+        return Integer.parseInt(nb);
+    }
+
     public Map getObject(String prefix) {
         Map map = request.getParameterMap();
         HashMap map2 = new HashMap();
         Iterator it = map.keySet().iterator();
         while (it.hasNext()) {
           String name = (String) it.next();
-          if (name.startsWith(prefix)) {
-              String newname = name.substring(prefix.length());
+          if (name.startsWith(prefix + "_")) {
+              String newname = name.substring(prefix.length()+1);
               map2.put(newname, map.get(name));
           }
         }

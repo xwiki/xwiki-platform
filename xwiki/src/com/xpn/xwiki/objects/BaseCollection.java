@@ -34,6 +34,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     private BaseClass xWikiClass;
     private Map fields = new HashMap();
 
+
     public int getId() {
             return (getName()+getClassName()).hashCode();
         }
@@ -194,6 +195,5 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
               safeput(name, (ElementInterface) ((BaseElement)object.safeget(name)).clone());
         }
     }
-
 
 }

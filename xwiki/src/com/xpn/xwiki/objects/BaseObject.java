@@ -29,7 +29,19 @@ import com.xpn.xwiki.objects.classes.*;
 import java.io.Serializable;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
+    private int number = 0;
 
+    public int getId() {
+            String str = getName()+getClassName();
+            int nb = getNumber();
+            if (nb>0)
+                str += "_" + nb;
+            return str.hashCode();
+        }
+
+    public void setId(int id) {
+    }
+    
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context) {
         ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
     }
@@ -89,5 +101,13 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public Object clone() {
         BaseObject object = (BaseObject) super.clone();
         return object;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 }

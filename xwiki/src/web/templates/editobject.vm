@@ -1,16 +1,32 @@
 <h2>Properties</h2>
 <table border="0">
 #foreach($prop in $doc.xWikiObject.xWikiClass.properties)
-<tr><td>$prop.prettyName</td>
-<td>$prop.displayEdit($prop.getName(), "object_",  $doc.xWikiObject, $context)
-</td></tr>
+ <tr><td>$prop.prettyName</td>
+ <td>$prop.displayEdit($prop.getName(), "object_",  $doc.xWikiObject, $context)
+ </td></tr>
+ </table>
 #end
-#foreach($obj in $doc.xWikiObjects)
-<tr><td>$obj.xWikiClass.name</td></tr>
-#foreach($prop in $obj.xWikiClass.properties)
-<tr><td>$prop.prettyName</td>
-<td>$prop.displayEdit($prop.getName(), "${obj.xWikiClass.name}_",  $obj, $context)
-</td></tr>
+#foreach($objlist in $doc.xWikiObjects)
+#set( $class = $objlist.elementAt(0).xWikiClass)
+#set( $nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb">
+<br>
+*$class.name*
+<br>
+ <table>
+ <tr>
+  #foreach($prop in $class.properties)
+   <td>$prop.prettyName
+   </td>
+  #end
+ </tr>
+  #foreach($obj in $objlist)
+   <tr>
+    #foreach($prop in $class.properties)
+     <td>$prop.displayEdit($prop.getName(), "${class.name}_${obj.number}_",  $obj, $context)
+     </td>
+    #end
+   </tr>
+  #end
+ </table>
 #end
-#end
-</table>

@@ -32,6 +32,8 @@ import java.io.FileNotFoundException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -403,7 +405,58 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         BaseObject object = new BaseObject();
         object.setName(getFullName());
         object.setxWikiClass(objclass);
-        getxWikiObjects().put(objclass.getName(), object);
+        Vector objects = getObjects(objclass.getName());
+        if (objects==null) {
+           objects = new Vector();
+           setObjects(objclass.getName(), objects);
+        }
+        objects.add(object);
+        object.setNumber(objects.size()-1);
+    }
+
+    public int getObjectNumbers(String classname) {
+        try {
+            return ((Vector)getxWikiObjects().get(classname)).size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public Vector getObjects(String classname) {
+        try {
+            return (Vector)getxWikiObjects().get(classname);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void setObjects(String classname, Vector objects) {
+        getxWikiObjects().put(classname, objects);
+    }
+
+    public BaseObject getObject(String classname, int nb) {
+        try {
+            return (BaseObject) ((Vector)getxWikiObjects().get(classname)).get(nb);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void setObject(String classname, int nb, BaseObject object) {
+        Vector objects = null;
+        objects = getObjects(classname);
+        if (objects==null) {
+            objects = new Vector();
+            setObjects(classname, objects);
+        }
+        if (nb >= objects.size()) {
+         objects.add(object);
+         object.setNumber(objects.size()-1);
+        }
+        else {
+         objects.set(nb, object);
+         object.setNumber(nb);
+        }
     }
 
     public boolean isNew() {
@@ -415,39 +468,55 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public void mergexWikiClass(XWikiDocInterface templatedoc) {
-            BaseClass bclass = getxWikiClass();
-            BaseClass tbclass = templatedoc.getxWikiClass();
-            if (tbclass!=null) {
-                if (bclass==null) {
-                    setxWikiClass((BaseClass)tbclass.clone());
-                } else {
-                    getxWikiClass().merge((BaseClass)tbclass.clone());
-                }
+        BaseClass bclass = getxWikiClass();
+        BaseClass tbclass = templatedoc.getxWikiClass();
+        if (tbclass!=null) {
+            if (bclass==null) {
+                setxWikiClass((BaseClass)tbclass.clone());
+            } else {
+                getxWikiClass().merge((BaseClass)tbclass.clone());
             }
+        }
     }
 
     public void mergexWikiObject(XWikiDocInterface templatedoc) {
-            BaseObject bobject = getxWikiObject();
-            BaseObject tbobject = templatedoc.getxWikiObject();
-            if (tbobject!=null) {
-                if (bobject==null) {
-                    setxWikiObject((BaseObject)tbobject.clone());
-                } else {
-                    getxWikiObject().merge((BaseObject)tbobject.clone());
-                }
+        BaseObject bobject = getxWikiObject();
+        BaseObject tbobject = templatedoc.getxWikiObject();
+        if (tbobject!=null) {
+            if (bobject==null) {
+                setxWikiObject((BaseObject)tbobject.clone());
+            } else {
+                getxWikiObject().merge((BaseObject)tbobject.clone());
             }
+        }
     }
 
     public void mergexWikiObjects(XWikiDocInterface templatedoc) {
-          // TODO: look for each object if it already exist and add it if it doesn't
+        // TODO: look for each object if it already exist and add it if it doesn't
         Iterator itobjects = templatedoc.getxWikiObjects().keySet().iterator();
         while (itobjects.hasNext()) {
             String name = (String) itobjects.next();
-            BaseObject object = (BaseObject) getxWikiObjects().get(name);
-            if (object!=null) {
-              object.merge((BaseObject) templatedoc.getxWikiObjects().get(name));
+            Vector objects = (Vector) getxWikiObjects().get(name);
+
+            if (objects!=null) {
+                Vector tobjects = (Vector) templatedoc.getxWikiObjects().get(name);
+                for (int i=0;i<tobjects.size();i++) {
+                    {
+                     BaseObject bobj = (BaseObject) ((BaseObject) tobjects.get(i)).clone();
+                     objects.add(bobj);
+                     bobj.setNumber(objects.size()-1);
+                    }
+                }
             } else {
-              getxWikiObjects().put(name, ((BaseObject)templatedoc.getxWikiObjects().get(name)).clone() );
+                Vector tobjects = (Vector) templatedoc.getxWikiObjects().get(name);
+                objects = new Vector();
+                for (int i=0;i<tobjects.size();i++)
+                {
+                    BaseObject bobj = (BaseObject) ((BaseObject) tobjects.get(i)).clone();
+                    objects.add(bobj);
+                    bobj.setNumber(objects.size()-1);
+                }
+                getxWikiObjects().put(name, objects);
             }
         }
     }
@@ -466,17 +535,17 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) getxWikiClass().get(fieldname);
             if (type.equals("view")) {
-               pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
             }
             else if (type.equals("edit")) {
-                           pclass.displayEdit(result, fieldname, "object_", getxWikiObject(), context);
-                        }
+                pclass.displayEdit(result, fieldname, "object_", getxWikiObject(), context);
+            }
             else if (type.equals("hidden")) {
-                           pclass.displayHidden(result, fieldname, "object_", getxWikiObject(), context);
-                        }
+                pclass.displayHidden(result, fieldname, "object_", getxWikiObject(), context);
+            }
             else if (type.equals("search")) {
-                           pclass.displaySearch(result, fieldname, "object_", getxWikiObject(), context);
-                        }
+                pclass.displaySearch(result, fieldname, "object_", getxWikiObject(), context);
+            }
             else {
                 pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
             }
@@ -487,15 +556,15 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
-        public String display(String fieldname, XWikiContext context) {
-           String type = null;
-           try { type = (String) context.get("display"); }
-           catch (Exception e) {
-           };
-           if (type==null)
+    public String display(String fieldname, XWikiContext context) {
+        String type = null;
+        try { type = (String) context.get("display"); }
+        catch (Exception e) {
+        };
+        if (type==null)
             type = "view";
-           return display(fieldname, type, context);
-        }
+        return display(fieldname, type, context);
+    }
 
     public boolean isFromCache() {
         return fromCache;
@@ -504,4 +573,96 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public void setFromCache(boolean fromCache) {
         this.fromCache = fromCache;
     }
+
+    public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException {
+        String content = eform.getContent();
+        if ((content!=null)&&(!content.equals("")))
+            setContent(content);
+        String parent = eform.getParent();
+        if (parent!=null)
+            setParent(parent);
+        BaseClass bclass = getxWikiClass();
+        if (bclass!=null)
+            setxWikiObject((BaseObject)bclass.fromMap(eform.getObject("object_")));
+
+        readFromTemplate(eform, context);
+
+        Iterator itobj = getxWikiObjects().keySet().iterator();
+        while (itobj.hasNext()) {
+            String name = (String) itobj.next();
+            BaseObject baseobject = (BaseObject)getObject(name, 0);
+            BaseClass baseclass = baseobject.getxWikiClass();
+            int nb = eform.getObjectNumbers(baseclass.getName());
+            if (nb>0) {
+                Vector newobjects = new Vector();
+                for (int i=0;i<nb;i++) {
+                    BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i));
+                    newobject.setNumber(i);
+                    newobject.setName(getFullName());
+                    newobjects.add(newobject);
+                }
+                getxWikiObjects().put(name, newobjects);
+            }
+        }
+
+    }
+
+    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException {
+        // Get the class from the template
+        String template = eform.getTemplate();
+        if ((template!=null)&&(!template.equals(""))) {
+            if (template.indexOf('.')==-1) {
+                template = getWeb() + "." + template;
+            }
+            XWiki xwiki = context.getWiki();
+            XWikiDocInterface templatedoc = xwiki.getDocument(template);
+            if (templatedoc.isNew()) {
+                Object[] args = { template, getFullName() };
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
+                        "Template document {0} does not exist when adding to document {1}", null, args);
+            } else {
+                setTemplate(template);
+                mergexWikiObjects(templatedoc);
+            }
+        }
+    }
+
+    public void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException {
+
+        String template = eform.getTemplate();
+        if ((template!=null)&&(!template.equals(""))) {
+            String content = getContent();
+            if ((content==null)||(!content.equals(""))) {
+                Object[] args = { getFullName() };
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                        "Cannot add a template to document {0} because it already has content", null, args);
+            } else {
+
+                if (template.indexOf('.')==-1) {
+                    template = getWeb() + "." + template;
+                }
+                XWiki xwiki = context.getWiki();
+                XWikiDocInterface templatedoc = xwiki.getDocument(template);
+                if (templatedoc.isNew()) {
+                    Object[] args = { template, getFullName() };
+                    throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
+                            "Template document {0} does not exist when adding to document {1}", null, args);
+                } else {
+                    setTemplate(template);
+                    setContent(templatedoc.getContent());
+                    if ((getParent()==null)||(getParent().equals(""))) {
+                        String tparent = templatedoc.getParent();
+                        if (tparent!=null)
+                            setParent(tparent);
+                    }
+
+                    // Merge the external objects
+                    // Currently the choice is not to merge the base class and object because it is not
+                    // the prefered way of using external classes and objects.
+                    mergexWikiObjects(templatedoc);
+                }
+            }
+        }
+    }
+
 }

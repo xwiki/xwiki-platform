@@ -48,10 +48,7 @@ public class StoreHibernateTest extends StoreTest {
        }
 
     public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
-        hibstore.checkHibernate();
-        hibstore.beginTransaction();
-        runSQL(hibstore, "drop table xwikidoc");
-        hibstore.endTransaction(true);
+        StoreObjectTest.cleanUp(hibstore);
     }
 
     public void setUp() throws HibernateException {

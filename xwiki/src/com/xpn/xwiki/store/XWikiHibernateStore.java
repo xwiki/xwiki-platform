@@ -73,9 +73,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         // Load Configuration and build SessionFactory
         String path = getPath();
         if (path!=null)
-         configuration =  (new Configuration()).configure(new File(path));
+            configuration =  (new Configuration()).configure(new File(path));
         else
-         configuration = new Configuration().configure();
+            configuration = new Configuration().configure();
         sessionFactory = configuration.buildSessionFactory();
     }
 
@@ -145,16 +145,21 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             BaseObject bobject = doc.getxWikiObject();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
-                saveXWikiClass(bclass, false);
+                if (bclass.getFields().size()>0)
+                 saveXWikiClass(bclass, false);
             }
             if (bobject!=null) {
                 bobject.setName(doc.getFullName());
+                bobject.setxWikiClass(bclass);
                 saveXWikiObject(bobject, false);
             }
             Iterator it = doc.getxWikiObjects().values().iterator();
             while (it.hasNext()) {
-                BaseObject obj = (BaseObject)it.next();
-                saveXWikiObject(obj, false);
+                Vector objects = (Vector) it.next();
+                for (int i=0;i<objects.size();i++) {
+                    BaseObject obj = (BaseObject)objects.get(i);
+                    saveXWikiObject(obj, false);
+                }
             }
 
             endTransaction(true);
@@ -184,34 +189,43 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
-            BaseClass bclass = new BaseClass();
-            bclass.setName(doc.getFullName());
-            loadXWikiClass(bclass, false);
-            doc.setxWikiClass(bclass);
-            BaseObject bobject = new BaseObject();
-            bobject.setName(doc.getFullName());
-            bobject.setxWikiClass(bclass);
-            loadXWikiObject(bobject, false);
-            doc.setxWikiObject(bobject);
+                BaseClass bclass = new BaseClass();
+                bclass.setName(doc.getFullName());
+                loadXWikiClass(bclass, false);
+                doc.setxWikiClass(bclass);
+                BaseObject bobject = new BaseObject();
+                bobject.setName(doc.getFullName());
+                bobject.setxWikiClass(bclass);
+                loadXWikiObject(bobject, false);
+                doc.setxWikiObject(bobject);
 
             // Find the list of classes for which we have an object
-            Query query = getSession().createQuery("select bobject.name, bobject.className from BaseObject as bobject where bobject.name = :name");
+//            Query query = getSession().createQuery("select bobject.name, bobject.className from BaseObject as bobject where bobject.name = :name order by bobject.number");
+            Query query = getSession().createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name");
             query.setText("name", doc.getFullName());
             Iterator it = query.list().iterator();
-            List list = new ArrayList();
+            Map bclasses = new HashMap();
             while (it.hasNext()) {
                 Object[] result = (Object[]) it.next();
                 String name = (String)result[0];
                 String classname = (String)result[1];
+                Integer nb = (Integer)result[2];
                 if ((!classname.equals(""))&&(!name.equals(classname))) {
-                    BaseClass objclass = new BaseClass();
-                    objclass.setName(classname);
-                    loadXWikiClass(objclass, false);
+                    BaseClass objclass;
+                    objclass = (BaseClass) bclasses.get(classname);
+                    if (objclass==null) {
+                       objclass = new BaseClass();
+                       objclass.setName(classname);
+                       loadXWikiClass(objclass, false);
+                       bclasses.put(classname, objclass);
+                    }
+
                     BaseObject object = new BaseObject();
+                    object.setNumber(nb.intValue());
                     object.setName(doc.getFullName());
                     object.setxWikiClass(objclass);
                     loadXWikiObject(object, false);
-                    doc.getxWikiObjects().put(objclass.getName(), object);
+                    doc.setObject(objclass.getName(), nb.intValue(), object);
                 }
             }
 

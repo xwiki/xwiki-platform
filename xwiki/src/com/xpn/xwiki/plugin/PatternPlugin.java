@@ -135,9 +135,9 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
          String result = (String) results.get(i);
          try {
            if (pattern.startsWith("s/"))
-            line = util.substitute(pattern, line);
+            line = util.substitute(pattern,line);
            else
-            line = StringUtils.replace(line, pattern, result);
+            line = StringUtils.replace(line, " " + pattern, " " + result);
          } catch (Exception e) {
              // Log a error but do not fail..
          }

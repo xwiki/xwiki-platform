@@ -443,7 +443,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public void addObject(String classname, BaseObject object) {
-        setObject(classname, getObjects(classname).size(), object);
+        Vector vobj = getObjects(classname);
+        if (vobj==null)
+         setObject(classname, 0, object);
+        else
+         setObject(classname, vobj.size(), object);
     }
 
     public void setObject(String classname, int nb, BaseObject object) {
@@ -628,9 +632,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
           BaseObject object = (BaseObject) objects.get(i);
           result.append("|");
           for (Iterator it = fields.keySet().iterator();it.hasNext();) {
-              result.append(" ");
+              result.append("<nop>");
               result.append(display((String)it.next(), object, context));
-              result.append(" |");
+              result.append("|");
           }
           result.append("\n");
       }
@@ -664,7 +668,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             if (nb>0) {
                 Vector newobjects = new Vector();
                 for (int i=0;i<nb;i++) {
-                    BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i));
+                    BaseObject oldobject = (BaseObject) getObject(name, i);
+                    BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
                     newobject.setNumber(i);
                     newobject.setName(getFullName());
                     newobjects.add(newobject);

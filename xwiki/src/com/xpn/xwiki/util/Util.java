@@ -28,9 +28,14 @@ import org.apache.oro.text.perl.*;
 import org.apache.oro.text.regex.*;
 
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.io.*;
 
 import com.xpn.xwiki.render.WikiSubstitution;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 public class Util {
@@ -118,6 +123,20 @@ public class Util {
 
     public static void setPatterns(PatternCache patterns) {
         Util.patterns = patterns;
+    }
+
+       public static Map getObject(HttpServletRequest request, String prefix) {
+        Map map = request.getParameterMap();
+        HashMap map2 = new HashMap();
+        Iterator it = map.keySet().iterator();
+        while (it.hasNext()) {
+          String name = (String) it.next();
+          if (name.startsWith(prefix + "_")) {
+              String newname = name.substring(prefix.length()+1);
+              map2.put(newname, map.get(name));
+          }
+        }
+        return map2;
     }
 
 }

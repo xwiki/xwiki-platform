@@ -31,14 +31,25 @@ import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.PropertyChangedRule;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.user.XWikiUserProvider;
+import com.xpn.xwiki.user.XWikiGroupProvider;
+import com.xpn.xwiki.util.Util;
+import com.opensymphony.user.UserManager;
+import com.opensymphony.user.ImmutableException;
+import com.opensymphony.user.DuplicateEntityException;
+import com.opensymphony.user.User;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.io.File;
 
 import org.apache.ecs.html.TextArea;
@@ -47,6 +58,7 @@ import org.apache.ecs.Filter;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -114,6 +126,10 @@ public class XWiki implements XWikiNotificationInterface {
         // Add a notification rule if the preference property plugin is modified
         getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
                 new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
+
+        // Make sure these classes exists
+        getUserClass();
+        getGroupClass();
     }
 
     public String getVersion() {
@@ -432,16 +448,20 @@ public class XWiki implements XWikiNotificationInterface {
         bclass.setName("XWiki.XWikiUsers");
         if (bclass.get("fullname")==null) {
             needsUpdate = true;
-            StringClass first_name_class = new StringClass();
-            first_name_class.setSize(20);
-            first_name_class.setObject(bclass);
-            bclass.put("fullname", first_name_class);
+            StringClass fullname_class = new StringClass();
+            fullname_class.setName("fullname");
+            fullname_class.setPrettyName("Full Name");
+            fullname_class.setSize(30);
+            fullname_class.setObject(bclass);
+            bclass.put("fullname", fullname_class);
         }
 
         if (bclass.get("email")==null) {
             needsUpdate = true;
             StringClass email_class = new StringClass();
-            email_class.setSize(20);
+            email_class.setName("email");
+            email_class.setPrettyName("e-Mail");
+            email_class.setSize(30);
             email_class.setObject(bclass);
             bclass.put("email", email_class);
         }
@@ -449,6 +469,8 @@ public class XWiki implements XWikiNotificationInterface {
         if (bclass.get("password")==null) {
             needsUpdate = true;
             PasswordClass passwd_class = new PasswordClass();
+            passwd_class.setName("password");
+            passwd_class.setPrettyName("Password");
             passwd_class.setSize(10);
             passwd_class.setObject(bclass);
             bclass.put("password", passwd_class);
@@ -457,8 +479,10 @@ public class XWiki implements XWikiNotificationInterface {
         if (bclass.get("comment")==null) {
             needsUpdate = true;
             TextAreaClass comment_class = new TextAreaClass();
-            comment_class.setSize(80);
-            comment_class.setRows(10);
+            comment_class.setName("comment");
+            comment_class.setPrettyName("Comment");
+            comment_class.setSize(40);
+            comment_class.setRows(5);
             comment_class.setObject(bclass);
             bclass.put("comment", comment_class);
         }
@@ -488,6 +512,8 @@ public class XWiki implements XWikiNotificationInterface {
         if (bclass.get("member")==null) {
             needsUpdate = true;
             StringClass member_class = new StringClass();
+            member_class.setName("member");
+            member_class.setPrettyName("Member");
             member_class.setSize(30);
             member_class.setObject(bclass);
             bclass.put("member", member_class);
@@ -500,5 +526,52 @@ public class XWiki implements XWikiNotificationInterface {
         if (needsUpdate)
          saveDocument(doc);
         return bclass;
+    }
+
+    public UserManager getUserManager() {
+        UserManager um = UserManager.getInstance();
+        ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setxWiki(this);
+        ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setxWiki(this);
+        return um;
+    }
+
+    public int createUser(XWikiContext context) throws XWikiException {
+        HttpServletRequest request = (HttpServletRequest) context.getRequest();
+        BaseClass baseclass = getUserClass();
+        String xwikiname = request.getParameter("xwikiname");
+        String password2 = request.getParameter("register2_password");
+
+        try {
+            // TODO: Verify existing user
+            XWikiDocInterface doc = getDocument("XWiki." + xwikiname);
+            if (!doc.isNew()) {
+                // TODO: throws Exception
+                return 0;
+            }
+            // TODO: Verify XWiki Name
+
+
+            // Read map
+            Map map = Util.getObject(request, "register");
+            String password = ((String[])map.get("password"))[0];
+            if (!password.equals(password2)) {
+                // TODO: throw wrong password exception
+                return -1;
+            }
+
+            BaseObject newobject = (BaseObject) baseclass.fromMap(map);
+            newobject.setName(xwikiname);
+            doc.addObject(baseclass.getName(), newobject);
+            saveDocument(doc, null, context);
+
+            // TODO: send a notification email
+            return 1;
+        }
+        catch (Exception e) {
+            Object[] args = { xwikiname };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_CREATE,
+                    "Cannot create user {0}", e, args);
+        }
     }
 }

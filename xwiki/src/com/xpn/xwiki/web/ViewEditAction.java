@@ -194,6 +194,9 @@ public class ViewEditAction extends XWikiAction
         // Any error before this will be treated using a redirection to an error page
 
         VelocityContext vcontext = null;
+        // Prepare velocity context
+        vcontext = XWikiVelocityRenderer.prepareContext(context);
+
         try {
         // From there we will try to catch any exceptions and show a nice page
 
@@ -202,8 +205,6 @@ public class ViewEditAction extends XWikiAction
         doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
         context.put("doc", doc);
 
-        // Prepare velocity context
-        vcontext = XWikiVelocityRenderer.prepareContext(context);
         vcontext.put("doc", new Document(doc, context));
         vcontext.put("cdoc",  vcontext.get("doc"));
 

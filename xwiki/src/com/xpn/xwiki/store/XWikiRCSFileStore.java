@@ -108,7 +108,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             }
             File file = getFilePath(doc, context);
             FileWriter wr = new FileWriter(file);
-            wr.write(getFullContent(doc));
+            wr.write(getFullContent(doc, context));
             wr.flush();
             wr.close();
 
@@ -116,7 +116,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
                 File vfile = getVersionedFilePath(doc, context);
                 Archive archive;
-                Lines lines = new Lines(getFullContent(doc));
+                Lines lines = new Lines(getFullContent(doc, context));
                 try {
                     // Let's try to read the archive
                     archive = new Archive(vfile.toString());
@@ -302,8 +302,8 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         }
     }
 
-    public String getFullContent(XWikiDocInterface doc) {
-        return doc.toXML();
+    public String getFullContent(XWikiDocInterface doc, XWikiContext context) {
+        return doc.toXML(context);
     }
 
     public String getMetaFullContent(XWikiDocInterface doc) {

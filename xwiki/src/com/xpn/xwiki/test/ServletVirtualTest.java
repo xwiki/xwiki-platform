@@ -22,7 +22,11 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import net.sf.hibernate.HibernateException;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
@@ -30,6 +34,7 @@ import org.apache.cactus.client.authentication.Authentication;
 import org.apache.cactus.client.authentication.BasicAuthentication;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ServletVirtualTest extends ServletTest {
@@ -158,6 +163,52 @@ public class ServletVirtualTest extends ServletTest {
         launchTest();
     }
 
+    public void testAddVirtualObject() throws Throwable {
+        launchTest();
+    }
+
+    public void beginAddVirtualObject(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc, "Main.PropAddVirtualObjectClass");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        Utils.createDoc(hibstore, "Main", "PropAddVirtualObject", context);
+
+        // Create the class in the second db
+        context.setDatabase("xwikitest2");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        Utils.createDoc(hibstore, "Main", "PropAddVirtualObjectClass", bobject, bclass, context);
+
+        // Switch back to standard db
+        context.setDatabase("xwikitest");
+
+        // Add the class of the second db to a document of the first db
+        setUrl(webRequest, "objectadd", "PropAddVirtualObject");
+        webRequest.addParameter("classname", "xwikitest2:Main.PropAddVirtualObjectClass");
+    }
+
+    public void endAddVirtualObject(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Adding Class returned exception", result.indexOf("Exception")==-1);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropAddVirtualObject");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        Map bobjects = doc2.getxWikiObjects();
+        BaseObject bobject = null;
+        try { bobject = (BaseObject) doc2.getObject("xwikitest2:Main.PropAddVirtualObjectClass", 0); }
+        catch (Exception e) {}
+        assertNotNull("Added Object does not exist", bobject);
+
+        BaseClass bclass = bobject.getxWikiClass(context);
+        assertNotNull("Added Object does not have a wikiClass", bclass);
+
+        assertNotNull("Added Object wikiClass should have ageclass property", bclass.safeget("age"));
+        assertNotNull("Added Object wikiClass should have nameclass property", bclass.safeget("first_name"));
+    }
 
 
 }

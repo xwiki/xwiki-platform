@@ -10,8 +10,12 @@ import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
+import junit.framework.AssertionFailedError;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
+import org.apache.commons.jrcs.diff.Diff;
+import org.apache.commons.jrcs.diff.Revision;
+import org.apache.commons.jrcs.util.ToString;
 
 import java.io.*;
 import java.util.*;
@@ -151,12 +155,18 @@ public class Utils {
         return doc1;
     }
 
-    public static BaseObject prepareObject() throws XWikiException {
-        return prepareObject("Test.TestObject");
+    public static void prepareObject(XWikiDocInterface doc) throws XWikiException {
+        prepareObject(doc, "Test.TestObject");
     }
 
-    public static BaseObject prepareObject(String name) throws XWikiException {
+    public static void prepareObject(XWikiDocInterface doc, String name) throws XWikiException {
+
+        doc.setFullName(name);
+
         BaseClass wclass = new BaseClass();
+        wclass.setName(name);
+        doc.setxWikiClass(wclass);
+
         StringClass first_name_class = new StringClass();
         first_name_class.setName("first_name");
         first_name_class.setPrettyName("First Name");
@@ -190,26 +200,27 @@ public class Utils {
         wclass.put("age", age_class);
         wclass.put("password", passwd_class);
         wclass.put("comment", comment_class);
-        wclass.setName(name);
 
         BaseObject object = new BaseObject();
-        object.setxWikiClass(wclass);
+        doc.setObject(wclass.getName(), 0, object);
+
+        object.setClassName(wclass.getName());
         object.setName(name);
         object.put("first_name", first_name_class.fromString("Ludovic"));
         object.put("last_name", last_name_class.fromString("Von Dubost"));
         object.put("age", age_class.fromString("33"));
         object.put("password", passwd_class.fromString("sesame"));
         object.put("comment",comment_class.fromString("Hello1\nHello2\nHello3\n"));
-        return object;
     }
 
-    public static BaseObject prepareAdvancedObject() throws XWikiException {
-        return prepareAdvancedObject("Test.TestObject");
+    public static void prepareAdvancedObject(XWikiDocInterface doc) throws XWikiException {
+        prepareAdvancedObject(doc, "Test.TestObject");
     }
 
-    public static BaseObject prepareAdvancedObject(String name) throws XWikiException {
-        BaseObject object = prepareObject(name);
-        BaseClass wclass = object.getxWikiClass();
+    public static void prepareAdvancedObject(XWikiDocInterface doc, String name) throws XWikiException {
+        prepareObject(doc, name);
+        BaseClass wclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(wclass.getName(), 0);
 
         BooleanClass boolean_class = new BooleanClass();
         boolean_class.setName("driver");
@@ -254,8 +265,6 @@ public class Utils {
         dblist_class.setObject(wclass);
         wclass.put("dblist", dblist_class);
         object.put("dblist", dblist_class.fromString("XWikiUsers"));
-
-        return object;
     }
 
 
@@ -308,19 +317,33 @@ public class Utils {
     }
 
 
+    public static void assertEquals(String msg, Object o1, Object o2) {
+        try {
+            TestCase.assertEquals(msg, o1, o2);
+        } catch (AssertionFailedError e) {
+            try {
+             String so1 = o1.toString();
+             String so2 = o2.toString();
+             Revision rev = Diff.diff(ToString.stringToArray(so1), ToString.stringToArray(so2));
+             throw new AssertionFailedError(msg + ":\n" + rev.toString());
+            } catch (Exception e2) {}
+            throw e;
+        }
+    }
+
     public static void assertEquals(XWikiSimpleDoc doc1, XWikiSimpleDoc doc2) {
-        TestCase.assertEquals("Name is different", doc1.getName(), doc2.getName());
-        TestCase.assertEquals("Web is different", doc1.getWeb(), doc2.getWeb());
-        TestCase.assertEquals("Author is different", doc1.getAuthor(), doc2.getAuthor());
-        // TestCase.assertEquals("Date is different", doc1.getDate().getTime(), doc2.getDate().getTime());
-        TestCase.assertEquals("Format is different", doc1.getFormat(), doc2.getFormat());
-        TestCase.assertEquals("Version is different", doc1.getVersion(), doc2.getVersion());
-        TestCase.assertEquals("Content is different", doc1.getContent(), doc2.getContent());
-        TestCase.assertEquals("xWikiClass is different", doc1.getxWikiClass(), doc2.getxWikiClass());
+        assertEquals("Name is different", doc1.getName(), doc2.getName());
+        assertEquals("Web is different", doc1.getWeb(), doc2.getWeb());
+        assertEquals("Author is different", doc1.getAuthor(), doc2.getAuthor());
+        // assertEquals("Date is different", doc1.getDate().getTime(), doc2.getDate().getTime());
+        assertEquals("Format is different", doc1.getFormat(), doc2.getFormat());
+        assertEquals("Version is different", doc1.getVersion(), doc2.getVersion());
+        assertEquals("Content is different", doc1.getContent(), doc2.getContent());
+        assertEquals("xWikiClass is different", doc1.getxWikiClass(), doc2.getxWikiClass());
 
         Set list1 = doc1.getxWikiObjects().keySet();
         Set list2 = doc2.getxWikiObjects().keySet();
-        TestCase.assertEquals("Object list is different", list1, list2);
+        assertEquals("Object list is different", list1, list2);
 
         for (Iterator it = list1.iterator();it.hasNext();) {
             String name = (String) it.next();
@@ -329,7 +352,7 @@ public class Utils {
             TestCase.assertEquals("Object number for " + name + " is different", v1.size(), v2.size());
 
             for (int i=0;i<v1.size();i++) {
-                TestCase.assertEquals("Object " + i + " for " + name + " is different\n", v1.get(i), v2.get(i));
+                assertEquals("Object " + i + " for " + name + " is different\n", v1.get(i), v2.get(i));
             }
         }
     }
@@ -337,7 +360,7 @@ public class Utils {
     public static void assertProperty(BaseCollection object1, BaseCollection object2, String propname) {
         BaseElement prop1 = (BaseElement)object1.safeget(propname);
         BaseElement prop2 = (BaseElement)object2.safeget(propname);
-        TestCase.assertEquals("Property " + propname + " is different", prop1, prop2);
+        assertEquals("Property " + propname + " is different", prop1, prop2);
     }
 
 
@@ -367,7 +390,7 @@ public class Utils {
         doc.setxWikiClass(bclass);
         BaseObject bobject = new BaseObject();
         bobject.setName(docName);
-        bobject.setxWikiClass(bclass);
+        bobject.setClassName(bclass.getName());
         bobject.setStringValue(propname, propvalue);
         doc.addObject(docName, bobject);
         xwiki.saveDocument(doc, context);
@@ -398,7 +421,7 @@ public class Utils {
         XWikiDocInterface doc = xwiki.getDocument(docName, context);
         BaseObject bobject = new BaseObject();
         bobject.setName(docName);
-        bobject.setxWikiClass(bclass);
+        bobject.setClassName(bclass.getName());
         bobject.setStringValue(propname, propvalue);
         doc.addObject(className, bobject);
         xwiki.saveDocument(doc, context);
@@ -414,7 +437,7 @@ public class Utils {
             bclass = xwiki.getGlobalRightsClass(context);
         else
             bclass = xwiki.getRightsClass(context);
-        bobj.setxWikiClass(bclass);
+        bobj.setClassName(bclass.getName());
         bobj.setStringValue("users", user);
         bobj.setStringValue("groups", group);
         bobj.setStringValue("levels", level);

@@ -131,7 +131,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
 		try {
 			try {
-                transaction = beginTransaction(context);
+                beginTransaction(context);
+                transaction = getTransaction(context);
                 session = getSession(context);
                 connection = session.connection();
                 setDatabase(session, context);
@@ -201,10 +202,12 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         }
     }
 
-    public Transaction beginTransaction(XWikiContext context)
+    public boolean beginTransaction(XWikiContext context)
             throws HibernateException, XWikiException {
 
-        Transaction transaction;
+        Transaction transaction = getTransaction(context);
+        if (transaction!=null)
+          return false;
         Session session = getSession(context);
         if (session==null) {
          session = getSessionFactory().openSession();
@@ -225,7 +228,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
            // transaction = session.beginTransaction();
            // setTransaction(transaction, context);
         }
-        return transaction;
+        return true;
     }
 
 
@@ -263,7 +266,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
                 doc.setDate(new Date());
                 doc.incrementVersion();
-                doc.updateArchive(doc.toXML());
+                doc.updateArchive(doc.toXML(context));
             }
 
             // Verify if the document already exists
@@ -328,10 +331,11 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
+        boolean bTransaction = true;
         try {
             doc.setStore(this);
             checkHibernate(context);
-            beginTransaction(context);
+            bTransaction = bTransaction && beginTransaction(context);
             Session session = getSession(context);
 
             try {
@@ -342,7 +346,6 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 doc.setNew(true);
                 return doc;
             }
-            Map bclasses = new HashMap();
 
             // Loading the attachment list
             loadAttachmentList(doc, context, false);
@@ -352,7 +355,6 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             bclass.setName(doc.getFullName());
             loadXWikiClass(bclass, context, false);
             doc.setxWikiClass(bclass);
-            bclasses.put(doc.getFullName(), bclass);
 
             // Find the list of classes for which we have an object
             Query query = session.createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name order by bobject.number");
@@ -361,35 +363,27 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             while (it.hasNext()) {
                 Object[] result = (Object[]) it.next();
-                String name = (String)result[0];
                 String classname = (String)result[1];
                 Integer nb = (Integer)result[2];
                 if (!classname.equals("")) {
-                    BaseClass objclass;
-                    objclass = (BaseClass) bclasses.get(classname);
-                    if (objclass==null) {
-                        objclass = new BaseClass();
-                        objclass.setName(classname);
-                        loadXWikiClass(objclass, context, false);
-                        bclasses.put(classname, objclass);
-                    }
-
                     BaseObject object = new BaseObject();
                     object.setNumber(nb.intValue());
                     object.setName(doc.getFullName());
-                    object.setxWikiClass(objclass);
+                    object.setClassName(classname);
                     loadXWikiObject(object, context, false);
-                    doc.setObject(objclass.getName(), nb.intValue(), object);
+                    doc.setObject(classname, nb.intValue(), object);
                 }
             }
 
-            endTransaction(context, false);
+            if (bTransaction)
+             endTransaction(context, false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC,
                     "Exception while reading document {0}", e, args);
         } finally {
             try {
+                if (bTransaction)
                   endTransaction(context, false);
             } catch (Exception e) {}
         }
@@ -404,7 +398,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             doc.setRCSArchive(archive);
 
             if (archive == null) {
-                doc.updateArchive(doc.toXML());
+                doc.updateArchive(doc.toXML(context));
                 archive = basedoc.getRCSArchive();
             }
 

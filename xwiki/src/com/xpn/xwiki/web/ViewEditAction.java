@@ -239,7 +239,7 @@ public class ViewEditAction extends XWikiAction
                 PropertyClass origproperty = (PropertyClass) property.clone();
                 String name = property.getName();
                 Map map = ((EditForm)form).getObject(name);
-                property.getxWikiClass().fromMap(map, property);
+                property.getxWikiClass(context).fromMap(map, property);
                 String newname = property.getName();
                 bclass2.addField(newname, property);
                 if (!newname.equals(name)) {

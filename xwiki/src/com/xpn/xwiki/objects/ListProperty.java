@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.xpn.xwiki.XWikiContext;
+
 public class ListProperty extends BaseProperty {
     protected List list = new ArrayList();
 
@@ -141,10 +143,4 @@ public class ListProperty extends BaseProperty {
         return el;
     }
 
-    public String toString() {
-        if ((getList() instanceof PersistentCollection)
-               &&(!((PersistentCollection)getList()).wasInitialized()))
-              return "";
-        return toXMLString();
-    }
 }

@@ -45,10 +45,11 @@ public abstract class StoreObjectTest extends TestCase {
 
     public abstract XWikiStoreInterface getStore();
 
-    public void testWriteObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+    public void testWriteObjectInDoc(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
         object.setName("Test.TestObject");
         doc.setObject("Test.TestObject", 0, object);
+        doc.setxWikiClass(bclass);
         store.saveXWikiDoc(doc, context);
     }
 
@@ -102,39 +103,57 @@ public abstract class StoreObjectTest extends TestCase {
 
     public void testWriteObjectInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteObjectInDoc(store, object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
     }
 
     public void testReadWriteObjectInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteObjectInDoc(store, object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
         testReadObjectInDoc(store, object);
     }
 
     public void testDeleteObjectAndDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteObjectInDoc(store, object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
         testDeleteObjectAndDoc(store, object);
         // To test that delete did it's work properly
         // we use a smaller object
-        object = Utils.prepareObject();
-        testWriteObjectInDoc(store, object);
+        doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        bclass = doc.getxWikiClass();
+        object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
         testReadObjectInDoc(store, object);
     }
 
     public void testWriteAdvancedObjectInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteObjectInDoc(store, object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
     }
 
     public void testReadWriteAdvancedObjectInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteObjectInDoc(store, object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteObjectInDoc(store, object, bclass);
         testReadObjectInDoc(store, object, true);
     }
 
@@ -162,34 +181,45 @@ public abstract class StoreObjectTest extends TestCase {
 
     public void testWriteClassInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteClassInDoc(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClassInDoc(store, bclass);
     }
 
     public void testReadWriteClassInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteClassInDoc(store, object.getxWikiClass());
-        testReadClassInDoc(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClassInDoc(store, bclass);
+        testReadClassInDoc(store, bclass);
     }
 
     public void testWriteAdvancedClassInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteClassInDoc(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClassInDoc(store, bclass);
     }
 
     public void testReadWriteAdvancedClassInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteClassInDoc(store, object.getxWikiClass());
-        testReadClassInDoc(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClassInDoc(store, bclass);
+        testReadClassInDoc(store, bclass);
     }
 
 
-    public void testVersionedObject(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
-
-       Utils.createDoc(store, "Test", "TestVersion", object, object.getxWikiClass(), null, context);
+    public void testVersionedObject(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
+       Utils.createDoc(store, "Test", "TestVersion", object, bclass, null, context);
        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
        doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1, context);
        BaseObject bobject1 = doc1.getxWikiObject();
@@ -210,23 +240,29 @@ public abstract class StoreObjectTest extends TestCase {
 
     public void testVersionedObject() throws XWikiException {
          XWikiStoreInterface store = getStore();
-         BaseObject bobject = Utils.prepareObject("Test.TestVersion");
-         testVersionedObject(store, bobject);
+         XWikiSimpleDoc doc = new XWikiSimpleDoc();
+         Utils.prepareObject(doc, "Test.TestVersion");
+         BaseClass bclass = doc.getxWikiClass();
+         BaseObject bobject = doc.getObject(bclass.getName(), 0);
+         testVersionedObject(store, bobject, bclass);
      }
 
     public void testVersionedAdvancedObject() throws XWikiException {
          XWikiStoreInterface store = getStore();
-         BaseObject bobject = Utils.prepareAdvancedObject("Test.TestVersion");
-         testVersionedObject(store, bobject);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc, "Test.TestVersion");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        testVersionedObject(store, bobject, bclass);
      }
 
-    public void testXML(XWikiStoreInterface store, BaseObject bobject) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
-         XWikiSimpleDoc doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null, context);
-         String xml0 = doc0.toXML();
+    public void testXML(XWikiStoreInterface store, BaseObject bobject, BaseClass bclass) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+         XWikiSimpleDoc doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bclass, null, context);
+         String xml0 = doc0.toXML(context);
          XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
          doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1, context);
          Utils.assertEquals(doc0, doc1);
-         String xml1 = doc1.toXML();
+         String xml1 = doc1.toXML(context);
          // Cannot test this because XML tags can be ordered differently
          // assertEquals("XML is different", xml0, xml1);
          XWikiSimpleDoc doc2 = new XWikiSimpleDoc();
@@ -235,15 +271,21 @@ public abstract class StoreObjectTest extends TestCase {
      }
 
     public void testXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
-    XWikiStoreInterface store = getStore();
-    BaseObject bobject = Utils.prepareObject("Test.TestVersion");
-    testXML(store, bobject);
+        XWikiStoreInterface store = getStore();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc, "Test.TestVersion");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        testXML(store, bobject, bclass);
     }
 
     public void testAdvancedXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
-    XWikiStoreInterface store = getStore();
-    BaseObject bobject = Utils.prepareAdvancedObject("Test.TestVersion");
-    testXML(store, bobject);
+        XWikiStoreInterface store = getStore();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc, "Test.TestVersion");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        testXML(store, bobject, bclass);
     }
 
 }

@@ -31,6 +31,8 @@ import org.dom4j.io.XMLWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import com.xpn.xwiki.XWikiContext;
+
 public abstract class BaseElement extends Object {
     private String name;
     private String prettyName;
@@ -91,24 +93,4 @@ public abstract class BaseElement extends Object {
         return element;
     }
 
-    public abstract Element toXML();
-
-    public String toXMLString() {
-        Document doc = new DOMDocument();
-        doc.setRootElement(toXML());
-        OutputFormat outputFormat = new OutputFormat("", true);
-        StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter( out, outputFormat );
-        try {
-            writer.write(doc);
-            return out.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    public String toString() {
-        return toXMLString();
-    }
 }

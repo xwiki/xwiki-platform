@@ -39,7 +39,7 @@ import java.util.List;
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
     private BaseClass object;
     private int id;
-
+    private PropertyMetaClass pMetaClass;
 
     public PropertyClass() {
     }
@@ -50,6 +50,18 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setPrettyName(prettyname);
         setxWikiClass(xWikiClass);
         setUnmodifiable(false);
+    }
+
+    public BaseClass getxWikiClass() {
+        if (pMetaClass==null) {
+        MetaClass metaClass = MetaClass.getMetaClass();
+        pMetaClass = (PropertyMetaClass)metaClass.get(getClassType());
+        }
+        return pMetaClass;
+    }
+
+    public void setxWikiClass(BaseClass xWikiClass) {
+        this.pMetaClass = (PropertyMetaClass) xWikiClass;
     }
 
     public BaseCollection getObject() {
@@ -72,12 +84,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void checkField(String name) throws XWikiException {
-        if ((getxWikiClass().safeget(name)==null)&&
-            (getxWikiClass().safeget("meta" + name)==null)){
-            Object[] args = { name, getxWikiClass().getName() };
+        // Let's stop checking
+        /*if ((getxWikiClass(context).safeget(name)==null)&&
+            (getxWikiClass(context).safeget("meta" + name)==null)){
+            Object[] args = { name, getxWikiClass(context).getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
                     "Field {0} does not exist in class {1}", null, args);
         }
+        */
     }
 
     public String toString(BaseProperty property) {
@@ -166,14 +180,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
 
-    public BaseClass getxWikiClass() {
-        BaseClass wclass = (BaseClass)super.getxWikiClass();
-        if (wclass==null) {
-            MetaClass metaclass = MetaClass.getMetaClass();
-            wclass = (BaseClass)metaclass.get(getClassType());
-            setxWikiClass(wclass);
-        }
-        return wclass;
+    public BaseClass getxWikiClass(XWikiContext context) {
+        return getxWikiClass();
     }
 
     public String getClassName() {
@@ -219,6 +227,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         pclass.setObject(getObject());
         pclass.setClassType(getClassType());
         return pclass;
+    }
+
+    public Element toXML(BaseClass bclass) {
+        return toXML();
     }
 
     public Element toXML() {

@@ -24,18 +24,25 @@ package com.xpn.xwiki.objects;
 
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.collections.map.ListOrderedMap;
+import org.dom4j.Element;
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.dom.DOMDocument;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
-    private BaseClass xWikiClass;
-    private Map fields = ListOrderedMap.decorate(new HashMap());
-
     private String className;
+    private Map fields = ListOrderedMap.decorate(new HashMap());
     private List fieldsToRemove = new ArrayList();
     private int number;
 
@@ -59,9 +66,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public String getClassName() {
-        if (xWikiClass!=null)
-         return xWikiClass.getName();
-        else
          return (className == null) ? "" : className;
     }
 
@@ -71,11 +75,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
 
     public void checkField(String name) throws XWikiException {
-        if (getxWikiClass().safeget(name)==null) {
-            Object[] args = { name, getxWikiClass().getName() };
+        /*  // Let's stop checking.. This is a pain
+        if (getxWikiClass(context).safeget(name)==null) {
+            Object[] args = { name, getxWikiClass(context).getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
                     "Field {0} does not exist in class {1}", null, args);
-        }
+        } */
     }
 
     public PropertyInterface safeget(String name) {
@@ -101,13 +106,23 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
 
-    public BaseClass getxWikiClass() {
-        return xWikiClass;
+    public BaseClass getxWikiClass(XWikiContext context) {
+        String name = getClassName();
+        try {
+            XWikiDocInterface doc = context.getWiki().getDocument(name, context);
+         if (doc==null)
+          return null;
+        else
+         return doc.getxWikiClass();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public void setxWikiClass(BaseClass xWikiClass) {
-        this.xWikiClass = xWikiClass;
-    }
+    /*public void setxWikiClass(BaseClass xWikiClass) {
+        setClassName(xWikiClass.getName());
+    }*/
 
     public String getStringValue(String name) {
         StringProperty prop = (StringProperty)safeget(name);
@@ -235,29 +250,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return false;
      }
 
-     if (this instanceof BaseObject) {
-     BaseClass bclass = getxWikiClass();
-     if (bclass==null) {
-         if (collection.getxWikiClass()!=null)
-             return false;
-     } else {
-         if (!bclass.equals(collection.getxWikiClass()))
-             return false;
-     }
-     }
-
      return true;
     }
 
     public Object clone() {
         BaseCollection collection = (BaseCollection) super.clone();
         collection.setClassName(getClassName());
-
-        if (this instanceof BaseObject) {
-          if (getxWikiClass()!=null)
-            collection.setxWikiClass((BaseClass)getxWikiClass().clone());
-        }
-
         Map fields = getFields();
         Map cfields = new HashMap();
         Iterator itfields = fields.keySet().iterator();
@@ -287,5 +285,27 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setFieldsToRemove(List fieldsToRemove) {
         this.fieldsToRemove = fieldsToRemove;
     }
+
+    public abstract Element toXML(BaseClass bclass);
+
+    public String toXMLString() {
+        Document doc = new DOMDocument();
+        doc.setRootElement(toXML(null));
+        OutputFormat outputFormat = new OutputFormat("", true);
+        StringWriter out = new StringWriter();
+        XMLWriter writer = new XMLWriter( out, outputFormat );
+        try {
+            writer.write(doc);
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public String toString() {
+        return toXMLString();
+    }
+
 
 }

@@ -3,9 +3,11 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.List;
 
 public class ObjectTest extends TestCase {
 
+    public XWikiContext context = new XWikiContext();
 
     public void testEqualsNumberProperty() {
          // Test both cloning and equals
@@ -125,20 +128,26 @@ public class ObjectTest extends TestCase {
       }
 
     public void testEqualsObject() throws XWikiException {
-        BaseObject object = Utils.prepareObject();
-        testEqualsObject(object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testEqualsObject(object, bclass);
     }
 
     public void testEqualsAdvancedObject() throws XWikiException {
-        BaseObject object = Utils.prepareAdvancedObject();
-        testEqualsObject(object);
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testEqualsObject(object, bclass);
 
         BaseObject object2 = (BaseObject)object.clone();
         ((StringProperty)object.safeget("category")).setValue(null);
         assertNotSame("Equals did not detect different List field value", object, object2);
     }
 
-     public void testEqualsObject(BaseObject object) throws XWikiException {
+     public void testEqualsObject(BaseObject object, BaseClass bclass) throws XWikiException {
          BaseObject object2 = (BaseObject)object.clone();
 
          // test cloning and equals at the same time
@@ -160,24 +169,26 @@ public class ObjectTest extends TestCase {
          assertNotSame("Equals did not detect missing age field", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object.getxWikiClass().safeget("age").setName("titi");
+         bclass.safeget("age").setName("titi");
          assertNotSame("Equals did not detect different class property name", object, object2);
 
          object2 = (BaseObject)object.clone();
-         ((NumberClass)object.getxWikiClass().safeget("age")).setSize(1);
+         ((NumberClass)bclass.safeget("age")).setSize(1);
          assertNotSame("Equals did not detect different class property size", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object.getxWikiClass().removeField("age");
+         bclass.removeField("age");
          assertNotSame("Equals did not detect different null class", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object.setxWikiClass(null);
+         object.setClassName(null);
          assertNotSame("Equals did not detect different null class", object, object2);
      }
 
      public void testMergeObject() throws XWikiException {
-         BaseObject object = Utils.prepareObject();
+         XWikiSimpleDoc doc = new XWikiSimpleDoc();
+         Utils.prepareObject(doc);
+         BaseObject object = doc.getObject(doc.getxWikiClass().getName(), 0);
          BaseObject object2 = (BaseObject)object.clone();
 
          object2.merge(object);

@@ -2,6 +2,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -201,7 +202,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     public void testReadObject(XWikiHibernateStore store, BaseObject object) throws  XWikiException {
         // Prepare object2 for reading
         BaseObject object2 = new BaseObject();
-        object2.setxWikiClass(object.getxWikiClass());
+        object2.setClassName(object.getClassName());
         object2.setName(object.getName());
 
         // Read object2
@@ -216,26 +217,38 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public void testWriteObject()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareObject();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
         testWriteObject(store, object);
     }
 
     public void testReadWriteObject()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareObject();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
         testWriteObject(store, object);
         testReadObject(store, object);
     }
 
     public void testWriteAdvancedObject()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
         testWriteObject(store, object);
     }
 
     public void testReadWriteAdvancedObject()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
         testWriteObject(store, object);
         testReadObject(store, object);
     }
@@ -262,28 +275,40 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public void testWriteClass()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteClass(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClass(store, bclass);
     }
 
     public void testReadWriteClass()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareObject();
-        testWriteClass(store, object.getxWikiClass());
-        testReadClass(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClass(store, bclass);
+        testReadClass(store, bclass);
     }
 
      public void testWriteAdvancedClass()  throws  XWikiException {
          XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteClass(store, object.getxWikiClass());
+         XWikiSimpleDoc doc = new XWikiSimpleDoc();
+         Utils.prepareAdvancedObject(doc);
+         BaseClass bclass = doc.getxWikiClass();
+         BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClass(store, bclass);
     }
 
     public void testReadWriteAdvancedClass()  throws  XWikiException {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        BaseObject object = Utils.prepareAdvancedObject();
-        testWriteClass(store, object.getxWikiClass());
-        testReadClass(store, object.getxWikiClass());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject object = doc.getObject(bclass.getName(), 0);
+        testWriteClass(store, bclass);
+        testReadClass(store, bclass);
     }
 
     public void testSearchClass() throws XWikiException {

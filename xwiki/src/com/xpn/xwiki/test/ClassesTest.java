@@ -6,6 +6,7 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheInterface;
@@ -127,15 +128,15 @@ public class ClassesTest extends TestCase {
         }
 
 
-    public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected) {
-        testDisplayer(cname, obj, viewexpected, editexpected, null);
+    public void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected) {
+        testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
     }
 
-    public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected, XWikiContext context) {
+    public void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected, XWikiContext context) {
       if (context==null)
          context = new XWikiContext();
       StringBuffer result = new StringBuffer();
-      PropertyClass pclass = (PropertyClass)obj.getxWikiClass().get(cname);
+      PropertyClass pclass = (PropertyClass)bclass.get(cname);
       pclass.displayView(result,cname, "", obj, context);
       assertEquals("Class " + cname + " view displayer not correct:\n" +
                     "Expected: " + viewexpected + "\nResult: " + result,
@@ -152,24 +153,35 @@ public class ClassesTest extends TestCase {
     }
 
     public void testBasicDisplayers() throws XWikiException {
-        BaseObject obj = Utils.prepareObject();
-        testDisplayer("age", obj, "33", "value=\'33\'");
-        testDisplayer("first_name", obj, "Ludovic", "value=\'Ludovic\'");
-        testDisplayer("last_name", obj, "von Dubost", "value=\'von Dubost\'");
-        testDisplayer("password", obj, "********", "value=\'********\'");
-        testDisplayer("comment", obj, "Hello1\nHello2\nHello3\n", "textarea");
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject obj = doc.getObject(bclass.getName(), 0);
+        testDisplayer("age", obj, bclass, "33", "value=\'33\'");
+        testDisplayer("first_name", obj, bclass,  "Ludovic", "value=\'Ludovic\'");
+        testDisplayer("last_name", obj, bclass, "von Dubost", "value=\'von Dubost\'");
+        testDisplayer("password", obj, bclass, "********", "value=\'********\'");
+        testDisplayer("comment", obj, bclass, "Hello1\nHello2\nHello3\n", "textarea");
     }
 
     public void testBooleanDisplayers() throws XWikiException {
-        BaseObject obj = Utils.prepareAdvancedObject();
-        testDisplayer("driver", obj, "true", "<select");
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject obj = doc.getObject(bclass.getName(), 0);
+
+        testDisplayer("driver", obj, bclass, "true", "<select");
     }
 
     public void testListDisplayers() throws XWikiException {
-        BaseObject obj = Utils.prepareAdvancedObject();
-        testDisplayer("category", obj, "1", "<select");
-        testDisplayer("category2", obj, "1 2", "multiple");
-        testDisplayer("category3", obj, "1 2", "multiple");
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject obj = doc.getObject(bclass.getName(), 0);
+
+        testDisplayer("category", obj, bclass, "1", "<select");
+        testDisplayer("category2", obj, bclass, "1 2", "multiple");
+        testDisplayer("category3", obj, bclass, "1 2", "multiple");
     }
 
 
@@ -187,8 +199,12 @@ public class ClassesTest extends TestCase {
         XWiki xwiki = new XWiki("./xwiki.cfg", context);
 
         try {
-            BaseObject obj = Utils.prepareAdvancedObject();
-            testDisplayer("dblist", obj, "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", context);
+            XWikiSimpleDoc doc = new XWikiSimpleDoc();
+            Utils.prepareAdvancedObject(doc);
+            BaseObject obj = doc.getObject(doc.getxWikiClass().getName(), 0);
+
+            testDisplayer("dblist", obj, doc.getxWikiClass(),
+                          "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", context);
         } finally {
             xwiki = null;
             System.gc();
@@ -196,7 +212,9 @@ public class ClassesTest extends TestCase {
     }
 
     public void testObject() throws XWikiException {
-        BaseObject object = Utils.prepareObject();
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        Utils.prepareObject(doc);
+        BaseObject obj = doc.getObject(doc.getxWikiClass().getName(), 0);
     }
 
 }

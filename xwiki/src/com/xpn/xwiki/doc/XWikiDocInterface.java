@@ -121,8 +121,8 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public Object clone();
     public void addObject(String classname, BaseObject object);
 
-    public String toXML();
-    public Document toXMLDocument();
+    public String toXML(XWikiContext context);
+    public Document toXMLDocument(XWikiContext context);
     public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException;
 
     public Version[] getRevisions(XWikiContext context) throws XWikiException;
@@ -146,7 +146,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void addObjectsToRemove(BaseObject object);
     ArrayList getObjectsToRemove();
     void setObjectsToRemove(ArrayList objectsToRemove);
-    List getxWikiClasses();
+    List getxWikiClasses(XWikiContext context);
 
     List getIncludedPages(XWikiContext context);
 

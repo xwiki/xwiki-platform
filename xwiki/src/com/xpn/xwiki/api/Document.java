@@ -138,7 +138,7 @@ public class Document extends Api {
 
 
     public Class[] getxWikiClasses() {
-        List list = doc.getxWikiClasses();
+        List list = doc.getxWikiClasses(context);
         if (list==null)
             return null;
         Class[] result = new Class[list.size()];
@@ -194,11 +194,16 @@ public class Document extends Api {
     }
 
     public String toXML() {
-         return doc.toXML();
+         if (checkProgrammingRights())
+          return doc.toXML(context);
+         else
+          return "";
     }
 
     public org.dom4j.Document toXMLDocument() {
-        return doc.toXMLDocument();
+        if (checkProgrammingRights())
+          return doc.toXMLDocument(context);
+        else return null;
     }
 
     public Version[] getRevisions() throws XWikiException {

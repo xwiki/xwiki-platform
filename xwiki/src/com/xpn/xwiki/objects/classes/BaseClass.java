@@ -23,6 +23,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.XWikiContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
@@ -66,7 +67,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public BaseCollection fromMap(Map map, BaseCollection object) {
-        object.setxWikiClass(this);
+        object.setClassName(getName());
         Iterator classit = getFieldList().iterator();
         while (classit.hasNext()) {
             PropertyClass property = (PropertyClass) classit.next();
@@ -94,6 +95,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public void merge(BaseClass bclass) {
+    }
+
+    public Element toXML(BaseClass bclass) {
+        return toXML();
     }
 
     public Element toXML() {

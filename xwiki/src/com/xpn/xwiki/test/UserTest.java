@@ -93,7 +93,7 @@ public class UserTest extends TestCase {
         BaseClass bclass = xwiki.getUserClass(context);
         BaseObject bobj = new BaseObject();
         bobj.setName("XWiki.LudovicDubost");
-        bobj.setxWikiClass(bclass);
+        bobj.setClassName(bclass.getName());
         bobj.setStringValue("fullname", "Ludovic Dubost");
         bobj.setStringValue("email", "ldubost@pobox.com");
         bobj.setStringValue("password", "toto");
@@ -105,7 +105,7 @@ public class UserTest extends TestCase {
         bclass = xwiki.getGroupClass(context);
         bobj = new BaseObject();
         bobj.setName("XWiki.AdminGroup");
-        bobj.setxWikiClass(bclass);
+        bobj.setClassName(bclass.getName());
         bobj.setStringValue("member", "XWiki.LudovicDubost");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ AdminGroup");

@@ -23,6 +23,7 @@
 package com.xpn.xwiki.objects;
 
 import org.dom4j.Element;
+import com.xpn.xwiki.XWikiContext;
 
 public interface PropertyInterface extends ElementInterface {
     public int getId();

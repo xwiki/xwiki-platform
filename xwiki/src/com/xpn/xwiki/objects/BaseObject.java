@@ -48,42 +48,42 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        ((PropertyClass)getxWikiClass().get(name)).displaySearch(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displaySearch(buffer, name, prefix, this, context);
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        ((PropertyClass)getxWikiClass().get(name)).displayView(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        ((PropertyClass)getxWikiClass().get(name)).displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
     public String displayHidden(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displaySearch(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass)getxWikiClass().get(name)).displaySearch(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displaySearch(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displayView(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass)getxWikiClass().get(name)).displayView(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displayEdit(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass)getxWikiClass().get(name)).displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
@@ -118,14 +118,15 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return true;
     }
 
-    public Element toXML() {
+    public Element toXML(BaseClass bclass) {
         Element oel = new DOMElement("object");
 
         // Add Class
-        BaseClass bclass = getxWikiClass();
+        if (bclass!=null) {
         Collection fields = bclass.getFieldList();
         if (fields.size()>0) {
-          oel.add(bclass.toXML());
+            oel.add(bclass.toXML());
+          }
         }
 
         Element el = new DOMElement("name");
@@ -155,7 +156,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         BaseClass bclass = new BaseClass();
         if (cel!=null) {
             bclass.fromXML(cel);
-            setxWikiClass(bclass);
+            setClassName(bclass.getName());
         }
 
         setName(oel.element("name").getText());
@@ -170,4 +171,5 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
             safeput(name, property);
         }
     }
+
 }

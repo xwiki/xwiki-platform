@@ -54,7 +54,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
                 BaseObject obj = (BaseObject) bclass.newObject();
-                obj.setxWikiClass(bclass);
+                obj.setClassName(bclass.getName());
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiUsers", 0, obj);
                 getPropertySets().put(getFullName(name), doc);

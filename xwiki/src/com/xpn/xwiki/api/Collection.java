@@ -39,7 +39,7 @@ public abstract class Collection extends Element {
     }
 
     public Class getxWikiClass() {
-        return new Class(getCollection().getxWikiClass(), context);
+        return new Class(getCollection().getxWikiClass(context), context);
     }
 
     public String getName() {

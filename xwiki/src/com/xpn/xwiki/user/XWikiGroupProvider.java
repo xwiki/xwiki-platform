@@ -46,7 +46,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
                 BaseObject obj = (BaseObject) bclass.newObject();
-                obj.setxWikiClass(bclass);
+                obj.setClassName(bclass.getName());
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiGroups", 0, obj);
                 getxWiki().saveDocument(doc, context);
@@ -115,7 +115,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             BaseObject bobj = new BaseObject();
             bobj.setName(groupname);
             bobj.setStringValue("member", username);
-            bobj.setxWikiClass(bclass);
+            bobj.setClassName(bclass.getName());
             doc.addObject("XWiki.XWikiGroups", bobj);
             getxWiki().saveDocument(doc, context);
         } catch (XWikiException e) {

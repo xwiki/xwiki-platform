@@ -23,10 +23,17 @@
 package com.xpn.xwiki.objects;
 
 import com.xpn.xwiki.test.Utils;
+import com.xpn.xwiki.XWikiContext;
 import org.dom4j.Element;
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 import org.dom4j.dom.DOMElement;
+import org.dom4j.dom.DOMDocument;
 
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.io.IOException;
 
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;
@@ -108,4 +115,24 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     public String toText() {
         return getValue().toString();
     }
+
+    public String toXMLString() {
+        Document doc = new DOMDocument();
+        doc.setRootElement(toXML());
+        OutputFormat outputFormat = new OutputFormat("", true);
+        StringWriter out = new StringWriter();
+        XMLWriter writer = new XMLWriter( out, outputFormat );
+        try {
+            writer.write(doc);
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public String toString() {
+        return toXMLString();
+    }
+
 }

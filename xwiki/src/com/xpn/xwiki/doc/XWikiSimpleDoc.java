@@ -358,7 +358,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         if ((content==null)||(content.equals("")))
             setContent("\n");
         if (archive==null)
-            updateArchive(toXML());
+            updateArchive(toXML(null));
         if (archive==null)
             return "";
         else {
@@ -426,7 +426,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return getObject(getFullName(),0);
     }
 
-    public List getxWikiClasses() {
+    public List getxWikiClasses(XWikiContext context) {
         List list = new ArrayList();
         for (Iterator it=getxWikiObjects().keySet().iterator();it.hasNext();) {
             String classname = (String) it.next();
@@ -435,7 +435,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             for (int i=0;i<objects.size();i++) {
                 BaseObject obj = (BaseObject) objects.get(i);
                 if (obj!=null) {
-                    bclass = obj.getxWikiClass();
+                    bclass = obj.getxWikiClass(context);
                     if (bclass!=null)
                         break;
                 }
@@ -447,16 +447,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public void createNewObject(String classname, XWikiContext context) throws XWikiException {
-        XWiki xwiki = (XWiki) context.getWiki();
-        XWikiDocInterface doc = xwiki.getDocument(classname, context);
-        BaseClass objclass = (BaseClass) doc.getxWikiClass().clone();
         BaseObject object = new BaseObject();
         object.setName(getFullName());
-        object.setxWikiClass(objclass);
-        Vector objects = getObjects(objclass.getName());
+        object.setClassName(classname);
+        Vector objects = getObjects(classname);
         if (objects==null) {
            objects = new Vector();
-           setObjects(objclass.getName(), objects);
+           setObjects(classname, objects);
         }
         objects.add(object);
         object.setNumber(objects.size()-1);
@@ -573,8 +570,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         try {
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
-            PropertyClass pclass = (PropertyClass) obj.getxWikiClass().get(fieldname);
-            String prefix = obj.getxWikiClass().getName() + "_" + obj.getNumber() + "_";
+            PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
+            String prefix = obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
             if (type.equals("view")) {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -637,7 +634,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       if (firstobject==null)
          return "";
 
-      BaseClass bclass = firstobject.getxWikiClass();
+      BaseClass bclass = firstobject.getxWikiClass(context);
       Collection fields = bclass.getFieldList();
       if (fields.size()==0)
          return "";
@@ -680,7 +677,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       if (firstobject==null)
          return "";
 
-      BaseClass bclass = firstobject.getxWikiClass();
+      BaseClass bclass = firstobject.getxWikiClass(context);
       Collection fields = bclass.getFieldList();
       if (fields.size()==0)
        return "";
@@ -738,7 +735,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                     BaseObject oldobject = (BaseObject) getObject(name, i);
                     if (oldobject!=null)
                     {
-                     BaseClass baseclass = oldobject.getxWikiClass();
+                     BaseClass baseclass = oldobject.getxWikiClass(context);
                      BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
                      newobject.setNumber(oldobject.getNumber());
                      newobject.setName(getFullName());
@@ -895,8 +892,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return true;
     }
 
-    public String toXML() {
-        Document doc = toXMLDocument();
+    public String toXML(XWikiContext context) {
+        Document doc = toXMLDocument(context);
         OutputFormat outputFormat = new OutputFormat("", true);
         StringWriter out = new StringWriter();
         XMLWriter writer = new XMLWriter( out, outputFormat );
@@ -909,7 +906,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
-    public Document toXMLDocument() {
+    public Document toXMLDocument(XWikiContext context) {
         Document doc = new DOMDocument();
         Element docel = new DOMElement("xwikidoc");
         doc.setRootElement(docel);
@@ -950,7 +947,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         // Add Class
         BaseClass bclass = getxWikiClass();
         if (bclass.getFieldList().size()>0) {
-          docel.add(bclass.toXML());
+          docel.add(bclass.toXML(null));
         }
 
         // Add Objects
@@ -959,8 +956,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             Vector objects = (Vector) it.next();
             for (int i=0;i<objects.size();i++) {
                 BaseObject obj = (BaseObject)objects.get(i);
-                if (obj!=null)
-                 docel.add(obj.toXML());
+                if (obj!=null) {
+                 BaseClass objclass = null;
+                 if (obj.getName().equals(obj.getClassName()))
+                  objclass = bclass;
+                 else
+                  objclass = obj.getxWikiClass(context);
+                 docel.add(obj.toXML(bclass));
+                }
             }
         }
 
@@ -1012,10 +1015,6 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             bobject.fromXML(objel);
             addObject(bobject.getClassName(), bobject);
         }
-    }
-
-   public String toString() {
-        return toXML();
     }
 
     public void setAttachmentList(List list) {

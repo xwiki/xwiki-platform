@@ -1464,7 +1464,8 @@ public class XWiki implements XWikiNotificationInterface {
 
     public void prepareResources(XWikiContext context) {
         String language = getLanguagePreference(context);
-        context.getResponse().setLocale(new Locale(language));
+        if (context.getResponse()!=null)
+         context.getResponse().setLocale(new Locale(language));
         ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
         if (bundle==null)
            bundle = ResourceBundle.getBundle("ApplicationResources");

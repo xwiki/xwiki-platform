@@ -80,7 +80,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* fix save document to make sure getArchive is called first with a valid context before saving" />
+    <option name="LAST_COMMIT_MESSAGE" value="* added more translations of templates&#10;* fixed setting language for certain pages (login, access denied, etc..)" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -697,7 +697,7 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java">
+    <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <entry file="file://$PROJECT_DIR$/src/ApplicationResources.properties" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
           <state line="98" column="16" selection-start="3205" selection-end="3205" vertical-scroll-proportion="0.33838382">
@@ -714,14 +714,14 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="231" column="0" selection-start="8315" selection-end="8315" vertical-scroll-proportion="0.41919193">
+          <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.5479798">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1582" column="0" selection-start="60461" selection-end="60461" vertical-scroll-proportion="0.04292929">
+          <state line="1466" column="12" selection-start="55877" selection-end="55877" vertical-scroll-proportion="0.38636363">
             <folding />
           </state>
         </provider>
@@ -1582,14 +1582,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="231" column="0" selection-start="8315" selection-end="8315" vertical-scroll-proportion="0.41919193">
+        <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.5479798">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1582" column="0" selection-start="60461" selection-end="60461" vertical-scroll-proportion="0.04292929">
+        <state line="1466" column="12" selection-start="55877" selection-end="55877" vertical-scroll-proportion="0.38636363">
           <folding />
         </state>
       </provider>

@@ -55,7 +55,7 @@ $xwiki.parseContent($pagemenu)
 <div id="xwikipagemenulinks" class="xwikimenu">
 <a href="$attachurl">$msg.get("attachments") ($doc.getAttachmentList().size())</a><span class="xwikisep"> | </span>
 <a href="$inlineurl">$msg.get("editinline")</a><span class="xwikisep"> | </span>
-#if ($xwiki.isMultiLingual())
+#if ($xwiki.isMultiLingual()==true)
 #if ($tdoc.realLanguage!="")
 <a href="$editurl?language=${tdoc.realLanguage}">$msg.get("editcontent")</a><span class="xwikisep"> | </span>
 #else
@@ -73,6 +73,7 @@ $xwiki.parseContent($pagemenu)
 <a href="${editurl}?xpage=editclass">$msg.get("editclass")</a><span class="xwikisep"> | </span>
 <a href="$deleteurl">$msg.get("delete")</a><span class="xwikisep"> | </span>
 <a href="${viewurl}?raw=1">$msg.get("raw")</a><span class="xwikisep"> | </span>
+<a href="${viewurl}?xpage=xml">$msg.get("xml")</a><span class="xwikisep"> | </span>
 #versions()
 </div>
 <div id="xwikiwebmenutitle" class="xwikimenu">$msg.get("webmenu")</div>

@@ -48,6 +48,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.struts.MessageTool;
 import org.apache.log4j.MDC;
 
 import javax.servlet.ServletException;
@@ -239,6 +240,15 @@ public class ViewEditAction extends XWikiAction
                         return parseTemplate(getPage(request, "userinactive"), context);
                     }
                 }
+
+                String language = xwiki.getLanguagePreference(context);
+                response.setLocale(new Locale(language));
+                ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
+                if (bundle==null)
+                   bundle = ResourceBundle.getBundle("ApplicationResources");
+                vcontext.put("msg", new XWikiMessageTool(bundle));
+
+
 
                 if (xwiki.isMultiLingual(context)) {
                     tdoc = doc.getTranslatedDocument(context);
@@ -680,6 +690,8 @@ public class ViewEditAction extends XWikiAction
         String defaultLanguage = peform.getDefaultLanguage();
         if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
                doc.setDefaultLanguage(defaultLanguage);
+        if (doc.getDefaultLanguage().equals(""))
+               doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
 
         String language = context.getWiki().getLanguagePreference(context);
         String languagefromrequest = context.getRequest().getParameter("language");
@@ -712,6 +724,11 @@ public class ViewEditAction extends XWikiAction
         String parent = peform.getParent();
         if (parent!=null)
             doc.setParent(parent);
+        String defaultLanguage = peform.getDefaultLanguage();
+        if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
+               doc.setDefaultLanguage(defaultLanguage);
+        if (doc.getDefaultLanguage().equals(""))
+               doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
 
         doc.readFromTemplateForEdit(peform, context);
 
@@ -727,11 +744,7 @@ public class ViewEditAction extends XWikiAction
         String rev = request.getParameter("rev");
 
         if (rev!=null) {
-            // Let's get the revision
-            doc = xwiki.getDocument(tdoc, rev, context);
-            context.put("doc", doc);
-            // We need to have the old version doc in the context
-            vcontext.put("cdoc", new Document(doc, context));
+            context.put("rev", rev);
         }
         // forward to view template
         String page = getPage(request, "view");

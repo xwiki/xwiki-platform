@@ -20,6 +20,8 @@ import org.apache.cactus.WebResponse;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.struts.action.ActionServlet;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.DocumentException;
 
 import javax.servlet.ServletException;
 import java.io.File;
@@ -30,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.text.ParseException;
 
 /**
  * ===================================================================
@@ -80,14 +83,19 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
         Utils.createDoc(hibstore, "Main", "ViewOkTest", context);
+        Utils.content1 = content;
         setUrl(webRequest, "view", "ViewOkTest");
     }
 
     public void endViewOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find Hello in Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find page name in content", result.indexOf("ViewOkTest")!=-1);
+            assertTrue("Could not find hr in content", result.indexOf("<hr")!=-1);
         } finally {
             clientTearDown();
         }
@@ -97,6 +105,65 @@ public class ViewEditTest extends ServletTest {
         launchTest();
     }
 
+    public void beginViewRawOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(hibstore, "Main", "ViewRawOkTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "ViewRawOkTest");
+        webRequest.addParameter("raw","1");
+    }
+
+    public void endViewRawOk(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content", result.indexOf("$doc.name")!=-1);
+            assertTrue("Could not find raw hr in content", result.indexOf("----")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewRawOk() throws IOException, Throwable {
+        launchTest();
+    }
+
+    public void beginViewXMLOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(hibstore, "Main", "ViewXMLOkTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "ViewXMLOkTest");
+        webRequest.addParameter("xpage","xml");
+    }
+
+    public void endViewXMLOk(WebResponse webResponse) throws HibernateException, IllegalAccessException, DocumentException, ParseException, ClassNotFoundException, InstantiationException, XWikiException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content", result.indexOf("$doc.name")!=-1);
+            assertTrue("Could not find raw hr in content", result.indexOf("----")!=-1);
+            assertTrue("Could not find xml tags in content", result.indexOf("<content")!=-1);
+
+            XWikiSimpleDoc doc1 = (XWikiSimpleDoc) xwiki.getDocument("Main.ViewXMLOkTest", context);
+            XWikiSimpleDoc doc2 = new XWikiSimpleDoc();
+            doc2.fromXML(result);
+            Utils.assertEquals(doc1, doc2);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewXMLOk() throws IOException, Throwable {
+        launchTest();
+    }
 
 
     public void beginViewGetDocument(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -334,17 +401,52 @@ public class ViewEditTest extends ServletTest {
     }
 
 
+    public void beginViewLatestRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(hibstore, "Main", "ViewRevOkTest", context);
+        Utils.content1 = content;
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "ViewRevOkTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
+        hibstore.saveXWikiDoc(doc2, context);
+        setUrl(webRequest, "view", "ViewRevOkTest", "");
+        webRequest.addParameter("rev", "1.2");
+    }
+
+
+
+    public void endViewLatestRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find zzz in Content", result.indexOf("zzzzzzzzzzzzzzzzzzzzzzzz")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewLatestRevOk() throws Throwable {
+        launchTest();
+    }
+
 
     public void beginViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
         Utils.createDoc(hibstore, "Main", "ViewRevOkTest", context);
+        Utils.content1 = content;
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "ViewRevOkTest");
         doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
         hibstore.saveXWikiDoc(doc2, context);
-        setUrl(webRequest, "view", "ViewRevOkTest", "rev=1.1");
+        setUrl(webRequest, "view", "ViewRevOkTest", "");
+        webRequest.addParameter("rev", "1.1");
     }
 
 
@@ -352,13 +454,50 @@ public class ViewEditTest extends ServletTest {
     public void endViewRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find Hello in Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content", result.indexOf("ViewRevOkTest")!=-1);
+            assertTrue("Could not find raw hr in content", result.indexOf("<hr")!=-1);
         } finally {
             clientTearDown();
         }
     }
 
     public void testViewRevOk() throws Throwable {
+        launchTest();
+    }
+
+
+
+    public void beginViewRawRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(hibstore, "Main", "ViewRawRevOkTest", context);
+        Utils.content1 = content;
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "ViewRawRevOkTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
+        hibstore.saveXWikiDoc(doc2, context);
+        setUrl(webRequest, "view", "ViewRawRevOkTest", "");
+        webRequest.addParameter("rev","1.1");
+        webRequest.addParameter("raw","1");
+    }
+
+
+    public void endViewRawRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content", result.indexOf("$doc.name")!=-1);
+            assertTrue("Could not find raw hr in content", result.indexOf("----")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewRawRevOk() throws Throwable {
         launchTest();
     }
 

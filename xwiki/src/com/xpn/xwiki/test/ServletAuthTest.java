@@ -32,8 +32,6 @@ import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.apache.cactus.client.authentication.Authentication;
 import org.apache.cactus.client.authentication.BasicAuthentication;
-import org.apache.cactus.client.authentication.FormAuthentication;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.net.URL;
@@ -107,7 +105,7 @@ public class ServletAuthTest extends ServletTest {
 
     public void endAuthPage(WebResponse webResponse) throws HibernateException {
         try {
-            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            assertEquals("Response status should be 401", 401, webResponse.getStatusCode());
             assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
         } finally {
             clientTearDown();
@@ -131,7 +129,7 @@ public class ServletAuthTest extends ServletTest {
 
     public void endAuthPage2(WebResponse webResponse) throws HibernateException {
         try {
-            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            assertEquals("Response status should be 401", 401, webResponse.getStatusCode());
             assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
         } finally {
             clientTearDown();
@@ -155,7 +153,7 @@ public class ServletAuthTest extends ServletTest {
 
       public void endAuthPage3(WebResponse webResponse) throws HibernateException {
           try {
-              assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+              assertEquals("Response status should be 401", 401, webResponse.getStatusCode());
               assertTrue("Content should be login page", webResponse.getText().indexOf("j_username")!=-1);
           } finally {
               clientTearDown();
@@ -193,10 +191,11 @@ public class ServletAuthTest extends ServletTest {
     }
 
 
-    // Deactivate the test until I know how to pass the parameters
-    /*public void testBasicAuth() throws Throwable {
+   // Deactivate the test until I know how to pass the parameters
+   /* public void testBasicAuth() throws Throwable {
     launchTest();
-    }*/
+   }
+   */
 
 
     public void beginFormAuth(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
@@ -210,7 +209,7 @@ public class ServletAuthTest extends ServletTest {
         updateRight("Main.WebHome", "XWiki.LudovicDubost", "", "view", true, false);
         setUrl(webRequest, "view", "WebHome");
 
-        FormAuthentication auth = new FormAuthentication("LudovicDubost", "toto");
+        MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
@@ -226,12 +225,12 @@ public class ServletAuthTest extends ServletTest {
 
     }
 
-    /*
+
     // I can't make FormAuthentication to work..
     public void testFormAuth() throws Throwable {
         launchTest();
     }
-    */
+    
 
     public void beginCreateUser(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());

@@ -71,8 +71,8 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
 
     public String getContent();
     public void setContent(String content);
-    public String getRenderedContent(XWikiContext context);
-    public String getEscapedContent(XWikiContext context);
+    public String getRenderedContent(XWikiContext context) throws XWikiException;
+    public String getEscapedContent(XWikiContext context) throws XWikiException;
 
     public boolean isMetaDataDirty();
     public boolean isContentDirty();
@@ -174,10 +174,10 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void setDefaultLanguage(String defaultLanguage);
     int getTranslation();
     void setTranslation(int translation);
-    String getTranslatedContent(String language, XWikiContext context);
+    String getTranslatedContent(String language, XWikiContext context) throws XWikiException;
     XWikiDocInterface getTranslatedDocument(String language, XWikiContext context) throws XWikiException;
     List getTranslationList(XWikiContext context) throws XWikiException;
-    String getTranslatedContent(XWikiContext context);
+    String getTranslatedContent(XWikiContext context) throws XWikiException;
 
     XWikiDocInterface getTranslatedDocument(XWikiContext context) throws XWikiException;
 
@@ -186,4 +186,11 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void setCreationDate(Date date);
 
     String getRealLanguage(XWikiContext context) throws XWikiException;
+
+    String getXMLContent(XWikiContext context) throws XWikiException;
+    String toXML(Document doc, XWikiContext context);
+    Document toXMLDocument(boolean bWithObjects, boolean bWithRendering,
+                                  boolean bWithAttachmentContent,
+                                  boolean bWithTranslations, boolean bWithVersions,
+                                  XWikiContext context);
 }

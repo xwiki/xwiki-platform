@@ -25,6 +25,8 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -32,6 +34,8 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
+
+import java.util.HashMap;
 
 
 public class XWikiTest extends TestCase {
@@ -77,6 +81,20 @@ public class XWikiTest extends TestCase {
         XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
         RenderTest.renderTest(wikiengine, "$xwiki.getSkin()",
                 "altern", true, context);
+    }
+
+    public void testPassword() throws XWikiException, HibernateException {
+        HashMap map = new HashMap();
+        map.put("password", "toto");
+        xwiki.createUser("LudovicDubost", map, "", "", context);
+        XWikiDocInterface doc = xwiki.getDocument("XWiki.LudovicDubost", context);
+        String xml = doc.getXMLContent(context);
+        assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
+        assertTrue("XML should contain password", xml.indexOf("toto")!=-1);
+        Document ddoc = new Document(doc, context);
+        xml = ddoc.getXMLContent();
+        assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
+        assertTrue("XML should not contain password", xml.indexOf("toto")==-1);
     }
 
 }

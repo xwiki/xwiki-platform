@@ -124,6 +124,7 @@
         <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
         <root url="file://C:/dev/java/jrcs-full-0.1.7/src/java" />
         <root url="file://C:/dev/java/commons-net-1.1.0/src/java" />
+        <root url="file://C:/dev/java/commons-logging-1.0.3-src/src/java" />
       </SOURCES>
     </library>
     <library name="Unit Tests">
@@ -133,15 +134,12 @@
         <root url="jar://$PROJECT_DIR$/lib/nekohtml-0.7.4.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/httpunit-1.5.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/junit.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev20040402.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cactus-ant-1.6dev20040402.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/jakarta-cactus-13-1.6dev20040402/doc/api/framework-13" />
-      </JAVADOC>
+      <JAVADOC />
       <SOURCES>
-        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040402/framework/src/java/share" />
-        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040402/framework/src/java/j2ee13" />
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/share" />
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/j2ee13" />
       </SOURCES>
     </library>
     <library name="Hibernate">
@@ -158,7 +156,7 @@
         <root url="jar://$PROJECT_DIR$/lib/c3p0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ehcache.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/swarmcache.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.11-stable-bin.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.9-stable-bin.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate-2.1/doc/api" />

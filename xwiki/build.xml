@@ -79,7 +79,7 @@
         value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar;${lib.dir}/ejb.jar" />
 
     <property name="libs.tests"
-        value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
+        value="${lib.dir}/cactus-1.6dev.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
 
     <property name="libs.radeox"
 	value="${lib.dir}/radeox.jar" />

@@ -156,7 +156,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
      * @param clearText
      * @return clearText, encrypted
      */
-    private String encryptText(String clearText) {
+    public String encryptText(String clearText) {
        sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
        try {
           Cipher c1 = Cipher.getInstance(cipherParameters);

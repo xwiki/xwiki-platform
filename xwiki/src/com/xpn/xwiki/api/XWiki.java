@@ -235,11 +235,11 @@ public class XWiki extends Api {
             xwiki.sendMessage(sender, recipient, message, context);
     }
 
-    public String includeTopic(String topic) {
+    public String includeTopic(String topic) throws XWikiException {
         return xwiki.includeTopic(topic, context);
     }
 
-    public String includeForm(String topic) {
+    public String includeForm(String topic) throws XWikiException {
         return xwiki.includeForm(topic, context);
     }
 

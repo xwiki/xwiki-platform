@@ -107,7 +107,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         Element cel = new DOMElement("class");
 
         Element el = new DOMElement("name");
-        el.addText(getName());
+        el.addText((getName()==null) ? "" : getName());
         cel.add(el);
 
         Iterator it = getFieldList().iterator();

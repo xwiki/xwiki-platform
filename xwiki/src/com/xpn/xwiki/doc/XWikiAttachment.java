@@ -240,6 +240,10 @@ public class XWikiAttachment {
     */
 
     public Element toXML() {
+        return toXML(false, false);
+    }
+
+    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions) {
         Element docel = new DOMElement("attachment");
         Element el = new DOMElement("filename");
         el.addText(getFilename());

@@ -177,7 +177,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.content = content;
     }
 
-    public String getRenderedContent(XWikiContext context) {
+    public String getRenderedContent(XWikiContext context) throws XWikiException {
         return context.getWiki().getRenderingEngine().renderDocument(this, context);
     }
 
@@ -185,10 +185,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return context.getWiki().getRenderingEngine().renderText(text, this, context);
     }
 
-    public String getEscapedContent(XWikiContext context) {
+    public String getEscapedContent(XWikiContext context) throws XWikiException {
         CharacterFilter filter = new CharacterFilter();
         return filter.process(getTranslatedContent(context));
     }
+
 
     public String getName() {
         return name;
@@ -420,6 +421,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public BaseClass getxWikiClass() {
         if (xWikiClass==null) {
             xWikiClass = new BaseClass();
+            xWikiClass.setName(getFullName());
         }
         return xWikiClass;
     }
@@ -694,6 +696,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String displayForm(String className, XWikiContext context) {
       Vector objects = getObjects(className);
+      if (objects==null)
+        return "";
+
       BaseObject firstobject = null;
       Iterator foit = objects.iterator();
       while ((firstobject==null)&&foit.hasNext()) {
@@ -721,10 +726,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       }
       result.append("\n");
       for (int i=0;i<objects.size();i++) {
-          if (i!=0)
-              result.append("|");
           BaseObject object = (BaseObject) objects.get(i);
+          first = true;
           for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
+              if (first==true)
+                first = false;
+              else
+                result.append("|");
               result.append(display((String)it.next(), object, context));
           }
           result.append("\n");
@@ -918,8 +926,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return true;
     }
 
-    public String toXML(XWikiContext context) {
-        Document doc = toXMLDocument(context);
+    public String toXML(Document doc, XWikiContext context) {
         OutputFormat outputFormat = new OutputFormat("", true);
         if ((context==null)||(context.getWiki()==null))
             outputFormat.setEncoding("ISO-8859-1");
@@ -936,7 +943,25 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
+    public String getXMLContent(XWikiContext context) throws XWikiException {
+        XWikiDocInterface tdoc = getTranslatedDocument(context);
+        Document doc =  tdoc.toXMLDocument(true, true, false, false, false, context);
+        return toXML(doc, context);
+    }
+
+    public String toXML(XWikiContext context) {
+        Document doc = toXMLDocument(context);
+        return toXML(doc, context);
+    }
+
     public Document toXMLDocument(XWikiContext context) {
+        return toXMLDocument(true, false, false, false, false, context);
+    }
+
+    public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering,
+                                  boolean bWithAttachmentContent,
+                                  boolean bWithTranslations, boolean bWithVersions,
+                                  XWikiContext context) {
         Document doc = new DOMDocument();
         Element docel = new DOMElement("xwikidoc");
         doc.setRootElement(docel);
@@ -986,29 +1011,30 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         List alist = getAttachmentList();
         for (int ai=0;ai<alist.size();ai++) {
             XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
-            docel.add(attach.toXML());
-
+            docel.add(attach.toXML(bWithAttachmentContent, bWithVersions));
         }
 
-        // Add Class
-        BaseClass bclass = getxWikiClass();
-        if (bclass.getFieldList().size()>0) {
-          docel.add(bclass.toXML(null));
-        }
+        if (bWithObjects) {
+            // Add Class
+            BaseClass bclass = getxWikiClass();
+            if (bclass.getFieldList().size()>0) {
+                docel.add(bclass.toXML(null));
+            }
 
-        // Add Objects
-        Iterator it = getxWikiObjects().values().iterator();
-        while (it.hasNext()) {
-            Vector objects = (Vector) it.next();
-            for (int i=0;i<objects.size();i++) {
-                BaseObject obj = (BaseObject)objects.get(i);
-                if (obj!=null) {
-                 BaseClass objclass = null;
-                 if (obj.getName().equals(obj.getClassName()))
-                  objclass = bclass;
-                 else
-                  objclass = obj.getxWikiClass(context);
-                 docel.add(obj.toXML(bclass));
+            // Add Objects
+            Iterator it = getxWikiObjects().values().iterator();
+            while (it.hasNext()) {
+                Vector objects = (Vector) it.next();
+                for (int i=0;i<objects.size();i++) {
+                    BaseObject obj = (BaseObject)objects.get(i);
+                    if (obj!=null) {
+                        BaseClass objclass = null;
+                        if (obj.getName().equals(obj.getClassName()))
+                            objclass = bclass;
+                        else
+                            objclass = obj.getxWikiClass(context);
+                        docel.add(obj.toXML(bclass));
+                    }
                 }
             }
         }
@@ -1017,6 +1043,17 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         el = new DOMElement("content");
         el.addText(getContent());
         docel.add(el);
+
+        if (bWithRendering) {
+            el = new DOMElement("renderedcontent");
+            try {
+                el.addText(getRenderedContent(context));
+            } catch (XWikiException e) {
+                el.addText("Exception with rendering content: " + e.getFullMessage());
+            }
+            docel.add(el);
+        }
+
         return doc;
     }
 
@@ -1283,30 +1320,20 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.translation = translation;
     }
 
-    public String getTranslatedContent(XWikiContext context) {
+    public String getTranslatedContent(XWikiContext context) throws XWikiException {
         String language = context.getWiki().getLanguagePreference(context);
         return getTranslatedContent(language, context);
     }
 
-    public String getTranslatedContent(String language, XWikiContext context) {
-        if ((language==null)||(language.equals("")))
-         return getContent();
+    public String getTranslatedContent(String language, XWikiContext context) throws XWikiException {
+        XWikiDocInterface tdoc = getTranslatedDocument(language, context);
 
-        if (language.equals(defaultLanguage))
-            return getContent();
+        String rev = (String)context.get("rev");
+        if (rev==null)
+            return tdoc.getContent();
 
-        XWikiDocInterface tdoc = new XWikiSimpleDoc(getWeb(), getName());
-        tdoc.setLanguage(language);
-        try {
-         tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
-
-         if (tdoc.isNew())
-          return getContent();
-         else
-          return tdoc.getContent();
-        } catch (Exception e) {
-            return getContent();
-        }
+        XWikiDocInterface cdoc = context.getWiki().getDocument(tdoc, rev, context);
+        return cdoc.getContent();
     }
 
     public XWikiDocInterface getTranslatedDocument(XWikiContext context) throws XWikiException {
@@ -1315,17 +1342,21 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public XWikiDocInterface getTranslatedDocument(String language, XWikiContext context) throws XWikiException {
-        if (language.equals(""))
-         return this;
+        XWikiDocInterface tdoc = this;
 
-        XWikiDocInterface tdoc = new XWikiSimpleDoc(getWeb(), getName());
-        tdoc.setLanguage(language);
-        tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
+        if (!((language==null)||(language.equals(""))||language.equals(defaultLanguage))) {
+            tdoc = new XWikiSimpleDoc(getWeb(), getName());
+            tdoc.setLanguage(language);
+            try {
+                tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
 
-        if (tdoc.isNew())
-         return tdoc;
-        else
-         return tdoc;
+                if (tdoc.isNew())
+                    tdoc = this;
+            } catch (Exception e) {
+                tdoc = this;
+            }
+        }
+        return tdoc;
     }
 
 

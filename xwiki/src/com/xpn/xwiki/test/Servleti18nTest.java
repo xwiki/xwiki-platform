@@ -25,7 +25,6 @@ package com.xpn.xwiki.test;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.apache.cactus.Cookie;
-import org.apache.cactus.client.authentication.FormAuthentication;
 import net.sf.hibernate.HibernateException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
@@ -156,7 +155,7 @@ public class Servleti18nTest extends ServletTest {
         xwiki.createUser("LudovicDubost", map, "", "", context);
 
         setUrl(webRequest, "view", "ViewLocTest");
-        FormAuthentication auth = new FormAuthentication("LudovicDubost", "toto");
+        MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
@@ -171,11 +170,9 @@ public class Servleti18nTest extends ServletTest {
 
     }
 
-    /*
     public void testViewLocalizedWithUserParam() throws Throwable {
         launchTest();
     }
-    */
 
     public void beginEditLocalized(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
         createLocPage("EditLocTest");

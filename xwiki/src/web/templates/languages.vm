@@ -1,4 +1,4 @@
-#if ($xwiki.isMultiLingual())
+#if ($xwiki.isMultiLingual()==true)
 $msg.get("languages"):
 #set($preflanguage = $xwiki.languagePreference)
 #set($languageactive = (($preflanguage = "")||($preflanguage==$doc.defaultLanguage)))

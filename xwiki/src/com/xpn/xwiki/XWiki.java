@@ -986,6 +986,16 @@ public class XWiki implements XWikiNotificationInterface {
             bclass.put("validkey", validkey_class);
         }
 
+        if (bclass.get("default_language")==null) {
+            needsUpdate = true;
+            StringClass deflang_class = new StringClass();
+            deflang_class.setName("default_language");
+            deflang_class.setPrettyName("Default Language");
+            deflang_class.setSize(5);
+            deflang_class.setObject(bclass);
+            bclass.put("default_language", deflang_class);
+        }
+
         if (bclass.get("active")==null) {
             needsUpdate = true;
             BooleanClass active_class = new BooleanClass();
@@ -1439,7 +1449,7 @@ public class XWiki implements XWikiNotificationInterface {
                 if (Param("xwiki.authentication.loginsubmitpage")!=null)
                     fconfig.setInitParameter("loginSubmitPattern", Param("xwiki.authentication.loginsubmitpage"));
                 else
-                    fconfig.setInitParameter("loginSubmitPattern", "/bin/login/XWiki/XWikiLogin");
+                    fconfig.setInitParameter("loginSubmitPattern", "/login/XWiki/XWikiLogin");
                 authenticator.init(fconfig, sconfig);
             }
 
@@ -1631,15 +1641,15 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
-    public String includeTopic(String topic, XWikiContext context) {
+    public String includeTopic(String topic, XWikiContext context) throws XWikiException {
         return include(topic, context, false);
     }
 
-    public String includeForm(String topic, XWikiContext context) {
+    public String includeForm(String topic, XWikiContext context) throws XWikiException {
         return include(topic, context, true);
     }
 
-    public String include(String topic, XWikiContext context, boolean isForm) {
+    public String include(String topic, XWikiContext context, boolean isForm) throws XWikiException {
         String database = null, incdatabase = null;
         Document currentdoc = null, currentcdoc = null, currenttdoc = null;
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");

@@ -24,6 +24,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
@@ -31,6 +32,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -114,15 +116,23 @@ public class Document extends Api {
         return doc.getTranslationList(context);
     }
 
-    public String getTranslatedContent() {
+    public String getTranslatedContent() throws XWikiException {
         return doc.getTranslatedContent(context);
     }
 
-    public String getTranslatedContent(String language) {
+    public String getTranslatedContent(String language) throws XWikiException {
         return doc.getTranslatedContent(language, context);
     }
 
-    public String getRenderedContent() {
+    public Document getTranslatedDocument(String language) throws XWikiException {
+        return new Document(doc.getTranslatedDocument(language, context), context);
+    }
+
+    public Document getTranslatedDocument() throws XWikiException {
+        return new Document(doc.getTranslatedDocument(context), context);
+    }
+
+    public String getRenderedContent() throws XWikiException {
         return doc.getRenderedContent(context);
     }
 
@@ -130,7 +140,7 @@ public class Document extends Api {
         return doc.getRenderedContent(text, context);
     }
 
-    public String getEscapedContent() {
+    public String getEscapedContent() throws XWikiException {
         return doc.getEscapedContent(context);
     }
 
@@ -223,6 +233,11 @@ public class Document extends Api {
          return null;
         else
          return new Object(obj, context);
+    }
+
+    public String getXMLContent() throws XWikiException {
+        String xml = doc.getXMLContent(context);
+        return context.getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml);
     }
 
     public String toXML() {

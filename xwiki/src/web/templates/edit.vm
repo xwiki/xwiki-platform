@@ -17,7 +17,7 @@ $msg.get("editincludepagemsg")
 </p>
 #end
 <div id="xwikitext">
-#if ($xwiki.isMultiLingual())
+#if ($xwiki.isMultiLingual()==true)
 $msg.get("youareediting"): $tdoc.language
 <br /><br />
 #end

@@ -450,6 +450,70 @@ public class Utils {
         xwiki.saveDocument(doc, context);
     }
 
+    public static void setIntValue(String docName, String propname, int propvalue, XWikiContext context) throws XWikiException {
+        XWiki xwiki = context.getWiki();
+        XWikiDocInterface doc = xwiki.getDocument(docName, context);
+        BaseClass bclass = doc.getxWikiClass();
+        if (bclass==null) {
+            bclass = new BaseClass();
+        }
+
+        bclass.setName(docName);
+        NumberClass propclass = new NumberClass();
+        propclass.setName(propname);
+        propclass.setNumberType("integer");
+        propclass.setPrettyName(propname);
+        propclass.setSize(5);
+        propclass.setObject(bclass);
+        bclass.addField(propname, propclass);
+        doc.setxWikiClass(bclass);
+
+        BaseObject bobject = doc.getxWikiObject();
+        if (bobject==null) {
+          bobject = new BaseObject();
+          doc.addObject(docName, bobject);
+        }
+        bobject.setName(docName);
+        bobject.setClassName(bclass.getName());
+        bobject.setIntValue(propname, propvalue);
+        xwiki.saveDocument(doc, context);
+    }
+
+    public static void setIntValue(String docName, String className, String propname, int propvalue, XWikiContext context) throws XWikiException {
+        if (docName.equals(className)) {
+            setIntValue(docName, propname, propvalue, context);
+            return;
+        }
+
+        XWiki xwiki = context.getWiki();
+        XWikiDocInterface classdoc = xwiki.getDocument(className, context);
+        BaseClass bclass = classdoc.getxWikiClass();
+        if (bclass==null) {
+                    bclass = new BaseClass();
+        }
+        bclass.setName(className);
+        NumberClass propclass = new NumberClass();
+        propclass.setName(propname);
+        propclass.setNumberType("integer");
+        propclass.setPrettyName(propname);
+        propclass.setSize(5);
+        propclass.setObject(bclass);
+        bclass.addField(propname, propclass);
+        classdoc.setxWikiClass(bclass);
+        xwiki.saveDocument(classdoc, context);
+
+        XWikiDocInterface doc = xwiki.getDocument(docName, context);
+        BaseObject bobject = doc.getObject(className, 0);
+        if (bobject==null) {
+          bobject = new BaseObject();
+          doc.addObject(className, bobject);
+        }
+        bobject.setName(docName);
+        bobject.setClassName(bclass.getName());
+        bobject.setIntValue(propname, propvalue);
+        xwiki.saveDocument(doc, context);
+    }
+
 
     public static void updateRight(XWiki xwiki, XWikiContext context, String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
         XWikiDocInterface doc = xwiki.getDocument(fullname, context);

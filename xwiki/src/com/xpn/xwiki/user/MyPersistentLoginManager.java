@@ -36,6 +36,11 @@ import java.security.NoSuchAlgorithmException;
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
     protected String cookiePath = "/";
 
+
+    public MyPersistentLoginManager() {
+        super();
+    }
+
     public void setCookiePath(String cp) {
         cookiePath = cp;
     }

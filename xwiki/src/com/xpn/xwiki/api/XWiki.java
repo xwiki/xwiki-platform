@@ -172,8 +172,13 @@ public class XWiki extends Api {
         if (checkProgrammingRights())
          return xwiki.createUser(withValidation, context);
         else
-         return -2;
-        // TODO: We might need to send a notification email here.
+         return -1;
+    }
+
+    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist) throws XWikiException {
+        if (checkProgrammingRights())
+            return xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, failOnExist, context);
+        else return -1;
     }
 
     public int validateUser(boolean withConfirmEmail) throws XWikiException {

@@ -30,11 +30,14 @@ import com.opensymphony.module.access.entities.Resource_I;
 import com.opensymphony.module.access.provider.ResourceProvider;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +46,7 @@ import java.util.Vector;
 
 public class XWikiResourceProvider extends XWikiBaseProvider implements ResourceProvider {
 
+    private static final Log log = LogFactory.getLog(XWikiResourceProvider.class);
 
     public String getRealm() {
         return "default";
@@ -170,8 +174,9 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                     if (ArrayUtils.contains(levelsarray, accessLevel)) {
                         found = true;
                         String[] userarray = StringUtils.split(users," ,|");
-                        if (ArrayUtils.contains(userarray, name))
+                        if (ArrayUtils.contains(userarray, name)) {
                            return true;
+                        }
                     }
                 }
             }
@@ -214,6 +219,22 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         return hasAccessLevel(userId, resourceKey, accessLevel, true);
     }
 
+
+    public void logAllow(String name, String resourceKey, String accessLevel, String info) {
+        if (log.isDebugEnabled())
+          log.debug("Access has been granted for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info);
+    }
+
+    public void logDeny(String name, String resourceKey, String accessLevel, String info) {
+        if (log.isDebugEnabled())
+          log.debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info);
+    }
+
+    public void logDeny(String name, String resourceKey, String accessLevel, String info, Exception e) {
+        if (log.isDebugEnabled())
+          log.debug("Access has been denied for (" + name + "," + resourceKey + "," + accessLevel + ") at " + info, e);
+    }
+
     public boolean hasAccessLevel(String name, String resourceKey, String accessLevel, boolean user) throws NotFoundException {
         boolean deny = false;
         boolean allow = false;
@@ -231,19 +252,27 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
               // Programming right can only been given if user is from main wiki
                 try {
                     allow = checkRight(name, xwikidoc , "programming", true, true, true);
-                    if (allow)
+                    if (allow) {
+                        logAllow(name, resourceKey, accessLevel, "programming level");
                         return true;
-                    else
+                    }
+                    else {
+                        logDeny(name, resourceKey, accessLevel, "programming level");
                         return false;
+                    }
                 } catch (NotFoundException e) {}
-                return false;
-              }
+                   logDeny(name, resourceKey, accessLevel, "programming level (no right found)");
+                   return false;
+                }
 
 
             // Verify XWiki super user
             try {
                 allow = checkRight(name, xwikidoc , "admin", true, true, true);
-                if (allow) return true;
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "admin level");
+                    return true;
+                }
             } catch (NotFoundException e) {}
 
             // Verify Web super user
@@ -251,7 +280,10 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             XWikiDocInterface webdoc = getXWiki().getDocument(web, "WebPreferences", context);
             try {
                 allow = checkRight(name, webdoc , "admin", true, true, true);
-                if (allow) return true;
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "web admin level");
+                    return true;
+                }
             } catch (NotFoundException e) {}
 
             // First check if this document is denied to the specific user
@@ -260,13 +292,19 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             try {
                 deny = checkRight(name, doc, accessLevel, true, false, false);
                 deny_found = true;
-                if (deny) return false;
+                if (deny) {
+                    logDeny(name, resourceKey, accessLevel, "document level");
+                    return false;
+                }
             } catch (NotFoundException e) {}
 
             try {
                 allow = checkRight(name, doc , accessLevel, true, true, false);
                 allow_found = true;
-                if (allow) return true;
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "document level");
+                    return true;
+                }
             } catch (NotFoundException e) {}
 
 
@@ -275,12 +313,18 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             try {
                 deny =  checkRight(name, webdoc, accessLevel, true, false, true);
                 deny_found = true;
-                if (deny) return false;
+                if (deny) {
+                    logDeny(name, resourceKey, accessLevel, "web level");
+                    return false;
+                }
             } catch (NotFoundException e) {}
             try {
                 allow = checkRight(name, webdoc , accessLevel, true, true, true);
                 allow_found = true;
-                if (allow) return true;
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "web level");
+                    return true;
+                }
             } catch (NotFoundException e) {}
 
             // Check if this document is denied/allowed
@@ -288,23 +332,34 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             try {
                 deny = checkRight(name, xwikidoc , accessLevel, true, false, true);
                 deny_found = true;
-                if (deny) return false;
+                if (deny) {
+                    logDeny(name, resourceKey, accessLevel, "xwiki level");
+                    return false;
+                }
             } catch (NotFoundException e) {}
             try {
                 allow = checkRight(name, xwikidoc , accessLevel, true, true, true);
                 allow_found = true;
-                if (allow) return true;
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "xwiki level");
+                    return true;
+                }
             } catch (NotFoundException e) {}
 
             // If neither doc, web or topic had any allowed ACL
             // and that all users that were not denied
             // should be allowed.
-            if (!allow_found)
+            if (!allow_found) {
+                logAllow(name, resourceKey, accessLevel, "global level (no restricting right)");
                 return true;
-            else
+            }
+            else {
+                logDeny(name, resourceKey, accessLevel, "global level (restricting right was found)");
                 return false;
+            }
 
         } catch (XWikiException e) {
+            logDeny(name, resourceKey, accessLevel, "global level (exception)", e);
             e.printStackTrace();
             return false;
         }

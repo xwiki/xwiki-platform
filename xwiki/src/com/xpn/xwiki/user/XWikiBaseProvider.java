@@ -35,7 +35,7 @@ public class XWikiBaseProvider {
     private XWiki xWiki;
     private Set handledNames = new HashSet();
     private static Map propertySets;
-    protected XWikiContext context = new XWikiContext();
+    protected XWikiContext context;
 
     public XWiki getXWiki() {
         return xWiki;

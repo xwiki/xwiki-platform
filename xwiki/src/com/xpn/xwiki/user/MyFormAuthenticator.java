@@ -24,16 +24,22 @@ package com.xpn.xwiki.user;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 
 public class MyFormAuthenticator extends FormAuthenticator {
+
+    private static final Log log = LogFactory.getLog(MyFormAuthenticator.class);
+
 
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception {
         return processLogin(request, response, null);
@@ -61,6 +67,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
             Principal principal = authenticate(username, password, context);
 
             if (principal != null) {
+                if (log.isDebugEnabled()) log.debug("User " + principal.getName() + " has been authentified from cookie");
                 request.setUserPrincipal(principal);
             } else {
                 // failed authentication with remembered login, better forget login now
@@ -75,6 +82,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
             Principal principal = authenticate(username, password, context);
             if (principal != null) {
                 // login successful
+                if (log.isInfoEnabled()) log.info("User " + principal.getName() + " has been logged-in");
 
                 // invalidate old session if the user was already authenticated, and they logged in as a different user
                 if (request.getUserPrincipal() != null && !username.equals(request.getRemoteUser())) {
@@ -101,6 +109,8 @@ public class MyFormAuthenticator extends FormAuthenticator {
             } else {
                 // login failed
                 // set response status and forward to error page
+                if (log.isInfoEnabled()) log.info("User " + username + " login has failed");
+
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.getRequestDispatcher(errorPage).forward(request, response);
             }

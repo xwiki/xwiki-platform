@@ -153,6 +153,20 @@ public abstract class ServletTest extends ServletTestCase {
             ActionServlet servlet = new ActionServlet();
             servlet.init(config);
             servlet.service(request, response);
+
+            // Let's verify that we didn't let any connections behind..
+            XWiki xwiki = (XWiki) config.getServletContext().getAttribute("xwiki");
+            if (xwiki != null) {
+             XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheInterface) xwiki.getStore()).getStore();
+             assertEquals("Active connections in xwiki should be zero", 0, store.getConnections().size());
+            }
+
+            xwiki = (XWiki) config.getServletContext().getAttribute("xwikitest");
+            if (xwiki != null) {
+             XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheInterface) xwiki.getStore()).getStore();
+             assertEquals("Active connections in xwikitest should be zero", 0, store.getConnections().size());
+            }
+
             cleanSession(session);
         } catch (ServletException e) {
             e.getRootCause().printStackTrace();

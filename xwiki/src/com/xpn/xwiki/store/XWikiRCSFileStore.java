@@ -486,4 +486,8 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
 
     public void cleanUp(XWikiContext context) {
     }
+
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
+        // Nothing to do
+    }
 }

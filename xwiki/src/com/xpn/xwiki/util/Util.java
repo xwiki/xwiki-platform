@@ -24,6 +24,7 @@ package com.xpn.xwiki.util;
 
 import com.xpn.xwiki.render.WikiSubstitution;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
@@ -162,6 +163,11 @@ public class Util {
                     content.append("\n");
                     line = fr.readLine();
                 }
+    }
+
+    public static boolean contains(String name, String list, String sep) {
+          String[] sarray = StringUtils.split(list, sep);
+          return ArrayUtils.contains(sarray, name);
     }
 
 }

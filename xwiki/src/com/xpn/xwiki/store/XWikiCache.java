@@ -158,4 +158,8 @@ public class XWikiCache implements XWikiCacheInterface {
     public void cleanUp(XWikiContext context) {
         store.cleanUp(context);
     }
+
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
+        store.createWiki(wikiName, context);
+    }
 }

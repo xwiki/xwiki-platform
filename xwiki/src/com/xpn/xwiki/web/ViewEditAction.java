@@ -41,10 +41,13 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.apache.log4j.MDC;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,6 +73,7 @@ import java.util.*;
  */
 public class ViewEditAction extends XWikiAction
 {
+    private static final Log log = LogFactory.getLog(ViewEditAction.class);
 
 
     public ViewEditAction() throws Exception {
@@ -169,121 +173,132 @@ public class ViewEditAction extends XWikiAction
         // Test works with xwiki-test.cfg instead of xwiki.cfg
         String dbname = "xwiki";
         String url = XWiki.getRequestURL(request);
-        String baseUrl = "";
-        if (request.getServletPath().startsWith ("/testbin")) {
-            dbname = "xwikitest";
-            baseUrl = url.substring(0, url.indexOf("/testbin/")) + "/testbin/";
-        } else {
-            baseUrl = url.substring(0, url.indexOf("/bin/")) + "/bin/";
-        }
-
-        servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
-        XWikiContext context = new XWikiContext();
-        context.setBaseUrl(baseUrl);
-        context.setServlet(servlet);
-        context.setRequest(request);
-        context.setResponse(response);
-        context.setAction(this);
-        context.setDatabase(dbname);
-
-        // We should not go further for the Database Status
-        // To make sure we don't have more database connections
-        if (action.equals("dbstatus"))
-           return executeDatabaseStatus(context);
-
-
-        XWiki xwiki = XWiki.getXWiki(context);
-        // Any error before this will be treated using a redirection to an error page
-
-        VelocityContext vcontext = null;
-        // Prepare velocity context
-        vcontext = XWikiVelocityRenderer.prepareContext(context);
-
 
         try {
-            // From there we will try to catch any exceptions and show a nice page
+            // Push the URL into the Log4j NDC context
+            MDC.put("url", url);
 
-            XWikiDocInterface doc = null;
-
-            doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
-            context.put("doc", doc);
-
-            vcontext.put("doc", new Document(doc, context));
-            vcontext.put("cdoc",  vcontext.get("doc"));
-
-            if (xwiki.checkAccess(action, doc, context)==false) {
-                return parseTemplate(getPage(request, "accessdenied"), context);
+            String baseUrl = "";
+            if (request.getServletPath().startsWith ("/testbin")) {
+                dbname = "xwikitest";
+                baseUrl = url.substring(0, url.indexOf("/testbin/")) + "/testbin/";
+            } else {
+                baseUrl = url.substring(0, url.indexOf("/bin/")) + "/bin/";
             }
 
-            String checkactivefield = xwiki.getXWikiPreference("auth_active_check", context);
-            if (checkactivefield.equals("1")) {
-                String username = context.getUser();
-                XWikiDocInterface userdoc = xwiki.getDocument(username, context);
-                int active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
+            servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
+            XWikiContext context = new XWikiContext();
+            context.setBaseUrl(baseUrl);
+            context.setServlet(servlet);
+            context.setRequest(request);
+            context.setResponse(response);
+            context.setAction(this);
+            context.setDatabase(dbname);
 
-                if (active==0) {
-                    return parseTemplate(getPage(request, "userinactive"), context);
+            // We should not go further for the Database Status
+            // To make sure we don't have more database connections
+            if (action.equals("dbstatus"))
+                return executeDatabaseStatus(context);
+
+
+            XWiki xwiki = XWiki.getXWiki(context);
+            // Any error before this will be treated using a redirection to an error page
+
+            VelocityContext vcontext = null;
+            // Prepare velocity context
+            vcontext = XWikiVelocityRenderer.prepareContext(context);
+
+
+            try {
+                // From there we will try to catch any exceptions and show a nice page
+
+                XWikiDocInterface doc = null;
+
+                doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
+                context.put("doc", doc);
+
+                vcontext.put("doc", new Document(doc, context));
+                vcontext.put("cdoc",  vcontext.get("doc"));
+
+                if (xwiki.checkAccess(action, doc, context)==false) {
+                    return parseTemplate(getPage(request, "accessdenied"), context);
+                }
+
+                String checkactivefield = xwiki.getXWikiPreference("auth_active_check", context);
+                if (checkactivefield.equals("1")) {
+                    String username = context.getUser();
+                    XWikiDocInterface userdoc = xwiki.getDocument(username, context);
+                    int active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
+
+                    if (active==0) {
+                        return parseTemplate(getPage(request, "userinactive"), context);
+                    }
+                }
+
+
+                // Determine what to do
+                if (action.equals("view"))
+                    return executeView(xwiki, doc, request, context, vcontext);
+                else if ( action.equals("inline"))
+                    return executeInline(doc, form, request, context);
+                else if ( action.equals("edit") )
+                    return executeEdit(doc, form, request, context);
+                else if ( action.equals("preview"))
+                    return executePreview(doc, form, request, context, vcontext);
+                else if (action.equals("save"))
+                    return executeSave(xwiki, doc, form, request, response, context);
+                else if (action.equals("delete"))
+                    return executeDelete(xwiki, doc, request, response, context);
+                else if (action.equals("propupdate"))
+                    return executePropertyUpdate(xwiki, doc, form, request, response, context);
+                else if (action.equals("propadd"))
+                    return executePropertyAdd(xwiki, doc, form, request, response, context);
+                else if (action.equals("objectadd"))
+                    return executeObjectAdd(xwiki, doc, form, request, response, context);
+                else if (action.equals("objectremove"))
+                    return executeObjectRemove(xwiki, doc, form, request, response, context);
+                else if (action.equals("download"))
+                    return executeDownload(doc, request, response, context);
+                else if (action.equals("attach"))
+                    return parseTemplate(getPage(request, "attach"), context);
+                else if (action.equals("upload"))
+                    return executeUpload(xwiki, doc, request, response, context);
+                else if (action.equals("delattachment"))
+                    return executeDeleteAttachment(doc, request, response, context);
+                else if (action.equals("skin"))
+                    return executeSkin(xwiki, doc, request, response, context);
+                else if (action.equals("login"))
+                    return executeLogin(xwiki, doc, request, response, context);
+                else if (action.equals("loginerror"))
+                    return parseTemplate(getPage(request, "login"), context);
+                else if (action.equals("logout"))
+                    return executeLogout(xwiki, request, response, context);
+            } catch (Throwable e) {
+                vcontext.put("exp", e);
+                try {
+                    if (log.isWarnEnabled()) {
+                           log.warn("Uncaught exception: " + e.getMessage(), e);
+                    }
+                    return parseTemplate(getPage(request, "exception"), context);
+                } catch (Exception e2) {
+                    // I hope this never happens
+                    e.printStackTrace();
+                    e2.printStackTrace();
+                    return null;
+                }
+            } finally {
+                // Make sure we cleanup database connections
+                // There could be cases where we have some
+                if ((context!=null)&&(xwiki!=null)) {
+                    xwiki.getStore().cleanUp(context);
                 }
             }
 
-
-            // Determine what to do
-            if (action.equals("view"))
-                return executeView(xwiki, doc, request, context, vcontext);
-            else if ( action.equals("inline"))
-                return executeInline(doc, form, request, context);
-            else if ( action.equals("edit") )
-                return executeEdit(doc, form, request, context);
-            else if ( action.equals("preview"))
-                return executePreview(doc, form, request, context, vcontext);
-            else if (action.equals("save"))
-                return executeSave(xwiki, doc, form, request, response, context);
-            else if (action.equals("delete"))
-                return executeDelete(xwiki, doc, request, response, context);
-            else if (action.equals("propupdate"))
-                return executePropertyUpdate(xwiki, doc, form, request, response, context);
-            else if (action.equals("propadd"))
-                return executePropertyAdd(xwiki, doc, form, request, response, context);
-            else if (action.equals("objectadd"))
-                return executeObjectAdd(xwiki, doc, form, request, response, context);
-            else if (action.equals("objectremove"))
-                return executeObjectRemove(xwiki, doc, form, request, response, context);
-            else if (action.equals("download"))
-                return executeDownload(doc, request, response, context);
-            else if (action.equals("attach"))
-                return parseTemplate(getPage(request, "attach"), context);
-            else if (action.equals("upload"))
-                return executeUpload(xwiki, doc, request, response, context);
-            else if (action.equals("delattachment"))
-                return executeDeleteAttachment(doc, request, response, context);
-            else if (action.equals("skin"))
-                return executeSkin(xwiki, doc, request, response, context);
-            else if (action.equals("login"))
-                return executeLogin(xwiki, doc, request, response, context);
-            else if (action.equals("loginerror"))
-                return parseTemplate(getPage(request, "login"), context);
-            else if (action.equals("logout"))
-                return executeLogout(xwiki, request, response, context);
-        } catch (Throwable e) {
-            vcontext.put("exp", e);
-            try {
-             return parseTemplate(getPage(request, "exception"), context);
-            } catch (Exception e2) {
-                // I hope this never happens
-                e.printStackTrace();
-                e2.printStackTrace();
-                return null;
-            }
+            // Let's redirect to an error page here..
+            return null;
         } finally {
-            // Make sure we cleanup database connections
-            // There could be cases where we have some
-            if ((context!=null)&&(xwiki!=null)) {
-                xwiki.getStore().cleanUp(context);
-            }
+            MDC.remove("url");
         }
-
-        // Let's redirect to an error page here..
-        return null;
     }
 
     private ActionForward executeDatabaseStatus(XWikiContext context) throws IOException, XWikiException {

@@ -23,6 +23,7 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -233,6 +234,57 @@ public class ServletVirtualTest extends ServletTest {
         } finally {
             clientTearDown();
         }
+    }
+
+
+    public void beginCreateNewWiki(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Result: $xwiki.createNewWiki(\"xwikitest2\", \"localhost\", \"XWiki.LudovicDubost\", \"xwikitest\", true)";
+        Utils.createDoc(hibstore, "Main", "CreateNewWikiTest", context);
+        Utils.content1 = content;
+
+        // In order for createUser to work, we need programming right
+        Utils.createDoc(hibstore, "Test", "CreateNewWikiTestDoc", context);
+
+        Utils.createDoc(hibstore, "XWiki", "LudovicDubost", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "email", "ludovic@xwiki.org", context);
+        Utils.setIntValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "active", 1, context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "password", "toto", context);
+
+        // In order for createUser to work, we need programming right
+        Utils.createDoc(hibstore, "XWiki", "XWikiPreferences", context);
+        updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
+
+        context.setDatabase("xwikitest2");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        context.setDatabase("xwikitest");
+
+        setUrl(webRequest, "view", "CreateNewWikiTest");
+
+    }
+
+    public void endCreateNewWiki(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            String result = webResponse.getText();
+            assertTrue("Response code is not correct", result.indexOf("Result: 1")!=-1 );
+
+            context.setDatabase("xwikitest2");
+            XWikiDocInterface doc = xwiki.getDocument("Test.CreateNewWikiTestDoc", context);
+            assertTrue("Document in new wiki should exist", !doc.isNew());
+
+        } finally {
+            clientTearDown();
+        }
+
+    }
+
+
+    public void testCreateNewWiki() throws Throwable {
+        launchTest();
     }
 
 

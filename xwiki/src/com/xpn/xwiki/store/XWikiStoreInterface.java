@@ -41,14 +41,12 @@ public interface XWikiStoreInterface {
     public List getClassList(XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
-
-    void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-
-    List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
-
-    void cleanUp(XWikiContext context);
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
+    public void cleanUp(XWikiContext context);
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
 
 }

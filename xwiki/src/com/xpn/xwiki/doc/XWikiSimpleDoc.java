@@ -31,6 +31,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
@@ -426,7 +427,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public BaseObject getxWikiObject() {
-        return getObject(getFullName(),0);
+        return getObject(getFullName());
     }
 
     public List getxWikiClasses(XWikiContext context) {
@@ -476,6 +477,18 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void setObjects(String classname, Vector objects) {
         getxWikiObjects().put(classname, objects);
+    }
+
+    public BaseObject getObject(String classname) {
+        Vector objects = (Vector)getxWikiObjects().get(classname);
+        if (objects==null)
+         return null;
+        for (int i=0;i<objects.size();i++) {
+            BaseObject obj = (BaseObject) objects.get(i);
+            if (obj!=null)
+                return obj;
+        }
+        return null;
     }
 
     public BaseObject getObject(String classname, int nb) {
@@ -1127,10 +1140,33 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return obj.getIntValue(objName);
     }
 
-    public String getStringValue(String className, String objName) {
-        BaseObject obj = getObject(className, 0);
-        return obj.getStringValue(objName);
+    public String getStringValue(String className, String fieldName) {
+        BaseObject obj = getObject(className);
+        return obj.getStringValue(fieldName);
     }
+
+    public void setStringValue(String className, String fieldName, String value) {
+        BaseObject bobject = getObject(className);
+        if (bobject==null) {
+          bobject = new BaseObject();
+          addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.setStringValue(fieldName, value);
+    }
+
+    public void setIntValue(String className, String fieldName, int value) {
+        BaseObject bobject = getObject(className);
+        if (bobject==null) {
+          bobject = new BaseObject();
+          addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.setIntValue(fieldName, value);
+    }
+
 
     public String getDatabase() {
         return database;

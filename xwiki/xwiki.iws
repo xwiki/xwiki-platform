@@ -4,7 +4,7 @@
   <component name="AspectsView" />
   <component name="BookmarkManager">
     <editor_bookmark url="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/StoreObjectHibernateTest.java" line="297" />
-    <editor_bookmark url="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateStore.java" line="493" />
+    <editor_bookmark url="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateStore.java" line="550" />
     <commander_bookmark type="package" url="file://$PROJECT_DIR$/src/com/xpn/xwiki/web" />
   </component>
   <component name="CheckinPanelState">
@@ -223,7 +223,34 @@
     <method_breakpoints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints />
+    <line_breakpoints>
+      <breakpoint url="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletVirtualTest.java" line="272">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="LOG_MESSAGE" value="" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/MyFormAuthenticator.java" line="59">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="LOG_MESSAGE" value="" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+      </breakpoint>
+    </line_breakpoints>
     <exception_breakpoints>
       <breakpoint_any>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -537,33 +564,49 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletAuthTest.java">
-      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletAuthTest.java" pinned="false">
+    <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/MyFormAuthenticator.java">
+      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletVirtualTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="196" column="6" selection-start="7345" selection-end="7345" vertical-scroll-proportion="0.32673267">
+          <state line="253" column="22" selection-start="10989" selection-end="10989" vertical-scroll-proportion="0.17777778">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/Utils.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="213" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.38613862">
+          <state line="465" column="27" selection-start="17629" selection-end="17629" vertical-scroll-proportion="0.17777778">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1300" column="24" selection-start="50201" selection-end="50201" vertical-scroll-proportion="0.8217822">
+          <state line="1298" column="61" selection-start="50407" selection-end="50407" vertical-scroll-proportion="0.37385622">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletTest.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/MyFormAuthenticator.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="154" column="35" selection-start="5258" selection-end="5265" vertical-scroll-proportion="1.319307">
+          <state line="84" column="4" selection-start="3647" selection-end="3647" vertical-scroll-proportion="0.20784314">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateStore.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="1429" column="0" selection-start="55433" selection-end="55433" vertical-scroll-proportion="0.43006536">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/doc/XWikiSimpleDoc.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="483" column="19" selection-start="13576" selection-end="13576" vertical-scroll-proportion="0.17777778">
             <folding />
           </state>
         </provider>
@@ -658,13 +701,9 @@
   </component>
   <component name="PackagesPane" />
   <component name="ProjectPane">
-    <expanded_node url="file://$PROJECT_DIR$/src/com" module="xwikibase" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src/com/xpn" module="xwikibase" type="directory" />
-    <expanded_node url="" module="xwiki" type="module" />
+    <expanded_node url="file://$PROJECT_DIR$/src/web" module="xwiki" type="directory" />
     <expanded_node url="" module="xwikibase" type="module" />
-    <expanded_node url="file://$PROJECT_DIR$/src/com/xpn/xwiki" module="xwikibase" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$/src" module="xwikibase" type="directory" />
-    <expanded_node url="file://$PROJECT_DIR$" module="xwikibase" type="directory" />
+    <expanded_node url="" module="xwiki" type="module" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.71280277">
@@ -712,8 +751,8 @@
     <property name="last_opened_file_path" value="C:\dev\java\osaccess\src\java\com\opensymphony\module\access\provider" />
     <property name="cvs_file_history_flatOrder5" value="5" />
     <property name="cvs_file_history_flatWidth5" value="95" />
-    <property name="cvs_file_history_treeWidth3" value="172" />
     <property name="cvs_file_history_treeOrder2" value="2" />
+    <property name="cvs_file_history_treeWidth3" value="172" />
     <property name="cvs_file_history_treeWidth5" value="172" />
     <property name="cvs_file_history_flatOrder6" value="6" />
     <property name="cvs_file_history_flatWidth0" value="171" />
@@ -1015,8 +1054,8 @@
     <configuration name="current" type="JUnit" default="false" selected="false">
       <module name="xwiki" />
       <option name="PACKAGE_NAME" value="com.xpn.xwiki.test" />
-      <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.ServletAuthTest" />
-      <option name="METHOD_NAME" value="testFormAuth" />
+      <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.ServletVirtualTest" />
+      <option name="METHOD_NAME" value="testCreateNewWiki" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
@@ -1162,21 +1201,21 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1288" height="968" extended-state="6" />
+    <frame x="-4" y="-4" width="1288" height="968" extended-state="0" />
     <editor active="false" />
     <layout>
-      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.28994083" order="8" />
+      <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23550296" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.34918034" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.25485438" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32781065" order="1" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.32281554" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.24260356" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23572594" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3112426" order="9" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.46627218" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27993527" order="1" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.44615385" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.43905327" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="CVS File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3704142" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39171597" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.40038684" order="0" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.330033" order="10" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
@@ -1268,333 +1307,109 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/client/connector/http/ConnectionHelperFactory.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/util/Util.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="35" selection-start="3573" selection-end="3573" vertical-scroll-proportion="0.33333334">
+        <state line="167" column="34" selection-start="5583" selection-end="5591" vertical-scroll-proportion="0.7621212">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/Cookie.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/XWikiResourceProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="131" column="0" selection-start="4260" selection-end="4260" vertical-scroll-proportion="0.38215104">
+        <state line="173" column="78" selection-start="7616" selection-end="7769" vertical-scroll-proportion="0.50542635">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/internal/client/WebClientTestCaseDelegate.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiStoreInterface.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="280" column="0" selection-start="11198" selection-end="11198" vertical-scroll-proportion="0.3318078">
-          <folding>
-            <marker date="1066920386000" expanded="true" signature="3676:3909" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="9815:9925" placeholder="{...}" />
-            <marker date="1066920386000" expanded="true" signature="5215:8146" placeholder="{...}" />
-            <marker date="1066920386000" expanded="true" signature="9931:10216" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="10264:10378" placeholder="{...}" />
-            <marker date="1066920386000" expanded="true" signature="11669:12273" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="9078:9696" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="10384:10826" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="4036:4110" placeholder="{...}" />
-            <marker date="1066920386000" expanded="true" signature="10923:11663" placeholder="{...}" />
-            <marker date="1066920386000" expanded="false" signature="2706:3250" placeholder="..." />
-            <marker date="1066920386000" expanded="true" signature="8152:8810" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="8956:9072" placeholder="{...}" />
-            <marker date="1066920386000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1066920386000" expanded="true" signature="4116:5037" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="3252:3599" placeholder="/**...*/" />
-            <marker date="1066920386000" expanded="true" signature="12417:13488" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/BaseWebRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="402" column="22" selection-start="12495" selection-end="12495" vertical-scroll-proportion="0.6430206">
-          <folding>
-            <marker date="1056702852000" expanded="true" signature="20004:20086" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="5127:5235" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="20137:20180" placeholder="{...}" />
-            <marker date="1056702852000" expanded="false" signature="2690:2967" placeholder="..." />
-            <marker date="1056702852000" expanded="true" signature="9358:9524" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="4288:4350" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="9530:9910" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="15464:15687" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="5730:5770" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="4092:4124" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="11587:12035" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="17888:18207" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="8663:8841" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="12535:13030" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="4426:4507" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="13848:14050" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="12041:12407" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="9966:10133" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="11139:11501" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="19942:19998" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="16295:16961" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="8462:8545" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="15019:15249" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="8963:9303" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="5776:5936" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="2969:3391" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="10618:10997" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="19718:19869" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="4976:5027" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="8913:8957" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="5079:5121" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="18213:18328" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="4916:4970" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="11061:11133" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="15298:15458" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="8242:8342" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="3644:3683" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="10541:10612" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="7828:8094" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="18458:18564" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="3730:3811" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="8596:8657" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="17775:17840" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="6198:6728" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="3543:3585" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="14882:14925" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="14970:15013" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="3873:3952" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="5365:5495" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="4773:4780" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="5996:6044" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="5610:5690" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="3445:3486" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="13806:13842" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="6813:7822" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="13510:13686" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="8394:8456" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="6050:6111" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="13112:13180" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="0:2654" placeholder="/.../" />
-            <marker date="1056702852000" expanded="true" signature="15744:16190" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="16196:16261" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="10139:10478" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="8161:8236" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="4013:4043" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="6153:6192" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="4179:4246" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="18692:18849" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="17080:17769" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="12471:12529" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="16967:17032" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="18618:18686" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="13186:13461" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="4786:4853" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="18923:19712" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="5554:5604" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="5305:5359" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="4556:4740" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="18383:18452" placeholder="{...}" />
-            <marker date="1056702852000" expanded="true" signature="13692:13770" placeholder="/**...*/" />
-            <marker date="1056702852000" expanded="true" signature="14114:14876" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/configuration/BaseConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="18" selection-start="4488" selection-end="4488" vertical-scroll-proportion="0.31578946">
-          <folding>
-            <marker date="1066921810000" expanded="false" signature="2704:2826" placeholder="..." />
-            <marker date="1066921810000" expanded="true" signature="5588:5780" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="5820:5891" placeholder="{...}" />
-            <marker date="1066921810000" expanded="true" signature="4508:4924" placeholder="{...}" />
-            <marker date="1066921810000" expanded="true" signature="4930:5090" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1066921810000" expanded="true" signature="2828:3159" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="4123:4286" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="5135:5582" placeholder="{...}" />
-            <marker date="1066921810000" expanded="true" signature="3222:3445" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="3882:3988" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="4385:4469" placeholder="/**...*/" />
-            <marker date="1066921810000" expanded="true" signature="3542:3752" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/client/authentication/FormAuthentication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="157" column="0" selection-start="5758" selection-end="5758" vertical-scroll-proportion="0.5652174">
-          <folding>
-            <marker date="1058200320000" expanded="true" signature="4092:4213" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="4998:5042" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="5222:5293" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="6279:6491" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="6992:7702" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="4808:4927" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="6225:6269" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="3227:3894" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="3964:3994" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="false" signature="2712:3225" placeholder="..." />
-            <marker date="1058200320000" expanded="true" signature="5354:5394" placeholder="{...}" />
-            <marker date="1058200320000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1058200320000" expanded="true" signature="7708:7921" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="6544:6590" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="5052:5119" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="5577:5955" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="5961:6177" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="5172:5212" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="4482:4592" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="4635:4737" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="8023:11949" placeholder="{...}" />
-            <marker date="1058200320000" expanded="true" signature="4260:4429" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="6600:6920" placeholder="/**...*/" />
-            <marker date="1058200320000" expanded="true" signature="5400:5483" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/client/connector/http/HttpClientConnectionHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="125" column="0" selection-start="4859" selection-end="4927" vertical-scroll-proportion="0.3318078">
-          <folding>
-            <marker date="1056705284000" expanded="true" signature="4336:4411" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="true" signature="8148:8675" placeholder="{...}" />
-            <marker date="1056705284000" expanded="true" signature="6912:7110" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="true" signature="8681:8909" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="true" signature="8985:9194" placeholder="{...}" />
-            <marker date="1056705284000" expanded="true" signature="7177:7924" placeholder="{...}" />
-            <marker date="1056705284000" expanded="true" signature="3862:4019" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="false" signature="2712:3530" placeholder="..." />
-            <marker date="1056705284000" expanded="true" signature="7930:8092" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1056705284000" expanded="true" signature="4155:4238" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="true" signature="3532:3787" placeholder="/**...*/" />
-            <marker date="1056705284000" expanded="true" signature="4296:4330" placeholder="{...}" />
-            <marker date="1056705284000" expanded="true" signature="4534:6902" placeholder="{...}" />
-            <marker date="1056705284000" expanded="true" signature="4056:4125" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/ServletTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="270" column="0" selection-start="9469" selection-end="9469" vertical-scroll-proportion="0.3318078">
-          <folding>
-            <marker date="1066921808000" expanded="true" signature="4419:4759" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1066921808000" expanded="true" signature="4003:4342" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7684:7734" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="6615:6666" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="3943:3997" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="5556:5787" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7355:7422" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="9721:10274" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="8409:8917" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="6672:6862" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="6984:7117" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7150:7349" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="6135:6377" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7493:7543" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="7851:7894" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="8965:9505" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="6411:6438" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="7740:7796" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="4806:5138" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7549:7616" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="7900:7956" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="6444:6567" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="9514:9664" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8065:8191" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8016:8059" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="6924:6978" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="5176:5510" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8231:8403" placeholder="{...}" />
-            <marker date="1066921808000" expanded="false" signature="2690:3145" placeholder="..." />
-            <marker date="1066921808000" expanded="true" signature="3147:3483" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="5847:6078" placeholder="/**...*/" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/j2sdk1.4.2_03/src.zip!/java/lang/reflect/Method.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="323" column="0" selection-start="12573" selection-end="12573" vertical-scroll-proportion="0.798627">
+        <state line="49" column="64" selection-start="2817" selection-end="2817" vertical-scroll-proportion="0.8862559">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/configuration/AbstractWebConfiguration.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiRCSFileStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="94" column="26" selection-start="3709" selection-end="3709" vertical-scroll-proportion="1.5171624">
-          <folding>
-            <marker date="1053949526000" expanded="true" signature="3097:3163" placeholder="/**...*/" />
-            <marker date="1053949526000" expanded="true" signature="2735:2984" placeholder="/**...*/" />
-            <marker date="1053949526000" expanded="true" signature="3292:3361" placeholder="/**...*/" />
-            <marker date="1053949526000" expanded="true" signature="3212:3286" placeholder="{...}" />
-            <marker date="1053949526000" expanded="true" signature="3507:3577" placeholder="/**...*/" />
-            <marker date="1053949526000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1053949526000" expanded="true" signature="3641:3943" placeholder="{...}" />
-            <marker date="1053949526000" expanded="true" signature="3424:3501" placeholder="{...}" />
-          </folding>
+        <state line="489" column="42" selection-start="19945" selection-end="19967" vertical-scroll-proportion="1.3554503">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://C:/dev/java/jakarta-cactus-src-1.5/framework/src/java/share/org/apache/cactus/WebRequest.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWikiException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="18" selection-start="4859" selection-end="4859" vertical-scroll-proportion="2.3272312">
-          <folding>
-            <marker date="1066921808000" expanded="true" signature="4300:4624" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8945:9411" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="false" signature="0:2654" placeholder="/.../" />
-            <marker date="1066921808000" expanded="true" signature="4932:5089" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="4689:4745" placeholder="{...}" />
-            <marker date="1066921808000" expanded="false" signature="2690:3108" placeholder="..." />
-            <marker date="1066921808000" expanded="true" signature="8553:8618" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="3569:3638" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="5158:5219" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="10612:13169" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="4883:4926" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="8652:8939" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="4125:4192" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="3110:3438" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="5391:5438" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="10250:10559" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="3497:3535" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="4751:4840" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8515:8547" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="4254:4294" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="8435:8479" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="5225:5345" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="8150:8429" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="9481:10240" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="4112:4119" placeholder="{...}" />
-            <marker date="1066921808000" expanded="true" signature="3899:4083" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="3691:3858" placeholder="/**...*/" />
-            <marker date="1066921808000" expanded="true" signature="5444:8002" placeholder="/**...*/" />
-          </folding>
+        <state line="105" column="71" selection-start="5032" selection-end="5032" vertical-scroll-proportion="0.96682465">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletTest.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/api/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="154" column="35" selection-start="5258" selection-end="5265" vertical-scroll-proportion="1.319307">
+        <state line="177" column="120" selection-start="5490" selection-end="5595" vertical-scroll-proportion="0.76540285">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletAuthTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="196" column="6" selection-start="7345" selection-end="7345" vertical-scroll-proportion="0.32673267">
+        <state line="362" column="0" selection-start="15842" selection-end="16240" vertical-scroll-proportion="0.52369666">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java">
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiCache.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="213" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.38613862">
+        <state line="162" column="42" selection-start="5863" selection-end="5863" vertical-scroll-proportion="1.3957345">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/j2sdk1.4.2_03/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1217" column="0" selection-start="49448" selection-end="49448" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/doc/XWikiSimpleDoc.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="483" column="19" selection-start="13576" selection-end="13576" vertical-scroll-proportion="0.17777778">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletVirtualTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="253" column="22" selection-start="10989" selection-end="10989" vertical-scroll-proportion="0.17777778">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/Utils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="465" column="27" selection-start="17629" selection-end="17629" vertical-scroll-proportion="0.17777778">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/MyFormAuthenticator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="4" selection-start="3647" selection-end="3647" vertical-scroll-proportion="0.20784314">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1300" column="24" selection-start="50201" selection-end="50201" vertical-scroll-proportion="0.8217822">
+        <state line="1298" column="61" selection-start="50407" selection-end="50407" vertical-scroll-proportion="0.37385622">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateStore.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1429" column="0" selection-start="55433" selection-end="55433" vertical-scroll-proportion="0.43006536">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

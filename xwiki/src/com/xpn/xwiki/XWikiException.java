@@ -24,6 +24,8 @@ package com.xpn.xwiki;
 
 import net.sf.hibernate.JDBCException;
 import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.ServletException;
 import java.io.PrintStream;
@@ -32,6 +34,9 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 
 public class XWikiException extends Exception {
+
+    private static final Log log = LogFactory.getLog(XWikiException.class);
+
     private int module;
     private int code;
     private Throwable exception;
@@ -97,7 +102,8 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT = 3233;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST = 3234;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3235;
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3350;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3301;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE = 3401;
 
     public static final int ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION = 4001;
 
@@ -133,6 +139,8 @@ public class XWikiException extends Exception {
         setException(e);
         setArgs(args);
         setMessage(message);
+        if (log.isTraceEnabled())
+            log.trace(getMessage(), e);
     }
 
     public XWikiException(int module, int code, String message, Throwable e) {

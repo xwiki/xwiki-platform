@@ -171,4 +171,10 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String getDatabase();
 
     void setDatabase(String database);
+
+    BaseObject getObject(String classname);
+
+    void setStringValue(String className, String fieldName, String value);
+
+    void setIntValue(String className, String fieldName, int value);
 }

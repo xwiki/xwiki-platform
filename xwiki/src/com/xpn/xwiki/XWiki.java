@@ -21,10 +21,32 @@
  * Time: 13:52:39
  */
 
+/**
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
+ * root folder of this distribution.
+ *
+ * Created by
+ * User: Ludovic Dubost
+ * Date: 26 nov. 2003
+ * Time: 13:52:39
+ */
+
 package com.xpn.xwiki;
 
 import com.opensymphony.module.access.AccessManager;
-import com.opensymphony.module.access.NotFoundException;
 import com.opensymphony.module.user.User;
 import com.opensymphony.module.user.UserManager;
 import com.xpn.xwiki.api.Document;
@@ -47,10 +69,13 @@ import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.test.Utils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
@@ -80,15 +105,14 @@ import java.util.Map;
 import java.util.Date;
 
 public class XWiki implements XWikiNotificationInterface {
+    private static final Log log = LogFactory.getLog(XWiki.class);
+
 
     private XWikiConfig config;
     private XWikiStoreInterface store;
     private XWikiRenderingEngine renderingEngine;
     private XWikiPluginManager pluginManager;
     private XWikiNotificationManager notificationManager;
-
-    private UserManager usermanager;
-    private AccessManager accessmanager;
     private Authenticator authenticator;
     private SecurityRealmInterface realm;
 
@@ -966,7 +990,7 @@ public class XWiki implements XWikiNotificationInterface {
 
         if (!password.equals(password2)) {
             // TODO: throw wrong password exception
-            return -1;
+            return -2;
         }
 
         if ((template!=null)&&(!template.equals(""))) {
@@ -1188,7 +1212,7 @@ public class XWiki implements XWikiNotificationInterface {
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
                 if (Param("xwiki.authentication.cookiepath")!=null)
-                    persistent.setCookieLife(Param("xwiki.authentication.cookiepath"));
+                    persistent.setCookiePath(Param("xwiki.authentication.cookiepath"));
                 if (Param("xwiki.authentication.cookielife")!=null)
                     persistent.setCookieLife(Param("xwiki.authentication.cookielife"));
                 if (Param("xwiki.authentication.protection")!=null)
@@ -1227,7 +1251,15 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface doc = getDocument(username, context);
             String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
-            return (password.equals(passwd));
+            boolean result = (password.equals(passwd));
+
+            if (log.isDebugEnabled()) {
+                if (result)
+                 log.debug("Password check for user " + username + " successfull");
+                else
+                 log.debug("Password check for user " + username + " failed");
+            }
+            return result;
         } catch (Throwable e) {
             e.printStackTrace();
             return false;
@@ -1249,6 +1281,7 @@ public class XWiki implements XWikiNotificationInterface {
 
             // Process login out (this only works with FORMS
             if (auth.processLogout(wrappedRequest, response, urlPatternMatcher)) {
+                if (log.isInfoEnabled()) log.info("User " + context.getUser() + " has been logged-out");
                 wrappedRequest.setUserPrincipal(null);
                 return null;
             }
@@ -1256,8 +1289,8 @@ public class XWiki implements XWikiNotificationInterface {
             // In case of virtual server we never use osuser
             // because the fact that it is "static" doesn't
             // allow to dynamically switch databases
-            if ((Param("xwiki.virtual").equals("1"))
-                    || !Param("xwiki.authentication.osuser").equals("1")) {
+            if (("1".equals(Param("xwiki.virtual")))
+                    || !("1".equals(Param("xwiki.authentication.osuser")))) {
                 if (auth.getAuthMethod().equals("BASIC")) {
                        if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
                          return null;
@@ -1274,12 +1307,26 @@ public class XWiki implements XWikiNotificationInterface {
             }
 
             Principal user = wrappedRequest.getUserPrincipal();
+           if (log.isInfoEnabled()) {
+               if (user!=null)
+                   log.info("User " + user.getName() + " is authentified");
+           }
             return user;
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public void logAllow(String username, String page, String action, String info) {
+        if (log.isDebugEnabled())
+          log.debug("Access has been granted for (" + username + "," + page + "," + action + "): " + info);
+    }
+
+    public void logDeny(String username, String page, String action, String info) {
+        if (log.isInfoEnabled())
+          log.info("Access has been denied for (" + username + "," + page + "," + action + "): " + info);
     }
 
     public boolean checkAccess(String action, XWikiDocInterface doc, XWikiContext context)
@@ -1298,6 +1345,7 @@ public class XWiki implements XWikiNotificationInterface {
 
             // Save the user
             context.setUser(username);
+            logAllow(username, doc.getFullName(), action, "login/logout pages");
             return true;
         }
 
@@ -1321,6 +1369,8 @@ public class XWiki implements XWikiNotificationInterface {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
                 return false;
             }
         } catch (XWikiException e) {
@@ -1338,10 +1388,6 @@ public class XWiki implements XWikiNotificationInterface {
         // Save the user
         context.setUser(username);
 
-        // This correspond to the login/logout/loginerror documents
-        if (doc==null)
-            return true;
-
         // Check Rights
         try {
             // Verify access rights and return if ok
@@ -1353,16 +1399,20 @@ public class XWiki implements XWikiNotificationInterface {
             else
                 docname = doc.getFullName();
 
-            if (getAccessManager(context).userHasAccessLevel(username, docname, right))
+            if (getAccessManager(context).userHasAccessLevel(username, docname, right)) {
+                logAllow(username, docname, action, "access manager granted right");
                 return true;
-        } catch (NotFoundException e) {
+            }
+        } catch (Exception e) {
             // This should not happen..
+            logDeny(username, doc.getFullName(), action, "access manager exception " + e.getMessage());
             e.printStackTrace();
             return false;
         }
 
         if (user==null) {
             // Denied Guest need to be authenticated
+            logDeny("unauthentified", doc.getFullName(), action, "Guest has been denied - Redirecting to authentication");
             try {
                 if (context.getRequest()!=null)
                     getAuthenticator().showLogin(context.getRequest(), context.getResponse());
@@ -1372,7 +1422,7 @@ public class XWiki implements XWikiNotificationInterface {
             return false;
         }
         else {
-            // Other user is refused
+            logDeny(username, doc.getFullName(), action, "access manager denied right");
             return false;
         }
     }
@@ -1561,23 +1611,85 @@ public class XWiki implements XWikiNotificationInterface {
         copyWikiWeb(null, sourceWiki, targetWiki, context);
     }
 
-    public boolean createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, XWikiContext context) throws XWikiException {
-        // Make sure user exists
+    public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist, XWikiContext context) throws XWikiException {
+        String database = context.getDatabase();
 
-        // Make sure user does not have other wikis or has right to have multiple wikis
+        try {
+            XWikiDocInterface userdoc = getDocument(wikiAdmin, context);
 
-        // Create Wiki Server page
+            // User does not exist
+            if (userdoc.isNew()) {
+                if (log.isErrorEnabled()) log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "user does not exist");
+                return -2;
+            }
 
-        // Create wiki database
+            // User is not active
+            if (!(userdoc.getIntValue("XWiki.XWikiUsers", "active")==1)) {
+                if (log.isErrorEnabled()) log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "user is not active");
+                return -3;
+            }
 
-        // Copy base wiki
-        copyWiki("base", wikiName, context);
 
-        // Create user page in his wiki, and protect it
+            String wikiForbiddenList = Param("xwiki.virtual.reserved_wikis");
+            if (Util.contains(wikiName, wikiForbiddenList, ", ")) {
+                if (log.isErrorEnabled()) log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki name is forbidden");
+                return -4;
+            }
 
-        // Give admin and edit rights to user to his wiki
+            String wikiServerPage = "XWikiServer" + wikiName;
+            // Verify is server page already exist
+            XWikiDocInterface serverdoc = getDocument("XWiki", wikiServerPage, context);
+            if (serverdoc.isNew()) {
+                // Create Wiki Server page
+                serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
+                serverdoc.setStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
+                saveDocument(serverdoc, context);
+            } else {
+                // If we are not allowed to continue if server page already exists
 
-        return true;
+                if (failOnExist) {
+                    if (log.isErrorEnabled()) log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki server page already exists");
+                    return -5;
+                } else
+                    if (log.isWarnEnabled()) log.warn("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki server page already exists");
+
+            }
+
+            // Create wiki database
+            try {
+             context.setDatabase(getDatabase());
+             getStore().createWiki(wikiName, context);
+            } catch (XWikiException e) {
+                if (log.isErrorEnabled()) {
+                  if (e.getCode()==10010)
+                   log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database already exists");
+                  else if (e.getCode()==10011)
+                   log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database creation failed");
+                  else
+                   log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database creation threw exception", e);
+                }
+            } catch (Exception e) {
+                log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database creation threw exception", e);
+            }
+
+
+            // Copy base wiki
+            copyWiki(baseWikiName, wikiName, context);
+
+            // Create user page in his wiki
+            copyDocument(wikiAdmin, getDatabase(), wikiName, context);
+
+            // Modify rights in user wiki
+            XWikiDocInterface wikiprefdoc = getDocument(wikiName + ":XWiki.XWikiPreferences", context);
+            wikiprefdoc.setStringValue("XWiki.XWikiPreferences", "user", getDatabase() + ":" + wikiAdmin);
+            saveDocument(wikiprefdoc, context);
+            return 1;
+        } catch (Exception e) {
+            log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki creation threw exception", e);
+            return -10;
+        } finally {
+            context.setDatabase(database);
+        }
     }
 
     public String getEncoding() {

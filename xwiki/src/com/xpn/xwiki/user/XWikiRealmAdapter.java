@@ -33,7 +33,7 @@ import java.security.Principal;
 
 public class XWikiRealmAdapter  implements SecurityRealmInterface {
     private XWiki xwiki;
-    private XWikiContext context = new XWikiContext();
+    private XWikiContext context;
 
     public XWikiRealmAdapter() {
     }

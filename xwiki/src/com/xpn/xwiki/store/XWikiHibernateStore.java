@@ -38,6 +38,9 @@ import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,6 +52,8 @@ import java.util.*;
 
 
 public class XWikiHibernateStore implements XWikiStoreInterface {
+
+    private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
 
     private Map connections = new HashMap();
     private int nbConnections = 0;
@@ -140,7 +145,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 				stmt = connection.createStatement();
 			}
 			catch (SQLException sqle) {
-                System.err.println("Failed updating schema: " + sqle.getMessage());
+                if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + sqle.getMessage());
 				throw sqle;
 			}
 
@@ -149,20 +154,18 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
 				final String sql = createSQL[j];
 				try {
-					System.out.println(sql);
+                    if ( log.isDebugEnabled() ) log.debug("Update Schema sql: " + sql);
 					stmt.executeUpdate(sql);
                     connection.commit();
 				}
 				catch (SQLException e) {
                     connection.rollback();
-                    System.err.println("Failed updating schema: " + e.getMessage());
-					// log.error( "Unsuccessful: " + sql );
-					//log.error( e.getMessage() );
+                    if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
 				}
 			}
 		}
 		catch (Exception e) {
-			  System.err.println("Failed updating schema: " + e.getMessage());
+            if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
 		}
 		finally {
 
@@ -192,7 +195,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     public void setDatabase(Session session, XWikiContext context) throws XWikiException {
         String database = context.getDatabase();
         try {
-            System.out.println("Switch database to: " + database);
+            if ( log.isDebugEnabled() ) log.debug("Switch database to: " + database);
              if (database!=null)
               session.connection().setCatalog(database);
         } catch (Exception e) {
@@ -206,11 +209,23 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             throws HibernateException, XWikiException {
 
         Transaction transaction = getTransaction(context);
-        if (transaction!=null)
-          return false;
         Session session = getSession(context);
+
+        if (((session==null)&&(transaction!=null))
+            ||((transaction==null)&&(session!=null))) {
+            if ( log.isWarnEnabled() ) log.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
+            return false;
+        }
+
+        if (transaction!=null) {
+          if ( log.isDebugEnabled() ) log.debug("Taking session from context " + session);
+          if ( log.isDebugEnabled() ) log.debug("Taking transaction from context " + transaction);
+          return false;
+        }
         if (session==null) {
-          session = getSessionFactory().openSession();
+         if ( log.isDebugEnabled() ) log.debug("Trying to get session from pool");
+         session = getSessionFactory().openSession();
+         if ( log.isDebugEnabled() ) log.debug("Taken session from pool " + session);
 
          // Keep some statistics about session and connections
          nbConnections++;
@@ -223,15 +238,13 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
              if ((database!=null)&&(!database.equals("")))
               session.connection().setCatalog(database);
          } catch (Exception e) {
-             System.err.println("Failed to setup catalog " + context.getDatabase());
+             if ( log.isErrorEnabled() ) log.error("Failed to setup catalog " + ((context==null) ? "" : context.getDatabase()));
          }
 
+         if ( log.isDebugEnabled() ) log.debug("Trying to open transaction");
          transaction = session.beginTransaction();
+         if ( log.isDebugEnabled() ) log.debug("Opened transaction " + transaction);
          setTransaction(transaction, context);
-        } else {
-           transaction = getTransaction(context);
-           // transaction = session.beginTransaction();
-           // setTransaction(transaction, context);
         }
         return true;
     }
@@ -257,19 +270,21 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         setSession(null, context);
         setTransaction(null, context);
 
-        if (commit) {
-            if (transaction!=null)
+        if (transaction!=null) {
+             if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
+             if (commit) {
              transaction.commit();
-        } else {
+         } else {
             // Don't commit the transaction, can be faster for read-only operations
-            if (transaction!=null)
              transaction.rollback();
+         }
         }
         closeSession(session);
     }
 
     private void closeSession(Session session) throws HibernateException {
         if (session!=null) {
+            if ( log.isDebugEnabled() ) log.debug("Releasing hibernate session " + session);
              Connection connection = session.connection();
              if ((connection!=null)) {
               nbConnections--;
@@ -281,6 +296,46 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
               }
              }
             session.close();
+        }
+    }
+
+    public void cleanUp(XWikiContext context) {
+        try {
+            Session session = getSession(context);
+            if (session!=null) {
+                if ( log.isWarnEnabled() ) log.warn("Cleanup of session was needed: " + session);
+                endTransaction(context, false);
+            }
+        } catch (HibernateException e) {
+        }
+    }
+
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
+        String database = context.getDatabase();
+        Statement stmt = null;
+        try {
+            bTransaction = beginTransaction(context);
+            Session session = getSession(context);
+            Connection connection = session.connection();
+            stmt = connection.createStatement();
+            stmt.execute("create database " + wikiName);
+            endTransaction(context, true);
+        }
+        catch (Exception e) {
+            Object[] args = { wikiName  };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE,
+                    "Exception while create wiki database {0}", e, args);
+        } finally {
+            context.setDatabase(database);
+            try {
+                if (stmt!=null)
+                    stmt.close();
+            } catch (Exception e) {}
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
         }
     }
 
@@ -471,10 +526,12 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         return doc;
     }
 
+
     public void deleteXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
         try {
             checkHibernate(context);
-            beginTransaction(context);
+            bTransaction = beginTransaction(context);
             Session session = getSession(context);
 
             if (doc.getStore()==null) {
@@ -487,7 +544,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             List attachlist = doc.getAttachmentList();
             for (int i=0;i<attachlist.size();i++) {
                 XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                deleteXWikiAttachment(attachment, context, false);
+                deleteXWikiAttachment(attachment, false, context, false);
             }
 
             BaseClass bclass = doc.getxWikiClass();
@@ -514,14 +571,16 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             }
 
             session.delete(doc);
-            endTransaction(context, true);
+            if (bTransaction)
+             endTransaction(context, true);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
                     "Exception while deleting document {0}", e, args);
         }finally {
             try {
-                endTransaction(context, false);
+                if (bTransaction)
+                 endTransaction(context, false);
             } catch (Exception e) {}
         }
     }
@@ -535,6 +594,10 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             if (doc.getStore()==null) {
                 doc = loadXWikiDoc(doc, context);
             }
+
+            if (doc.getRCSArchive()==null)
+                return new Version[0];
+
             Node[] nodes = doc.getRCSArchive().changeLog();
             Version[] versions = new Version[nodes.length];
             for (int i=0;i<nodes.length;i++) {
@@ -1033,7 +1096,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             List list = doc.getAttachmentList();
             for (int i=0;i<list.size();i++) {
                 XWikiAttachment attachment = (XWikiAttachment) list.get(i);
-                saveAttachment(attachment, context, false);
+                saveAttachment(attachment, false, context, false);
             }
 
             if (bTransaction)
@@ -1052,6 +1115,10 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     }
 
     public void saveAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        saveAttachment(attachment, true, context, bTransaction);
+    }
+
+    public void saveAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
               checkHibernate(context);
@@ -1067,8 +1134,9 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             else
                 session.update(attachment);
 
-            if (bTransaction) {
+            if (parentUpdate)
                 saveXWikiDoc(attachment.getDoc(), context, false);
+            if (bTransaction) {
                 endTransaction(context, true);
             }
         }
@@ -1083,8 +1151,11 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             } catch (Exception e) {}
         }
     }
-
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        saveAttachmentContent(attachment, true, context, bTransaction);
+    }
+
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             XWikiAttachmentContent content = attachment.getAttachment_content();
             if (content.isContentDirty()) {
@@ -1113,8 +1184,9 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             else
                 session.update(archive);
 
+            if (parentUpdate)
+             saveXWikiDoc(attachment.getDoc(), context, false);
             if (bTransaction) {
-                saveXWikiDoc(attachment.getDoc(), context, false);
                 endTransaction(context, true);
             }
         }
@@ -1190,8 +1262,11 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         }
     }
 
+    public void deleteXWikiAttachment(XWikiAttachment attachment,  XWikiContext context, boolean bTransaction) throws XWikiException {
+           deleteXWikiAttachment(attachment, true, context, bTransaction);
+    }
 
-    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
        try {
             if (bTransaction) {
                checkHibernate(context);
@@ -1207,20 +1282,22 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
            session.delete(attachment.getAttachment_archive());
            session.delete(attachment);
 
+           if (parentUpdate) {
+               List list = attachment.getDoc().getAttachmentList();
+               for (int i=0;i<list.size();i++) {
+                   XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                   if (attachment.getFilename().equals(attach.getFilename())) {
+                       list.remove(i);
+                       break;
+                   }
+               }
+               saveXWikiDoc(attachment.getDoc(), context, false);
+           }
            if (bTransaction) {
-                List list = attachment.getDoc().getAttachmentList();
-                for (int i=0;i<list.size();i++) {
-                    XWikiAttachment attach = (XWikiAttachment) list.get(i);
-                    if (attachment.getFilename().equals(attach.getFilename())) {
-                        list.remove(i);
-                        break;
-                    }
-                }
-                saveXWikiDoc(attachment.getDoc(), context, false);
-                endTransaction(context, true);
-              }
-            }
-            catch (Exception e) {
+               endTransaction(context, true);
+           }
+       }
+       catch (Exception e) {
                 Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
                 throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
                         "Exception while deleting attachment {0} of document {1}", e, args);
@@ -1306,16 +1383,6 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         }
     }
 
-    public void cleanUp(XWikiContext context) {
-        try {
-            Session session = getSession(context);
-            if (session!=null) {
-                System.err.println("Cleanup of db connection was needed: " + XWiki.getRequestURL(context.getRequest()));
-                endTransaction(context, false);
-            }
-        } catch (HibernateException e) {
-        }
-    }
 
 
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
@@ -1349,7 +1416,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 String name = (String) result[0] + "." + (String)result[1];
                 list.add(name);
             }
-            endTransaction(context, false);
+            if (bTransaction)
+             endTransaction(context, false);
             return list;
         }
         catch (Exception e) {

@@ -676,7 +676,7 @@
     <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/XWikiTest.java">
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1287" column="49" selection-start="0" selection-end="57635" vertical-scroll-proportion="0.6535948">
+          <state line="1287" column="49" selection-start="0" selection-end="57635" vertical-scroll-proportion="1.1764706">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -685,63 +685,63 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/api/Api.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="56" column="44" selection-start="1890" selection-end="1890" vertical-scroll-proportion="0.7410256">
+          <state line="56" column="44" selection-start="1890" selection-end="1890" vertical-scroll-proportion="1.3136364">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://C:/dev/java/osaccess/src/java/com/opensymphony/module/access/AccessManager.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1296" column="28" selection-start="0" selection-end="44227" vertical-scroll-proportion="0.5189543">
+          <state line="1296" column="28" selection-start="0" selection-end="44227" vertical-scroll-proportion="0.9341177">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://C:/dev/java/osaccess/src/java/com/opensymphony/module/access/provider/ResourceProvider.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="283" column="19" selection-start="9852" selection-end="9852" vertical-scroll-proportion="1.0143791">
+          <state line="283" column="19" selection-start="9852" selection-end="9852" vertical-scroll-proportion="1.8258823">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/UserTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="324" column="38" selection-start="14861" selection-end="14875" vertical-scroll-proportion="0.35686275">
+          <state line="324" column="38" selection-start="14861" selection-end="14875" vertical-scroll-proportion="0.64235294">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/build.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="60" column="386" selection-start="2923" selection-end="2923" vertical-scroll-proportion="0.35947713">
+          <state line="60" column="386" selection-start="2923" selection-end="2923" vertical-scroll-proportion="0.64705884">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/XWikiTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="36" column="13" selection-start="1292" selection-end="1292" vertical-scroll-proportion="0.021794872">
+          <state line="36" column="13" selection-start="1292" selection-end="1292" vertical-scroll-proportion="0.038636364">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/XWikiResourceProvider.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="302" column="0" selection-start="12540" selection-end="12540" vertical-scroll-proportion="0.7176471">
+          <state line="302" column="0" selection-start="12540" selection-end="12540" vertical-scroll-proportion="1.2917647">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/XWikiBaseProvider.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="66" column="26" selection-start="1981" selection-end="1990" vertical-scroll-proportion="0.34615386">
+          <state line="66" column="26" selection-start="1981" selection-end="1990" vertical-scroll-proportion="0.6136364">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/attach.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="54" column="54" selection-start="1647" selection-end="1647" vertical-scroll-proportion="0.9843137">
+          <state line="54" column="54" selection-start="1647" selection-end="1647" vertical-scroll-proportion="1.7717648">
             <folding />
           </state>
         </provider>
@@ -894,7 +894,7 @@
     <property name="cvs_file_history_treeOrder0" value="0" />
   </component>
   <component name="RunManager">
-    <activeType name="JUnit" />
+    <activeType name="WebApp" />
     <tempConfiguration name="ServletAuthTest" type="JUnit" default="false" selected="false">
       <module name="xwiki" />
       <option name="PACKAGE_NAME" value="com.xpn.xwiki.test" />
@@ -962,7 +962,7 @@
     <configuration name="&lt;template&gt;" type="WebLogic Instance" default="true" selected="false">
       <setting name="WEBLOGIC_INSTANCE_CONFIGURATION_NAME" value="" />
     </configuration>
-    <configuration name="AllTests" type="JUnit" default="false" selected="true">
+    <configuration name="AllTests" type="JUnit" default="false" selected="false">
       <module name="xwiki" />
       <option name="PACKAGE_NAME" value="" />
       <option name="MAIN_CLASS_NAME" value="" />
@@ -1226,7 +1226,7 @@
       <option name="WORKING_DIRECTORY" value="C:\dev\java\xwiki\build\xwikibase_test" />
       <option name="ADDITIONAL_CLASS_PATH" />
     </configuration>
-    <configuration name="VelocityRenderTest" type="JUnit" default="false" selected="false">
+    <configuration name="VelocityRenderTest" type="JUnit" default="false" selected="true">
       <module name="xwikibase" />
       <option name="PACKAGE_NAME" value="com.xpn.xwiki.test" />
       <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.VelocityRenderTest" />
@@ -1340,13 +1340,13 @@
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.48047337" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.34918034" order="7" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.31957927" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.27346277" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32781065" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23572594" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3112426" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27993527" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39408284" order="2" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.39408284" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="CVS File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3893491" order="3" />
@@ -1480,7 +1480,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1287" column="49" selection-start="0" selection-end="57635" vertical-scroll-proportion="0.6535948">
+        <state line="1287" column="49" selection-start="0" selection-end="57635" vertical-scroll-proportion="1.1764706">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1489,63 +1489,63 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/api/Api.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="44" selection-start="1890" selection-end="1890" vertical-scroll-proportion="0.7410256">
+        <state line="56" column="44" selection-start="1890" selection-end="1890" vertical-scroll-proportion="1.3136364">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://C:/dev/java/osaccess/src/java/com/opensymphony/module/access/AccessManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1296" column="28" selection-start="0" selection-end="44227" vertical-scroll-proportion="0.5189543">
+        <state line="1296" column="28" selection-start="0" selection-end="44227" vertical-scroll-proportion="0.9341177">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://C:/dev/java/osaccess/src/java/com/opensymphony/module/access/provider/ResourceProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="283" column="19" selection-start="9852" selection-end="9852" vertical-scroll-proportion="1.0143791">
+        <state line="283" column="19" selection-start="9852" selection-end="9852" vertical-scroll-proportion="1.8258823">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/UserTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="324" column="38" selection-start="14861" selection-end="14875" vertical-scroll-proportion="0.35686275">
+        <state line="324" column="38" selection-start="14861" selection-end="14875" vertical-scroll-proportion="0.64235294">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="386" selection-start="2923" selection-end="2923" vertical-scroll-proportion="0.35947713">
+        <state line="60" column="386" selection-start="2923" selection-end="2923" vertical-scroll-proportion="0.64705884">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/XWikiTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="13" selection-start="1292" selection-end="1292" vertical-scroll-proportion="0.021794872">
+        <state line="36" column="13" selection-start="1292" selection-end="1292" vertical-scroll-proportion="0.038636364">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/XWikiResourceProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="302" column="0" selection-start="12540" selection-end="12540" vertical-scroll-proportion="0.7176471">
+        <state line="302" column="0" selection-start="12540" selection-end="12540" vertical-scroll-proportion="1.2917647">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/user/XWikiBaseProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="26" selection-start="1981" selection-end="1990" vertical-scroll-proportion="0.34615386">
+        <state line="66" column="26" selection-start="1981" selection-end="1990" vertical-scroll-proportion="0.6136364">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/attach.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="54" selection-start="1647" selection-end="1647" vertical-scroll-proportion="0.9843137">
+        <state line="54" column="54" selection-start="1647" selection-end="1647" vertical-scroll-proportion="1.7717648">
           <folding />
         </state>
       </provider>

@@ -56,7 +56,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         return evaluate(content, name, vcontext);
     }
 
-    public static VelocityContext prepareContext(XWikiContext context, boolean bInternal) {
+    public static VelocityContext prepareContext(XWikiContext context) {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext==null)
             vcontext = new VelocityContext();

@@ -91,7 +91,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Default skin with copyright and w3 validator icons and links" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed wiki links with aliases when doc does not exist&#10;Added radeox modified code to CVS&#10;&#10;Fixed preview which was not transmitting object info&#10;Implemented preview and edit tests with objects&#10;&#10;Fixed context modification when doing includes&#10;&#10;New Authentication and Access rights tests&#10;Fixed virtual authentication (main wiki and local wiki are used)&#10;New Virtual server tests&#10;&#10;Implemented Context wrapper with security (programming rights)&#10;Have templates make no use of the restricted API&#10;&#10;Added Util tests&#10;Optimize imports" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -864,7 +864,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/render/XWikiVelocityRenderer.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="66" column="0" selection-start="2665" selection-end="2665" vertical-scroll-proportion="0.5353075">
+          <state line="58" column="69" selection-start="2240" selection-end="2240" vertical-scroll-proportion="0.55125284">
             <folding />
           </state>
         </provider>
@@ -1665,7 +1665,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/render/XWikiVelocityRenderer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="0" selection-start="2665" selection-end="2665" vertical-scroll-proportion="0.5353075">
+        <state line="58" column="69" selection-start="2240" selection-end="2240" vertical-scroll-proportion="0.55125284">
           <folding />
         </state>
       </provider>

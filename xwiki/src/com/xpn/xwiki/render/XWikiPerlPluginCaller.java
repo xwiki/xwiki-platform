@@ -29,11 +29,13 @@ public class XWikiPerlPluginCaller extends InlineJavaPerlCaller {
 
     public XWikiPerlPluginCaller() throws InlineJavaException {
       super();
+        System.err.println("perlCaller registered at port 7890");
       XWikiPerlPluginRenderer.setPerlCaller("7890", this);
      }
 
     public XWikiPerlPluginCaller(String port) throws InlineJavaException {
       super();
+      System.err.println("perlCaller registered at port " + port);
       XWikiPerlPluginRenderer.setPerlCaller(port, this);
      }
 

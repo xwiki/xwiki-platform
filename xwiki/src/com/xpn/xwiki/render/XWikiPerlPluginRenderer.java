@@ -113,6 +113,7 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
         while (true) {
             perlCaller = (InlineJavaPerlCaller) perlCallers.get(javaserverport);
             if (perlCaller!=null) {
+                System.err.println("perlCaller found");
                 break;
             }
             else {

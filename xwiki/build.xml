@@ -286,6 +286,7 @@
                     port="9080" todir="${test.reports.dir}"/>
             </containerset>
         </cactus>
+        <delete file="${cactus.warfile}" />
     </target>
 
     <target name="test"  depends="test.client, test.server" />
@@ -302,7 +303,7 @@
         </java>
     </target>
 
-    <target name="junit.report" depends="test">
+    <target name="junit.report" depends="">
         <mkdir dir="${doc.dir}/junit" />
         <junitreport todir="${doc.dir}/junit">
             <fileset dir="${test.reports.dir}">
@@ -339,7 +340,7 @@
 
     </target>
 
-    <target name="bin.dist" depends="release, javadoc">
+    <target name="bin.dist" depends="release, test, javadoc">
         <mkdir dir="${dist.dir}" />
         <property name="bin.tarfile" value="${dist.dir}/xwiki-${version}.tar.gz" />
         <delete file="${bin.tarfile}" />
@@ -352,14 +353,13 @@
         </tar>
     </target>
 
-    <target name="src.dist" depends="release, javadoc">
+    <target name="src.dist" depends="release, test, javadoc">
         <mkdir dir="${dist.dir}" />
         <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar.gz" />
         <delete file="${src.tarfile}" />
 
         <tar compression="gzip" tarfile="${src.tarfile}">
             <tarfileset dir="CVS" prefix="CVS" />
-            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
             <tarfileset dir="${lib.dir}" prefix="lib" />
             <tarfileset dir="${doc.dir}" prefix="doc" />
             <tarfileset dir="${src.dir}" prefix="src" />

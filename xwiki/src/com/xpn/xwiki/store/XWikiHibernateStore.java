@@ -158,6 +158,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             endTransaction(true);
+            doc.setNew(false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_FILE,

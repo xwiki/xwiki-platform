@@ -103,6 +103,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 doc.getRCSArchive().save(vfile.toString());
             }
             doc.setMostRecent(true);
+            doc.setNew(false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SAVING_FILE,

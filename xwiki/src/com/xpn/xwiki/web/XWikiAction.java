@@ -25,6 +25,7 @@ package com.xpn.xwiki.web;
 import org.apache.struts.action.Action;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
@@ -32,13 +33,14 @@ import javax.servlet.http.HttpServlet;
 
 public class XWikiAction extends Action {
 
-    public XWiki getXWiki() throws XWikiException {
+    public XWiki getXWiki(XWikiContext context) throws XWikiException {
       XWiki xwiki = (XWiki) servlet.getServletContext().getAttribute("xwiki");
       if (xwiki == null) {
-          String path = servlet.getServletContext().getRealPath("xwiki.cfg");
-          xwiki = new XWiki(path);
+          String path = servlet.getServletContext().getRealPath("WEB-INF/xwiki.cfg");
+          xwiki = new XWiki(path, context);
           servlet.getServletContext().setAttribute("xwiki", xwiki);
       }
+        context.setWiki(xwiki);
         return xwiki;
     }
 }

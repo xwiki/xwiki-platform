@@ -24,17 +24,15 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.*;
-import org.apache.ecs.xhtml.object;
 
 import java.io.*;
 import java.util.*;
@@ -52,8 +50,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     private String hibpath;
 
-    public XWikiHibernateStore(XWiki xwiki) {
-        setPath(xwiki.Param("xwiki.store.hibernate.path"));
+    public XWikiHibernateStore(XWiki xwiki, XWikiContext context) {
+        String path = xwiki.ParamAsRealPath("xwiki.store.hibernate.path", context);
+        setPath(path);
     }
 
     public XWikiHibernateStore(String hibpath) {
@@ -72,7 +71,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     // Helper Methods
     private void initHibernate() throws HibernateException {
         // Load Configuration and build SessionFactory
-        configuration =  new Configuration().configure(getPath());
+        String path = getPath();
+        if (path!=null)
+         configuration =  (new Configuration()).configure(new File(path));
+        else
+         configuration = new Configuration().configure();
         sessionFactory = configuration.buildSessionFactory();
     }
 

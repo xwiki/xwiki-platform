@@ -25,6 +25,7 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.jrcs.rcs.*;
 import java.io.*;
@@ -39,8 +40,8 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
 
-    public XWikiRCSFileStore(XWiki xwiki) {
-        String rcspath = xwiki.Param("xwiki.store.rcs.path");
+    public XWikiRCSFileStore(XWiki xwiki, XWikiContext context) {
+        String rcspath = xwiki.ParamAsRealPath("xwiki.store.rcs.path", context);
         setPath(rcspath);
     }
 

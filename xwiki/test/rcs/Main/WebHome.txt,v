@@ -1,0 +1,45 @@
+head	1.2;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.2
+date	2004.01.12.18.57.21;	author Ludovic_Dubost;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2004.01.12.18.57.21;	author Ludovic_Dubost;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.2
+log
+@@
+text
+@%META:TOPICINFO{author="JulesVerne" date="1073930241327" version="1.2" format="" }%
+%META:TOPICPARENT{name="Main.WebHome" }%
+Hello 1
+Intermediary line
+Hello 2
+Hello 3
+@
+
+
+1.1
+log
+@Main.WebHome
+@
+text
+@d1 1
+a1 1
+%META:TOPICINFO{author="VirtorHugo" date="1073930241297" version="1.1" format="" }%
+d4 1
+@

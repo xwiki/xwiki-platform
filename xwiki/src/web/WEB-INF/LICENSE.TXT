@@ -1,0 +1,16 @@
+/*
+XWiki is LGPL software. See LGPL.txt for more information.
+XWiki is inspired from Wiki Wiki webs and in particular from the perl twiki from twiki.org.
+
+Contributions from:
+ * Some code from jspwiki.org (LGPL)
+
+Libraries used:
+ * Jakarta TomCat (Apache License)
+ * Jakarta Commons (Apache License)
+ * Jakarta Log4J (Apache License)
+ * Hibernate (LGPL)
+
+Sample Configuraton & Content is freely redistributable and modifiable to make sure it is not LGPL tainted.
+This allows to use xwiki as development platform without tainting your content and applications to the GPL.
+*/

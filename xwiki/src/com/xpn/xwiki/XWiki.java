@@ -35,6 +35,9 @@ import org.apache.ecs.html.TextArea;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.Filter;
 
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
+
 public class XWiki {
 
     private XWikiConfig config;
@@ -42,14 +45,16 @@ public class XWiki {
     private XWikiRenderingEngine renderingEngine;
     private MetaClass metaclass = MetaClass.getMetaClass();
 
-    public XWiki(String path) throws XWikiException {
+    public XWiki(String path, XWikiContext context) throws XWikiException {
       config = new XWikiConfig(path);
       String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
       try {
-         Class[] classes = new Class[1];
+         Class[] classes = new Class[2];
          classes[0] = this.getClass();
-         Object[] args = new Object[1] ;
+         classes[1] = context.getClass();
+         Object[] args = new Object[2] ;
          args[0] = this;
+         args[1] = context;
          store = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
         }
         catch (InvocationTargetException e)
@@ -65,6 +70,7 @@ public class XWiki {
                                       "Cannot load store class {0}",e, args);
         }
         renderingEngine = new XWikiRenderingEngine(this);
+        context.setWiki(this);
     }
 
     public XWikiConfig getConfig() {
@@ -74,6 +80,18 @@ public class XWiki {
     public String Param(String key) {
         return getConfig().getProperty(key);
     }
+
+    public String ParamAsRealPath(String key, XWikiContext context) {
+        String path = getConfig().getProperty(key);
+        if (context==null)
+         return path;
+        HttpServlet servlet = context.getServlet();
+        if (servlet==null)
+            return path;
+        else
+            return servlet.getServletContext().getRealPath(path);
+    }
+
 
     public String Param(String key, String default_value) {
         return getConfig().getProperty(key, default_value);

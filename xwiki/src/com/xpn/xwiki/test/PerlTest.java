@@ -38,8 +38,8 @@ public class PerlTest extends TestCase {
     XWikiRenderingEngine wikiengine;
 
     public PerlTest() throws XWikiException {
-        xwiki = new XWiki("c:/dev/java/xwiki/src/web/xwiki.cfg");
-        context = new XWikiContext(xwiki);
+        context = new XWikiContext();
+        xwiki = new XWiki("c:/dev/java/xwiki/src/web/xwiki.cfg", context);
         perlplugin = new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
                         xwiki.Param("xwiki.perl.pluginspath"),
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0);

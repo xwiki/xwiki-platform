@@ -26,12 +26,16 @@ import com.xpn.xwiki.util.Util;
 
 import java.util.Hashtable;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+
 public class XWikiContext extends Hashtable {
 
    private XWiki wiki;
+   private HttpServlet servlet;
+   private HttpServletRequest request;
 
-   public XWikiContext(XWiki wiki) {
-       this.wiki = wiki;
+   public XWikiContext() {
    }
 
    public XWiki getWiki() {
@@ -45,6 +49,26 @@ public class XWikiContext extends Hashtable {
            this.put("util", util);
        }
        return util;
+    }
+
+    public void setWiki(XWiki wiki) {
+        this.wiki = wiki;
+    }
+
+    public HttpServlet getServlet() {
+        return servlet;
+    }
+
+    public void setServlet(HttpServlet servlet) {
+        this.servlet = servlet;
+    }
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
     }
 
 

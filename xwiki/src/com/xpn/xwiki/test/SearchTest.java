@@ -45,8 +45,6 @@ public class SearchTest extends TestCase {
     }
 
     public void testSearch(XWikiHibernateStore hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
-        hibstore.checkHibernate();
-        hibstore.beginTransaction();
         List lresult = hibstore.searchDocuments(wheresql);
         String[] result = {};
         result = (String[]) lresult.toArray(result);
@@ -55,7 +53,6 @@ public class SearchTest extends TestCase {
             assertEquals("Element " + i + " of search " + wheresql + " is different",
                     result[i], expected[i]);
         }
-        hibstore.endTransaction(false);
     }
 
     public void testSearch() throws HibernateException, XWikiException {

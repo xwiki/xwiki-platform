@@ -24,13 +24,8 @@ package com.xpn.xwiki.objects;
 
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.*;
 
-import javax.mail.internet.ParameterList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
 import java.io.Serializable;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {

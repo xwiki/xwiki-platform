@@ -92,13 +92,13 @@ public class ViewEditAction extends XWikiAction
         action = mapping.getName();
 
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
-        XWiki xwiki = getXWiki();
+        XWikiContext context = new XWikiContext();
+        context.setServlet(servlet);
+        XWiki xwiki = getXWiki(context);
         XWikiDocInterface doc;
         doc = xwiki.getDocumentFromPath(request.getPathInfo());
-        XWikiContext context = new XWikiContext(xwiki);
         context.put("doc", doc);
-        context.put("xwiki", xwiki);
-        context.put("request", request);
+        context.setRequest(request);
         session.setAttribute("doc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);

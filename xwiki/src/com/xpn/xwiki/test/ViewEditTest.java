@@ -1,11 +1,12 @@
 
+package com.xpn.xwiki.test;
+
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebResponse;
 import org.apache.struts.action.ActionServlet;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletConfig;
 import java.io.IOException;
 
 import net.sf.hibernate.HibernateException;
@@ -38,9 +39,12 @@ import com.xpn.xwiki.XWikiException;
 
 public class ViewEditTest extends ServletTestCase {
 
-    public static String hibpath = "/hibernate-test.cfg.xml";
+    public static String hibpath = "./hibernate-test.cfg.xml";
 
-    public void setUp() throws HibernateException, XWikiException {
+    public void setUp() {};
+    public void cleanUp() {};
+
+    public void clientSetUp() throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(com.xpn.xwiki.test.StoreTest.web, com.xpn.xwiki.test.StoreTest.name);
@@ -50,8 +54,8 @@ public class ViewEditTest extends ServletTestCase {
         hibstore.saveXWikiDoc(doc1);
     }
 
-    public void beginViewNotOk(WebRequest webRequest)
-    {
+    public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        clientSetUp();
         webRequest.setURL("127.0.0.1:9080", "/xwiki", "/bin", "/view/" + com.xpn.xwiki.test.StoreTest.web + "/"
                             + "Gloubiboulga", "");
     }
@@ -61,7 +65,8 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Page should have generated an error", result.indexOf("No row")!=-1);
     }
 
-    public void testViewNotOk() throws IOException, ServletException {
+    public void testViewNotOk() throws IOException, ServletException, HibernateException, XWikiException {
+        clientSetUp();
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);

@@ -79,7 +79,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         XWikiDocInterface parentdoc = (XWikiDocInterface) context.get("doc");
 
         // TODO: check if the document exists
-        XWiki xwiki = (XWiki) context.get("xwiki");
+        XWiki xwiki = context.getWiki();
         XWikiDocInterface doc;
         try {
          doc = xwiki.getDocument(web, topic);

@@ -36,9 +36,8 @@ public class RenderTest extends TestCase {
     private static XWikiContext context;
 
     public RenderTest() throws XWikiException {
-        xwiki = new XWiki("c:/dev/java/xwiki/src/web/xwiki.cfg");
-        context = new XWikiContext(xwiki);
-        context.put("xwiki", xwiki);
+        context = new XWikiContext();
+        xwiki = new XWiki("./xwiki.cfg", context);
     }
 
     public static void renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {

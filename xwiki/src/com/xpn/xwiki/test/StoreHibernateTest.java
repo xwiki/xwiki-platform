@@ -50,8 +50,11 @@ public class StoreHibernateTest extends StoreTest {
            }
        }
 
-
     public static void cleanUp(XWikiHibernateStore hibstore, XWikiContext context) throws HibernateException, XWikiException {
+        cleanUp(hibstore, true, context);
+    }
+
+    public static void cleanUp(XWikiHibernateStore hibstore, boolean bSchemaUpdate, XWikiContext context) throws HibernateException, XWikiException {
         hibstore.checkHibernate(context);
         hibstore.beginTransaction(context);
         String database = context.getDatabase();
@@ -60,7 +63,8 @@ public class StoreHibernateTest extends StoreTest {
         StoreHibernateTest.runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
         StoreHibernateTest.runSQL(hibstore, "create database " + context.getDatabase(), context);
         hibstore.endTransaction(context, true);
-        hibstore.updateSchema(context);
+        if (bSchemaUpdate)
+         hibstore.updateSchema(context);
     }
 
     public void setUp() throws HibernateException, XWikiException {

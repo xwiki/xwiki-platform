@@ -1904,6 +1904,13 @@ public class XWiki implements XWikiNotificationInterface {
                 log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database creation threw exception", e);
             }
 
+            try {
+                updateDatabase(wikiName, context);
+            } catch (Exception e) {
+                log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database shema update threw exception", e);
+                return -6;
+            }
+
 
             // Copy base wiki
             copyWiki(baseWikiName, wikiName, context);

@@ -4,9 +4,6 @@
 <div id="xwikinav_header">
 <div class="xwikiactions">
 </div>
-<div id="xwikiwebmenu">
-$!xwiki.getWebPreference("menu")
-</div>
 </div>
 #if($message)
 <div id="xwikimessage">

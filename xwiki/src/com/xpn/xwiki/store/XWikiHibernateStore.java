@@ -126,10 +126,11 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         DatabaseMetadata meta;
         Statement stmt=null;
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
+        boolean bTransaction = true;
 
 		try {
 			try {
-                beginTransaction(context);
+                bTransaction = beginTransaction(context);
                 transaction = getTransaction(context);
                 session = getSession(context);
                 connection = session.connection();
@@ -167,7 +168,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
 			try {
 				if (stmt!=null) stmt.close();
-                endTransaction(context, true);
+                if (bTransaction)
+                 endTransaction(context, true);
 			}
 			catch (Exception e) {
 			}
@@ -286,7 +288,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -551,7 +553,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -605,7 +607,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -655,7 +657,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
             for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
@@ -692,7 +694,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -723,7 +725,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -809,7 +811,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -858,7 +860,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -907,7 +909,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -989,7 +991,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1020,7 +1022,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1050,7 +1052,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1089,7 +1091,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1130,7 +1132,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1159,7 +1161,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         try {
             if (bTransaction) {
               checkHibernate(context);
-              beginTransaction(context);
+              bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -1190,7 +1192,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
        try {
             if (bTransaction) {
                checkHibernate(context);
-               beginTransaction(context);
+               bTransaction = beginTransaction(context);
             }
 
             Session session = getSession(context);
@@ -1233,9 +1235,10 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     }
 
     public List getClassList(XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
         try {
              checkHibernate(context);
-             beginTransaction(context);
+             bTransaction = beginTransaction(context);
              Session session = getSession(context);
 
             Query query = session.createQuery("select bclass.name from BaseClass as bclass");
@@ -1245,7 +1248,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 String name = (String)it.next();
                 list.add(name);
             }
-            endTransaction(context, false);
+            if (bTransaction)
+             endTransaction(context, false);
             return list;
         }
         catch (Exception e) {
@@ -1253,6 +1257,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                     "Exception while searching class list", e);
         } finally {
             try {
+                  if (bTransaction)
                    endTransaction(context, false);
             } catch (Exception e) {}
         }
@@ -1263,9 +1268,14 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     }
 
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
+
+        if (sql==null)
+         return null;
+
         try {
             checkHibernate(context);
-            beginTransaction(context);
+            bTransaction = beginTransaction(context);
             Session session = getSession(context);
             Query query = session.createQuery(sql.toString());
             if (start!=0)
@@ -1277,7 +1287,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             while (it.hasNext()) {
                 list.add(it.next());
             }
-            endTransaction(context, false);
+            if (bTransaction)
+             endTransaction(context, false);
             return list;
         }
         catch (Exception e) {
@@ -1286,7 +1297,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                     "Exception while searching documents with sql {0}", e, args);
         } finally {
             try {
-                   endTransaction(context, false);
+                   if (bTransaction)
+                     endTransaction(context, false);
             } catch (Exception e) {}
         }
     }
@@ -1304,9 +1316,13 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
 
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
         try {
+            if (wheresql==null)
+             wheresql = "";
+
             checkHibernate(context);
-            beginTransaction(context);
+            bTransaction = beginTransaction(context);
             Session session = getSession(context);
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name from XWikiSimpleDoc as doc");
             wheresql.trim();
@@ -1340,7 +1356,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                     "Exception while searching documents with sql {0}", e, args);
         } finally {
             try {
-                   endTransaction(context, false);
+                   if (bTransaction)
+                     endTransaction(context, false);
             } catch (Exception e) {}
         }
     }

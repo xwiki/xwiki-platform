@@ -25,6 +25,7 @@ package com.xpn.xwiki;
 import net.sf.hibernate.JDBCException;
 import org.apache.velocity.exception.MethodInvocationException;
 
+import javax.servlet.ServletException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -238,6 +239,8 @@ public class XWikiException extends Exception {
                 (((JDBCException)exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
                 (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+            } else if (exception instanceof ServletException) {
+                (((ServletException)exception).getRootCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }
@@ -252,6 +255,8 @@ public class XWikiException extends Exception {
                 (((JDBCException)exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
                 (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+            } else if (exception instanceof ServletException) {
+                (((ServletException)exception).getRootCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }

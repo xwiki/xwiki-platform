@@ -192,7 +192,11 @@
         <root url="jar://$PROJECT_DIR$/lib/struts.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/share" />
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/upload/org" />
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/validator/org" />
+      </SOURCES>
     </library>
     <library name="Ant">
       <CLASSES>

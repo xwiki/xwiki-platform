@@ -172,9 +172,9 @@ public class ViewEditAction extends XWikiAction
         String baseUrl = "";
         if (request.getServletPath().startsWith ("/testbin")) {
             dbname = "xwikitest";
-            baseUrl = url.substring(0, url.indexOf("/testbin/" + action)) + "/testbin/";
+            baseUrl = url.substring(0, url.indexOf("/testbin/")) + "/testbin/";
         } else {
-            baseUrl = url.substring(0, url.indexOf("/bin/" + action)) + "/bin/";
+            baseUrl = url.substring(0, url.indexOf("/bin/")) + "/bin/";
         }
 
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);

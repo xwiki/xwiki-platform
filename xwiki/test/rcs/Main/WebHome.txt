@@ -8,8 +8,8 @@
 <translation>0</translation>
 <parent>Main.WebHome</parent>
 <author>XWiki.LudovicDubost</author>
-<creationDate>1083255453982</creationDate>
-<date>1083255453982</date>
+<creationDate>1084204991210</creationDate>
+<date>1084204991210</date>
 <version>1.1</version>
 <content>Hello 1
 Hello 2

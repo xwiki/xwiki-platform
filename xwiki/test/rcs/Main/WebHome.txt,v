@@ -6,22 +6,22 @@ comment	@# @;
 
 
 1.4
-date	2004.04.29.18.17.33;	author Ludovic_Dubost;	state Exp;
+date	2004.05.10.18.03.11;	author root;	state Exp;
 branches;
 next	1.3;
 
 1.3
-date	2004.04.29.18.17.33;	author Ludovic_Dubost;	state Exp;
+date	2004.05.10.18.03.11;	author root;	state Exp;
 branches;
 next	1.2;
 
 1.2
-date	2004.04.29.18.17.33;	author Ludovic_Dubost;	state Exp;
+date	2004.05.10.18.03.11;	author root;	state Exp;
 branches;
 next	1.1;
 
 1.1
-date	2004.04.29.18.17.33;	author Ludovic_Dubost;	state Exp;
+date	2004.05.10.18.03.11;	author root;	state Exp;
 branches;
 next	;
 
@@ -44,8 +44,8 @@ text
 <translation>0</translation>
 <parent>Main.WebHome</parent>
 <author>XWiki.LudovicDubost</author>
-<creationDate>1083255453982</creationDate>
-<date>1083255453982</date>
+<creationDate>1084204991210</creationDate>
+<date>1084204991210</date>
 <version>1.1</version>
 <content>Hello 1
 Hello 2
@@ -61,14 +61,14 @@ log
 text
 @d11 2
 a12 8
-<creationDate>1083255453912</creationDate>
-<date>1083255453932</date>
+<creationDate>1084204991106</creationDate>
+<date>1084204991121</date>
 <version>1.3</version>
 <attachment>
 <filename>test1.sxw</filename>
 <filesize>13550</filesize>
 <author></author>
-<date>1083255453912</date>
+<date>1084204991113</date>
 a13 2
 <comment></comment>
 </attachment>
@@ -81,7 +81,7 @@ log
 text
 @d12 10
 a21 2
-<date>1083255453922</date>
+<date>1084204991114</date>
 <version>1.2</version>
 @
 
@@ -93,6 +93,6 @@ log
 text
 @d12 2
 a13 2
-<date>1083255453912</date>
+<date>1084204991106</date>
 <version>1.1</version>
 @

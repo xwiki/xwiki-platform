@@ -27,7 +27,7 @@ use Inline (
 	PORT => 7890,
 	DEBUG => 1,
 	STUDY => ["com.xpn.xwiki.render.XWikiPerlPluginCaller"],
-	CLASSPATH => "c:/dev/java/xwiki/build",
+	CLASSPATH => "../classes",
 	AUTOSTUDY => "1",
 ) ;
 

@@ -28,7 +28,7 @@
     <property file="build.properties" />
 
     <property name="app.name" value="xwiki" />
-    <property name="version"  value="0.1.8" />
+    <property name="version"  value="0.1.9" />
     <property name="pkg"  value="com.xpn.xwiki" />
 
     <property name="src.dir"   value="${basedir}/src" />

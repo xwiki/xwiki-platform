@@ -1005,7 +1005,7 @@ public class XWiki implements XWikiNotificationInterface {
 
         if (bclass.get("validkey")==null) {
             needsUpdate = true;
-            StringClass validkey_class = new StringClass();
+            StringClass validkey_class = new PasswordClass();
             validkey_class.setName("validkey");
             validkey_class.setPrettyName("Validation Key");
             validkey_class.setSize(10);

@@ -76,6 +76,21 @@ public class Utils {
         afilename = filename;
     }
 
+
+    public static void setStandardAccentData() {
+        name = "WebHome";
+        name2 = "Globals";
+        web = "Main";
+        content1 = "Hello 1\nTexte avec des accents: איחפש\nHello 3\n";
+        content3 = "Hello 1\nAutre texte אחטי\nHello 2\nHello 3\n";
+        author = "XWiki.LudovicDubost";
+        author2 = "XWiki.JulesVerne";
+        parent = "Main.WebHome";
+        version = "1.1";
+        version2 = "1.2";
+        afilename = filename;
+    }
+
     public static void setStandardIsoData() {
         name = "Août2002";
         name2 = "Globals";

@@ -1,6 +1,6 @@
 #set($showactions=1)
 #template("editheader.vm")
-<div id="xwikicontent">
+<div id="xwikieditcontent">
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
 <p>
 <input type="hidden" name="template" value="$!doc.getTemplate()" />

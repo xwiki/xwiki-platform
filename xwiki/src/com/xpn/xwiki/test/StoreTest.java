@@ -183,6 +183,14 @@ public abstract class StoreTest extends TestCase {
         testVersionedReadWrite(store, Utils.web, Utils.name);
     }
 
+    public void testVersionedReadWriteWithAccents() throws XWikiException {
+        Utils.setStandardAccentData();
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, Utils.web, Utils.name);
+        testVersionedReadWrite(store, Utils.web, Utils.name);
+    }
+
+
     public void testMediumReadWrite() throws XWikiException {
         Utils.setMediumData();
         XWikiStoreInterface store = getStore();

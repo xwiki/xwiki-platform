@@ -141,6 +141,10 @@ html, body {
    text-align: justify;
 }
 
+#xwikieditcontent {
+   margin: 10px;
+}
+
 #xwikinav_footer {
     position: relative;
     display: block;

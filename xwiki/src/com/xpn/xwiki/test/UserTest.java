@@ -52,13 +52,6 @@ public class UserTest extends TestCase {
     private UserManager um;
     private AccessManager am;
 
-    public UserTest() throws XWikiException {
-        context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-    }
-
-
     public XWikiHibernateStore getHibStore() {
         XWikiStoreInterface store = xwiki.getStore();
         if (store instanceof XWikiCacheInterface)
@@ -67,7 +60,10 @@ public class UserTest extends TestCase {
             return (XWikiHibernateStore) store;
     }
 
-    public void setUp() throws HibernateException {
+    public void setUp() throws HibernateException, XWikiException {
+        context = new XWikiContext();
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
         StoreHibernateTest.cleanUp(getHibStore());
         um = xwiki.getUsermanager();
         am = xwiki.getAccessmanager();
@@ -250,18 +246,17 @@ public class UserTest extends TestCase {
         xwiki.flushCache();
         assertTrue("View Access should be allowed",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
-        xwiki.flushCache();
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+        xwiki.flushCache();
         assertFalse("View Access should be refused",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
-        xwiki.flushCache();
         updateRight("XWiki.LudovicDubost", docname,"","view,edit", true,false);
+        xwiki.flushCache();
         assertTrue("Edit Access should be granted",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
-        xwiki.flushCache();
         updateRight("XWiki.LudovicDubost", docname,"","view", false, false);
+        xwiki.flushCache();
         assertFalse("View Access should be refused",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
     }
-
 }

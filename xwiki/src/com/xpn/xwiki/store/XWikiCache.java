@@ -51,6 +51,10 @@ public class XWikiCache implements XWikiCacheInterface {
 
     public XWikiCache(XWikiStoreInterface store) {
         setStore(store);
+        initCache();
+    }
+
+    public void initCache() {
         cache = new Cache(true, false);
         cache.setCapacity(100);
     }
@@ -69,7 +73,7 @@ public class XWikiCache implements XWikiCacheInterface {
     }
 
     public void flushCache() {
-        cache.flushAll(new Date());
+        initCache();
     }
 
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {

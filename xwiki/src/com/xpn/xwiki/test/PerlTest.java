@@ -25,10 +25,14 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.render.XWikiPerlPluginRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
 
 public class PerlTest extends TestCase {
     XWiki xwiki;
@@ -49,6 +53,21 @@ public class PerlTest extends TestCase {
         wikirenderer = new XWikiWikiBaseRenderer();
         // perlplugin = (XWikiPerlPluginRenderer) wikiengine.getRenderer(XWikiPerlPluginRenderer.class.getName());
     }
+
+
+    public XWikiHibernateStore getHibStore() {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
+    }
+
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+    
 
     protected void finalize() throws Throwable {
         super.finalize();

@@ -25,6 +25,9 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -32,6 +35,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
 
 
 public class RenderTest extends TestCase {
@@ -44,6 +48,21 @@ public class RenderTest extends TestCase {
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
     }
+
+    public XWikiHibernateStore getHibStore() {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
+    }
+
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+
+
 
     public static void renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
 

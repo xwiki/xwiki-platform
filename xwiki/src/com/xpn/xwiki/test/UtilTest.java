@@ -25,12 +25,17 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.util.Util;
 import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.util.Hashtable;
+
+import net.sf.hibernate.HibernateException;
 
 
 public class UtilTest extends TestCase {
@@ -44,11 +49,21 @@ public class UtilTest extends TestCase {
         context.setWiki(xwiki);
     }
 
-
-    public void setUp() {
+    public XWikiHibernateStore getHibStore() {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
     }
 
-    public void tearDown() {
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+
+
+    public void setUp() {
     }
 
     public void testTopicInfo() throws IOException {

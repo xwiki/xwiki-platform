@@ -4,10 +4,14 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.plugin.PatternPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
 
 /**
  * ===================================================================
@@ -49,6 +53,18 @@ public class PluginTest extends TestCase {
         pplugin.addPattern("s/[bB]ug\\s+([0-9]+?)/http:\\/\\/bugzilla.xpertnet.biz\\/show_bug.cgi?id=$1/go","bugzilla link","no desc");
     }
 
+    public XWikiHibernateStore getHibStore() {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
+    }
+
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
 
     public void testSmilies() throws XWikiException {
         XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();

@@ -8,8 +8,8 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details, published at 
-# http://www.gnu.org/copyleft/lgpl.html
+# GNU General Public License for more details, published at 
+# http://www.gnu.org/copyleft/gpl.html
 
 use strict ;
 use CGI qw(:standard);

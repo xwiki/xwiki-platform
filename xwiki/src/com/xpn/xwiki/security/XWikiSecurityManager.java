@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * User: ludovic
@@ -22,9 +22,8 @@
 
 package com.xpn.xwiki.security;
 
-import java.security.Permission;
-import java.security.SecurityPermission;
 import java.lang.reflect.ReflectPermission;
+import java.security.Permission;
 
 public class XWikiSecurityManager extends SecurityManager {
     private boolean enabled = false;

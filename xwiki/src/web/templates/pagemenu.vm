@@ -46,8 +46,7 @@ $xwiki.parseContent($pagemenu)
 #else
 <div id="xwikiusermenulinks" class="xwikimenu">
 #set ($user = $context.getUser())
-#set ($userdoc = $xwiki.getDocument($user))
-<a href="../../view/${userdoc.web}/${userdoc.name}">$msg.get("homepage")</a><span class="xwikisep"> | </span>
+<a href="$xwiki.getActionUrl($user, "view")">$msg.get("homepage")</a><span class="xwikisep"> | </span>
 #template("stylesheetlinks.vm")
 </div>
 <div id="xwikipagemenutitle" class="xwikimenu">$msg.get("pagemenu")</div>

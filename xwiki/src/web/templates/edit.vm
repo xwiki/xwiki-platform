@@ -11,8 +11,7 @@
 <p>
 $msg.get("editincludepagemsg")
 #foreach ($page in $pages)
-#set ( $incldoc = $xwiki.getDocument($doc.web , $page) )
-<a href="../../edit/${incldoc.web}/${incldoc.name}">$page</a>&nbsp;
+<a href="$xwiki.getActionUrl($page, "edit")">$page</a>&nbsp;
 #end
 </p>
 #end

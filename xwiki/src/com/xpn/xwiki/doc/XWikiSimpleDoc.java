@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * Created by
@@ -72,6 +72,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private boolean isNew = true;
     private String template;
     private String language;
+    private String database;
 
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = false;
@@ -198,7 +199,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public void setFullName(String name) {
-        // It is not allowed to use this..
+        // Should not be used
     }
 
     public String getFormat() {
@@ -1129,6 +1130,44 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public String getStringValue(String className, String objName) {
         BaseObject obj = getObject(className, 0);
         return obj.getStringValue(objName);
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+
+    public void setFullName(String fullname, XWikiContext context) {
+        if (fullname==null)
+         return;
+
+        int i0 = fullname.lastIndexOf(":");
+        int i1 = fullname.lastIndexOf(".");
+
+        if (i0!=-1) {
+            database = fullname.substring(0,i0);
+            web = fullname.substring(i0+1,i1);
+            name = fullname.substring(i1+1);
+        } else {
+            if (i1==-1) {
+                try {
+                  web = context.getDoc().getWeb();
+                } catch (Exception e) {
+                  web = "XWiki";
+                }
+                name = fullname;
+            } else {
+                web = fullname.substring(0,i1);
+                name = fullname.substring(i1+1);
+            }
+        }
+
+        if (name.equals(""))
+            name = "WebHome";
     }
 
 }

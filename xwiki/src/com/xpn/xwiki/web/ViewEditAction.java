@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * Created by
@@ -27,35 +27,29 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.MyBasicAuthenticator;
-import com.xpn.xwiki.user.MyFormAuthenticator;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.codec.DecoderException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
-import org.securityfilter.authenticator.Authenticator;
-import org.securityfilter.filter.URLPatternMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -265,7 +259,20 @@ public class ViewEditAction extends XWikiAction
                 return executeLogout(xwiki, request, response, context);
         } catch (Throwable e) {
             vcontext.put("exp", e);
-            return parseTemplate(getPage(request, "exception"), context);
+            try {
+             return parseTemplate(getPage(request, "exception"), context);
+            } catch (Exception e2) {
+                // I hope this never happens
+                e.printStackTrace();
+                e2.printStackTrace();
+                return null;
+            }
+        } finally {
+            // Make sure we cleanup database connections
+            // There could be cases where we have some
+            if ((context!=null)&&(xwiki!=null)) {
+                xwiki.getStore().cleanUp(context);
+            }
         }
 
         // Let's redirect to an error page here..

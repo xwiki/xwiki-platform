@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * Created by
@@ -1264,6 +1264,17 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         }
     }
 
+    public void cleanUp(XWikiContext context) {
+        try {
+            Session session = getSession(context);
+            if (session!=null) {
+                System.err.println("Cleanup of db connection was needed: " + XWiki.getRequestURL(context.getRequest()));
+                endTransaction(context, false);
+            }
+        } catch (HibernateException e) {
+        }
+    }
+
 
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
         try {
@@ -1296,7 +1307,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             return list;
         }
         catch (Exception e) {
-            Object[] args = { wheresql };
+            Object[] args = { wheresql  };
+            // Object[] args = { ((wheresql==null) ? "" : wheresql)  };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                     "Exception while searching documents with sql {0}", e, args);
         } finally {

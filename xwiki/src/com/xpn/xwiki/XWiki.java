@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * Created by
@@ -47,8 +47,8 @@ import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.ecs.Filter;
@@ -57,30 +57,26 @@ import org.apache.ecs.xhtml.textarea;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 import org.securityfilter.authenticator.Authenticator;
-import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SecurityRealmInterface;
 
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.FilterConfig;
 import java.io.File;
-import java.io.StringWriter;
-import java.io.PrintWriter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Principal;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
-import java.util.Random;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -360,36 +356,18 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public XWikiDocInterface getDocument(String fullname, XWikiContext context) throws XWikiException {
-        String server = null, web = null, name = null, database = null;
+        String server = null, database = null;
         try {
-
-            int i0 = fullname.lastIndexOf(":");
-            int i1 = fullname.lastIndexOf(".");
-
-            if (i0!=-1) {
-                server = fullname.substring(0,i0);
-                web = fullname.substring(i0+1,i1);
-                name = fullname.substring(i1+1);
-            } else {
-                server = null;
-                if (i1==-1) {
-                 web = "XWiki";
-                 name = fullname;
-                } else {
-                  web = fullname.substring(0,i1);
-                  name = fullname.substring(i1+1);
-                }
-            }
-
-            if (name.equals(""))
-                name = "WebHome";
+            XWikiDocInterface doc = new XWikiSimpleDoc();
+            doc.setFullName(fullname, context);
+            server = doc.getDatabase();
 
             if (server!=null) {
                 database = context.getDatabase();
                 context.setDatabase(server);
             }
 
-            XWikiDocInterface doc = getDocument(new XWikiSimpleDoc(web, name), context);
+            doc = getDocument(doc, context);
             return doc;
         }
         finally {
@@ -1617,6 +1595,50 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getEncoding() {
         return Param("xwiki.encoding", "ISO-8859-1");
+    }
+
+    public String getBaseUrl(String database, XWikiContext context) {
+        String baseurl = null;
+        if (database!=null) {
+            String db = context.getDatabase();
+            try {
+              context.setDatabase(getDatabase());
+              XWikiDocInterface doc = getDocument("XWiki.XWikiServer"
+                            + database.substring(0,1).toUpperCase()
+                            + database.substring(1), context);
+              BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass",0);
+              String server = serverobject.getStringValue("server");
+              int mode = serverobject.getIntValue("secure");
+              if (server!=null) {
+                  baseurl = ((mode==1) ? "https://" : "http://")
+                            + server + "/xwiki/bin/";
+              }
+
+            } catch (Exception e) {
+            } finally {
+                context.setDatabase(db);
+            }
+        }
+
+       if (baseurl==null)
+         return getBase(context);
+       else
+         return baseurl;
+    }
+
+     public String getActionUrl(String fullname, String action, XWikiContext context) {
+        StringBuffer url = new StringBuffer();
+        XWikiDocInterface doc = new XWikiSimpleDoc();
+        doc.setFullName(fullname, context);
+
+        String baseurl = getBaseUrl(doc.getDatabase(), context);
+        url.append(baseurl);
+        url.append(action);
+        url.append("/");
+        url.append(doc.getWeb());
+        url.append("/");
+        url.append(doc.getName());
+        return url.toString();
     }
 
 }

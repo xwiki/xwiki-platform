@@ -5,15 +5,15 @@
 * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
 *
 * This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public License
+* modify it under the terms of the GNU General Public License
 * as published by the Free Software Foundation; either version 2
 * of the License, or (at your option) any later version.
 *
 * This program is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU Lesser General Public License for more details, published at
-* http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+* GNU General Public License for more details, published at
+* http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
 * root folder of this distribution.
 -->
 
@@ -180,7 +180,7 @@
         <copy todir="${build.dir}/web/WEB-INF">
             <fileset includes="license.txt"
                 dir="${basedir}" />
-            <fileset includes="lesser.txt"
+            <fileset includes="gpl.txt"
                 dir="${basedir}/" />
         </copy>
 
@@ -344,7 +344,7 @@
             <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
             <tarfileset dir="${lib.dir}" prefix="lib" excludes="**/CVS/*" />
             <tarfileset dir="${doc.dir}" prefix="doc" excludes="**/CVS/*" />
-            <tarfileset dir="${basedir}" includes="license.txt,lesser.txt" />
+            <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
         </tar>
     </target>
 
@@ -361,7 +361,7 @@
             <tarfileset dir="${src.dir}" prefix="src" />
             <tarfileset dir="${basedir}/test" prefix="test" excludes="reports/*" />
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
-            <tarfileset dir="${basedir}" includes="license.txt,lesser.txt" />
+            <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
         </tar>
     </target>
 

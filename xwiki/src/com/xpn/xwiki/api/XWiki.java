@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * User: ludovic
@@ -27,8 +27,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -60,21 +60,27 @@ public class XWiki extends Api {
      public Document getDocument(String fullname) throws XWikiException {
          XWikiDocInterface doc = xwiki.getDocument(fullname, context);
          if (xwiki.checkAccess("view", doc, context)==false) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                    // Finally we return null, otherwise showing search result is a real pain
+                    return null;
+                    /* throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                             XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                             "Access to this document is denied");
+                    */
                 }
 
          Document newdoc = new Document(doc, context);
          return newdoc;
      }
-    
+
      public Document getDocument(String web, String fullname) throws XWikiException {
          XWikiDocInterface doc = xwiki.getDocument(web, fullname, context);
          if (xwiki.checkAccess("view", doc, context)==false) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                     // Finally we return null, otherwise showing search result is a real pain
+                    return null;
+                    /* throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                             XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                             "Access to this document is denied");
+                    */
                 }
 
          Document newdoc = new Document(doc, context);
@@ -173,7 +179,7 @@ public class XWiki extends Api {
     public int validateUser() throws XWikiException {
         return xwiki.validateUser(context);
     }
-    
+
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {
         if (checkProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
@@ -229,5 +235,17 @@ public class XWiki extends Api {
 
     public String getEncoding() {
         return xwiki.getEncoding();
+    }
+
+    public Object getNull() {
+        return null;
+    }
+
+    public String getBaseUrl(String fullname) {
+        return xwiki.getBaseUrl(fullname, context);
+    }
+
+    public String getActionUrl(String fullname, String action) {
+        return xwiki.getActionUrl(fullname, action, context);
     }
 }

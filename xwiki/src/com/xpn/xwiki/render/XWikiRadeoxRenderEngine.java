@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * User: ludovic
@@ -23,19 +23,17 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.render.filter.XWikiFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.WikiRenderEngine;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.engine.BaseRenderEngine;
-import org.radeox.util.Service;
-import org.radeox.filter.FilterPipe;
 import org.radeox.filter.Filter;
+import org.radeox.filter.FilterPipe;
+import org.radeox.util.Service;
 
 import java.util.Iterator;
 
@@ -82,32 +80,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         }
     }
 
-    private String getBaseUrl(String database, XWikiContext context) {
-        String baseurl = null;
-        if (database!=null) {
-            String db = context.getDatabase();
-            try {
-              context.setDatabase(context.getWiki().getDatabase());
-              XWikiDocInterface doc = context.getWiki().getDocument("XWiki.XWikiServer"
-                            + database.substring(0,1).toUpperCase()
-                            + database.substring(1), context);
-              BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass",0);
-              String server = serverobject.getStringValue("server");
-              int mode = serverobject.getIntValue("secure");
-              if (server!=null) {
-                  baseurl = ((mode==1) ? "https://" : "http://")
-                            + server + "/xwiki/bin/";
-              }
-
-            } catch (Exception e) {
-            } finally {
-                context.setDatabase(db);
-            }
-        }
-        return baseurl;
-    }
-
-    public boolean exists(String name) {
+     public boolean exists(String name) {
         String database = context.getDatabase();
         try {
             int colonIndex = name.indexOf(":");
@@ -150,16 +123,9 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             name = name.substring(colonIndex + 1);
         }
 
-        String baseurl = getBaseUrl(database, context);
-
-
+        String baseurl = context.getWiki().getBaseUrl(database, context);
         buffer.append("<span class=\"wikilink\"><a href=\"");
-        if (baseurl==null) {
-            buffer.append(context.getWiki().getBase(context));
-        } else {
-            buffer.append(baseurl);
-        }
-
+        buffer.append(baseurl);
         buffer.append("view");
         buffer.append("/");
 
@@ -198,16 +164,11 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             name = name.substring(colonIndex + 1);
         }
 
-        String baseurl = getBaseUrl(database, context);
+        String baseurl = context.getWiki().getBaseUrl(database, context);
         buffer.append("<span class=\"wikicreatelink\">");
         buffer.append(view);
         buffer.append("<a href=\"");
-
-        if (baseurl==null) {
-            buffer.append(context.getWiki().getBase(context));
-        } else {
-            buffer.append(baseurl);
-        }
+        buffer.append(baseurl);
         buffer.append("edit");
         buffer.append("/");
 

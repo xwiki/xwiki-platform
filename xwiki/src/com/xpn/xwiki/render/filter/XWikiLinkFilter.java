@@ -4,15 +4,15 @@
  * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
+ * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at
- * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  *
  * Original Work:
@@ -25,16 +25,16 @@
  *
  * --LICENSE NOTICE--
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
+ * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
+ * You should have received a copy of the GNU General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * --LICENSE NOTICE--
@@ -46,17 +46,17 @@
 
 package com.xpn.xwiki.render.filter;
 
-import org.radeox.filter.regex.LocaleRegexTokenFilter;
-import org.radeox.filter.regex.MatchResult;
-import org.radeox.filter.LinkTestFilter;
-import org.radeox.filter.interwiki.InterWiki;
-import org.radeox.filter.context.FilterContext;
-import org.radeox.util.StringBufferWriter;
-import org.radeox.util.Encoder;
-import org.radeox.api.engine.WikiRenderEngine;
-import org.radeox.api.engine.RenderEngine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.radeox.api.engine.RenderEngine;
+import org.radeox.api.engine.WikiRenderEngine;
+import org.radeox.filter.LinkTestFilter;
+import org.radeox.filter.context.FilterContext;
+import org.radeox.filter.interwiki.InterWiki;
+import org.radeox.filter.regex.LocaleRegexTokenFilter;
+import org.radeox.filter.regex.MatchResult;
+import org.radeox.util.Encoder;
+import org.radeox.util.StringBufferWriter;
 
 import java.io.IOException;
 import java.io.Writer;

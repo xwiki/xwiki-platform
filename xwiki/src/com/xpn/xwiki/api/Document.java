@@ -45,6 +45,13 @@ public class Document extends Api {
        this.doc = doc;
     }
 
+    public XWikiDocInterface getDocument() {
+        if (checkProgrammingRights())
+            return doc;
+        else
+            return null;
+    }
+
     public long getId() {
         return doc.getId();
     }
@@ -236,23 +243,23 @@ public class Document extends Api {
     }
 
     public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displayRendered(pclass.getPropertyClass(), prefix, object.getCollection(), context);
+         return doc.displayRendered(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayView(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displayView(pclass.getPropertyClass(), prefix, object.getCollection(), context);
+         return doc.displayView(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayEdit(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displayEdit(pclass.getPropertyClass(), prefix, object.getCollection(), context);
+         return doc.displayEdit(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayHidden(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displayHidden(pclass.getPropertyClass(), prefix, object.getCollection(), context);
+         return doc.displayHidden(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displaySearch(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-         return doc.displaySearch(pclass.getPropertyClass(), prefix, object.getCollection(), context);
+         return doc.displaySearch(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public List getIncludedPages() {

@@ -32,11 +32,18 @@ public class Property extends Element {
        super(property, context);
     }
 
-    protected BaseElement getProperty() {
-        return element;
+    protected BaseProperty getBaseProperty() {
+        return (BaseProperty)element;
     }
 
     public String getName() {
         return element.getName();
+    }
+
+    public BaseProperty getProperty() {
+        if (checkProgrammingRights())
+            return (BaseProperty) element;
+        else
+            return null;
     }
 }

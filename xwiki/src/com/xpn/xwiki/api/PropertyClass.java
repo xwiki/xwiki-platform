@@ -31,11 +31,18 @@ public class PropertyClass extends Collection {
         super(property, context);
     }
 
-    protected com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass() {
+    protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass() {
         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
     }
 
     public String getClassName() {
         return getCollection().getClassName();
+    }
+
+    protected com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass() {
+        if (checkProgrammingRights())
+         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
+        else
+         return null;
     }
 }

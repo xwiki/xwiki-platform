@@ -38,4 +38,12 @@ public class Object extends Collection {
         return (BaseObject) getCollection();
     }
 
+    public BaseObject getXWikiObject() {
+        if (checkProgrammingRights())
+         return (BaseObject) getCollection();
+        else
+         return null;
+    }
+
+
 }

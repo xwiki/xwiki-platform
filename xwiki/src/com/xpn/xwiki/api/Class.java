@@ -56,4 +56,15 @@ public class Class extends Collection {
        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name), context);
     }
 
+    public BaseClass getXWikiClass() {
+        if (checkProgrammingRights())
+         return (BaseClass) getCollection();
+        else
+         return null;
+    }
+
+    public Object newObject() {
+        return new Object((BaseObject)getBaseClass().newObject(), context);
+    }
+
 }

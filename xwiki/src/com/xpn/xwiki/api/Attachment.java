@@ -98,4 +98,11 @@ public class Attachment extends Api {
         return attachment.getVersionList();
     }
 
+    public XWikiAttachment getAttachment() {
+        if (checkProgrammingRights())
+            return attachment;
+        else
+            return null;
+    }
+
 }

@@ -33,7 +33,7 @@ public class Element extends Api {
        this.element = element;
     }
 
-    protected BaseElement getElement() {
+    protected BaseElement getBaseElement() {
         return element;
     }
 

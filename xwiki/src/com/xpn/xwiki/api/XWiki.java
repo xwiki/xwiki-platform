@@ -37,6 +37,13 @@ public class XWiki extends Api {
        this.xwiki = xwiki;
     }
 
+    public com.xpn.xwiki.XWiki getXWiki() {
+        if (checkProgrammingRights())
+            return xwiki;
+        else
+            return null;
+    }
+
      public String getVersion() {
           return xwiki.getVersion();
      }

@@ -551,19 +551,19 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("edit")) {
-                result.append("\n<pre>\n");
+                result.append("<pre>");
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                result.append("\n</pre>\n");
+                result.append("</pre>");
             }
             else if (type.equals("hidden")) {
-                result.append("\n<pre>\n");
+                result.append("<pre>");
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                result.append("\n</pre>\n");
+                result.append("</pre>");
             }
             else if (type.equals("search")) {
-                result.append("\n<pre>\n");
+                result.append("<pre>");
                 pclass.displaySearch(result, fieldname, prefix, obj, context);
-                result.append("\n</pre>\n");
+                result.append("</pre>");
             }
             else {
                 pclass.displayView(result, fieldname, prefix, obj, context);

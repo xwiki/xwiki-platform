@@ -38,6 +38,8 @@ import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
 
+import java.util.ArrayList;
+
 
 public class RenderTest extends TestCase {
 
@@ -161,8 +163,31 @@ public class RenderTest extends TestCase {
          XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
 
         // Test formatting
+        renderTest(wikibase, "<pre>This is a text with *strong* text</pre>",
+                "This is a text with *strong* text", false, context);
         renderTest(wikibase, "<pre>\nThis is a text with *strong* text\n</pre>",
                 "This is a text with *strong* text", false, context);
+        renderTest(wikibase, "This is a text with<pre> *strong* </pre>text\n",
+                "This is a text with *strong* text", false, context);
+        renderTest(wikibase, "---+ Title <pre>\n*strong*\n</pre>",
+                 "<h1>Title \n*strong*\n</h1>", false, context);
+        renderTest(wikibase, "   * Item <pre>*strong*</pre>",
+                 "<li> Item *strong*</li>", false, context);
+        renderTest(wikibase, "This is a text with<pre> *one* </pre>and<pre> *two* </pre>items\n",
+                "This is a text with *one* and *two* items", false, context);
+        renderTest(wikibase, "<PrE>This is a text with *strong* text</PrE>",
+                "This is a text with *strong* text", false, context);
+        renderTest(wikibase, "<PrE>\nThis is a text with *strong* text\n</PrE>",
+                "This is a text with *strong* text", false, context);
+        renderTest(wikibase, "This is a text with<PrE> *strong* </PrE>text\n",
+                "This is a text with *strong* text", false, context);
+        renderTest(wikibase, "---+ Title <PrE>\n*strong*\n</PrE>",
+                 "<h1>Title \n*strong*\n</h1>", false, context);
+        renderTest(wikibase, "   * Item <PrE>*strong*</PrE>",
+                 "<li> Item *strong*</li>", false, context);
+        renderTest(wikibase, "This is a text with<PrE> *one* </PrE>and<PrE> *two* </PrE>items\n",
+                "This is a text with *one* and *two* items", false, context);
+
     }
 
     public void testWikiBaseTabListRenderer() throws XWikiException {

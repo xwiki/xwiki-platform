@@ -23,6 +23,7 @@
 package com.xpn.xwiki.util;
 
 import com.xpn.xwiki.render.WikiSubstitution;
+import com.xpn.xwiki.render.PreTagSubstitution;
 import org.apache.commons.lang.StringUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
@@ -149,5 +150,5 @@ public class Util {
 	getP5util().split ((Collection) results,pattern,text);
 	return results;
     }
-    
+
 }

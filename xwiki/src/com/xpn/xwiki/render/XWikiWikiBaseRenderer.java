@@ -32,6 +32,8 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
 
 import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class XWikiWikiBaseRenderer implements XWikiRenderer {
 
@@ -166,6 +168,10 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         // Start by handling all tags (plugins + internal)
         content = handleAllTags(content, doc, context);
 
+        // Remove the content that is inside "<pre>"
+        PreTagSubstitution preTagSubst = new PreTagSubstitution(util);
+        content = preTagSubst.substitute(content);
+
         // PLUGIN: call startRenderingHandler at the start with the full content
         content = plugins.startRenderingHandler(content, context);
 
@@ -211,7 +217,8 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         ls.dumpCurrentList(output, true);
 
         // PLUGIN: call endRenderingHandler at the end with the full content
-        return plugins.endRenderingHandler(output.toString(), context);
+        output.append(plugins.endRenderingHandler("", context));
+        return preTagSubst.insertNonWikiText(output.toString());
     }
 
     private String handleList(ListSubstitution ls, StringBuffer output, String line, Util util) {
@@ -264,5 +271,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         line = WikiNameSubstitution.substitute(context, WikiNameSubstitution.TYPE_FOUR, util, line);
         return line;
     }
+
+
 
 }

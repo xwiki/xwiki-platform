@@ -29,6 +29,7 @@ import com.xpn.xwiki.notify.DocObjectChangedRule;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.util.Util;
 import org.apache.ecs.filter.CharacterFilter;
@@ -64,9 +65,9 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
             if (patternlist!=null) {
             for (int i=0;i<patternlist.size();i++) {
                     BaseObject obj = (BaseObject) patternlist.get(i);
-                    patterns.add(obj.get("pattern").toString());
-                    results.add(obj.get("result").toString());
-                    descriptions.add(obj.get("description").toString());
+                    patterns.add(((StringProperty)obj.get("pattern")).getValue().toString());
+                    results.add(((StringProperty)obj.get("result")).getValue().toString());
+                    descriptions.add(((StringProperty)obj.get("description")).getValue().toString());
                 }
             }
         } catch (Exception e) {
@@ -92,7 +93,7 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
         list.append("<tr><td><strong>Pattern</strong></td>");
         list.append("<td><strong>Result</strong></td><td><strong>Description</strong></td></tr>");
         for (int i=0;i<patterns.size();i++) {
-            list.append("<tr><td><nop>");
+            list.append("<tr><td>");
             list.append(filter.process((String)patterns.get(i)));
             list.append("</td><td>");
             list.append(filter.process((String)results.get(i)));

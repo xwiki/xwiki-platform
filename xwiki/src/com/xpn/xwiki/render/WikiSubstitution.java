@@ -50,6 +50,10 @@ public class WikiSubstitution extends Perl5Substitution {
         setPattern(util.getPatterns().getPattern(makePattern(patternparam)));
     }
 
+    public void setPattern(String patternparam, int options) {
+        setPattern(util.getPatterns().getPattern(makePattern(patternparam), options));
+    }
+
     public String makePattern(String patternparam) {
         return patternparam;
     }
@@ -60,7 +64,7 @@ public class WikiSubstitution extends Perl5Substitution {
     }
 
     public String substitute(String line) {
-        return org.apache.oro.text.regex.Util.substitute(getMatcher(), getPattern(), this, line);
+        return org.apache.oro.text.regex.Util.substitute(getMatcher(), getPattern(), this, line, org.apache.oro.text.regex.Util.SUBSTITUTE_ALL);
     }
 
     public Perl5Matcher getMatcher() {

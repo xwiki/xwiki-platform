@@ -33,8 +33,8 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 <h2>Add a right entry</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="hidden" name="classname" value="$classname">
+<input type="hidden" name="xredirect" value="$redirect" />
+<input type="hidden" name="classname" value="$classname" />
 <input type="submit" value="Add Right Entry" />
 </p>
 </form>
@@ -43,8 +43,8 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 <div class="left">
 <br />
 <form id="update" method="post" action="$doc.getActionUrl("save")">
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="submit" value="Save Rights Modifications" />
+<input type="hidden" name="xredirect" value="$redirect" />
+<input type="submit" value="Save Rights" />
 </div>
 
 <div class="center">

@@ -1,11 +1,31 @@
+<script type="text/javascript">
+var menustatus = "none";
+function setmenustyle(style) {
+ var parent = document.getElementById("xwikinav_sidebar");
+ var list = parent.getElementsByTagName("div");
+ for (var i=1;i<list.length;i++) {
+   list[i].style.display = style;
+ }
+}
+function showhidemenu() {
+ if (menustatus == "none") {
+   menustatus = "block";
+ }
+ else
+   menustatus = "none";
+ setmenustyle(menustatus);
+}
+</script>
 #macro( versions )
 #foreach( $rev in $doc.recentRevisions )
 <a href="$viewurl?rev=$rev">$rev</a><span class="xwikisep"> | </span>
 #end
 #end
 <div id="xwikinav_sidebar">
-<div id="xwikiusermenutitle">$msg.get("usermenu")</div>
-<div id="xwikiusermenulinks">
+<div id="xwikinav_sidebarbutton"><a href="" onclick="showhidemenu(); return false;">Menu</a></div>
+<div id="xwikiusermenutitle" class="xwikimenu">$msg.get("usermenu")
+</div>
+<div id="xwikiusermenulinks" class="xwikimenu">
 #if ($context.getUser().equals("XWiki.XWikiGuest"))
 <a href="../../view/XWiki/XWikiLogIn">$msg.get("login")</a><span class="xwikisep"> | </span>
 #else
@@ -19,8 +39,8 @@
 <a href="#" onclick="setActiveStyleSheet('Alternate StyleSheet 2'); return false;">$msg.get("altstyle2")</a>
 <a href="#" onclick="setActiveStyleSheet('Alternate StyleSheet 3'); return false;">$msg.get("altstyle3")</a>
 </div>
-<div id="xwikipagemenutitle">$msg.get("pagemenu")</div>
-<div id="xwikipagemenulinks">
+<div id="xwikipagemenutitle" class="xwikimenu">$msg.get("pagemenu")</div>
+<div id="xwikipagemenulinks" class="xwikimenu">
 <a href="$attachurl">$msg.get("attachments") ($doc.getAttachmentList().size())</a><span class="xwikisep"> | </span>
 <a href="$inlineurl">$msg.get("editinline")</a><span class="xwikisep"> | </span>
 <a href="$editurl">$msg.get("editcontent")</a><span class="xwikisep"> | </span>
@@ -31,12 +51,15 @@
 <a href="${viewurl}?raw=1">$msg.get("raw")</a><span class="xwikisep"> | </span>
 #versions()
 </div>
-<div id="xwikiwebmenutitle">$msg.get("webmenu")</div>
-<div id="xwikiwebmenulinks">
+<div id="xwikiwebmenutitle" class="xwikimenu">$msg.get("webmenu")</div>
+<div id="xwikiwebmenulinks" class="xwikimenu">
 <a href="WebHome">$msg.get("space")</a><span class="xwikisep"> | </span>
 <a href="../../view/${doc.web}/WebPreferences">$msg.get("webprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/${doc.web}/WebPreferences?xpage=editrights&global=1">$msg.get("webrights")</a><span class="xwikisep"> | </span>
-<a href="../../view/XWiki/XWikPreferences">$msg.get("xwikiprefs")</a><span class="xwikisep"> | </span>
+<a href="../../view/XWiki/XWikiPreferences">$msg.get("xwikiprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/XWiki/XWikiPreferences?xpage=editrights&global=1">$msg.get("xwikirights")</a><span class="xwikisep"> | </span>
 </div>
 </div>
+<script type="text/javascript">
+ setmenustyle(menustatus);
+</script>

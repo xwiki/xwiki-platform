@@ -38,7 +38,7 @@ function show(fieldname) {
 <h2>Add an Object</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect">
+<input type="hidden" name="xredirect" value="$redirect" />
 <select name="classname" size="1">
 <option value="---">Select a class</option>
 #foreach ($classname in $xwiki.classList)
@@ -50,8 +50,8 @@ function show(fieldname) {
 </form>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="text" name="classname" size="20">
+<input type="hidden" name="xredirect" value="$redirect" />
+<input type="text" name="classname" size="20" />
 <input type="submit" value="Add Class" />
 </p>
 </form>
@@ -61,8 +61,8 @@ function show(fieldname) {
 <br />
 <form id="update" method="post" action="$doc.getActionUrl("save")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="submit" value="Save Object Modifications" />
+<input type="hidden" name="xredirect" value="$redirect" />
+<input type="submit" value="Save Objects" />
 </p>
 </div>
 

@@ -22,7 +22,7 @@ function show(fieldname) {
 <div class="left">
 <form id="propadd" method="post" action="$doc.getActionUrl("propadd")">
 <p style="text-align: center">
-<input type="hidden" name="xredirect" value="$redirect">
+<input type="hidden" name="xredirect" value="$redirect" />
 Name: <input type="text" name="propname" value="" size="20" />
 <br /><br />
 <select name="proptype" size="1">
@@ -41,14 +41,15 @@ Name: <input type="text" name="propname" value="" size="20" />
 <br />
 <form id="propupdate" method="post" action="$doc.getActionUrl("propupdate")">
 <p>
-<input type="hidden" name="xredirect" value="$redirect">
-<input type="submit" value="Save Class Modifications" />
+<input type="hidden" name="xredirect" value="$redirect" />
+<input type="submit" value="Save Class" />
 </p>
 </div>
 <div class="center">
 
 <div id="intro">
 Welcome to the class editor. Choose a field to edit or add a field to the class.
+<br />
 </div>
 
 #set ( $first = 1)
@@ -57,11 +58,11 @@ Welcome to the class editor. Choose a field to edit or add a field to the class.
 <div id="field_$field.name" style="display: #if ($first==1) block #else none #end;">
 #if ($first==1)
 <script type="text/javascript">
-currentfield = "field_$field.name";
+currentfield = "$field.name";
 </script>
 #set ($first = 0)
 #end
-Edit field $field.prettyName <br />
+<h3>Edit field $field.prettyName</h3>
 
 <table border="0">
 #foreach ($classprop in $field.xWikiClass.propertyNames)

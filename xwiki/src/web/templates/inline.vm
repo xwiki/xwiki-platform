@@ -5,6 +5,7 @@ $message
 </div>
 #end
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 #foreach($class in $doc.xWikiClasses)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <p>

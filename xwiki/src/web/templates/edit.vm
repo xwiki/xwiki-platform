@@ -3,6 +3,7 @@
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
 <p>
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 </p>
 #set( $pages = $doc.getIncludedPages() )
 #if ( $pages.size() > 0)

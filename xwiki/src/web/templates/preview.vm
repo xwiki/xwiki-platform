@@ -13,7 +13,7 @@ $doc.getRenderedContent()
 <input type="hidden" name="content" value="$xwiki.getFormEncoded($doc.content)" />
 <input type="hidden" name="parent" value="$!doc.getParent()" />
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
-<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")">
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 
 </p>
 <div id="xwikiobject">

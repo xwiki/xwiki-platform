@@ -160,7 +160,7 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
           return "cmd.exe /c " + getPluginspath().substring(0,2) + " && cd "
                                + getPluginspath().substring(2) + " && " + getPerlpath() + " perlplugins.pl 7890 true";
         else
-          return "cd " + getPluginspath() + " && " + getPerlpath() + " perlplugins.pl 7890 true";
+          return "sh -c \"cd " + getPluginspath() + " && " + getPerlpath() + " perlplugins.pl 7890 true\"";
     }
 
     public void startPerlEngine() throws XWikiException {

@@ -1,5 +1,4 @@
-#foreach($objlist in $doc.xWikiObjects)
-#set( $class = $objlist.elementAt(0).xWikiClass)
+#foreach($class in $doc.xWikiClasses)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <p>
 <input type="hidden" name="${class.name}_nb" value="$nb" />
@@ -9,18 +8,26 @@
 <br />
  <table>
  <tr>
+   <td></td>
   #foreach($prop in $class.properties)
    <td>$prop.prettyName
    </td>
   #end
  </tr>
-  #foreach($obj in $objlist)
+ #foreach($obj in $doc.getObjects($class.name))
+  #if ($obj.xWikiClass)
    <tr>
+   <td>
+   <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&classid=${obj.number}"
+         onclick="return confirm('$msg.get("confirmobjectremove")')">
+    Remove</a>
+   </td>
     #foreach($prop in $class.properties)
      <td>$prop.displayEdit($prop.getName(), "${class.name}_${obj.number}_",  $obj, $context)
      </td>
     #end
    </tr>
   #end
+ #end
  </table>
 #end

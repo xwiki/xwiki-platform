@@ -65,6 +65,8 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
             if (patternlist!=null) {
             for (int i=0;i<patternlist.size();i++) {
                     BaseObject obj = (BaseObject) patternlist.get(i);
+                    if (obj==null)
+                        continue;
                     patterns.add(((StringProperty)obj.get("pattern")).getValue().toString());
                     results.add(((StringProperty)obj.get("result")).getValue().toString());
                     descriptions.add(((StringProperty)obj.get("description")).getValue().toString());

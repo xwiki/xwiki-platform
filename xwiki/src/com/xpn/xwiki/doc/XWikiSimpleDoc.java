@@ -83,6 +83,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     // Caching
     private boolean fromCache = false;
+    private ArrayList objectsToRemove = new ArrayList();
 
     public long getId() {
         if (id==0) {
@@ -418,6 +419,26 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return getObject(getFullName(),0);
     }
 
+    public List getxWikiClasses() {
+        List list = new ArrayList();
+        for (Iterator it=getxWikiObjects().keySet().iterator();it.hasNext();) {
+            String classname = (String) it.next();
+            BaseClass bclass = null;
+            Vector objects = getObjects(classname);
+            for (int i=0;i<objects.size();i++) {
+                BaseObject obj = (BaseObject) objects.get(i);
+                if (obj!=null) {
+                    bclass = obj.getxWikiClass();
+                    if (bclass!=null)
+                        break;
+                }
+            }
+            if (bclass!=null)
+             list.add(bclass);
+        }
+        return list;
+    }
+
     public void createNewObject(String classname, XWikiContext context) throws XWikiException {
         XWiki xwiki = (XWiki) context.getWiki();
         XWikiDocInterface doc = xwiki.getDocument(classname, context);
@@ -478,12 +499,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             setObjects(classname, objects);
         }
         if (nb >= objects.size()) {
-         objects.add(object);
-         object.setNumber(objects.size()-1);
-        }
-        else {
-         objects.set(nb, object);
-         object.setNumber(nb);
+            objects.setSize(nb+1);
+            objects.set(nb, object);
+            object.setNumber(nb);
         }
     }
 
@@ -524,13 +542,16 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                     }
                 }
             } else {
-                Vector tobjects = (Vector) templatedoc.getxWikiObjects().get(name);
+                Vector tobjects = (Vector) templatedoc.getObjects(name);
                 objects = new Vector();
                 for (int i=0;i<tobjects.size();i++)
                 {
-                    BaseObject bobj = (BaseObject) ((BaseObject) tobjects.get(i)).clone();
-                    objects.add(bobj);
-                    bobj.setNumber(objects.size()-1);
+                    BaseObject bobj1 = (BaseObject) tobjects.get(i);
+                    if (bobj1!=null) {
+                       BaseObject bobj = (BaseObject)bobj1.clone();
+                       objects.add(bobj);
+                       bobj.setNumber(objects.size()-1);
+                    }
                 }
                 getxWikiObjects().put(name, objects);
             }
@@ -604,11 +625,18 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       if (format.endsWith("\\n"))
        linebreak = true;
 
-      if (objects.size()==0)
-       return "";
-        BaseClass bclass = ((BaseObject)objects.get(0)).getxWikiClass();
-        Map fields = bclass.getFields();
-        if (fields.size()==0)
+      BaseObject firstobject = null;
+      Iterator foit = objects.iterator();
+      while ((firstobject==null)&&foit.hasNext()) {
+         firstobject = (BaseObject) foit.next();
+      }
+
+      if (firstobject==null)
+         return "";
+
+      BaseClass bclass = firstobject.getxWikiClass();
+      Map fields = bclass.getFields();
+      if (fields.size()==0)
          return "";
 
       StringBuffer result = new StringBuffer();
@@ -639,9 +667,16 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String displayForm(String className, XWikiContext context) {
       Vector objects = getObjects(className);
-      if (objects.size()==0)
-       return "";
-      BaseClass bclass = ((BaseObject)objects.get(0)).getxWikiClass();
+      BaseObject firstobject = null;
+      Iterator foit = objects.iterator();
+      while ((firstobject==null)&&foit.hasNext()) {
+         firstobject = (BaseObject) foit.next();
+      }
+
+      if (firstobject==null)
+         return "";
+
+      BaseClass bclass = firstobject.getxWikiClass();
       Map fields = bclass.getFields();
       if (fields.size()==0)
        return "";
@@ -689,22 +724,22 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         Iterator itobj = getxWikiObjects().keySet().iterator();
         while (itobj.hasNext()) {
             String name = (String) itobj.next();
-            BaseObject baseobject = (BaseObject)getObject(name, 0);
-            BaseClass baseclass = baseobject.getxWikiClass();
-            int nb = eform.getObjectNumbers(baseclass.getName());
-            if (nb>0) {
-                Vector newobjects = new Vector();
-                for (int i=0;i<nb;i++) {
+            Vector bobjects = getObjects(name);
+            Vector newobjects = new Vector();
+            newobjects.setSize(bobjects.size());
+            for (int i=0;i<bobjects.size();i++) {
                     BaseObject oldobject = (BaseObject) getObject(name, i);
-                    BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
-                    newobject.setNumber(i);
-                    newobject.setName(getFullName());
-                    newobjects.add(newobject);
-                }
-                getxWikiObjects().put(name, newobjects);
+                    if (oldobject!=null)
+                    {
+                     BaseClass baseclass = oldobject.getxWikiClass();
+                     BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
+                     newobject.setNumber(oldobject.getNumber());
+                     newobject.setName(getFullName());
+                     newobjects.set(newobject.getNumber(), newobject);
+                    }
             }
-        }
-
+            getxWikiObjects().put(name, newobjects);
+           }
     }
 
     public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException {
@@ -842,6 +877,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             if (v1.size()!=v2.size())
                 return false;
             for (int i=0;i<v1.size();i++) {
+                if ((v1.get(i)==null)&&(v2.get(i)!=null))
+                    return false;
                 if (!v1.get(i).equals(v2.get(i)))
                     return false;
             }
@@ -915,7 +952,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             Vector objects = (Vector) it.next();
             for (int i=0;i<objects.size();i++) {
                 BaseObject obj = (BaseObject)objects.get(i);
-                docel.add(obj.toXML());
+                if (obj!=null)
+                 docel.add(obj.toXML());
             }
         }
 
@@ -949,6 +987,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             XWikiAttachment attach = new XWikiAttachment();
             attach.setDoc(this);
             attach.fromXML(atel);
+            getAttachmentList().add(attach);
         }
 
         Element cel = docel.element("class");
@@ -992,6 +1031,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         Vector objects = getObjects(className);
         for (int j=0;j<objects.size();j++) {
             BaseObject bobject = (BaseObject) objects.get(j);
+            if (bobject==null)
+                continue;
             for (Iterator renameit = fieldsToRename.keySet().iterator();renameit.hasNext();) {
                 String origname = (String)renameit.next();
                 String newname = (String) fieldsToRename.get(origname);
@@ -1006,6 +1047,18 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 }
             }
         }
+    }
+
+    public void addObjectsToRemove(BaseObject object) {
+        getObjectsToRemove().add(object);
+    }
+
+    public ArrayList getObjectsToRemove() {
+        return objectsToRemove;
+    }
+
+    public void setObjectsToRemove(ArrayList objectsToRemove) {
+        this.objectsToRemove = objectsToRemove;
     }
 
 }

@@ -48,7 +48,7 @@ public class StoreObjectRCSFileTest extends StoreObjectTest {
     }
 
     public XWikiStoreInterface getStore() {
-        XWikiStoreInterface store = new XWikiRCSFileStore(Utils.rcspath);
+        XWikiStoreInterface store = new XWikiRCSFileStore(Utils.rcspath, Utils.rcsattachmentpath);
         return store;
     }
 }

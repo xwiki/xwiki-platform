@@ -99,7 +99,6 @@
 
     <target name="clover-yes" depends="prepare" if="clover.available">
         <property name="compiler" value="org.apache.tools.ant.taskdefs.CloverCompilerAdapter"/>
-        <mkdir dir="${clover.dir}" />
         <mkdir dir="${test.clover.dir}" />
     </target>
 

@@ -270,7 +270,25 @@ public class ViewEditAction extends XWikiAction
             String className = ((ObjectAddForm) form).getClassName();
             doc.createNewObject(className, context);
             xwiki.saveDocument(doc, olddoc, context);
-            return (mapping.findForward("objectadd"));
+
+            // forward to edit
+            response.sendRedirect(doc.getActionUrl("edit",context));
+            return null;
+        }
+        else if (action.equals("objectremove")) {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+            String className = ((ObjectRemoveForm) form).getClassName();
+            int classId = ((ObjectRemoveForm) form).getClassId();
+            Vector objects = doc.getObjects(className);
+            BaseObject object = (BaseObject)objects.get(classId);
+            // Remove it from the object list
+            objects.set(classId, null);
+            doc.addObjectsToRemove(object);
+            xwiki.saveDocument(doc, olddoc, context);
+
+            // forward to edit
+            response.sendRedirect(doc.getActionUrl("edit",context));
+            return null;
         }
         if (action.equals("download"))
         {

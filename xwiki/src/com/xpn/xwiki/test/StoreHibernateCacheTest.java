@@ -75,10 +75,6 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     public void testVirtualCachedReadWrite() throws XWikiException, HibernateException {
         XWikiStoreInterface store = getStore();
 
-        context.setDatabase("xwikitest");
-        cleanUp(getHibStore(), context);
-
-        // We need to setup the second DB
         context.setDatabase("xwikitest2");
         cleanUp(getHibStore(), context);
 
@@ -95,9 +91,6 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     public void testVirtualCachedReadWrite2() throws XWikiException, HibernateException {
         XWikiStoreInterface store = getStore();
 
-        context.setDatabase("xwikitest");
-        cleanUp(getHibStore(), context);
-        
         context.setDatabase("xwikitest2");
         cleanUp(getHibStore(), context);
 

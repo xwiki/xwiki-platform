@@ -471,7 +471,7 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Object does not exists", bobject2);
 
         setUrl(webRequest, "objectremove", "PropRemoveObject");
-        webRequest.addParameter("classname", "Main.PropRemoveObject");
+        webRequest.addParameter("classname", "Main.PropRemoveObjectClass");
         webRequest.addParameter("classid", "0");
     }
 
@@ -482,7 +482,6 @@ public class ViewEditTest extends ServletTestCase {
         XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropRemoveObject");
         doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
-        Map bobjects = doc2.getxWikiObjects();
         BaseObject bobject = null;
         try {
             bobject = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0); }

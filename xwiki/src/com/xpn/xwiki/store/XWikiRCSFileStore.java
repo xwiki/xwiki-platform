@@ -44,7 +44,8 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
-    private File rscpath;
+    private File rcspath;
+    private File rcsattachmentpath;
 
     public XWikiRCSFileStore() {
     }
@@ -53,18 +54,29 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     public XWikiRCSFileStore(XWiki xwiki, XWikiContext context) {
         String rcspath = xwiki.ParamAsRealPath("xwiki.store.rcs.path", context);
         setPath(rcspath);
+        String rcsattachementpath = xwiki.ParamAsRealPath("xwiki.store.rcs.attachmentpath", context);
+        setAttachmentPath(rcsattachementpath);
     }
 
-    public XWikiRCSFileStore(String rcspath) {
+    public XWikiRCSFileStore(String rcspath, String rcsattachmentpath) {
         setPath(rcspath);
+        setAttachmentPath(rcsattachmentpath);
     }
 
     public void setPath(String rcspath) {
-        this.rscpath = new File(rcspath);
+        this.rcspath = new File(rcspath);
     }
 
     public String getPath() {
-        return rscpath.toString();
+        return rcspath.toString();
+    }
+
+    public void setAttachmentPath(String rcsattachmentpath) {
+        this.rcsattachmentpath = new File(rcsattachmentpath);
+    }
+
+    public String getAttachmentPath() {
+        return rcsattachmentpath.toString();
     }
 
     public File getFilePath(XWikiDocInterface doc, XWikiContext context) {
@@ -76,6 +88,20 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     public File getVersionedFilePath(XWikiDocInterface doc, XWikiContext context) {
         File webfile = new File(getPath(), doc.getWeb().replace('.','/'));
         return new File(webfile, doc.getName() + ".txt,v");
+    }
+
+    public File getAttachmentPath(XWikiAttachment attachment, XWikiContext context) {
+        File webdir = new File(getAttachmentPath(), attachment.getDoc().getWeb().replace('.','/')
+                                + "/" + attachment.getDoc().getName());
+        webdir.mkdirs();
+        return new File(webdir, attachment.getFilename());
+    }
+
+    public File getVersionedAttachmentPath(XWikiAttachment attachment, XWikiContext context) {
+        File webdir = new File(getAttachmentPath(), attachment.getDoc().getWeb().replace('.','/')
+                                + "/" + attachment.getDoc().getName());
+        webdir.mkdirs();
+        return new File(webdir, attachment.getFilename() + ",v");
     }
 
     public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
@@ -325,10 +351,6 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return true;
     }
 
-    public XWikiAttachment loadAttachment(XWikiAttachment attachment, XWikiContext context) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     public List getClassList(XWikiContext context) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
@@ -344,18 +366,64 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Attachment not implemented");
+        try {
+            File file = getAttachmentPath(attachment, context);
+            FileOutputStream os = new FileOutputStream(file);
+            os.write(attachment.getContent(context));
+            os.flush();
+            os.close();
+
+            // Now handle the versioned file
+            if (attachment.isContentDirty()) {
+                File vfile = getVersionedAttachmentPath(attachment, context);
+                attachment.updateContentArchive(context);
+                Archive archive = attachment.getArchive();
+                archive.save(vfile.toString());
+            }
+
+            // We need to save the attachment info
+            saveXWikiDoc(attachment.getDoc(), context);
+        } catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SAVING_ATTACHMENT,
+                    "Exception while saving attachment {0} from document {1}", e, args);
+        }
     }
 
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Attachment not implemented");
+        try {
+                byte[] content = new byte[attachment.getFilesize()];
+                File file = getAttachmentPath(attachment, context);
+                FileInputStream is = new FileInputStream(file);
+                is.read(content);
+                attachment.setContent(content);
+        } catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_LOADING_ATTACHMENT,
+                    "Exception while reading document {0} version {1}", e, args);
+        }
     }
 
     public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Attachment not implemented");
+        try {
+            Archive archive = attachment.getArchive();
+
+            if (archive==null) {
+                File file = getVersionedAttachmentPath(attachment, context);
+                String path = file.toString();
+                try {
+                   synchronized (path) {
+                      archive = new Archive(path);
+                      attachment.setArchive(archive);
+                   }
+                } catch (FileNotFoundException e) {
+                }
+            }
+        } catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_LOADING_ATTACHMENT,
+                    "Exception while reading document {0} version {1}", e, args);
+        }
     }
 
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {

@@ -133,7 +133,10 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         if (vobj==null)
             return false;
         for (int i=0;i<vobj.size();i++) {
-            String member = ((BaseObject)vobj.get(i)).getStringValue("member");
+            BaseObject object = (BaseObject)vobj.get(i);
+            if (object==null)
+             continue;
+            String member = object.getStringValue("member");
             if (member==null)
                 return false;
             if (member.equals(username))
@@ -165,7 +168,10 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         if (vobj==null)
             return list;
         for (int i=0;i<vobj.size();i++) {
-            String member = ((BaseObject)vobj.get(i)).getStringValue("member");
+            BaseObject object = (BaseObject)vobj.get(i);
+            if (object==null)
+                continue;
+            String member = object.getStringValue("member");
             list.add(member);
         }
         return list;
@@ -181,9 +187,13 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             if (vobj==null)
                 return true;
             for (int i=0;i<vobj.size();i++) {
-                String member = ((BaseObject)vobj.get(i)).getStringValue("member");
+                BaseObject object = (BaseObject)vobj.get(i);
+                if (object==null)
+                    continue;
+                String member = object.getStringValue("member");
                 if (member.equals(username)) {
-                    vobj.remove(i);
+                    doc.getObjectsToRemove().add(object);
+                    vobj.set(i, null);
                     needsUpdate = true;
                 }
             }

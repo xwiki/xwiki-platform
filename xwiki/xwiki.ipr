@@ -79,7 +79,7 @@
       <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="false" project-jdk-name="java version &quot;1.4.2_03&quot;" />
+  <component name="ProjectRootManager" version="2" assert-keyword="false" project-jdk-name="java version &quot;1.3.1_08&quot;" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />

@@ -52,6 +52,7 @@ public class Utils {
 
 
     public static String rcspath = "./rcs";
+    public static String rcsattachmentpath = "./rcsattachments";
     public static String filename = "test1.sxw";
     public static String filename2 = "test1.doc";
 

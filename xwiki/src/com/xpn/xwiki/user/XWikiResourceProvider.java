@@ -173,6 +173,8 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             boolean found = false;
             for (int i=0;i<vobj.size();i++) {
                 BaseObject bobj = (BaseObject) vobj.get(i);
+                if (bobj==null)
+                    continue;
                 String users = bobj.getStringValue(fieldName);
                 String levels = bobj.getStringValue("levels");
                 boolean allowdeny = (bobj.getIntValue("allow")==1);

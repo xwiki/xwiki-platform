@@ -113,6 +113,10 @@ public class Document {
         return doc.getxWikiObject();
     }
 
+    public List getxWikiClasses() {
+        return doc.getxWikiClasses();
+    }
+
     public void createNewObject(String classname) throws XWikiException {
         doc.createNewObject(classname, context);
     }

@@ -28,6 +28,7 @@ import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 
 import java.io.ByteArrayInputStream;
+import java.util.Date;
 
 public class XWikiAttachmentArchive {
 
@@ -85,6 +86,7 @@ public class XWikiAttachmentArchive {
             if (archive!=null) {
                 archive.addRevision(lines.toArray(),"");
                 attachment.incrementVersion();
+                attachment.setDate(new Date());
             }
             else
                 archive = new Archive(lines.toArray(),getAttachment().getFilename(),getAttachment().getVersion());

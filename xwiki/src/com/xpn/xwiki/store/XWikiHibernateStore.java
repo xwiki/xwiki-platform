@@ -89,7 +89,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
     public void setSession(Session session, XWikiContext context) {
-        context.put("hibsession", session);
+        if (session==null)
+            context.remove("hibsession");
+        else
+            context.put("hibsession", session);
     }
 
 
@@ -99,7 +102,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
     public void setTransaction(Transaction transaction, XWikiContext context) {
-        context.put("hibtransaction", transaction);
+        if (transaction==null)
+            context.remove("hibtransaction");
+        else
+            context.put("hibtransaction", transaction);
     }
 
 
@@ -227,8 +233,8 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
         Session session = getSession(context);
         Transaction transaction = getTransaction(context);
-        context.remove("hibsession");
-        context.remove("hibtransaction");
+        setSession(null, context);
+        setTransaction(null, context);
 
         if (commit) {
             transaction.commit();
@@ -265,6 +271,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 session.update(doc);
 
+            // Remove all existing properties
+            if (doc.getObjectsToRemove().size()>0) {
+               for (int i=0;i<doc.getObjectsToRemove().size();i++) {
+                   deleteXWikiObject((BaseObject)doc.getObjectsToRemove().get(i), context, false);
+               }
+               doc.setObjectsToRemove(new ArrayList());
+            }
+
             BaseClass bclass = doc.getxWikiClass();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
@@ -284,11 +298,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     saveXWikiObject(obj, context, false);
                 }
                 // Delete all objects of this class that have a bigger ID
+                /* This should not be needed anymore
                 String squery = "from BaseObject as bobject where bobject.name = '" + doc.getFullName()
                         + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
                         + "' and bobject.number >= " + objects.size();
                 int result = session.delete(squery);
                 System.err.println("Deleted " + result + " instances");
+                */
             }
 
             endTransaction(context, true);
@@ -375,7 +391,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             doc.setStore(this);
             Archive archive = basedoc.getRCSArchive();
             doc.setRCSArchive(archive);
-            
+
             if (archive == null) {
                 doc.updateArchive(doc.toXML());
                 archive = basedoc.getRCSArchive();
@@ -437,6 +453,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     public void saveXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
+            // Nothing to save
+            if (object==null)
+                return;
 
             if (bTransaction) {
               checkHibernate(context);
@@ -453,8 +472,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 session.update(object);
 
             // Remove all existing properties
-            for (int i=0;i<object.getFieldsToRemove().size();i++) {
-                session.delete(object.getFieldsToRemove().get(i));
+            if (object.getFieldsToRemove().size()>0) {
+               for (int i=0;i<object.getFieldsToRemove().size();i++) {
+                   session.delete(object.getFieldsToRemove().get(i));
+               }
+               object.setFieldsToRemove(new ArrayList());
             }
 
             Iterator it = object.getFields().keySet().iterator();
@@ -480,7 +502,6 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     "Exception while saving object {0}", e, args);
 
         }
-
     }
 
     public void loadXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
@@ -528,6 +549,29 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
 
     }
+
+    public void deleteXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+              checkHibernate(context);
+              beginTransaction(context);
+            }
+            Session session = getSession(context);
+            for (Iterator it = object.getFields().values().iterator(); it.hasNext();) {
+                    BaseProperty property = (BaseProperty)it.next();
+                    session.delete(property);
+            }
+            session.delete(object);
+            if (bTransaction) {
+                    endTransaction(context, false);
+            }
+        } catch (Exception e) {
+            Object[] args = { object.getName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_OBJECT,
+                    "Exception while deleting object {0}", e, args);
+        }
+    }
+
 
     public void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction) throws XWikiException
     {
@@ -655,9 +699,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 session.update(bclass);
 
             // Remove all existing properties
-            for (int i=0;i<bclass.getFieldsToRemove().size();i++) {
-                session.delete(bclass.getFieldsToRemove().get(i));
+            if (bclass.getFieldsToRemove().size()>0) {
+               for (int i=0;i<bclass.getFieldsToRemove().size();i++) {
+                   session.delete(bclass.getFieldsToRemove().get(i));
+               }
+               bclass.setFieldsToRemove(new ArrayList());
             }
+
 
             Collection coll = bclass.getFields().values();
             Iterator it = coll.iterator();

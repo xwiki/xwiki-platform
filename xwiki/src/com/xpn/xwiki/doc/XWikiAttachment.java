@@ -311,6 +311,14 @@ public class XWikiAttachment {
             return attachment_archive.getRCSArchive();
     }
 
+    public void setArchive(Archive archive) {
+        if (attachment_archive==null) {
+            attachment_archive = new XWikiAttachmentArchive();
+            attachment_archive.setAttachment(this);
+        }
+        attachment_archive.setRCSArchive(archive);
+    }
+
     public Version[] getVersions() {
         Node[] nodes = getArchive().changeLog();
         Version[] versions = new Version[nodes.length];
@@ -347,12 +355,12 @@ public class XWikiAttachment {
          return;
 
         if (attachment_archive==null) {
-            try {
-             getDoc().getStore().loadAttachmentArchive(this, context, true);
-            } catch (XWikiException e) {
+             try {
+               getDoc().getStore().loadAttachmentArchive(this, context, true);
+             } catch (XWikiException e) {
                 if (!(e.getException() instanceof ObjectNotFoundException))
                     throw e;
-            }
+             }
         }
 
         if (attachment_archive==null) {

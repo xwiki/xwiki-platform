@@ -72,6 +72,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION = 3204;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT = 3211;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT = 3212;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_OBJECT = 3213;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_CLASS = 3221;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS = 3222;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCH = 3223;

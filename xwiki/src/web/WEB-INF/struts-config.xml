@@ -50,6 +50,8 @@
                     type="com.xpn.xwiki.web.PropAddForm"/>
     <form-bean name="objectadd"
                       type="com.xpn.xwiki.web.ObjectAddForm"/>
+    <form-bean name="objectremove"
+                      type="com.xpn.xwiki.web.ObjectRemoveForm"/>
   </form-beans>
 
   <!-- ========== Global Forward Definitions ============================== -->
@@ -128,6 +130,13 @@
                   name="objectadd"
                   scope="request">
               <forward name="objectadd" path="/templates/edit.vm"/>
+      </action>
+
+      <action path="/objectremove/"
+                  type="com.xpn.xwiki.web.ViewEditAction"
+                  name="objectremove"
+                  scope="request">
+              <forward name="objectremove" path="/templates/edit.vm"/>
       </action>
 
       <action path="/attach/"

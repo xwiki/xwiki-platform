@@ -37,10 +37,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 
 import java.io.FileNotFoundException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public interface XWikiDocInterface extends XWikiNotificationInterface {
     public long getId();
@@ -147,4 +144,12 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String displayForm(String className, XWikiContext context);
 
     void renameProperties(String className, Map fieldsToRename);
+
+    void addObjectsToRemove(BaseObject object);
+
+    ArrayList getObjectsToRemove();
+
+    void setObjectsToRemove(ArrayList objectsToRemove);
+
+    List getxWikiClasses();
 }

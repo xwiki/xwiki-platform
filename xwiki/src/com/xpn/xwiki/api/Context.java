@@ -69,11 +69,8 @@ public class Context extends Api {
          return null;
     }
 
-    public XWikiAction getAction() {
-        if (checkProgrammingRights())
+    public String getAction() {
          return context.getAction();
-        else
-         return null;
     }
 
     public com.xpn.xwiki.XWiki getXWiki() {

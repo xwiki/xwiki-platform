@@ -7,10 +7,10 @@
 </div>
 </div>
 <div id="xwikicontent">
-$doc.getRenderedContent()
+$tdoc.getRenderedContent($tdoc.content)
 <form id="edit" method="post" action="$doc.getActionUrl("save")">
 <p>
-<input type="hidden" name="content" value="$xwiki.getFormEncoded($doc.content)" />
+<input type="hidden" name="content" value="$xwiki.getFormEncoded($tdoc.content)" />
 <input type="hidden" name="parent" value="$!doc.getParent()" />
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />

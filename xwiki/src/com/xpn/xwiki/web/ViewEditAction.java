@@ -195,7 +195,7 @@ public class ViewEditAction extends XWikiAction
             context.setServlet(servlet);
             context.setRequest(request);
             context.setResponse(response);
-            context.setAction(this);
+            context.setAction(action);
             context.setDatabase(dbname);
 
             // We should not go further for the Database Status
@@ -255,7 +255,7 @@ public class ViewEditAction extends XWikiAction
                 else if ( action.equals("inline"))
                     return executeInline(doc, form, request, context);
                 else if ( action.equals("edit") )
-                    return executeEdit(doc, form, request, context);
+                    return executeEdit(doc, tdoc, form, request, vcontext, context);
                 else if ( action.equals("preview"))
                     return executePreview(doc, form, request, context, vcontext);
                 else if (action.equals("save"))
@@ -644,23 +644,63 @@ public class ViewEditAction extends XWikiAction
     }
 
     private ActionForward executePreview(XWikiDocInterface doc, ActionForm form, HttpServletRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException, IOException {
+        String language = ((EditForm)form).getLanguage();
+        XWikiDocInterface tdoc;
+
+        // Make sure it is not considered as new
         XWikiDocInterface doc2 = (XWikiDocInterface)doc.clone();
-        context.put("doc", doc2);
-        vcontext.put("doc", new Document(doc2, context));
-        vcontext.put("cdoc",  vcontext.get("doc"));
-        doc2.readFromForm((EditForm)form, context);
+
+        if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
+            context.put("doc", doc2);
+            vcontext.put("doc", new Document(doc2, context));
+            vcontext.put("tdoc", vcontext.get("doc"));
+            vcontext.put("cdoc",  vcontext.get("doc"));
+            doc2.readFromForm((EditForm)form, context);
+        } else {
+            // Need to save parent and defaultLanguage if they have changed
+            tdoc = doc.getTranslatedDocument(language, context);
+            tdoc.setLanguage(language);
+            tdoc.setTranslation(1);
+            XWikiDocInterface tdoc2 = (XWikiDocInterface)tdoc.clone();
+            vcontext.put("tdoc", new Document(tdoc2, context));
+            vcontext.put("cdoc",  vcontext.get("tdoc"));
+            tdoc2.readFromForm((EditForm)form, context);
+        }
+
         // forward to view template
         String page = getPage(request, "preview");
         return parseTemplate(page, context);
-    }
+        }
 
-    private ActionForward executeEdit(XWikiDocInterface doc, ActionForm form, HttpServletRequest request, XWikiContext context) throws XWikiException, IOException {
+    private ActionForward executeEdit(XWikiDocInterface doc, XWikiDocInterface tdoc, ActionForm form, HttpServletRequest request, VelocityContext vcontext, XWikiContext context) throws XWikiException, IOException {
         PrepareEditForm peform = (PrepareEditForm) form;
         String parent = peform.getParent();
         if (parent!=null)
             doc.setParent(parent);
+        String defaultLanguage = peform.getDefaultLanguage();
+        if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
+               doc.setDefaultLanguage(defaultLanguage);
 
-        doc.readFromTemplateForEdit(peform, context);
+        String language = context.getWiki().getLanguagePreference(context);
+        String languagefromrequest = context.getRequest().getParameter("language");
+
+        if ((doc.isNew())||
+           ((tdoc.isNew())&&(languagefromrequest==null))) {
+               // In this case the created document is going to be the default document
+               tdoc = doc;
+               context.put("tdoc", doc);
+               vcontext.put("tdoc", vcontext.get("doc"));
+               if (doc.isNew()) {
+                doc.setDefaultLanguage(language);
+                doc.setLanguage("");
+               }
+        }
+
+        if (tdoc.isNew()&&(languagefromrequest!=null)) {
+            tdoc.setContent(doc.getContent());
+        }
+
+        tdoc.readFromTemplateForEdit(peform, context);
 
         // forward to edit template
         String page = getPage(request, "edit");

@@ -5,7 +5,7 @@
 <p>
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
-<input type="hidden" name="language" value="$xwiki.languagePreference" />
+<input type="hidden" name="language" value="$!tdoc.language" />
 </p>
 #set( $pages = $doc.includedPages)
 #if ( $pages.size() > 0)
@@ -17,11 +17,17 @@ $msg.get("editincludepagemsg")
 </p>
 #end
 <div id="xwikitext">
-$xwiki.getTextArea($doc.translatedContent)
+#if ($xwiki.isMultiLingual())
+$msg.get("youareediting"): $tdoc.language
+<br /><br />
+#end
+$xwiki.getTextArea($tdoc.content)
 <br/><br/>
+#if ($tdoc.language=="")
 Parent:&nbsp;<input type="text" name="parent" value="$!doc.parent" size="40" />
 <br/><br/>
 Default Language:&nbsp;<input type="text" name="default_language" value="$!doc.defaultLanguage" size="10" />
+#end
 </div>
 </form>
 </div>

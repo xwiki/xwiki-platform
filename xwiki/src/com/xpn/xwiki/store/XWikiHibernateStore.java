@@ -168,6 +168,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             // Make sure we have no null valued in integer fields
           	stmt.executeUpdate("update xwikidoc set xwd_translation=0 where xwd_translation is null");
             stmt.executeUpdate("update xwikidoc set xwd_creationDate=0 where xwd_creationDate is null");
+            stmt.executeUpdate("update xwikidoc set xwd_language=' where xwd_language is null");
+            stmt.executeUpdate("update xwikidoc set xwd_default_language='' where xwd_default_language is null");
             connection.commit();
 		}
 		catch (Exception e) {

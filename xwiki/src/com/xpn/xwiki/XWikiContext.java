@@ -38,12 +38,12 @@ public class XWikiContext extends Hashtable {
    private HttpServlet servlet;
    private HttpServletRequest request;
    private HttpServletResponse response;
-   private XWikiAction action;
+   private String action;
    private String database;
    private String baseUrl;
    private boolean virtual;
-   private XWikiDocInterface doc;
    private XWikiUser user;
+   private String language;
 
    public XWikiContext() {
    }
@@ -81,11 +81,11 @@ public class XWikiContext extends Hashtable {
         this.request = request;
     }
 
-    public XWikiAction getAction() {
+    public String getAction() {
         return action;
     }
 
-    public void setAction(XWikiAction action) {
+    public void setAction(String action) {
         this.action = action;
     }
 
@@ -126,7 +126,6 @@ public class XWikiContext extends Hashtable {
     }
 
     public void setDoc(XWikiDocInterface doc) {
-        this.doc = doc;
         put("doc", doc);
     }
 
@@ -148,4 +147,13 @@ public class XWikiContext extends Hashtable {
     public XWikiUser getXWikiUser() {
         return user;
     }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
 }

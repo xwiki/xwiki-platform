@@ -184,4 +184,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     Date getCreationDate();
 
     void setCreationDate(Date date);
+
+    String getRealLanguage(XWikiContext context) throws XWikiException;
 }

@@ -31,11 +31,13 @@ public class PrepareEditForm extends ActionForm {
     private String formTemplate;
     private String template;
     private String parent;
+    private String defaultLanguage;
 
        public void reset(ActionMapping actionMapping, HttpServletRequest httpServletRequest) {
         setFormTemplate(httpServletRequest.getParameter("formtemplate"));
         setTemplate(httpServletRequest.getParameter("template"));
         setParent(httpServletRequest.getParameter("parent"));
+        setDefaultLanguage(httpServletRequest.getParameter("defaultLanguage"));
     }
 
     public String getFormTemplate() {
@@ -60,5 +62,13 @@ public class PrepareEditForm extends ActionForm {
 
     public void setParent(String parent) {
         this.parent = parent;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
     }
 }

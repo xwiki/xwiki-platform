@@ -67,6 +67,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiCache;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.lang.RandomStringUtils;
@@ -101,6 +102,8 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.*;
 
+import net.sf.hibernate.HibernateException;
+
 public class XWiki implements XWikiNotificationInterface {
     private static final Log log = LogFactory.getLog(XWiki.class);
 
@@ -120,6 +123,7 @@ public class XWiki implements XWikiNotificationInterface {
     private String database;
 
     private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
+    private List virtualWikiList = new ArrayList();
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = "WEB-INF/xwiki.cfg";
@@ -135,6 +139,42 @@ public class XWiki implements XWikiNotificationInterface {
         context.setWiki(xwiki);
         xwiki.setDatabase(context.getDatabase());
         return xwiki;
+    }
+
+    public XWikiHibernateStore getHibernateStore() {
+        XWikiStoreInterface store = getStore();
+        if (store instanceof XWikiHibernateStore)
+            return (XWikiHibernateStore) store;
+        else if (store instanceof XWikiCacheInterface) {
+            store = ((XWikiCacheInterface)store).getStore();
+            if (store instanceof XWikiHibernateStore)
+                return (XWikiHibernateStore) store;
+            else
+                return null;
+        }
+        else
+            return null;
+    }
+
+    public synchronized void updateDatabase(String appname, XWikiContext context) throws HibernateException {
+        String database = context.getDatabase();
+        try {
+           List wikilist = getVirtualWikiList();
+           if (!wikilist.contains(appname)) {
+               wikilist.add(appname);
+               context.setDatabase(appname);
+               XWikiHibernateStore store = getHibernateStore();
+               if (store!=null)
+                   store.updateSchema(context);
+           }
+        } finally {
+            context.setDatabase(database);
+        }
+
+    }
+
+    public List getVirtualWikiList() {
+        return virtualWikiList;
     }
 
     public static XWiki getXWiki(XWikiContext context) throws XWikiException {
@@ -174,6 +214,13 @@ public class XWiki implements XWikiNotificationInterface {
             }
             context.setVirtual(true);
             context.setDatabase(appname);
+            try {
+                // Let's make sure the virtaul wikis are upgraded to the latest database version
+                xwiki.updateDatabase(appname, context);
+            } catch (HibernateException e) {
+                // Just to report it
+                e.printStackTrace();
+            }
         }
         return xwiki;
     }
@@ -719,18 +766,40 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getLanguagePreference(XWikiContext context) {
         // First we get the language from the request
-        String result;
+        String language;
+
+        language = context.getLanguage();
+        if (language!=null)
+            return language;
+
         try {
-            result = context.getRequest().getParameter("language");
-            if ((result!=null)&&(!result.equals("")))
-              return result;
+            language = context.getRequest().getParameter("language");
+            if ((language!=null)&&(!language.equals(""))) {
+              if (language.equals("default")) {
+                  // forgetting language cookie
+                  Cookie cookie = new Cookie("language", "");
+                  cookie.setMaxAge(0);
+                  cookie.setPath("/");
+                  context.getResponse().addCookie(cookie);
+              } else {
+                  // setting language cookie
+                  Cookie cookie = new Cookie("language", language);
+                  cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+                  cookie.setPath("/");
+                  context.getResponse().addCookie(cookie);
+              }
+              context.setLanguage(language);
+              return language;
+            }
         } catch (Exception e) {}
 
         try {
-        // First we get the language from the cookie
-        result = getUserPreferenceFromCookie("language", context);
-        if ((result!=null)&&(!result.equals("")))
-            return result;
+         // First we get the language from the cookie
+         language = getUserPreferenceFromCookie("language", context);
+         if ((language!=null)&&(!language.equals(""))) {
+            context.setLanguage(language);
+            return language;
+         }
         } catch (Exception e) {}
 
         // Next from the default user preference
@@ -739,9 +808,11 @@ public class XWiki implements XWikiNotificationInterface {
             XWikiDocInterface userdoc = null;
             userdoc = getDocument(user, context);
             if (userdoc!=null) {
-                 result = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
-                    if (!result.equals(""))
-                         return result;
+                 language = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
+                    if (!language.equals("")) {
+                         context.setLanguage(language);
+                         return language;
+                    }
                  }
         } catch (XWikiException e) {
         }
@@ -749,16 +820,23 @@ public class XWiki implements XWikiNotificationInterface {
         // Then from the navigator language setting
         if (context.getRequest()!=null) {
             String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept==null)||(accept.equals("")))
+            if ((accept==null)||(accept.equals(""))) {
+                context.setLanguage("");
                 return "";
+            }
 
-            String[] alist = StringUtils.split(accept, ",;");
-            if ((alist==null)||(alist.length==0))
+            String[] alist = StringUtils.split(accept, ",;-");
+            if ((alist==null)||(alist.length==0)) {
+                context.setLanguage("");
                 return "";
-            else
+            }
+            else {
+                context.setLanguage(alist[0]);
                 return alist[0];
+            }
         }
 
+        context.setLanguage("");
         return "";
     }
 

@@ -4,7 +4,7 @@ $msg.get("languages"):
 #set($languageactive = (($preflanguage = "")||($preflanguage==$doc.defaultLanguage)))
 <a #if ($languageactive==1) class="xwikilanguageactive" #end href="${viewurl}?language=default">
  #if ($doc.defaultLanguage != "")
-  $doc.defaultLanguage
+  default (${doc.defaultLanguage})
  #else
   default
  #end

@@ -211,7 +211,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getFormat() {
-        return format;
+        if (format==null)
+            return "";
+        else
+            return format;
     }
 
     public void setFormat(String format) {
@@ -222,7 +225,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getAuthor() {
-        return author;
+        if (author==null)
+            return "";
+        else
+            return author;
     }
 
     public void setAuthor(String author) {
@@ -233,7 +239,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public Date getDate() {
-        return updateDate;
+        if (updateDate==null)
+            return new Date();
+        else
+            return updateDate;
     }
 
     public void setDate(Date date) {
@@ -244,7 +253,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public Date getCreationDate() {
-        return creationDate;
+        if (creationDate == null)
+            return new Date();
+        else
+            return creationDate;
     }
 
     public void setCreationDate(Date date) {
@@ -1242,7 +1254,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getLanguage() {
-        return language;
+        if (language==null)
+            return "";
+        else
+            return language;
     }
 
     public void setLanguage(String language) {
@@ -1250,7 +1265,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getDefaultLanguage() {
-        return defaultLanguage;
+        if (defaultLanguage==null)
+            return "";
+        else
+            return defaultLanguage;
     }
 
     public void setDefaultLanguage(String defaultLanguage) {
@@ -1308,6 +1326,20 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
          return tdoc;
         else
          return tdoc;
+    }
+
+
+    public String getRealLanguage(XWikiContext context) throws XWikiException {
+        XWikiDocInterface tdoc = getTranslatedDocument(context);
+
+        if (context.getAction().equals("edit")
+            ||context.getAction().equals("preview"))
+            return tdoc.getLanguage();
+        
+        if (tdoc.isNew())
+            return getDefaultLanguage();
+        else
+            return tdoc.getLanguage();
     }
 
     public List getTranslationList(XWikiContext context) throws XWikiException {

@@ -19,7 +19,7 @@ $message
 #end
 </p>
 <div id="xwikicontent">
-$doc.getRenderedContent()
+$cdoc.getRenderedContent()
 </div>
 </form>
 #template("editfooter.vm")

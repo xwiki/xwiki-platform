@@ -44,6 +44,7 @@ public class EditForm extends ActionForm
     private String parent;
     private String template;
     private String language;
+    private String defaultLanguage;
 
     private HttpServletRequest request;
     /**
@@ -58,6 +59,8 @@ public class EditForm extends ActionForm
         setWeb(request.getParameter("web"));
         setName(request.getParameter("name"));
         setParent(request.getParameter("parent"));
+        setLanguage(request.getParameter("language"));
+        setDefaultLanguage(request.getParameter("defaultLanguage"));
         this.request = request;
     }
 
@@ -128,6 +131,14 @@ public class EditForm extends ActionForm
 
     public void setTemplate(String template) {
         this.template = template;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
     }
 }
 

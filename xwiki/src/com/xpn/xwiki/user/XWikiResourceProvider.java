@@ -44,32 +44,17 @@ import java.util.Vector;
 public class XWikiResourceProvider extends XWikiBaseProvider implements ResourceProvider {
 
 
-    public boolean init(Properties properties) {
-        return super.init(properties);
-    }
-
     public String getRealm() {
         return "default";
     }
 
-    // Any existing document can have access rights
+     // Any existing document can have access rights
     public boolean handles(String name) {
-        if (name.equals("default"))
             return true;
+    }
 
-        if (super.handles(name))
-            return true;
-        try {
-            name = getName(name);
-            List list = getXWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'", context);
-            boolean result = (list.size()>0);
-            if (result)
-                getHandledNames().add(name);
-            return result;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean init(Properties properties) {
+        return super.init(properties);
     }
 
     public ArrayList getAcls() throws NotFoundException {
@@ -201,7 +186,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             // This should not happen
             e.printStackTrace();
         }
-          
+
 
         if (grouplist!=null) {
             for (int i=0;i<grouplist.size();i++) {
@@ -234,6 +219,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         boolean allow = false;
         boolean allow_found = false;
         boolean deny_found = false;
+        String database = context.getDatabase();
         try {
             // Make sure we remove the database name and set the context
             name = getName(name);
@@ -321,6 +307,9 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        }
+        finally {
+            context.setDatabase(database);
         }
     }
 }

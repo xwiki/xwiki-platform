@@ -38,10 +38,11 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         super.init(properties);
         return true;
     }
-    
+
     public boolean create(String name) {
-        name = getName(name);
+        String database = context.getDatabase();
         try {
+            name = getName(name);
             BaseClass bclass = getXWiki().getGroupClass(context);
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
@@ -57,6 +58,8 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
@@ -64,6 +67,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
     public boolean handles(String name) {
         if (super.handles(name))
             return true;
+        String database = context.getDatabase();
         try {
             name = getName(name);
             List list = getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
@@ -75,6 +79,8 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
@@ -88,6 +94,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
 
     public PropertySet getPropertySet(String name) {
+        String database = context.getDatabase();
         try {
             name = getName(name);
             HashMap args = new HashMap();
@@ -100,10 +107,13 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
     public boolean addToGroup(String username, String groupname) {
+        String database = context.getDatabase();
         try {
             username = getName(username);
             groupname = getName(groupname);
@@ -121,32 +131,40 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
         return true;
     }
 
     public boolean inGroup(String username, String groupname) {
-        username = getName(username);
-        groupname = getName(groupname);
-        XWikiDocInterface doc = getDocument(groupname);
-        Vector vobj = doc.getObjects("XWiki.XWikiGroups");
-        if (vobj==null)
-            return false;
-        for (int i=0;i<vobj.size();i++) {
-            BaseObject object = (BaseObject)vobj.get(i);
-            if (object==null)
-             continue;
-            String member = object.getStringValue("member");
-            if (member==null)
+        String database = context.getDatabase();
+        try {
+            username = getName(username);
+            groupname = getName(groupname);
+            XWikiDocInterface doc = getDocument(groupname);
+            Vector vobj = doc.getObjects("XWiki.XWikiGroups");
+            if (vobj==null)
                 return false;
-            if (member.equals(username))
-                return true;
+            for (int i=0;i<vobj.size();i++) {
+                BaseObject object = (BaseObject)vobj.get(i);
+                if (object==null)
+                    continue;
+                String member = object.getStringValue("member");
+                if (member==null)
+                    return false;
+                if (member.equals(username))
+                    return true;
+            }
+            return false;
+        } finally {
+            context.setDatabase(database);
         }
-        return false;
     }
 
     public List listGroupsContainingUser(String username) {
         List list;
+        String database = context.getDatabase();
         try {
             username = getName(username);
             list = getXWiki().searchDocuments(", BaseObject as obj, StringProperty as prop "
@@ -157,28 +175,36 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return new ArrayList();
+        } finally {
+            context.setDatabase(database);
         }
     }
 
 
     public List listUsersInGroup(String groupname) {
-        groupname = getName(groupname);
-        List list = new ArrayList();
-        XWikiDocInterface doc = getDocument(groupname);
-        Vector vobj = doc.getObjects("XWiki.XWikiGroups");
-        if (vobj==null)
+        String database = context.getDatabase();
+        try {
+            groupname = getName(groupname);
+            List list = new ArrayList();
+            XWikiDocInterface doc = getDocument(groupname);
+            Vector vobj = doc.getObjects("XWiki.XWikiGroups");
+            if (vobj==null)
+                return list;
+            for (int i=0;i<vobj.size();i++) {
+                BaseObject object = (BaseObject)vobj.get(i);
+                if (object==null)
+                    continue;
+                String member = object.getStringValue("member");
+                list.add(member);
+            }
             return list;
-        for (int i=0;i<vobj.size();i++) {
-            BaseObject object = (BaseObject)vobj.get(i);
-            if (object==null)
-                continue;
-            String member = object.getStringValue("member");
-            list.add(member);
+        } finally {
+            context.setDatabase(database);
         }
-        return list;
     }
 
     public boolean removeFromGroup(String username, String groupname) {
+        String database = context.getDatabase();
         try {
             username = getName(username);
             groupname = getName(groupname);
@@ -204,6 +230,8 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 

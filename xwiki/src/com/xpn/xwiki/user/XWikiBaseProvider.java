@@ -71,7 +71,7 @@ public class XWikiBaseProvider {
              return name;
         }
 
-        context.setDatabase(null);
+        context.setDatabase(getXWiki().getDatabase());
         if (name.indexOf(".") !=-1)
             return name;
         else
@@ -83,6 +83,7 @@ public class XWikiBaseProvider {
     }
 
     public XWikiDocInterface getDocument(String name) {
+        String database = context.getDatabase();
         XWikiDocInterface doc = null;
         try {
             name = getName(name);
@@ -91,6 +92,8 @@ public class XWikiBaseProvider {
             return doc;
         } catch (XWikiException e) {
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
@@ -116,22 +119,24 @@ public class XWikiBaseProvider {
     }
 
     public boolean remove(String name) {
-        name = getName(name);
         // Currently a user cannot be removed
         return false;
     }
 
     public boolean store(String name, Entity.Accessor accessor) {
-        name = getName(name);
-        XWikiDocInterface doc = (XWikiDocInterface) getPropertySets().get(getFullName(name));
-        if (doc==null)
-            return false;
-
+        String database = context.getDatabase();
         try {
+            name = getName(name);
+            XWikiDocInterface doc = (XWikiDocInterface) getPropertySets().get(getFullName(name));
+            if (doc==null)
+                return false;
+
             getXWiki().saveDocument(doc, context);
             return true;
         } catch (XWikiException e) {
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 

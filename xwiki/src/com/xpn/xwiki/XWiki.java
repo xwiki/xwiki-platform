@@ -894,8 +894,8 @@ public class XWiki implements XWikiNotificationInterface {
         if (um==null) {
            um = UserManager.getInstance();
           ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setXWiki(this);
-          ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setXWiki(this);
           ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setXWikiContext(context);
+          ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setXWiki(this);
           ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setXWikiContext(context);
           context.put("usermanager", um);
         }
@@ -905,9 +905,11 @@ public class XWiki implements XWikiNotificationInterface {
     public AccessManager getAccessManager(XWikiContext context) {
         AccessManager am = (AccessManager) context.get("accessmanager");
         if (am==null) {
-            am =AccessManager.getInstance();
+            am = AccessManager.getInstance();
            ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setXWiki(this);
            ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setXWikiContext(context);
+           ((XWikiAccessUserProvider) am.getAccessProviders().toArray()[0]).setXWiki(this);
+           ((XWikiAccessUserProvider) am.getAccessProviders().toArray()[0]).setXWikiContext(context);
            context.put("accessmanager", am);
         }
         return am;

@@ -2,7 +2,7 @@
   <provider class="com.xpn.xwiki.user.XWikiResourceProvider">
       <property name="realm">default</property>
   </provider>
-  <provider class="com.opensymphony.module.access.provider.osuser.OSUserUserProvider">
+  <provider class="com.xpn.xwiki.user.XWikiAccessUserProvider">
     <property name="realm">default</property>
   </provider>
 </opensymphony-access>

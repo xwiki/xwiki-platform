@@ -50,6 +50,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     }
 
     public boolean create(String name) {
+        String database = context.getDatabase();
         try {
             name = getName(name);
             BaseClass bclass = getXWiki().getUserClass(context);
@@ -67,13 +68,15 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
-
 
     public boolean handles(String name) {
         if (super.handles(name))
             return true;
+        String database = context.getDatabase();
         try {
             name = getName(name);
             List list = getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
@@ -85,6 +88,8 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
@@ -99,6 +104,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
 
     public PropertySet getPropertySet(String name) {
+        String database = context.getDatabase();
         try {
             name = getName(name);
             HashMap args = new HashMap();
@@ -111,30 +117,40 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
     public boolean authenticate(String name, String password) {
+        String database = context.getDatabase();
         try {
             name = getName(name);
             return getXWiki().checkPassword(name, password, context);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
     public boolean changePassword(String name, String password) {
-        name = getName(name);
-        XWikiDocInterface doc = getDocument(name);
-        BaseObject bobj = doc.getObject("XWiki.XWikiUsers", 0);
-        BaseProperty bprop = (BaseProperty) bobj.safeget("password");
-        if (bprop==null) {
-            bprop = new StringProperty();
-            bobj.safeput("password", bprop);
+        String database = context.getDatabase();
+        try {
+            name = getName(name);
+            XWikiDocInterface doc = getDocument(name);
+            BaseObject bobj = doc.getObject("XWiki.XWikiUsers", 0);
+            BaseProperty bprop = (BaseProperty) bobj.safeget("password");
+            if (bprop==null) {
+                bprop = new StringProperty();
+                bobj.safeput("password", bprop);
+            }
+            bprop.setValue(new String(password));
+            return store(name, null);
+        } finally {
+            context.setDatabase(database);
         }
-        bprop.setValue(new String(password));
-        return store(name, null);
     }
 
 }

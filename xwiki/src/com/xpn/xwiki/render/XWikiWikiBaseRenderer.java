@@ -29,6 +29,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 import org.apache.oro.text.regex.*;
 import org.apache.ecs.html.A;
 import java.util.StringTokenizer;
@@ -78,7 +79,6 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         // Parent Document
         XWikiDocInterface parentdoc = (XWikiDocInterface) context.get("doc");
 
-        // TODO: check if the document exists
         XWiki xwiki = context.getWiki();
         XWikiDocInterface doc;
         try {
@@ -127,6 +127,25 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
        }
    */
 
+    public String handleInternalTags(String content, XWikiDocInterface doc, XWikiContext context) {
+        return content;
+    }
+
+    public String handleAllTags(String content, XWikiDocInterface doc, XWikiContext context) {
+        XWiki xwiki = context.getWiki();
+        XWikiPluginManager plugins = xwiki.getPluginManager();
+
+        // Call it again after plugins..
+        handleInternalTags(content, doc, context);
+
+        // PLUGIN: call startRenderingHandler at the start with the full content
+        content = plugins.commonTagsHandler(content, context);
+
+        // Call it again after plugins..
+        handleInternalTags(content, doc, context);
+        return content;
+    }
+
     public String render(String content, XWikiDocInterface doc, XWikiContext context) {
         boolean insidePRE = false;
         boolean insideVERBATIM = false;
@@ -134,6 +153,8 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         boolean noAutoLink = false;
         Util util = context.getUtil();
         ListSubstitution ls = new ListSubstitution(util);
+        XWiki xwiki = context.getWiki();
+        XWikiPluginManager plugins = xwiki.getPluginManager();
 
         content = util.substitute("s/\\r//go", content);
         content = util.substitute("s/\\\\\\n//go", content);
@@ -142,6 +163,13 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         // Initialization of input and output omitted
         StringBuffer output = new StringBuffer();
         String line;
+
+        // Start by handling all tags (plugins + internal)
+        content = handleAllTags(content, doc, context);
+
+        // PLUGIN: call startRenderingHandler at the start with the full content
+        content = plugins.startRenderingHandler(content, context);
+
         StringTokenizer tokens = new StringTokenizer(content,"\n");
         while(tokens.hasMoreTokens()) {
             line = tokens.nextToken();
@@ -158,10 +186,13 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
                 if (insideVERBATIM) {
                     line = handleVERBATIM(line, util);
                 }
-                // TODO call plugin insidePREHandler
+
+                // PLUGIN: call insidePREHandler with the current line
+                line = plugins.insidePREHandler(line, context);
             }
             else {
-                // TODO call plugin outsidePREHandler
+                // PLUGIN: call insidePREHandler with the current line
+                line = plugins.outsidePREHandler(line, context);
                 line = handleHeadings(line, util);
                 line = handleHR(line, util);
                 line = handleEmphasis(line, util);
@@ -177,7 +208,9 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
             }
         }
         ls.dumpCurrentList(output, true);
-        return output.toString();
+
+        // PLUGIN: call endRenderingHandler at the end with the full content
+        return plugins.endRenderingHandler(output.toString(), context);
     }
 
     private String handleList(ListSubstitution ls, StringBuffer output, String line, Util util) {

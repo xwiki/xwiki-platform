@@ -30,6 +30,8 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.io.File;
@@ -46,6 +48,7 @@ public class XWiki {
     private XWikiConfig config;
     private XWikiStoreInterface store;
     private XWikiRenderingEngine renderingEngine;
+    private XWikiPluginManager pluginManager;
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
     private String version = null;
@@ -58,7 +61,7 @@ public class XWiki {
     public XWiki(String path, XWikiContext context, HttpServlet servlet) throws XWikiException {
         setServlet(servlet);
         XWikiStoreInterface basestore;
-        config = new XWikiConfig(path);
+        setConfig(new XWikiConfig(path));
         String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
         try {
             Class[] classes = new Class[2];
@@ -85,11 +88,12 @@ public class XWiki {
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache)
-            store = new XWikiCache(basestore);
+            setStore(new XWikiCache(basestore));
         else
-            store = basestore;
+            setStore(basestore);
 
-        renderingEngine = new XWikiRenderingEngine(this);
+        setRenderingEngine(new XWikiRenderingEngine(this));
+        setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
     }
 
     public String getVersion() {
@@ -111,7 +115,7 @@ public class XWiki {
     }
 
     public String getRealPath(String path) {
-        return servlet.getServletContext().getRealPath(path);
+        return getServlet().getServletContext().getRealPath(path);
     }
 
     public String Param(String key) {
@@ -141,12 +145,12 @@ public class XWiki {
     }
 
     public void saveDocument(XWikiDocInterface doc) throws XWikiException {
-        store.saveXWikiDoc(doc);
+        getStore().saveXWikiDoc(doc);
     }
 
     public XWikiDocInterface getDocument(XWikiDocInterface doc) throws XWikiException {
         try {
-            doc = store.loadXWikiDoc(doc);
+            doc = getStore().loadXWikiDoc(doc);
         }  catch (XWikiException e) {
             // TODO: log error for document that does not exist.
         }
@@ -219,7 +223,7 @@ public class XWiki {
     }
 
     public List getClassList() throws XWikiException {
-        return store.getClassList();
+        return getStore().getClassList();
     }
     /*
     public String[] getClassList() throws XWikiException {
@@ -232,11 +236,11 @@ public class XWiki {
     */
 
     public List searchDocuments(String wheresql) throws XWikiException {
-        return store.searchDocuments(wheresql);
+        return getStore().searchDocuments(wheresql);
     }
 
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-        return store.searchDocuments(wheresql, nb, start);
+        return getStore().searchDocuments(wheresql, nb, start);
     }
 
     public boolean isTest() {
@@ -315,8 +319,8 @@ public class XWiki {
     }
 
     public void flushCache() {
-        if (store instanceof XWikiCacheInterface) {
-            ((XWikiCacheInterface)store).flushCache();
+        if (getStore() instanceof XWikiCacheInterface) {
+            ((XWikiCacheInterface)getStore()).flushCache();
         }
     }
 
@@ -326,5 +330,25 @@ public class XWiki {
 
     public void setServlet(HttpServlet servlet) {
         this.servlet = servlet;
+    }
+
+    public XWikiPluginManager getPluginManager() {
+        return pluginManager;
+    }
+
+    public void setPluginManager(XWikiPluginManager pluginManager) {
+        this.pluginManager = pluginManager;
+    }
+
+    public void setConfig(XWikiConfig config) {
+        this.config = config;
+    }
+
+    public void setStore(XWikiStoreInterface store) {
+        this.store = store;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -52,7 +52,9 @@ public class Util {
     }
 
     public String substitute(String pattern, String substitution, String text) {
-        return (new WikiSubstitution(this, substitution)).substitute(text);
+        WikiSubstitution subst = new WikiSubstitution(this, pattern);
+        subst.setSubstitution(substitution);
+        return subst.substitute(text);
     }
 
     public Perl5Matcher getMatcher() {

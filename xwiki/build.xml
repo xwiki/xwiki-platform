@@ -178,6 +178,20 @@
         </javac>
     </target>
 
+    <target name="test.perl" depends="xwiki, tests">
+        <mkdir dir="${test.reports.dir}" />
+
+        <junit printsummary="yes" dir="${basedir}/test" fork="on" >
+
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="xml" />
+
+            <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no"/>
+        </junit>
+    </target>
 
     <target name="test.client" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
@@ -194,8 +208,11 @@
             <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.PluginTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreTest" haltonfailure="no" />
+	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreRCSFileTest" haltonfailure="no" />
+	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateTest" haltonfailure="no" />
+	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateCacheTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
         </junit>

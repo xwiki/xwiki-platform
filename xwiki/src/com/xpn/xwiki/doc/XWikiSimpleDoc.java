@@ -897,7 +897,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public String toXML(XWikiContext context) {
         Document doc = toXMLDocument(context);
         OutputFormat outputFormat = new OutputFormat("", true);
-        outputFormat.setEncoding(context.getWiki().getEncoding());
+        if (context.getWiki()==null)
+            outputFormat.setEncoding("ISO-8859-1");
+        else
+            outputFormat.setEncoding(context.getWiki().getEncoding());
         StringWriter out = new StringWriter();
         XMLWriter writer = new XMLWriter( out, outputFormat );
         try {

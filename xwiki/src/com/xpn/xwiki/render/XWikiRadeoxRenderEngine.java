@@ -43,7 +43,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         return true;
     }
 
-    public void appendLink(StringBuffer buffer, String name, String view, String anchor, boolean create) {
+    public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         XWikiContext context = getContext();
         buffer.append("<a href=\"");
         buffer.append(context.getWiki().getBase(context));
@@ -64,30 +64,45 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             buffer.append(anchor);
         }
 
-        if (create==true) {
-            XWikiDocInterface currentdoc = ((XWikiDocInterface) context.get("doc"));
-            if (currentdoc!=null) {
-                buffer.append("?parent=");
-                buffer.append(currentdoc.getFullName());
-            }
-        }
-
         buffer.append("\">");
         buffer.append(view);
         buffer.append("</a>");
     }
 
-    public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
-        appendLink(buffer, name, view, anchor, false);
-    }
-
     public void appendLink(StringBuffer buffer, String name, String view) {
-        appendLink(buffer, name, view, null, false);
+        appendLink(buffer, name, view, null);
     }
 
     public void appendCreateLink(StringBuffer buffer, String name, String view) {
-        appendLink(buffer, name, view, null, true);
+        XWikiContext context = getContext();
+        buffer.append("<u>");
+        buffer.append(view);
+        buffer.append("</u>");
+        buffer.append("<a href=\"");
+        buffer.append(context.getWiki().getBase(context));
+        buffer.append("view");
+        buffer.append("/");
+
+        String newname = StringUtils.replace(name, " ", "");
+
+        if (newname.indexOf(".")!=-1) {
+           newname = StringUtils.replace(newname, ".","/", 1);
+        } else {
+           newname = ((XWikiDocInterface)context.get("doc")).getWeb() + "/" + newname;
+        }
+
+        buffer.append(newname);
+        XWikiDocInterface currentdoc = ((XWikiDocInterface) context.get("doc"));
+        if (currentdoc!=null) {
+                buffer.append("?parent=");
+                buffer.append(currentdoc.getFullName());
+            }
+
+        buffer.append("\">");
+        buffer.append("?");
+        buffer.append("</a>");
     }
+
 
     public XWikiContext getContext() {
         return context;

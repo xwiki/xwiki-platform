@@ -102,11 +102,11 @@ public class RadeoxRenderTest  extends RenderTest {
         renderTest(wikibase, "Test link: [Web Home]",
                 "WebHome", false, context);
         renderTest(wikibase, "Test link: [Web Home2]",
-                "Web Home2</a>", false, context);
+                "Web Home2", false, context);
         renderTest(wikibase, "Test link: [Web Home2]",
                 "WebHome2?parent=", false, context);
         renderTest(wikibase, "Test link: [WebHome|Other Text]",
-                "Other Text</a>", false, context);
+                "Other Text", false, context);
         renderTest(wikibase, "Test link: [WebHome|Other Text]",
                 "WebHome", false, context);
          renderTest(wikibase, "Test link: http://www.ludovic.org/",

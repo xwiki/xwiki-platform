@@ -136,11 +136,6 @@
                 dir="${src.dir}/perl" />
         </copy>
 
-        <copy todir="${build.dir}/web">
-            <fileset includes="jspRedirector.jsp"
-                dir="${basedir}/test" />
-        </copy>
-
                 <copy todir="${build.dir}/web/WEB-INF">
                     <fileset includes="license.txt"
                         dir="${basedir}" />

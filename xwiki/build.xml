@@ -138,8 +138,16 @@
 
         <copy todir="${build.dir}/web">
             <fileset includes="jspRedirector.jsp"
-                dir="test" />
+                dir="${basedir}/test" />
         </copy>
+
+                <copy todir="${build.dir}/web/WEB-INF">
+                    <fileset includes="license.txt"
+                        dir="${basedir}" />
+                    <fileset includes="lesser.txt"
+                        dir="${basedir}/" />
+                </copy>
+
 
         <copy todir="${build.dir}/web/WEB-INF/classes">
             <fileset dir="${build.dir}/web/WEB-INF">

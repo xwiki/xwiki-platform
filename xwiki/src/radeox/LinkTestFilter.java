@@ -94,6 +94,8 @@ public class LinkTestFilter extends LocaleRegexTokenFilter {
 
         // Is there an alias like [alias|link] ?
         int pipeIndex = name.indexOf('|');
+        if (pipeIndex==-1)
+         pipeIndex = name.indexOf('>');
         String alias ="";
         if (-1 != pipeIndex) {
           alias = name.substring(0, pipeIndex);

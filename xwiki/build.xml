@@ -73,11 +73,14 @@
     <property name="libs.inlinejava"
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
+    <property name="libs.osuser"
+            value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar" />
+
     <property name="libs.tests"
         value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar" />
 
     <property name="libs"
-        value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.tests}" />
+        value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.tests}" />
 
 
     <!-- Define the Cactus tasks -->
@@ -215,6 +218,7 @@
 	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateCacheTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.UserTest" haltonfailure="no" />
         </junit>
     </target>
 

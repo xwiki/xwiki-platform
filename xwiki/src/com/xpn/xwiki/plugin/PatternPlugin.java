@@ -25,6 +25,10 @@ package com.xpn.xwiki.plugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.notify.DocObjectChangedRule;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.render.HeadingSubstitution;
@@ -42,7 +46,7 @@ import org.apache.tools.ant.util.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.Entities;
 
-public class PatternPlugin extends XWikiDefaultPlugin {
+public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificationInterface {
     Vector patterns = new Vector();
     Vector results = new Vector();
     Vector descriptions = new Vector();
@@ -52,16 +56,20 @@ public class PatternPlugin extends XWikiDefaultPlugin {
         super(name, context);
         init(context);
 
-        // TODO: register for any modifications of the Plugins.PatternPlugin document..
-        // TODO: the notification method needs to be implemented.
+        // register for any modifications of the Plugins.PatternPlugin document..
+        XWiki xwiki = context.getWiki();
+        xwiki.getNotificationManager().addNamedRule("Plugins.PatternPlugin",
+                              new DocObjectChangedRule(this, "Plugins.PatternPlugin"));
+
     }
 
     public void init(XWikiContext context) {
+        XWiki xwiki = context.getWiki();
         try {
-            XWiki xwiki = context.getWiki();
+            patterns = new Vector();
+            results = new Vector();
+            descriptions = new Vector();
             XWikiDocInterface pattern_doc = xwiki.getDocument("Plugins", "PatternPlugin");
-            String content = pattern_doc.getContent();
-
             Vector patternlist = pattern_doc.getObjects("Plugins.PatternPlugin");
             if (patternlist!=null) {
             for (int i=0;i<patternlist.size();i++) {
@@ -76,6 +84,7 @@ public class PatternPlugin extends XWikiDefaultPlugin {
         }
 
         patternListSubstitution = new WikiSubstitution(context.getUtil(),"%PATTERNS%");
+        // Add a notification rule if the preference property plugin is modified
     }
 
 
@@ -145,5 +154,8 @@ public class PatternPlugin extends XWikiDefaultPlugin {
         return line;
     }
 
-
+    public void notify(XWikiNotificationRule rule, XWikiDocInterface newdoc, XWikiDocInterface olddoc, int event, XWikiContext context) {
+     // If the PatternPlugin document has been modified we need to reload the patterns
+     init(context);
+    }
 }

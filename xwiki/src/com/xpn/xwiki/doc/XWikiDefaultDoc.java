@@ -23,9 +23,12 @@
 package com.xpn.xwiki.doc;
 
 import com.xpn.xwiki.*;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.store.*;
 
-public abstract class XWikiDefaultDoc implements XWikiDocInterface {
+import java.io.Serializable;
+
+public abstract class XWikiDefaultDoc implements XWikiDocInterface, Serializable {
   private XWikiStoreInterface store;
   private XWikiCacheInterface docCache;
 
@@ -35,5 +38,16 @@ public abstract class XWikiDefaultDoc implements XWikiDocInterface {
 
     public void setStore(XWikiStoreInterface store) {
         this.store = store;
+    }
+
+    public Object clone()
+    {
+        XWikiDefaultDoc doc = null;
+        try {
+            doc = (XWikiDefaultDoc) getClass().newInstance();
+        } catch (Exception e) {
+            // This should not happen
+        }
+        return doc;
     }
 }

@@ -31,6 +31,10 @@ import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -43,12 +47,14 @@ import org.apache.ecs.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
-public class XWiki {
+public class XWiki implements XWikiNotificationInterface {
 
     private XWikiConfig config;
     private XWikiStoreInterface store;
     private XWikiRenderingEngine renderingEngine;
     private XWikiPluginManager pluginManager;
+    private XWikiNotificationManager notificationManager;
+
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
     private String version = null;
@@ -59,8 +65,14 @@ public class XWiki {
     }
 
     public XWiki(String path, XWikiContext context, HttpServlet servlet) throws XWikiException {
-        context.setWiki(this);
+        // Important to have these in the context
         setServlet(servlet);
+        context.setWiki(this);
+
+        // Create the notification manager
+        setNotificationManager(new XWikiNotificationManager());
+
+        // Prepare the store
         XWikiStoreInterface basestore;
         setConfig(new XWikiConfig(path));
         String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
@@ -93,8 +105,14 @@ public class XWiki {
         else
             setStore(basestore);
 
+        // Prepare the Rendering Engine
         setRenderingEngine(new XWikiRenderingEngine(this));
+
+        // Prepare the Plugin Engine
         setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
+        // Add a notification rule if the preference property plugin is modified
+        getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
+                            new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
     }
 
     public String getVersion() {
@@ -171,8 +189,9 @@ public class XWiki {
         return store;
     }
 
-    public void saveDocument(XWikiDocInterface doc) throws XWikiException {
+    public void saveDocument(XWikiDocInterface doc, XWikiDocInterface olddoc, XWikiContext context) throws XWikiException {
         getStore().saveXWikiDoc(doc);
+        getNotificationManager().verify(doc, olddoc, 0, context);
     }
 
     public XWikiDocInterface getDocument(XWikiDocInterface doc) throws XWikiException {
@@ -377,5 +396,19 @@ public class XWiki {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public XWikiNotificationManager getNotificationManager() {
+        return notificationManager;
+    }
+
+    public void setNotificationManager(XWikiNotificationManager notificationManager) {
+        this.notificationManager = notificationManager;
+    }
+
+    public void notify(XWikiNotificationRule rule, XWikiDocInterface newdoc, XWikiDocInterface olddoc, int event, XWikiContext context) {
+        if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
+            setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
+        }
     }
 }

@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
@@ -215,7 +216,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public void setMeta(String meta) {
-        if (!meta.equals(this.meta)) {
+        if (meta==null) {
+            if (this.meta!=null)
+                setMetaDataDirty(true);
+        } else if (!meta.equals(this.meta)) {
             setMetaDataDirty(true);
         }
         this.meta = meta;
@@ -723,4 +727,35 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
+    public void notify(XWikiNotificationRule rule, XWikiDocInterface newdoc, XWikiDocInterface olddoc, int event, XWikiContext context) {
+        // Do nothing for the moment..
+        // A usefull thing here would be to look at any instances of a Notification Object
+        // with email addresses and send an email to warn that the document has been modified..
+
+    }
+
+    public Object clone() {
+        XWikiSimpleDoc doc = (XWikiSimpleDoc) super.clone();
+        doc.setRCSArchive(getRCSArchive());
+        doc.setRCSVersion(getRCSVersion());
+        doc.setAuthor(getAuthor());
+        doc.setContent(getContent());
+        doc.setContentDirty(isContentDirty());
+        doc.setDate(getDate());
+        doc.setFormat(getFormat());
+        doc.setFromCache(isFromCache());
+        doc.setId(getId());
+        doc.setMeta(getMeta());
+        doc.setMetaDataDirty(isMetaDataDirty());
+        doc.setMostRecent(isMostRecent());
+        doc.setName(getName());
+        doc.setNew(isNew());
+        doc.setStore(getStore());
+        doc.setTemplate(getTemplate());
+        doc.setWeb(getWeb());
+        doc.setParent(getParent());
+        doc.setxWikiClass((BaseClass)getxWikiClass().clone());
+        doc.mergexWikiObjects(this);
+        return doc;
+    }
 }

@@ -142,8 +142,9 @@ public class ViewEditAction extends XWikiAction
         }
         else if (action.equals("save"))
         {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
             doc.readFromForm((EditForm)form, context);
-            xwiki.saveDocument(doc);
+            xwiki.saveDocument(doc, olddoc, context);
 
             // forward to view
             response.sendRedirect(doc.getActionUrl("view",context));
@@ -151,6 +152,7 @@ public class ViewEditAction extends XWikiAction
         }
         else if (action.equals("propupdate"))
         {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
             BaseClass bclass = doc.getxWikiClass();
             Iterator it = bclass.getFields().values().iterator();
             while (it.hasNext()) {
@@ -158,7 +160,7 @@ public class ViewEditAction extends XWikiAction
                 Map map = ((EditForm)form).getObject(property.getName());
                 property.getxWikiClass().fromMap(map, property);
             }
-            xwiki.saveDocument(doc);
+            xwiki.saveDocument(doc, olddoc, context);
 
             // forward to edit
             response.sendRedirect(doc.getActionUrl("edit",context));
@@ -166,6 +168,7 @@ public class ViewEditAction extends XWikiAction
         }
         else if (action.equals("propadd"))
         {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
             String propName = ((PropAddForm) form).getPropName();
             String propType = ((PropAddForm) form).getPropType();
             BaseClass bclass = doc.getxWikiClass();
@@ -180,7 +183,7 @@ public class ViewEditAction extends XWikiAction
                     pclass.setName(propName);
                     pclass.setPrettyName(propName);
                     bclass.put(propName, pclass);
-                    xwiki.saveDocument(doc);
+                    xwiki.saveDocument(doc, olddoc, context);
                 }
             }
             // forward to edit
@@ -188,9 +191,10 @@ public class ViewEditAction extends XWikiAction
             return null;
         }
         else if (action.equals("classadd")) {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
             String className = ((ClassAddForm) form).getClassName();
             doc.createNewObject(className, context);
-            xwiki.saveDocument(doc);
+            xwiki.saveDocument(doc, olddoc, context);
             return (mapping.findForward("classadd"));
         }
         // forward to edit
@@ -205,3 +209,4 @@ public class ViewEditAction extends XWikiAction
     }
 }
 
+    

@@ -110,4 +110,14 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public void setNumber(int number) {
         this.number = number;
     }
+
+    public boolean equals(Object obj) {
+     if (!super.equals(obj))
+      return false;
+
+     if (getNumber()!=((BaseObject)obj).getNumber())
+         return false;
+
+     return true;
+    }   
 }

@@ -24,6 +24,7 @@ package com.xpn.xwiki.doc;
 
 import org.apache.commons.jrcs.rcs.*;
 import com.xpn.xwiki.*;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.io.FileNotFoundException;
 
-public interface XWikiDocInterface {
+public interface XWikiDocInterface extends XWikiNotificationInterface {
     public long getId();
     public void setId(long id);
     public String getName();
@@ -97,20 +98,15 @@ public interface XWikiDocInterface {
     public boolean isFromCache() ;
     public void setFromCache(boolean fromCache);
 
-    int getObjectNumbers(String classname);
+    public int getObjectNumbers(String classname);
+    public Vector getObjects(String classname);
+    public void setObjects(String classname, Vector objects);
+    public BaseObject getObject(String classname, int nb);
+    public void setObject(String classname, int nb, BaseObject object);
 
-    Vector getObjects(String classname);
+    public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException;
+    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException;
+    public void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException;
 
-    void setObjects(String classname, Vector objects);
-
-    BaseObject getObject(String classname, int nb);
-
-    void setObject(String classname, int nb, BaseObject object);
-
-    void readFromForm(EditForm eform, XWikiContext context) throws XWikiException;
-
-    void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException;
-
-    void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException;
-
+    public Object clone();
 }

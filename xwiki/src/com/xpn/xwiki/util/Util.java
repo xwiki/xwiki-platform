@@ -35,7 +35,7 @@ import com.xpn.xwiki.render.WikiSubstitution;
 
 public class Util {
 
-    private static PatternCache patterns = new PatternCacheLRU(20);
+    private static PatternCache patterns = new PatternCacheLRU(200);
     private Perl5Matcher matcher = new Perl5Matcher();
     private Perl5Util p5util = new Perl5Util(getPatterns());
 

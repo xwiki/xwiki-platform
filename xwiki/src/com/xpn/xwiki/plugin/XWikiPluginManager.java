@@ -65,6 +65,7 @@ public class XWikiPluginManager {
             }
         } catch (Exception e) {
             // Log an error but do not fail..
+            e.printStackTrace();
         }
 
     }
@@ -78,6 +79,10 @@ public class XWikiPluginManager {
         for (int i=0;i<classNames.length;i++) {
             addPlugin(classNames[i], context);
         }
+    }
+
+    public XWikiPluginInterface getPlugin(String className) {
+        return (XWikiPluginInterface) plugins_classes.get(className);
     }
 
     public Vector getPlugins() {

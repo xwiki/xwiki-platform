@@ -59,6 +59,7 @@ public class XWiki {
     }
 
     public XWiki(String path, XWikiContext context, HttpServlet servlet) throws XWikiException {
+        context.setWiki(this);
         setServlet(servlet);
         XWikiStoreInterface basestore;
         setConfig(new XWikiConfig(path));

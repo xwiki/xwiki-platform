@@ -182,18 +182,20 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 doc.setNew(true);
                 return doc;
             }
+            Map bclasses = new HashMap();
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
             bclass.setName(doc.getFullName());
             loadXWikiClass(bclass, false);
             doc.setxWikiClass(bclass);
+            bclasses.put(doc.getFullName(), bclass);
 
             // Find the list of classes for which we have an object
             Query query = getSession().createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name order by bobject.number");
             query.setText("name", doc.getFullName());
             Iterator it = query.list().iterator();
-            Map bclasses = new HashMap();
+
             while (it.hasNext()) {
                 Object[] result = (Object[]) it.next();
                 String name = (String)result[0];

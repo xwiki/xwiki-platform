@@ -155,7 +155,9 @@
         <root url="jar://$PROJECT_DIR$/lib/InlineJavaUser.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://C:/dev/perl/Inline-Java-0.44/Java/sources" />
+      </SOURCES>
     </library>
     <library name="Velocity">
       <CLASSES>
@@ -176,8 +178,12 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/ant.jar!/" />
       </CLASSES>
-      <JAVADOC />
-      <SOURCES />
+      <JAVADOC>
+        <root url="file://C:/tools/apache-ant-1.6.0/docs/manual/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/apache-ant-1.6.0/src/main" />
+      </SOURCES>
     </library>
   </component>
   <component name="uidesigner-configuration">

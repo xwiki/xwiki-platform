@@ -25,6 +25,7 @@ package com.xpn.xwiki.plugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.render.HeadingSubstitution;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
@@ -59,17 +60,20 @@ public class PatternPlugin extends XWikiDefaultPlugin {
             XWikiDocInterface pattern_doc = xwiki.getDocument("Plugins", "PatternPlugin");
             String content = pattern_doc.getContent();
 
-            // Parsing document for pattern definitions
-
-        } catch (XWikiException e) {
-            // Document not found.. No pattern definitions configured
+            Vector patternlist = pattern_doc.getObjects("Plugins.PatternPlugin");
+            if (patternlist!=null) {
+            for (int i=0;i<patternlist.size();i++) {
+                    BaseObject obj = (BaseObject) patternlist.get(i);
+                    patterns.add(obj.get("pattern").toString());
+                    results.add(obj.get("result").toString());
+                    descriptions.add(obj.get("description").toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        // Some test patterns
-        addPattern(":\\)","I am happy","no description");
-        addPattern(":\\(","I am sad","no description");
         patternListSubstitution = new WikiSubstitution(context.getUtil(),"%PATTERNS%");
-        patternListSubstitution.setSubstitution(getPatternList());
     }
 
 
@@ -94,6 +98,7 @@ public class PatternPlugin extends XWikiDefaultPlugin {
     }
 
     public String commonTagsHandler(String line, XWikiContext context) {
+        patternListSubstitution.setSubstitution(getPatternList());
         line = patternListSubstitution.substitute(line);
         return line;
     }
@@ -108,8 +113,16 @@ public class PatternPlugin extends XWikiDefaultPlugin {
         for (int i=0;i<patterns.size();i++) {
          String pattern = (String) patterns.get(i);
          String result = (String) results.get(i);
-         line = util.substitute("s/" + pattern + "/" +  result + "/go", line);
+         try {
+           if (pattern.startsWith("s/"))
+            line = util.substitute(pattern, line);
+           else
+            line = StringUtils.replace(line, pattern, result);
+         } catch (Exception e) {
+             // Log a error but do not fail..
+         }
         }
+
         return line;
     }
 

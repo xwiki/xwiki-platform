@@ -68,17 +68,17 @@
       </pairs>
       <pairs>
         <key>
-          <option name="value" value="11" />
-        </key>
-        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
-      </pairs>
-      <pairs>
-        <key>
           <option name="value" value="9" />
         </key>
         <value predicate="moduleLibrary">
           <url>file://$MODULE_DIR$/build/xwikibase_test</url>
         </value>
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="11" />
+        </key>
+        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
       </pairs>
       <pairs>
         <key>
@@ -94,15 +94,15 @@
       </pairs>
       <pairs>
         <key>
-          <option name="value" value="6" />
-        </key>
-        <value predicate="higherLibrary" level="project" libraryName="Perl" />
-      </pairs>
-      <pairs>
-        <key>
           <option name="value" value="1" />
         </key>
         <value predicate="dependencyModule" moduleName="xwikibase" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="6" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Perl" />
       </pairs>
     </orderEntriesWatcher>
     <order-entry-info>
@@ -144,7 +144,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="11" />
+          <option name="value" value="9" />
         </key>
         <value>
           <option name="copy" value="false" />
@@ -153,7 +153,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="9" />
+          <option name="value" value="11" />
         </key>
         <value>
           <option name="copy" value="false" />
@@ -180,20 +180,20 @@
       </info>
       <info>
         <key>
-          <option name="value" value="6" />
-        </key>
-        <value>
-          <option name="copy" value="false" />
-          <option name="URI" value="/WEB-INF/lib" />
-        </value>
-      </info>
-      <info>
-        <key>
           <option name="value" value="1" />
         </key>
         <value>
           <option name="copy" value="false" />
           <option name="URI" value="/WEB-INF/classes" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="6" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
         </value>
       </info>
     </order-entry-info>

@@ -6,7 +6,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.RenderTest;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.PatternPlugin;
 
 /**
  * ===================================================================
@@ -41,22 +43,40 @@ public class PluginTest extends TestCase {
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
         xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin", context));
+        PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
+        pplugin.addPattern(":)","smile","no desc");
+        pplugin.addPattern(":-)","smile","no desc");
+        pplugin.addPattern("8-)","cool","no desc");
+        pplugin.addPattern("s/[bB]ug\\s+([0-9]+?)/http:\\/\\/bugzilla.xpertnet.biz\\/show_bug.cgi?id=$1/go","bugzilla link","no desc");
     }
 
-        public void testSmilies() throws XWikiException {
-        XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+
+    public void testSmilies() throws XWikiException {
+        XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
         RenderTest.renderTest(wikibase, "Hello 1\n:)\nHello 2",
-                "Hello 1\nI am happy\nHello 2", true, context);
-        RenderTest.renderTest(wikibase, "Hello 1\n:(\nHello 2",
-                    "Hello 1\nI am sad\nHello 2", true, context);
+                "smile", false, context);
+        RenderTest.renderTest(wikibase, "Hello 1\n:-)\nHello 2",
+                "smile", false, context);
         RenderTest.renderTest(wikibase, "Hello 1\n:) :)\nHello 2",
-                    "Hello 1\nI am happy I am happy\nHello 2", true, context);
+                "smile smile", false, context);
+        RenderTest.renderTest(wikibase, "Hello 1\n:) 8-)\nHello 2",
+                "smile cool", false, context);
+    }
+
+    public void testBugzilla() throws XWikiException {
+        XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
+        RenderTest.renderTest(wikibase, "hello bug 234 end",
+                "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
+        RenderTest.renderTest(wikibase, "hello Bug 234 end",
+                "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
+        RenderTest.renderTest(wikibase, "hello [bug 234] end",
+                "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, context);
     }
 
     public void testPatternsTag() throws XWikiException {
-    XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
-    RenderTest.renderTest(wikibase, "Hello 1\n%PATTERNS%\nHello 2",
-            "I am happy", false, context);
+        XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
+        RenderTest.renderTest(wikibase, "Hello 1\n%PATTERNS%\nHello 2",
+                "smile", false, context);
     }
 
 }

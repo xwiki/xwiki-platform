@@ -3,7 +3,7 @@
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb">
 <br>
-<b>$class.name</b>
+<b>$class.prettyName</b>
 <br>
  <table>
  <tr>

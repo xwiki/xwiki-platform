@@ -302,11 +302,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
         try {
-            doc.setStore(this);
-            checkHibernate();
-            beginTransaction();
-            getSession().load(doc, new Long(doc.getId()));
-            endTransaction(true);
+            if (doc.getStore()==null) {
+                doc = loadXWikiDoc(doc);
+            }
             Node[] nodes = doc.getRCSArchive().changeLog();
             Version[] versions = new Version[nodes.length];
             for (int i=0;i<nodes.length;i++) {

@@ -64,7 +64,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.net.URL;
 
 public class XWiki implements XWikiNotificationInterface {
@@ -103,10 +102,8 @@ public class XWiki implements XWikiNotificationInterface {
             HttpServletRequest request = context.getRequest();
             String host = "";
             try {
-                StringBuffer requestURL = request.getRequestURL();
-                if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
-                    requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
-                host = new URL(requestURL.toString()).getHost();
+                String requestURL = getRequestURL(request);
+                host = new URL(requestURL).getHost();
             } catch (Exception e) {};
 
             String appname = findWikiServer(host, context);
@@ -137,6 +134,13 @@ public class XWiki implements XWikiNotificationInterface {
             context.setDatabase(appname);
         }
         return xwiki;
+    }
+
+    public static String getRequestURL(HttpServletRequest request) {
+        StringBuffer requestURL = request.getRequestURL();
+        if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
+            requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
+        return requestURL.toString();
     }
 
     private static String findWikiServer(String host, XWikiContext context) {
@@ -313,12 +317,7 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     private XWikiDocInterface getDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
-        try {
-            doc = getStore().loadXWikiDoc(doc, context);
-        }  catch (XWikiException e) {
-            throw e;
-        }
-        return doc;
+        return getStore().loadXWikiDoc(doc, context);
     }
 
     public XWikiDocInterface getDocument(XWikiDocInterface doc, String revision, XWikiContext context) throws XWikiException {
@@ -394,8 +393,8 @@ public class XWiki implements XWikiNotificationInterface {
         return getDocument(web + "." + name, context);
     }
 
-    public String getBase() {
-        return Param("xwiki.base","../../");
+    public String getBase(XWikiContext context) {
+        return context.getBaseUrl();
     }
 
     public XWikiRenderingEngine getRenderingEngine() {
@@ -1083,4 +1082,10 @@ public class XWiki implements XWikiNotificationInterface {
                 context.setDatabase(database);
         }
     }
+
+    public void deleteDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        getStore().deleteXWikiDoc(doc, context);
+    }
+
+
 }

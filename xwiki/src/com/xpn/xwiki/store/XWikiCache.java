@@ -70,6 +70,17 @@ public class XWikiCache implements XWikiCacheInterface {
 
     public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         store.saveXWikiDoc(doc, context);
+        doc.setStore(store);
+        String key = getKey(doc, context);
+        // We need to flush so that caches
+        // on the cluster are informed about the change
+        cache.flushEntry(key);
+        cache.putInCache(key, doc);
+    }
+
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.saveXWikiDoc(doc, context, bTransaction);
+        doc.setStore(store);
         String key = getKey(doc, context);
         // We need to flush so that caches
         // on the cluster are informed about the change
@@ -96,6 +107,7 @@ public class XWikiCache implements XWikiCacheInterface {
         } catch (NeedsRefreshException e) {
             try {
                 doc = store.loadXWikiDoc(doc, context);
+                doc.setStore(store);
             } catch (XWikiException xwikiexception) {
                 cache.cancelUpdate(key);
                 throw xwikiexception;
@@ -106,7 +118,15 @@ public class XWikiCache implements XWikiCacheInterface {
     }
 
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version, XWikiContext context) throws XWikiException {
-        return store.loadXWikiDoc(doc, version, context);
+        XWikiDocInterface doc2 = store.loadXWikiDoc(doc, version, context);
+        doc2.setStore(store);
+        return doc2;
+    }
+
+    public void deleteXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        String key = getKey(doc, context);
+        store.deleteXWikiDoc(doc, context);
+        cache.flushEntry(key);
     }
 
     public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
@@ -136,6 +156,10 @@ public class XWikiCache implements XWikiCacheInterface {
 
     public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         store.loadAttachmentArchive(attachment, context, bTransaction);
+    }
+
+    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.deleteXWikiAttachment(attachment, context, bTransaction);
     }
 
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {

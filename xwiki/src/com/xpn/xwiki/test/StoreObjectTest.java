@@ -53,6 +53,10 @@ public abstract class StoreObjectTest extends TestCase {
     }
 
     public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+        testReadObjectInDoc(store, object, false);
+    }
+
+    public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object, boolean advanced) throws  XWikiException {
         // Prepare object2 for reading
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
 
@@ -63,6 +67,37 @@ public abstract class StoreObjectTest extends TestCase {
         // Verify object2
         Utils.assertProperty(object2, object, "first_name");
         Utils.assertProperty(object2, object, "age");
+
+        if (advanced) {
+            Utils.assertProperty(object2, object, "driver");
+            Utils.assertProperty(object2, object, "category");
+            Utils.assertProperty(object2, object, "category2");
+            Utils.assertProperty(object2, object, "category3");
+            Utils.assertProperty(object2, object, "dblist");
+        } else {
+            assertNull("driver Field should not exist", object2.safeget("driver"));
+            assertNull("category Field should not exist", object2.safeget("category"));
+            assertNull("category2 Field should not exist", object2.safeget("category2"));
+            assertNull("category3 Field should not exist", object2.safeget("category3"));
+            assertNull("dblist Field should not exist", object2.safeget("dblist"));
+        }
+
+
+    }
+
+    public void testDeleteObjectAndDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+        // Prepare object2 for reading
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
+
+        // Load document (needed to delete)
+        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc, context);
+        // Delete object2
+        store.deleteXWikiDoc(doc, context);
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test","TestObject");
+
+        // Read object2
+        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
+        assertTrue("Document should not exist", doc2.isNew());
     }
 
     public void testWriteObjectInDoc()  throws  XWikiException {
@@ -78,6 +113,18 @@ public abstract class StoreObjectTest extends TestCase {
         testReadObjectInDoc(store, object);
     }
 
+    public void testDeleteObjectAndDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareAdvancedObject();
+        testWriteObjectInDoc(store, object);
+        testDeleteObjectAndDoc(store, object);
+        // To test that delete did it's work properly
+        // we use a smaller object
+        object = Utils.prepareObject();
+        testWriteObjectInDoc(store, object);
+        testReadObjectInDoc(store, object);
+    }
+
     public void testWriteAdvancedObjectInDoc()  throws  XWikiException {
         XWikiStoreInterface store = getStore();
         BaseObject object = Utils.prepareAdvancedObject();
@@ -88,7 +135,7 @@ public abstract class StoreObjectTest extends TestCase {
         XWikiStoreInterface store = getStore();
         BaseObject object = Utils.prepareAdvancedObject();
         testWriteObjectInDoc(store, object);
-        testReadObjectInDoc(store, object);
+        testReadObjectInDoc(store, object, true);
     }
 
 

@@ -11,6 +11,7 @@
 <a href="$editurl">$msg.get("edit")</a><span> | </span>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
+<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
 <a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
 #versions()
 </div>
@@ -37,6 +38,7 @@ $cdoc.getRenderedContent()
 <a href="$editurl">$msg.get("edit")</a>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
+<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
 <a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
 #versions()
 </div>

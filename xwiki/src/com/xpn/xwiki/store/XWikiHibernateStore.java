@@ -48,7 +48,8 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 
-public class XWikiHibernateStore extends XWikiRCSFileStore {
+public class XWikiHibernateStore implements XWikiStoreInterface {
+
     private SessionFactory sessionFactory;
     private Configuration configuration;
 
@@ -246,12 +247,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
 
-    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             doc.setStore(this);
 
-            checkHibernate(context);
-            beginTransaction(context);
+            if (bTransaction) {
+              checkHibernate(context);
+              beginTransaction(context);
+            }
             Session session = getSession(context);
 
             saveAttachmentList(doc, context, false);
@@ -271,7 +274,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 session.update(doc);
 
-            // Remove all existing properties
+            // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
                for (int i=0;i<doc.getObjectsToRemove().size();i++) {
                    deleteXWikiObject((BaseObject)doc.getObjectsToRemove().get(i), context, false);
@@ -297,28 +300,28 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     BaseObject obj = (BaseObject)objects.get(i);
                     saveXWikiObject(obj, context, false);
                 }
-                // Delete all objects of this class that have a bigger ID
-                /* This should not be needed anymore
-                String squery = "from BaseObject as bobject where bobject.name = '" + doc.getFullName()
-                        + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
-                        + "' and bobject.number >= " + objects.size();
-                int result = session.delete(squery);
-                System.err.println("Deleted " + result + " instances");
-                */
             }
 
-            endTransaction(context, true);
+            if (bTransaction) {
+               endTransaction(context, true);
+            }
             doc.setNew(false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_FILE,
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
                     "Exception while saving document {0}", e, args);
         } finally {
             try {
-                  endTransaction(context, false);
-            } catch (Exception e) {}
+                if (bTransaction) {
+                    endTransaction(context, false);
+                }
+          } catch (Exception e) {}
         }
 
+    }
+
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        saveXWikiDoc(doc, context, true);
     }
 
 
@@ -383,7 +386,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             endTransaction(context, false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_FILE,
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC,
                     "Exception while reading document {0}", e, args);
         } finally {
             try {
@@ -419,7 +422,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 boolean bMetaDataDone = false;
                 for (int i=0;i<text.length;i++) {
                     String line = text[i].toString();
-                    if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+                    if (bMetaDataDone||(XWikiRCSFileStore.parseMetaData(doc,line)==false)) {
                         content.append(line);
                         content.append("\n");
                     }
@@ -437,6 +440,61 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
         return doc;
     }
+
+    public void deleteXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        try {
+            checkHibernate(context);
+            beginTransaction(context);
+            Session session = getSession(context);
+
+            if (doc.getStore()==null) {
+                Object[] args = { doc.getFullName() };
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CANNOT_DELETE_UNLOADED_DOC,
+                        "Impossible to delete document {0} if it is not loaded", null, args);
+            }
+
+            // Let's delete any attachment this document might have
+            List attachlist = doc.getAttachmentList();
+            for (int i=0;i<attachlist.size();i++) {
+                XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
+                deleteXWikiAttachment(attachment, context, false);
+            }
+
+            BaseClass bclass = doc.getxWikiClass();
+            if ((bclass==null)&&(bclass.getName()!=null)) {
+                deleteXWikiClass(bclass, context, false);
+            }
+
+            // Find the list of classes for which we have an object
+            // Remove properties planned for removal
+            if (doc.getObjectsToRemove().size()>0) {
+                for (int i=0;i<doc.getObjectsToRemove().size();i++) {
+                    deleteXWikiObject((BaseObject)doc.getObjectsToRemove().get(i), context, false);
+                }
+                doc.setObjectsToRemove(new ArrayList());
+            }
+            Iterator it = doc.getxWikiObjects().values().iterator();
+            while (it.hasNext()) {
+                Vector objects = (Vector) it.next();
+                for (int i=0;i<objects.size();i++) {
+                    BaseObject obj = (BaseObject)objects.get(i);
+                    deleteXWikiObject(obj, context, false);
+                }
+            }
+
+            session.delete(doc);
+            endTransaction(context, true);
+        } catch (Exception e) {
+            Object[] args = { doc.getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC,
+                    "Exception while deleting document {0}", e, args);
+        }finally {
+            try {
+                endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+    }
+
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
         return getXWikiDocVersions(doc, null);
     }
@@ -568,7 +626,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
-    public void deleteXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public void deleteXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
               checkHibernate(context);
@@ -593,6 +651,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                    endTransaction(context, false);
             } catch (Exception e) {}
         }
+    }
+
+    public void deleteXWikiObject(BaseObject baseObject, XWikiContext context, boolean b) throws XWikiException {
+        deleteXWikiCollection(baseObject, context, b);
+    }
+
+    public void deleteXWikiClass(BaseClass baseClass, XWikiContext context, boolean b) throws XWikiException {
+        deleteXWikiCollection(baseClass, context, b);
     }
 
 
@@ -972,8 +1038,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 session.update(attachment);
 
-            if (bTransaction)
+            if (bTransaction) {
+                saveXWikiDoc(attachment.getDoc(), context, false);
                 endTransaction(context, true);
+            }
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -1016,8 +1084,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 session.update(archive);
 
-            if (bTransaction)
+            if (bTransaction) {
+                saveXWikiDoc(attachment.getDoc(), context, false);
                 endTransaction(context, true);
+            }
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -1090,6 +1160,49 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             } catch (Exception e) {}
         }
     }
+
+
+    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+       try {
+            if (bTransaction) {
+               checkHibernate(context);
+               beginTransaction(context);
+            }
+
+            Session session = getSession(context);
+
+            // Delete the three attachement entries
+           loadAttachmentContent(attachment, context, false);
+           session.delete(attachment.getAttachment_content());
+           loadAttachmentArchive(attachment, context, false);
+           session.delete(attachment.getAttachment_archive());
+           session.delete(attachment);
+
+           if (bTransaction) {
+                List list = attachment.getDoc().getAttachmentList();
+                for (int i=0;i<list.size();i++) {
+                    XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                    if (attachment.getFilename().equals(attach.getFilename())) {
+                        list.remove(i);
+                        break;
+                    }
+                }
+                saveXWikiDoc(attachment.getDoc(), context, false);
+                endTransaction(context, true);
+              }
+            }
+            catch (Exception e) {
+                Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT,
+                        "Exception while deleting attachment {0} of document {1}", e, args);
+            } finally {
+                try {
+                      if (bTransaction)
+                       endTransaction(context, false);
+                } catch (Exception e) {}
+            }
+        }
+
 
     public void getContent(XWikiDocInterface doc, StringBuffer buf) {
         buf.append(doc.getContent());

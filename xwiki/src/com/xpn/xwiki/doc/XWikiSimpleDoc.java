@@ -276,7 +276,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String getActionUrl(String action, XWikiContext context) {
         StringBuffer url = new StringBuffer();
-        url.append(context.getWiki().getBase());
+        url.append(context.getBaseUrl());
         url.append(action);
         url.append("/");
         url.append(getWeb());
@@ -309,7 +309,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     
     public String getParentUrl(XWikiContext context) {
         StringBuffer url = new StringBuffer();
-        url.append(context.getWiki().getBase());
+        url.append(context.getWiki().getBase(context));
         url.append("view");
         url.append("/");
         String parent = getParent();
@@ -1026,6 +1026,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
         getStore().loadAttachmentContent(attachment, context, true);
+    }
+
+    public void deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
+         getStore().deleteXWikiAttachment(attachment, context, true);
     }
 
     public void renameProperties(String className, Map fieldsToRename) {

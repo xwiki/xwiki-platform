@@ -109,12 +109,18 @@ public class ViewEditAction extends XWikiAction
 
         // Test works with xwiki-test.cfg instead of xwiki.cfg
         String dbname = "xwiki";
+        String url = XWiki.getRequestURL(request);
+        String baseUrl = "";
         if (request.getServletPath().startsWith ("/testbin")) {
           dbname = "xwikitest";
+          baseUrl = url.substring(0, url.indexOf("/testbin/" + action)) + "/testbin/";
+        } else {
+          baseUrl = url.substring(0, url.indexOf("/bin/" + action)) + "/bin/";
         }
 
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
         XWikiContext context = new XWikiContext();
+        context.setBaseUrl(baseUrl);
         context.setServlet(servlet);
         context.setRequest(request);
         context.setResponse(response);
@@ -199,6 +205,15 @@ public class ViewEditAction extends XWikiAction
             response.sendRedirect(doc.getActionUrl("view",context));
             return null;
         }
+        else if (action.equals("delete"))
+                {
+                    String confirm = request.getParameter("confirm");
+                    if ((confirm!=null)&&(confirm.equals("1"))) {
+                      xwiki.deleteDocument(doc, context);
+                      return parseTemplate("deleted", context);
+                    } else
+                       return parseTemplate("delete", context);
+                }
         else if (action.equals("propupdate"))
         {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
@@ -379,10 +394,31 @@ public class ViewEditAction extends XWikiAction
             // Save the content and the archive
             doc.saveAttachmentContent(attachment, context);
 
-            // Save the document with the attachment meta data
-            xwiki.saveDocument(doc, olddoc, context);
+            // forward to attach page
+            response.sendRedirect(doc.getActionUrl("attach",context));
+            return null;
+         }
+        else if (action.equals("delattachment"))
+        {
+            String path = request.getPathInfo();
+            String filename = path.substring(path.lastIndexOf("/")+1);
+            XWikiAttachment attachment = null;
 
-            // forward to edit
+            if (request.getParameter("id")!=null) {
+              int id = Integer.parseInt(request.getParameter("id"));
+              attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+            }
+            else {
+                List list = doc.getAttachmentList();
+                for (int i=0;i<list.size();i++) {
+                   attachment = (XWikiAttachment) list.get(i);
+                   if (attachment.getFilename().equals(filename))
+                       break;
+                }
+            }
+
+            doc.deleteAttachment(attachment, context);
+            // forward to attach page
             response.sendRedirect(doc.getActionUrl("attach",context));
             return null;
          }

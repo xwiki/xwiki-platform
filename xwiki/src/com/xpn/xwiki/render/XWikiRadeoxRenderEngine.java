@@ -30,7 +30,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         XWikiContext context = getContext();
         buffer.append("<a href=\"");
-        buffer.append(context.getWiki().getBase());
+        buffer.append(context.getWiki().getBase(context));
         buffer.append("view");
         buffer.append("/");
 

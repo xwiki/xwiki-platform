@@ -11,6 +11,8 @@
 <a href="$editurl">$msg.get("edit")</a><span> | </span>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
+<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
+<a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
 #versions()
 </div>
 </div>
@@ -21,15 +23,21 @@ $message
 #end
 <div id="xwikicontent">
 #set( $counter = 0)
-<table border="1">
-<tr><td>File</td><td>Version</td><td>Author</td><td>Size</td></tr>
+<br />
+<br />
+<table border="1" cellpadding="4" cellspacing="0" width="70%">
+<tr><th> <b>$msg.get("filename")</b> </th><th> <b>$msg.get("version")</b> </th>
+<th> <b>$msg.get("author")</b> </th><th> <b>$msg.get("size")</b> </th><th> <b>$msg.get("delete")</b></th> </tr>
 #foreach ($attach in $doc.attachmentList)
-<tr><td><a href="${downloadurl}/${attach.filename}?id=${counter}">$attach.filename</a></td>
-<td>$attach.version</td><td>$attach.author</td><td>$attach.filesize</td></tr>
+<tr><td><a href="${downloadurl}/${attach.filename}">$attach.filename</a></td>
+<td>$attach.version</td><td>$attach.author</td><td>$attach.filesize</td>
+<td><a href="${delattachmenturl}/${attach.filename}" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</a></td>
+</tr>
 #set( $counter = $counter + 1)
 #end
 </table>
-<hr />
+<br />
+<br />
 <form action="$uploadurl" enctype="multipart/form-data" method="post">
 <p>
 Choose a file to upload:
@@ -43,6 +51,8 @@ Choose a file to upload:
 <a href="$editurl">$msg.get("edit")</a>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
+<a href="$deleteurl">$msg.get("delete")</a><span> | </span>
+<a href="${viewurl}?raw=1">$msg.get("raw")</a><span> | </span>
 #versions()
 </div>
 </div>

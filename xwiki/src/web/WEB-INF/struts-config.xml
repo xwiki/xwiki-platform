@@ -104,6 +104,14 @@
         <forward name="save" path="/templates/save.vm"/>
     </action>
 
+    <action path="/delete/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="delete"
+            scope="request">
+        <forward name="delete" path="/templates/delete.vm"/>
+        <forward name="deleted" path="/templates/deleted.vm"/>
+    </action>
+
     <action path="/propupdate/"
               type="com.xpn.xwiki.web.ViewEditAction"
               name="propupdate"
@@ -156,6 +164,12 @@
       <action path="/download/"
           type="com.xpn.xwiki.web.ViewEditAction"
           name="download"
+          scope="request">
+      </action>
+
+      <action path="/delattachment/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="delattachment"
           scope="request">
       </action>
 

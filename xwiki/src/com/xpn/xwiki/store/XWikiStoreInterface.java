@@ -37,8 +37,10 @@ import java.util.List;
 
 public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context, boolean bTransaction) throws XWikiException;
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version, XWikiContext context) throws XWikiException;
+    public void deleteXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
     public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
     public List getClassList(XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException;
@@ -47,6 +49,8 @@ public interface XWikiStoreInterface {
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
     void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
     void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
+
 }

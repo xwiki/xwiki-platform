@@ -45,7 +45,7 @@ import junit.framework.TestCase;
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details, published at 
+ * GNU Lesser General Public License for more details, published at
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
 
@@ -340,6 +340,74 @@ public class ViewEditTest extends ServletTestCase {
         assertEquals("Content is not indentical", "Hello1Hello2Hello3",content2);
         assertEquals("Parent is not identical", "Main.WebHome", doc2.getParent());
     }
+
+
+    public void testDelete() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+
+    }
+
+    public void beginDelete(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        Utils.createDoc(hibstore, "Main", "DeleteTest", context);
+        setUrl(webRequest, "delete", "DeleteTest");
+        webRequest.addParameter("confirm","1");
+    }
+
+    public void endDelete(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Delete returned exception", result.indexOf("Exception")==-1);
+
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "DeleteTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+
+        assertTrue("Document should not exist", doc2.isNew());
+    }
+
+
+    public void testDeleteWithoutConfirm() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+
+    }
+
+    public void beginDeleteWithoutConfirm(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        Utils.createDoc(hibstore, "Main", "DeleteTest2", context);
+        setUrl(webRequest, "delete", "DeleteTest2");
+    }
+
+    public void endDeleteWithoutConfirm(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("DeleteWithoutConfirm returned exception", result.indexOf("Exception")==-1);
+
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "DeleteTest2");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+
+        assertFalse("Document should exist", doc2.isNew());
+    }
+
 
     public void testAddProp(Class cclass) throws IOException, Throwable {
         try {
@@ -990,6 +1058,95 @@ public class ViewEditTest extends ServletTestCase {
         assertEquals("Attachment version is not correct", attachment.getVersion(), "1.2");
         assertEquals("Attachment size is not correct", fattach.length(), attachment.getFilesize());
     }
+
+    public void testAttachDownload() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+    }
+
+
+    public void beginAttachDownload(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", "AttachDownloadTest");
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        hibstore.saveXWikiDoc(doc1, context);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        String attachcontent1 = "blablabla";
+        attachment1.setContent(attachcontent1.getBytes());
+        doc1.saveAttachmentContent(attachment1, context);
+        doc1.getAttachmentList().add(attachment1);
+        hibstore.saveXWikiDoc(doc1, context);
+        setUrl(webRequest, "download", "AttachDownloadTest/" + Utils.filename);
+    }
+
+    public void endAttachDownload(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Attach Delete returned exception", result.indexOf("Exception")==-1);
+        assertTrue("Attach Delete should contain attachment text", result.indexOf("blablabla")!=-1);
+
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "AttachDownloadTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        List list = doc2.getAttachmentList();
+        assertEquals("Document should have an attachement", 1, list.size());
+    }
+
+
+    public void testAttachDelete() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+    }
+
+
+    public void beginAttachDelete(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", "AttachDeleteTest");
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        hibstore.saveXWikiDoc(doc1, context);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
+        attachment1.setContent(attachcontent1);
+        doc1.saveAttachmentContent(attachment1, context);
+        doc1.getAttachmentList().add(attachment1);
+        hibstore.saveXWikiDoc(doc1, context);
+        setUrl(webRequest, "delattachment", "AttachDeleteTest/" + Utils.filename);
+    }
+
+    public void endAttachDelete(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Attach Delete returned exception", result.indexOf("Exception")==-1);
+
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "AttachDeleteTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        List list = doc2.getAttachmentList();
+        assertEquals("Document should have no attachement", 0, list.size());
+    }
+
 
     public static class MultipartSenderThread extends Thread  {
 

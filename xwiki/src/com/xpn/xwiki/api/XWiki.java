@@ -56,7 +56,7 @@ public class XWiki {
      }
 
      public String getBase() {
-         return xwiki.getBase();
+         return xwiki.getBase(context);
      }
 
      public String getFormEncoded(String content) {

@@ -1,0 +1,29 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div class="xwikiactions">
+</div>
+<div id="xwikiwebmenu">
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<br />
+$msg.get("confirmdelete")
+<br />
+<br />
+<br />
+</div>
+<div id="xwikinav_footer">
+<div class="xwikiactions">
+<a href="$viewurl">View</a><span> | </span>
+<a href="${deleteurl}?confirm=1" onclick="return confirm('$msg.get("confirmdelete2")')">$msg.get("delete")</a>
+</div>
+</div>
+#template("footer.vm")

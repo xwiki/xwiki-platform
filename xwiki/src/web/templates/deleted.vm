@@ -1,0 +1,27 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div class="xwikiactions">
+</div>
+<div id="xwikiwebmenu">
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<br />
+$msg.get("deleted")
+<br />
+<br />
+<br />
+</div>
+<div id="xwikinav_footer">
+<div class="xwikiactions">
+</div>
+</div>
+#template("footer.vm")

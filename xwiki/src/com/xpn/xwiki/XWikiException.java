@@ -61,15 +61,19 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_STORE_RCS_SAVING_FILE = 3101;
     public static final int ERROR_XWIKI_STORE_RCS_READING_FILE = 3102;
+    public static final int ERROR_XWIKI_STORE_RCS_DELETING_FILE = 3103;
     public static final int ERROR_XWIKI_STORE_RCS_READING_REVISIONS = 3103;
     public static final int ERROR_XWIKI_STORE_RCS_READING_VERSION = 3104;
     public static final int ERROR_XWIKI_STORE_RCS_SEARCH = 3111;
     public static final int ERROR_XWIKI_STORE_RCS_LOADING_ATTACHMENT = 3221;
     public static final int ERROR_XWIKI_STORE_RCS_SAVING_ATTACHMENT = 3222;
     public static final int ERROR_XWIKI_STORE_RCS_SEARCHING_ATTACHMENT = 3223;
+    public static final int ERROR_XWIKI_STORE_RCS_DELETING_ATTACHMENT = 3224;
 
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_FILE = 3201;
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_FILE = 3202;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC = 3201;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_DOC = 3202;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC = 3203;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_CANNOT_DELETE_UNLOADED_DOC = 3204;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS = 3203;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION = 3204;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT = 3211;
@@ -80,9 +84,10 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCH = 3223;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT = 3231;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT = 3232;
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST = 3233;
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3234;
-    public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3235;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_ATTACHMENT = 3233;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST = 3234;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3235;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3350;
 
 
     public static final int ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION = 6001;

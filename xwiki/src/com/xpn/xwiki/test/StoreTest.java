@@ -84,6 +84,44 @@ public abstract class StoreTest extends TestCase {
     }
 
 
+    public void testStandardDelete(XWikiStoreInterface store, String web, String name) throws XWikiException {
+           XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
+           doc1.setContent(Utils.content1);
+           doc1.setAuthor(Utils.author);
+           doc1.setParent(Utils.parent);
+           store.saveXWikiDoc(doc1, context);
+
+           XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
+           doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
+
+           String content1 = doc2.getContent();
+           assertEquals(Utils.content1, content1);
+
+           XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
+           doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
+           store.deleteXWikiDoc(doc3, context);
+
+           XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
+           doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4, context);
+
+           assertTrue("Document should be new", doc4.isNew());
+         }
+
+    public void testStandardWriteAfterDelete(XWikiStoreInterface store, String web, String name) throws XWikiException {
+           XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
+           doc1.setContent("toto");
+           doc1.setAuthor(Utils.author);
+           doc1.setParent(Utils.parent);
+           store.saveXWikiDoc(doc1, context);
+
+           XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
+           doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
+
+           String content1 = doc2.getContent();
+           assertEquals("toto", content1);
+         }
+
+
 
     public void testVersionedReadWrite(XWikiStoreInterface store,String web, String name) throws XWikiException {
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
@@ -118,6 +156,19 @@ public abstract class StoreTest extends TestCase {
         XWikiStoreInterface store = getStore();
         testStandardReadWrite(store, Utils.web, Utils.name);
     }
+
+    public void testStandardDelete() throws XWikiException {
+            Utils.setStandardData();
+            XWikiStoreInterface store = getStore();
+            testStandardDelete(store, Utils.web, Utils.name);
+        }
+
+    public void testStandardWriteAfterDelete() throws XWikiException {
+            Utils.setStandardData();
+            XWikiStoreInterface store = getStore();
+            testStandardDelete(store, Utils.web, Utils.name);
+            testStandardWriteAfterDelete(store, Utils.web, Utils.name);
+        }
 
     public void testVersionedReadWrite() throws XWikiException {
         Utils.setStandardData();
@@ -230,11 +281,62 @@ public abstract class StoreTest extends TestCase {
         }
     }
 
+    public void testDeleteAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
+
+        XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
+        List attachlist = doc3.getAttachmentList();
+        XWikiAttachment attachment3 = (XWikiAttachment) attachlist.get(0);
+
+        store.deleteXWikiAttachment(attachment3, context, true);
+
+        attachlist = doc3.getAttachmentList();
+        assertEquals("Attachment is still there", 0, attachlist.size());
+
+        XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
+        doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4, context);
+        attachlist = doc4.getAttachmentList();
+        assertEquals("Attachment is still there", 0, attachlist.size());
+    }
+
+    public void testDeleteDocWithAttachment(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
+
+        XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
+        store.deleteXWikiDoc(doc3, context);
+
+        XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
+        doc4.setContent(Utils.content1);
+        doc4.setAuthor(Utils.author);
+        doc4.setParent(Utils.parent);
+        store.saveXWikiDoc(doc4, context);
+
+        XWikiSimpleDoc doc5 = new XWikiSimpleDoc(web, name);
+        doc5 = (XWikiSimpleDoc) store.loadXWikiDoc(doc5, context);
+        List attachlist = doc5.getAttachmentList();
+        assertEquals("Attachment is still there", 0, attachlist.size());
+    }
+
+
         public void testUpdateAttachmentReadWrite() throws XWikiException, IOException {
             Utils.setStandardData();
             XWikiStoreInterface store = getStore();
             testAttachmentReadWrite(store, Utils.web, Utils.name);
             testUpdateAttachmentReadWrite(store, Utils.web, Utils.name);
+        }
+
+        public void testDeleteAttachmentReadWrite() throws XWikiException, IOException {
+            Utils.setStandardData();
+            XWikiStoreInterface store = getStore();
+            testAttachmentReadWrite(store, Utils.web, Utils.name);
+            testDeleteAttachmentReadWrite(store, Utils.web, Utils.name);
+        }
+
+        public void testDeleteDocWithAttachment() throws XWikiException, IOException {
+         Utils.setStandardData();
+         XWikiStoreInterface store = getStore();
+         testAttachmentReadWrite(store, Utils.web, Utils.name);
+         testDeleteDocWithAttachment(store, Utils.web, Utils.name);
         }
 
 

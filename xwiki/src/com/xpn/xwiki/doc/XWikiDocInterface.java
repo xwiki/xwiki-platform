@@ -130,26 +130,19 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public List getAttachmentList();
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException;
     public void loadAttachmentContent(XWikiAttachment xWikiAttachment, XWikiContext context) throws XWikiException;
+    void deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException;
 
     String getParentUrl(XWikiContext context);
-
     String display(String fieldname, BaseObject obj, XWikiContext context);
-
     String display(String fieldname, XWikiContext context);
-
     String displayForm(String className,String header, String format, XWikiContext context);
-
     String displayForm(String className,String header, String format, boolean linebreak, XWikiContext context);
-
     String displayForm(String className, XWikiContext context);
 
     void renameProperties(String className, Map fieldsToRename);
-
     void addObjectsToRemove(BaseObject object);
-
     ArrayList getObjectsToRemove();
-
     void setObjectsToRemove(ArrayList objectsToRemove);
-
     List getxWikiClasses();
+
 }

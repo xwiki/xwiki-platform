@@ -110,6 +110,7 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.1-ld.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.diff.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />
@@ -117,6 +118,7 @@
       <SOURCES>
         <root url="file://C:/dev/java/commons-fileupload-1.0/src/java" />
         <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
+        <root url="file://C:/dev/java/jrcs-full-0.1.7/src/java" />
       </SOURCES>
     </library>
     <library name="Unit Tests">

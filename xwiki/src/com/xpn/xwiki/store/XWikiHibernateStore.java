@@ -261,7 +261,8 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         try {
             doc.setStore(this);
             Archive archive = basedoc.getRCSArchive();
-
+            doc.setRCSArchive(archive);
+            
             if (archive == null) {
                 doc.updateArchive(doc.toXML());
                 archive = basedoc.getRCSArchive();

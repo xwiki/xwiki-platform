@@ -198,7 +198,35 @@
             </property>
 
             <property name="values" type="string">
-                <column name="XWN_VALUES" length="2000" />
+                <column name="XWL_VALUES" length="2000" />
+            </property>
+
+        </joined-subclass>
+
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.DBListClass" table="xwikislistclasses">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWL_DISPLAYTYPE" length="20" />
+            </property>
+
+            <property name="multiSelect" type="boolean">
+                <column name="XWL_MULTISELECT" />
+            </property>
+
+            <property name="size" type="integer">
+                <column name="XWL_SIZE" />
+            </property>
+
+            <property name="relationalStorage" type="boolean">
+                <column name="XWL_RELATIONAL" />
+            </property>
+
+            <property name="sql" type="string">
+                <column name="XWL_SQL" length="2000" />
             </property>
 
         </joined-subclass>
@@ -275,20 +303,30 @@
             </property>
         </joined-subclass>
 
+        <joined-subclass name="com.xpn.xwiki.objects.LargeStringProperty" table="xwikilargestrings">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="value" type="string">
+                <column name="XWL_VALUE" length="60000" />
+            </property>
+        </joined-subclass>
+
         <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
             <key>
                 <column name="XWL_ID"  />
                 <column name="XWL_NAME"  />
             </key>
             <property name="textValue" type="string">
-                <column name="XWL_VALUE" length="2000" />
+                <column name="XWL_VALUE" length="60000" />
             </property>
         </joined-subclass>
 
         <joined-subclass name="com.xpn.xwiki.objects.DBStringListProperty" table="xwikilists">
             <key>
-                    <column name="XWL_ID"  />
-                    <column name="XWL_NAME"  />
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
             </key>
             <list name="list" table="xwikilistitems" batch-size="10">
                 <key>

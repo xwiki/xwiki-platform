@@ -55,4 +55,6 @@ public interface XWikiStoreInterface {
     void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
 
     void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
+
+    List search(String sql, int nb, int start) throws XWikiException;
 }

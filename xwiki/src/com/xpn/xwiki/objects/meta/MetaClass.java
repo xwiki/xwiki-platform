@@ -45,7 +45,8 @@ public class MetaClass extends BaseClass {
         safeput(booleanclass.getName(), booleanclass);
         StaticListMetaClass listclass = new StaticListMetaClass();
         safeput(listclass.getName(), listclass);
-
+        DBListMetaClass dblistclass = new DBListMetaClass();
+        safeput(dblistclass.getName(), dblistclass);
     }
 
     public void safeput(String name, ElementInterface property) {

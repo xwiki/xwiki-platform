@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -17,36 +17,45 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 1 févr. 2004
- * Time: 21:51:06
+ * Date: 5 févr. 2004
+ * Time: 15:58:43
  */
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
 
 import java.util.List;
+import java.util.ArrayList;
 
-public class StaticListClass extends ListClass {
+public class DBListClass extends ListClass {
 
-    public StaticListClass(PropertyMetaClass wclass) {
-        super("staticlist", "Static List", wclass);
+    private String sql;
+
+    public DBListClass(PropertyMetaClass wclass) {
+        super("dblist", "DB List", wclass);
     }
 
-    public StaticListClass() {
+    public DBListClass() {
         this(null);
     }
 
-    public String getValues() {
-        return getStringValue("values");
-    }
-
-    public void setValues(String values) {
-        setStringValue("values", values);
-    }
-
     public List getList(XWikiContext context) {
-        String values = (String) getValues();
-        return getListFromString(values);
+        XWiki xwiki = context.getWiki();
+        try {
+            return xwiki.search(getSql());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList();
+        }
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

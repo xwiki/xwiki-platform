@@ -43,6 +43,7 @@ public class XWikiException extends Exception {
 
     // Error list
     public static final int ERROR_XWIKI_UNKNOWN = 0;
+    public static final int ERROR_XWIKI_NOT_IMPLEMENTED = 1;
 
     // Config
     public static final int ERROR_XWIKI_CONFIG_FILENOTFOUND = 1001;

@@ -187,7 +187,7 @@ public abstract class ListClass extends PropertyClass {
             Select select = new Select(prefix + name, 1);
             select.setMultiple(isMultiSelect());
 
-            List list = getList();
+            List list = getList(context);
             List selectlist;
 
             BaseProperty prop =  (BaseProperty)object.safeget(name);
@@ -213,7 +213,7 @@ public abstract class ListClass extends PropertyClass {
         }
     }
 
-    public abstract List getList();
+    public abstract List getList(XWikiContext context);
 
 
 }

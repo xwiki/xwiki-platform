@@ -245,6 +245,14 @@ public class Utils {
         wclass.put("category3", slist_class3);
         object.put("category3", slist_class3.fromString("1|2"));
 
+        DBListClass dblist_class = new DBListClass();
+        dblist_class.setName("dblist");
+        dblist_class.setPrettyName("dblist");
+        dblist_class.setSql("select distinct doc.name from XWikiSimpleDoc as doc");
+        dblist_class.setObject(wclass);
+        wclass.put("dblist", dblist_class);
+        object.put("dblist", dblist_class.fromString("XWikiUsers"));
+
         return object;
     }
 

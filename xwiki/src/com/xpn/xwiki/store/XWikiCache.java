@@ -152,4 +152,8 @@ public class XWikiCache implements XWikiCacheInterface {
     public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
         store.loadXWikiProperty(property, bTransaction);
     }
+
+    public List search(String sql, int nb, int start) throws XWikiException {
+        return store.search(sql, nb, start);
+    }
 }

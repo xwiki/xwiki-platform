@@ -5,6 +5,7 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import junit.framework.TestCase;
@@ -70,8 +71,8 @@ public class ClassesTest extends TestCase {
 
     public void testTextArea() {
         TextAreaClass pclass = new TextAreaClass();
-        StringProperty property;
-        property = (StringProperty)pclass.fromString("Hello1\nHello2\nHello3\n");
+        LargeStringProperty property;
+        property = (LargeStringProperty)pclass.fromString("Hello1\nHello2\nHello3\n");
         assertEquals("TextArea not supported", new String("Hello1\nHello2\nHello3\n"), property.getValue());
     }
 
@@ -123,7 +124,12 @@ public class ClassesTest extends TestCase {
 
 
     public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected) {
-      XWikiContext context = new XWikiContext();
+        testDisplayer(cname, obj, viewexpected, editexpected, null);
+    }
+
+    public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected, XWikiContext context) {
+      if (context==null)
+         context = new XWikiContext();
       StringBuffer result = new StringBuffer();
       PropertyClass pclass = (PropertyClass)obj.getxWikiClass().get(cname);
       pclass.displayView(result,cname, "", obj, context);
@@ -160,6 +166,18 @@ public class ClassesTest extends TestCase {
         testDisplayer("category", obj, "1", "<select");
         testDisplayer("category2", obj, "1 2", "multiple");
         testDisplayer("category3", obj, "1 2", "multiple");
+    }
+
+    public void testDBListDisplayers() throws XWikiException {
+        XWikiContext context = new XWikiContext();
+        XWiki xwiki = new XWiki("./xwiki.cfg", context);
+        try {
+            BaseObject obj = Utils.prepareAdvancedObject();
+            testDisplayer("dblist", obj, "XWikiUsers", "<option selected value='XWikiUsers' label='XWikiUsers'>", context);
+        } finally {
+            xwiki = null;
+            System.gc();
+        }
     }
 
     public void testObject() throws XWikiException {

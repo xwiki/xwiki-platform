@@ -328,6 +328,15 @@ public class XWiki implements XWikiNotificationInterface {
     }
     */
 
+    public List search(String wheresql) throws XWikiException {
+        return getStore().search(wheresql, 0, 0);
+    }
+
+    public List search(String wheresql, int nb, int start) throws XWikiException {
+        return getStore().search(wheresql, nb, start);
+    }
+
+
     public List searchDocuments(String wheresql) throws XWikiException {
         return getStore().searchDocuments(wheresql);
     }

@@ -330,7 +330,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public List getClassList() throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
     }
 
@@ -339,57 +339,62 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
     }
 
     public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "objects function not needed");
     }
 
     public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "objects function not needed");
     }
 
     public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "objects function not needed");
     }
 
     public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "objects function not needed");
+    }
+
+    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "objects function not needed");
+    }
+
+        public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "objects function not needed");
+    }
+
+    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "objects function not needed");
     }
 
     public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
     public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
     public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
-    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                "Exception while searching: not implemented");
-    }
-
-    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                "Exception while searching: not implemented");
-    }
-
-    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                "Exception while searching: not implemented");
+    public List search(String sql, int nb, int start) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Search not implemented");
     }
 }

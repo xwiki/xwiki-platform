@@ -85,7 +85,7 @@
         value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.tests}" />
 
 
-    <property name="clover.initstring" location="${test.clover.dir}"/>
+    <property name="clover.initstring" location="${test.clover.dir}/clover"/>
     <available property="junit.available" classname="junit.framework.TestCase"/>
     <available property="clover.available" classname="org.apache.tools.ant.taskdefs.CloverCompilerAdapter" />
 

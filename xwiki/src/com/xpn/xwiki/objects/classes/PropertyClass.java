@@ -161,7 +161,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public String getClassName() {
-        return getxWikiClass().getName();
+        BaseClass bclass = getxWikiClass();
+        return (bclass==null) ? "" : bclass.getName();
     }
 
     // In property classes we need to store this info in the HashMap for fields

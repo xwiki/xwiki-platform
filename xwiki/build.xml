@@ -180,7 +180,7 @@
                 <pathelement path="${classes.dir}" />
                 <pathelement path="${libs}" />
             </classpath>
-            <formatter type="plain" />
+            <formatter type="xml" />
 
             <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
             <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
@@ -203,7 +203,7 @@
                 <pathelement path="${classes.dir}" />
                 <pathelement path="${libs}" />
             </classpath>
-            <formatter type="plain" />
+            <formatter type="xml" />
 
             <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
             <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />

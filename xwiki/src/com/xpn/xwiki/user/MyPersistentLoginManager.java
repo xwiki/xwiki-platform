@@ -23,6 +23,7 @@
 package com.xpn.xwiki.user;
 
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
+import org.securityfilter.filter.SecurityRequestWrapper;
 
 import javax.crypto.Cipher;
 import javax.servlet.ServletException;
@@ -187,6 +188,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
     */
    public void forgetLogin(HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
+      ((SecurityRequestWrapper)request).setUserPrincipal(null);
       removeCookie(request, response, COOKIE_USERNAME);
       removeCookie(request, response, COOKIE_PASSWORD);
       removeCookie(request, response, COOKIE_REMEMBERME);

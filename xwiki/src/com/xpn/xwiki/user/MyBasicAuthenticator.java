@@ -40,8 +40,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
     }
 
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
-        if (request.getUserPrincipal() == null) {
-            // attempt to dig out authentication info only if the user has not yet been authenticated
+            // Always verify authentication
             String authorizationHeader = request.getHeader("Authorization");
             HttpSession session = request.getSession();
             if (authorizationHeader != null) {
@@ -62,7 +61,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
                     return true;
                 }
             }
-        }
         return false;
     }
 

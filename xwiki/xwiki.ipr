@@ -279,7 +279,10 @@
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/servlet.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/tools.jar!/" />
       </CLASSES>
-      <JAVADOC />
+      <JAVADOC>
+        <root url="file://C:/Program Files/Apache Group/Tomcat 4.1/webapps/tomcat-docs/catalina/docs" />
+        <root url="file://C:/Program Files/Apache Group/Tomcat 4.1/webapps/tomcat-docs/servletapi" />
+      </JAVADOC>
       <SOURCES>
         <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
       </SOURCES>

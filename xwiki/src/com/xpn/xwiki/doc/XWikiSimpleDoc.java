@@ -172,6 +172,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return context.getWiki().getRenderingEngine().renderDocument(this, context);
     }
 
+    public String getRenderedContent(String text, XWikiContext context) {
+        return context.getWiki().getRenderingEngine().renderText(text, this, context);
+    }
+
     public String getEscapedContent(XWikiContext context) {
         CharacterFilter filter = new CharacterFilter();
         return filter.process(getContent());
@@ -638,7 +642,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
          return "";
 
       BaseClass bclass = firstobject.getxWikiClass();
-      Map fields = bclass.getFields();
+      Collection fields = bclass.getFieldList();
       if (fields.size()==0)
          return "";
 
@@ -646,7 +650,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       XWikiVelocityRenderer renderer = new XWikiVelocityRenderer();
       VelocityContext vcontext = new VelocityContext();
       vcontext.put("formatter", new VelocityFormatter(vcontext));
-      for (Iterator it = fields.values().iterator();it.hasNext();) {
+      for (Iterator it = fields.iterator();it.hasNext();) {
           PropertyClass pclass = (PropertyClass) it.next();
           vcontext.put(pclass.getName(), pclass.getPrettyName());
       }
@@ -658,7 +662,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
       for (int i=0;i<objects.size();i++) {
           vcontext.put("id", new Integer(i+1));
           BaseObject object = (BaseObject) objects.get(i);
-          for (Iterator it = fields.keySet().iterator();it.hasNext();) {
+          for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
               String name = (String) it.next();
               vcontext.put(name, display(name, object, context));
           }
@@ -681,14 +685,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
          return "";
 
       BaseClass bclass = firstobject.getxWikiClass();
-      Map fields = bclass.getFields();
+      Collection fields = bclass.getFieldList();
       if (fields.size()==0)
        return "";
 
       StringBuffer result = new StringBuffer();
       result.append("{table}\n");
       boolean first = true;
-      for (Iterator it = fields.values().iterator();it.hasNext();) {
+      for (Iterator it = fields.iterator();it.hasNext();) {
           if (first==true)
             first = false;
           else
@@ -701,7 +705,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
           if (i!=0)
               result.append("|");
           BaseObject object = (BaseObject) objects.get(i);
-          for (Iterator it = fields.keySet().iterator();it.hasNext();) {
+          for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
               result.append(display((String)it.next(), object, context));
           }
           result.append("\n");
@@ -949,7 +953,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
         // Add Class
         BaseClass bclass = getxWikiClass();
-        if (bclass.getFields().size()>0) {
+        if (bclass.getFieldList().size()>0) {
           docel.add(bclass.toXML());
         }
 
@@ -1049,14 +1053,12 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             for (Iterator renameit = fieldsToRename.keySet().iterator();renameit.hasNext();) {
                 String origname = (String)renameit.next();
                 String newname = (String) fieldsToRename.get(origname);
-                Map fields = bobject.getFields();
-                BaseProperty prop = (BaseProperty) bobject.safeget(origname);
-                BaseProperty origprop = (BaseProperty) prop.clone();
+                BaseProperty origprop = (BaseProperty) bobject.safeget(origname);
+                BaseProperty prop = (BaseProperty) origprop.clone();
                 if (prop!=null) {
-                 fields.remove(origname);
-                 bobject.getFieldsToRemove().add(origprop);
+                 bobject.removeField(origname);
                  prop.setName(newname);
-                 fields.put(newname, prop);
+                 bobject.addField(newname, prop);
                 }
             }
         }
@@ -1084,6 +1086,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+          String result = pclass.displayView(pclass.getName(), prefix, object, context);
+          return getRenderedContent(result, context);
     }
 
     public String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {

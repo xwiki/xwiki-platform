@@ -387,3 +387,26 @@ ol.katakana { list-style-type: katakana; }
 ol.KATAKANA { list-style-type: katakana-iroha; }
 ol.HEBREW { list-style-type: hebrew; }
 
+
+.rssfeed {
+  padding: 10px;
+  border: 1px dotted #003366;
+  width: 30%;
+}
+
+.rsschanneltitle {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding: 5px;
+  text-align: center;
+  background-color: #BBEE88;
+}
+
+.rssitemtitle {
+  margin-bottom: 5px;
+}
+
+.rssitem {
+  margin-bottom: 10px;
+}

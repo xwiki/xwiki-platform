@@ -15,20 +15,26 @@
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
  *
- * Created by
- * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:37:09
+ * User: ludovic
+ * Date: 17 mars 2004
+ * Time: 17:12:39
  */
-package com.xpn.xwiki.objects;
 
-import org.dom4j.Element;
+package com.xpn.xwiki.render.filter;
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
-    public Element toXML();
+import org.radeox.api.engine.context.InitialRenderContext;
+import org.radeox.macro.Repository;
+import com.xpn.xwiki.render.macro.MacroRepository;
+
+public class MacroFilter extends org.radeox.filter.MacroFilter {
+ private MacroRepository macros;
+
+ public void setInitialContext(InitialRenderContext context) {
+   macros = MacroRepository.getInstance();
+   macros.setInitialContext(context);
+ }
+
+ protected Repository getMacroRepository() {
+   return macros;
+ }
 }

@@ -32,9 +32,9 @@ import org.dom4j.dom.DOMElement;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
-    private int number = 0;
 
     public int getId() {
         String str = getName()+getClassName();
@@ -108,14 +108,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return object;
     }
 
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
     public boolean equals(Object obj) {
         if (!super.equals(obj))
             return false;
@@ -131,7 +123,8 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
         // Add Class
         BaseClass bclass = getxWikiClass();
-        if (bclass.getFields().size()>0) {
+        Collection fields = bclass.getFieldList();
+        if (fields.size()>0) {
           oel.add(bclass.toXML());
         }
 
@@ -147,10 +140,10 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         el.addText(getClassName());
         oel.add(el);
 
-        Iterator it = getFields().values().iterator();
+        Iterator it = getFieldList().iterator();
         while (it.hasNext()) {
             Element pel = new DOMElement("property");
-            BaseProperty bprop = (BaseProperty)it.next();
+            PropertyInterface bprop = (PropertyInterface)it.next();
             pel.add(bprop.toXML());
             oel.add(pel);
         }

@@ -363,7 +363,7 @@ public class Utils {
         propclass.setPrettyName(propname);
         propclass.setSize(80);
         propclass.setObject(bclass);
-        bclass.getFields().put(propname, propclass);
+        bclass.addField(propname, propclass);
         doc.setxWikiClass(bclass);
         BaseObject bobject = new BaseObject();
         bobject.setName(docName);
@@ -391,7 +391,7 @@ public class Utils {
         propclass.setPrettyName(propname);
         propclass.setSize(80);
         propclass.setObject(bclass);
-        bclass.getFields().put(propname, propclass);
+        bclass.addField(propname, propclass);
         classdoc.setxWikiClass(bclass);
         xwiki.saveDocument(classdoc, context);
 

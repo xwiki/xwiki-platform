@@ -20,6 +20,8 @@
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld|cfg|txt.1|txt.2|sxw|doc|vm)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
+      <entry name="com.xpn.xwiki.render.filter.XWikiFilter" />
+      <entry name="com.xpn.xwiki.render.macro.XWikiMacro" />
     </resourceExtensions>
   </component>
   <component name="DataSourceManager" />

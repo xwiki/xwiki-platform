@@ -226,12 +226,13 @@ public class ViewEditAction extends XWikiAction
             BaseClass bclass = doc.getxWikiClass();
             BaseClass bclass2 = (BaseClass)bclass.clone();
             bclass2.setFields(new HashMap());
+
             doc.setxWikiClass(bclass2);
 
             // Prepare a Map for field renames
             Map fieldsToRename = new HashMap();
 
-            Iterator it = bclass.getFields().values().iterator();
+            Iterator it = bclass.getFieldList().iterator();
             while (it.hasNext()) {
                 PropertyClass property = (PropertyClass)it.next();
                 PropertyClass origproperty = (PropertyClass) property.clone();
@@ -239,7 +240,7 @@ public class ViewEditAction extends XWikiAction
                 Map map = ((EditForm)form).getObject(name);
                 property.getxWikiClass().fromMap(map, property);
                 String newname = property.getName();
-                bclass2.getFields().put(newname, property);
+                bclass2.addField(newname, property);
                 if (!newname.equals(name)) {
                     fieldsToRename.put(name, newname);
                     bclass2.addPropertyForRemoval(origproperty);

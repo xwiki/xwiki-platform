@@ -1,3 +1,25 @@
+/**
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ *
+ * User: ludovic
+ * Date: 26 févr. 2004
+ * Time: 16:59:02
+ */
+
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
@@ -14,13 +36,7 @@ import org.apache.commons.jrcs.rcs.Version;
 
 import java.util.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 26 févr. 2004
- * Time: 16:59:02
- * To change this template use File | Settings | File Templates.
- */
+
 public class Document extends Api {
     private XWikiDocInterface doc;
 
@@ -75,6 +91,10 @@ public class Document extends Api {
 
     public String getRenderedContent() {
         return doc.getRenderedContent(context);
+    }
+
+    public String getRenderedContent(String text) {
+        return doc.getRenderedContent(text, context);
     }
 
     public String getEscapedContent() {
@@ -184,6 +204,10 @@ public class Document extends Api {
 
     public String displayForm(String className) {
         return doc.displayForm(className, context);
+    }
+
+    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object) {
+         return doc.displayRendered(pclass, prefix, object, context);
     }
 
     public String displayView(PropertyClass pclass, String prefix, BaseCollection object) {

@@ -15,20 +15,18 @@
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
  *
- * Created by
- * User: Ludovic Dubost
- * Date: 9 déc. 2003
- * Time: 11:37:09
+ * User: ludovic
+ * Date: 17 mars 2004
+ * Time: 15:26:57
  */
-package com.xpn.xwiki.objects;
 
-import org.dom4j.Element;
+package com.xpn.xwiki.render.filter;
 
-public interface PropertyInterface extends ElementInterface {
-    public int getId();
-    public void setId(int id);
-    public BaseCollection getObject();
-    public void setObject(BaseCollection object);
-    public String toFormString();
-    public Element toXML();
-}
+import org.radeox.filter.regex.LocaleRegexReplaceFilter;
+import org.radeox.filter.CacheFilter;
+
+public class StrongFilter extends LocaleRegexReplaceFilter implements CacheFilter {
+      protected String getLocaleKey() {
+        return "filter.strong";
+      }
+    }

@@ -1,3 +1,25 @@
+/**
+ * User: ludovic
+ * Date: 13 mars 2004
+ * Time: 15:04:19
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ *
+ */
+
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWiki;
@@ -15,13 +37,7 @@ import java.io.File;
 import java.util.Enumeration;
 import java.util.Vector;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 13 mars 2004
- * Time: 15:04:19
- * To change this template use File | Settings | File Templates.
- */
+
 public abstract class ServletTest extends ServletTestCase {
     public String hibpath = "hibernate-test.cfg.xml";
     public XWikiContext context = new XWikiContext();

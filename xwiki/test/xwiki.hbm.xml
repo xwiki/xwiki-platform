@@ -117,6 +117,9 @@
         <property name="unmodifiable" type="boolean">
             <column name="XWP_UNMODIFIABLE" />
         </property>
+        <property name="number" type="integer">
+            <column name="XWP_NUMBER" />
+        </property>
 
         <joined-subclass name="com.xpn.xwiki.objects.classes.NumberClass" table="xwikinumberclasses">
             <key>

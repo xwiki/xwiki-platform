@@ -285,7 +285,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             BaseClass bclass = doc.getxWikiClass();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
-                if (bclass.getFields().size()>0)
+                if (bclass.getFieldList().size()>0)
                     saveXWikiClass(bclass, context, false);
             } else {
                 // TODO: Remove existing class
@@ -545,10 +545,10 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                object.setFieldsToRemove(new ArrayList());
             }
 
-            Iterator it = object.getFields().keySet().iterator();
+            Iterator it = object.getPropertyList().iterator();
             while (it.hasNext()) {
                 String key = (String) it.next();
-                BaseProperty prop = (BaseProperty) object.getFields().get(key);
+                BaseProperty prop = (BaseProperty) object.getField(key);
                 if (!prop.getName().equals(key)) {
                     Object[] args = { key, object.getName() };
                     throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
@@ -605,9 +605,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 property.setObject(object);
                 property.setName(name);
                 loadXWikiProperty(property, context, false);
-                map.put(name, property);
+                object.addField(name, property);
             }
-            object.setFields(map);
 
             if (bTransaction) {
                     endTransaction(context, false);
@@ -633,7 +632,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
               beginTransaction(context);
             }
             Session session = getSession(context);
-            for (Iterator it = object.getFields().values().iterator(); it.hasNext();) {
+            for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
                     BaseProperty property = (BaseProperty)it.next();
                     session.delete(property);
             }
@@ -806,7 +805,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             }
 
 
-            Collection coll = bclass.getFields().values();
+            Collection coll = bclass.getFieldList();
             Iterator it = coll.iterator();
             while (it.hasNext()) {
                 PropertyClass prop = (PropertyClass) it.next();
@@ -847,7 +846,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 return;
             }
             HashMap map = new HashMap();
-            Query query = session.createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id");
+            Query query = session.createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id order by prop.number asc");
             query.setInteger("id", bclass.getId());
             Iterator it = query.list().iterator();
             while (it.hasNext()) {
@@ -859,9 +858,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 property.setName(name);
                 property.setObject(bclass);
                 session.load(property, property);
-                map.put(name, property);
+                bclass.addField(name, property);
             }
-            bclass.setFields(map);
 
             if (bTransaction) {
                 endTransaction(context, true);

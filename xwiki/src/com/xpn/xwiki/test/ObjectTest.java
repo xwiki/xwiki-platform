@@ -156,7 +156,7 @@ public class ObjectTest extends TestCase {
          assertNotSame("Equals did not detect changed field property", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object.getFields().remove("age");
+         object.removeField("age");
          assertNotSame("Equals did not detect missing age field", object, object2);
 
          object2 = (BaseObject)object.clone();
@@ -168,7 +168,7 @@ public class ObjectTest extends TestCase {
          assertNotSame("Equals did not detect different class property size", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object.getxWikiClass().getFields().remove("age");
+         object.getxWikiClass().removeField("age");
          assertNotSame("Equals did not detect different null class", object, object2);
 
          object2 = (BaseObject)object.clone();
@@ -185,7 +185,7 @@ public class ObjectTest extends TestCase {
          assertEquals("Merging did not created equals objects", object, object2);
 
          object2 = (BaseObject)object.clone();
-         object2.getFields().remove("age");
+         object2.removeField("age");
          object2.merge(object);
          assertEquals("Merging did not created equals objects", object, object2);
 

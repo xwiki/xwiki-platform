@@ -1,3 +1,24 @@
+/**
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ * * User: ludovic
+ * Date: 8 mars 2004
+ * Time: 09:19:35
+ */
+
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWiki;
@@ -14,13 +35,6 @@ import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 8 mars 2004
- * Time: 09:19:35
- * To change this template use File | Settings | File Templates.
- */
 public class VelocityRenderTest extends TestCase {
 
         private XWiki xwiki;
@@ -101,9 +115,6 @@ public class VelocityRenderTest extends TestCase {
             testInclude( "#includeForm(\"Test.WebHome\")", "IncludeTest");
         }
 
-        public void testIncludeFromOtherDatabase() throws XWikiException {
-            testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")", "XWiki Users");
-        }
 
         public void testIncludeTopicContext() throws XWikiException {
            testInclude("#includeTopic(\"Test.WebHome\")\n$doc.author", "SecondAuthor");
@@ -113,8 +124,21 @@ public class VelocityRenderTest extends TestCase {
             testInclude( "#includeForm(\"Test.WebHome\")\n$doc.author", "SecondAuthor");
         }
 
-        public void testIncludeFromOtherDatabaseContext() throws XWikiException {
-            testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")\n$doc.author", "SecondAuthor");
+        public void testIncludeFromOtherDatabase() throws XWikiException, HibernateException {
+          context.setDatabase("xwikitest2");
+          StoreHibernateTest.cleanUp(getHibStore(), context);
+          String content = Utils.content1;
+          Utils.content1 = "XWiki Users";
+          Utils.createDoc(getHibStore(),"XWiki", "XWikiUsers", context);
+          Utils.content1 = content;
+          context.setDatabase("xwikitest");
+
+          testInclude( "#includeTopic(\"xwikitest2:XWiki.XWikiUsers\")", "XWiki Users");
+        }
+
+        public void testIncludeFromOtherDatabaseContext() throws XWikiException, HibernateException {
+          testIncludeFromOtherDatabase();
+          testInclude( "#includeTopic(\"xwikitest2:XWiki.XWikiUsers\")\n$doc.author", "SecondAuthor");
         }
 
 

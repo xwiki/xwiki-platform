@@ -22,24 +22,33 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.*;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {
-    public ElementInterface get(String name) {
+
+    // This insures natural ordering between properties
+    public void addField(String name, PropertyInterface element) {
+        Set properties = getPropertyList();
+        if (!properties.contains(name)) {
+          if (((BaseCollection)element).getNumber()==0)
+           ((BaseCollection)element).setNumber(properties.size()+1);
+        }
+        super.addField(name, element);
+    }
+
+    public PropertyInterface get(String name) {
         return safeget(name);
     }
 
-    public void put(String name, ElementInterface property) {
+    public void put(String name, PropertyInterface property) {
         safeput(name, property);
     }
 
@@ -58,7 +67,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public BaseCollection fromMap(Map map, BaseCollection object) {
         object.setxWikiClass(this);
-        Iterator classit = getFields().values().iterator();
+        Iterator classit = getFieldList().iterator();
         while (classit.hasNext()) {
             PropertyClass property = (PropertyClass) classit.next();
             String name = property.getName();
@@ -94,7 +103,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         el.addText(getName());
         cel.add(el);
 
-        Iterator it = getFields().values().iterator();
+        Iterator it = getFieldList().iterator();
         while (it.hasNext()) {
           PropertyClass bprop = (PropertyClass)it.next();
           cel.add(bprop.toXML());

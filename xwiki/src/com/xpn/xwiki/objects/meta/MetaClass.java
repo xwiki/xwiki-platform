@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -49,23 +50,23 @@ public class MetaClass extends BaseClass {
         safeput(dblistclass.getName(), dblistclass);
     }
 
-    public void safeput(String name, ElementInterface property) {
-        super.safeput("meta" + name, property);
+    public void safeput(String name, PropertyInterface property) {
+        addField("meta" + name, property);
         if (property instanceof PropertyClass) {
          ((PropertyClass)property).setObject(this);
          ((BaseProperty)property).setName(name);
         }
     }
 
-    public ElementInterface safeget(String name) {
+    public PropertyInterface safeget(String name) {
         return super.safeget("meta" + name);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public ElementInterface get(String name) {
+    public PropertyInterface get(String name) {
         return safeget(name);
     }
 
-    public void put(String name, ElementInterface property) {
+    public void put(String name, PropertyInterface property) {
         safeput(name, property);
     }
 

@@ -18,7 +18,6 @@
  * Created by
  * Date: 30 nov. 2003
  * Time: 10:46:55
- * To change this template use Options | File Templates.
  */
 package com.xpn.xwiki.render;
 

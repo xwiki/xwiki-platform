@@ -1,19 +1,37 @@
+/**
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ *
+ * User: ludovic
+ * Date: 8 mars 2004
+ * Time: 09:23:00
+ */
+
+
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
 
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 8 mars 2004
- * Time: 09:23:00
- * To change this template use File | Settings | File Templates.
- */
+
 public class RadeoxRenderTest  extends RenderTest {
 
     public XWikiRenderer getXWikiRenderer() {
@@ -116,12 +134,56 @@ public class RadeoxRenderTest  extends RenderTest {
         renderTest(wikibase, "Test link: http://www.ludovic.org/",
                 "<a href=\"http://www.ludovic.org/\">", false, context);
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
-                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);    }
+                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+    }
 
+       public String renderTestInTable(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
+           String source2 = "{table}\na | b\ntext|" + source + "\n{table}\n";
+           String res = RenderTest.renderTest(renderer, source2, result, fullmatch, context);
+           assertTrue("Result should contain a table", res.indexOf("<table")!=-1);
+           return res;
+       }
+
+       public void testWikiLinksInTables() throws XWikiException {
+           Utils.createDoc(getHibStore(), "Main", "WebHome", context);
+           XWikiRenderer wikibase = getXWikiRenderer();
+           XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
+           context.put("doc", doc);
+
+           renderTestInTable(wikibase, "Test link: [Web Home]",
+                   "view/Main/WebHome", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home]",
+                   "Web Home</a>", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home]",
+                   "view/Main/WebHome", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home2]",
+                   "Web Home2", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home2]",
+                   "edit/Main/WebHome2?parent=", false, context);
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
+                   "Other Text", false, context);
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
+                   "view/Main/WebHome", false, context);
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome2]",
+                   "Other Text", false, context);
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome2]",
+                   "edit/Main/WebHome2?parent=", false, context);
+           renderTestInTable(wikibase, "Test link: http://www.ludovic.org/",
+                   "<a href=\"http://www.ludovic.org/\">", false, context);
+           renderTestInTable(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
+                   "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+       }
 
        public void testHTMLCodeRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         renderTest(wikibase, "{code}\n<html>\n{code}",
                 "&#60;html&#62;", false, context);
        }
+
+       public void testRSSRenderer() throws XWikiException {
+        XWikiRenderer wikibase = getXWikiRenderer();
+        renderTest(wikibase, "{rss:feed=http://www.ludovic.org/blog/index.rdf}",
+                "LudoBlog", false, context);
+       }
+
 }

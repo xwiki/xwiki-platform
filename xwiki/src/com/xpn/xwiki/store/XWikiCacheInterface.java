@@ -22,13 +22,6 @@
  */
 package com.xpn.xwiki.store;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Ludovic Dubost
- * Date: 24 nov. 2003
- * Time: 14:40:17
- * To change this template use Options | File Templates.
- */
 public interface XWikiCacheInterface extends XWikiStoreInterface {
     public XWikiStoreInterface getStore();
     public void setStore(XWikiStoreInterface store);

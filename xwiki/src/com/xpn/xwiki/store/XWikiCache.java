@@ -33,13 +33,7 @@ import org.apache.commons.jrcs.rcs.Version;
 
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Ludovic Dubost
- * Date: 24 nov. 2003
- * Time: 14:40:49
- * To change this template use Options | File Templates.
- */
+
 public class XWikiCache implements XWikiCacheInterface {
 
     private XWikiStoreInterface store;

@@ -36,7 +36,7 @@ import java.sql.PreparedStatement;
 
 public class StoreHibernateTest extends StoreTest {
 
-    public String hibpath = "hibernate-test.cfg.xml";
+    public static String hibpath = "hibernate-test.cfg.xml";
     public XWikiStoreInterface store;
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql, XWikiContext context) {

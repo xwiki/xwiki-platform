@@ -29,8 +29,8 @@ public interface ObjectInterface extends ElementInterface {
     public BaseClass getxWikiClass();
     public void setxWikiClass(BaseClass xWikiClass);
 
-    public ElementInterface get(String name) throws XWikiException;
-    void put(String name,ElementInterface property) throws XWikiException;
-    public ElementInterface safeget(String name);
-    void safeput(String name,ElementInterface property);
+    public PropertyInterface get(String name) throws XWikiException;
+    void put(String name,PropertyInterface property) throws XWikiException;
+    public PropertyInterface safeget(String name);
+    void safeput(String name, PropertyInterface property);
 }

@@ -25,8 +25,11 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.BaseCollection;
 
-public class PropertyMetaClass extends BaseClass {
+public class PropertyMetaClass extends BaseClass implements PropertyInterface {
 
     public PropertyMetaClass() {
         super();
@@ -55,5 +58,21 @@ public class PropertyMetaClass extends BaseClass {
         unmodif_class.setDisplayType("yesno");
         safeput("unmodifiable", unmodif_class);
 
+        NumberClass number_class = new NumberClass(this);
+        number_class.setName("number");
+        number_class.setPrettyName("Number");
+        number_class.setNumberType("integer");
+        safeput("number", unmodif_class);
+    }
+
+    public BaseCollection getObject() {
+        return null;
+    }
+
+    public void setObject(BaseCollection object) {
+    }
+
+    public String toFormString() {
+        return null;
     }
 }

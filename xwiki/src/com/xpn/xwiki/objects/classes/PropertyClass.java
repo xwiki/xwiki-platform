@@ -40,6 +40,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     private BaseClass object;
     private int id;
 
+
     public PropertyClass() {
     }
 
@@ -198,6 +199,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setStringValue("prettyName", prettyName);
     }
 
+    public int getNumber() {
+        return getIntValue("number");
+    }
+
+    public void setNumber(int number) {
+      setIntValue("number", number);
+    }
+
     public String getClassType() {
         return getClass().getName();
     }
@@ -214,7 +223,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public Element toXML() {
          Element pel = new DOMElement(getName());
-         Iterator it = getFields().values().iterator();
+         Iterator it = getFieldList().iterator();
          while (it.hasNext()) {
            BaseProperty bprop = (BaseProperty)it.next();
            pel.add(bprop.toXML());

@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 
 import java.util.Vector;
 
@@ -72,14 +73,15 @@ public class XWikiRenderingEngine {
     }
 
     public String renderDocument(XWikiDocInterface doc, XWikiContext context) {
-        String content = doc.getContent();
-        for (int i=0;i<renderers.size();i++)
-            content = ((XWikiRenderer)renderers.elementAt(i)).render(content, doc, context);
-        return content;
+           return renderText(doc.getContent(), doc, context);
     }
 
     public String renderDocument(XWikiDocInterface doc, XWikiDocInterface includingdoc, XWikiContext context) {
-        String content = doc.getContent();
+        return renderText(doc.getContent(), includingdoc, context);
+    }
+
+    public String renderText(String text, XWikiDocInterface includingdoc, XWikiContext context) {
+        String content = text;
         for (int i=0;i<renderers.size();i++)
             content = ((XWikiRenderer)renderers.elementAt(i)).render(content, includingdoc, context);
         return content;

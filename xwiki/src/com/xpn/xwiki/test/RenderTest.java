@@ -71,7 +71,7 @@ public abstract class RenderTest extends TestCase {
 
 
 
-    public static void renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
+    public static String renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
 
         // Add a line feed at the end of source and target
         // because if one is missing at the end it will be added by the rendering engine
@@ -89,16 +89,17 @@ public abstract class RenderTest extends TestCase {
                 + "\n-------\nto\n-------\n" + result + "\n-------\nRendered output:\n-------\n"
                 + res + "\n-------\n",
                 (fullmatch) ? res.equals(result) : (res.indexOf(result)!=-1));
+        return res;
     }
 
-    public static void renderTest(XWikiRenderingEngine renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
+    public static String renderTest(XWikiRenderingEngine renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
         XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
         doc.setContent(source);
-        renderTest(renderer, doc, result, fullmatch, context);
+        return renderTest(renderer, doc, result, fullmatch, context);
     }
 
 
-    public static void renderTest(XWikiRenderingEngine renderer, XWikiDocInterface doc, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
+    public static String renderTest(XWikiRenderingEngine renderer, XWikiDocInterface doc, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
           // Make sure we have the doc in the context
           context.put("doc", doc);
           context.put("cdoc", doc);
@@ -120,6 +121,7 @@ public abstract class RenderTest extends TestCase {
                   + "\n-------\nto\n-------\n" + result + "\n-------\nRendered output:\n-------\n"
                   + res + "\n-------\n",
                   (fullmatch) ? res.equals(result) : (res.indexOf(result)!=-1));
+          return res;
       }
 
 

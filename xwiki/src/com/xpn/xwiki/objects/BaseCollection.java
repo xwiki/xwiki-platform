@@ -31,9 +31,10 @@ import java.util.*;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;
-    private Map fields = new HashMap();
+    private Map fields = new TreeMap();
     private String className;
     private List fieldsToRemove = new ArrayList();
+    private int number;
 
     public int getId() {
             return (getName()+getClassName()).hashCode();
@@ -42,10 +43,17 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setId(int id) {
     }
 
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
+
     public void addPropertyForRemoval(PropertyInterface field) {
         getFieldsToRemove().add(field);
     }
-
 
     public String getClassName() {
         if (xWikiClass!=null)
@@ -58,15 +66,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         className = name;
     }
 
-    public Object[] getProperties() {
-        Object[] array = getFields().values().toArray();
-        return array;
-    }
-
-    public Object[] getPropertyNames() {
-        Object[] array = getFields().keySet().toArray();
-        return array;
-    }
 
     public void checkField(String name) throws XWikiException {
         if (getxWikiClass().safeget(name)==null) {
@@ -76,24 +75,24 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    public ElementInterface safeget(String name) {
-        return (ElementInterface) getFields().get(name);
+    public PropertyInterface safeget(String name) {
+        return (PropertyInterface) getFields().get(name);
     }
 
-    public ElementInterface get(String name) throws XWikiException {
+    public PropertyInterface get(String name) throws XWikiException {
         checkField(name);
         return safeget(name);
     }
 
-    public void safeput(String name,ElementInterface property) {
-        getFields().put(name, property);
+    public void safeput(String name, PropertyInterface property) {
+        addField(name, property);
         if (property instanceof BaseProperty) {
          ((BaseProperty)property).setObject(this);
          ((BaseProperty)property).setName(name);
         }
     }
 
-    public void put(String name,ElementInterface property) throws XWikiException {
+    public void put(String name, PropertyInterface property) throws XWikiException {
         checkField(name);
         safeput(name, property);
     }
@@ -162,13 +161,48 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
-
-    public Map getFields() {
+    // These functions should not be used
+    // but instead our own implementation
+    private Map getFields() {
         return fields;
     }
 
     public void setFields(Map fields) {
         this.fields = fields;
+    }
+
+    public PropertyInterface getField(String name) {
+        return (PropertyInterface)fields.get(name);
+    }
+
+    public void addField(String name, PropertyInterface element) {
+        fields.put(name, element);
+    }
+
+    public void removeField(String name) {
+        Object field = safeget(name);
+        if (field!=null) {
+         fields.remove(name);
+         fieldsToRemove.add(field);
+        }
+    }
+
+    public Collection getFieldList() {
+        return fields.values();
+    }
+
+    public Set getPropertyList() {
+        return fields.keySet();
+    }
+
+    public Object[] getProperties() {
+        Object[] array = getFields().values().toArray();
+        return array;
+    }
+
+    public Object[] getPropertyNames() {
+        Object[] array = getFields().keySet().toArray();
+        return array;
     }
 
     public boolean equals(Object coll) {
@@ -230,11 +264,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public void merge(BaseObject object) {
-        Iterator itfields = object.getFields().keySet().iterator();
+        Iterator itfields = object.getPropertyList().iterator();
         while (itfields.hasNext()) {
           String name = (String) itfields.next();
           if (safeget(name)==null)
-              safeput(name, (ElementInterface) ((BaseElement)object.safeget(name)).clone());
+              safeput(name, (PropertyInterface) ((BaseElement)object.safeget(name)).clone());
         }
     }
 

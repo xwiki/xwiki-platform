@@ -157,4 +157,8 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
 
     String displaySearch(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
+
+    String getRenderedContent(String text, XWikiContext context);
+
+    String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
 }

@@ -6,9 +6,13 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
 
 /**
  * ===================================================================
@@ -168,9 +172,20 @@ public class ClassesTest extends TestCase {
         testDisplayer("category3", obj, "1 2", "multiple");
     }
 
-    public void testDBListDisplayers() throws XWikiException {
+
+    public XWikiHibernateStore getHibStore(XWiki xwiki) {
+        XWikiStoreInterface store = xwiki.getStore();
+        if (store instanceof XWikiCacheInterface)
+            return (XWikiHibernateStore)((XWikiCacheInterface)store).getStore();
+        else
+            return (XWikiHibernateStore) store;
+    }
+
+    public void testDBListDisplayers() throws XWikiException, HibernateException {
         XWikiContext context = new XWikiContext();
+        StoreHibernateTest.cleanUp(new XWikiHibernateStore(StoreHibernateTest.hibpath), context);
         XWiki xwiki = new XWiki("./xwiki.cfg", context);
+
         try {
             BaseObject obj = Utils.prepareAdvancedObject();
             testDisplayer("dblist", obj, "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", context);

@@ -72,7 +72,7 @@ import java.io.Writer;
 * @version $Id$
 */
 
-public class MyLinkTestFilter extends LocaleRegexTokenFilter {
+public class XWikiLinkFilter extends LocaleRegexTokenFilter {
 
     private static Log log = LogFactory.getLog(LinkTestFilter.class);
 
@@ -87,7 +87,7 @@ public class MyLinkTestFilter extends LocaleRegexTokenFilter {
      */
 
     protected String getLocaleKey() {
-        return "filter.linktest";
+        return "filter.link";
     }
 
     protected void setUp(FilterContext context) {

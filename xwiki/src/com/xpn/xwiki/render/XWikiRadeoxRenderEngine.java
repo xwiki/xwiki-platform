@@ -1,23 +1,77 @@
-package com.xpn.xwiki.render;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import org.apache.commons.lang.StringUtils;
-import org.radeox.api.engine.WikiRenderEngine;
-import org.radeox.engine.BaseRenderEngine;
 /**
- * Created by IntelliJ IDEA.
+ * ===================================================================
+ *
+ * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ *
  * User: ludovic
  * Date: 8 mars 2004
  * Time: 08:55:40
- * To change this template use File | Settings | File Templates.
  */
+
+package com.xpn.xwiki.render;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.filter.XWikiFilter;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.radeox.api.engine.WikiRenderEngine;
+import org.radeox.api.engine.context.InitialRenderContext;
+import org.radeox.engine.BaseRenderEngine;
+import org.radeox.util.Service;
+import org.radeox.filter.FilterPipe;
+import org.radeox.filter.Filter;
+
+import java.util.Iterator;
+
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine {
+    private static Log log = LogFactory.getLog(BaseRenderEngine.class);
     private XWikiContext context;
 
     public XWikiRadeoxRenderEngine(XWikiContext context) {
+        // super();
         this.setContext(context);
     }
+
+    public XWikiRadeoxRenderEngine(InitialRenderContext ircontext, XWikiContext context) {
+        super(ircontext);
+        this.setContext(context);
+    }
+
+    // Overidding to load our own Filter list.
+    protected void init() {
+    if (null == fp) {
+      fp = new FilterPipe(initialContext);
+
+      Iterator iterator = Service.providers(XWikiFilter.class);
+      while (iterator.hasNext()) {
+        try {
+          Filter filter = (Filter) iterator.next();
+          fp.addFilter(filter);
+          log.debug("Loaded filter: " + filter.getClass().getName());
+        } catch (Exception e) {
+          log.warn("BaseRenderEngine: unable to load filter", e);
+        }
+      }
+
+      fp.init();
+      //Logger.debug("FilterPipe = "+fp.toString());
+    }
+  }
+
 
     public boolean exists(String name) {
         try {

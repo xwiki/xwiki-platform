@@ -370,11 +370,20 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
             saveAttachmentList(doc, context, false);
 
+
             // Handle the latest text file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
                 doc.setDate(new Date());
                 doc.incrementVersion();
                 doc.updateArchive(doc.toXML(context));
+            } else {
+                // Make sure the getArchive call has been made once
+                // with a valid context
+                try {
+                    doc.getArchive(context);
+                } catch (XWikiException e) {
+                    // this is a non critical error
+                }
             }
 
             // Verify if the document already exists

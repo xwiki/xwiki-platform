@@ -81,6 +81,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public Archive getRCSArchive();
     public void setRCSArchive(Archive archive);
     public String getArchive() throws XWikiException;
+    public String getArchive(XWikiContext context) throws XWikiException;
     public void setArchive(String text) throws FileNotFoundException, ParseException, XWikiException;
     public void updateArchive(String text) throws XWikiException;
     public boolean isMostRecent();

@@ -370,10 +370,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public String getArchive() throws XWikiException {
+        return getArchive(null);
+    }
+
+    public String getArchive(XWikiContext context) throws XWikiException {
         if ((content==null)||(content.equals("")))
             setContent("\n");
         if (archive==null)
-            updateArchive(toXML(null));
+            updateArchive(toXML(context));
         if (archive==null)
             return "";
         else {

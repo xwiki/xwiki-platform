@@ -55,13 +55,13 @@ public class PluginTest extends TestCase {
 
     public void testSmilies() throws XWikiException {
         XWikiRenderingEngine wikibase = xwiki.getRenderingEngine();
-        RenderTest.renderTest(wikibase, "Hello 1\n:)\nHello 2",
+        RenderTest.renderTest(wikibase, "Hello 1\n :)\nHello 2",
                 "smile", false, context);
-        RenderTest.renderTest(wikibase, "Hello 1\n:-)\nHello 2",
+        RenderTest.renderTest(wikibase, "Hello 1\n :-)\nHello 2",
                 "smile", false, context);
-        RenderTest.renderTest(wikibase, "Hello 1\n:) :)\nHello 2",
+        RenderTest.renderTest(wikibase, "Hello 1\n :) :)\nHello 2",
                 "smile smile", false, context);
-        RenderTest.renderTest(wikibase, "Hello 1\n:) 8-)\nHello 2",
+        RenderTest.renderTest(wikibase, "Hello 1\n :) 8-)\nHello 2",
                 "smile cool", false, context);
     }
 

@@ -143,7 +143,10 @@ public class ViewEditAction extends XWikiAction
                 session.setAttribute("cdoc", doc);
             }
             // forward to view template
-            return (mapping.findForward("view"));
+            if (xwiki.getSkin(context).equals("plain"))
+                return (mapping.findForward("plain"));
+            else
+                return (mapping.findForward("view"));
         }
         else if ( action.equals("inline")) {
             PrepareEditForm peform = (PrepareEditForm) form;

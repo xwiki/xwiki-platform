@@ -72,8 +72,8 @@
             name="view"
             scope="request">
         <forward name="view" path="/templates/view.vm"/>
+        <forward name="plain" path="/templates/plain.vm"/>
     </action>
-
     <action path="/edit/"
             type="com.xpn.xwiki.web.ViewEditAction"
             name="edit"

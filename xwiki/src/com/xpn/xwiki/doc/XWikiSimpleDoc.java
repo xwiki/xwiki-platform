@@ -38,6 +38,7 @@ import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
+import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -165,6 +166,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String getRenderedContent(XWikiContext context) {
         return context.getWiki().getRenderingEngine().renderDocument(this, context);
+    }
+
+    public String getEscapedContent(XWikiContext context) {
+        CharacterFilter filter = new CharacterFilter();
+        return filter.process(getContent());
     }
 
     public String getName() {

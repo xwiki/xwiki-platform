@@ -1,0 +1,8 @@
+#template("xwiki.vm")
+#if ($request.getParameter("raw").equals("1"))
+<pre>
+$cdoc.getEscapedContent($context)
+</pre>
+#else
+$cdoc.getRenderedContent($context)
+#end

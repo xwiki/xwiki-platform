@@ -45,15 +45,15 @@
     <orderEntriesWatcher>
       <pairs>
         <key>
-          <option name="value" value="3" />
-        </key>
-        <value predicate="higherLibrary" level="project" libraryName="Hibernate" />
-      </pairs>
-      <pairs>
-        <key>
           <option name="value" value="10" />
         </key>
         <value predicate="higherLibrary" level="project" libraryName="OSUser" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="3" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Hibernate" />
       </pairs>
       <pairs>
         <key>
@@ -75,17 +75,17 @@
       </pairs>
       <pairs>
         <key>
+          <option name="value" value="11" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="TomCat 4.1" />
+      </pairs>
+      <pairs>
+        <key>
           <option name="value" value="9" />
         </key>
         <value predicate="moduleLibrary">
           <url>file://$MODULE_DIR$/build/xwikibase_test</url>
         </value>
-      </pairs>
-      <pairs>
-        <key>
-          <option name="value" value="11" />
-        </key>
-        <value predicate="higherLibrary" level="project" libraryName="TomCat 4.1" />
       </pairs>
       <pairs>
         <key>
@@ -101,9 +101,9 @@
       </pairs>
       <pairs>
         <key>
-          <option name="value" value="12" />
+          <option name="value" value="6" />
         </key>
-        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
+        <value predicate="higherLibrary" level="project" libraryName="Perl" />
       </pairs>
       <pairs>
         <key>
@@ -113,15 +113,15 @@
       </pairs>
       <pairs>
         <key>
-          <option name="value" value="6" />
+          <option name="value" value="12" />
         </key>
-        <value predicate="higherLibrary" level="project" libraryName="Perl" />
+        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
       </pairs>
     </orderEntriesWatcher>
     <order-entry-info>
       <info>
         <key>
-          <option name="value" value="3" />
+          <option name="value" value="10" />
         </key>
         <value>
           <setting name="copy" value="false" />
@@ -130,7 +130,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="10" />
+          <option name="value" value="3" />
         </key>
         <value>
           <setting name="copy" value="false" />
@@ -166,7 +166,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="9" />
+          <option name="value" value="11" />
         </key>
         <value>
           <setting name="copy" value="false" />
@@ -175,7 +175,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="11" />
+          <option name="value" value="9" />
         </key>
         <value>
           <setting name="copy" value="false" />
@@ -202,7 +202,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="12" />
+          <option name="value" value="6" />
         </key>
         <value>
           <setting name="copy" value="false" />
@@ -220,7 +220,7 @@
       </info>
       <info>
         <key>
-          <option name="value" value="6" />
+          <option name="value" value="12" />
         </key>
         <value>
           <setting name="copy" value="false" />

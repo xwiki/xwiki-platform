@@ -301,6 +301,12 @@ public class XWiki implements XWikiNotificationInterface {
         return scontent;
     }
 
+    public String getXMLEncoded(String content) {
+        Filter filter = new CharacterFilter();
+        String scontent = filter.process(content);
+        return scontent;
+    }
+
     public String getTextArea(String content) {
         Filter filter = new CharacterFilter();
         filter.removeAttribute("'");
@@ -371,6 +377,13 @@ public class XWiki implements XWikiNotificationInterface {
             String skin = (String) context.get("skin");
             if (skin!=null)
                 return skin;
+
+            // Try to get it from URL
+            skin = context.getRequest().getParameter("skin");
+            if ((skin!=null)&&(!skin.equals(""))) {
+                context.put("skin",skin);
+                return skin;
+            }
 
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
             skin = ((BaseProperty)doc.getxWikiObject().get("skin")).getValue().toString();
@@ -737,7 +750,7 @@ public class XWiki implements XWikiNotificationInterface {
         boolean needsAuth = false;
         String right = "edit";
 
-        if (action.equals("view"))
+        if (action.equals("view")||(action.equals("plain")||(action.equals("raw"))))
             right = "view";
 
         needsAuth = getXWikiPreference("authenticate_" + right, context).toLowerCase().equals("yes");

@@ -700,70 +700,70 @@
     <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <entry file="file://$PROJECT_DIR$/src/ApplicationResources_fr.properties" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="95" column="10" selection-start="3236" selection-end="3246" vertical-scroll-proportion="0.49866667">
+          <state line="95" column="10" selection-start="3236" selection-end="3246" vertical-scroll-proportion="0.7110266">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.5786667">
+          <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.82509506">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1878" column="62" selection-start="71465" selection-end="71465" vertical-scroll-proportion="0.77066666">
+          <state line="1851" column="71" selection-start="69930" selection-end="69930" vertical-scroll-proportion="0.8403042">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/deleted.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="6" column="0" selection-start="133" selection-end="133" vertical-scroll-proportion="0.26153848">
+          <state line="6" column="0" selection-start="133" selection-end="133" vertical-scroll-proportion="0.36690646">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletVirtualTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="261" column="8" selection-start="11415" selection-end="11458" vertical-scroll-proportion="0.408">
+          <state line="261" column="8" selection-start="11415" selection-end="11458" vertical-scroll-proportion="0.581749">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/StoreHibernateTest.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="66" column="9" selection-start="2585" selection-end="2585" vertical-scroll-proportion="0.58133334">
+          <state line="66" column="9" selection-start="2585" selection-end="2585" vertical-scroll-proportion="0.82889736">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/delete.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="22" column="68" selection-start="462" selection-end="462" vertical-scroll-proportion="0.99733335">
+          <state line="22" column="68" selection-start="462" selection-end="462" vertical-scroll-proportion="1.4220532">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/attach.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="18" column="0" selection-start="373" selection-end="373" vertical-scroll-proportion="0.816">
+          <state line="18" column="0" selection-start="373" selection-end="373" vertical-scroll-proportion="1.163498">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/login.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="24" column="0" selection-start="724" selection-end="724" vertical-scroll-proportion="1.0461539">
+          <state line="24" column="0" selection-start="724" selection-end="724" vertical-scroll-proportion="1.4676259">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/accessdenied.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="4" column="16" selection-start="115" selection-end="115" vertical-scroll-proportion="0.17435898">
+          <state line="4" column="16" selection-start="115" selection-end="115" vertical-scroll-proportion="0.24460432">
             <folding />
           </state>
         </provider>
@@ -860,13 +860,14 @@
   <component name="ProjectPane">
     <expanded_node url="file://$PROJECT_DIR$" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/com/xpn/xwiki" module="xwikibase" type="directory" />
-    <expanded_node url="com.xpn.xwiki.test.ServletVirtualTest" module="xwikibase" type="class" />
     <expanded_node url="file://$PROJECT_DIR$/src/com/xpn/xwiki/test" module="xwikibase" type="directory" />
+    <expanded_node url="com.xpn.xwiki.api.Api" module="xwikibase" type="class" />
     <expanded_node url="file://$PROJECT_DIR$/src/com" module="xwikibase" type="directory" />
     <expanded_node url="" module="xwiki" type="module" />
     <expanded_node url="file://$PROJECT_DIR$/src" module="xwikibase" type="directory" />
     <expanded_node url="" module="xwikibase" type="module" />
     <expanded_node url="file://$PROJECT_DIR$/src/com/xpn" module="xwikibase" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/com/xpn/xwiki/api" module="xwikibase" type="directory" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.71280277">
@@ -1384,18 +1385,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1288" height="748" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3983871" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.2626728" order="7" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.1699029" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.3357605" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.5370968" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23572594" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4048387" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Aspects" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27993527" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.2548387" order="2" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.3983871" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="CVS File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.5564516" order="3" />
@@ -1526,70 +1527,70 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/delete.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="68" selection-start="462" selection-end="462" vertical-scroll-proportion="0.99733335">
+        <state line="22" column="68" selection-start="462" selection-end="462" vertical-scroll-proportion="1.4220532">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/attach.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="0" selection-start="373" selection-end="373" vertical-scroll-proportion="0.816">
+        <state line="18" column="0" selection-start="373" selection-end="373" vertical-scroll-proportion="1.163498">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/login.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="0" selection-start="724" selection-end="724" vertical-scroll-proportion="1.0461539">
+        <state line="24" column="0" selection-start="724" selection-end="724" vertical-scroll-proportion="1.4676259">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/accessdenied.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="16" selection-start="115" selection-end="115" vertical-scroll-proportion="0.17435898">
+        <state line="4" column="16" selection-start="115" selection-end="115" vertical-scroll-proportion="0.24460432">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ApplicationResources_fr.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="95" column="10" selection-start="3236" selection-end="3246" vertical-scroll-proportion="0.49866667">
+        <state line="95" column="10" selection-start="3236" selection-end="3246" vertical-scroll-proportion="0.7110266">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/web/ViewEditAction.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.5786667">
+        <state line="234" column="16" selection-start="8482" selection-end="8482" vertical-scroll-proportion="0.82509506">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/deleted.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="0" selection-start="133" selection-end="133" vertical-scroll-proportion="0.26153848">
+        <state line="6" column="0" selection-start="133" selection-end="133" vertical-scroll-proportion="0.36690646">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1878" column="62" selection-start="71465" selection-end="71465" vertical-scroll-proportion="0.77066666">
+        <state line="1851" column="71" selection-start="69930" selection-end="69930" vertical-scroll-proportion="0.8403042">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/StoreHibernateTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="9" selection-start="2585" selection-end="2585" vertical-scroll-proportion="0.58133334">
+        <state line="66" column="9" selection-start="2585" selection-end="2585" vertical-scroll-proportion="0.82889736">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/test/ServletVirtualTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="261" column="8" selection-start="11415" selection-end="11458" vertical-scroll-proportion="0.408">
+        <state line="261" column="8" selection-start="11415" selection-end="11458" vertical-scroll-proportion="0.581749">
           <folding />
         </state>
       </provider>

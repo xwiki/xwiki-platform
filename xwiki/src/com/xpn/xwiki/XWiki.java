@@ -1845,6 +1845,7 @@ public class XWiki implements XWikiNotificationInterface {
 
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName, boolean failOnExist, XWikiContext context) throws XWikiException {
         String database = context.getDatabase();
+        wikiName = wikiName.toLowerCase();
 
         try {
             XWikiDocInterface userdoc = getDocument(wikiAdmin, context);
@@ -1921,8 +1922,9 @@ public class XWiki implements XWikiNotificationInterface {
             copyDocument(wikiAdmin, getDatabase(), wikiName, context);
 
             // Modify rights in user wiki
-            XWikiDocInterface wikiprefdoc = getDocument(wikiName + ":XWiki.XWikiPreferences", context);
-            wikiprefdoc.setStringValue("XWiki.XWikiPreferences", "user", getDatabase() + ":" + wikiAdmin);
+            context.setDatabase(wikiName);
+            XWikiDocInterface wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
+            wikiprefdoc.setStringValue("XWiki.XWikiPreferences", "users", getDatabase() + ":" + wikiAdmin);
             saveDocument(wikiprefdoc, context);
             return 1;
         } catch (Exception e) {

@@ -80,7 +80,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* remove accents from wiki links in brackets&#10;* throw exception when trying to get a page non alpha numeric chars" />
+    <option name="LAST_COMMIT_MESSAGE" value="* fix css for login button&#10;* fix isalpha to accept the minus sign" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -753,7 +753,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/util/Util.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="185" column="62" selection-start="6252" selection-end="6252" vertical-scroll-proportion="0.68045115">
+          <state line="185" column="78" selection-start="6268" selection-end="6268" vertical-scroll-proportion="0.68045115">
             <folding />
           </state>
         </provider>
@@ -1588,7 +1588,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/util/Util.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="185" column="62" selection-start="6252" selection-end="6252" vertical-scroll-proportion="0.68045115">
+        <state line="185" column="78" selection-start="6268" selection-end="6268" vertical-scroll-proportion="0.68045115">
           <folding />
         </state>
       </provider>

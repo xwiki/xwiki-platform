@@ -28,6 +28,7 @@ import com.xpn.xwiki.store.XWikiCache;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.classes.*;
@@ -239,7 +240,7 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             doc = getStore().loadXWikiDoc(doc);
         }  catch (XWikiException e) {
-            // TODO: log error for document that does not exist.
+            throw e;
         }
         return doc;
     }
@@ -268,10 +269,15 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public XWikiDocInterface getDocumentFromPath(String path) throws XWikiException {
+        String web, name;
         int i1 = path.indexOf("/",1);
-        int i2 = path.lastIndexOf("/");
-        String web = path.substring(i1+1,i2);
-        String name = path.substring(i2+1);
+        int i2 = path.indexOf("/", i1+1);
+        int i3 = path.indexOf("/", i2+1);
+        web = path.substring(i1+1,i2);
+        if (i3==-1)
+         name = path.substring(i2+1);
+        else
+         name = path.substring(i2+1,i3);
         if (name.equals(""))
             name = "WebHome";
         return getDocument(web,name);
@@ -681,5 +687,6 @@ public class XWiki implements XWikiNotificationInterface {
 
         return true;
     }
+
 
 }

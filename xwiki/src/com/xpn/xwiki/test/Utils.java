@@ -11,10 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Vector;
-import java.io.File;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 
 import junit.framework.TestCase;
 
@@ -55,6 +52,8 @@ public class Utils {
 
 
     public static String rcspath = "./rcs";
+    public static String filename = "test1.sxw";
+    public static String filename2 = "test1.doc";
 
 
     public static void setStandardData() {
@@ -96,6 +95,14 @@ public class Utils {
         return content.toString();
     }
 
+    public static byte[] getDataAsBytes(File file) throws IOException {
+        byte[] result = new byte[(int)file.length()];
+        FileInputStream fileis = new FileInputStream(file);
+        fileis.read(result);
+        fileis.close();
+        return result;
+    }
+
     public static void setBigData() throws IOException {
         setStandardData();
         while (author.length()<120)
@@ -122,6 +129,7 @@ public class Utils {
                           BaseObject bobject, BaseClass bclass,
                           Map bobjects) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
+        String fullname = doc1.getFullName();
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.web + "." + Utils.name);
@@ -129,11 +137,14 @@ public class Utils {
         if (bobjects!=null)
             doc1.setxWikiObjects(bobjects);
 
-        if (bobject!=null)
-            doc1.setObject(doc1.getFullName(), 0, bobject);
+        if (bobject!=null) {
+            bobject.setName(fullname);
+            doc1.setObject(fullname, 0, bobject);
+        }
 
-        if (bclass!=null)
+        if (bclass!=null) {
             doc1.setxWikiClass(bclass);
+        }
 
         store.saveXWikiDoc(doc1);
     }

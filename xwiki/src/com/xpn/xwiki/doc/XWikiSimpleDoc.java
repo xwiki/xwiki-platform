@@ -88,6 +88,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private BaseClass xWikiClass;
     private Map xWikiObjects = new HashMap();
 
+    private List attachmentList;
+
     // Caching
     private boolean fromCache = false;
 
@@ -142,6 +144,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.format = "";
         this.author = "";
         this.archive = null;
+        this.attachmentList = new ArrayList();
     }
 
     public XWikiDocInterface getParentDoc() {
@@ -885,6 +888,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         el.addText(getVersion());
         docel.add(el);
 
+        List alist = getAttachmentList();
+        for (int ai=0;ai<alist.size();ai++) {
+            XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
+            docel.add(attach.toXML());
+
+        }
+
         // Add Class
         BaseClass bclass = getxWikiClass();
         if (bclass.getFields().size()>0) {
@@ -925,6 +935,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         Date date = new Date(Long.parseLong(sdate));
         setDate(date);
 
+        List atels = docel.elements("attachment");
+        for (int i=0;i<atels.size();i++) {
+            Element atel = (Element) atels.get(i);
+            XWikiAttachment attach = new XWikiAttachment();
+            attach.setDoc(this);
+            attach.fromXML(atel);
+        }
 
         Element cel = docel.element("class");
         BaseClass bclass = new BaseClass();
@@ -946,4 +963,21 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
    public String toString() {
         return toXML();
     }
+
+    public void setAttachmentList(List list) {
+       attachmentList = list;
+    }
+
+    public List getAttachmentList() {
+        return attachmentList;
+    }
+
+    public void saveAttachmentContent(XWikiAttachment attachment) throws XWikiException {
+        getStore().saveAttachmentContent(attachment, true);
+    }
+
+    public void loadAttachmentContent(XWikiAttachment attachment) throws XWikiException {
+        getStore().loadAttachmentContent(attachment,  true);
+    }
+
 }

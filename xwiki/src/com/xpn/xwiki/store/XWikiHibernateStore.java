@@ -23,8 +23,7 @@
 
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
@@ -35,22 +34,11 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.*;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.io.DocumentResult;
-import org.dom4j.io.DocumentSource;
-import org.dom4j.Document;
-import org.dom4j.Element;
-
 import java.io.*;
 import java.util.*;
 import net.sf.hibernate.*;
-import net.sf.hibernate.engine.SessionFactoryImplementor;
 import net.sf.hibernate.tool.hbm2ddl.SchemaUpdate;
 import net.sf.hibernate.cfg.*;
-
-import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.stream.StreamResult;
 
 
 public class XWikiHibernateStore extends XWikiRCSFileStore {
@@ -133,16 +121,18 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         //To change body of implemented methods use Options | File Templates.
         try {
             doc.setStore(this);
+
+            checkHibernate();
+            beginTransaction();
+
+            saveAttachmentList(doc, false);
+
             // Handle the latest text file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
-                doc.setDate(new Date());
                 doc.setDate(new Date());
                 doc.incrementVersion();
                 doc.updateArchive(doc.toXML());
             }
-
-            checkHibernate();
-            beginTransaction();
 
             // Verify if the document already exists
             Query query = getSession().createQuery("select xwikidoc.id from XWikiSimpleDoc as xwikidoc where xwikidoc.id = :id");
@@ -196,6 +186,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             doc.setStore(this);
             checkHibernate();
             beginTransaction();
+
             try {
                 getSession().load(doc, new Long(doc.getId()));
                 doc.setNew(false);
@@ -205,6 +196,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 return doc;
             }
             Map bclasses = new HashMap();
+
+            // Loading the attachment list
+            loadAttachmentList(doc, false);
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
@@ -258,8 +252,8 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Archive archive = basedoc.getRCSArchive();
 
             if (archive == null) {
-               doc.updateArchive(doc.toXML());
-               archive = basedoc.getRCSArchive();
+                doc.updateArchive(doc.toXML());
+                archive = basedoc.getRCSArchive();
             }
 
             Object[] text = (Object[]) archive.getRevision(version);
@@ -624,6 +618,160 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
+    public void loadAttachmentList(XWikiDocInterface doc, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+            Query query = getSession().createQuery("from XWikiAttachment as attach where attach.docId=:docid");
+            query.setLong("docid", doc.getId());
+            List list = query.list();
+            for (int i=0;i<list.size();i++) {
+                ((XWikiAttachment)list.get(i)).setDoc(doc);
+            }
+            doc.setAttachmentList(list);
+            if (bTransaction)
+                endTransaction(false);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            Object[] args = { doc.getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT,
+                    "Exception while searching attachments for documents {0}", e, args);
+        }
+    }
+
+    public void saveAttachmentList(XWikiDocInterface doc, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            List list = doc.getAttachmentList();
+            for (int i=0;i<list.size();i++) {
+                XWikiAttachment attachment = (XWikiAttachment) list.get(i);
+                saveAttachment(attachment, false);
+            }
+
+            if (bTransaction)
+                endTransaction(true);
+        }
+        catch (Exception e) {
+            Object[] args = { doc.getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST,
+                    "Exception while saving attachments attachment list of document {0}", e, args);
+        }
+    }
+
+    public void saveAttachment(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            Query query = getSession().createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
+            query.setLong("id", attachment.getId());
+            if (query.uniqueResult()==null)
+             session.save(attachment);
+            else
+             session.update(attachment);
+
+            if (bTransaction)
+                endTransaction(true);
+        }
+        catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                    "Exception while saving attachments for attachment {0} of document {1}", e, args);
+        }
+    }
+
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        try {
+            XWikiAttachmentContent content = attachment.getAttachment_content();
+            if (content.isContentDirty()) {
+                attachment.updateContentArchive();
+            }
+            XWikiAttachmentArchive archive = attachment.getAttachment_archive();
+
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            Query query = getSession().createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
+            query.setLong("id", content.getId());
+            if (query.uniqueResult()==null)
+             session.save(content);
+            else
+             session.update(content);
+
+            query = getSession().createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
+            query.setLong("id", archive.getId());
+            if (query.uniqueResult()==null)
+             session.save(archive);
+            else
+             session.update(archive);
+
+            if (bTransaction)
+                endTransaction(true);
+        }
+        catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                    "Exception while saving attachment {0} of document {1}", e, args);
+        }
+
+    }
+
+    public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
+            attachment.setAttachment_content(content);
+
+            session.load(content, new Long(content.getId()));
+
+            if (bTransaction)
+                endTransaction(false);
+        }
+        catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
+                    "Exception while loading attachment {0} of document {1}", e, args);
+        }
+    }
+
+    public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate();
+                beginTransaction();
+            }
+
+            XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
+            archive.setAttachment(attachment);
+            attachment.setAttachment_archive(archive);
+
+            session.load(archive, new Long(archive.getId()));
+
+            if (bTransaction)
+                endTransaction(false);
+        }
+        catch (Exception e) {
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
+                    "Exception while loading attachment {0} of document {1}", e, args);
+        }
+    }
+
     public void getContent(XWikiDocInterface doc, StringBuffer buf) {
         buf.append(doc.getContent());
     }
@@ -655,6 +803,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     "Exception while searching class list", e);
         }
     }
+
     public List searchDocuments(String wheresql) throws XWikiException {
         return searchDocuments(wheresql,0,0);
     }

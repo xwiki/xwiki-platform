@@ -26,9 +26,23 @@ import junit.framework.TestCase;
 import java.io.*;
 import java.util.*;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 
 public class UtilTest extends TestCase {
+
+    private static XWiki xwiki;
+    private static XWikiContext context;
+
+    public UtilTest() throws XWikiException {
+        context = new XWikiContext();
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
+    }
+
 
     public void setUp() {
     }
@@ -63,5 +77,25 @@ public class UtilTest extends TestCase {
         topicinfo = "   test=\"Ludovic%_N_%Dubost\"   ";
         params = Util.keyValueToHashtable(topicinfo);
         assertTrue(params.get("test").equals("Ludovic\nDubost"));
+    }
+
+    public void testgetDocumentFromPath() throws XWikiException {
+        String path = "/view/Main/WebHome";
+        XWikiDocInterface doc = xwiki.getDocumentFromPath(path);
+        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc name is not correct", "WebHome", doc.getName());
+         path = "/view/Main/WebHome/taratata.doc";
+        doc = xwiki.getDocumentFromPath(path);
+        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc name is not correct", "WebHome", doc.getName());
+         path = "/view/Main/WebHome/blabla/tfdfdf.doc";
+        doc = xwiki.getDocumentFromPath(path);
+        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc name is not correct", "WebHome", doc.getName());
+        path = "/view/Test/Titi/taratata.doc";
+       doc = xwiki.getDocumentFromPath(path);
+       assertEquals("Doc web is not correct", "Test", doc.getWeb());
+       assertEquals("Doc name is not correct", "Titi", doc.getName());
+
     }
 }

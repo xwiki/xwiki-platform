@@ -24,6 +24,7 @@ package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
@@ -37,6 +38,7 @@ import java.io.*;
 import java.util.Hashtable;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
     private File rscpath;
@@ -320,6 +322,10 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return true;
     }
 
+    public XWikiAttachment loadAttachment(XWikiAttachment attachment) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public List getClassList() throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
                 "Exception while searching: not implemented");
@@ -352,6 +358,18 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
                 "Exception while searching: not implemented");
+    }
+
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {

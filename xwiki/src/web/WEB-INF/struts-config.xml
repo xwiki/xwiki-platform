@@ -128,6 +128,28 @@
               <forward name="classadd" path="/templates/edit.vm"/>
       </action>
 
+      <action path="/attach/"
+                        type="com.xpn.xwiki.web.ViewEditAction"
+                        name="attach"
+                        scope="request">
+               <forward name="attach" path="/templates/attach.vm"/>
+      </action>
+
+      <action path="/upload/"
+                        type="com.xpn.xwiki.web.ViewEditAction"
+                        name="upload"
+                        scope="request">
+               <forward name="upload" path="/templates/attach.vm"/>
+      </action>
+
+            <action path="/download/"
+                              type="com.xpn.xwiki.web.ViewEditAction"
+                              name="download"
+                              scope="request">
+                     <forward name="download" path="/templates/download.vm"/>
+            </action>
+
+
   </action-mappings>
 
   <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"

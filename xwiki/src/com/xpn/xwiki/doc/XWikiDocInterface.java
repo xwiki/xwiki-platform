@@ -32,10 +32,8 @@ import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.*;
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Vector;
+
+import java.util.*;
 import java.io.FileNotFoundException;
 
 public interface XWikiDocInterface extends XWikiNotificationInterface {
@@ -51,10 +49,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public void setRCSVersion(Version version);
     public String getVersion();
     public void setVersion(String version);
-    public String getParent();
-    public void setParent(String parent);
-    public String getContent();
-    public void setContent(String content);
     public String getFormat();
     public void setFormat(String format);
     public String getAuthor();
@@ -64,6 +58,14 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public String getMeta();
     public void setMeta(String meta);
     public void appendMeta(String meta);
+
+    public String getParent();
+    public void setParent(String parent);
+    public XWikiDocInterface getParentDoc();
+
+    public String getContent();
+    public void setContent(String content);
+    public String getRenderedContent(XWikiContext context);
 
     public boolean isMetaDataDirty();
     public boolean isContentDirty();
@@ -111,20 +113,17 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException;
 
     public Object clone();
+    public void addObject(String classname, BaseObject object);
 
-    void addObject(String classname, BaseObject object);
+    public String toXML();
+    public Document toXMLDocument();
+    public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException;
 
-    String toXML();
+    public Version[] getRevisions() throws XWikiException;
+    public String[] getRecentRevisions() throws XWikiException;
 
-    Document toXMLDocument();
-
-    XWikiDocInterface getParentDoc();
-
-    String getRenderedContent(XWikiContext context);
-
-    Version[] getRevisions() throws XWikiException;
-
-    String[] getRecentRevisions() throws XWikiException;
-
-    void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException;
+    public void setAttachmentList(List list);
+    public List getAttachmentList();
+    public void saveAttachmentContent(XWikiAttachment attachment) throws XWikiException;
+    public void loadAttachmentContent(XWikiAttachment xWikiAttachment) throws XWikiException;
 }

@@ -20,12 +20,27 @@ $message
 </div>
 #end
 <div id="content">
-$cdoc.getRenderedContent($context)
+#set( $counter = 0)
+<table border="1">
+<tr><td>File</td><td>Version</td><td>Author</td><td>Size</td></tr>
+#foreach ($attach in $doc.attachmentList)
+<tr><td><a href="${downloadurl}/${attach.filename}?id=${counter}">$attach.filename</a></td>
+<td>$attach.version</td><td>$attach.author</td><td>$attach.filesize</td></tr>
+#set( $counter = $counter + 1)
+#end
+</table>
+<hr>
+<form action="$uploadurl" enctype="multipart/form-data" method="post">
+Choose a file to upload:
+<input type="file" name="filepath" value="" size="40">
+<input type="submit" value="Attach this file">
+</form>
 </div>
 <div id="nav_footer">
 <div id="actions">
 <a href="$editurl">$msg.get("edit")</a>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
+<a href="$attachurl">$msg.get("attach")</a><span> | </span>
 #versions()
 </div>
 </div>

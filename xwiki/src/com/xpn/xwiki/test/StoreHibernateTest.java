@@ -51,6 +51,9 @@ public class StoreHibernateTest extends StoreTest {
         hibstore.checkHibernate();
         hibstore.beginTransaction();
         StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment_content");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment_archive");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiobjects");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiproperties");
         StoreHibernateTest.runSQL(hibstore, "drop table xwikiintegers");

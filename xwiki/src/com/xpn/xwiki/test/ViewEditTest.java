@@ -4,23 +4,21 @@ package com.xpn.xwiki.test;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebResponse;
-import org.apache.cactus.client.ServletExceptionWrapper;
 import org.apache.struts.action.ActionServlet;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.File;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.io.*;
+import java.util.*;
 
 import net.sf.hibernate.HibernateException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -402,10 +400,10 @@ public class ViewEditTest extends ServletTestCase {
     public void testUpdateClassProp() throws IOException, Throwable {
         try {
             ActionServlet servlet = new ActionServlet();
-        servlet.init(config);
-        servlet.service(request, response);
-        cleanSession(session);
-          } catch (ServletException e) {
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
             e.getRootCause().printStackTrace();
             throw e.getRootCause();
         }
@@ -458,5 +456,134 @@ public class ViewEditTest extends ServletTestCase {
         assertEquals("Updated Class age property value is incorrect", new Integer(12), age);
         String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
         assertEquals("Updated Class name property value is incorrect", "john", name);
+    }
+
+
+    public void sendMultipart(WebRequest webRequest, File file) throws IOException {
+        Part part = new FilePart("application/octet-stream", file);
+        Part[] parts = new Part[1];
+        parts[0] = part;
+
+        if (Part.getBoundary() != null) {
+            webRequest.setContentType(
+                    "multipart/form-data" + "; boundary=" + Part.getBoundary());
+        }
+
+        PipedInputStream pipedin = new PipedInputStream();
+        PipedOutputStream pipedout = new PipedOutputStream(pipedin);
+        MultipartSenderThread sender = new MultipartSenderThread(pipedout, parts);
+        sender.start();
+        webRequest.setUserData(pipedin);
+    }
+
+
+    public void testAttach() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+
+    }
+
+
+    public void beginAttach(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore);
+        setUrl(webRequest, "upload", "AttachTest");
+        webRequest.setContentType("multipart/form-data");
+        File file = new File(Utils.filename);
+        sendMultipart(webRequest, file);
+    }
+
+    public void endAttach(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Saving returned exception", result.indexOf("Exception")==-1);
+
+        File fattach = new File(Utils.filename);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "AttachTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2);
+        List list = doc2.getAttachmentList();
+        assertEquals("Document has no attachement", 1, list.size());
+        XWikiAttachment attachment = (XWikiAttachment) list.get(0);
+        assertEquals("Attachment size is not correct", fattach.length(), attachment.getFilesize());
+    }
+
+
+    public void testAttachUpdate() throws IOException, Throwable {
+        try {
+            ActionServlet servlet = new ActionServlet();
+            servlet.init(config);
+            servlet.service(request, response);
+            cleanSession(session);
+        } catch (ServletException e) {
+            e.getRootCause().printStackTrace();
+            throw e.getRootCause();
+        }
+    }
+
+
+    public void beginAttachUpdate(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore);
+
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", "AttachTest");
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        hibstore.saveXWikiDoc(doc1);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
+        attachment1.setContent(attachcontent1);
+        doc1.saveAttachmentContent(attachment1);
+        doc1.getAttachmentList().add(attachment1);
+        hibstore.saveXWikiDoc(doc1);
+
+        setUrl(webRequest, "upload", "AttachTest");
+        webRequest.setContentType("multipart/form-data");
+        File file = new File(Utils.filename);
+        sendMultipart(webRequest, file);
+    }
+
+    public void endAttachUpdate(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Saving returned exception", result.indexOf("Exception")==-1);
+
+        File fattach = new File(Utils.filename);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "AttachTest");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2);
+        List list = doc2.getAttachmentList();
+        assertEquals("Document has no attachement", 2, list.size());
+        XWikiAttachment attachment = (XWikiAttachment) list.get(0);
+        assertEquals("Attachment size is not correct", fattach.length(), attachment.getFilesize());
+    }
+
+    public static class MultipartSenderThread extends Thread  {
+
+        private PipedOutputStream out;
+        private Part[] parts;
+
+        protected MultipartSenderThread(PipedOutputStream outs, Part[] source) {
+            out = outs;
+            parts = source;
+        }
+
+        public void run() {
+            try {
+                Part.sendParts(out, parts);
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }

@@ -47,6 +47,63 @@
 
     </class>
 
+    <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+
+        <property name="docId" type="long">
+            <column name="XWA_DOC_ID" />
+        </property>
+
+        <property name="filename" type="string">
+            <column name="XWA_FILENAME" length="255" not-null="true"/>
+        </property>
+
+        <property name="filesize" type="integer">
+            <column name="XWA_SIZE" />
+        </property>
+
+        <property name="date" type="timestamp">
+            <column name="XWA_DATE" not-null="true" />
+        </property>
+
+        <property name="author" type="string">
+            <column name="XWA_AUTHOR" length="255"/>
+        </property>
+
+        <property name="version" type="string">
+            <column name="XWA_VERSION" length="255" not-null="true"/>
+        </property>
+
+        <property name="comment" type="string">
+            <column name="XWA_COMMENT" length="255" />
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+        
+        <property name="content" type="binary">
+            <column name="XWA_CONTENT" length="4000000" not-null="true"/>
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+        <property name="archive" type="binary">
+            <column name="XWA_ARCHIVE" length="4000000" />
+        </property>
+    </class>
+
+
     <class name="com.xpn.xwiki.objects.classes.PropertyClass" table="xwikiclassesprop">
         <composite-id unsaved-value="any">
             <key-property name="id" column="XWP_ID" type="integer" />
@@ -95,16 +152,16 @@
         </joined-subclass>
 
         <joined-subclass name="com.xpn.xwiki.objects.classes.TextAreaClass" table="xwikistringclasses">
-                    <key>
-                        <column name="XWS_ID"  />
-                        <column name="XWS_NAME"  />
-                    </key>
-                    <property name="size" type="integer">
-                        <column name="XWS_SIZE" />
-                    </property>
-                    <property name="rows" type="integer">
-                        <column name="XWS_ROWS" />
-                    </property>
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+            <property name="rows" type="integer">
+                <column name="XWS_ROWS" />
+            </property>
         </joined-subclass>
 
     </class>

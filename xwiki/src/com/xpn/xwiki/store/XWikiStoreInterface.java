@@ -24,6 +24,8 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -46,8 +48,10 @@ public interface XWikiStoreInterface {
     public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException;
     public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
     public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
+    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
+    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException;
 
-    void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
-
-    void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException;
+    void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
+    void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
+    void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
 }

@@ -25,12 +25,20 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
+import java.security.Principal;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.apache.struts.action.*;
+import org.apache.struts.upload.MultipartRequestWrapper;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.DefaultFileItem;
 import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -119,6 +127,9 @@ public class ViewEditAction extends XWikiAction
         if (xwiki.checkAccess(action, doc, context)==false)
            return null;
 
+        Principal user = (Principal)context.get("user");
+        String username = (user==null) ? "" : user.getName();
+
         // Determine what to do
         if (action.equals("view"))
         {
@@ -160,6 +171,10 @@ public class ViewEditAction extends XWikiAction
         {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
             doc.readFromForm((EditForm)form, context);
+
+            // TODO: handle Author
+            doc.setAuthor(username);
+
             xwiki.saveDocument(doc, olddoc, context);
 
             // forward to view
@@ -188,6 +203,7 @@ public class ViewEditAction extends XWikiAction
             String propName = ((PropAddForm) form).getPropName();
             String propType = ((PropAddForm) form).getPropType();
             BaseClass bclass = doc.getxWikiClass();
+            bclass.setName(doc.getFullName());
             if (bclass.get(propName)!=null) {
                 // TODO: handle the error of the property already existing when we want to add a class property
             } else {
@@ -213,6 +229,60 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc, olddoc, context);
             return (mapping.findForward("classadd"));
         }
+        if (action.equals("download"))
+        {
+            String path = request.getPathInfo();
+            String filename = path.substring(path.lastIndexOf("/")+1);
+            int id = Integer.parseInt(request.getParameter("id"));
+            XWikiAttachment attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+
+            // Choose the right content type
+            response.setContentType(servlet.getServletContext().getMimeType(filename));
+
+            // Sending the content of the attachment
+            byte[] data = attachment.getContent();
+            response.setContentLength(data.length);
+            response.getOutputStream().write(data);
+
+            return null;
+        }
+        if (action.equals("attach"))
+        {
+            return (mapping.findForward("attach"));
+        }
+        else if (action.equals("upload")) {
+            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+            XWikiAttachment attachment = new XWikiAttachment();
+
+            // Get the FileUpload Data
+            DiskFileUpload fileupload = new DiskFileUpload();
+            fileupload.setSizeMax(1000000);
+            fileupload.setRepositoryPath(".");
+            List filelist = fileupload.parseRequest(request);
+            DefaultFileItem fileitem = (DefaultFileItem)filelist.get(0);
+
+            // Get the data in the Attachment object
+            File file = fileitem.getStoreLocation();
+            byte[] data = new byte[(int)file.length()];
+            FileInputStream fileis = new FileInputStream(file);
+            fileis.read(data);
+            fileis.close();
+            attachment.setContent(data);
+            attachment.setFilename(fileitem.getName());
+
+            // TODO: handle Author
+            attachment.setAuthor(username);
+
+            // Add the attachment to the document
+            doc.getAttachmentList().add(attachment);
+            attachment.setDoc(doc);
+
+            // Save the content and the archive
+            doc.saveAttachmentContent(attachment);
+
+            // Save the document with the attachment meta data
+            xwiki.saveDocument(doc, olddoc, context);
+         }
         // forward to edit
         response.sendRedirect(doc.getActionUrl("edit",context));
         return null;

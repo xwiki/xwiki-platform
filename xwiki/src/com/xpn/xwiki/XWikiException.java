@@ -55,11 +55,16 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_CLASSINVOCATIONERROR = 3001;
     public static final int ERROR_XWIKI_STORE_FILENOTFOUND = 3002;
     public static final int ERROR_XWIKI_STORE_ARCHIVEFORMAT = 3003;
+    public static final int ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT = 3004;
+
     public static final int ERROR_XWIKI_STORE_RCS_SAVING_FILE = 3101;
     public static final int ERROR_XWIKI_STORE_RCS_READING_FILE = 3102;
     public static final int ERROR_XWIKI_STORE_RCS_READING_REVISIONS = 3103;
     public static final int ERROR_XWIKI_STORE_RCS_READING_VERSION = 3104;
     public static final int ERROR_XWIKI_STORE_RCS_SEARCH = 3111;
+    public static final int ERROR_XWIKI_STORE_RCS_LOADING_ATTACHMENT = 3221;
+    public static final int ERROR_XWIKI_STORE_RCS_SAVING_ATTACHMENT = 3222;
+    public static final int ERROR_XWIKI_STORE_RCS_SEARCHING_ATTACHMENT = 3223;
 
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_FILE = 3201;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_READING_FILE = 3202;
@@ -70,6 +75,11 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_CLASS = 3221;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS = 3222;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCH = 3223;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT = 3231;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT = 3232;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST = 3233;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3234;
+
 
     public static final int ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION = 6001;
     public static final int ERROR_XWIKI_PERLPLUGIN_START = 6002;

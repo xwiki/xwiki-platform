@@ -1,242 +1,224 @@
-
-<!-- ANT
-     This is an Ant script for building the XWiki code.
-     Ant is the Jakarta project's build tool.
-	  You can get a copy of Ant from:
-	  
-	      http://jakarta.apache.org/ant/
-
-	  You'll need to also download the optional Ant tasks if you'll be
-     running JavaCC or the JUnit tests (more information below).
--->  
-
-<!-- hibernate
-     Hibernate is used for managing storage and much more of the XWiki
-     
-        http://www.hibernate.org/
-
-          A copy of Hibernate is included in the full distribution of this
-	  library.
-
--->
-
-<!-- Jakarta ORO
-     The Jakarta ORO Regexp library is used for Wiki page parsing
-     and for RCS keyword management.
-
-	  You can get a copy of Jakarta ORO from:
-
-       http://jakarta.apache.org/oro/
-
-	  A copy of Jakarta ORO is included in the full distribution of this
-	  library.
--->  
-
-
-<!-- JUnit
-     The library tests are written for the JUnit Testing Framework. 
-	  For distributions and documentation see:
-	     
-        http://www.junit.org/
-
-     You'll need to place a copy of junit.jar in Ant's lib directory
-     to run the tests.
+<!--
+/**
+* ===================================================================
+*
+* Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details, published at
+* http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+* root folder of this distribution.
 -->
 
 <project name="XWiki Content and Application Management Framework"
-			default="test" 
-			basedir="." >
+    default="release"
+    basedir="." >
 
-  <!-- Allow any user specific values to override the defaults -->
-  <property file="${user.home}/build.properties" />
-  <!-- Allow user defaults for this project -->
-  <property file="build.properties" />
+    <!-- Allow any user specific values to override the defaults -->
+    <property file="${user.home}/build.properties" />
+    <!-- Allow user defaults for this project -->
+    <property file="build.properties" />
 
-  <property name="app.name" value="xwiki" />
-  <property name="version"  value="0.1.1" />
+    <property name="app.name" value="xwiki" />
+    <property name="version"  value="0.1.7" />
+    <property name="pkg"  value="com.xpn.xwiki" />
 
-  <property name="src.dir"   value="${basedir}/src" />
-  <property name="java.dir"  value="${src.dir}/" />
-  <property name="tests.dir" value="${src.dir}/" />
-  <property name="lib.dir"   value="${basedir}/lib" />
-  <property name="doc.dir"   value="${basedir}/doc" />
-  <property name="javadoc"   value="${doc.dir}/api" />
-  <property name="dist.dir"  value="${doc.dir}/dist" />
-  <property name="classes"   value="${basedir}/classes" />
-  <property name="test.classes" value="${basedir}/test-classes" />
+    <property name="src.dir"   value="${basedir}/src" />
+    <property name="lib.dir"   value="${basedir}/lib" />
 
-  <property name="javacc.lib.dir" value="${javacc.home}/bin/lib" />
+    <property name="build.dir"  value="${basedir}/build" />
+    <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
+    <property name="release.dir"  value="${basedir}/release" />
+    <property name="dist.dir" value="${basedir}/dist" />
 
-<!-- <property name="build.compiler" value="jikes" /> -->
-<!-- <property name="build.compiler" value="classic"/> -->
+    <property name="doc.dir"   value="${basedir}/doc" />
+    <property name="javadoc.dir"   value="${doc.dir}/api" />
 
-  <property name="xwiki.jar"    value="${lib.dir}/xpertnet-xwiki-${version}.jar" />
-  <property name="tests.jar"  value="${lib.dir}/xpertnet-xwiki-tests.jar" />
-  <property name="hibernate.jar" value="${lib.dir}/jakarta-oro-2.0.6.jar" />
-  <property name="rcs.jar"    value="${lib.dir}/org.apache.commons.jrcs.rcs.jar" />
-  <property name="diff.jar"   value="${lib.dir}/org.apache.commons.jrcs.diff.jar" />
-  <property name="regexp.jar" value="${lib.dir}/jakarta-oro-2.0.6.jar" />
-  <property name="junit.jar"  value="${lib.dir}/junit-3.8.jar" />
-  <property name="libs"
-            value="${xwiki.jar};${hibernate.jar};${diff.jar};${rcs.jar};${regexp.jar};${tests.jar};${junit.jar}" />
+    <property name="javacc.lib.dir" value="${javacc.home}/bin/lib" />
 
-  <target name="prepare">
-    <mkdir dir="${classes}" />
-    <mkdir dir="${test.classes}" />
-    <mkdir dir="${lib.dir}" />
-  </target>
+    <property name="libs.servlet"
+        value="${lib.dir}/servlet.jar" />
 
-  <target name="tidy">
-    <delete dir="${classes}" />
-  </target>
+    <property name="libs.hibernate"
+        value="${lib.dir}/hibernate2.jar;${lib.dir}/c3p0.jar;${lib.dir}/cglib2.jar;${lib.dir}/dom4j.jar;${lib.dir}/ehcache.jar;${lib.dir}/hibernate-tools.jar;${lib.dir}/mysql-connector-java-3.0.9-stable-bin.jar;${lib.dir}/odmg.jar;${lib.dir}/oscache.jar;${lib.dir}/swarmcache.jar;${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis.jar;${lib.dir}/jta.jar" />
 
-  <target name="clean" depends="tidy">
-    <delete dir="${javadoc}" />
-    <delete dir="${dist.dir}" />
+    <property name="libs.jakartacommons"
+        value="${lib.dir}/commons-beanutils.jar;${lib.dir}/commons-collections.jar;${lib.dir}/commons-digester.jar;${lib.dir}/commons-lang.jar;${lib.dir}/commons-logging.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/jakarta-oro-2.0.7.jar;${lib.dir}/log4j-1.2.8.jar" />
 
-    <delete file="${diff.jar}" />
-    <delete file="${rcs.jar}" />
-    <delete file="${tests.jar}" />
-  </target>
+    <property name="libs.jrcs"
+        value="${lib.dir}/org.apache.commons.jrcs.rcs.jar" />
 
-  <patternset id="non.java.sources">
-    <include name="**/*.properties" />
-    <include name="**/*.html" />
-    <include name="**/defaultManifest.mf" />
-  </patternset>
+    <property name="libs.struts"
+        value="${lib.dir}/struts.jar" />
 
-  <target name="xwiki" depends="prepare">
-    <copy todir="${classes}">
-      <fileset dir="${java.dir}">
-        <patternset refid="non.java.sources" />
-      </fileset>
-    </copy>
+    <property name="libs.velocity"
+        value="${lib.dir}/velocity-dep-1.3.1.jar;${lib.dir}/velocity-tools-1.1-beta1.jar" />
 
-    <javac srcdir="${java.dir}" 
-	        destdir="${classes}" 
-			  classpath="${libs}"
-           debug="on" optimize="on" deprecation="on" >
-           <include name="**/xwiki/**/*.java" />
-           <include name="**/xwiki/util/**/*.java" />
-      <exclude name="**/*Test*.class" />
-    </javac>
+    <property name="libs.ant"
+        value="${lib.dir}/ant.jar" />
 
-    <jar jarfile="${xwiki.jar}" basedir="${classes}" >
-      <include name="com.xpn.xwiki/**" />
-      <exclude name="**/*Test*.class" />
-    </jar>
-  </target>
+    <property name="libs.inlinejava"
+        value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
-  <target name="tests" depends="prepare,xwiki">
-    <javac srcdir="${tests.dir}" 
-	 		  destdir="${test.classes}" 
-           classpath="${libs};${classes}"
-           debug="on" optimize="on" deprecation="on">
-      <include name="**/*.java" />
-    </javac>
+    <property name="libs.tests"
+        value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar" />
 
-    <jar jarfile="${tests.jar}" basedir="${test.classes}" >
-      <include name="**/*test*.class" />
-      <include name="**/*Test*.class" />
-    </jar>
-  </target>
+    <property name="libs"
+        value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.tests}" />
 
-  <target name="libs" depends="xwiki">
-  </target>
+    <target name="prepare">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+        <mkdir dir="${release.dir}" />
+    </target>
 
-  <target name="test" depends="tests">
-    <junit printsummary="yes" >
-      <classpath>
-        <pathelement path="${libs}" />
-        <pathelement location="${libs}/*.jar" />
-      </classpath>
-    
-      <formatter type="plain" />
-    
-      <test name="com.xpn.xwiki.tests.AllTests" 
-				haltonfailure="no" 
-				 >
-        <!-- <formatter type="plain" usefile="no" /> -->
-      </test>
-    </junit>
-  </target>
+    <target name="clean">
+        <delete dir="${javadoc.dir}" />
+        <delete dir="${build.dir}" />
+        <delete dir="${release.dir}" />
+        <delete dir="${dist.dir}" />
+    </target>
 
-  <target name="javadoc" depends="libs">
-    <mkdir dir="${javadoc}" />
-    <javadoc packagenames="com.xpn.xwiki.*"
-             sourcepath="${java.dir}" 
-             destdir="${javadoc}" 
-             classpath="${libs};classes"
-				 author="true"
-             version="true" 
-             private="yes"
-             overview="${java.dir}/com/xpn/xwiki/overview.html"
-				 windowtitle="${app.name} API"
-    		    doctitle="${app.name}"
-             bottom="Copyright 2003 Ludovic Dubost"
+    <patternset id="non.java.sources">
+        <include name="**/*.properties" />
+        <include name="**/*.xml" />
+        <include name="**/*.tld" />
+        <include name="**/*.vm" />
+        <include name="**/*.cfg" />
+        <include name="**/*.txt" />
+        <exclude name="web/**" />
+        <exclude name="perl/**" />
+        <exclude name="${src.dir}/web.xml" />
+    </patternset>
+
+    <patternset id="test.classes">
+        <include name="**/test/*.class" />
+    </patternset>
+
+    <target name="xwiki" depends="prepare">
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <patternset refid="non.java.sources" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}/web">
+            <fileset includes="**"
+                dir="${src.dir}/web" />
+        </copy>
+
+        <copy todir="${build.dir}/web/WEB-INF">
+            <fileset includes="web.xml"
+                dir="${src.dir}" />
+        </copy>
+
+
+        <copy todir="${build.dir}/web/WEB-INF/perl">
+            <fileset includes="**"
+                dir="${src.dir}/perl" />
+        </copy>
+
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs}"
+            debug="on" optimize="on" deprecation="on" >
+            <include name="com/xpn/xwiki/**/*.java" />
+            <exclude name="**/test/*.class" />
+        </javac>
+
+    </target>
+
+    <target name="tests" depends="prepare,xwiki">
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs};${classes.dir}"
+            debug="on" optimize="on" deprecation="on">
+            <include name="**/test/*.java" />
+        </javac>
+    </target>
+
+    <target name="test" depends="tests">
+        <junit printsummary="yes" dir="${basedir}/test" fork="on">
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="plain" />
+            <test name="${pkg}.test.UtilTest" haltonfailure="no"/>
+            <test name="${pkg}.test.RenderTest" haltonfailure="no" />
+            <test name="${pkg}.test.PerlTest" haltonfailure="no" />
+            <test name="${pkg}.test.ObjectTest" haltonfailure="no" />
+            <test name="${pkg}.test.ClassesTest" haltonfailure="no" />
+            <test name="${pkg}.test.StoreTest" haltonfailure="no" />
+            <test name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
+            <test name="${pkg}.test.SearchTest" haltonfailure="no" />
+            <test name="${pkg}.test.ViewEditTest" haltonfailure="no" />
+        </junit>
+    </target>
+
+    <target name="javadoc" depends="xwiki">
+        <mkdir dir="${javadoc.dir}" />
+        <javadoc packagenames="com.xpn.xwiki.*"
+            sourcepath="${src.dir}"
+            destdir="${javadoc.dir}"
+            classpath="${libs}"
+            author="true"
+            version="true"
+            private="yes"
+            windowtitle="${app.name} API"
+            doctitle="${app.name}"
+            bottom="Copyright 2003 Ludovic Dubost"
             >
-    </javadoc>
-  </target>
+        </javadoc>
+    </target>
 
-  <target name="all" depends="prepare,libs,test,javadoc" />
+    <target name="release" depends="xwiki, test, javadoc">
+        <mkdir dir="${release.dir}" />
+        <property name="war" value="${release.dir}/xwiki-${version}.war" />
+    </target>
 
-  <target name="compact.dist" depends="all">
-    <mkdir dir="${dist.dir}" />
-    <property name="tarfile" value="${dist.dir}/xwiki-${version}.tar" />
-    <delete file="${tarfile}" />
+    <target name="bin.dist" depends="release">
+        <mkdir dir="${dist.dir}" />
+        <property name="bin.tarfile" value="${dist.dir}/xwiki-${version}.tar" />
+        <delete file="${bin.tarfile}" />
 
-    <tar tarfile="${tarfile}" basedir="${basedir}">
-      <exclude name="classes/**/*" />
-      <exclude name="test-classes/**/*" />
-      <exclude name="dist/**/*" />
-      <exclude name="lib/junit*.jar" />
-    </tar>
+        <tar tarfile="${bin.tarfile}" basedir="${basedir}">
+            <include name="${release.dir}/**" />
+            <include name="${doc.dir}/**" />
+            <include name="*.txt" />
+            <exclude name="**/CVS/*" />
+        </tar>
 
-    <delete file="${tarfile}.gz" />
-    <gzip zipfile="${tarfile}.gz" src="${tarfile}" />
+        <delete file="${bin.tarfile}.gz" />
+        <gzip zipfile="${bin.tarfile}.gz" src="${bin.tarfile}" />
 
-    <delete file="${tarfile}" />
+        <delete file="${bin.tarfile}" />
+    </target>
 
-    <property name="zipfile" value="${dist.dir}/xwiki-${version}.zip" />
-    <zip zipfile="${zipfile}" basedir="${basedir}">
-      <exclude name="classes/**/*" />
-      <exclude name="test-classes/**/*" />
-      <exclude name="dist/**/*" />
-      <exclude name="lib/junit*.jar" />
-    </zip>
+    <target name="src.dist" depends="release">
+        <mkdir dir="${dist.dir}" />
+        <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar" />
+        <delete file="${src.tarfile}" />
 
-  </target>
+        <tar tarfile="${src.tarfile}" basedir="${basedir}">
+            <exclude name="**/CVS/*" />
+            <exclude name="${build.dir}/**/*" />
+            <exclude name="${dist.dir}/**/*" />
+            <exclude name="${release.dir}/**" />
+        </tar>
 
-  <target name="full.dist" depends="all">
-    <mkdir dir="${dist.dir}" />
-    <property name="full.tarfile" value="${dist.dir}/xwiki-full-${version}.tar" />
-    <property name="full.zipfile" value="${dist.dir}/xwiki-full-${version}.zip" />
-    <delete file="${full.tarfile}" />
+        <delete file="${src.tarfile}.gz" />
+        <gzip zipfile="${src.tarfile}.gz" src="${src.tarfile}" />
 
-    <tar tarfile="${full.tarfile}" basedir="${basedir}">
-      <exclude name="**/CVS/*" />
-      <exclude name="classes/**/*" />
-      <exclude name="test-classes/**/*" />
-      <exclude name="dist/**/*" />
-    </tar>
+        <delete file="${src.tarfile}" />
+    </target>
 
-    <delete file="${full.tarfile}.gz" />
-    <gzip zipfile="${full.tarfile}.gz" src="${full.tarfile}" />
-
-    <delete file="${full.tarfile}" />
-
-    <zip zipfile="${full.zipfile}" basedir="${basedir}">
-      <exclude name="**/CVS/*" />
-      <exclude name="classes/**/*" />
-      <exclude name="test-classes/**/*" />
-      <exclude name="dist/**/*" />
-    </zip>
-  </target>
-
-  <target name="dist" depends="compact.dist,full.dist" />
-
-  <target name="changelog" >
-     <cvschangelog destfile="changelog.xml" />
-  </target>
 </project>
 

@@ -1,341 +1,201 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module version="4" relativePaths="true">
-  <component name="LvcsConfiguration">
-    <option name="LOCAL_VCS_ENABLED" value="true" />
-    <option name="LOCAL_VCS_PURGING_PERIOD" value="259200000" />
-    <option name="SHOW_CHANGES_ONLY" value="false" />
-  </component>
+<module version="4" relativePaths="true" type="J2EE_WEB_MODULE">
   <component name="ModuleRootManager" />
   <component name="NewModuleRootManager">
-    <output url="file://$MODULE_DIR$/build" />
-    <output-test url="file://$MODULE_DIR$/test-classes" />
-    <content url="file://$MODULE_DIR$/src">
-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/com/xpn/xwiki/test" isTestSource="true" />
-      <excludeFolder url="file://$MODULE_DIR$/src/perl/TWiki/Plugins" />
-      <excludeFolder url="file://$MODULE_DIR$/src/perl/TWiki/Plugins/PeerPlugin" />
-      <excludeFolder url="file://$MODULE_DIR$/src/perl/TWiki/Plugins/TWikiDrawPlugin" />
-      <excludeFolder url="file://$MODULE_DIR$/src/perl/TWiki/Plugins/TreePlugin" />
-      <excludeFolder url="file://$MODULE_DIR$/src/perl/_Inline" />
-    </content>
+    <output url="file://$MODULE_DIR$/build/xwiki" />
+    <output-test url="file://$MODULE_DIR$/build/xwiki_test" />
+    <content url="file://$MODULE_DIR$/src/perl" />
+    <content url="file://$MODULE_DIR$/src/web" />
     <orderEntry type="jdk" jdkName="java version &quot;1.3.1_08&quot;" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="xwikibase" />
+    <orderEntry type="library" name="Ant" level="project" />
+    <orderEntry type="library" name="Hibernate" level="project" />
+    <orderEntry type="library" name="Struts" level="project" />
+    <orderEntry type="library" name="Perl" level="project" />
+    <orderEntry type="library" name="Velocity" level="project" />
+    <orderEntry type="library" name="Unit Tests" level="project" />
+    <orderEntry type="library" name="Tomcat 4.1" level="application" />
+    <orderEntry type="library" name="Jakarta Commons" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-beanutils.jar!/" />
+          <root url="file://$MODULE_DIR$/build/xwikibase_test" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-collections.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-digester.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-logging.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/junit.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../jrcs-full-0.1.7/doc/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../jrcs-full-0.1.7/src/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/servlet.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/struts.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../jakarta-struts-1.1/webapps/struts-documentation.war!/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../jakarta-struts-1.1-src/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library name="TomCat">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/catalina-ant.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/catalina.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/commons-beanutils.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/commons-digester.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/commons-fileupload-1.0-beta-1.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/commons-logging.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/commons-modeler.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/jaas.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/jakarta-regexp-1.2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/mx4j-jmx.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-common.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-default.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-invoker.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-manager.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-webdav.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-coyote.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-http11.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-jk.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-jk2.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-util.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-warp.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/endorsed/xercesImpl.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/endorsed/xmlParserAPIs.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/activation.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/ant.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/commons-collections.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/commons-dbcp.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/commons-logging-api.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/commons-pool.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/jasper-compiler.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/jasper-runtime.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/jdbc2_0-stdext.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/jndi.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/jta.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/mail.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/naming-common.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/naming-factory.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/naming-resources.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/servlet.jar!/" />
-          <root url="jar://$MODULE_DIR$/../../../Program Files/Apache Group/Tomcat 4.1/common/lib/tools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/InlineJavaServer.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../perl/Inline-Java-0.44/Java/sources" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/InlineJavaUser.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../perl/Inline-Java-0.44/Java/sources" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/cglib.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-lang.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../commons-lang-2.0/docs/api" />
-        </JAVADOC>
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/commons-logging-api-1.0.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/dom4j.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/ecs-1.4.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/hibernate2.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../hibernate-2.1/doc/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../hibernate-2.1/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/log4j-1.2.8.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/mysql-connector-java-3.0.9-stable-bin.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../jrcs-full-0.1.7/doc/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../jrcs-full-0.1.7/src/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/velocity-dep-1.3.1.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../velocity-1.3.1/docs/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../velocity-1.3.1/src/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/velocity-tools-1.1-beta1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/xpertnet-xwiki-0.1.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/xpertnet-xwiki-tests.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../tools/IntelliJ/plugins/HibernateTools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jakarta-oro-2.0.7.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../jakarta-oro-2.0.7/docs/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../jakarta-oro-2.0.7/src/java" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../tools/jdk1.3.1_08/jre/lib/rt.jar!/" />
-        </CLASSES>
-        <JAVADOC>
-          <root url="file://$MODULE_DIR$/../../../tools/jdk1.3.1_08/docs/api" />
-        </JAVADOC>
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../../tools/jdk1.3.1_08/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+  </component>
+  <component name="WebModuleBuildComponent">
+    <option name="JAR_PATH" value="$MODULE_DIR$/release/xwiki.war" />
+    <option name="JAR_ENABLED" value="true" />
+    <option name="EXPLODED_PATH" value="$MODULE_DIR$/release/xwiki/web" />
+    <option name="EXPLODED_ENABLED" value="true" />
+  </component>
+  <component name="WebModuleProperties">
+    <option name="SERVLET_VERSION" value="2.3" />
+    <option name="h" value="$MODULE_DIR$/src/web.xml" />
+    <webroots>
+      <root path="$MODULE_DIR$/src/web" relative="/" />
+      <root path="$MODULE_DIR$/src/perl" relative="/WEB-INF/perl" />
+    </webroots>
+    <orderEntriesWatcher>
+      <pairs>
+        <key>
+          <option name="value" value="3" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Hibernate" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="5" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Struts" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="7" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Velocity" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="2" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Ant" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="11" />
+        </key>
+        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="9" />
+        </key>
+        <value predicate="moduleLibrary">
+          <url>file://$MODULE_DIR$/build/xwikibase_test</url>
+        </value>
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="4" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Jakarta Commons" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="8" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Unit Tests" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="6" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="Perl" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="1" />
+        </key>
+        <value predicate="dependencyModule" moduleName="xwikibase" />
+      </pairs>
+    </orderEntriesWatcher>
+    <order-entry-info>
+      <info>
+        <key>
+          <option name="value" value="3" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="5" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="7" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="2" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="11" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="9" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="4" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="8" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="6" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="1" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="/WEB-INF/classes" />
+        </value>
+      </info>
+    </order-entry-info>
   </component>
 </module>
 

@@ -80,7 +80,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* fix null pointer in prepare resources if called outside of web context" />
+    <option name="LAST_COMMIT_MESSAGE" value="* fix createNewWiki function (schema was not created)&#10;* fix createNewWiki test which was not catching this issue" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -714,7 +714,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="1910" column="25" selection-start="73171" selection-end="73171" vertical-scroll-proportion="0.864">
+          <state line="1877" column="13" selection-start="71333" selection-end="71333" vertical-scroll-proportion="0.72533333">
             <folding />
           </state>
         </provider>
@@ -1575,7 +1575,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1910" column="25" selection-start="73171" selection-end="73171" vertical-scroll-proportion="0.864">
+        <state line="1877" column="13" selection-start="71333" selection-end="71333" vertical-scroll-proportion="0.72533333">
           <folding />
         </state>
       </provider>

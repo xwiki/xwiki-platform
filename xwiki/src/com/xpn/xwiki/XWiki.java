@@ -1868,13 +1868,14 @@ public class XWiki implements XWikiNotificationInterface {
                 return -4;
             }
 
-            String wikiServerPage = "XWikiServer" + wikiName;
+            String wikiServerPage = "XWikiServer" + wikiName.substring(0,1).toUpperCase() + wikiName.substring(1);
             // Verify is server page already exist
             XWikiDocInterface serverdoc = getDocument("XWiki", wikiServerPage, context);
             if (serverdoc.isNew()) {
                 // Create Wiki Server page
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
+                serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");
                 saveDocument(serverdoc, context);
             } else {
                 // If we are not allowed to continue if server page already exists

@@ -1,0 +1,5 @@
+<opensymphony-access>
+  <provider class="com.opensymphony.module.access.provider.osuser.OSUserUserProvider">
+    <property name="realm">default</property>
+  </provider>
+</opensymphony-access>

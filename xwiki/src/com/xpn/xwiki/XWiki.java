@@ -44,6 +44,7 @@ import com.opensymphony.user.UserManager;
 import com.opensymphony.user.ImmutableException;
 import com.opensymphony.user.DuplicateEntityException;
 import com.opensymphony.user.User;
+import com.opensymphony.user.adapter.catalina.OSUserRealm;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -51,14 +52,24 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.io.File;
+import java.io.IOException;
+import java.security.Principal;
 
 import org.apache.ecs.html.TextArea;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.Filter;
+import org.securityfilter.authenticator.BasicAuthenticator;
+import org.securityfilter.authenticator.Authenticator;
+import org.securityfilter.filter.SavedRequest;
+import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.realm.SecurityRealmInterface;
+import org.securityfilter.realm.catalina.CatalinaRealmAdapter;
+import org.securityfilter.config.SecurityConfig;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -67,6 +78,10 @@ public class XWiki implements XWikiNotificationInterface {
     private XWikiRenderingEngine renderingEngine;
     private XWikiPluginManager pluginManager;
     private XWikiNotificationManager notificationManager;
+
+    private UserManager usermanager;
+    private Authenticator authenticator;
+    private SecurityRealmInterface realm;
 
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
@@ -130,6 +145,11 @@ public class XWiki implements XWikiNotificationInterface {
         // Make sure these classes exists
         getUserClass();
         getGroupClass();
+
+        // Initialize User Manager
+        usermanager = UserManager.getInstance();
+        ((XWikiUserProvider) usermanager.getProfileProviders().toArray()[0]).setxWiki(this);
+        ((XWikiGroupProvider) usermanager.getAccessProviders().toArray()[0]).setxWiki(this);
     }
 
     public String getVersion() {
@@ -489,10 +509,10 @@ public class XWiki implements XWikiNotificationInterface {
 
         String content = doc.getContent();
         if ((content==null)||(content.equals("")))
-         doc.setContent("---+ XWiki Users");
+            doc.setContent("---+ XWiki Users");
 
         if (needsUpdate)
-         saveDocument(doc);
+            saveDocument(doc);
         return bclass;
     }
 
@@ -521,10 +541,10 @@ public class XWiki implements XWikiNotificationInterface {
 
         String content = doc.getContent();
         if ((content==null)||(content.equals("")))
-         doc.setContent("---+ XWiki Groups");
+            doc.setContent("---+ XWiki Groups");
 
         if (needsUpdate)
-         saveDocument(doc);
+            saveDocument(doc);
         return bclass;
     }
 
@@ -574,4 +594,83 @@ public class XWiki implements XWikiNotificationInterface {
                     "Cannot create user {0}", e, args);
         }
     }
+
+    public User getUser(XWikiContext context) {
+        return null;
+    }
+
+
+    public Authenticator getAuthenticator() throws XWikiException {
+        if (authenticator!=null)
+            return authenticator;
+
+        try {
+            authenticator = new BasicAuthenticator();
+            realm = new CatalinaRealmAdapter();
+            ((CatalinaRealmAdapter)realm).setRealm(new OSUserRealm());
+            SecurityConfig sconfig = new SecurityConfig(false);
+            sconfig.setRealmName("XWiki");
+            sconfig.addRealm(realm);
+            sconfig.setAuthMethod("BASIC");
+            authenticator.init(null, sconfig);
+            return authenticator;
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INIT,
+                    "Cannot initialize authentication system",e);
+        }
+    }
+
+    public Principal checkAuth(XWikiContext context) throws XWikiException {
+        HttpServletRequest request = context.getRequest();
+        HttpServletResponse response = context.getResponse();
+        Authenticator auth = getAuthenticator();
+        SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
+                realm, auth.getAuthMethod());
+        try {
+            if (auth.processLogin(wrappedRequest, response)) {
+                return null;
+            }
+            else {
+                Principal user = wrappedRequest.getUserPrincipal();
+                if (user==null)
+                    auth.showLogin(request, response);
+                else {
+                    return user;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            try {
+                auth.showLogin(request, response);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public boolean checkAccess(String action, XWikiDocInterface doc, XWikiContext context)
+                    throws XWikiException {
+        boolean needsAuth = false;
+        if (action.equals("view")) {
+            needsAuth = getXWikiPreference("authenticate_view", context).toLowerCase().equals("yes");
+        } else {
+            needsAuth = !getXWikiPreference("authenticate_edit", context).toLowerCase().equals("no");
+        }
+        if (needsAuth) {
+            Principal user = checkAuth(context);
+            if (user==null) {
+                return false;
+            }
+            // Save the user
+            context.put("user", user);
+        }
+
+        // Now we can verify the rights
+
+        return true;
+    }
+
 }

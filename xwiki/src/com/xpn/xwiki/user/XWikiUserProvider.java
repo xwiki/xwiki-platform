@@ -22,14 +22,11 @@
  */
 package com.xpn.xwiki.user;
 
-import com.opensymphony.user.provider.UserProvider;
 import com.opensymphony.user.provider.ProfileProvider;
 import com.opensymphony.user.provider.CredentialsProvider;
-import com.opensymphony.user.Entity;
 import com.opensymphony.user.User;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.module.propertyset.PropertySetManager;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -43,7 +40,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     private static Map propertyMap;
 
-        public boolean init(Properties properties) {
+    public boolean init(Properties properties) {
         super.init(properties);
         propertyMap = new HashMap();
         propertyMap.put(User.PROPERTY_EMAIL, "email");
@@ -53,6 +50,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     public boolean create(String name) {
         try {
+            name = getName(name);
             BaseClass bclass = getxWiki().getUserClass();
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
@@ -73,7 +71,8 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
 
     public boolean handles(String name) {
-       try {
+        try {
+            name = getName(name);
             List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
                     + " and obj.className='XWiki.XWikiUsers' and obj.name = '" + name + "'");
             return (list.size()>0);
@@ -95,13 +94,14 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     public PropertySet getPropertySet(String name) {
         try {
-        HashMap args = new HashMap();
-        XWikiDocInterface doc = getDocument(name);
-        args.put("doc", doc);
-        args.put("globalKey", name);
-        args.put("classKey", "XWiki.XWikiUsers");
-        args.put("propertyMap", propertyMap);
-        return PropertySetManager.getInstance("xwiki", args);
+            name = getName(name);
+            HashMap args = new HashMap();
+            XWikiDocInterface doc = getDocument(name);
+            args.put("doc", doc);
+            args.put("globalKey", name);
+            args.put("classKey", "XWiki.XWikiUsers");
+            args.put("propertyMap", propertyMap);
+            return PropertySetManager.getInstance("xwiki", args);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -110,6 +110,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     public boolean authenticate(String name, String password) {
         try {
+            name = getName(name);
             XWikiDocInterface doc = getDocument(name);
             String passwd = doc.getObject("XWiki.XWikiUsers", 0).get("password").toString();
             return (password.equals(passwd));
@@ -120,6 +121,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     }
 
     public boolean changePassword(String name, String password) {
+        name = getName(name);
         XWikiDocInterface doc = getDocument(name);
         BaseObject bobj = doc.getObject("XWiki.XWikiUsers", 0);
         BaseProperty bprop = (BaseProperty) bobj.safeget("password");

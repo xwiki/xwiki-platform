@@ -39,8 +39,9 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         super.init(properties);
         return true;
     }
-
+    
     public boolean create(String name) {
+        name = getName(name);
         try {
             BaseClass bclass = getxWiki().getGroupClass();
             XWikiDocInterface doc = getDocument(name);
@@ -62,7 +63,8 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
 
     public boolean handles(String name) {
-           try {
+        try {
+            name = getName(name);
             List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
                     + " and obj.className in ('XWiki.XWikiUsers','XWiki.XWikiGroups') and obj.name = '" + name + "'");
             return (list.size()>0);
@@ -83,6 +85,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
     public PropertySet getPropertySet(String name) {
         try {
+            name = getName(name);
             HashMap args = new HashMap();
             XWikiDocInterface doc = getDocument(name);
             args.put("doc", doc);
@@ -98,6 +101,8 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
     public boolean addToGroup(String username, String groupname) {
         try {
+            username = getName(username);
+            groupname = getName(groupname);
             if (inGroup(username, groupname))
                 return true;
             XWikiDocInterface doc = getDocument(groupname);
@@ -117,12 +122,14 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
     }
 
     public boolean inGroup(String username, String groupname) {
+        username = getName(username);
+        groupname = getName(groupname);
         XWikiDocInterface doc = getDocument(groupname);
         Vector vobj = doc.getObjects("XWiki.XWikiGroups");
         if (vobj==null)
             return false;
         for (int i=0;i<vobj.size();i++) {
-             String member = ((BaseObject)vobj.get(i)).getStringValue("member");
+            String member = ((BaseObject)vobj.get(i)).getStringValue("member");
             if (member==null)
                 return false;
             if (member.equals(username))
@@ -134,9 +141,10 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
     public List listGroupsContainingUser(String username) {
         List list;
         try {
+            username = getName(username);
             list = getxWiki().searchDocuments(", BaseObject as obj, StringProperty as prop "
-                            + "where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups' "
-                            + "and obj.id = prop.id.id and prop.id.name='member' and prop.value='" + username + "'");
+                    + "where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups' "
+                    + "and obj.id = prop.id.id and prop.id.name='member' and prop.value='" + username + "'");
             // we might need to deduplicate..
             return list;
         } catch (XWikiException e) {
@@ -146,25 +154,28 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
     }
 
     public List listUsersInGroup(String groupname) {
+        groupname = getName(groupname);
         List list = new ArrayList();
         XWikiDocInterface doc = getDocument(groupname);
         Vector vobj = doc.getObjects("XWiki.XWikiGroups");
         if (vobj==null)
-         return list;
+            return list;
         for (int i=0;i<vobj.size();i++) {
-          String member = ((BaseObject)vobj.get(i)).getStringValue("member");
-          list.add(member);
+            String member = ((BaseObject)vobj.get(i)).getStringValue("member");
+            list.add(member);
         }
         return list;
     }
 
     public boolean removeFromGroup(String username, String groupname) {
         try {
+            username = getName(username);
+            groupname = getName(groupname);
             boolean needsUpdate = false;
             XWikiDocInterface doc = getDocument(groupname);
             Vector vobj = doc.getObjects("XWiki.XWikiGroups");
             if (vobj==null)
-             return true;
+                return true;
             for (int i=0;i<vobj.size();i++) {
                 String member = ((BaseObject)vobj.get(i)).getStringValue("member");
                 if (member.equals(username)) {
@@ -173,7 +184,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
                 }
             }
             if (needsUpdate)
-             getxWiki().saveDocument(doc);
+                getxWiki().saveDocument(doc);
             return true;
         } catch (XWikiException e) {
             e.printStackTrace();

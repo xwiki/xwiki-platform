@@ -23,6 +23,7 @@
 package com.xpn.xwiki.web;
 
 import org.apache.struts.action.RequestProcessor;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,10 +33,7 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String result = super.processPath(httpServletRequest, httpServletResponse);    //To change body of overriden methods use Options | File Templates.
         String res = result.substring(0,result.indexOf("/",1)+1);
-/*        if (res.equals("/templates/"))
-         return result;
-        else
-*/
+        // res = StringUtils.replace(res, "auth", "");
         return res;
     }
 }

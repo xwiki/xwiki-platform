@@ -37,7 +37,6 @@ public class XWikiBaseProvider {
     private XWiki xWiki;
     private static Map propertySets;
 
-
     public XWiki getxWiki() {
         return xWiki;
     }
@@ -54,6 +53,13 @@ public class XWikiBaseProvider {
         XWikiBaseProvider.propertySets = propertySets;
     }
 
+    public String getName(String name) {
+        if (name.startsWith("XWiki."))
+            return name;
+        else
+            return "XWiki." + name;
+    }
+
     public XWikiDocInterface getDocument(String name) {
         XWikiDocInterface doc = null;
         try {
@@ -65,7 +71,7 @@ public class XWikiBaseProvider {
         }
     }
 
-     public boolean init(Properties properties) {
+    public boolean init(Properties properties) {
         propertySets = new HashMap();
         return true;
     }
@@ -76,20 +82,23 @@ public class XWikiBaseProvider {
 
 
     public boolean load(String name, Entity.Accessor accessor) {
+        name = getName(name);
         XWikiDocInterface doc = getDocument(name);
         accessor.setMutable(true);
         return (doc!=null);
     }
 
     public boolean remove(String name) {
+        name = getName(name);
         // Currently a user cannot be removed
         return false;
     }
 
     public boolean store(String name, Entity.Accessor accessor) {
+        name = getName(name);
         XWikiDocInterface doc = (XWikiDocInterface) getPropertySets().get(name);
         if (doc==null)
-         return false;
+            return false;
 
         try {
             getxWiki().saveDocument(doc);

@@ -37,8 +37,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 
@@ -101,17 +99,23 @@ public class ViewEditAction extends XWikiAction
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
         XWikiContext context = new XWikiContext();
         context.setServlet(servlet);
+        context.setRequest(request);
+        context.setResponse(response);
+
         XWiki xwiki = getXWiki(context, test);
         XWikiDocInterface doc;
         doc = xwiki.getDocumentFromPath(request.getPathInfo());
         context.put("doc", doc);
-        context.setRequest(request);
         context.setAction(this);
         session.setAttribute("doc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);
+
+        if (xwiki.checkAccess(action, doc, context)==false)
+           return null;
+
         // Determine what to do
-        if ( action.equals("view") )
+        if (action.equals("view"))
         {
             // forward to view template
             return (mapping.findForward("view"));

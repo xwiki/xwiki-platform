@@ -6,20 +6,6 @@
 
 <web-app>
 
-
-    <!-- Example Database Initialization Servlet Configuration
-    <servlet>
-    <servlet-name>database</servlet-name>
-    <servlet-class>org.apache.struts.example.DatabaseServlet</servlet-class>
-    <init-param>
-    <param-name>debug</param-name>
-    <param-value>2</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-    </servlet>
-  -->
-
-
     <!-- Standard Action Servlet Configuration (with debugging) -->
     <display-name>xwiki</display-name>
     <servlet>
@@ -143,5 +129,13 @@
         <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
         <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
     </taglib>
+
+    <!-- Define the Login Configuration for this Application -->
+    <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>XWiki Authentication</realm-name>
+    </login-config>
+
+
 
 </web-app>

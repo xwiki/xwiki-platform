@@ -190,14 +190,22 @@
         <root url="jar://$PROJECT_DIR$/lib/oscore.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/osuser.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/osuserpropertyset.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/osaccess.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/securityfilter.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-codec.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/osuser/dist/docs/api" />
         <root url="file://C:/dev/java/ospropertyset/docs/api" />
+        <root url="file://C:/dev/java/osaccess/dist/docs/api" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/build/documentation/api" />
       </JAVADOC>
       <SOURCES>
         <root url="file://C:/dev/java/osuser/src/java" />
         <root url="file://C:/dev/java/ospropertyset/src/java" />
+        <root url="file://C:/dev/java/osaccess/src/java" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/src/share" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/src/catalina" />
       </SOURCES>
     </library>
   </component>

@@ -29,12 +29,14 @@ import java.util.Hashtable;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class XWikiContext extends Hashtable {
 
    private XWiki wiki;
    private HttpServlet servlet;
    private HttpServletRequest request;
+   private HttpServletResponse response;
    private XWikiAction action;
     
    public XWikiContext() {
@@ -79,6 +81,14 @@ public class XWikiContext extends Hashtable {
 
     public void setAction(XWikiAction action) {
         this.action = action;
+    }
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
+
+    public void setResponse(HttpServletResponse response) {
+        this.response = response;
     }
 
 

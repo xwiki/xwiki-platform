@@ -25,6 +25,7 @@ package com.xpn.xwiki.doc;
 import org.apache.commons.jrcs.rcs.*;
 import org.apache.commons.jrcs.diff.DiffException;
 import org.apache.tools.ant.filters.StringInputStream;
+import org.apache.velocity.VelocityContext;
 
 import java.util.*;
 import java.io.FileNotFoundException;
@@ -32,6 +33,7 @@ import java.io.FileNotFoundException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -509,25 +511,27 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         this.template = template;
     }
 
-    public String display(String fieldname, String type, XWikiContext context) {
+    public String display(String fieldname, String type, BaseObject obj, XWikiContext context) {
         try {
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) getxWikiClass().get(fieldname);
+            String prefix = obj.getxWikiClass().getName() + "_" + obj.getNumber() + "_";
+
             if (type.equals("view")) {
-                pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displayView(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("edit")) {
-                pclass.displayEdit(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displayEdit(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("hidden")) {
-                pclass.displayHidden(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displayHidden(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("search")) {
-                pclass.displaySearch(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displaySearch(result, fieldname, prefix, obj, context);
             }
             else {
-                pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
+                pclass.displayView(result, fieldname, prefix, obj, context);
             }
             return result.toString();
         }
@@ -536,15 +540,93 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
-    public String display(String fieldname, XWikiContext context) {
+    public String display(String fieldname, BaseObject obj, XWikiContext context) {
         String type = null;
         try { type = (String) context.get("display"); }
         catch (Exception e) {
         };
         if (type==null)
             type = "view";
-        return display(fieldname, type, context);
+        return display(fieldname, type, obj, context);
     }
+
+    public String display(String fieldname, XWikiContext context) {
+        return display(fieldname, getxWikiObject(), context);
+    }
+
+    public String displayForm(String className,String header, String format, XWikiContext context) {
+        return displayForm(className, header, format, true, context);
+    }
+
+    public String displayForm(String className,String header, String format, boolean linebreak, XWikiContext context) {
+      Vector objects = getObjects(className);
+      if (format.endsWith("\\n"))
+       linebreak = true;
+
+      if (objects.size()==0)
+       return "";
+        BaseClass bclass = ((BaseObject)objects.get(0)).getxWikiClass();
+        Map fields = bclass.getFields();
+        if (fields.size()==0)
+         return "";
+
+      StringBuffer result = new StringBuffer();
+      XWikiVelocityRenderer renderer = new XWikiVelocityRenderer();
+      VelocityContext vcontext = new VelocityContext();
+      for (Iterator it = fields.values().iterator();it.hasNext();) {
+          PropertyClass pclass = (PropertyClass) it.next();
+          vcontext.put(pclass.getName(), pclass.getPrettyName());
+      }
+      result.append(renderer.evaluate(header, "Form displayer for class " + className, vcontext));
+      if (linebreak)
+         result.append("\n");
+
+      // display each line
+      for (int i=0;i<objects.size();i++) {
+          vcontext.put("id", new Integer(i+1));
+          BaseObject object = (BaseObject) objects.get(i);
+          for (Iterator it = fields.keySet().iterator();it.hasNext();) {
+              String name = (String) it.next();
+              vcontext.put(name, display(name, object, context));
+          }
+          result.append(renderer.evaluate(format, "Form displayer for class " + className, vcontext));
+          if (linebreak)
+             result.append("\n");
+      }
+      return result.toString();
+    }
+
+    public String displayForm(String className, XWikiContext context) {
+      Vector objects = getObjects(className);
+      if (objects.size()==0)
+       return "";
+      BaseClass bclass = ((BaseObject)objects.get(0)).getxWikiClass();
+      Map fields = bclass.getFields();
+      if (fields.size()==0)
+       return "";
+
+      StringBuffer result = new StringBuffer();
+      result.append("|");
+      for (Iterator it = fields.values().iterator();it.hasNext();) {
+          PropertyClass pclass = (PropertyClass) it.next();
+          result.append(" *");
+          result.append(pclass.getPrettyName());
+          result.append("* |");
+      }
+      result.append("\n");
+      for (int i=0;i<objects.size();i++) {
+          BaseObject object = (BaseObject) objects.get(i);
+          result.append("|");
+          for (Iterator it = fields.keySet().iterator();it.hasNext();) {
+              result.append(" ");
+              result.append(display((String)it.next(), object, context));
+              result.append(" |");
+          }
+          result.append("\n");
+      }
+      return result.toString();
+    }
+
 
     public boolean isFromCache() {
         return fromCache;

@@ -51,7 +51,11 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         vcontext.put("xwiki", context.getWiki());
         vcontext.put("request", context.getRequest());
         vcontext.put("context", context);
+        return evaluate(content, name, vcontext);
+    }
 
+    public String evaluate(String content, String name, VelocityContext vcontext) {
+        StringWriter writer = new StringWriter();
         try {
           boolean result =  Velocity.evaluate(vcontext, writer, name,
                                 new StringReader(content));

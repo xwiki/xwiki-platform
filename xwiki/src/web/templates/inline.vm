@@ -15,6 +15,11 @@ $message
 </div>
 #end
 <form name="edit" method="post" action="$doc.getPreviewUrl($context)">
+#foreach($objlist in $doc.xWikiObjects)
+#set( $class = $objlist.elementAt(0).xWikiClass)
+#set( $nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb">
+#end
 <div id="content">
 $doc.getRenderedContent($context)
 </div>

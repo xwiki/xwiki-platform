@@ -68,7 +68,6 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private boolean isNew = true;
     private String template;
     private String language;
-    private
 
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = false;

@@ -3,6 +3,9 @@
 #parse("/templates/header.vm")
 <div id="nav_header">
 <div id="actions">
+<a href="$doc.getPreviewUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 <div id="content">

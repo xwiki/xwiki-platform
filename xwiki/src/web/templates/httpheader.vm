@@ -2,7 +2,7 @@
 <head>
 <title> XPertNet . $!doc.web . $!doc.name</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="/xwiki/skins/$skin/style.css" rel="stylesheet" type="text/css"  title="currentStyle">
+<link href="../../../skins/$skin/style.css" rel="stylesheet" type="text/css"  title="currentStyle">
 </style>
 </head>
 <body>

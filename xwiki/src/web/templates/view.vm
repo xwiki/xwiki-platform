@@ -23,7 +23,8 @@ $doc.getRenderedContent($context)
 </div>
 <div id="nav_footer">
 <div id="actions">
-<a href="$editurl">$msg.get("edit")</a><span> | </span>
+<a href="$editurl">$msg.get("edit")</a>
+<a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 #versions()
 </div>
 </div>

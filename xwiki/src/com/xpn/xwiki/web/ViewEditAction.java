@@ -247,8 +247,10 @@ public class ViewEditAction extends XWikiAction
                 doc.getxWikiObjects().put(name, newobject);
             }
             xwiki.saveDocument(doc);
-            // forward to list
-            return (mapping.findForward("save"));
+
+            // forward to view
+            response.sendRedirect(doc.getActionUrl("view",context));
+            return null;
         }
         else if (action.equals("propupdate"))
         {
@@ -261,8 +263,9 @@ public class ViewEditAction extends XWikiAction
             }
             xwiki.saveDocument(doc);
 
-            // forward to list
-            return (mapping.findForward("propupdate"));
+            // forward to edit
+            response.sendRedirect(doc.getActionUrl("edit",context));
+            return null;
         }
         else if (action.equals("propadd"))
         {
@@ -283,7 +286,9 @@ public class ViewEditAction extends XWikiAction
                     xwiki.saveDocument(doc);
                 }
             }
-            return (mapping.findForward("propadd"));
+            // forward to edit
+            response.sendRedirect(doc.getActionUrl("edit",context));
+            return null;
         }
         else if (action.equals("classadd")) {
             String className = ((ClassAddForm) form).getClassName();
@@ -291,7 +296,9 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc);
             return (mapping.findForward("classadd"));
         }
-        return (mapping.findForward("view"));
+        // forward to edit
+        response.sendRedirect(doc.getActionUrl("edit",context));
+        return null;
     }
 
 

@@ -35,7 +35,8 @@
   </component>
   <component name="WebModuleProperties">
     <option name="SERVLET_VERSION" value="2.3" />
-    <option name="h" value="$MODULE_DIR$/src/web.xml" />
+    <option name="h" value="N/A" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/web.xml" version="2.3" />
     <webroots>
       <root path="$MODULE_DIR$/src/web" relative="/" />
       <root path="$MODULE_DIR$/src/perl" relative="/WEB-INF/perl" />

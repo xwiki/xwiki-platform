@@ -3,17 +3,18 @@
 #parse("/templates/header.vm")
 <div id="nav_header">
 <div id="actions">
+<a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 <div id="content">
 $doc.getRenderedContent($context)
 <form name="edit" method="post" action="$doc.getPreviewUrl($context)">
-<input type=hidden name="content" value="$doc.content">
+<input type=hidden name="content" value="$xwiki.getFormEncoded($doc.content)">
 <input type="hidden" name="parent" value="$!doc.getParent()">
 <input type="hidden" name="template" value="$!doc.getTemplate()">
 Parent: $doc.getParent()
 <div id="object">
-#parse("/templates/viewobject.vm")
+#parse("/templates/hiddenobject.vm")
 </div>
 </form>
 </div>

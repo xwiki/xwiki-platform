@@ -151,7 +151,7 @@ public class XWiki {
     }
 
     public String getBase() {
-        return Param("xwiki.base","/xwiki/bin/");
+        return Param("xwiki.base","../../");
     }
 
     public XWikiRenderingEngine getRenderingEngine() {
@@ -168,6 +168,13 @@ public class XWiki {
 
     public void setMetaclass(MetaClass metaclass) {
         this.metaclass = metaclass;
+    }
+
+    public String getFormEncoded(String content) {
+        Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
+        String scontent = filter.process(content);
+        return scontent;
     }
 
     public String getTextArea(String content) {

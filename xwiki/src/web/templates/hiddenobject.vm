@@ -1,0 +1,8 @@
+#foreach($prop in $doc.xWikiObject.xWikiClass.properties)
+$prop.displayHidden($prop.getName(), "object_",  $doc.xWikiObject, $context)
+#end
+#foreach($obj in $doc.xWikiObjects)
+#foreach($prop in $obj.xWikiClass.properties)
+$prop.displayHidden($prop.getName(), "${obj.xWikiClass.name}_",  $obj, $context)
+#end
+#end

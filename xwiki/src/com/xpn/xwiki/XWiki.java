@@ -663,7 +663,7 @@ public class XWiki implements XWikiNotificationInterface {
             }
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map);
-            newobject.setName(xwikiname);
+            newobject.setName("XWiki." + xwikiname);
             doc.addObject(baseclass.getName(), newobject);
             saveDocument(doc, null, context);
 
@@ -671,7 +671,7 @@ public class XWiki implements XWikiNotificationInterface {
             return 1;
         }
         catch (Exception e) {
-            Object[] args = { xwikiname };
+            Object[] args = { "XWiki." + xwikiname };
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                     XWikiException.ERROR_XWIKI_USER_CREATE,
                     "Cannot create user {0}", e, args);

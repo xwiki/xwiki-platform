@@ -23,6 +23,7 @@
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiAction;
 
 import java.util.Hashtable;
 
@@ -34,7 +35,8 @@ public class XWikiContext extends Hashtable {
    private XWiki wiki;
    private HttpServlet servlet;
    private HttpServletRequest request;
-
+   private XWikiAction action;
+    
    public XWikiContext() {
    }
 
@@ -69,6 +71,14 @@ public class XWikiContext extends Hashtable {
 
     public void setRequest(HttpServletRequest request) {
         this.request = request;
+    }
+
+    public XWikiAction getAction() {
+        return action;
+    }
+
+    public void setAction(XWikiAction action) {
+        this.action = action;
     }
 
 

@@ -32,6 +32,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.io.File;
 
 import org.apache.ecs.html.TextArea;
 import org.apache.ecs.filter.CharacterFilter;
@@ -220,12 +221,31 @@ public class XWiki {
         this.test = test;
     }
 
-    public String getSkin(XWikiContext context) {
-        // TODO: implement a cache for the documents
+    public String getTemplate(String template, XWikiContext context) {
         try {
-         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-         return doc.getxWikiObject().get("skin").toString();
+            String skin = getSkin(context);
+            String path = "/skins/" + skin + "/" + template;
+            File file = new File(context.getAction().getRealPath(path));
+            if (file.exists())
+              return path;
         } catch (Exception e) {
+        }
+        return "/templates/" + template;
+    }
+
+    public String getSkin(XWikiContext context) {
+        try {
+         // Try to get it from context
+         String skin = (String) context.get("skin");
+         if (skin!=null)
+          return skin;
+
+         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+         skin = doc.getxWikiObject().get("skin").toString();
+         context.put("skin",skin);
+         return skin;
+        } catch (Exception e) {
+            context.put("skin","default");
             return "default";
         }
     }

@@ -1,6 +1,6 @@
-#parse("/templates/xwiki.vm")
-#parse("/templates/httpheader.vm")
-#parse("/templates/header.vm")
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
 <div id="nav_header">
 <div id="actions">
 <a href="$doc.getPreviewUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
@@ -17,11 +17,11 @@ $xwiki.getTextArea($doc.content)
 Parent:&nbsp;<input type="text" name="parent" value="$doc.getParent()" size="40">
 </div>
 <div id="object">
-#parse("/templates/editobject.vm")
+#template("editobject.vm")
 </div>
 </form>
 <div id="class">
-#parse("/templates/editclass.vm")
+#template("editclass.vm")
 </div>
 </div>
 <div id="nav_footer">
@@ -31,4 +31,4 @@ Parent:&nbsp;<input type="text" name="parent" value="$doc.getParent()" size="40"
 <a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
-#parse("/templates/footer.vm")
+#template("footer.vm")

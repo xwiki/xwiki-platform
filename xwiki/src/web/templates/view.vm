@@ -1,6 +1,6 @@
-#parse("/templates/xwiki.vm")
-#parse("/templates/httpheader.vm")
-#parse("/templates/header.vm")
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
 #macro( versions )
 #foreach( $rev in $doc.recentRevisions )
 <a href="$viewurl?rev=$rev">$rev</a><span> | </span>
@@ -28,4 +28,4 @@ $doc.getRenderedContent($context)
 #versions()
 </div>
 </div>
-#parse("/templates/footer.vm")
+#template("footer.vm")

@@ -54,4 +54,8 @@ public class XWikiAction extends Action {
         return xwiki;
     }
 
+    public String getRealPath(String path) {
+        return servlet.getServletContext().getRealPath(path);
+    }
+    
 }

@@ -106,6 +106,7 @@ public class ViewEditAction extends XWikiAction
         doc = xwiki.getDocumentFromPath(request.getPathInfo());
         context.put("doc", doc);
         context.setRequest(request);
+        context.setAction(this);
         session.setAttribute("doc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);

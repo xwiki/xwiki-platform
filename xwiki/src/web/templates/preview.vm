@@ -1,6 +1,6 @@
-#parse("/templates/xwiki.vm")
-#parse("/templates/httpheader.vm")
-#parse("/templates/header.vm")
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
 <div id="nav_header">
 <div id="actions">
 <a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
@@ -14,7 +14,7 @@ $doc.getRenderedContent($context)
 <input type="hidden" name="template" value="$!doc.getTemplate()">
 Parent: $doc.getParent()
 <div id="object">
-#parse("/templates/hiddenobject.vm")
+#template("hiddenobject.vm")
 </div>
 </form>
 </div>
@@ -23,4 +23,4 @@ Parent: $doc.getParent()
 <a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
-#parse("/templates/footer.vm")
+#template("footer.vm")

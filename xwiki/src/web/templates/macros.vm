@@ -1,3 +1,7 @@
+#macro( template $tname )
+#parse($xwiki.getTemplate($tname, $context))
+#end
+
 
 ## Display all queued Struts errors
 #macro (errorMarkup)
@@ -8,7 +12,7 @@
         #end
         </ul>
     #end
-#end                    
+#end
 
 ## Display all queued Struts errors for a particular property
 #macro (errorMarkupForProperty $property)
@@ -19,4 +23,4 @@
         #end
         </ul>
     #end
-#end                    
+#end

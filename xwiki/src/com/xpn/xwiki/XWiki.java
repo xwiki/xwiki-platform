@@ -271,9 +271,9 @@ public class XWiki implements XWikiNotificationInterface {
         int i3 = path.indexOf("/", i2+1);
         web = path.substring(i1+1,i2);
         if (i3==-1)
-         name = path.substring(i2+1);
+            name = path.substring(i2+1);
         else
-         name = path.substring(i2+1,i3);
+            name = path.substring(i2+1,i3);
         if (name.equals(""))
             name = "WebHome";
         return getDocument(web,name);
@@ -637,8 +637,8 @@ public class XWiki implements XWikiNotificationInterface {
 
     public void initAccessManager() {
         AccessManager am = AccessManager.getInstance();
-       ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setxWiki(this);
-       setAccessmanager(am);
+        ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setxWiki(this);
+        setAccessmanager(am);
     }
 
     public int createUser(XWikiContext context) throws XWikiException {
@@ -719,26 +719,17 @@ public class XWiki implements XWikiNotificationInterface {
             }
             else {
                 Principal user = wrappedRequest.getUserPrincipal();
-                if (user==null)
-                    auth.showLogin(request, response);
-                else {
-                    return user;
-                }
+                return user;
             }
 
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            try {
-                auth.showLogin(request, response);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean checkAccess(String action, XWikiDocInterface doc, XWikiContext context)
-            throws XWikiException, NotFoundException {
+            throws XWikiException {
         Principal user = null;
         boolean needsAuth = false;
         String right = "edit";
@@ -750,21 +741,55 @@ public class XWiki implements XWikiNotificationInterface {
         if (!needsAuth)
             needsAuth = getWebPreference("authenticate_" + right, context).toLowerCase().equals("yes");
 
-        if (needsAuth) {
+        try {
             user = checkAuth(context);
-            if (user==null) {
+            if ((user==null)&&(needsAuth)) {
+                try {
+                    getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
-            // Save the user
-            context.put("user", user);
+        } catch (XWikiException e) {
+            if (needsAuth)
+                throw e;
         }
 
-        String username = user.getName();
-        if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), "deny" + right))
+
+        String username;
+        if (user==null)
+            username = "XWiki.XWikiGuest";
+        else
+            username = user.getName();
+
+        // Save the user
+        context.put("user", username);
+
+        // Check Rights
+        try {
+            // Verify access rights and return if ok
+            if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), right))
+                return true;
+        } catch (NotFoundException e) {
+            // This should not happen..
+            e.printStackTrace();
             return false;
-        if (getAccessmanager().userHasAccessLevel(username, doc.getFullName(), right))
-            return true;
-        return false;
+        }
+
+        if (user==null) {
+            // Denied Guest need to be authenticated
+            try {
+                getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+        else {
+            // Other user is refused
+            return false;
+        }
     }
 
     public UserManager getUsermanager() {

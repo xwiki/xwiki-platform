@@ -53,10 +53,10 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
     // Any existing document can have access rights
     public boolean handles(String name) {
         if (name.equals("default"))
-         return true;
+            return true;
 
         if (super.handles(name))
-                return true;
+            return true;
         try {
             name = getName(name);
             List list = getxWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'");
@@ -161,25 +161,32 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public boolean checkRight(String name, XWikiDocInterface doc, String accessLevel, boolean user, boolean allow, boolean global) throws XWikiException {
-         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
-         String fieldName = user ? "users" : "groups";
+    public boolean checkRight(String name, XWikiDocInterface doc, String accessLevel,
+                              boolean user, boolean allow, boolean global) throws NotFoundException {
+        String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
+        String fieldName = user ? "users" : "groups";
 
-         Vector vobj = doc.getObjects(className);
-         if (vobj==null)
-             return false;
-         else {
-             for (int i=0;i<vobj.size();i++) {
+        Vector vobj = doc.getObjects(className);
+        if (vobj==null)
+            throw new NotFoundException();
+        else {
+            boolean found = false;
+            for (int i=0;i<vobj.size();i++) {
                 BaseObject bobj = (BaseObject) vobj.get(i);
                 String users = bobj.getStringValue(fieldName);
                 String levels = bobj.getStringValue("levels");
                 boolean allowdeny = (bobj.getIntValue("allow")==1);
                 if ((allowdeny == allow)
-                    &&(users.indexOf(name)!=-1)
-                    &&(levels.indexOf(accessLevel)!=-1))
-                 return true;
+                        &&(levels.indexOf(accessLevel)!=-1)) {
+                    found = true;
+                    if (users.indexOf(name)!=-1)
+                        return true;
+                }
             }
-            return false;
+            if (found)
+                return false;
+            else
+                throw new NotFoundException();
         }
     }
 
@@ -190,44 +197,72 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
     public boolean hasAccessLevel(String name, String resourceKey, String accessLevel, boolean user) throws NotFoundException {
         boolean deny = false;
         boolean allow = false;
-
+        boolean allow_found = false;
+        boolean deny_found = false;
         try {
             // Verify XWiki super user
             XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences");
-            allow = checkRight(name, xwikidoc , "admin", true, true, true);
-            if (allow) return true;
+            try {
+                allow = checkRight(name, xwikidoc , "admin", true, true, true);
+                if (allow) return true;
+            } catch (NotFoundException e) {}
 
             // Verify Web super user
             String web = Util.getWeb(resourceKey);
             XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences");
-            allow = checkRight(name, webdoc , "admin", true, true, true);
-            if (allow) return true;
+            try {
+                allow = checkRight(name, webdoc , "admin", true, true, true);
+                if (allow) return true;
+            } catch (NotFoundException e) {}
 
             // First check if this document is denied to the specific user
             XWikiDocInterface doc = getxWiki().getDocument(resourceKey);
-            deny = checkRight(name, doc, accessLevel, true, false, false);
-            if (deny) return false;
+            try {
+                deny = checkRight(name, doc, accessLevel, true, false, false);
+                deny_found = true;
+                if (deny) return false;
+            } catch (NotFoundException e) {}
 
-            allow = checkRight(name, doc , accessLevel, true, true, false);
-            if (allow) return true;
+            try {
+                allow = checkRight(name, doc , accessLevel, true, true, false);
+                allow_found = true;
+                if (allow) return true;
+            } catch (NotFoundException e) {}
 
 
-            deny =  checkRight(name, webdoc, accessLevel, true, false, true);
-            if (deny) return false;
+            try {
+                deny =  checkRight(name, webdoc, accessLevel, true, false, true);
+                deny_found = true;
+                if (deny) return false;
+            } catch (NotFoundException e) {}
 
-            allow = checkRight(name, webdoc , accessLevel, true, true, true);
-            if (allow) return true;
+            try {
+                allow = checkRight(name, webdoc , accessLevel, true, true, true);
+                allow_found = true;
+                if (allow) return true;
+            } catch (NotFoundException e) {}
 
             // Check if XWiki is denied
-            deny = checkRight(name, xwikidoc , accessLevel, true, false, true);
-            if (deny) return false;
+            try {
+                deny = checkRight(name, xwikidoc , accessLevel, true, false, true);
+                deny_found = true;
+                if (deny) return false;
+            } catch (NotFoundException e) {}
 
-            allow = checkRight(name, xwikidoc , accessLevel, true, true, true);
-            if (allow) return true;
+            try {
+                allow = checkRight(name, xwikidoc , accessLevel, true, true, true);
+                allow_found = true;
+                if (allow) return true;
+            } catch (NotFoundException e) {}
 
-            // Document was neither allowed, neither denied
-            // Default is denied..
-            return false;
+            // If neither doc, web or topic had any allowed ACL
+            // and that all users that were not denied
+            // should be allowed.
+            if (!allow_found)
+                return true;
+            else
+                return false;
+
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;

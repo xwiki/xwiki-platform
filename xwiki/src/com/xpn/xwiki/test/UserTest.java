@@ -69,13 +69,10 @@ public class UserTest extends TestCase {
 
     public void setUp() throws HibernateException {
         StoreHibernateTest.cleanUp(getHibStore());
-        um = UserManager.getInstance();
-        getUserProvider(um).setxWiki(xwiki);
+        um = xwiki.getUsermanager();
+        am = xwiki.getAccessmanager();
         getUserProvider(um).flushCaches();
-        getGroupProvider(um).setxWiki(xwiki);
         getGroupProvider(um).flushCaches();
-        am = AccessManager.getInstance();
-        getResourceProvider(am).setxWiki(xwiki);
         getResourceProvider(am).flushCaches();
         xwiki.flushCache();
     }
@@ -107,6 +104,11 @@ public class UserTest extends TestCase {
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ AdminGroup");
         xwiki.saveDocument(doc);
+
+        doc = new XWikiSimpleDoc("XWiki","TestDoc");
+        doc.setContent("---+ TestDoc");
+        xwiki.saveDocument(doc);
+
     }
 
     public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
@@ -243,18 +245,19 @@ public class UserTest extends TestCase {
     }
 
     public void testUserAccessRead()  throws XWikiException, NotFoundException {
+        String docname = "XWiki.TestDoc";
         prepareData();
+        assertTrue("View Access should be allowed",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "XWiki.JohnDoe","","view", true, false);
         assertFalse("View Access should be refused",
-                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
-        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view", true, false);
-        assertTrue("View Access should be granted",
-                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
-        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view,edit", true,false);
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight("XWiki.LudovicDubost", docname,"","view,edit", true,false);
         assertTrue("Edit Access should be granted",
-                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "edit"));
-        updateRight("XWiki.LudovicDubost","XWiki.LudovicDubost","","view", false, false);
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+        updateRight("XWiki.LudovicDubost", docname,"","view", false, false);
         assertFalse("View Access should be refused",
-                    am.userHasAccessLevel("XWiki.LudovicDubost", "XWiki.LudovicDubost", "view"));
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
     }
 
 }

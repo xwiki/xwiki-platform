@@ -173,7 +173,7 @@ public class ClassesTest extends TestCase {
         XWiki xwiki = new XWiki("./xwiki.cfg", context);
         try {
             BaseObject obj = Utils.prepareAdvancedObject();
-            testDisplayer("dblist", obj, "XWikiUsers", "<option selected value='XWikiUsers' label='XWikiUsers'>", context);
+            testDisplayer("dblist", obj, "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", context);
         } finally {
             xwiki = null;
             System.gc();

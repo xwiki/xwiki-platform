@@ -57,5 +57,6 @@ public class ListMetaClass extends PropertyMetaClass {
     size_class.setPrettyName("Size");
     size_class.setSize(5);
     size_class.setNumberType("integer");
+    safeput("size", size_class);
   }
 }

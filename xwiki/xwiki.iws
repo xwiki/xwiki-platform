@@ -83,7 +83,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed DBListClass so that the sql field is stored&#10;Fixed storage of DBList to move them to their own table&#10;Fixed output of textarea to not transform single quotes&#10;Fixed class prettyName in template" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed DBListClass sql field type" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -709,7 +709,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/objects/meta/ListMetaClass.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="27" column="13" selection-start="997" selection-end="997" vertical-scroll-proportion="-0.041062802">
+          <state line="59" column="30" selection-start="2196" selection-end="2196" vertical-scroll-proportion="0.7801932">
             <folding />
           </state>
         </provider>
@@ -1267,7 +1267,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-1028" width="1288" height="1032" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27986726" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.34918034" order="7" />
@@ -1277,7 +1277,7 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3119469" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="6" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.117313914" order="1" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.4369469" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.4369469" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="CVS File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.35840708" order="4" />
@@ -1467,7 +1467,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/objects/meta/ListMetaClass.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="13" selection-start="997" selection-end="997" vertical-scroll-proportion="-0.041062802">
+        <state line="59" column="30" selection-start="2196" selection-end="2196" vertical-scroll-proportion="0.7801932">
           <folding />
         </state>
       </provider>

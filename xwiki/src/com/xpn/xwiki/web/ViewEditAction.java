@@ -85,7 +85,8 @@ public class ViewEditAction extends XWikiAction
         HttpSession session;
 
         // ActionErrors errors = new ActionErrors();
-
+        // session is needed for the velocity renderer
+        // I need to check-out why..
         session = request.getSession();
 
         // fetch action from mapping
@@ -108,7 +109,6 @@ public class ViewEditAction extends XWikiAction
         session.setAttribute("doc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);
-
         // Determine what to do
         if ( action.equals("view") )
         {

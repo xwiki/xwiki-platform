@@ -9,10 +9,13 @@ import org.apache.struts.action.ActionServlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Enumeration;
+import java.util.Vector;
 
 import net.sf.hibernate.HibernateException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -53,7 +56,6 @@ import com.xpn.xwiki.objects.StringProperty;
 public class ViewEditTest extends ServletTestCase {
 
     private static String hibpath = "hibernate-test.cfg.xml";
-    private static String realhibpath = "";
 
     public void setUp() {};
     public void cleanUp() {};
@@ -95,16 +97,44 @@ public class ViewEditTest extends ServletTestCase {
 
 
     public String getHibpath() {
+        // Usefull in case we need to understand where we are
         String path = (new File(".")).getAbsolutePath();
+        System.out.println("Current Directory is: " + path);
 
-        if (config==null)
+        File file = new File(hibpath);
+        if (file.exists())
             return hibpath;
 
-        ServletContext context = config.getServletContext();
-        if (context!=null)
+        file = new File("WEB-INF", hibpath);
+        if (file.exists())
+            return "./WEB-INF/" + hibpath;
+
+        file = new File("test", hibpath);
+        if (file.exists())
+            return "./test/" + hibpath;
+
+        if (config!=null)
+        {
+         ServletContext context = config.getServletContext();
+         if (context!=null)
             return context.getRealPath("WEB-INF/" + hibpath);
-        else
-            return hibpath;
+        }
+
+        return hibpath;
+    }
+
+    public void cleanSession(HttpSession session) {
+        Vector names = new Vector();
+        Enumeration enum = session.getAttributeNames();
+        while (enum.hasMoreElements()) {
+            String name = (String) enum.nextElement();
+            names.add(name);
+        }
+
+        for (int i=0;i<names.size();i++)
+        {
+         session.removeAttribute((String)names.get(i));
+        }
     }
 
     public void beginViewNotOk(WebRequest webRequest) throws HibernateException {
@@ -122,6 +152,7 @@ public class ViewEditTest extends ServletTestCase {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);
+        cleanSession(session);
     }
 
     public void beginViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -140,12 +171,14 @@ public class ViewEditTest extends ServletTestCase {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);
+        cleanSession(session);
     }
 
     public void testSave() throws IOException, ServletException {
          ActionServlet servlet = new ActionServlet();
          servlet.init(config);
          servlet.service(request, response);
+         cleanSession(session);
      }
 
      public void beginSave(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -173,6 +206,7 @@ public class ViewEditTest extends ServletTestCase {
          ActionServlet servlet = new ActionServlet();
          servlet.init(config);
          servlet.service(request, response);
+         cleanSession(session);
      }
 
      public void beginAddProp(WebRequest webRequest, Class cclass) throws HibernateException, XWikiException {
@@ -225,6 +259,7 @@ public class ViewEditTest extends ServletTestCase {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);
+        cleanSession(session);
     }
 
     public void beginAddClass(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -261,6 +296,7 @@ public class ViewEditTest extends ServletTestCase {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);
+        cleanSession(session);
     }
 
     public void beginUpdateClassProp(WebRequest webRequest) throws HibernateException, XWikiException {

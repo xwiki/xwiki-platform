@@ -54,8 +54,4 @@ public class XWikiAction extends Action {
         return xwiki;
     }
 
-    public void finalize() {
-        servlet.getServletContext().removeAttribute("xwiki");
-        servlet.getServletContext().removeAttribute("xwikitest");
-    }
 }

@@ -42,10 +42,20 @@ sub render {
  my $result = "";
  my $webName = $doc->getWeb();
  my $topic = $doc->getName();
- TWiki::Func::cacheTopic($webName, $topic, $content);
 
+ eval {
+ TWiki::Func::cacheTopic($webName, $topic, $content);
  $content = &TWiki::handleAllTags( $webName, $topic, $content, "" );
  $content = &TWiki::getRenderedVersion( $content );
+ return $content;
+ };
+
+ my $error = $@;
+ $error =~ s/\&/&amp;/go;
+ $error =~ s/\</&lt;/go;
+ $error =~ s/\>/&gt;/go;
+ $content .= " " . $error . " ";
+
  return $content;
 } 
 

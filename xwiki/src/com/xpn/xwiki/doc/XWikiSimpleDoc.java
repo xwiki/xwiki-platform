@@ -67,6 +67,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private boolean mostRecent = false;
     private boolean isNew = true;
     private String template;
+    private String language;
+    private
 
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = false;
@@ -713,7 +715,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         String template = eform.getTemplate();
         if ((template!=null)&&(!template.equals(""))) {
             String content = getContent();
-            if ((content==null)||(!content.equals(""))) {
+            if ((!content.equals("\n"))&&(!content.equals(""))) {
                 Object[] args = { getFullName() };
                 throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                         "Cannot add a template to document {0} because it already has content", null, args);

@@ -39,6 +39,8 @@ import org.apache.oro.text.regex.PatternMatcherInput;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.tools.ant.util.StringUtils;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.Entities;
 
 public class PatternPlugin extends XWikiDefaultPlugin {
     Vector patterns = new Vector();
@@ -84,21 +86,30 @@ public class PatternPlugin extends XWikiDefaultPlugin {
     }
 
     public String getPatternList() {
-        StringBuffer list = new StringBuffer("| *Pattern* | *Result* | *Description* |\n");
+        CharacterFilter filter = new CharacterFilter();
+        StringBuffer list = new StringBuffer();
+        list.append("<pre>\n");
+        list.append("<table border=1>");
+        list.append("<tr><td><strong>Pattern</strong></td>");
+        list.append("<td><strong>Result</strong></td><td><strong>Description</strong></td></tr>");
         for (int i=0;i<patterns.size();i++) {
-            list.append("|");
-            list.append(patterns.get(i));
-            list.append("|");
-            list.append(results.get(i));
-            list.append("|");
+            list.append("<tr><td><nop>");
+            list.append(filter.process((String)patterns.get(i)));
+            list.append("</td><td>");
+            list.append(filter.process((String)results.get(i)));
+            list.append("</td><td>");
             list.append(descriptions.get(i));
-            list.append("|\n");
+            list.append("</td></tr>");
         }
+        list.append("</table>");
+        list.append("\n<pre>");
         return list.toString();
     }
 
     public String commonTagsHandler(String line, XWikiContext context) {
-        patternListSubstitution.setSubstitution(getPatternList());
+        String subst = getPatternList();
+        subst = StringUtils.replace(subst,"$","\\$");
+        patternListSubstitution.setSubstitution(subst);
         line = patternListSubstitution.substitute(line);
         return line;
     }

@@ -155,7 +155,7 @@ public class ViewEditAction extends XWikiAction
             Iterator it = bclass.getFields().values().iterator();
             while (it.hasNext()) {
                 PropertyClass property = (PropertyClass)it.next();
-                Map map = ((EditForm)form).getObject(property.getName() + "_");
+                Map map = ((EditForm)form).getObject(property.getName());
                 property.getxWikiClass().fromMap(map, property);
             }
             xwiki.saveDocument(doc);

@@ -19,8 +19,7 @@ $message
 </div>
 #end
 <form id="edit" method="post" action="$doc.getActionUrl("preview")">
-#foreach($objlist in $doc.xWikiObjects)
-#set( $class = $objlist.elementAt(0).xWikiClass)
+#foreach($class in $doc.xWikiClasses)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <p>
 <input type="hidden" name="${class.name}_nb" value="$nb" />

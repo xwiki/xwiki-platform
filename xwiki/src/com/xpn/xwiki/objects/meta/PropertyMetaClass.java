@@ -62,7 +62,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         number_class.setName("number");
         number_class.setPrettyName("Number");
         number_class.setNumberType("integer");
-        safeput("number", unmodif_class);
+        safeput("number", number_class);
     }
 
     public BaseCollection getObject() {

@@ -119,18 +119,18 @@ public class RadeoxRenderTest  extends RenderTest {
                 "Web Home</a>", false, context);
         renderTest(wikibase, "Test link: [Web Home]",
                 "view/Main/WebHome", false, context);
-        renderTest(wikibase, "Test link: [Web Home2]",
-                "Web Home2", false, context);
-        renderTest(wikibase, "Test link: [Web Home2]",
-                "edit/Main/WebHome2?parent=", false, context);
+        renderTest(wikibase, "Test link: [Web Home12]",
+                "Web Home12", false, context);
+        renderTest(wikibase, "Test link: [Web Home12]",
+                "edit/Main/WebHome12?parent=", false, context);
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
                 "Other Text", false, context);
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
                 "view/Main/WebHome", false, context);
-        renderTest(wikibase, "Test link: [Other Text|WebHome2]",
+        renderTest(wikibase, "Test link: [Other Text|WebHome12]",
                 "Other Text", false, context);
-        renderTest(wikibase, "Test link: [Other Text|WebHome2]",
-                "edit/Main/WebHome2?parent=", false, context);
+        renderTest(wikibase, "Test link: [Other Text|WebHome12]",
+                "edit/Main/WebHome12?parent=", false, context);
         renderTest(wikibase, "Test link: http://www.ludovic.org/",
                 "<a href=\"http://www.ludovic.org/\">", false, context);
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
@@ -156,18 +156,18 @@ public class RadeoxRenderTest  extends RenderTest {
                    "Web Home</a>", false, context);
            renderTestInTable(wikibase, "Test link: [Web Home]",
                    "view/Main/WebHome", false, context);
-           renderTestInTable(wikibase, "Test link: [Web Home2]",
-                   "Web Home2", false, context);
-           renderTestInTable(wikibase, "Test link: [Web Home2]",
-                   "edit/Main/WebHome2?parent=", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home12]",
+                   "Web Home12", false, context);
+           renderTestInTable(wikibase, "Test link: [Web Home12]",
+                   "edit/Main/WebHome12?parent=", false, context);
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
                    "Other Text", false, context);
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
                    "view/Main/WebHome", false, context);
-           renderTestInTable(wikibase, "Test link: [Other Text>WebHome2]",
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
                    "Other Text", false, context);
-           renderTestInTable(wikibase, "Test link: [Other Text>WebHome2]",
-                   "edit/Main/WebHome2?parent=", false, context);
+           renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
+                   "edit/Main/WebHome12?parent=", false, context);
            renderTestInTable(wikibase, "Test link: http://www.ludovic.org/",
                    "<a href=\"http://www.ludovic.org/\">", false, context);
            renderTestInTable(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",

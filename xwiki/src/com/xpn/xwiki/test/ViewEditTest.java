@@ -826,7 +826,7 @@ public class ViewEditTest extends ServletTest {
 
 
     public void sendMultipart(WebRequest webRequest, File file) throws IOException {
-        Part part = new FilePart("application/octet-stream", file);
+        Part part = new FilePart("filepath", file);
         Part[] parts = new Part[1];
         parts[0] = part;
 

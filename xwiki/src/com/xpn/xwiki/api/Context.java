@@ -106,7 +106,7 @@ public class Context extends Api {
          return null;
     }
 
-    public Object get(String key) {
+    public java.lang.Object get(String key) {
         if (checkProgrammingRights())
             return context.get(key);
         else

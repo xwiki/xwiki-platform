@@ -471,11 +471,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public Vector getObjects(String classname) {
-        try {
-            return (Vector)getxWikiObjects().get(classname);
-        } catch (Exception e) {
-            return null;
-        }
+        return (Vector) getxWikiObjects().get(classname);
     }
 
     public void setObjects(String classname, Vector objects) {

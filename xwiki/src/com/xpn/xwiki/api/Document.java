@@ -121,24 +121,28 @@ public class Document extends Api {
         return doc.getParentUrl(context);
     }
 
-    public BaseClass getxWikiClass() {
-        return doc.getxWikiClass();
+    public Class getxWikiClass() {
+        BaseClass bclass = doc.getxWikiClass();
+        if (bclass==null)
+            return null;
+        else
+            return new Class(bclass, context);
     }
 
-    public Map getxWikiObjects() {
-        return doc.getxWikiObjects();
-    }
 
-    public BaseObject getxWikiObject() {
-        return doc.getxWikiObject();
-    }
-
-    public List getxWikiClasses() {
-        return doc.getxWikiClasses();
+    public Class[] getxWikiClasses() {
+        List list = doc.getxWikiClasses();
+        if (list==null)
+            return null;
+        Class[] result = new Class[list.size()];
+        for (int i=0;i<list.size();i++)
+            result[i] = new Class((BaseClass) list.get(i), context);
+        return result;
     }
 
     public void createNewObject(String classname) throws XWikiException {
-        doc.createNewObject(classname, context);
+        if (checkProgrammingRights())
+         doc.createNewObject(classname, context);
     }
 
     public boolean isFromCache() {
@@ -149,12 +153,37 @@ public class Document extends Api {
         return doc.getObjectNumbers(classname);
     }
 
-    public Vector getObjects(String classname) {
-        return doc.getObjects(classname);
+
+    public Map getxWikiObjects() {
+        Map map = doc.getxWikiObjects();
+        Map resultmap = new HashMap();
+        for (Iterator it = map.keySet().iterator();it.hasNext();) {
+            String name = (String) it.next();
+            Vector objects = (Vector)map.get(name);
+            resultmap.put(name, getObjects(objects));
+        }
+        return resultmap;
     }
 
-    public BaseObject getObject(String classname, int nb) {
-         return doc.getObject(classname, nb);
+    protected Vector getObjects(Vector objects) {
+        Vector result = new Vector();
+
+        for (int i=0;i<objects.size();i++) {
+            BaseObject bobj = (BaseObject) objects.get(i);
+            if (bobj!=null) {
+              result.add(new Object(bobj, context));
+            }
+        }
+        return result;
+    }
+
+    public Vector getObjects(String classname) {
+        Vector objects = doc.getObjects(classname);
+        return getObjects(objects);
+    }
+
+    public Object getObject(String classname, int nb) {
+         return new Object(doc.getObject(classname, nb), context);
     }
 
     public String toXML() {
@@ -182,12 +211,12 @@ public class Document extends Api {
         return list2;
     }
 
-    public String display(String fieldname, BaseObject obj) {
-        return doc.display(fieldname, obj, context);
+    public String display(String fieldname, Object obj) {
+        return doc.display(fieldname, obj.getBaseObject(), context);
     }
 
-    public String display(String fieldname, String mode, BaseObject obj) {
-        return doc.display(fieldname, mode, obj, context);
+    public String display(String fieldname, String mode, Object obj) {
+        return doc.display(fieldname, mode, obj.getBaseObject(), context);
     }
 
     public String display(String fieldname) {
@@ -206,24 +235,24 @@ public class Document extends Api {
         return doc.displayForm(className, context);
     }
 
-    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object) {
-         return doc.displayRendered(pclass, prefix, object, context);
+    public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+         return doc.displayRendered(pclass.getPropertyClass(), prefix, object.getCollection(), context);
     }
 
-    public String displayView(PropertyClass pclass, String prefix, BaseCollection object) {
-         return doc.displayView(pclass, prefix, object, context);
+    public String displayView(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+         return doc.displayView(pclass.getPropertyClass(), prefix, object.getCollection(), context);
     }
 
-    public String displayEdit(PropertyClass pclass, String prefix, BaseCollection object) {
-         return doc.displayEdit(pclass, prefix, object, context);
+    public String displayEdit(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+         return doc.displayEdit(pclass.getPropertyClass(), prefix, object.getCollection(), context);
     }
 
-    public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object) {
-         return doc.displayHidden(pclass, prefix, object, context);
+    public String displayHidden(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+         return doc.displayHidden(pclass.getPropertyClass(), prefix, object.getCollection(), context);
     }
 
-    public String displaySearch(PropertyClass pclass, String prefix, BaseCollection object) {
-         return doc.displaySearch(pclass, prefix, object, context);
+    public String displaySearch(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+         return doc.displaySearch(pclass.getPropertyClass(), prefix, object.getCollection(), context);
     }
 
     public List getIncludedPages() {

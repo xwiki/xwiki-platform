@@ -29,9 +29,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import java.io.Serializable;
 import java.util.*;
 
+import org.apache.commons.collections.map.ListOrderedMap;
+
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;
-    private Map fields = new TreeMap();
+    private Map fields = ListOrderedMap.decorate(new HashMap());
+
     private String className;
     private List fieldsToRemove = new ArrayList();
     private int number;
@@ -133,11 +136,16 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
 
     public int getIntValue(String name) {
+        try {
         NumberProperty prop = (NumberProperty)safeget(name);
         if (prop==null)
          return 0;
         else
          return ((Number)prop.getValue()).intValue();
+        }
+         catch (Exception e) {
+            return 0;
+        }
     }
 
     public void setIntValue(String name, int value) {

@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -355,8 +356,8 @@ public class ViewEditAction extends XWikiAction
 
             // Get the FileUpload Data
             DiskFileUpload fileupload = new DiskFileUpload();
-            fileupload.setSizeMax(1000000);
-            fileupload.setSizeThreshold(0);
+            fileupload.setSizeMax(10000000);
+            fileupload.setSizeThreshold(100000);
 
             String tempdir = xwiki.Param("xwiki.upload.tempdir");
             if (tempdir!=null) {
@@ -367,20 +368,30 @@ public class ViewEditAction extends XWikiAction
                 fileupload.setRepositoryPath(".");
             List filelist = fileupload.parseRequest(request);
 
-            DefaultFileItem fileitem = (DefaultFileItem)filelist.get(0);
+            // I don't like it.. But this is the way
+            // to get form elements..
+            byte[] data = getContent(filelist, "filename");
+            String filename = null;
 
-            // Get the data
-            File file = fileitem.getStoreLocation();
-            String fullpath = file.getAbsolutePath();
-            byte[] data = new byte[(int)file.length()];
-            FileInputStream fileis = new FileInputStream(file);
-            fileis.read(data);
-            fileis.close();
+            if (data!=null) {
+                filename = new String(data);
+            }
+
+            // Get the file content
+            data = getContent(filelist, "filepath");
+
+            if (filename==null) {
+                String fname = getFileName(filelist, "filepath");
+                int i = fname.indexOf("\\");
+                if (i==-1)
+                    i = fname.indexOf("/");
+                filename = fname.substring(i+1);
+            }
+
 
             // Read XWikiAttachment
             XWikiAttachment attachment = null;
             List list = doc.getAttachmentList();
-            String filename = fileitem.getName();
             for (int i=0;i<list.size();i++) {
                 XWikiAttachment attach = (XWikiAttachment) list.get(i);
                 if (attach.getFilename().equals(filename))
@@ -392,7 +403,7 @@ public class ViewEditAction extends XWikiAction
              doc.getAttachmentList().add(attachment);
             }
             attachment.setContent(data);
-            attachment.setFilename(fileitem.getName());
+            attachment.setFilename(filename);
 
             // TODO: handle Author
             attachment.setAuthor(username);
@@ -472,6 +483,42 @@ public class ViewEditAction extends XWikiAction
             }
 
         return null;
+    }
+
+    private String getFileName(List filelist, String name) {
+        DefaultFileItem  fileitem = null;
+        for (int i=0;i<filelist.size();i++) {
+            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            if (name.equals(item.getFieldName())) {
+                fileitem = item;
+                break;
+            }
+        }
+
+        if (fileitem==null)
+         return null;
+
+        return fileitem.getName();
+    }
+
+    private byte[] getContent(List filelist, String name) throws IOException {
+        DefaultFileItem  fileitem = null;
+        for (int i=0;i<filelist.size();i++) {
+            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            if (name.equals(item.getFieldName())) {
+                fileitem = item;
+                break;
+            }
+        }
+
+        if (fileitem==null)
+         return null;
+
+        byte[] data = new byte[(int)fileitem.getSize()];
+        InputStream fileis = fileitem.getInputStream();
+        fileis.read(data);
+        fileis.close();
+        return data;
     }
 
 

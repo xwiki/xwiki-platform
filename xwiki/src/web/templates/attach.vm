@@ -40,9 +40,32 @@ $message
 <br />
 <form action="$uploadurl" enctype="multipart/form-data" method="post">
 <p>
+<script type="text/javascript">
+function updateName(form) {
+  var fname = form.filepath.value;
+  var i = fname.lastIndexOf('\\');
+  if (i==-1)
+   i = fname.lastIndexOf('/');
+
+  fname = fname.substring(i+1);
+  if (form.filename.value==fname)
+   return;
+
+  if (form.filename.value=="")
+   form.filename.value = fname;
+  else {
+   if (confirm("Do you want to replace the filename with '" + fname + "' ?"))
+     form.filename.value = fname;
+  }
+}
+</script>
+Choose the target file name:
+<input type="text" name="filename" value="" size="20" "/>
+<br /><br />
 Choose a file to upload:
-<input type="file" name="filepath" value="" size="40" />
-<input type="submit" value="Attach this file" />
+<input type="file" name="filepath" value="" size="40"  />
+<br /><br />
+<input type="submit" value="Attach this file" onclick="updateName(this.form)" />
 </p>
 </form>
 </div>

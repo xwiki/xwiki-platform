@@ -15,7 +15,6 @@
   #end
  </tr>
  #foreach($obj in $doc.getObjects($class.name))
-  #if ($obj.xWikiClass)
    <tr>
    <td>
    <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&classid=${obj.number}"
@@ -27,7 +26,6 @@
      </td>
     #end
    </tr>
-  #end
  #end
  </table>
 #end

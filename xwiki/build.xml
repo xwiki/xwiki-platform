@@ -82,7 +82,7 @@
         value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
 
     <property name="libs.radeox"
-	value="${lib.dir}/radeox.jar;${lib.dir}/asm.jar;${lib.dir}/asm-util.jar;${lib.dir}/groovy.jar" />
+	value="${lib.dir}/radeox.jar" />
 
     <property name="libs"
         value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.radeox};${libs.tests}" />

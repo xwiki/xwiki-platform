@@ -131,6 +131,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND = 11003;
     public static final int ERROR_XWIKI_APP_CREATE_USER = 11004;
     public static final int ERROR_XWIKI_APP_VALIDATE_USER = 11005;
+    public static final int ERROR_XWIKI_APP_INVALID_CHARS = 11006;
 
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {

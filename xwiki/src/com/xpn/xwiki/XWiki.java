@@ -2056,7 +2056,7 @@ public class XWiki implements XWikiNotificationInterface {
          return baseurl;
     }
 
-     public String getActionUrl(String fullname, String action, XWikiContext context) {
+     public String getActionUrl(String fullname, String action, XWikiContext context) throws XWikiException {
         StringBuffer url = new StringBuffer();
         XWikiDocInterface doc = new XWikiSimpleDoc();
         doc.setFullName(fullname, context);

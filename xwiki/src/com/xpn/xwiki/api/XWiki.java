@@ -289,7 +289,7 @@ public class XWiki extends Api {
         return xwiki.getBaseUrl(fullname, context);
     }
 
-    public String getActionUrl(String fullname, String action) {
+    public String getActionUrl(String fullname, String action) throws XWikiException {
         return xwiki.getActionUrl(fullname, action, context);
     }
 }

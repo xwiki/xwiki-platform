@@ -23,6 +23,7 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.render.filter.XWikiFilter;
 import org.apache.commons.lang.StringUtils;
@@ -80,7 +81,12 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         }
     }
 
-     public boolean exists(String name) {
+    public String noaccents(String name) {
+      Util util = context.getUtil();
+      return StringUtils.replace( util.noaccents(name), " ", "");
+    }
+
+    public boolean exists(String name) {
         String database = context.getDatabase();
         try {
             int colonIndex = name.indexOf(":");
@@ -91,7 +97,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             }
 
             XWikiDocInterface currentdoc = ((XWikiDocInterface) context.get("doc"));
-            String newname = StringUtils.replace(name, " ", "");
+            String newname = noaccents(name);
             XWikiDocInterface doc = context.getWiki().getDocument(
                     (currentdoc!=null) ? currentdoc.getWeb() : "Main",
                     newname, context);
@@ -130,7 +136,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("/");
 
 
-        String newname = StringUtils.replace(name, " ", "");
+        String newname = noaccents(name);
 
         if (newname.indexOf(".")!=-1) {
             newname = StringUtils.replace(newname, ".","/", 1);
@@ -172,7 +178,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("edit");
         buffer.append("/");
 
-        String newname = StringUtils.replace(name, " ", "");
+        String newname = noaccents(name);
 
         if (newname.indexOf(".")!=-1) {
             newname = StringUtils.replace(newname, ".","/", 1);
@@ -191,6 +197,4 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("?");
         buffer.append("</a></span>");
     }
-
-
 }

@@ -25,6 +25,7 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -1306,7 +1307,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
 
-    public void setFullName(String fullname, XWikiContext context) {
+    public void setFullName(String fullname, XWikiContext context) throws XWikiException {
         if (fullname==null)
          return;
 
@@ -1333,6 +1334,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
         if (name.equals(""))
             name = "WebHome";
+
+        Util util = context.getUtil();
+        if ((!util.isAlphaNumeric(name))||(!util.isAlphaNumeric(web))) {
+            Object[] args = { fullname };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
+                    "Document name {0} contains invalid characters", null, args);
+        }
+
     }
 
     public String getLanguage() {

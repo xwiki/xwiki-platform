@@ -50,7 +50,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public void setWeb(String web);
     public String getFullName();
     public void setFullName(String name);
-    public void setFullName(String name, XWikiContext context);
+    public void setFullName(String name, XWikiContext context) throws XWikiException;
     public Version getRCSVersion();
     public void setRCSVersion(Version version);
     public String getVersion();

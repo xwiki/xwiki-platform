@@ -23,6 +23,7 @@
 package com.xpn.xwiki.util;
 
 import com.xpn.xwiki.render.WikiSubstitution;
+import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.oro.text.PatternCache;
@@ -171,4 +172,18 @@ public class Util {
           String[] sarray = StringUtils.split(list, sep);
           return ArrayUtils.contains(sarray, name);
     }
+
+    public String noaccents(String text) {
+      String temp = text;
+      String orig = "אגהיטךכמןפצשûü";
+      String targ = "aaaeeeeiioouuu";
+      for (int i=0;i<orig.length();i++)
+        temp = temp.replace(orig.charAt(i), targ.charAt(i));
+      return temp;
+ }
+
+    public static boolean isAlphaNumeric(String text) {
+        return StringUtils.isAlphanumeric(text);
+    }
+
 }

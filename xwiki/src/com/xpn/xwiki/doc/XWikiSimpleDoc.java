@@ -33,6 +33,8 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.DocumentException;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.dom.DOMDocumentFactory;
@@ -40,6 +42,8 @@ import org.dom4j.dom.DOMDocumentFactory;
 import java.util.*;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.IOException;
 import java.text.*;
 
 import com.xpn.xwiki.XWiki;
@@ -838,7 +842,16 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String toXML() {
         Document doc = toXMLDocument();
-        return doc.asXML();
+        OutputFormat outputFormat = new OutputFormat("", true);
+        StringWriter out = new StringWriter();
+        XMLWriter writer = new XMLWriter( out, outputFormat );
+        try {
+            writer.write(doc);
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     public Document toXMLDocument() {
@@ -930,7 +943,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
-    public String toString() {
+   public String toString() {
         return toXML();
     }
 }

@@ -10,13 +10,15 @@ Name: <input type="text" value="" size="20">
 <input type="submit" value="Add Property">
 </form>
 <form name="propupdate" method="post" action="$doc.getActionUrl("propupdate", $context)">
-<br>Current Properties<br>
+<table border="0">
 #foreach($prop in $doc.xWikiClass.properties)
-Property: $prop.prettyName<br>
-<div id="proplist">
+<tr><th>Property</th><th>$prop.prettyName</th></tr>
 #foreach ($classprop in $prop.propertyNames)
-Param $prop.xWikiClass.safeget("meta$classprop").getPrettyName(): $prop.get($classprop)<br>
+<tr><td>$prop.xWikiClass.safeget("meta$classprop").getPrettyName()</td>
+<td>$prop.xWikiClass.safeget("meta$classprop").displayEdit($classprop, $prop, $context)
+</td>
+</tr>
 #end
-</div>
 #end
+</table>
 </form>

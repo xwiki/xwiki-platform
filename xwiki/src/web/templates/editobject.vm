@@ -1,5 +1,9 @@
 <h2>Properties</h2>
-#foreach($prop in $doc.class.properties)
-Property: $prop.prettyName: [edit field]<br>
+<table border="0">
+#foreach($prop in $doc.xWikiClass.properties)
+<tr><td>$prop.prettyName</td>
+<td>$prop.displayEdit($prop.getName(), $doc.xWikiObject, $context)
+</td></tr>
 #end
+</table>
 </form>

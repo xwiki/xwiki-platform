@@ -26,7 +26,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import org.apache.ecs.html.Input;
 
 public abstract class PropertyClass extends BaseObject implements PropertyClassInterface {
 
@@ -43,17 +45,77 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
         return property.toString();  //To change body of implemented methods use Options | File Templates.
     }
 
-    public void displayHidden(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+       Input input = new Input();
+       PropertyInterface prop = object.safeget(name);
+       if (prop!=null) input.setValue(prop.toString());
+
+       input.setType("hidden");
+       input.setName(prefix + name);
+       buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        Input input = new Input();
+        PropertyInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(prop.toString());
+
+        input.setType("text");
+        input.setName(prefix + name);
+        buffer.append(input.toString());
     }
 
-    public void displayView(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        buffer.append(object.safeget(name).toString());
     }
 
-    public void displayEdit(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        Input input = new Input();
+
+        PropertyInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(prop.toString());
+
+        input.setType("text");
+        input.setName(prefix + name);
+        buffer.append(input.toString());
     }
+
+    public String displayHidden(String name, String prefix, BaseObject object, XWikiContext context) {
+      StringBuffer buffer = new StringBuffer();
+      displayHidden(buffer, name, prefix, object, context);
+      return buffer.toString();
+    }
+    public String displayHidden(String name, BaseObject object, XWikiContext context) {
+      return displayHidden(name, "", object, context);
+    }
+
+    public String displaySearch(String name, String prefix, BaseObject object, XWikiContext context) {
+      StringBuffer buffer = new StringBuffer();
+      displaySearch(buffer, name, prefix, object, context);
+      return buffer.toString();
+    }
+    public String displaySearch(String name, BaseObject object, XWikiContext context) {
+      return displaySearch(name, "", object, context);
+    }
+
+    public String displayView(String name, String prefix, BaseObject object, XWikiContext context) {
+      StringBuffer buffer = new StringBuffer();
+      displayView(buffer, name, prefix, object, context);
+      return buffer.toString();
+    }
+    public String displayView(String name, BaseObject object, XWikiContext context) {
+      return displayView(name, "", object, context);
+    }
+
+    public String displayEdit(String name, String prefix, BaseObject object, XWikiContext context) {
+      StringBuffer buffer = new StringBuffer();
+      displayEdit(buffer, name, prefix, object, context);
+      return buffer.toString();
+    }
+    public String displayEdit(String name, BaseObject object, XWikiContext context) {
+      return displayEdit(name, "", object, context);
+    }
+
 
     public BaseClass getxWikiClass() {
         BaseClass wclass = (BaseClass)super.getxWikiClass();

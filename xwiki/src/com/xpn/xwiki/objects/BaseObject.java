@@ -100,5 +100,59 @@ public class BaseObject extends BaseProperty implements ObjectInterface {
         safeput(name, property);
     }
 
+    public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context) {
+        getxWikiClass().displayHidden(buffer, name, prefix, this, context);
+    }
 
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiContext context) {
+        getxWikiClass().displaySearch(buffer, name, prefix, this, context);
+    }
+
+    public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context) {
+        getxWikiClass().displayView(buffer, name, prefix, this, context);
+    }
+
+    public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context) {
+        getxWikiClass().displayEdit(buffer, name, prefix, this, context);
+    }
+
+    public String displayHidden(String name, String prefix, XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
+        getxWikiClass().displayHidden(buffer, name, prefix, this, context);
+        return buffer.toString();
+    }
+
+    public String displaySearch(String name, String prefix, XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
+        getxWikiClass().displaySearch(buffer, name, prefix, this, context);
+        return buffer.toString();
+    }
+
+    public String displayView(String name, String prefix, XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
+        getxWikiClass().displayView(buffer, name, prefix, this, context);
+        return buffer.toString();
+    }
+
+    public String displayEdit(String name, String prefix, XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
+        getxWikiClass().displayEdit(buffer, name, prefix, this, context);
+        return buffer.toString();
+    }
+
+    public String displayHidden(String name, XWikiContext context) {
+        return displayHidden(name, "", context);
+    }
+
+    public String displaySearch(String name, XWikiContext context) {
+        return displaySearch(name, "", context);
+    }
+
+    public String displayView(String name, XWikiContext context) {
+        return displayView(name, "", context);
+    }
+
+    public String displayEdit(String name, XWikiContext context) {
+        return displayEdit(name, "", context);
+    }
 }

@@ -32,8 +32,8 @@ import com.xpn.xwiki.objects.PropertyInterface;
 public interface PropertyClassInterface extends ObjectInterface, PropertyInterface {
     public String toString(BaseProperty property);
     public BaseProperty fromString(String value);
-    public void displayHidden(StringBuffer buffer, String name, BaseObject object, XWikiContext context);
-    public void displaySearch(StringBuffer buffer, String name, BaseObject object, XWikiContext context);
-    public void displayView(StringBuffer buffer, String name, BaseObject object, XWikiContext context);
-    public void displayEdit(StringBuffer buffer, String name, BaseObject object, XWikiContext context);
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
 }

@@ -24,11 +24,9 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.NumberProperty;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import org.apache.ecs.html.Input;
 
 public class StringClass extends PropertyClass {
 
@@ -62,19 +60,26 @@ public class StringClass extends PropertyClass {
         return property;
     }
 
-    public void displayHidden(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
-        super.displayHidden(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        super.displayHidden(buffer, name, prefix, object, context);
     }
 
-    public void displaySearch(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
-        super.displaySearch(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        super.displaySearch(buffer, name, prefix, object, context);
     }
 
-    public void displayView(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
-        super.displayView(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        super.displayView(buffer, name, prefix, object, context);
     }
 
-    public void displayEdit(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
-        super.displayEdit(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+        Input input = new Input();
+        PropertyInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(prop.toString());
+
+        input.setType("text");
+        input.setName(prefix + name);
+        input.setSize(getSize());
+        buffer.append(input.toString());
     }
 }

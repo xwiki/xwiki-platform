@@ -77,7 +77,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented user registration function.&#10;Fix a few problems with objects (still needs some work on deletion)&#10;Fix problem with display of object data." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented authentication using securityfilter. &#10;By default view is not authentified.&#10;By default edit is authentified.&#10;This is configurable in XWiki.XWikiPreferences." />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -485,7 +485,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="659" column="45" selection-start="22474" selection-end="22474" vertical-scroll-proportion="0.568254">
+          <state line="659" column="24" selection-start="22453" selection-end="22453" vertical-scroll-proportion="0.568254">
             <folding />
           </state>
         </provider>
@@ -1216,7 +1216,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="659" column="45" selection-start="22474" selection-end="22474" vertical-scroll-proportion="0.568254">
+        <state line="659" column="24" selection-start="22453" selection-end="22453" vertical-scroll-proportion="0.568254">
           <folding />
         </state>
       </provider>

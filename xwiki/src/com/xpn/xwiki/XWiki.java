@@ -657,7 +657,7 @@ public class XWiki implements XWikiNotificationInterface {
         if (action.equals("view")) {
             needsAuth = getXWikiPreference("authenticate_view", context).toLowerCase().equals("yes");
         } else {
-            needsAuth = !getXWikiPreference("authenticate_edit", context).toLowerCase().equals("no");
+            needsAuth = getXWikiPreference("authenticate_edit", context).toLowerCase().equals("yes");
         }
         if (needsAuth) {
             Principal user = checkAuth(context);

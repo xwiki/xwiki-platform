@@ -89,7 +89,6 @@
     <available property="junit.available" classname="junit.framework.TestCase"/>
     <available property="clover.available" classname="org.apache.tools.ant.taskdefs.CloverCompilerAdapter" />
 
-
     <target name="junit-check" depends="prepare" unless="junit.available">
         <fail message="Cannot run test cases. Please copy lib/build/junit-3.8.1.jar to ${ant.home}/lib"/>
     </target>

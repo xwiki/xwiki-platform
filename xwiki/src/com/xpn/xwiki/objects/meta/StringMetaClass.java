@@ -17,31 +17,25 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 19 déc. 2003
- * Time: 18:49:14
+ * Date: 22 déc. 2003
+ * Time: 09:21:13
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
-public class MetaClass extends BaseClass {
+public class StringMetaClass extends PropertyMetaClass {
 
-    public void XWikiMetaClass() {
-        NumberMetaClass numberclass = new NumberMetaClass();
-        put("numberclass", numberclass);
-        StringMetaClass stringclass = new StringMetaClass();
-        put("stringclass", stringclass);
-    }
+   public void StringMetaClass() {
+    setType("stringmetaclass");
+    setName("stringclass");
+    setPrettyName("String Class");
 
-    public PropertyInterface get(String name) {
-        return (PropertyInterface)fields.get(name);
-    }
-
-    public void put(String name, PropertyInterface property) {
-        fields.put(name, property);
-    }
+    NumberClass size_class = new NumberClass(this);
+    size_class.setSize(5);
+    size_class.setNumberType("integer");
+    safeput("size", size_class);
+  }
 }

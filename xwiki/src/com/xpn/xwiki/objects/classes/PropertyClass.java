@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.meta.MetaClass;
 
 public abstract class PropertyClass extends BaseObject implements PropertyClassInterface {
 
@@ -43,6 +44,15 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
     }
 
     public void displayEdit(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
+    }
+
+    public BaseClass getxWikiClass() {
+        BaseClass wclass = (BaseClass)super.getxWikiClass();
+        if (wclass==null) {
+            wclass = new MetaClass();
+            setxWikiClass(wclass);
+        }
+        return wclass;
     }
 
     public String getName() {

@@ -56,28 +56,6 @@ public class NumberClass  extends PropertyClass {
         setNumberType("long");
     }
 
-    public BaseClass getxWikiClass() {
-        BaseClass wclass = (BaseClass)super.getxWikiClass();
-        if (wclass==null) {
-            wclass = new BaseClass();
-            wclass.setType("numbermetaclass");
-            wclass.setName("number");
-            wclass.setPrettyName("Number");
-
-            StringClass type_class = new StringClass(wclass);
-            type_class.setSize(20);
-            NumberClass size_class = new NumberClass(wclass);
-            size_class.setSize(5);
-            size_class.setNumberType("integer");
-            wclass.put("number_type", type_class);
-            wclass.put("size", size_class);
-            setxWikiClass(wclass);
-        }
-        return wclass;
-    }
-
-
-
     public int getSize() {
         try {
             return ((NumberProperty)get("size")).getValue().intValue();

@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.meta.MetaClass;
 
 public class StringClass extends PropertyClass {
 
@@ -45,24 +46,6 @@ public class StringClass extends PropertyClass {
         setPrettyName("String");
         setSize(30);
     }
-
-    public BaseClass getxWikiClass() {
-        BaseClass wclass = (BaseClass)super.getxWikiClass();
-        if (wclass==null) {
-            wclass = new BaseClass();
-            wclass.setType("stringmetaclass");
-            wclass.setName("string");
-            wclass.setPrettyName("String");
-
-            NumberClass size_class = new NumberClass(wclass);
-            size_class.setSize(5);
-            size_class.setNumberType("integer");
-            wclass.put("size", size_class);
-            setxWikiClass(wclass);
-        }
-        return wclass;
-    }
-
 
     public int getSize() {
         try {

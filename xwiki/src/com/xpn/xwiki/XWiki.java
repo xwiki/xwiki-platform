@@ -1367,8 +1367,11 @@ public class XWiki implements XWikiNotificationInterface {
     public int createUser(String xwikiname, Map map, String parent, String content, XWikiContext context) throws XWikiException {
         BaseClass baseclass = getUserClass(context);
         BaseClass rclass = getRightsClass(context);
+        BaseClass gclass = getGroupClass(context);
 
         try {
+            String fullwikiname =  context.getDatabase() + ":XWiki." + xwikiname;
+
             // TODO: Verify existing user
             XWikiDocInterface doc = getDocument("XWiki." + xwikiname, context);
             if (!doc.isNew()) {
@@ -1391,7 +1394,24 @@ public class XWiki implements XWikiNotificationInterface {
             newrightsobject.setIntValue("allow", 1);
             doc.addObject(rclass.getName(), newrightsobject);
 
+            BaseObject newuserrightsobject = (BaseObject) rclass.newObject();
+            newuserrightsobject.setClassName(rclass.getName());
+            newuserrightsobject.setName("XWiki." + xwikiname);
+            newuserrightsobject.setStringValue("users", fullwikiname);
+            newuserrightsobject.setStringValue("levels", "view");
+            newuserrightsobject.setIntValue("allow", 1);
+            doc.addObject(rclass.getName(), newuserrightsobject);
+
             saveDocument(doc, null, context);
+
+            // Now let's add the user to XWiki.XWikiAllGroup
+            XWikiDocInterface allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
+            BaseObject memberobj = (BaseObject) gclass.newObject();
+            memberobj.setClassName(gclass.getName());
+            memberobj.setName(allgroupdoc.getFullName());
+            memberobj.setStringValue("member", fullwikiname);
+            allgroupdoc.addObject(gclass.getName(), memberobj);
+            saveDocument(allgroupdoc, null, context);
             return 1;
         }
         catch (Exception e) {

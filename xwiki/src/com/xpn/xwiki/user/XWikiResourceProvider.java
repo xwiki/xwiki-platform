@@ -174,10 +174,13 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                     if (ArrayUtils.contains(levelsarray, accessLevel)) {
                         found = true;
                         String[] userarray = StringUtils.split(users," ,|");
-                        if (ArrayUtils.contains(userarray, name)) {
+                        if (ArrayUtils.contains(userarray, name))
                            return true;
-                        }
-                    }
+
+                          if ((context.getDatabase()!=null)&&
+                              (ArrayUtils.contains(userarray, context.getDatabase() + ":" + name)))
+                               return true;
+                       }
                 }
             }
         }

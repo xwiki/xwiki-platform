@@ -27,6 +27,8 @@ import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.smtp.SimpleSmtpServer;
 import com.xpn.xwiki.test.smtp.SmtpMessage;
+import com.opensymphony.module.access.AccessManager;
+import com.opensymphony.module.access.NotFoundException;
 import net.sf.hibernate.HibernateException;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
@@ -253,7 +255,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_fullname","Ludovic Dubost");
     }
 
-    public void endCreateUser(WebResponse webResponse) throws XWikiException, HibernateException {
+    public void endCreateUser(WebResponse webResponse) throws XWikiException, HibernateException, NotFoundException {
         try {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -264,6 +266,10 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Email is wrong", "ludovic@pobox.com", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
             assertEquals("Fullname is wrong", "Ludovic Dubost", doc.getObject("XWiki.XWikiUsers",0).getStringValue("fullname"));
             assertEquals("Activity is wrong", 1, doc.getObject("XWiki.XWikiUsers",0).getIntValue("active"));
+
+            AccessManager am = xwiki.getAccessManager(context);
+            assertTrue("View Access should be allowed",
+                        am.userHasAccessLevel("xwikitest:XWiki.LudovicDubost", "xwikitest:XWiki.LudovicDubost", "view"));
         } finally {
             clientTearDown();
         }

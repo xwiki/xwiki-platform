@@ -329,7 +329,11 @@ public class ViewEditAction extends XWikiAction
             }
 
             // Choose the right content type
-            response.setContentType(servlet.getServletContext().getMimeType(filename));
+            String mimetype = servlet.getServletContext().getMimeType(filename);
+            if (mimetype!=null)
+             response.setContentType(mimetype);
+            else
+             response.setContentType("application/octet-stream");
 
             // Sending the content of the attachment
             byte[] data = attachment.getContent(context);

@@ -59,7 +59,7 @@ public class SearchTest extends TestCase {
         hibstore.shutdownHibernate();
     }
 
-    public void cleanUp() throws HibernateException {
+    public void tearDown() throws HibernateException {
         System.gc();
     }
 

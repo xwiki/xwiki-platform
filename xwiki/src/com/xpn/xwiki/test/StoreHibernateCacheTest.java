@@ -39,6 +39,11 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
         cleanUp(getHibStore());
     }
 
+    public void tearDown() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+
     public XWikiHibernateStore getHibStore() {
         XWikiCacheInterface cache = (XWikiCacheInterface) getStore();
         return (XWikiHibernateStore) cache.getStore();

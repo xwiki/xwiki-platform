@@ -130,8 +130,7 @@ public class ViewEditAction extends XWikiAction
         if (xwiki.checkAccess(action, doc, context)==false)
            return null;
 
-        Principal user = (Principal)context.get("user");
-        String username = (user==null) ? "" : user.getName();
+        String username = (String)context.get("user");
 
         // Determine what to do
         if (action.equals("view"))

@@ -44,7 +44,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         StoreHibernateTest.cleanUp(getHibStore());
     }
 
-    public void cleanUp() throws HibernateException {
+    public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
         System.gc();
     }

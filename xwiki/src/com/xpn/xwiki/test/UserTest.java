@@ -47,10 +47,10 @@ import java.util.Collection;
 
 public class UserTest extends TestCase {
 
-    private static XWiki xwiki;
-    private static XWikiContext context;
-    private static UserManager um;
-    private static AccessManager am;
+    private XWiki xwiki;
+    private XWikiContext context;
+    private UserManager um;
+    private AccessManager am;
 
     public UserTest() throws XWikiException {
         context = new XWikiContext();
@@ -77,7 +77,7 @@ public class UserTest extends TestCase {
         xwiki.flushCache();
     }
 
-    public void cleanUp() throws HibernateException {
+    public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate();
         System.gc();
     }
@@ -247,14 +247,18 @@ public class UserTest extends TestCase {
     public void testUserAccessRead()  throws XWikiException, NotFoundException {
         String docname = "XWiki.TestDoc";
         prepareData();
+        xwiki.flushCache();
         assertTrue("View Access should be allowed",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        xwiki.flushCache();
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
         assertFalse("View Access should be refused",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        xwiki.flushCache();
         updateRight("XWiki.LudovicDubost", docname,"","view,edit", true,false);
         assertTrue("Edit Access should be granted",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+        xwiki.flushCache();
         updateRight("XWiki.LudovicDubost", docname,"","view", false, false);
         assertFalse("View Access should be refused",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));

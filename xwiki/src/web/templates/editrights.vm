@@ -20,7 +20,7 @@ function show(fieldname) {
 // -->
 </script>
 <div class="left">
-<h3>Rights Editor</h3>
+<h3>$msg.get("rightseditor")</h3>
 <br />
 <a href="" onclick="showobjects('$class.name'); return false;">$class.name</a><br />
 <div id="class_${class.name}">
@@ -33,12 +33,12 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 </div>
 
 <div class="left">
-<h2>Add a right entry</h2>
+<h2>$msg.get("addrightentry")</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="hidden" name="classname" value="$classname" />
-<input type="submit" value="Add Right Entry" />
+<input type="submit" value="$msg.get("addrightentry")" />
 </p>
 </form>
 </div>
@@ -48,14 +48,14 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 <form id="update" method="post" action="$doc.getActionUrl("save")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-<input type="submit" value="Save Rights" />
+<input type="submit" value="$msg.get("saverights")" />
 </p>
 </div>
 
 <div class="center">
 
 <div id="intro">
-Welcome to the rights editor. Choose a right entry to edit or add a new right entry:
+$msg.get("welcometorightseditor")
 </div>
 
 
@@ -77,9 +77,9 @@ currentfield = "${class.name}_${obj.number}";
 #end
 
 
-You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=$xwiki.getFormEncoded($redirect)"
+$msg.get("youcan") <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=$xwiki.getFormEncoded($redirect)"
     onclick="return confirm('$msg.get("confirmobjectremove")')">
-    remove this object</a><br /><br /><br />
+    $msg.get("removethisrightentry")</a><br /><br /><br />
 
 <table>
 #foreach($prop in $class.properties)

@@ -15,7 +15,7 @@ function show(fieldname) {
 // -->
 </script>
 <div class="left">
-<h3>Object Editor</h3>
+<h3>$msg.get("objecteditor")</h3>
 <br />
 #foreach ($class in $classes)
 <b>$class.name</b><br />
@@ -38,24 +38,24 @@ function show(fieldname) {
 </div>
 
 <div class="left">
-<h2>Add an Object</h2>
+<h2>$msg.get("addobject")</h2>
 <form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <select name="classname" size="1">
-<option value="---">Select a class</option>
+<option value="---">$msg.get("selectclass")</option>
 #foreach ($classname in $xwiki.classList)
 <option value="$classname">$classname</option>
 #end
 </select>
-<input type="submit" value="Add Class" />
+<input type="submit" value="$msg.get("addobjectfromclass")" />
 </p>
 </form>
 <form id="objectadd2" method="post" action="$doc.getActionUrl("objectadd")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="text" name="classname" size="20" />
-<input type="submit" value="Add Class" />
+<input type="submit" value="$msg.get("addobjectfromclass")" />
 </p>
 </form>
 </div>
@@ -65,14 +65,14 @@ function show(fieldname) {
 <form id="update" method="post" action="$doc.getActionUrl("save")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-<input type="submit" value="Save Objects" />
+<input type="submit" value="$msg.get("saveobjects")" />
 </p>
 </div>
 
 <div class="center">
 
 <div id="intro">
-Welcome to the objects editor. Choose an object to edit or add an object to the class.
+$msg.get("welcometoobjecteditor")
 </div>
 
 #set ( $first = 1)
@@ -92,10 +92,9 @@ currentfield = "${class.name}_${obj.number}";
 #set ($first = 0)
 #end
 
-
-You can <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=$xwiki.getFormEncoded($redirect)"
+$msg.get("youcan") <a href="$doc.getActionUrl("objectremove")?classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=$xwiki.getFormEncoded($redirect)"
     onclick="return confirm('$msg.get("confirmobjectremove")')">
-    remove this object</a><br /><br /><br />
+    $msg.get("removethisobject")</a><br /><br /><br />
 
 <table>
 #foreach($prop in $class.properties)

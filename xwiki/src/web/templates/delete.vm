@@ -4,9 +4,6 @@
 <div id="xwikinav_header">
 <div class="xwikiactions">
 </div>
-<div id="xwikiwebmenu">
-$!xwiki.getWebPreference("menu")
-</div>
 </div>
 #if($message)
 <div id="xwikimessage">
@@ -22,8 +19,8 @@ $msg.get("confirmdelete")
 </div>
 <div id="xwikinav_footer">
 <div class="xwikiactions">
-<a href="$viewurl">View</a><span> | </span>
-<a href="" onclick="this.href='${deleteurl}?confirm=1'; return confirm('$msg.get("confirmdelete2")')">$msg.get("delete")</a>
+<a href="$viewurl">$msg.get("view")</a><span> | </span>
+<a href="" onclick="if (confirm('$msg.get("confirmdelete2")')==false) { return false; } else { location='${deleteurl}?confirm=1'; return false; }">$msg.get("delete")</a>
 </div>
 </div>
 #template("footer.vm")

@@ -8,7 +8,7 @@ $!xwiki.getWebPreference("menu")
 </div>
 </div>
 <div id="xwikicontent">
-You are not allowed to view this document or perform this action.
+$msg.get("notallowed")
 </div>
 <div id="xwikinav_footer">
 </div>

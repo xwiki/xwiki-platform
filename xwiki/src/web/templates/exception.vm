@@ -8,9 +8,9 @@ $!xwiki.getWebPreference("menu")
 </div>
 </div>
 <div id="xwikicontent">
-A problem occured while trying to service your request. Please contact the support if this happens again.
+$msg.get("problemoccured")
 <br /><br />
-Detailed information:<br />
+$msg.get("detailedinformation"):<br />
 <pre>
 $exp.getFullMessage()
 </pre>

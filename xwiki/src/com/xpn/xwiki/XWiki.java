@@ -70,6 +70,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.smtp.SMTPClient;
@@ -1461,6 +1462,16 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
+    public void prepareResources(XWikiContext context) {
+        String language = getLanguagePreference(context);
+        context.getResponse().setLocale(new Locale(language));
+        ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
+        if (bundle==null)
+           bundle = ResourceBundle.getBundle("ApplicationResources");
+        ((VelocityContext)context.get("vcontext")).put("msg", new XWikiMessageTool(bundle));
+    }
+
+
     public boolean checkPassword(String username, String password, XWikiContext context) throws XWikiException {
         try {
             XWikiDocInterface doc = getDocument(username, context);
@@ -1559,6 +1570,7 @@ public class XWiki implements XWikiNotificationInterface {
 
             // Save the user
             context.setUser(username);
+            prepareResources(context);
             logAllow(username, doc.getFullName(), action, "login/logout pages");
             return true;
         }
@@ -1577,6 +1589,7 @@ public class XWiki implements XWikiNotificationInterface {
             user = checkAuth(context);
 
             if ((user==null)&&(needsAuth)) {
+                prepareResources(context);
                 try {
                     if (context.getRequest()!=null)
                         getAuthenticator().showLogin(context.getRequest(), context.getResponse());
@@ -1601,6 +1614,7 @@ public class XWiki implements XWikiNotificationInterface {
 
         // Save the user
         context.setUser(username);
+        prepareResources(context);
 
         // Check Rights
         try {

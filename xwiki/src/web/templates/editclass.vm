@@ -15,7 +15,7 @@ function show(fieldname) {
 // -->
 </script>
 <div class="left">
-<h3>Class Editor</h3>
+<h3>$msg.get("classeditor")</h3>
 <br />
 #foreach ($field in $class.properties)
 <a href="" onclick="show('$field.name'); return false;">$field.prettyName</a><br />
@@ -26,16 +26,16 @@ function show(fieldname) {
 <form id="propadd" method="post" action="$doc.getActionUrl("propadd")">
 <p style="text-align: center">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-Name: <input type="text" name="propname" value="" size="20" />
+$msg.get("classname"): <input type="text" name="propname" value="" size="20" />
 <br /><br />
 <select name="proptype" size="1">
-<option value="---">Select a class</option>
+<option value="---">$msg.get("selectclass")</option>
 #foreach($prop in $xwiki.metaclass.properties)
 <option value="$prop.name">$prop.prettyName</option>
 #end
 </select>
 <br /><br />
-<input type="submit" value="Add Property" />
+<input type="submit" value="$msg.get("addproperty")" />
 </p>
 </form>
 </div>
@@ -45,13 +45,13 @@ Name: <input type="text" name="propname" value="" size="20" />
 <form id="propupdate" method="post" action="$doc.getActionUrl("propupdate")">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-<input type="submit" value="Save Class" />
+<input type="submit" value="$msg.get("saveclass")" />
 </p>
 </div>
 <div class="center">
 
 <div id="intro">
-Welcome to the class editor. Choose a field to edit or add a field to the class.
+$msg.get("welcometoclasseditor")
 <br />
 </div>
 
@@ -67,7 +67,7 @@ currentfield = "$field.name";
 </script>
 #set ($first = 0)
 #end
-<h3>Edit field $field.prettyName</h3>
+<h3>$msg.get("editfield") $field.prettyName</h3>
 
 <table border="0">
 #foreach ($classprop in $field.xWikiClass.propertyNames)

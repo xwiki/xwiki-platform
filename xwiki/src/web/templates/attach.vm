@@ -46,18 +46,18 @@ function updateName(form) {
   if (form.filename.value=="")
    form.filename.value = fname;
   else {
-   if (confirm("Do you want to replace the filename with '" + fname + "' ?"))
+   if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?"))
      form.filename.value = fname;
   }
 }
 </script>
-Choose the target file name:
+$msg.get("choosetargetfilename"):
 <input type="text" name="filename" value="" size="20" />
 <br /><br />
-Choose a file to upload:
+$msg.get("choosefiletoupload"):
 <input type="file" name="filepath" value="" size="40"  />
 <br /><br />
-<input type="submit" value="Attach this file" onclick="updateName(this.form)" />
+<input type="submit" value="$msg.get("attachthisfile")" onclick="updateName(this.form)" />
 </p>
 </form>
 </div>

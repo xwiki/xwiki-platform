@@ -241,13 +241,6 @@ public class ViewEditAction extends XWikiAction
                     }
                 }
 
-                String language = xwiki.getLanguagePreference(context);
-                response.setLocale(new Locale(language));
-                ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
-                if (bundle==null)
-                   bundle = ResourceBundle.getBundle("ApplicationResources");
-                vcontext.put("msg", new XWikiMessageTool(bundle));
-
 
 
                 if (xwiki.isMultiLingual(context)) {

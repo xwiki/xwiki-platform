@@ -14,19 +14,17 @@ $message
 #end
 <div id="xwikicontent">
 <form id="loginForm" action="" method="POST">
+<input type="hidden" name="j_rememberme" value="true" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <table border="0">
-<tr><td>Username:</td>
+<tr><td>$msg.get("username"):</td>
 <td><input type="text" name="j_username" value="" /></td>
 </tr>
-<tr><td>Password:</td>
+<tr><td>$msg.get("password"):</td>
 <td><input type="password" name="j_password" value="" /></td>
 </tr>
-<tr><td>Remember Me</td>
-<td><input type="checkbox" name="j_rememberme" value="true" checked /></td>
-</tr>
 <tr>
-<td colspan="2"><input type="Submit" value="Log-in"/></td>
+<td colspan="2"><input type="submit" value="$msg.get("login")"/></td>
 </tr>
 </table>
 </form>

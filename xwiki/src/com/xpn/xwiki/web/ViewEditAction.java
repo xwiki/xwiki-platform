@@ -458,8 +458,11 @@ public class ViewEditAction extends XWikiAction
                       response.setContentType(servlet.getServletContext().getMimeType(filename));
                       response.setContentLength(data.length);
                       response.getOutputStream().write(data);
-                    }
+                    } else {
+                      // In this case we redirect to the default template file
+                      response.sendRedirect(xwiki.getBase(context) + "../skins/default/" + filename);
                   }
+                }
                 return null;
             }
 

@@ -118,6 +118,8 @@ public class MyLinkTestFilter extends LocaleRegexTokenFilter {
 
                 // Is there an alias like [alias|link] ?
                 int pipeIndex = name.indexOf('|');
+                if (pipeIndex==-1)
+                    pipeIndex = name.indexOf('>');
                 String alias ="";
                 if (-1 != pipeIndex) {
                     alias = name.substring(0, pipeIndex);
@@ -181,7 +183,11 @@ public class MyLinkTestFilter extends LocaleRegexTokenFilter {
                             wikiEngine.appendLink(buffer, name, view);
                         }
                     } else if (wikiEngine.showCreate()) {
-                        wikiEngine.appendCreateLink(buffer, name, getWikiView(name));
+                        String view = getWikiView(name);
+                        if (-1 != pipeIndex) {
+                            view = alias;
+                        }
+                        wikiEngine.appendCreateLink(buffer, name, view);
                         // links with "create" are not cacheable because
                         // a missing wiki could be created
                         context.getRenderContext().setCacheable(false);
@@ -208,6 +214,4 @@ public class MyLinkTestFilter extends LocaleRegexTokenFilter {
     protected String getWikiView(String name) {
         return name;
     }
-}
-
 }

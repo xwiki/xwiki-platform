@@ -127,7 +127,8 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                 }
 
                 int protocolIndex = name.indexOf("://");
-                if ((protocolIndex>=0)&&(protocolIndex<10)) {
+                if (((protocolIndex>=0)&&(protocolIndex<10))
+                    ||(name.indexOf("mailto:")==0)) {
                     // External link
                     String view = name;
                         if (-1 != pipeIndex) {

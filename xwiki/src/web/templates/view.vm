@@ -26,16 +26,18 @@ $message
 #end
 <div id="xwikicontent">
 #if ($request.getParameter("raw").equals("1"))
+<pre>
 {pre}
 $cdoc.getEscapedContent()
 {/pre}
+</pre>
 #else
 $cdoc.getRenderedContent()
 #end
 </div>
 <div id="xwikinav_footer">
 <div class="xwikiactions">
-<a href="$editurl">$msg.get("edit")</a>
+<a href="$editurl">$msg.get("edit")</a><span> | </span>
 <a href="$inlineurl">$msg.get("inline")</a><span> | </span>
 <a href="$attachurl">$msg.get("attach")</a><span> | </span>
 <a href="$deleteurl">$msg.get("delete")</a><span> | </span>

@@ -3,7 +3,8 @@ package com.xpn.xwiki.test;
 
 import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.NotFoundException;
-import com.opensymphony.user.*;
+import com.opensymphony.module.access.provider.osuser.OSUserUserProvider;
+import com.opensymphony.module.user.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,6 +63,7 @@ public class UserTest extends TestCase {
     }
 
     public void setUp() throws HibernateException, XWikiException {
+        OSUserUserProvider toto = new OSUserUserProvider();
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
@@ -460,6 +462,239 @@ public class UserTest extends TestCase {
       assertFalse("View Access should be refused even though LudovicDubost has global right",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
   }
+
+
+    public void testGroupAccessRead()  throws XWikiException, NotFoundException {
+        String docname = "XWiki.TestDoc";
+        prepareData();
+        xwiki.flushCache();
+        inTest = true;
+        assertTrue("View Access should be allowed",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+        xwiki.flushCache();
+        assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "XWiki.Ludovic","","view", true, false);
+        xwiki.flushCache();
+        assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+        xwiki.flushCache();
+        assertTrue("Edit Access should be granted",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+        updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+        xwiki.flushCache();
+        assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+    }
+
+      public void testGroupAccessReadWithAdmin()  throws XWikiException, NotFoundException {
+        String docname = "XWiki.TestDoc";
+        prepareData();
+        xwiki.flushCache();
+        inTest = true;
+
+        // Give Admin right to LudovicDubost
+        updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","admin", true, true);
+
+        assertTrue("View Access should be allowed",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+        xwiki.flushCache();
+        assertTrue("View Access should be allowed even though doc is protected",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+          updateRight(docname, "XWiki.Ludovic","","view", true, false);
+          xwiki.flushCache();
+          assertTrue("View Access should be allowed even though doc is protected",
+                      am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+        updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+        xwiki.flushCache();
+        assertTrue("Edit Access should be granted",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+        updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+        xwiki.flushCache();
+        assertTrue("View Access should be allowed even though doc is protected",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+    }
+
+    public void testGroupAccessReadWithWebGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+      // Give positive Web Global right to LudovicDubost
+      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+
+      assertTrue("View Access should be allowed",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused even though LudovicDubost has global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+    public void testGroupAccessReadWithWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+
+      // Give negative Web Global right to LudovicDubost
+      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+
+      assertFalse("View Access should be refused because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+
+
+   public void testGroupAccessReadWithXWikiGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+      // Give positive XWiki Global right to LudovicDubost
+      updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+
+      assertTrue("View Access should be allowed",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused even though LudovicDubost has global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+    public void testGroupAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+      // Give negative XWiki Global right to LudovicDubost
+      updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+
+      assertFalse("View Access should be refused because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+  public void testGroupAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+      // Give positive XWiki Global right to LudovicDubost
+      updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+      // Give negative Web Global right to LudovicDubost
+      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+
+      assertFalse("View Access should be refused because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+    public void testGroupAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException, NotFoundException {
+      String docname = "XWiki.TestDoc";
+      prepareData();
+      xwiki.flushCache();
+      inTest = true;
+
+      // Give negative XWiki Global right to LudovicDubost
+      updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+      // Give postive Web Global right to LudovicDubost
+      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+
+      assertTrue("View Access should be allowed",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.JohnDoe","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "XWiki.Ludovic","","view", true, false);
+      xwiki.flushCache();
+      assertTrue("View Access should granted because of global right",
+                    am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+      updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
+      xwiki.flushCache();
+      assertTrue("Edit Access should be granted",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "edit"));
+      updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
+      xwiki.flushCache();
+      assertFalse("View Access should be refused even though LudovicDubost has global right",
+                  am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+  }
+
+
 
 
 

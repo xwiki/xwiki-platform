@@ -204,6 +204,7 @@
         <root url="jar://$PROJECT_DIR$/lib/osaccess.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/securityfilter.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-codec.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ejb.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/osuser/dist/docs/api" />

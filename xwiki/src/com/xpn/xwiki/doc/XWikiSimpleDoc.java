@@ -686,24 +686,27 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
        return "";
 
       StringBuffer result = new StringBuffer();
-      result.append("|");
+      result.append("{table}\n");
+      boolean first = true;
       for (Iterator it = fields.values().iterator();it.hasNext();) {
+          if (first==true)
+            first = false;
+          else
+            result.append("|");
           PropertyClass pclass = (PropertyClass) it.next();
-          result.append(" *");
           result.append(pclass.getPrettyName());
-          result.append("* |");
       }
       result.append("\n");
       for (int i=0;i<objects.size();i++) {
+          if (i!=0)
+              result.append("|");
           BaseObject object = (BaseObject) objects.get(i);
-          result.append("|");
           for (Iterator it = fields.keySet().iterator();it.hasNext();) {
               result.append(display((String)it.next(), object, context));
-              result.append("|");
           }
           result.append("\n");
       }
-       result.append("\n");
+       result.append("{table}\n");
        return result.toString();
     }
 

@@ -25,8 +25,8 @@ package com.xpn.xwiki;
 
 import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.NotFoundException;
-import com.opensymphony.user.User;
-import com.opensymphony.user.UserManager;
+import com.opensymphony.module.user.User;
+import com.opensymphony.module.user.UserManager;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
@@ -480,6 +480,14 @@ public class XWiki implements XWikiNotificationInterface {
 
     public void setTest(boolean test) {
         this.test = test;
+    }
+
+    public String parseContent(String content, XWikiContext context) {
+        if ((content!=null)&&(!content.equals("")))
+          // Let's use this template
+          return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
+        else
+          return "";
     }
 
     public String parseTemplate(String template, XWikiContext context) {

@@ -95,9 +95,13 @@ public class XWiki extends Api {
         return xwiki.searchDocuments(wheresql, nb, start, context);
     }
 
-    public String parseTemplate(String template) {
-        return xwiki.parseTemplate(template, context);
+    public String parseContent(String content) {
+        return xwiki.parseTemplate(content, context);
     }
+
+    public String parseTemplate(String template) {
+            return xwiki.parseTemplate(template, context);
+        }
 
     public String getSkinFile(String filename) {
         return xwiki.getSkinFile(filename, context);
@@ -143,4 +147,12 @@ public class XWiki extends Api {
         return xwiki.includeForm(topic, context);
     }
 
+
+    public boolean hasAccessLevel(String level) {
+       try {
+           return xwiki.getAccessmanager().userHasAccessLevel(context.getUser(), context.getDoc().getFullName(), "admin");
+       } catch (Exception e) {
+           return false;
+       }
+    }
 }

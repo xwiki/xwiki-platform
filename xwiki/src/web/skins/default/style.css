@@ -243,3 +243,147 @@
 }
 
 
+.heading-1 {
+  color: #000000;
+  background-color: inherit;
+  font-weight: bold;
+  font-size: 16px;
+  font-variant: uppercase;
+}
+
+.heading-1-1 {
+  color: #000000;
+  background-color: inherit;
+  font-size: 15px;
+  font-variant: uppercase;
+}
+
+
+.heading-1-1-1 {
+  color: #000000;
+  background-color: inherit;
+  font-size: 13px;
+  font-variant: uppercase;
+}
+
+.heading-1-1-1-1 {
+  color: #000000;
+  background-color: inherit;
+  font-size: 12px;
+  font-variant: uppercase;
+}
+
+
+.quote {
+  font-style: italic;
+  color: inherit;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.code {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding: 5px 5px 5px 5px;
+  color: inherit;
+  background-color: #eeeeee;
+  border: 1px dotted #003366;
+  font-family: courier, courier new, monospace;
+  font-size: 12px;
+  line-height: 100%;
+  white-space: pre;
+  overflow: -moz-scrollbars-horizontal;
+  overflow-x: auto;
+  width: 98%;
+}
+
+
+.java-keyword {
+  font-weight: bold;
+  color: #0000aa;
+  background-color: inherit;
+}
+
+.java-object {
+  color: #000088;
+  background-color: inherit;
+}
+
+.java-quote {
+  color: #00aa00;
+  background-color: inherit;
+}
+
+.xml-keyword {
+  font-weight: bold;
+}
+
+.xml-tag {
+  color: #0000aa;
+  background-color: inherit;
+}
+
+/* special formatting of a wiki table */
+.wiki-table {
+  margin: auto;
+  empty-cells: show;
+  width: 80%;
+  border-left: 1px solid #5b5b5b;
+  border-right: 1px solid #5b5b5b;
+  border-bottom: 1px solid #5b5b5b;
+}
+
+.wiki-table td {
+  border-top: 1px solid #5b5b5b;
+  padding: 2px;
+}
+
+.wiki-table th {
+  border-top: 1px solid #5b5b5b;
+  text-align: left;
+  color: inherit;
+  font-weight: bold;
+  background-color: #BBEE88;
+  background:##FFFF66;
+  color: #000000;
+  padding: 2px;
+}
+
+.wiki-table .table-odd {
+}
+
+.wiki-table .table-even {
+}
+
+.list {
+}
+
+.list-title {
+  font-weight: bold;
+}
+
+.list ul {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-left: 0px;
+  list-style-type: none;
+}
+
+/* wiki lists */
+
+ul.minus { list-style-type: square; }
+ul.star { list-style-type: circle; }
+ol.roman { list-style-type: lower-roman; }
+ol.ROMAN { list-style-type: upper-roman; }
+ol.alpha { list-style-type: lower-alpha; }
+ol.ALPHA { list-style-type: upper-alpha; }
+ol.greek { list-style-type: lower-greek; }
+ol.GREEK { list-style-type: upper-greek; }
+ol.hiragana { list-style-type: hiragana; }
+ol.HIRAGANA { list-style-type: hiragana-iroha; }
+ol.katakana { list-style-type: katakana; }
+ol.KATAKANA { list-style-type: katakana-iroha; }
+ol.HEBREW { list-style-type: hebrew; }
+

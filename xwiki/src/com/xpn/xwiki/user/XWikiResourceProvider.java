@@ -167,12 +167,11 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                               boolean user, boolean allow, boolean global) throws NotFoundException {
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
+        boolean found = false;
 
         Vector vobj = doc.getObjects(className);
-        if (vobj==null)
-            throw new NotFoundException();
-        else {
-            boolean found = false;
+        if (vobj!=null)
+        {
             for (int i=0;i<vobj.size();i++) {
                 BaseObject bobj = (BaseObject) vobj.get(i);
                 if (bobj==null)
@@ -191,11 +190,39 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                     }
                 }
             }
-            if (found)
-                return false;
-            else
-                throw new NotFoundException();
         }
+
+        // Didn't found right at this level.. Let's go to group level
+        List grouplist = null;
+        try {
+          grouplist = getxWiki().getAccessmanager().listGroupsForUser(name);
+        } catch (NotFoundException e) {
+        } catch (Exception e) {
+            // This should not happen
+            e.printStackTrace();
+        }
+          
+
+        if (grouplist!=null) {
+            for (int i=0;i<grouplist.size();i++) {
+                String group = (String)grouplist.get(i);
+                try {
+                    boolean result = checkRight(group, doc, accessLevel, false, allow, global);
+                    if (result)
+                        return true;
+                    else
+                        found = true;
+                } catch (Exception e) {
+                    // This should not happen
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (found)
+           return false;
+        else
+            throw new NotFoundException();
     }
 
     public boolean userHasAccessLevel(String userId, String resourceKey, String accessLevel) throws NotFoundException {

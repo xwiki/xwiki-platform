@@ -177,6 +177,71 @@ public class ViewEditTest extends ServletTest {
         launchTest();
     }
 
+
+       public void beginEditWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+
+        BaseObject bobject = Utils.prepareObject("Main.EditOkTestTemplate");
+        String content = Utils.content1;
+        Utils.content1 = "Template content";
+        Utils.createDoc(hibstore, "Main", "EditOkTestTemplate", bobject, bobject.getxWikiClass(), context);
+        Utils.content1 = content;
+        setUrl(webRequest, "edit", "EditOkWithTestTemplate");
+        webRequest.addParameter("template", "Main.EditOkTestTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+    }
+
+    public void endEditWithTemplateOk(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
+        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.EditOkTestTemplate_nb\" value=\"1\"")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Main.EditOkTestTemplate_0_first_name")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Ludovic")!=-1);
+        assertTrue("Could not find parent", result.indexOf("TestParentComesFromTemplate")!=-1);
+        assertTrue("Could not find Template content", result.indexOf("Template content")!=-1);
+    }
+
+    public void testEditWithTemplateNotOk() throws Throwable {
+        try {
+           launchTest();
+        } catch (XWikiException e) {
+        }
+    }
+
+    public void beginEditWithTemplateNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
+     XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+     StoreHibernateTest.cleanUp(hibstore, context);
+
+     // Document already exist.. This will make template system fail
+     Utils.createDoc(hibstore, "Main", "EditOkTestWithTemplate", context);
+     BaseObject bobject = Utils.prepareObject("Main.EditOkTestTemplate");
+     String content = Utils.content1;
+     Utils.content1 = "Template content";
+     Utils.createDoc(hibstore, "Main", "EditOkTestTemplate", bobject, bobject.getxWikiClass(), context);
+     Utils.content1 = content;
+     setUrl(webRequest, "edit", "EditOkTestWithTemplate");
+     webRequest.addParameter("template", "Main.EditOkTestTemplate");
+     webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+ }
+
+ public void endEditWithTemplateNotOk(WebResponse webResponse) {
+     String result = webResponse.getText();
+     assertFalse("Template content should be ignored", result.indexOf("Template content")!=-1);
+ }
+
+ public void testEditWithTemplateOk() throws Throwable {
+     launchTest();
+ }
+
+
+
     public void beginViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
@@ -187,6 +252,8 @@ public class ViewEditTest extends ServletTest {
         hibstore.saveXWikiDoc(doc2, context);
         setUrl(webRequest, "view", "ViewRevOkTest", "rev=1.1");
     }
+
+
 
     public void endViewRevOk(WebResponse webResponse) throws XWikiException {
         String result = webResponse.getText();

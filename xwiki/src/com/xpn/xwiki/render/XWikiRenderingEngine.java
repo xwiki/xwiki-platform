@@ -54,8 +54,8 @@ public class XWikiRenderingEngine {
 
         // The first should not removePre
         // The last one should removePre
-        renderers.add(new XWikiRadeoxRenderer(false));
-        renderers.add(new XWikiWikiBaseRenderer(true));
+        renderers.add(new XWikiRadeoxRenderer(true));
+        // renderers.add(new XWikiWikiBaseRenderer(true));
     }
 
     public void addRenderer(XWikiRenderer renderer) {

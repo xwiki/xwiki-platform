@@ -22,9 +22,7 @@
  */
 package com.xpn.xwiki.user;
 
-import com.opensymphony.user.EntityNotFoundException;
-import com.opensymphony.user.User;
-import com.opensymphony.user.UserManager;
+import com.opensymphony.module.user.*;
 import com.xpn.xwiki.XWiki;
 import org.securityfilter.realm.SecurityRealmInterface;
 

@@ -74,6 +74,10 @@ public class Context extends Api {
          return null;
     }
 
+    public String getUser() {
+         return context.getUser();
+    }
+
     public void setDoc(XWikiDocInterface doc) {
         if (checkProgrammingRights())
           context.setDoc(doc);

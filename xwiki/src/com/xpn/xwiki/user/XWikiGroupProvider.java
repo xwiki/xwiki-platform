@@ -24,7 +24,7 @@ package com.xpn.xwiki.user;
 
 import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.module.propertyset.PropertySetManager;
-import com.opensymphony.user.provider.AccessProvider;
+import com.opensymphony.module.user.provider.AccessProvider;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
@@ -151,7 +151,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             username = getName(username);
             list = getxWiki().searchDocuments(", BaseObject as obj, StringProperty as prop "
                     + "where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups' "
-                    + "and obj.id = prop.id.id and prop.id.name='member' and prop.value='" + username + "'", context);
+                    + "and obj.id = prop.id.id and (prop.id.name='member' or prop.id.name='group') and prop.value='" + username + "'", context);
             // we might need to deduplicate..
             return list;
         } catch (XWikiException e) {
@@ -159,6 +159,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             return new ArrayList();
         }
     }
+
 
     public List listUsersInGroup(String groupname) {
         groupname = getName(groupname);

@@ -22,7 +22,7 @@
  */
 package com.xpn.xwiki.user;
 
-import com.opensymphony.user.Entity;
+import com.opensymphony.module.user.Entity;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

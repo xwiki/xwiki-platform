@@ -7,6 +7,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PatternPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -60,6 +61,7 @@ public class PluginTest extends TestCase {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
+        xwiki.getRenderingEngine().addRenderer(new XWikiWikiBaseRenderer(true));
         xwiki.setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.PatternPlugin, com.xpn.xwiki.plugin.TablePlugin", context));
         PatternPlugin pplugin = (PatternPlugin) xwiki.getPluginManager().getPlugin("com.xpn.xwiki.plugin.PatternPlugin");
         pplugin.addPattern(":)","smile","no desc");

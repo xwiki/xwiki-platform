@@ -90,7 +90,7 @@
     <option name="PUT_FOCUS_INTO_COMMENT" value="false" />
     <option name="SHOW_CHECKIN_OPTIONS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added control of existing wiki" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented domain based virtual hosts" />
     <option name="SAVE_LAST_COMMIT_MESSAGE" value="true" />
     <option name="CHECKIN_DIALOG_SPLITTER_PROPORTION" value="0.8" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
@@ -905,7 +905,7 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java">
+    <first-group selected-file="file://$PROJECT_DIR$/src/web/templates/httpheader.vm">
       <entry file="file://$PROJECT_DIR$/src/com/xpn/xwiki/XWiki.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
           <state line="151" column="78" selection-start="6321" selection-end="6321" vertical-scroll-proportion="0.2557652">
@@ -950,7 +950,7 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/templates/httpheader.vm" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="6" column="42" selection-start="356" selection-end="356" vertical-scroll-proportion="0.20731707">
+          <state line="6" column="32" selection-start="346" selection-end="346" vertical-scroll-proportion="0.20731707">
             <folding />
           </state>
         </provider>
@@ -1488,7 +1488,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1288" height="998" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.28047338" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.34918034" order="7" />
@@ -1498,7 +1498,7 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3112426" order="8" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="6" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.31877023" order="1" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.35542858" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.35542858" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="CVS File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.42285714" order="4" />
@@ -1683,7 +1683,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/templates/httpheader.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="42" selection-start="356" selection-end="356" vertical-scroll-proportion="0.20731707">
+        <state line="6" column="32" selection-start="346" selection-end="346" vertical-scroll-proportion="0.20731707">
           <folding />
         </state>
       </provider>

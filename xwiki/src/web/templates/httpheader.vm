@@ -4,10 +4,10 @@
 <head>
 <title> XPertNet . $!doc.web . $!doc.name</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-$!xwiki.getWebPreference("meta", $context)
+$!xwiki.getWebPreference("meta")
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  title="currentStyle" />
 <style type="text/css">
-$!doc.display("style","view",$doc.getObject("XWiki.XWikiHTML",0))
+$!doc.display("style", $doc.getObject("XWiki.XWikiHTML",0))
 </style>
 </head>
 <body>

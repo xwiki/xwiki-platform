@@ -273,7 +273,6 @@
             <tarfileset dir="${doc.dir}" prefix="doc" />
             <tarfileset dir="${src.dir}" prefix="src" />
             <tarfileset dir="${basedir}/test" prefix="test" excludes="reports/*" />
-            <tarfileset dir="${basedir}/tools" prefix="tools" />
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
             <tarfileset dir="${basedir}" includes="license.txt,lesser.txt" />
         </tar>

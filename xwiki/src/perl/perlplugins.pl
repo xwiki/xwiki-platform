@@ -52,7 +52,7 @@ sub render {
  eval {
  TWiki::Func::cacheTopic($webName, $topic, $content);
  $content = &TWiki::handleAllTags( $webName, $topic, $content, "" );
- #$content = &TWiki::getRenderedVersion( $content );
+ $content = &TWiki::getRenderedVersion( $content );
  return $content;
  };
 

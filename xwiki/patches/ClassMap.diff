@@ -1,0 +1,18 @@
+--- ClassMap.java	2004-03-24 00:38:23.735375000 +0100
++++ ClassMap.orig	2004-03-24 10:06:16.172875000 +0100
+@@ -204,15 +204,6 @@
+ 
+             Method publicMethod = getPublicMethod( method );
+ 
+-            // These are methods we don't want to give access
+-            // Otherwise this would be like giving access to all private
+-            // fields and methods
+-            if (clazz.getName().equals("java.lang.Class")) {
+-                if ((publicMethod.getName().equals("getDeclaredField"))
+-                    ||(publicMethod.getName().equals("getDeclaredMethod")))
+-                    continue;
+-            }
+-
+             /*
+              *  it is entirely possible that there is no public method for
+              *  the methods of this class (i.e. in the facade, a method

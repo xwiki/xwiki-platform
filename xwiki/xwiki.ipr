@@ -177,8 +177,12 @@
         <root url="jar://$PROJECT_DIR$/lib/velocity-dep-1.3.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/velocity-tools-1.1-beta1.jar!/" />
       </CLASSES>
-      <JAVADOC />
-      <SOURCES />
+      <JAVADOC>
+        <root url="file://C:/dev/java/velocity-1.3.1/docs/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/velocity-1.3.1/src/java" />
+      </SOURCES>
     </library>
     <library name="Struts">
       <CLASSES>

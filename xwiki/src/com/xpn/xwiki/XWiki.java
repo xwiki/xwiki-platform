@@ -58,15 +58,19 @@ import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SecurityRealmInterface;
 
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -86,6 +90,9 @@ public class XWiki implements XWikiNotificationInterface {
     private String version = null;
     private HttpServlet servlet;
     private String database;
+
+    private SecurityManager defaultSecurityManager;
+    private SecurityManager secureSecurityManager;
 
 
     public static XWiki getXWiki(XWikiContext context) throws XWikiException {
@@ -118,11 +125,11 @@ public class XWiki implements XWikiNotificationInterface {
                 String servername = (i1!=-1) ? host.substring(0, i1) : host;
                 appname = uri.substring(1,uri.indexOf("/",2));
                 if ((servername.equals("www"))
-                       ||(context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
+                        ||(context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
                     if (appname.equals("xwiki"))
                         return xwiki;
                 } else {
-                   appname = servername;
+                    appname = servername;
                 }
             }
 
@@ -149,8 +156,8 @@ public class XWiki implements XWikiNotificationInterface {
 
     private static String findWikiServer(String host, XWikiContext context) {
         String hql = ", BaseObject as obj, StringProperty as prop where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) "
-                    + "and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
-                    + "and prop.id.name = 'server' and prop.value='" + host + "'";
+                + "and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
+                + "and prop.id.name = 'server' and prop.value='" + host + "'";
         try {
             List list = context.getWiki().searchDocuments(hql, context);
             if ((list==null)||(list.size()==0))
@@ -167,8 +174,8 @@ public class XWiki implements XWikiNotificationInterface {
 
     public static String getServerWikiPage(String servername) {
         return "XWiki.XWikiServer"
-                  + servername.substring(0,1).toUpperCase()
-                  + servername.substring(1);
+                + servername.substring(0,1).toUpperCase()
+                + servername.substring(1);
     }
 
 
@@ -235,6 +242,10 @@ public class XWiki implements XWikiNotificationInterface {
         // Initialize User Manager
         initUserManager();
         initAccessManager();
+
+        // setDefaultSecurityManager(new XWikiSecurityManager(false));
+        // setSecureSecurityManager(new XWikiSecurityManager(true));
+        // System.setSecurityManager(getDefaultSecurityManager());
     }
 
     public String getVersion() {
@@ -484,10 +495,10 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String parseContent(String content, XWikiContext context) {
         if ((content!=null)&&(!content.equals("")))
-          // Let's use this template
-          return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
+        // Let's use this template
+            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
         else
-          return "";
+            return "";
     }
 
     public String parseTemplate(String template, XWikiContext context) {
@@ -923,14 +934,14 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public boolean checkPassword(String username, String password, XWikiContext context) throws XWikiException {
-      try {
-          XWikiDocInterface doc = getDocument(username, context);
-          String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
-          return (password.equals(passwd));
-      } catch (Throwable e) {
-          e.printStackTrace();
-          return false;
-      }
+        try {
+            XWikiDocInterface doc = getDocument(username, context);
+            String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
+            return (password.equals(passwd));
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 
@@ -949,14 +960,14 @@ public class XWiki implements XWikiNotificationInterface {
             // because the fact that it is "static" doesn't
             // allow to dynamically switch databases
             if ((Param("xwiki.virtual").equals("1"))
-                || !Param("xwiki.authentication.osuser").equals("1")) {
+                    || !Param("xwiki.authentication.osuser").equals("1")) {
                 if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
-                   return null;
+                    return null;
                 }
             } else {
-               if (auth.processLogin(wrappedRequest, response)) {
-                  return null;
-               }
+                if (auth.processLogin(wrappedRequest, response)) {
+                    return null;
+                }
             }
 
             Principal user = wrappedRequest.getUserPrincipal();
@@ -991,7 +1002,7 @@ public class XWiki implements XWikiNotificationInterface {
             if ((user==null)&&(needsAuth)) {
                 try {
                     if (context.getRequest()!=null)
-                     getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+                        getAuthenticator().showLogin(context.getRequest(), context.getResponse());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1017,11 +1028,11 @@ public class XWiki implements XWikiNotificationInterface {
             // Verify access rights and return if ok
             String docname;
             if (context.getDatabase()!=null) {
-              docname = context.getDatabase() + ":" + doc.getFullName();
-              username = context.getDatabase() + ":" + username;
+                docname = context.getDatabase() + ":" + doc.getFullName();
+                username = context.getDatabase() + ":" + username;
             }
             else
-              docname = doc.getFullName();
+                docname = doc.getFullName();
 
             if (getAccessmanager().userHasAccessLevel(username, docname, right))
                 return true;
@@ -1035,7 +1046,7 @@ public class XWiki implements XWikiNotificationInterface {
             // Denied Guest need to be authenticated
             try {
                 if (context.getRequest()!=null)
-                   getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+                    getAuthenticator().showLogin(context.getRequest(), context.getResponse());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1076,8 +1087,8 @@ public class XWiki implements XWikiNotificationInterface {
         Document currentdoc = null, currentcdoc = null;
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext!=null) {
-         currentdoc = (Document) vcontext.get("doc");
-         currentcdoc = (Document) vcontext.get("cdoc");
+            currentdoc = (Document) vcontext.get("doc");
+            currentcdoc = (Document) vcontext.get("cdoc");
         }
 
         try {
@@ -1120,9 +1131,9 @@ public class XWiki implements XWikiNotificationInterface {
             if (database!=null)
                 context.setDatabase(database);
             if (currentdoc!=null)
-             vcontext.put("doc", currentdoc);
+                vcontext.put("doc", currentdoc);
             if (currentcdoc!=null)
-             vcontext.put("cdoc", currentcdoc);
+                vcontext.put("cdoc", currentcdoc);
         }
     }
 
@@ -1138,5 +1149,80 @@ public class XWiki implements XWikiNotificationInterface {
         this.database = database;
     }
 
+    public void gc() {
+        System.gc();
+    }
+
+    public long freeMemory() {
+        return Runtime.getRuntime().freeMemory();
+    }
+
+    public long totalMemory() {
+        return Runtime.getRuntime().totalMemory();
+    }
+
+    public long maxMemory() {
+        return Runtime.getRuntime().maxMemory();
+    }
+
+    public Object getPrivateField(Object obj, String fieldName) {
+        // SecurityManager secmng = null;
+        try {
+            // secmng = System.getSecurityManager();
+            // System.setSecurityManager(getDefaultSecurityManager());
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (NoSuchFieldException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            // System.setSecurityManager(secmng);
+        }
+    }
+
+    public Object callPrivateMethod(Object obj, String methodName) {
+        return callPrivateMethod(obj, methodName, null, null);
+    }
+
+    public Object callPrivateMethod(Object obj, String methodName, Class[] classes, Object[] args) {
+        // SecurityManager secmng = null;
+        try {
+            // secmng = System.getSecurityManager();
+            // System.setSecurityManager(getDefaultSecurityManager());
+            Method method = obj.getClass().getDeclaredMethod(methodName, classes);
+            method.setAccessible(true);
+            return method.invoke(obj, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } catch (NoSuchMethodException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            // System.setSecurityManager(secmng);
+        }
+
+    }
+
+    public SecurityManager getDefaultSecurityManager() {
+        return defaultSecurityManager;
+    }
+
+    public void setDefaultSecurityManager(SecurityManager defaultSecurityManager) {
+        this.defaultSecurityManager = defaultSecurityManager;
+    }
+
+    public SecurityManager getSecureSecurityManager() {
+        return secureSecurityManager;
+    }
+
+    public void setSecureSecurityManager(SecurityManager secureSecurityManager) {
+        this.secureSecurityManager = secureSecurityManager;
+    }
 
 }

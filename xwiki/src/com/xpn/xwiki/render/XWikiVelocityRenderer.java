@@ -23,6 +23,7 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.security.XWikiSecurityManager;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
@@ -36,30 +37,42 @@ import org.apache.velocity.tools.view.context.ChainedContext;
 import javax.servlet.http.HttpServlet;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.AccessController;
+import java.security.AccessControlContext;
+import java.security.PermissionCollection;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
 
     public XWikiVelocityRenderer() {
-          try {
-              Velocity.init();
-          } catch (Exception e) {
-              e.printStackTrace();  //To change body of catch statement use Options | File Templates.
-          }
+        try {
+            Velocity.init();
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+        }
     }
 
     public String render(String content, XWikiDocInterface doc, XWikiContext context) {
-        StringWriter writer = new StringWriter();
-        String name = doc.getFullName();
-        content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
-        VelocityContext vcontext = prepareContext(context);
-
-        Document previousdoc = (Document) vcontext.get("doc");
+        VelocityContext vcontext = null;
         try {
-         vcontext.put("doc", new Document(doc, context));
-         return evaluate(content, name, vcontext);
+            StringWriter writer = new StringWriter();
+            String name = doc.getFullName();
+            content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
+            vcontext = prepareContext(context);
+
+            Document previousdoc = (Document) vcontext.get("doc");
+            // SecurityManager secmng = null;
+
+            try {
+                // System.setSecurityManager(context.getWiki().getSecureSecurityManager());
+                vcontext.put("doc", new Document(doc, context));
+                return evaluate(content, name, vcontext);
+            } finally {
+                if (previousdoc!=null)
+                    vcontext.put("doc", previousdoc);
+                // System.setSecurityManager(context.getWiki().getDefaultSecurityManager());
+            }
+
         } finally {
-          if (previousdoc!=null)
-            vcontext.put("doc", previousdoc);
         }
     }
 
@@ -77,7 +90,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         HttpServlet servlet = context.getServlet();
         if (servlet!=null) {
             msg.init(new ChainedContext(vcontext, context.getRequest(),
-                 context.getResponse(), (servlet==null) ? null : servlet.getServletContext()));
+                    context.getResponse(), (servlet==null) ? null : servlet.getServletContext()));
             vcontext.put("msg", msg);
         }
 
@@ -90,9 +103,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
     public static String evaluate(String content, String name, VelocityContext vcontext) {
         StringWriter writer = new StringWriter();
         try {
-          boolean result =  Velocity.evaluate(vcontext, writer, name,
-                                new StringReader(content));
-          return writer.toString();
+            boolean result =  Velocity.evaluate(vcontext, writer, name,
+                    new StringReader(content));
+            return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();
             return "Error while parsing velocity page " + name + ": " + e.getMessage();

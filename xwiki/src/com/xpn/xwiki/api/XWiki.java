@@ -28,6 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 
 import java.util.List;
+import java.util.Date;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -180,5 +181,9 @@ public class XWiki extends Api {
 
     public String renderText(String text, XWikiDocInterface doc) {
         return xwiki.getRenderingEngine().renderText(text, doc, context);
+    }
+
+    public Date getCurrentDate() {
+        return new Date();
     }
 }

@@ -485,7 +485,7 @@ public class ViewEditAction extends XWikiAction
     public String getRedirect(HttpServletRequest request, String defaultRedirect) {
         String redirect;
         redirect = request.getParameter("xredirect");
-        if (redirect == null)
+        if ((redirect == null)||(redirect.equals("")))
          redirect = defaultRedirect;
         return redirect;
     }
@@ -493,7 +493,7 @@ public class ViewEditAction extends XWikiAction
     public String getPage(HttpServletRequest request, String defaultpage) {
         String page;
         page = request.getParameter("xpage");
-        if (page == null)
+        if ((page == null)||(page.equals("")))
          page = defaultpage;
         return page;
     }

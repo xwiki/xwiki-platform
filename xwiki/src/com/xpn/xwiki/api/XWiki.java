@@ -49,6 +49,10 @@ public class XWiki extends Api {
           return xwiki.getVersion();
      }
 
+     public String getRequestURL() {
+         return com.xpn.xwiki.XWiki.getRequestURL(context.getRequest());
+     }
+
      public String getRealPath(String path) {
           return xwiki.getRealPath(path);
      }
@@ -119,7 +123,7 @@ public class XWiki extends Api {
     }
 
     public String parseContent(String content) {
-        return xwiki.parseTemplate(content, context);
+        return xwiki.parseContent(content, context);
     }
 
     public String parseTemplate(String template) {
@@ -185,5 +189,13 @@ public class XWiki extends Api {
 
     public Date getCurrentDate() {
         return new Date();
+    }
+
+    public String[] split(String str, String sep) {
+        return xwiki.split(str, sep);
+    }
+
+    public String printStrackTrace(Throwable e) {
+        return xwiki.printStrackTrace(e);
     }
 }

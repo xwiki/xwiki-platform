@@ -27,9 +27,12 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.MyBasicAuthenticator;
+import com.xpn.xwiki.user.MyFormAuthenticator;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -38,10 +41,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.securityfilter.authenticator.Authenticator;
+import org.securityfilter.filter.URLPatternMatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -69,6 +75,7 @@ import java.util.*;
 public class ViewEditAction extends XWikiAction
 {
 
+
     public ViewEditAction() throws Exception {
         super();
     }
@@ -83,6 +90,64 @@ public class ViewEditAction extends XWikiAction
         return null;
     }
 
+    public String getRedirect(HttpServletRequest request, String defaultRedirect) {
+        String redirect;
+        redirect = request.getParameter("xredirect");
+        if ((redirect == null)||(redirect.equals("")))
+            redirect = defaultRedirect;
+        return redirect;
+    }
+
+    public String getPage(HttpServletRequest request, String defaultpage) {
+        String page;
+        page = request.getParameter("xpage");
+        if ((page == null)||(page.equals("")))
+            page = defaultpage;
+        return page;
+    }
+
+
+    private String getFileName(List filelist, String name) {
+        DefaultFileItem  fileitem = null;
+        for (int i=0;i<filelist.size();i++) {
+            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            if (name.equals(item.getFieldName())) {
+                fileitem = item;
+                break;
+            }
+        }
+
+        if (fileitem==null)
+            return null;
+
+        return fileitem.getName();
+    }
+
+    private byte[] getContent(List filelist, String name) throws IOException {
+        DefaultFileItem  fileitem = null;
+        for (int i=0;i<filelist.size();i++) {
+            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            if (name.equals(item.getFieldName())) {
+                fileitem = item;
+                break;
+            }
+        }
+
+        if (fileitem==null)
+            return null;
+
+        byte[] data = new byte[(int)fileitem.getSize()];
+        InputStream fileis = fileitem.getInputStream();
+        fileis.read(data);
+        fileis.close();
+        return data;
+    }
+
+
+    public List getClassList() throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching class list");
+    }
     // --------------------------------------------------------- Public Methods
     /**
      * Handle server requests.
@@ -103,8 +168,6 @@ public class ViewEditAction extends XWikiAction
     {
         String action;
 
-        // ActionErrors errors = new ActionErrors();
-
         // fetch action from mapping
         action = mapping.getName();
         // Test works with xwiki-test.cfg instead of xwiki.cfg
@@ -112,10 +175,10 @@ public class ViewEditAction extends XWikiAction
         String url = XWiki.getRequestURL(request);
         String baseUrl = "";
         if (request.getServletPath().startsWith ("/testbin")) {
-          dbname = "xwikitest";
-          baseUrl = url.substring(0, url.indexOf("/testbin/" + action)) + "/testbin/";
+            dbname = "xwikitest";
+            baseUrl = url.substring(0, url.indexOf("/testbin/" + action)) + "/testbin/";
         } else {
-          baseUrl = url.substring(0, url.indexOf("/bin/" + action)) + "/bin/";
+            baseUrl = url.substring(0, url.indexOf("/bin/" + action)) + "/bin/";
         }
 
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
@@ -128,418 +191,426 @@ public class ViewEditAction extends XWikiAction
         context.setDatabase(dbname);
 
         XWiki xwiki = XWiki.getXWiki(context);
-        XWikiDocInterface doc;
+        // Any error before this will be treated using a redirection to an error page
+
+        VelocityContext vcontext = null;
+        try {
+        // From there we will try to catch any exceptions and show a nice page
+
+        XWikiDocInterface doc = null;
+
         doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
         context.put("doc", doc);
 
-
         // Prepare velocity context
-        VelocityContext vcontext = XWikiVelocityRenderer.prepareContext(context);
+        vcontext = XWikiVelocityRenderer.prepareContext(context);
         vcontext.put("doc", new Document(doc, context));
         vcontext.put("cdoc",  vcontext.get("doc"));
 
-        if (xwiki.checkAccess(action, doc, context)==false)
-           return null;
-
-        String username = context.getUser();
+        if (xwiki.checkAccess(action, doc, context)==false) {
+            return parseTemplate(getPage(request, "accessdenied"), context);
+        }
 
         // Determine what to do
         if (action.equals("view"))
-        {
-            String rev = request.getParameter("rev");
-            if (rev!=null) {
-                // Let's get the revision
-                doc = xwiki.getDocument(doc, rev, context);
-                context.put("doc", doc);
-                // We need to have the old version doc in the context
-                vcontext.put("cdoc", new Document(doc, context));
-            }
-            // forward to view template
-            String page = getPage(request, "view");
-            return parseTemplate(page, context);
-        }
-        else if ( action.equals("inline")) {
-            PrepareEditForm peform = (PrepareEditForm) form;
-            String parent = peform.getParent();
-            if (parent!=null)
-                doc.setParent(parent);
-
-            doc.readFromTemplateForEdit(peform, context);
-
-            // Set display context to 'view'
-            context.put("display", "edit");
-
-            // forward to inline template
-            String page = getPage(request, "inline");
-            return parseTemplate(page, context);
-        }
+            return executeView(xwiki, doc, request, context, vcontext);
+        else if ( action.equals("inline"))
+            return executeInline(doc, form, request, context);
         else if ( action.equals("edit") )
-        {
-            PrepareEditForm peform = (PrepareEditForm) form;
-            String parent = peform.getParent();
-            if (parent!=null)
-                doc.setParent(parent);
-
-            doc.readFromTemplateForEdit(peform, context);
-
-            // forward to edit template
-            String page = getPage(request, "edit");
-            return parseTemplate(page, context);
-        }
-        else if ( action.equals("preview") )
-        {
-            XWikiDocInterface doc2 = (XWikiDocInterface)doc.clone();
-            context.put("doc", doc2);
-            vcontext.put("doc", new Document(doc2, context));
-            vcontext.put("cdoc",  vcontext.get("doc"));
-            doc2.readFromForm((EditForm)form, context);
-            // forward to view template
-            String page = getPage(request, "preview");
-            return parseTemplate(page, context);
-        }
+            return executeEdit(doc, form, request, context);
+        else if ( action.equals("preview"))
+            return executePreview(doc, form, request, context, vcontext);
         else if (action.equals("save"))
-        {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            doc.readFromForm((EditForm)form, context);
-
-            // TODO: handle Author
-            doc.setAuthor(username);
-
-            xwiki.saveDocument(doc, olddoc, context);
-
-            // forward to view
-            String redirect = getRedirect(request, doc.getActionUrl("view",context));
-            response.sendRedirect(redirect);
-            return null;
-        }
+            return executeSave(xwiki, doc, form, request, response, context);
         else if (action.equals("delete"))
-                {
-                    String confirm = request.getParameter("confirm");
-                    if ((confirm!=null)&&(confirm.equals("1"))) {
-                      xwiki.deleteDocument(doc, context);
-                      return parseTemplate(getPage(request, "deleted"), context);
-                    } else {
-                      String redirect = getRedirect(request, null);
-                      if (redirect==null)
-                       return parseTemplate(getPage(request, "delete"), context);
-                      else
-                        response.sendRedirect(redirect);
-                    }
-                }
+            return executeDelete(xwiki, doc, request, response, context);
         else if (action.equals("propupdate"))
-        {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-
-            // Prepare new class
-            BaseClass bclass = doc.getxWikiClass();
-            BaseClass bclass2 = (BaseClass)bclass.clone();
-            bclass2.setFields(new HashMap());
-
-            doc.setxWikiClass(bclass2);
-
-            // Prepare a Map for field renames
-            Map fieldsToRename = new HashMap();
-
-            Iterator it = bclass.getFieldList().iterator();
-            while (it.hasNext()) {
-                PropertyClass property = (PropertyClass)it.next();
-                PropertyClass origproperty = (PropertyClass) property.clone();
-                String name = property.getName();
-                Map map = ((EditForm)form).getObject(name);
-                property.getxWikiClass(context).fromMap(map, property);
-                String newname = property.getName();
-                bclass2.addField(newname, property);
-                if (!newname.equals(name)) {
-                    fieldsToRename.put(name, newname);
-                    bclass2.addPropertyForRemoval(origproperty);
-                }
-            }
-            doc.renameProperties(bclass.getName(), fieldsToRename);
-            xwiki.saveDocument(doc, olddoc, context);
-
-            // We need to load all documents that use this property and rename it
-            if (fieldsToRename.size()>0) {
-               List list = xwiki.searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='" +
-                                                 bclass.getName() +  "' and CONCAT(XWD_WEB,'.',XWD_NAME)<> '" + bclass.getName() + "'", context);
-               for (int i=0;i<list.size();i++) {
-                  XWikiDocInterface doc2 = xwiki.getDocument((String)list.get(i), context);
-                  doc2.renameProperties(bclass.getName(), fieldsToRename);
-                  xwiki.saveDocument(doc2, doc2, context);
-               }
-            }
-            xwiki.flushCache();
-            // forward to edit
-            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
-            response.sendRedirect(redirect);
-            return null;
-        }
+            return executePropertyUpdate(xwiki, doc, form, request, response, context);
         else if (action.equals("propadd"))
-        {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            String propName = ((PropAddForm) form).getPropName();
-            String propType = ((PropAddForm) form).getPropType();
-            BaseClass bclass = doc.getxWikiClass();
-            bclass.setName(doc.getFullName());
-            if (bclass.get(propName)!=null) {
-                // TODO: handle the error of the property already existing when we want to add a class property
-            } else {
-                MetaClass mclass = xwiki.getMetaclass();
-                PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
-                if (pmclass!=null) {
-                    PropertyClass pclass = (PropertyClass) pmclass.newObject();
-                    pclass.setObject(bclass);
-                    pclass.setName(propName);
-                    pclass.setPrettyName(propName);
-                    bclass.put(propName, pclass);
-                    xwiki.saveDocument(doc, olddoc, context);
-                }
-            }
-            // forward to edit
-            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
-            response.sendRedirect(redirect);
-            return null;
-        }
-        else if (action.equals("objectadd")) {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            String className = ((ObjectAddForm) form).getClassName();
-            doc.createNewObject(className, context);
-            xwiki.saveDocument(doc, olddoc, context);
-
-            // forward to edit
-            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
-            response.sendRedirect(redirect);
-            return null;
-        }
-        else if (action.equals("objectremove")) {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            String className = ((ObjectRemoveForm) form).getClassName();
-            int classId = ((ObjectRemoveForm) form).getClassId();
-            Vector objects = doc.getObjects(className);
-            BaseObject object = (BaseObject)objects.get(classId);
-            // Remove it from the object list
-            objects.set(classId, null);
-            doc.addObjectsToRemove(object);
-            xwiki.saveDocument(doc, olddoc, context);
-
-            // forward to edit
-            String redirect = getRedirect(request, doc.getActionUrl("edit",context));
-            response.sendRedirect(redirect);
-            return null;
-        }
+            return executePropertyAdd(xwiki, doc, form, request, response, context);
+        else if (action.equals("objectadd"))
+            return executeObjectAdd(xwiki, doc, form, request, response, context);
+        else if (action.equals("objectremove"))
+            return executeObjectRemove(xwiki, doc, form, request, response, context);
         else if (action.equals("download"))
-        {
-            String path = request.getPathInfo();
-            String filename = path.substring(path.lastIndexOf("/")+1);
-            XWikiAttachment attachment = null;
-
-            if (request.getParameter("id")!=null) {
-              int id = Integer.parseInt(request.getParameter("id"));
-              attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-            }
-            else {
-                attachment = doc.getAttachment(filename);
-            }
-
-            if (attachment==null) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                                         XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                                         "Attachment not found", null);
-            }
-
-            // Choose the right content type
-            String mimetype = servlet.getServletContext().getMimeType(filename);
-            if (mimetype!=null)
-             response.setContentType(mimetype);
-            else
-             response.setContentType("application/octet-stream");
-
-            // Sending the content of the attachment
-            byte[] data = attachment.getContent(context);
-            response.setContentLength(data.length);
-            response.getOutputStream().write(data);
-            return null;
-        }
+            return executeDownload(doc, request, response, context);
         else if (action.equals("attach"))
-        {
             return parseTemplate(getPage(request, "attach"), context);
-        }
-        else if (action.equals("upload")) {
-            XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-
-            // Get the FileUpload Data
-            DiskFileUpload fileupload = new DiskFileUpload();
-            fileupload.setSizeMax(10000000);
-            fileupload.setSizeThreshold(100000);
-
-            String tempdir = xwiki.Param("xwiki.upload.tempdir");
-            if (tempdir!=null) {
-                fileupload.setRepositoryPath(tempdir);
-                (new File(tempdir)).mkdirs();
-            }
-            else
-                fileupload.setRepositoryPath(".");
-            List filelist = fileupload.parseRequest(request);
-
-            // I don't like it.. But this is the way
-            // to get form elements..
-            byte[] data = getContent(filelist, "filename");
-            String filename = null;
-
-            if (data!=null) {
-                filename = new String(data);
-            }
-
-            // Get the file content
-            data = getContent(filelist, "filepath");
-
-            if (filename==null) {
-                String fname = getFileName(filelist, "filepath");
-                int i = fname.indexOf("\\");
-                if (i==-1)
-                    i = fname.indexOf("/");
-                filename = fname.substring(i+1);
-            }
-
-
-            // Read XWikiAttachment
-            XWikiAttachment attachment = doc.getAttachment(filename);
-
-
-            if (attachment==null) {
-             attachment = new XWikiAttachment();
-             doc.getAttachmentList().add(attachment);
-            }
-            attachment.setContent(data);
-            attachment.setFilename(filename);
-
-            // TODO: handle Author
-            attachment.setAuthor(username);
-
-            // Add the attachment to the document
-            attachment.setDoc(doc);
-
-            // Save the content and the archive
-            doc.saveAttachmentContent(attachment, context);
-
-            // forward to attach page
-            response.sendRedirect(doc.getActionUrl("attach",context));
-            return null;
-         }
+        else if (action.equals("upload"))
+            return executeUpload(xwiki, doc, request, response, context);
         else if (action.equals("delattachment"))
-        {
-            String path = request.getPathInfo();
-            String filename = path.substring(path.lastIndexOf("/")+1);
-            XWikiAttachment attachment = null;
+            return executeDeleteAttachment(doc, request, response, context);
+        else if (action.equals("skin"))
+            return executeSkin(xwiki, doc, request, response, context);
+        else if (action.equals("login"))
+            return executeLogin(xwiki, doc, request, response, context);
+        else if (action.equals("loginerror"))
+            return parseTemplate(getPage(request, "login"), context);
+        else if (action.equals("logout"))
+            return executeLogout(xwiki, request, response, context);
+        } catch (Throwable e) {
+            vcontext.put("exp", e);
+            return parseTemplate(getPage(request, "exception"), context);
+        }
 
-            if (request.getParameter("id")!=null) {
-              int id = Integer.parseInt(request.getParameter("id"));
-              attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-            }
-            else {
-                attachment = doc.getAttachment(filename);
-            }
+       // Let's redirect to an error page here..
+       return null;
+    }
 
-            doc.deleteAttachment(attachment, context);
-            // forward to attach page
-            String redirect = getRedirect(request, doc.getActionUrl("attach",context));
-            response.sendRedirect(redirect);
-            return null;
-         }
-         else if (action.equals("skin"))
-            {
-                String path = request.getPathInfo();
-                String filename = path.substring(path.lastIndexOf("/")+1);
-
-                BaseObject object = doc.getObject("XWiki.XWikiSkinClass", 0);
-                String content = null;
-                if (object!=null) {
-                    content = object.getStringValue(filename);
-                }
-
-                if ((content!=null)&&(!content.equals(""))) {
-                    // Choose the right content type
-                    response.setContentType(servlet.getServletContext().getMimeType(filename));
-                    // Sending the content of the attachment
-                    response.setContentLength(content.length());
-                    response.getWriter().write(content);
-                }
-                else {
-                    XWikiAttachment attachment = doc.getAttachment(filename);
-                    if (attachment!=null) {
-                      // Sending the content of the attachment
-                      byte[] data = attachment.getContent(context);
-                      response.setContentType(servlet.getServletContext().getMimeType(filename));
-                      response.setContentLength(data.length);
-                      response.getOutputStream().write(data);
-                     } else {
-                      // In this case we redirect to the default template file
-                      response.sendRedirect(xwiki.getBase(context) + "../skins/default/" + filename);
-                  }
-                }
-                return null;
-            }
-
+    private ActionForward executeLogout(XWiki xwiki, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
+        String redirect = getRedirect(request, xwiki.getBase(context) + "view/Main/WebHome");
+        response.sendRedirect(redirect);
         return null;
     }
 
-    public String getRedirect(HttpServletRequest request, String defaultRedirect) {
-        String redirect;
-        redirect = request.getParameter("xredirect");
-        if ((redirect == null)||(redirect.equals("")))
-         redirect = defaultRedirect;
-        return redirect;
-    }
-
-    public String getPage(HttpServletRequest request, String defaultpage) {
-        String page;
-        page = request.getParameter("xpage");
-        if ((page == null)||(page.equals("")))
-         page = defaultpage;
-        return page;
+    private ActionForward executeLogin(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
+        if (doc.isNew()) {
+         String page = getPage(request, "login");
+         parseTemplate(page, context);
+         return null;
+        } else {
+            return executeView(xwiki, doc, request, context, (VelocityContext) context.get("vcontext"));
+        }
     }
 
 
-    private String getFileName(List filelist, String name) {
-        DefaultFileItem  fileitem = null;
-        for (int i=0;i<filelist.size();i++) {
-            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
-            if (name.equals(item.getFieldName())) {
-                fileitem = item;
-                break;
-            }
+    private ActionForward executeSkin(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException, XWikiException {
+        String path = request.getPathInfo();
+        String filename = path.substring(path.lastIndexOf("/")+1);
+
+        BaseObject object = doc.getObject("XWiki.XWikiSkinClass", 0);
+        String content = null;
+        if (object!=null) {
+            content = object.getStringValue(filename);
         }
 
-        if (fileitem==null)
-         return null;
-
-        return fileitem.getName();
-    }
-
-    private byte[] getContent(List filelist, String name) throws IOException {
-        DefaultFileItem  fileitem = null;
-        for (int i=0;i<filelist.size();i++) {
-            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
-            if (name.equals(item.getFieldName())) {
-                fileitem = item;
-                break;
+        if ((content!=null)&&(!content.equals(""))) {
+            // Choose the right content type
+            response.setContentType(servlet.getServletContext().getMimeType(filename));
+            // Sending the content of the attachment
+            response.setContentLength(content.length());
+            response.getWriter().write(content);
+        }
+        else {
+            XWikiAttachment attachment = doc.getAttachment(filename);
+            if (attachment!=null) {
+                // Sending the content of the attachment
+                byte[] data = attachment.getContent(context);
+                response.setContentType(servlet.getServletContext().getMimeType(filename));
+                response.setContentLength(data.length);
+                response.getOutputStream().write(data);
+            } else {
+                // In this case we redirect to the default template file
+                response.sendRedirect(xwiki.getBase(context) + "../skins/default/" + filename);
             }
         }
-
-        if (fileitem==null)
-         return null;
-
-        byte[] data = new byte[(int)fileitem.getSize()];
-        InputStream fileis = fileitem.getInputStream();
-        fileis.read(data);
-        fileis.close();
-        return data;
+        return null;
     }
 
+    private ActionForward executeDeleteAttachment(XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        String path = request.getPathInfo();
+        String filename = path.substring(path.lastIndexOf("/")+1);
+        XWikiAttachment attachment = null;
 
-    public List getClassList() throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                "Exception while searching class list");
+        if (request.getParameter("id")!=null) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+        }
+        else {
+            attachment = doc.getAttachment(filename);
+        }
+
+        doc.deleteAttachment(attachment, context);
+        // forward to attach page
+        String redirect = getRedirect(request, doc.getActionUrl("attach",context));
+        response.sendRedirect(redirect);
+        return null;
     }
+
+    private ActionForward executeUpload(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws FileUploadException, IOException, XWikiException {
+        String username = context.getUser();
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+
+        // Get the FileUpload Data
+        DiskFileUpload fileupload = new DiskFileUpload();
+        fileupload.setSizeMax(10000000);
+        fileupload.setSizeThreshold(100000);
+
+        String tempdir = xwiki.Param("xwiki.upload.tempdir");
+        if (tempdir!=null) {
+            fileupload.setRepositoryPath(tempdir);
+            (new File(tempdir)).mkdirs();
+        }
+        else
+            fileupload.setRepositoryPath(".");
+        List filelist = fileupload.parseRequest(request);
+
+        // I don't like it.. But this is the way
+        // to get form elements..
+        byte[] data = getContent(filelist, "filename");
+        String filename = null;
+
+        if (data!=null) {
+            filename = new String(data);
+        }
+
+        // Get the file content
+        data = getContent(filelist, "filepath");
+
+        if (filename==null) {
+            String fname = getFileName(filelist, "filepath");
+            int i = fname.indexOf("\\");
+            if (i==-1)
+                i = fname.indexOf("/");
+            filename = fname.substring(i+1);
+        }
+
+
+        // Read XWikiAttachment
+        XWikiAttachment attachment = doc.getAttachment(filename);
+
+
+        if (attachment==null) {
+            attachment = new XWikiAttachment();
+            doc.getAttachmentList().add(attachment);
+        }
+        attachment.setContent(data);
+        attachment.setFilename(filename);
+
+        // TODO: handle Author
+        attachment.setAuthor(username);
+
+        // Add the attachment to the document
+        attachment.setDoc(doc);
+
+        // Save the content and the archive
+        doc.saveAttachmentContent(attachment, context);
+
+        // forward to attach page
+        response.sendRedirect(doc.getActionUrl("attach",context));
+        return null;
+    }
+
+    private ActionForward executeDownload(XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        String path = request.getPathInfo();
+        String filename = path.substring(path.lastIndexOf("/")+1);
+        XWikiAttachment attachment = null;
+
+        if (request.getParameter("id")!=null) {
+            int id = Integer.parseInt(request.getParameter("id"));
+            attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+        }
+        else {
+            attachment = doc.getAttachment(filename);
+        }
+
+        if (attachment==null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                    "Attachment not found", null);
+        }
+
+        // Choose the right content type
+        String mimetype = servlet.getServletContext().getMimeType(filename);
+        if (mimetype!=null)
+            response.setContentType(mimetype);
+        else
+            response.setContentType("application/octet-stream");
+
+        // Sending the content of the attachment
+        byte[] data = attachment.getContent(context);
+        response.setContentLength(data.length);
+        response.getOutputStream().write(data);
+        return null;
+    }
+
+    private ActionForward executeObjectRemove(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+        String className = ((ObjectRemoveForm) form).getClassName();
+        int classId = ((ObjectRemoveForm) form).getClassId();
+        Vector objects = doc.getObjects(className);
+        BaseObject object = (BaseObject)objects.get(classId);
+        // Remove it from the object list
+        objects.set(classId, null);
+        doc.addObjectsToRemove(object);
+        xwiki.saveDocument(doc, olddoc, context);
+
+        // forward to edit
+        String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+        response.sendRedirect(redirect);
+        return null;
+    }
+
+    private ActionForward executeObjectAdd(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+        String className = ((ObjectAddForm) form).getClassName();
+        doc.createNewObject(className, context);
+        xwiki.saveDocument(doc, olddoc, context);
+
+        // forward to edit
+        String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+        response.sendRedirect(redirect);
+        return null;
+    }
+
+    private ActionForward executePropertyAdd(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+        String propName = ((PropAddForm) form).getPropName();
+        String propType = ((PropAddForm) form).getPropType();
+        BaseClass bclass = doc.getxWikiClass();
+        bclass.setName(doc.getFullName());
+        if (bclass.get(propName)!=null) {
+            // TODO: handle the error of the property already existing when we want to add a class property
+        } else {
+            MetaClass mclass = xwiki.getMetaclass();
+            PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
+            if (pmclass!=null) {
+                PropertyClass pclass = (PropertyClass) pmclass.newObject();
+                pclass.setObject(bclass);
+                pclass.setName(propName);
+                pclass.setPrettyName(propName);
+                bclass.put(propName, pclass);
+                xwiki.saveDocument(doc, olddoc, context);
+            }
+        }
+        // forward to edit
+        String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+        response.sendRedirect(redirect);
+        return null;
+    }
+
+    private ActionForward executePropertyUpdate(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+
+        // Prepare new class
+        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass2 = (BaseClass)bclass.clone();
+        bclass2.setFields(new HashMap());
+
+        doc.setxWikiClass(bclass2);
+
+        // Prepare a Map for field renames
+        Map fieldsToRename = new HashMap();
+
+        Iterator it = bclass.getFieldList().iterator();
+        while (it.hasNext()) {
+            PropertyClass property = (PropertyClass)it.next();
+            PropertyClass origproperty = (PropertyClass) property.clone();
+            String name = property.getName();
+            Map map = ((EditForm)form).getObject(name);
+            property.getxWikiClass(context).fromMap(map, property);
+            String newname = property.getName();
+            bclass2.addField(newname, property);
+            if (!newname.equals(name)) {
+                fieldsToRename.put(name, newname);
+                bclass2.addPropertyForRemoval(origproperty);
+            }
+        }
+        doc.renameProperties(bclass.getName(), fieldsToRename);
+        xwiki.saveDocument(doc, olddoc, context);
+
+        // We need to load all documents that use this property and rename it
+        if (fieldsToRename.size()>0) {
+            List list = xwiki.searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='" +
+                    bclass.getName() +  "' and CONCAT(XWD_WEB,'.',XWD_NAME)<> '" + bclass.getName() + "'", context);
+            for (int i=0;i<list.size();i++) {
+                XWikiDocInterface doc2 = xwiki.getDocument((String)list.get(i), context);
+                doc2.renameProperties(bclass.getName(), fieldsToRename);
+                xwiki.saveDocument(doc2, doc2, context);
+            }
+        }
+        xwiki.flushCache();
+        // forward to edit
+        String redirect = getRedirect(request, doc.getActionUrl("edit",context));
+        response.sendRedirect(redirect);
+        return null;
+    }
+
+    private ActionForward executeDelete(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        ActionForward result = null;
+        String confirm = request.getParameter("confirm");
+        if ((confirm!=null)&&(confirm.equals("1"))) {
+            xwiki.deleteDocument(doc, context);
+            result = parseTemplate(getPage(request, "deleted"), context);
+        } else {
+            String redirect = getRedirect(request, null);
+            if (redirect==null)
+                result = parseTemplate(getPage(request, "delete"), context);
+            else
+                response.sendRedirect(redirect);
+        }
+        return result;
+    }
+
+    private ActionForward executeSave(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
+        String username = context.getUser();
+        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+        doc.readFromForm((EditForm)form, context);
+
+        // TODO: handle Author
+        doc.setAuthor(username);
+
+        xwiki.saveDocument(doc, olddoc, context);
+
+        // forward to view
+        String redirect = getRedirect(request, doc.getActionUrl("view",context));
+        response.sendRedirect(redirect);
+        return null;
+    }
+
+    private ActionForward executePreview(XWikiDocInterface doc, ActionForm form, HttpServletRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException, IOException {
+        XWikiDocInterface doc2 = (XWikiDocInterface)doc.clone();
+        context.put("doc", doc2);
+        vcontext.put("doc", new Document(doc2, context));
+        vcontext.put("cdoc",  vcontext.get("doc"));
+        doc2.readFromForm((EditForm)form, context);
+        // forward to view template
+        String page = getPage(request, "preview");
+        return parseTemplate(page, context);
+    }
+
+    private ActionForward executeEdit(XWikiDocInterface doc, ActionForm form, HttpServletRequest request, XWikiContext context) throws XWikiException, IOException {
+        PrepareEditForm peform = (PrepareEditForm) form;
+        String parent = peform.getParent();
+        if (parent!=null)
+            doc.setParent(parent);
+
+        doc.readFromTemplateForEdit(peform, context);
+
+        // forward to edit template
+        String page = getPage(request, "edit");
+        return parseTemplate(page, context);
+    }
+
+    private ActionForward executeInline(XWikiDocInterface doc, ActionForm form, HttpServletRequest request, XWikiContext context) throws XWikiException, IOException {
+        PrepareEditForm peform = (PrepareEditForm) form;
+        String parent = peform.getParent();
+        if (parent!=null)
+            doc.setParent(parent);
+
+        doc.readFromTemplateForEdit(peform, context);
+
+        // Set display context to 'view'
+        context.put("display", "edit");
+
+        // forward to inline template
+        String page = getPage(request, "inline");
+        return parseTemplate(page, context);
+    }
+
+    private ActionForward executeView(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException, IOException {
+        String rev = request.getParameter("rev");
+        if (rev!=null) {
+            // Let's get the revision
+            doc = xwiki.getDocument(doc, rev, context);
+            context.put("doc", doc);
+            // We need to have the old version doc in the context
+            vcontext.put("cdoc", new Document(doc, context));
+        }
+        // forward to view template
+        String page = getPage(request, "view");
+        return parseTemplate(page, context);
+    }
+
 }
 
-    

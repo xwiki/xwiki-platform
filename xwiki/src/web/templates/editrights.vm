@@ -6,7 +6,7 @@
 #set ($classname = "XWiki.XWikiRights")
 #end
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
-#set( $redirect = "$request.getRequestURI()?$request.getQueryString()")
+#set( $redirect = $xwiki.getRequestURL())
 <script type="text/javascript">
 var currentfield = "";
 function show(fieldname) {

@@ -282,6 +282,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String getActionUrl(String action, XWikiContext context) {
         StringBuffer url = new StringBuffer();
+
+
         url.append(context.getBaseUrl());
         url.append(action);
         url.append("/");

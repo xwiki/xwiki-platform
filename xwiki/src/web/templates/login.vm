@@ -1,0 +1,34 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div id="xwikiwebusermenu">
+<span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<form id="loginForm" action="" method="POST">
+<table border="0">
+<tr><td>Username:</td>
+<td><input type="text" name="j_username" value="" /></td>
+</tr>
+<tr><td>Password:</td>
+<td><input type="password" name="j_password" value="" /></td>
+</tr>
+<tr><td>Remember Me</td>
+<td><input type="checkbox" name="j_rememberme" value="true" /></td>
+</tr>
+<tr>
+<td colspan="2"><input type="Submit" value="Log-in"/></td>
+</tr>
+</table>
+</div>
+<div id="xwikinav_footer">
+</div>
+#template("footer.vm")

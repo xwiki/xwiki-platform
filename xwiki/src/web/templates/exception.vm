@@ -1,0 +1,20 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div id="xwikiwebusermenu">
+<span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+<div id="xwikicontent">
+A problem occured while trying to server your request. Please contact the support if this happens again.
+<br /><br />
+Detailed information:<br />
+<pre>
+$xwiki.printStrackTrace($exp)
+</pre>
+</div>
+<div id="xwikinav_footer">
+</div>
+#template("footer.vm")

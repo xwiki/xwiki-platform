@@ -7,11 +7,11 @@
 
 <div id="xwikititle">
 #if ($doc.parent.length() > 0)
-<h1>$parent &gt; $!title</h1>
+<h1>$parent &gt; $!headertitle</h1>
 #else
-<h1>$!title</h1>
+<h1>$!headertitle</h1>
 #end
-   <h2>$!subtitle</h2>
+   <h2>$!headersubtitle</h2>
 </div>
 
 <div id="xwikilinks">
@@ -19,7 +19,14 @@
     $!xwiki.getXWikiPreference("menu")
   </div>
   <div id="xwikiversion">
-    <a href="../../view/Main/WebHome">XWiki Version $xwiki.version</a>
+    <a href="../../view/Main/WebHome">
+#set( $version = $!xwiki.getWebPreference("version"))
+#if ( $version != "")
+$xwiki.parseContent($version)
+#else
+XWiki Version $xwiki.version
+#end
+    </a>
   </div>
 </div>
 

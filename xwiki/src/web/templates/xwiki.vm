@@ -8,7 +8,7 @@
 #set($downloadurl=$doc.getActionUrl("download"))
 #set($delattachmenturl=$doc.getActionUrl("delattachment"))
 #set($parent="<a href='$parenturl'>${doc.parent}</a>")
-#set($title="<a href='$viewurl'>${doc.fullName}</a>")
+#set($headertitle="<a href='$viewurl'>${doc.fullName}</a>")
 #set($skin=$xwiki.getSkin())
 #set($copyright=$xwiki.getWebCopyright())
 

@@ -62,6 +62,9 @@
         name="start"
         path="/view/Main/WebHome"/>
 
+     <forward name="login" path="/templates/login.vm"/>
+     <forward name="accessdenied" path="/templates/accessdenied.vm"/>
+
   </global-forwards>
 
 
@@ -177,6 +180,25 @@
           type="com.xpn.xwiki.web.ViewEditAction"
           name="skin"
           scope="request">
+      </action>
+
+      <action path="/login/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="login"
+          scope="request">
+      </action>
+
+      <action path="/loginerror/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="loginerror"
+          scope="request">
+      </action>
+
+      <action path="/logout/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="logout"
+          scope="request">
+         <forward name="logout" path="/templates/logout.vm"/>
       </action>
 
   </action-mappings>

@@ -69,7 +69,7 @@ html, body {
     position: relative;
     display: block;
     float: left;
-    margin-top: 5px;
+    top: 10px;
     margin: 0px;
     margin-left: 5px;
     padding: 0px;
@@ -136,7 +136,7 @@ html, body {
 
 
 #xwikicontent {
-   margin: 5px;
+   margin: 10px;
 }
 
 #xwikinav_footer {
@@ -205,7 +205,7 @@ html, body {
    padding-bottom: 10px;
    margin-top: 10px;
    margin-bottom: 10px;
-   margin-right: 5px;
+   margin-right: 10px;
    width: 150px;
    z-index: 1;
    background-color: white;
@@ -224,6 +224,17 @@ html, body {
    font-size: 10px;
    font-family: verdana;
    width: 140px;
+}
+
+#xwikinav_loginbutton {
+    display: block;
+    position: absolute;
+    right: 170px;
+    top: 15px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 10px;
+    font-family: verdana;
 }
 
 #xwikiusermenulinks, #xwikipagemenulinks, #xwikiwebmenulinks {

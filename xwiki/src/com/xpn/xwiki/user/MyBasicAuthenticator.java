@@ -23,6 +23,7 @@
 package com.xpn.xwiki.user;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
@@ -39,8 +40,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
     }
 
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
-        Principal principal = null;
-
         if (request.getUserPrincipal() == null) {
             // attempt to dig out authentication info only if the user has not yet been authenticated
             String authorizationHeader = request.getHeader("Authorization");
@@ -50,35 +49,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
                 String username = parseUsername(decoded);
                 String password = parsePassword(decoded);
 
-                // If we have the context then we are using direct mode
-                // then we should specify the database
-                // This is needed for virtual mode to work
-                if (context!=null) {
-                    String susername = username;
-                    if (username.indexOf(".")==-1)
-                        susername = "XWiki." + username;
-
-                    if (context.isVirtual()) {
-                        String db = context.getDatabase();
-                        try {
-                            // First we check in the main database
-                            try {
-                                context.setDatabase(context.getWiki().getDatabase());
-                                if (context.getWiki().checkPassword(susername, password, context))
-                                    principal = new SimplePrincipal(username);
-                            } catch (Exception e) {}
-                        } finally {
-                            context.setDatabase(db);
-                        }
-                    }
-
-                    if (principal==null) {
-                        if (context.getWiki().checkPassword(susername, password, context))
-                            principal = new SimplePrincipal(username);
-                    }
-                } else {
-                    principal = realm.authenticate(username, password);
-                }
+                Principal principal = authenticate(username, password, context);
 
                 if (principal != null) {
                     // login successful
@@ -145,5 +116,41 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
             // Decode and parse the authorization credentials
             return new String(base64Helper.decodeBase64(authorization.getBytes()));
         }
+    }
+
+
+   protected Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
+        Principal principal = null;
+        // If we have the context then we are using direct mode
+        // then we should specify the database
+        // This is needed for virtual mode to work
+        if (context!=null) {
+            String susername = username;
+            if (username.indexOf(".")==-1)
+                susername = "XWiki." + username;
+
+            if (context.isVirtual()) {
+                String db = context.getDatabase();
+                try {
+                    // First we check in the main database
+                    try {
+                        context.setDatabase(context.getWiki().getDatabase());
+                        if (context.getWiki().checkPassword(susername, password, context))
+                            principal = new SimplePrincipal(username);
+                    } catch (Exception e) {}
+                } finally {
+                    context.setDatabase(db);
+                }
+            }
+
+            if (principal==null) {
+                if (context.getWiki().checkPassword(susername, password, context))
+                    principal = new SimplePrincipal(username);
+            }
+        }
+        else {
+            principal = realm.authenticate(username, password);
+        }
+        return principal;
     }
 }

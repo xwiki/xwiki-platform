@@ -54,15 +54,20 @@ import org.apache.ecs.xhtml.textarea;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 import org.securityfilter.authenticator.Authenticator;
+import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.filter.URLPatternMatcher;
 import org.securityfilter.realm.SecurityRealmInterface;
 
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.FilterConfig;
 import java.io.File;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -70,7 +75,6 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.util.Date;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -93,7 +97,7 @@ public class XWiki implements XWikiNotificationInterface {
 
     private SecurityManager defaultSecurityManager;
     private SecurityManager secureSecurityManager;
-
+    private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
     public static XWiki getXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = "WEB-INF/xwiki.cfg";
@@ -151,7 +155,12 @@ public class XWiki implements XWikiNotificationInterface {
         StringBuffer requestURL = request.getRequestURL();
         if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
             requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
-        return requestURL.toString();
+
+        String qs = request.getQueryString();
+        if ((qs!=null)&&(!qs.equals("")))
+            return requestURL.toString() + "?" + qs;
+        else
+            return requestURL.toString();
     }
 
     private static String findWikiServer(String host, XWikiContext context) {
@@ -547,10 +556,10 @@ public class XWiki implements XWikiNotificationInterface {
         } catch (Exception e) {}
 
         try {
-            String path = "/skins/" + skin + "/" + filename;
+            String path = "skins/" + skin + "/" + filename;
             File file = new File(getRealPath(path));
             if (file.exists())
-                return "../../.." + path;
+                return context.getBaseUrl() + "../" + path;
         } catch (Exception e) {}
 
         try {
@@ -560,7 +569,7 @@ public class XWiki implements XWikiNotificationInterface {
                 if (object!=null) {
                     String content = object.getStringValue(filename);
                     if ((content!=null)&&(!content.equals(""))) {
-                        return "../../skin/" + StringUtils.replace(skin, ".","/", 1) + "/" + filename;
+                        return context.getBaseUrl() + "skin/" + StringUtils.replace(skin, ".","/", 1) + "/" + filename;
                     }
                 }
 
@@ -918,13 +927,74 @@ public class XWiki implements XWikiNotificationInterface {
             return authenticator;
 
         try {
-            authenticator = new MyBasicAuthenticator();
-            realm = new XWikiRealmAdapter(this);
-            SecurityConfig sconfig = new SecurityConfig(false);
-            sconfig.setRealmName("XWiki");
-            sconfig.addRealm(realm);
-            sconfig.setAuthMethod("BASIC");
-            authenticator.init(null, sconfig);
+            if ("basic".equals(Param("xwiki.authentication"))) {
+                authenticator = new MyBasicAuthenticator();
+                realm = new XWikiRealmAdapter(this);
+                SecurityConfig sconfig = new SecurityConfig(false);
+                sconfig.addRealm(realm);
+                sconfig.setAuthMethod("BASIC");
+                if (Param("xwiki.authentication.realname")!=null)
+                    sconfig.setRealmName(Param("xwiki.authentication.realname"));
+                else
+                    sconfig.setRealmName("XWiki");
+                authenticator.init(null, sconfig);
+            } else {
+                authenticator =  new MyFormAuthenticator();
+                realm = new XWikiRealmAdapter(this);
+                SecurityConfig sconfig = new SecurityConfig(false);
+                sconfig.setAuthMethod("FORM");
+                sconfig.addRealm(realm);
+                if (Param("xwiki.authentication.realname")!=null)
+                    sconfig.setRealmName(Param("xwiki.authentication.realname"));
+                else
+                    sconfig.setRealmName("XWiki");
+                if (Param("xwiki.authentication.defaultpage")!=null)
+                    sconfig.setDefaultPage(Param("xwiki.authentication.defaultpage"));
+                else
+                    sconfig.setDefaultPage("/bin/view/Main/WebHome");
+                if (Param("xwiki.authentication.loginpage")!=null)
+                    sconfig.setLoginPage(Param("xwiki.authentication.loginpage"));
+                else
+                    sconfig.setLoginPage("/bin/login/XWiki/XWikiLogin");
+                if (Param("xwiki.authentication.logoutpage")!=null)
+                    sconfig.setLogoutPage(Param("xwiki.authentication.logoutpage"));
+                else
+                    sconfig.setLogoutPage("/bin/logout/XWiki/XWikiLogout");
+                if (Param("xwiki.authentication.errorpage")!=null)
+                    sconfig.setErrorPage(Param("xwiki.authentication.errorpage"));
+                else
+                    sconfig.setErrorPage("/bin/loginerror/XWiki/XWikiLoginError");
+
+
+                MyPersistentLoginManager persistent = new MyPersistentLoginManager();
+                if (Param("xwiki.authentication.cookiepath")!=null)
+                    persistent.setCookieLife(Param("xwiki.authentication.cookiepath"));
+                if (Param("xwiki.authentication.cookielife")!=null)
+                    persistent.setCookieLife(Param("xwiki.authentication.cookielife"));
+                if (Param("xwiki.authentication.protection")!=null)
+                    persistent.setProtection(Param("xwiki.authentication.protection"));
+                if (Param("xwiki.authentication.useip")!=null)
+                    persistent.setUseIP(Param("xwiki.authentication.useip"));
+                if (Param("xwiki.authentication.encryptionalgorithm")!=null)
+                    persistent.setEncryptionAlgorithm(Param("xwiki.authentication.encryptionalgorithm"));
+                if (Param("xwiki.authentication.encryptionmode")!=null)
+                    persistent.setEncryptionMode(Param("xwiki.authentication.encryptionmode"));
+                if (Param("xwiki.authentication.encryptionpadding")!=null)
+                    persistent.setEncryptionPadding(Param("xwiki.authentication.encryptionpadding"));
+                if (Param("xwiki.authentication.validationKey")!=null)
+                    persistent.setValidationKey(Param("xwiki.authentication.validationKey"));
+                if (Param("xwiki.authentication.encryptionKey")!=null)
+                    persistent.setEncryptionKey(Param("xwiki.authentication.encryptionKey"));
+                sconfig.setPersistentLoginManager(persistent);
+
+                MyFilterConfig fconfig = new MyFilterConfig();
+                if (Param("xwiki.authentication.loginsubmitpage")!=null)
+                    fconfig.setInitParameter("loginSubmitPattern", Param("xwiki.authentication.loginsubmitpage"));
+                else
+                    fconfig.setInitParameter("loginSubmitPattern", "/bin/login/XWiki/XWikiLogin");
+                authenticator.init(fconfig, sconfig);
+            }
+
             return authenticator;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
@@ -956,13 +1026,26 @@ public class XWiki implements XWikiNotificationInterface {
         SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
                 realm, auth.getAuthMethod());
         try {
+
+            // Process login out (this only works with FORMS
+            if (auth.processLogout(wrappedRequest, response, urlPatternMatcher)) {
+                wrappedRequest.setUserPrincipal(null);
+                return null;
+            }
+
             // In case of virtual server we never use osuser
             // because the fact that it is "static" doesn't
             // allow to dynamically switch databases
             if ((Param("xwiki.virtual").equals("1"))
                     || !Param("xwiki.authentication.osuser").equals("1")) {
-                if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
-                    return null;
+                if (auth.getAuthMethod().equals("BASIC")) {
+                       if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
+                         return null;
+                    }
+                } else {
+                       if (((MyFormAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
+                         return null;
+                    }
                 }
             } else {
                 if (auth.processLogin(wrappedRequest, response)) {
@@ -988,7 +1071,7 @@ public class XWiki implements XWikiNotificationInterface {
         if (action.equals("view")||(action.equals("plain")||(action.equals("raw"))))
             right = "view";
 
-        if (action.equals("skin")||(action.equals("download")))
+        if (action.equals("skin")||(action.equals("download"))||(action.equals("logout"))||(action.equals("login")))
             right = "view";
 
 
@@ -1022,6 +1105,10 @@ public class XWiki implements XWikiNotificationInterface {
 
         // Save the user
         context.setUser(username);
+
+        // This correspond to the login/logout/loginerror documents
+        if (doc==null)
+            return true;
 
         // Check Rights
         try {
@@ -1225,4 +1312,14 @@ public class XWiki implements XWikiNotificationInterface {
         this.secureSecurityManager = secureSecurityManager;
     }
 
+    public String[] split(String str, String sep) {
+        return StringUtils.split(str, sep);
+    }
+
+    public String printStrackTrace(Throwable e) {
+        StringWriter strwriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(strwriter);
+        e.printStackTrace(writer);
+        return strwriter.toString();
+    }
 }

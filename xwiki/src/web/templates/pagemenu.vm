@@ -1,5 +1,5 @@
 <script type="text/javascript">
-var menustatus = "none";
+var menustatus = "block";
 function setmenustyle(style) {
  var parent = document.getElementById("xwikinav_sidebar");
  var list = parent.getElementsByTagName("div");
@@ -21,23 +21,34 @@ function showhidemenu() {
 <a href="$viewurl?rev=$rev">$rev</a><span class="xwikisep"> | </span>
 #end
 #end
-<div id="xwikinav_sidebar">
+#if ($context.getUser().equals("XWiki.XWikiGuest"))
+#set( $displaylog = "block")
+#set( $displaysidebar = "none")
+#else
+#set( $displaylog = "block")
+#set( $displaysidebar = "block")
+#end
+<div id="xwikinav_loginbutton" style="display: ${displaylog};">
+#set( $logredir = $xwiki.getRequestURL())
+#if ($context.getUser().equals("XWiki.XWikiGuest"))
+<a href="../../login/XWiki/XWikiLogin">$msg.get("login")</a>
+#else
+<a href="../../logout/XWiki/XWikiLogout">$msg.get("logout")</a>
+#end
+</div>
+<div id="xwikinav_sidebar" style="display: ${displaysidebar};">
 <div id="xwikinav_sidebarbutton"><a href="" onclick="showhidemenu(); return false;">Menu</a></div>
 <div id="xwikiusermenutitle" class="xwikimenu">$msg.get("usermenu")
 </div>
-<div id="xwikiusermenulinks" class="xwikimenu">
-#if ($context.getUser().equals("XWiki.XWikiGuest"))
-<a href="../../view/XWiki/XWikiLogIn">$msg.get("login")</a><span class="xwikisep"> | </span>
+#set( $pagemenu = $xwiki.getWebPreference("pagemenu"))
+#if ( $pagemenu != "")
+$xwiki.parseContent($pagemenu)
 #else
-<a href="../../view/XWiki/XWikiLogOut">$msg.get("logout")</a><span class="xwikisep"> | </span>
+<div id="xwikiusermenulinks" class="xwikimenu">
 #set ($user = $context.getUser())
 #set ($userdoc = $xwiki.getDocument($user))
 <a href="../../view/${userdoc.web}/${userdoc.name}">$msg.get("homepage")</a><span class="xwikisep"> | </span>
-#end
-<a href="#" onclick="setActiveStyleSheet('default'); return false;">$msg.get("defaultstyle")</a>
-<a href="#" onclick="setActiveStyleSheet('Alternate StyleSheet 1'); return false;">$msg.get("altstyle1")</a>
-<a href="#" onclick="setActiveStyleSheet('Alternate StyleSheet 2'); return false;">$msg.get("altstyle2")</a>
-<a href="#" onclick="setActiveStyleSheet('Alternate StyleSheet 3'); return false;">$msg.get("altstyle3")</a>
+#template("stylesheetlinks.vm")
 </div>
 <div id="xwikipagemenutitle" class="xwikimenu">$msg.get("pagemenu")</div>
 <div id="xwikipagemenulinks" class="xwikimenu">
@@ -53,12 +64,13 @@ function showhidemenu() {
 </div>
 <div id="xwikiwebmenutitle" class="xwikimenu">$msg.get("webmenu")</div>
 <div id="xwikiwebmenulinks" class="xwikimenu">
-<a href="WebHome">$msg.get("space")</a><span class="xwikisep"> | </span>
+<a href="../../view/${doc.web}/WebHome">$msg.get("space")</a><span class="xwikisep"> | </span>
 <a href="../../view/${doc.web}/WebPreferences">$msg.get("webprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/${doc.web}/WebPreferences?xpage=editrights&global=1">$msg.get("webrights")</a><span class="xwikisep"> | </span>
 <a href="../../view/XWiki/XWikiPreferences">$msg.get("xwikiprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/XWiki/XWikiPreferences?xpage=editrights&global=1">$msg.get("xwikirights")</a><span class="xwikisep"> | </span>
 </div>
+#end
 </div>
 <script type="text/javascript">
  setmenustyle(menustatus);

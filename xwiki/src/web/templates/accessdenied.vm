@@ -1,0 +1,15 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div id="xwikinav_header">
+<div id="xwikiwebusermenu">
+<span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+$!xwiki.getWebPreference("menu")
+</div>
+</div>
+<div id="xwikicontent">
+You are not allowed to view this document or perform this action.
+</div>
+<div id="xwikinav_footer">
+</div>
+#template("footer.vm")

@@ -1,7 +1,7 @@
 #template("editheader.vm")
 <div id="xwikicontent">
 #set( $classes = $doc.getxWikiClasses())
-#set( $redirect = "$request.getRequestURI()?$request.getQueryString()")
+#set( $redirect = $xwiki.getRequestURL())
 <script type="text/javascript">
 var currentfield = "";
 function show(fieldname) {

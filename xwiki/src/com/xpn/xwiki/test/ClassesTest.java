@@ -5,6 +5,7 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -54,6 +55,7 @@ public class ClassesTest extends TestCase {
         assertEquals("Float number not supported", property.getValue(), new Float("10.01"));
     }
 
+
     public void testString() {
         StringClass pclass = new StringClass();
         StringProperty property;
@@ -61,7 +63,50 @@ public class ClassesTest extends TestCase {
         assertEquals("String not supported", property.getValue(), new String("Hello"));
     }
 
-    public void testObject() throws XWikiException {
+    public void testPassword() {
+        PasswordClass pclass = new PasswordClass();
+        StringProperty property;
+        property = (StringProperty)pclass.fromString("Hello");
+        assertEquals("Password not supported", property.getValue(), new String("Hello"));
+    }
+
+    public void testTextArea() {
+        TextAreaClass pclass = new TextAreaClass();
+        StringProperty property;
+        property = (StringProperty)pclass.fromString("Hello1\nHello2\nHello3\n");
+        assertEquals("TextArea not supported", property.getValue(), new String("Hello1\nHello2\nHello3\n"));
+    }
+
+    public void testDisplayer(String cname, BaseObject obj, String viewexpected, String editexpected) {
+      XWikiContext context = new XWikiContext();
+      StringBuffer result = new StringBuffer();
+      PropertyClass pclass = (PropertyClass)obj.getxWikiClass().get(cname);
+      pclass.displayView(result,cname, "", obj, context);
+      assertEquals("Class " + cname + " view displayer not correct:\n" +
+                    "Expected: " + viewexpected + "\nResult: " + result,
+                    result.toString().toLowerCase(),viewexpected.toLowerCase());
+
+      result = new StringBuffer();
+      pclass.displayEdit(result,cname, "", obj, context);
+      assertTrue("Class " + cname + " edit displayer not correct" +
+                 "\nExpected: " + editexpected + "\nResult: " + result,
+                 result.toString().toLowerCase().indexOf(editexpected.toLowerCase())!=-1);
+
+      pclass.displayHidden(result,cname, "", obj, context);
+      pclass.displaySearch(result,cname, "", obj, context);
+    }
+
+    public void testNumberDisplayers() throws XWikiException {
+        BaseObject obj = prepareObject();
+        testDisplayer("age", obj, "33", "value=\'33\'");
+        testDisplayer("first_name", obj, "Ludovic", "value=\'Ludovic\'");
+        testDisplayer("last_name", obj, "von Dubost", "value=\'von Dubost\'");
+        testDisplayer("password", obj, "********", "value=\'********\'");
+        testDisplayer("comment", obj, "Hello1\nHello2\nHello3\n", "textarea");
+    }
+
+
+    public BaseObject prepareObject() throws XWikiException {
         BaseClass wclass = new BaseClass();
         StringClass first_name_class = new StringClass();
         first_name_class.setSize(80);
@@ -70,14 +115,30 @@ public class ClassesTest extends TestCase {
         NumberClass age_class = new NumberClass();
         age_class.setSize(5);
         age_class.setNumberType("integer");
+        PasswordClass passwd_class = new PasswordClass();
+        passwd_class.setSize(10);
+        TextAreaClass comment_class = new TextAreaClass();
+        comment_class.setSize(80);
+        comment_class.setRows(10);
+
         wclass.put("first_name", first_name_class);
         wclass.put("last_name", last_name_class);
         wclass.put("age", age_class);
+        wclass.put("password", passwd_class);
+        wclass.put("comment", comment_class);
+
         BaseObject object = new BaseObject();
         object.setxWikiClass(wclass);
         object.put("first_name", first_name_class.fromString("Ludovic"));
-        object.put("last_name", last_name_class.fromString("Dubost"));
+        object.put("last_name", last_name_class.fromString("Von Dubost"));
         object.put("age", last_name_class.fromString("33"));
+        object.put("password", passwd_class.fromString("sesame"));
+        object.put("comment",comment_class.fromString("Hello1\nHello2\nHello3\n"));
+        return object;
+    }
+
+    public void testObject() throws XWikiException {
+        BaseObject object = prepareObject();
     }
 
 }

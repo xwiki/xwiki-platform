@@ -185,6 +185,18 @@
         <root url="file://C:/dev/java/apache-ant-1.6.0/src/main" />
       </SOURCES>
     </library>
+    <library name="OSUser">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/oscore.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/osuser.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/osuser/dist/docs/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/osuser/src/java" />
+      </SOURCES>
+    </library>
   </component>
   <component name="uidesigner-configuration">
     <option name="INSTRUMENT_CLASSES" value="true" />

@@ -41,6 +41,11 @@ public class MetaClass extends BaseClass {
         safeput(numberclass.getName(), numberclass);
         StringMetaClass stringclass = new StringMetaClass();
         safeput(stringclass.getName(), stringclass);
+        TextAreaMetaClass textareaclass = new TextAreaMetaClass();
+        safeput(textareaclass.getName(), textareaclass);
+        PasswordMetaClass passwdclass = new PasswordMetaClass();
+        safeput(passwdclass.getName(), passwdclass);
+
     }
 
     public void safeput(String name, ElementInterface property) {

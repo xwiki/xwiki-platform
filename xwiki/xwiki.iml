@@ -26,6 +26,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="OSUser" level="project" />
   </component>
   <component name="WebModuleBuildComponent">
     <option name="JAR_PATH" value="$MODULE_DIR$/release/xwiki.war" />
@@ -47,6 +48,12 @@
           <option name="value" value="3" />
         </key>
         <value predicate="higherLibrary" level="project" libraryName="Hibernate" />
+      </pairs>
+      <pairs>
+        <key>
+          <option name="value" value="10" />
+        </key>
+        <value predicate="higherLibrary" level="project" libraryName="OSUser" />
       </pairs>
       <pairs>
         <key>
@@ -113,6 +120,15 @@
         <value>
           <option name="copy" value="false" />
           <option name="URI" value="/WEB-INF/lib" />
+        </value>
+      </info>
+      <info>
+        <key>
+          <option name="value" value="10" />
+        </key>
+        <value>
+          <option name="copy" value="false" />
+          <option name="URI" value="" />
         </value>
       </info>
       <info>

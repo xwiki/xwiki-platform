@@ -575,7 +575,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
             return result.toString();
         }
         catch (Exception e) {
-            return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
+            return "";
+            // return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
         }
     }
 

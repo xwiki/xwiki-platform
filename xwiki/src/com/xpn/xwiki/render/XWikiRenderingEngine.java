@@ -40,7 +40,7 @@ public class XWikiRenderingEngine {
       addRenderer(new XWikiPluginRenderer());
       if (xwiki.Param("xwiki.perl.active", "1").equals("1")) {
           addRenderer(new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
-                        xwiki.Param("xwiki.perl.pluginspath"),
+                        xwiki.ParamAsRealPath("xwiki.perl.pluginspath"),
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0));
       }
       renderers.add(new XWikiWikiBaseRenderer());

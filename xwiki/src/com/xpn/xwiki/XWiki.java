@@ -1328,7 +1328,7 @@ public class XWiki implements XWikiNotificationInterface {
         if (user==null)
             username = "XWiki.XWikiGuest";
         else
-            username = "XWiki." + user.getName();
+            username = user.getName();
 
         // Save the user
         context.setUser(username);

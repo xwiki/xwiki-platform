@@ -696,8 +696,14 @@ public class ViewEditAction extends XWikiAction
 
         String language = context.getWiki().getLanguagePreference(context);
         String languagefromrequest = context.getRequest().getParameter("language");
+        String languagetoedit = ((languagefromrequest==null)||(languagefromrequest.equals(""))) ?
+                                    language : languagefromrequest;
+        if ((languagetoedit==null)||(languagetoedit.equals("")))
+            languagetoedit = "default";
+        if (doc.isNew()||(doc.getDefaultLanguage().equals(languagetoedit)))
+            languagetoedit = "default";
 
-        if ((doc.isNew())||("default".equals(languagefromrequest))) {
+        if (languagetoedit.equals("default")) {
                // In this case the created document is going to be the default document
                tdoc = doc;
                context.put("tdoc", doc);
@@ -709,7 +715,7 @@ public class ViewEditAction extends XWikiAction
         } else {
             // If the translated doc object is the same as the doc object
             // this means the translated doc did not exists so we need to create it
-            if (tdoc==doc) {
+            if ((tdoc==doc)) {
                 tdoc = new XWikiSimpleDoc(doc.getWeb(), doc.getName());
                 tdoc.setLanguage(language);
                 tdoc.setContent(doc.getContent());

@@ -14,7 +14,7 @@ $message
 #end
 <div id="xwikicontent">
 <form id="loginForm" action="" method="POST">
-<input type="text" name="xredirect" value="$!request.getParameter("xredirect")" />
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <table border="0">
 <tr><td>Username:</td>
 <td><input type="text" name="j_username" value="" /></td>

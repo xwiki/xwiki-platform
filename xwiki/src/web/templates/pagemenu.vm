@@ -31,9 +31,9 @@ function showhidemenu() {
 <div id="xwikinav_loginbutton" style="display: ${displaylog};">
 #set( $logredir = $xwiki.getRequestURL())
 #if ($context.getUser().equals("XWiki.XWikiGuest"))
-<a href="../../login/XWiki/XWikiLogin">$msg.get("login")</a>
+<a href="../../login/XWiki/XWikiLogin?xredirect=$logredir">$msg.get("login")</a>
 #else
-<a href="../../logout/XWiki/XWikiLogout">$msg.get("logout")</a>
+<a href="../../logout/XWiki/XWikiLogout?xredirect=$logredir">$msg.get("logout")</a>
 #end
 </div>
 <div id="xwikinav_sidebar" style="display: ${displaysidebar};">

@@ -265,4 +265,8 @@ public class Document extends Api {
     public List getIncludedPages() {
         return doc.getIncludedPages(context);
     }
+
+    public Attachment getAttachment(String filename) {
+        return new Attachment(this, doc.getAttachment(filename), context);
+    }
 }

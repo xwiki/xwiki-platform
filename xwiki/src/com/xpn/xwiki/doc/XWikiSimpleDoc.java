@@ -1105,5 +1105,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
           return pclass.displaySearch(pclass.getName(), prefix, object, context);
      }
 
-
+     public XWikiAttachment getAttachment(String filename) {
+        List list = getAttachmentList();
+        for (int i=0;i<list.size();i++) {
+           XWikiAttachment attach = (XWikiAttachment) list.get(i);
+           if (attach.getFilename().equals(filename)) {
+               return attach;
+           }
+        }
+        return null;
+    }
 }

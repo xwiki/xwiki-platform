@@ -104,6 +104,7 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST = 11001;
     public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 11002;
+    public static final int ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND = 11003;
 
 
     private int module;

@@ -326,12 +326,13 @@ public class ViewEditAction extends XWikiAction
               attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
             }
             else {
-                List list = doc.getAttachmentList();
-                for (int i=0;i<list.size();i++) {
-                   attachment = (XWikiAttachment) list.get(i);
-                   if (attachment.getFilename().equals(filename))
-                       break;
-                }
+                attachment = doc.getAttachment(filename);
+            }
+
+            if (attachment==null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                                         XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                                         "Attachment not found", null);
             }
 
             // Choose the right content type
@@ -390,13 +391,8 @@ public class ViewEditAction extends XWikiAction
 
 
             // Read XWikiAttachment
-            XWikiAttachment attachment = null;
-            List list = doc.getAttachmentList();
-            for (int i=0;i<list.size();i++) {
-                XWikiAttachment attach = (XWikiAttachment) list.get(i);
-                if (attach.getFilename().equals(filename))
-                    attachment = attach;
-            }
+            XWikiAttachment attachment = doc.getAttachment(filename);
+
 
             if (attachment==null) {
              attachment = new XWikiAttachment();
@@ -429,12 +425,7 @@ public class ViewEditAction extends XWikiAction
               attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
             }
             else {
-                List list = doc.getAttachmentList();
-                for (int i=0;i<list.size();i++) {
-                   attachment = (XWikiAttachment) list.get(i);
-                   if (attachment.getFilename().equals(filename))
-                       break;
-                }
+                attachment = doc.getAttachment(filename);
             }
 
             doc.deleteAttachment(attachment, context);
@@ -461,22 +452,14 @@ public class ViewEditAction extends XWikiAction
                     response.getWriter().write(content);
                 }
                 else {
-                  XWikiAttachment attachment = null;
-                  List list = doc.getAttachmentList();
-                  for (int i=0;i<list.size();i++) {
-                    XWikiAttachment attachment2 = (XWikiAttachment) list.get(i);
-                    if (attachment2.getFilename().equals(filename)) {
-                       attachment = attachment2;
-                       break;
-                    }
-                  }
-                  if (attachment!=null) {
+                    XWikiAttachment attachment = doc.getAttachment(filename);
+                    if (attachment!=null) {
                       // Sending the content of the attachment
                       byte[] data = attachment.getContent(context);
                       response.setContentType(servlet.getServletContext().getMimeType(filename));
                       response.setContentLength(data.length);
                       response.getOutputStream().write(data);
-                    } else {
+                     } else {
                       // In this case we redirect to the default template file
                       response.sendRedirect(xwiki.getBase(context) + "../skins/default/" + filename);
                   }
@@ -486,6 +469,8 @@ public class ViewEditAction extends XWikiAction
 
         return null;
     }
+
+
 
     private String getFileName(List filelist, String name) {
         DefaultFileItem  fileitem = null;

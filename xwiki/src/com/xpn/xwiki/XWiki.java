@@ -557,11 +557,7 @@ public class XWiki implements XWikiNotificationInterface {
                 XWikiAttachment attachment = null;
                 List list = doc.getAttachmentList();
                 String shortname = filename.substring(0, filename.indexOf(".")+1);
-                for (int i=0;i<list.size();i++) {
-                    XWikiAttachment attach = (XWikiAttachment) list.get(i);
-                    if (attach.getFilename().startsWith(shortname))
-                        attachment = attach;
-                }
+                attachment = doc.getAttachment(shortname);
 
                 if (attachment!=null) {
                     return "../../skin/" + StringUtils.replace(skin, ".","/", 1) + "/" + attachment.getFilename();

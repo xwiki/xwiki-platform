@@ -122,9 +122,9 @@ public class RenderTest extends TestCase {
                 "Hello 1\n<hr />\nHello 2", true, context);
         // Test heading
         renderTest(wikibase, "Hello 1\n---+ Title\nHello 2",
-                "<h1>", false, context);
+                "<h1 id=\"Title\" >", false, context);
         renderTest(wikibase, "Hello 1\n---++ Title\nHello 2",
-                "<h2>", false, context);
+                "<h2 id=\"Title\" >", false, context);
     }
 
     public void testWikiBaseFormattingRenderer() throws XWikiException {
@@ -170,7 +170,7 @@ public class RenderTest extends TestCase {
         renderTest(wikibase, "This is a text with<pre> *strong* </pre>text\n",
                 "This is a text with *strong* text", false, context);
         renderTest(wikibase, "---+ Title <pre>\n*strong*\n</pre>",
-                 "<h1>Title \n*strong*\n</h1>", false, context);
+                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
         renderTest(wikibase, "   * Item <pre>*strong*</pre>",
                  "<li> Item *strong*</li>", false, context);
         renderTest(wikibase, "This is a text with<pre> *one* </pre>and<pre> *two* </pre>items\n",
@@ -182,7 +182,7 @@ public class RenderTest extends TestCase {
         renderTest(wikibase, "This is a text with<PrE> *strong* </PrE>text\n",
                 "This is a text with *strong* text", false, context);
         renderTest(wikibase, "---+ Title <PrE>\n*strong*\n</PrE>",
-                 "<h1>Title \n*strong*\n</h1>", false, context);
+                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
         renderTest(wikibase, "   * Item <PrE>*strong*</PrE>",
                  "<li> Item *strong*</li>", false, context);
         renderTest(wikibase, "This is a text with<PrE> *one* </PrE>and<PrE> *two* </PrE>items\n",

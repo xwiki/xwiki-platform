@@ -8,7 +8,9 @@ import org.apache.struts.action.ActionServlet;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.File;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -51,6 +53,7 @@ import com.xpn.xwiki.objects.StringProperty;
 public class ViewEditTest extends ServletTestCase {
 
     private static String hibpath = "hibernate-test.cfg.xml";
+    private static String realhibpath = "";
 
     public void setUp() {};
     public void cleanUp() {};
@@ -92,17 +95,19 @@ public class ViewEditTest extends ServletTestCase {
 
 
     public String getHibpath() {
+        String path = (new File(".")).getAbsolutePath();
+
         if (config==null)
             return hibpath;
 
         ServletContext context = config.getServletContext();
         if (context!=null)
-            return context.getRealPath(hibpath);
+            return context.getRealPath("WEB-INF/" + hibpath);
         else
             return hibpath;
     }
 
-    public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginViewNotOk(WebRequest webRequest) throws HibernateException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
         setUrl(webRequest, "view", "ViewNotOkTest");
@@ -113,7 +118,7 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Page should have generated an error", result.indexOf("No row")!=-1);
     }
 
-    public void testViewNotOk() throws IOException, ServletException {
+    public void testViewNotOk() throws IOException, ServletException, HibernateException {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);

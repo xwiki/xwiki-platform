@@ -191,6 +191,11 @@
     </target>
 
     <target name="servertest" depends="release, tests">
+        <copy todir="${tomcat4x.home}">
+            <fileset includes="hibernate-test.cfg.xml"
+                dir="${basedir}/test" />
+        </copy>
+
         <mkdir dir="${test.reports.dir}" />
 
         <cactus printsummary="yes" dir="${basedir}/test"

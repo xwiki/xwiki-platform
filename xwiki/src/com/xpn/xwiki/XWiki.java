@@ -34,6 +34,7 @@ import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -363,7 +364,7 @@ public class XWiki implements XWikiNotificationInterface {
                 return skin;
 
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-            skin = doc.getxWikiObject().get("skin").toString();
+            skin = ((BaseProperty)doc.getxWikiObject().get("skin")).getValue().toString();
             context.put("skin",skin);
             return skin;
         } catch (Exception e) {
@@ -375,7 +376,7 @@ public class XWiki implements XWikiNotificationInterface {
     public String getWebCopyright(XWikiContext context) {
         try {
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-            return doc.getxWikiObject().get("webcopyright").toString();
+            return ((BaseProperty)doc.getxWikiObject().get("webcopyright")).getValue().toString();
         } catch (Exception e) {
             return "Copyright 2003,2004 (c) Ludovic Dubost";
         }
@@ -384,7 +385,7 @@ public class XWiki implements XWikiNotificationInterface {
     public String getXWikiPreference(String prefname, XWikiContext context) {
         try {
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
-            return doc.getxWikiObject().get(prefname).toString();
+            return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
         } catch (Exception e) {
             return "";
         }
@@ -394,7 +395,7 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
             XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
-            return doc.getxWikiObject().get(prefname).toString();
+            return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
         } catch (Exception e) {
             return getXWikiPreference(prefname, context);
         }

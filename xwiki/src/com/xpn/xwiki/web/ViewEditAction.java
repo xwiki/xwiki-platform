@@ -299,7 +299,7 @@ public class ViewEditAction extends XWikiAction
             xwiki.saveDocument(doc, olddoc, context);
          }
         // forward to edit
-        response.sendRedirect(doc.getActionUrl("edit",context));
+        response.sendRedirect(doc.getActionUrl("attach",context));
         return null;
     }
 

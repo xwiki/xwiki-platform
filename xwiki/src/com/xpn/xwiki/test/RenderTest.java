@@ -58,6 +58,8 @@ public abstract class RenderTest extends TestCase {
     public void setUp() throws Exception {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
+        xwiki.setDatabase("xwikitest");
+        context.setBaseUrl("../../");
         context.setWiki(xwiki);
         Velocity.init("velocity.properties");
     }
@@ -223,7 +225,7 @@ public abstract class RenderTest extends TestCase {
 
     }
 
-    public void testWikiBaseLinkRenderer() throws XWikiException {
+    public void testWikiBaseLinkRenderer() throws XWikiException, HibernateException {
          XWikiRenderer wikibase = getXWikiRenderer();
          XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
          context.put("doc", doc);

@@ -23,8 +23,10 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,35 +53,75 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         this.setContext(context);
     }
 
+    public XWikiContext getContext() {
+        return context;
+    }
+
+    public void setContext(XWikiContext context) {
+        this.context = context;
+    }
+
     // Overidding to load our own Filter list.
     protected void init() {
-    if (null == fp) {
-      fp = new FilterPipe(initialContext);
+        if (null == fp) {
+            fp = new FilterPipe(initialContext);
 
-      Iterator iterator = Service.providers(XWikiFilter.class);
-      while (iterator.hasNext()) {
-        try {
-          Filter filter = (Filter) iterator.next();
-          fp.addFilter(filter);
-          log.debug("Loaded filter: " + filter.getClass().getName());
-        } catch (Exception e) {
-          log.warn("BaseRenderEngine: unable to load filter", e);
+            Iterator iterator = Service.providers(XWikiFilter.class);
+            while (iterator.hasNext()) {
+                try {
+                    Filter filter = (Filter) iterator.next();
+                    fp.addFilter(filter);
+                    log.debug("Loaded filter: " + filter.getClass().getName());
+                } catch (Exception e) {
+                    log.warn("BaseRenderEngine: unable to load filter", e);
+                }
+            }
+
+            fp.init();
+            //Logger.debug("FilterPipe = "+fp.toString());
         }
-      }
-
-      fp.init();
-      //Logger.debug("FilterPipe = "+fp.toString());
     }
-  }
 
+    private String getBaseUrl(String database, XWikiContext context) {
+        String baseurl = null;
+        if (database!=null) {
+            String db = context.getDatabase();
+            try {
+              context.setDatabase(context.getWiki().getDatabase());
+              XWikiDocInterface doc = context.getWiki().getDocument("XWiki.XWikiServer"
+                            + database.substring(0,1).toUpperCase()
+                            + database.substring(1), context);
+              BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass",0);
+              String server = serverobject.getStringValue("server");
+              int mode = serverobject.getIntValue("secure");
+              if (server!=null) {
+                  baseurl = ((mode==1) ? "https://" : "http://")
+                            + server + "/xwiki/bin/";
+              }
+
+            } catch (Exception e) {
+            } finally {
+                context.setDatabase(db);
+            }
+        }
+        return baseurl;
+    }
 
     public boolean exists(String name) {
+        String database = context.getDatabase();
         try {
+            int colonIndex = name.indexOf(":");
+            if (colonIndex!=-1) {
+                String db = name.substring(0,colonIndex);
+                name = name.substring(colonIndex + 1);
+                context.setDatabase(db);
+            }
+
             XWikiDocInterface currentdoc = ((XWikiDocInterface) context.get("doc"));
             String newname = StringUtils.replace(name, " ", "");
             XWikiDocInterface doc = context.getWiki().getDocument(
-                                        (currentdoc!=null) ? currentdoc.getWeb() : "Main",
-                                        newname, context);
+                    (currentdoc!=null) ? currentdoc.getWeb() : "Main",
+                    newname, context);
             if ((doc==null)||doc.isNew())
                 return false;
             else
@@ -88,6 +130,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         catch (Exception e) {
             e.printStackTrace();
             return false;
+        } finally {
+            context.setDatabase(database);
         }
 
     }
@@ -98,17 +142,34 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         XWikiContext context = getContext();
+
+        String database = null;
+        int colonIndex = name.indexOf(":");
+        if (colonIndex!=-1) {
+            database = name.substring(0,colonIndex);
+            name = name.substring(colonIndex + 1);
+        }
+
+        String baseurl = getBaseUrl(database, context);
+
+
         buffer.append("<span class=\"wikilink\"><a href=\"");
-        buffer.append(context.getWiki().getBase(context));
+        if (baseurl==null) {
+            buffer.append(context.getWiki().getBase(context));
+        } else {
+            buffer.append(baseurl);
+        }
+
         buffer.append("view");
         buffer.append("/");
+
 
         String newname = StringUtils.replace(name, " ", "");
 
         if (newname.indexOf(".")!=-1) {
-           newname = StringUtils.replace(newname, ".","/", 1);
+            newname = StringUtils.replace(newname, ".","/", 1);
         } else {
-           newname = ((XWikiDocInterface)context.get("doc")).getWeb() + "/" + newname;
+            newname = ((XWikiDocInterface)context.get("doc")).getWeb() + "/" + newname;
         }
 
         buffer.append(newname);
@@ -122,33 +183,48 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("</a></span>");
     }
 
+
     public void appendLink(StringBuffer buffer, String name, String view) {
         appendLink(buffer, name, view, null);
     }
 
     public void appendCreateLink(StringBuffer buffer, String name, String view) {
         XWikiContext context = getContext();
+
+        String database = null;
+        int colonIndex = name.indexOf(":");
+        if (colonIndex!=-1) {
+            database = name.substring(0,colonIndex);
+            name = name.substring(colonIndex + 1);
+        }
+
+        String baseurl = getBaseUrl(database, context);
         buffer.append("<span class=\"wikicreatelink\">");
         buffer.append(view);
         buffer.append("<a href=\"");
-        buffer.append(context.getWiki().getBase(context));
+
+        if (baseurl==null) {
+            buffer.append(context.getWiki().getBase(context));
+        } else {
+            buffer.append(baseurl);
+        }
         buffer.append("edit");
         buffer.append("/");
 
         String newname = StringUtils.replace(name, " ", "");
 
         if (newname.indexOf(".")!=-1) {
-           newname = StringUtils.replace(newname, ".","/", 1);
+            newname = StringUtils.replace(newname, ".","/", 1);
         } else {
-           newname = ((XWikiDocInterface)context.get("doc")).getWeb() + "/" + newname;
+            newname = ((XWikiDocInterface)context.get("doc")).getWeb() + "/" + newname;
         }
 
         buffer.append(newname);
         XWikiDocInterface currentdoc = ((XWikiDocInterface) context.get("doc"));
         if (currentdoc!=null) {
-                buffer.append("?parent=");
-                buffer.append(currentdoc.getFullName());
-            }
+            buffer.append("?parent=");
+            buffer.append(currentdoc.getFullName());
+        }
 
         buffer.append("\">");
         buffer.append("?");
@@ -156,11 +232,4 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     }
 
 
-    public XWikiContext getContext() {
-        return context;
-    }
-
-    public void setContext(XWikiContext context) {
-        this.context = context;
-    }
 }

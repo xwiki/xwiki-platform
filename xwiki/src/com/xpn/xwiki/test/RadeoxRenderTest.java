@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
+import net.sf.hibernate.HibernateException;
 
 
 
@@ -107,7 +108,8 @@ public class RadeoxRenderTest  extends RenderTest {
                 "<ul class=\"star\">\n<li>List1</li>\n<li>List2</li>\n</ul>", false, context);
     }
 
-    public void testWikiBaseLinkRenderer() throws XWikiException {
+    public void testWikiBaseLinkRenderer() throws XWikiException, HibernateException {
+        StoreHibernateTest.cleanUp(getHibStore(), context);
         Utils.createDoc(getHibStore(), "Main", "WebHome", context);
         XWikiRenderer wikibase = getXWikiRenderer();
         XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
@@ -157,7 +159,8 @@ public class RadeoxRenderTest  extends RenderTest {
            return res;
        }
 
-       public void testWikiLinksInTables() throws XWikiException {
+       public void testWikiLinksInTables() throws XWikiException, HibernateException {
+           StoreHibernateTest.cleanUp(getHibStore(), context);
            Utils.createDoc(getHibStore(), "Main", "WebHome", context);
            XWikiRenderer wikibase = getXWikiRenderer();
            XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
@@ -210,5 +213,25 @@ public class RadeoxRenderTest  extends RenderTest {
         renderTest(wikibase, "{rss:feed=http://www.ludovic.org/blog/index.rdf}",
                 "LudoBlog", false, context);
        }
+
+      public void testWikiBaseVirtualLinkRenderer() throws XWikiException, HibernateException {
+        StoreHibernateTest.cleanUp(getHibStore(), context);
+        Utils.createDoc(getHibStore(), "Main", "WebHome", context);
+        Utils.createDoc(getHibStore(), "XWiki", "XWikiServerXwikitest", context);
+        Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
+
+
+        XWikiRenderer wikibase = getXWikiRenderer();
+        XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
+        context.put("doc", doc);
+
+        String res = renderTest(wikibase, "Test link: [xwikitest:Main.WebHome]",
+                "127.0.0.1", false, context);
+        assertTrue("Cannot find view link", res.indexOf("view/Main/WebHome")!=-1 );
+        res = renderTest(wikibase, "Test link: [xwikitest:Main.WebHome12]",
+                  "127.0.0.1", false, context);
+        assertTrue("Cannot find edit link", res.indexOf("edit/Main/WebHome")!=-1 );
+      }
+
 
 }

@@ -103,15 +103,6 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
 
             String name = result.group(1);
             if (name != null) {
-                // User probably wrote [http://radeox.org] instead of http://radeox.org
-                /*if (name.indexOf("http://") != -1) {
-                    try {
-                        writer.write("<div class=\"error\">Do not surround URLs with [...].</div>");
-                    } catch (IOException e) {
-                        // Do nothing. Give up.
-                    }
-                    return;
-                }*/
 
                 // trim the name and unescape it
                 name = Encoder.unescape(name.trim());

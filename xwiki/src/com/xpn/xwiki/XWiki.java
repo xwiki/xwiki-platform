@@ -259,6 +259,20 @@ public class XWiki implements XWikiNotificationInterface {
         return getDocument(web,name);
     }
 
+    public XWikiDocInterface getDocument(String fullname, XWikiDocInterface doc) throws XWikiException {
+        int i1 = fullname.lastIndexOf(".");
+        if (i1!=-1) {
+         String web = fullname.substring(0,i1);
+         String name = fullname.substring(i1+1);
+         if (name.equals(""))
+             name = "WebHome";
+         return getDocument(web,name);
+        } else {
+         return getDocument(doc.getWeb(), fullname);
+        }
+    }
+
+
     public XWikiDocInterface getDocumentFromPath(String path) throws XWikiException {
         String web, name;
         int i1 = path.indexOf("/",1);
@@ -824,5 +838,25 @@ public class XWiki implements XWikiNotificationInterface {
         this.accessmanager = accessmanager;
     }
 
+    public String includeTopic(String topic, XWikiContext context) {
+        return include(topic, context, false);
+    }
+
+    public String includeForm(String topic, XWikiContext context) {
+        return include(topic, context, true);
+    }
+
+    public String include(String topic, XWikiContext context, boolean isForm) {
+        XWikiDocInterface doc = null;
+        try {
+            doc = getDocument(topic, (XWikiDocInterface) context.get("doc"));
+        } catch (XWikiException e) {
+            return "Topic " + topic + " does not exist";
+        }
+        if (isForm)
+         return getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context);
+        else
+         return getRenderingEngine().renderDocument(doc, context);
+    }
 
 }

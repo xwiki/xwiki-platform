@@ -55,10 +55,13 @@ public class SearchTest extends TestCase {
     public void setUp() throws HibernateException {
         XWikiHibernateStore hibstore = getHibStore();
         StoreHibernateTest.cleanUp(hibstore);
-        hibstore.shutdownHibernate();
+        // hibstore.shutdownHibernate();
     }
 
     public void tearDown() throws HibernateException {
+        XWikiHibernateStore hibstore = getHibStore();
+        hibstore.shutdownHibernate();
+        hibstore = null;
         System.gc();
     }
 

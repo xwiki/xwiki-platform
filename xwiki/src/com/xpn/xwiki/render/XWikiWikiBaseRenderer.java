@@ -175,9 +175,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
 
             // Changing state..
             if (util.match("m|<pre>|i", line)) {
+                line = util.substitute("s/<pre>//i", line);
                 insidePRE = true;
             }
             if (util.match("m|</pre>|i", line)) {
+                line = util.substitute("s/<\\/pre>//i", line);
                 insidePRE = false;
             }
 

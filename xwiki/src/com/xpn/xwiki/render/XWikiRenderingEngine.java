@@ -73,4 +73,12 @@ public class XWikiRenderingEngine {
             content = ((XWikiRenderer)renderers.elementAt(i)).render(content, doc, context);
         return content;
     }
+
+    public String renderDocument(XWikiDocInterface doc, XWikiDocInterface includingdoc, XWikiContext context) {
+        String content = doc.getContent();
+        for (int i=0;i<renderers.size();i++)
+            content = ((XWikiRenderer)renderers.elementAt(i)).render(content, includingdoc, context);
+        return content;
+    }
+
 }

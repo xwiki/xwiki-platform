@@ -44,11 +44,15 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         VelocityContext vcontext = new VelocityContext();
         StringWriter writer = new StringWriter();
         String name = doc.getFullName();
-        content = context.getUtil().substitute("s/#include/\\\\#include/go", content);
+        content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
         vcontext.put("doc", doc);
         vcontext.put("xwiki", context.getWiki());
         vcontext.put("request", context.getRequest());
         vcontext.put("context", context);
+
+        // Put the Velocity Context in the context
+        // so that includes can use it..
+        context.put("vcontext", vcontext);
         return evaluate(content, name, vcontext);
     }
 

@@ -36,6 +36,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
+import org.apache.velocity.app.Velocity;
 
 
 public class RenderTest extends TestCase {
@@ -51,10 +52,15 @@ public class RenderTest extends TestCase {
             return (XWikiHibernateStore) store;
     }
 
-    public void setUp() throws XWikiException {
+    public XWikiStoreInterface getStore() {
+        return xwiki.getStore();
+    }
+
+    public void setUp() throws Exception {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);        
+        context.setWiki(xwiki);
+        Velocity.init("velocity.properties");
     }
 
     public void tearDown() throws HibernateException {
@@ -151,6 +157,14 @@ public class RenderTest extends TestCase {
                 "<code><b>Hello if (5 == 6) then let's finish</b></code>", false, context);
     }
 
+    public void testWikiBasePreRenderer() throws XWikiException {
+         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+
+        // Test formatting
+        renderTest(wikibase, "<pre>\nThis is a text with *strong* text\n</pre>",
+                "This is a text with *strong* text", false, context);
+    }
+
     public void testWikiBaseTabListRenderer() throws XWikiException {
          XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
          renderTest(wikibase, "\t* List1",
@@ -210,4 +224,29 @@ public class RenderTest extends TestCase {
         renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
                 " <strong>Hello2</strong> ", true, context);
     }
+
+
+    public void testInclude(String text, String result) throws XWikiException {
+        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        XWikiStoreInterface store = getStore();
+
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "WebHome");
+        doc1.setContent("This is the topic name: $doc.name");
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        store.saveXWikiDoc(doc1);
+
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "IncludeTest");
+        context.put("doc", doc2);
+        renderTest(wikiengine, text, result, false, context);
+    }
+
+    public void testIncludeTopic() throws XWikiException {
+        testInclude("#includeTopic(\"Test.WebHome\")", "WebHome");
+    }
+
+    public void testIncludeForm() throws XWikiException {
+        testInclude( "#includeForm(\"Test.WebHome\")", "IncludeTest");
+    }
+
 }

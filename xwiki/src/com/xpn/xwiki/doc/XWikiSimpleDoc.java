@@ -551,13 +551,19 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
             else if (type.equals("edit")) {
+                result.append("\n<pre>\n");
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
+                result.append("\n</pre>\n");
             }
             else if (type.equals("hidden")) {
+                result.append("\n<pre>\n");
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
+                result.append("\n</pre>\n");
             }
             else if (type.equals("search")) {
+                result.append("\n<pre>\n");
                 pclass.displaySearch(result, fieldname, prefix, obj, context);
+                result.append("\n</pre>\n");
             }
             else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -720,7 +726,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         String template = eform.getTemplate();
         if ((template!=null)&&(!template.equals(""))) {
             String content = getContent();
-            if ((!content.equals("\n"))&&(!content.equals(""))) {
+            if ((!content.equals("\n"))&&(!content.equals(""))&&!isNew()) {
                 Object[] args = { getFullName() };
                 throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                         "Cannot add a template to document {0} because it already has content", null, args);

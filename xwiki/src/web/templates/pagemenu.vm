@@ -19,7 +19,7 @@ function showhidemenu() {
 // -->
 </script>
 #macro( versions )
-#foreach( $rev in $doc.recentRevisions )
+#foreach( $rev in $tdoc.recentRevisions )
 <a href="$viewurl?rev=$rev">$rev</a><span class="xwikisep"> | </span>
 #end
 #end
@@ -54,8 +54,14 @@ $xwiki.parseContent($pagemenu)
 <div id="xwikipagemenutitle" class="xwikimenu">$msg.get("pagemenu")</div>
 <div id="xwikipagemenulinks" class="xwikimenu">
 <a href="$attachurl">$msg.get("attachments") ($doc.getAttachmentList().size())</a><span class="xwikisep"> | </span>
-<a href="$inlineurl">$msg.get("editinline")</a><span class="xwikisep"> | </span>
-<a href="$editurl">$msg.get("editcontent")</a><span class="xwikisep"> | </span>
+<a href="$inlineurl#if($doc.language!="")?language=${doc.language}#end">$msg.get("editinline")</a><span class="xwikisep"> | </span>
+<a href="$editurl#if($doc.language!="")?language=${doc.language}#end">$msg.get("editcontent")</a><span class="xwikisep"> | </span>
+#if ($xwiki.isMultiLingual())
+<span class="language">$msg.get("edit")</span>
+<a class="language" href="${editurl}?language=default">default</a>
+<a class="language" href="${editurl}?language=en">En</a>
+<a class="language"  href="${editurl}?language=fr">Fr</a>
+#end
 <a href="${editurl}?xpage=editrights">$msg.get("editrights")</a><span class="xwikisep"> | </span>
 <a href="${editurl}?xpage=editobject">$msg.get("editobject")</a><span class="xwikisep"> | </span>
 <a href="${editurl}?xpage=editclass">$msg.get("editclass")</a><span class="xwikisep"> | </span>

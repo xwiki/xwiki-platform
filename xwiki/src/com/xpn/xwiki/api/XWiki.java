@@ -152,12 +152,52 @@ public class XWiki extends Api {
         return xwiki.getXWikiPreference(prefname, context);
     }
 
+    public String getXWikiPreference(String prefname, String default_value) {
+        return xwiki.getXWikiPreference(prefname, default_value, context);
+    }
+
     public String getWebPreference(String prefname) {
         return xwiki.getWebPreference(prefname, context);
     }
 
+    public String getWebPreference(String prefname, String default_value) {
+        return xwiki.getWebPreference(prefname, default_value, context);
+    }
+
+    public long getXWikiPreferenceAsLong(String prefname, long default_value) {
+        return xwiki.getXWikiPreferenceAsLong(prefname, default_value, context);
+    }
+
+    public long getXWikiPreferenceAsLong(String prefname) {
+        return xwiki.getXWikiPreferenceAsLong(prefname, context);
+    }
+
+    public long getWebPreferenceAsLong(String prefname, long default_value) {
+        return xwiki.getWebPreferenceAsLong(prefname, default_value, context);
+    }
+
+    public long getWebPreferenceAsLong(String prefname) {
+        return xwiki.getWebPreferenceAsLong(prefname, context);
+    }
+
     public String getUserPreference(String prefname) {
         return xwiki.getUserPreference(prefname, context);
+    }
+
+    public String getUserPreferenceFromCookie(String prefname) {
+        return xwiki.getUserPreferenceFromCookie(prefname, context);
+    }
+
+    public String getLanguagePreference() {
+        return xwiki.getLanguagePreference(context);
+    }
+
+    public boolean isVirtual() {
+        return xwiki.isVirtual();
+    }
+
+    public boolean isMultiLingual() {
+        return xwiki.isMultiLingual(context);
     }
 
     public void flushCache() {

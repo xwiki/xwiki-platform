@@ -14,8 +14,24 @@
             <column name="XWD_NAME" length="255" not-null="true"/>
         </property>
 
+        <property name="language" type="string">
+                    <column name="XWD_LANGUAGE" length="5" />
+        </property>
+
+        <property name="defaultLanguage" type="string">
+                    <column name="XWD_DEFAULT_LANGUAGE" length="5" />
+        </property>
+
+        <property name="translation" type="int">
+                    <column name="XWD_TRANSLATION" />
+        </property>
+
         <property name="date" type="timestamp">
             <column name="XWD_DATE" not-null="true"/>
+        </property>
+
+        <property name="creationDate" type="timestamp">
+            <column name="XWD_CREATION_DATE" />
         </property>
 
         <property name="author" type="string">

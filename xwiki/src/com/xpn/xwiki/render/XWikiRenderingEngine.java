@@ -77,11 +77,11 @@ public class XWikiRenderingEngine {
     }
 
     public String renderDocument(XWikiDocInterface doc, XWikiContext context) {
-           return renderText(doc.getContent(), doc, context);
+           return renderText(doc.getTranslatedContent(context), doc, context);
     }
 
     public String renderDocument(XWikiDocInterface doc, XWikiDocInterface includingdoc, XWikiContext context) {
-        return renderText(doc.getContent(), includingdoc, context);
+        return renderText(doc.getTranslatedContent(context), includingdoc, context);
     }
 
     public String renderText(String text, XWikiDocInterface includingdoc, XWikiContext context) {

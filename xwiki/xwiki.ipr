@@ -136,8 +136,13 @@
         <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev20040402.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/cactus-ant-1.6dev20040402.jar!/" />
       </CLASSES>
-      <JAVADOC />
-      <SOURCES />
+      <JAVADOC>
+        <root url="file://C:/dev/java/jakarta-cactus-13-1.6dev20040402/doc/api/framework-13" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040402/framework/src/java/share" />
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040402/framework/src/java/j2ee13" />
+      </SOURCES>
     </library>
     <library name="Hibernate">
       <CLASSES>
@@ -145,7 +150,6 @@
         <root url="jar://$PROJECT_DIR$/lib/hibernate2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/odmg.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/dom4j.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.9-stable-bin.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xalan.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xerces.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xml-apis.jar!/" />
@@ -154,6 +158,7 @@
         <root url="jar://$PROJECT_DIR$/lib/c3p0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ehcache.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/swarmcache.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.11-stable-bin.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate-2.1/doc/api" />
@@ -162,6 +167,7 @@
       <SOURCES>
         <root url="file://C:/dev/java/hibernate-2.1/src" />
         <root url="file://C:/dev/java/oscache/src/core/java" />
+        <root url="file://C:/dev/java/mysql-connector-java-3.0.11-stable" />
       </SOURCES>
     </library>
     <library name="Perl">

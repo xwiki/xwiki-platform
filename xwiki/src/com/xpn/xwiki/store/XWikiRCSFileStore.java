@@ -101,6 +101,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         //To change body of implemented methods use Options | File Templates.
         try {
             doc.setStore(this);
+
             // Handle the latest text file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
                 doc.setDate(new Date());
@@ -360,7 +361,18 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             Object version = params.get("version");
             if (version!=null)
                 doc.setVersion((String) version);
-            Object date = params.get("date");
+            Object language = params.get("language");
+            if (language!=null)
+                doc.setLanguage((String) language);
+            Object defaultLanguage = params.get("defaultLanguage");
+            if (defaultLanguage!=null)
+                doc.setDefaultLanguage((String) defaultLanguage);
+            Object date = params.get("creationDate");
+            if (date!=null) {
+                long l = Long.parseLong((String)date);
+                doc.setCreationDate(new Date(l));
+            }
+            date = params.get("date");
             if (date!=null) {
                 long l = Long.parseLong((String)date);
                 doc.setDate(new Date(l));

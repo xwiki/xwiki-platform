@@ -43,6 +43,7 @@ public class EditForm extends ActionForm
     private String name;
     private String parent;
     private String template;
+    private String language;
 
     private HttpServletRequest request;
     /**
@@ -82,6 +83,14 @@ public class EditForm extends ActionForm
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public int getObjectNumbers(String prefix) {

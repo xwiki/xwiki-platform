@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -74,6 +75,8 @@ import java.util.*;
 public class ViewEditAction extends XWikiAction
 {
     private static final Log log = LogFactory.getLog(ViewEditAction.class);
+    private static final long UPLOAD_DEFAULT_MAXSIZE = 10000000L;
+    private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
 
 
     public ViewEditAction() throws Exception {
@@ -213,8 +216,10 @@ public class ViewEditAction extends XWikiAction
                 // From there we will try to catch any exceptions and show a nice page
 
                 XWikiDocInterface doc = null;
+                XWikiDocInterface tdoc = null;
 
                 doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
+
                 context.put("doc", doc);
 
                 vcontext.put("doc", new Document(doc, context));
@@ -235,10 +240,18 @@ public class ViewEditAction extends XWikiAction
                     }
                 }
 
+                if (xwiki.isMultiLingual(context)) {
+                    tdoc = doc.getTranslatedDocument(context);
+                } else {
+                    tdoc = doc;
+                }
+                context.put("tdoc", tdoc);
+                vcontext.put("tdoc", new Document(tdoc, context));
+
 
                 // Determine what to do
                 if (action.equals("view"))
-                    return executeView(xwiki, doc, request, context, vcontext);
+                    return executeView(xwiki, doc, tdoc, request, context, vcontext);
                 else if ( action.equals("inline"))
                     return executeInline(doc, form, request, context);
                 else if ( action.equals("edit") )
@@ -274,6 +287,11 @@ public class ViewEditAction extends XWikiAction
                 else if (action.equals("logout"))
                     return executeLogout(xwiki, request, response, context);
             } catch (Throwable e) {
+                if (!(e instanceof XWikiException)) {
+                    e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                            "Uncaught exception", e);
+                }
+
                 vcontext.put("exp", e);
                 try {
                     if (log.isWarnEnabled()) {
@@ -381,8 +399,8 @@ public class ViewEditAction extends XWikiAction
 
         // Get the FileUpload Data
         DiskFileUpload fileupload = new DiskFileUpload();
-        fileupload.setSizeMax(10000000);
-        fileupload.setSizeThreshold(100000);
+        fileupload.setSizeMax(xwiki.getXWikiPreferenceAsLong("upload_maxsize", UPLOAD_DEFAULT_MAXSIZE, context));
+        fileupload.setSizeThreshold((int)xwiki.getXWikiPreferenceAsLong("upload_sizethreshold", UPLOAD_DEFAULT_SIZETHRESHOLD, context));
 
         String tempdir = xwiki.Param("xwiki.upload.tempdir");
         if (tempdir!=null) {
@@ -598,17 +616,29 @@ public class ViewEditAction extends XWikiAction
     }
 
     private ActionForward executeSave(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
-        String username = context.getUser();
-        XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-        doc.readFromForm((EditForm)form, context);
+        String language = ((EditForm)form).getLanguage();
+        XWikiDocInterface tdoc;
+
+        if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
+            tdoc = doc;
+        } else {
+            // Need to save parent and defaultLanguage if they have changed
+            tdoc = doc.getTranslatedDocument(language, context);
+            tdoc.setLanguage(language);
+            tdoc.setTranslation(1);
+        }
+
+        XWikiDocInterface olddoc = (XWikiDocInterface) tdoc.clone();
+        tdoc.readFromForm((EditForm)form, context);
 
         // TODO: handle Author
-        doc.setAuthor(username);
+        String username = context.getUser();
+        tdoc.setAuthor(username);
 
-        xwiki.saveDocument(doc, olddoc, context);
+        xwiki.saveDocument(tdoc, olddoc, context);
 
         // forward to view
-        String redirect = getRedirect(request, doc.getActionUrl("view",context));
+        String redirect = getRedirect(request, tdoc.getActionUrl("view",context));
         response.sendRedirect(redirect);
         return null;
     }
@@ -653,11 +683,12 @@ public class ViewEditAction extends XWikiAction
         return parseTemplate(page, context);
     }
 
-    private ActionForward executeView(XWiki xwiki, XWikiDocInterface doc, HttpServletRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException, IOException {
+    private ActionForward executeView(XWiki xwiki, XWikiDocInterface doc, XWikiDocInterface tdoc, HttpServletRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException, IOException {
         String rev = request.getParameter("rev");
+
         if (rev!=null) {
             // Let's get the revision
-            doc = xwiki.getDocument(doc, rev, context);
+            doc = xwiki.getDocument(tdoc, rev, context);
             context.put("doc", doc);
             // We need to have the old version doc in the context
             vcontext.put("cdoc", new Document(doc, context));

@@ -81,6 +81,7 @@ import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.apache.tomcat.util.http.Cookies;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -90,6 +91,7 @@ import org.securityfilter.realm.SecurityRealmInterface;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -99,10 +101,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.Principal;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
+import java.util.*;
 
 public class XWiki implements XWikiNotificationInterface {
     private static final Log log = LogFactory.getLog(XWiki.class);
@@ -347,6 +346,19 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String Param(String key, String default_value) {
         return getConfig().getProperty(key, default_value);
+    }
+
+    public long ParamAsLong(String key) {
+        String param = getConfig().getProperty(key);
+        return Long.parseLong(param);
+    }
+
+    public long ParamAsLong(String key, long default_value) {
+        try {
+            return ParamAsLong(key);
+        } catch (NumberFormatException e) {
+            return default_value;
+        }
     }
 
     public XWikiStoreInterface getStore() {
@@ -635,31 +647,147 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context) {
+        return getXWikiPreference(prefname, "", context);
+    }
+
+    public String getXWikiPreference(String prefname, String default_value, XWikiContext context) {
         try {
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
             return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
         } catch (Exception e) {
-            return "";
+            return default_value;
         }
     }
 
     public String getWebPreference(String prefname, XWikiContext context) {
+        return getWebPreference(prefname, "", context);
+    }
+
+    public String getWebPreference(String prefname, String default_value, XWikiContext context) {
         try {
             XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
             XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences", context);
-            return ((BaseProperty)doc.getObject("XWiki.XWikiPreferences", 0).get(prefname)).getValue().toString();
+            String result = doc.getStringValue("XWiki.XWikiUsers", prefname);
+            if (!result.equals(""))
+                return result;
         } catch (Exception e) {
-            return getXWikiPreference(prefname, context);
         }
+        return getXWikiPreference(prefname, default_value, context);
     }
 
     public String getUserPreference(String prefname, XWikiContext context) {
         try {
-            return getWebPreference(prefname, context);
-        } catch (Exception e) {
-            return getXWikiPreference(prefname, context);
+             String user = context.getUser();
+             XWikiDocInterface userdoc = getDocument(user, context);
+             if (userdoc!=null) {
+                String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
+                if (!result.equals(""))
+                     return result;
+             }
+            }
+        catch (Exception e) {
+        }
+
+        return getWebPreference(prefname, context);
+    }
+
+
+    public String getUserPreferenceFromCookie(String prefname, XWikiContext context) {
+        Cookie[] cookies = context.getRequest().getCookies();
+        if (cookies==null)
+            return null;
+        for (int i=0;i<cookies.length;i++) {
+            String name = cookies[i].getName();
+            if (name.equals(prefname)) {
+                String value = cookies[i].getValue();
+                if (!value.trim().equals(""))
+                    return value;
+                else
+                    break;
+            }
+        }
+        return null;
+    }
+
+    public String getUserPreference(String prefname, boolean useCookie, XWikiContext context) {
+        // First we look in the cookies
+        if (useCookie) {
+            String result = getUserPreferenceFromCookie(prefname, context);
+            if (result!=null)
+                return result;
+        }
+        return getUserPreference(prefname, context);
+    }
+
+    public String getLanguagePreference(XWikiContext context) {
+        // First we get the language from the request
+        String result;
+        try {
+            result = context.getRequest().getParameter("language");
+            if ((result!=null)&&(!result.equals("")))
+              return result;
+        } catch (Exception e) {}
+
+        try {
+        // First we get the language from the cookie
+        result = getUserPreferenceFromCookie("language", context);
+        if ((result!=null)&&(!result.equals("")))
+            return result;
+        } catch (Exception e) {}
+
+        // Next from the default user preference
+        try {
+            String user = context.getUser();
+            XWikiDocInterface userdoc = null;
+            userdoc = getDocument(user, context);
+            if (userdoc!=null) {
+                 result = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
+                    if (!result.equals(""))
+                         return result;
+                 }
+        } catch (XWikiException e) {
+        }
+
+        // Then from the navigator language setting
+        if (context.getRequest()!=null) {
+            String accept = context.getRequest().getHeader("Accept-Language");
+            if ((accept==null)||(accept.equals("")))
+                return "";
+
+            String[] alist = StringUtils.split(accept, ",;");
+            if ((alist==null)||(alist.length==0))
+                return "";
+            else
+                return alist[0];
+        }
+
+        return "";
+    }
+
+    public long getXWikiPreferenceAsLong(String prefname, XWikiContext context) {
+        return Long.parseLong(getXWikiPreference(prefname, context));
+    }
+
+    public long getWebPreferenceAsLong(String prefname, XWikiContext context) {
+        return Long.parseLong(getWebPreference(prefname, context));
+    }
+
+    public long getXWikiPreferenceAsLong(String prefname, long default_value, XWikiContext context) {
+        try {
+            return Long.parseLong(getXWikiPreference(prefname, context));
+        } catch (NumberFormatException e) {
+            return default_value;
         }
     }
+
+    public long getWebPreferenceAsLong(String prefname, long default_value, XWikiContext context) {
+        try {
+           return Long.parseLong(getWebPreference(prefname, context));
+        } catch (NumberFormatException e) {
+           return default_value;
+        }
+    }
+
 
     public void flushCache() {
         if (getStore() instanceof XWikiCacheInterface) {
@@ -1437,11 +1565,12 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String include(String topic, XWikiContext context, boolean isForm) {
         String database = null, incdatabase = null;
-        Document currentdoc = null, currentcdoc = null;
+        Document currentdoc = null, currentcdoc = null, currenttdoc = null;
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext!=null) {
             currentdoc = (Document) vcontext.get("doc");
             currentcdoc = (Document) vcontext.get("cdoc");
+            currenttdoc = (Document) vcontext.get("tdoc");
         }
 
         try {
@@ -1487,6 +1616,8 @@ public class XWiki implements XWikiNotificationInterface {
                 vcontext.put("doc", currentdoc);
             if (currentcdoc!=null)
                 vcontext.put("cdoc", currentcdoc);
+            if (currenttdoc!=null)
+                vcontext.put("tdoc", currentcdoc);
         }
     }
 
@@ -1752,5 +1883,13 @@ public class XWiki implements XWikiNotificationInterface {
 
     public Date getDate(long time) {
         return new Date(time);
+    }
+
+    public boolean isMultiLingual(XWikiContext context) {
+        return "1".equals(getXWikiPreference("multilingual", "1", context));
+    }
+
+    public boolean isVirtual() {
+        return "1".equals(Param("xwiki.virtual"));
     }
 }

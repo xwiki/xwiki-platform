@@ -6,6 +6,9 @@
 <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
 $!xwiki.getWebPreference("menu")
 </div>
+<div id="xwikilanguagemenu">
+#template("languages.vm")
+</div>
 </div>
 #template("pagemenu.vm")
 #if($message)

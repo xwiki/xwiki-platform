@@ -23,7 +23,7 @@ $msg.get("confirmdelete")
 <div id="xwikinav_footer">
 <div class="xwikiactions">
 <a href="$viewurl">View</a><span> | </span>
-<a href="${deleteurl}?confirm=1" onclick="return confirm('$msg.get("confirmdelete2")')">$msg.get("delete")</a>
+<a href="" onclick="this.href='${deleteurl}?confirm=1'; return confirm('$msg.get("confirmdelete2")')">$msg.get("delete")</a>
 </div>
 </div>
 #template("footer.vm")

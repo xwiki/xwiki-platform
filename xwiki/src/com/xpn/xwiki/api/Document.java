@@ -86,12 +86,36 @@ public class Document extends Api {
         return doc.getDate();
     }
 
+    public Date getCreationDate() {
+        return doc.getCreationDate();
+    }
+
     public String getParent() {
         return doc.getParent();
     }
 
     public String getContent() {
         return doc.getContent();
+    }
+
+    public String getLanguage() {
+        return doc.getLanguage();
+    }
+
+    public String getDefaultLanguage() {
+        return doc.getDefaultLanguage();
+    }
+
+    public List getTranslationList() throws XWikiException {
+        return doc.getTranslationList(context);
+    }
+
+    public String getTranslatedContent() {
+        return doc.getTranslatedContent(context);
+    }
+
+    public String getTranslatedContent(String language) {
+        return doc.getTranslatedContent(language, context);
     }
 
     public String getRenderedContent() {

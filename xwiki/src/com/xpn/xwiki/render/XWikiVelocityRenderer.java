@@ -117,7 +117,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
             return "<a href=\"\" onclick=\"document.getElementById('xwikierror').style.display='block'; return false;\">"
                     + title + "</a><div id=\"xwikierror\" style=\"display: none;\"><pre>\n"
-                    + text + "</div></pre>";
+                    + text + "</pre></div>";
         }
     }
 }

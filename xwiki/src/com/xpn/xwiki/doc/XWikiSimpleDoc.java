@@ -66,13 +66,16 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private String format;
     private String author;
     private Archive archive;
-    private Date date;
+    private Date updateDate;
+    private Date creationDate;
     private Version version;
     private long id = 0;
     private boolean mostRecent = false;
     private boolean isNew = true;
     private String template;
     private String language;
+    private String defaultLanguage;
+    private int translation;
     private String database;
 
     // Used to make sure the MetaData String is regenerated
@@ -91,9 +94,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private ArrayList objectsToRemove = new ArrayList();
 
     public long getId() {
-        if (id==0) {
-            id = getFullName().hashCode();
-        }
+        if ((language==null)||language.equals(""))
+         id = getFullName().hashCode();
+        else
+         id = (getFullName() + ":" + language).hashCode();
         return id;
     }
 
@@ -135,11 +139,14 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public XWikiSimpleDoc(String web, String name) {
         this.web = web;
         this.name = name;
-        this.date = new Date();
+        this.updateDate = new Date();
+        this.creationDate = new Date();
         this.parent = "";
         this.content = "\n";
         this.format = "";
         this.author = "";
+        this.language = "";
+        this.defaultLanguage = "";
         this.archive = null;
         this.attachmentList = new ArrayList();
     }
@@ -180,7 +187,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public String getEscapedContent(XWikiContext context) {
         CharacterFilter filter = new CharacterFilter();
-        return filter.process(getContent());
+        return filter.process(getTranslatedContent(context));
     }
 
     public String getName() {
@@ -226,14 +233,25 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public Date getDate() {
-        return date;
+        return updateDate;
     }
 
     public void setDate(Date date) {
-        if (!date.equals(this.date)) {
+        if (!date.equals(this.updateDate)) {
             setMetaDataDirty(true);
         }
-        this.date = date;
+        this.updateDate = date;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date date) {
+        if (!creationDate.equals(this.creationDate)) {
+            setMetaDataDirty(true);
+        }
+        this.creationDate = date;
     }
 
     public String getMeta() {
@@ -295,27 +313,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return url.toString();
     }
 
-    /*
-    public String getViewUrl(XWikiContext context) {
-        return getActionUrl("view", context);
-    }
 
-    public String getEditUrl(XWikiContext context) {
-        return getActionUrl("edit", context);
-    }
-
-    public String getPreviewUrl(XWikiContext context) {
-        return getActionUrl("preview", context);
-    }
-
-    public String getSaveUrl(XWikiContext context) {
-        return getActionUrl("save", context);
-    }
-
-    public String getAttachUrl(XWikiContext context) {
-        return getActionUrl("attach", context);
-    }
-    */
     
     public String getParentUrl(XWikiContext context) {
         StringBuffer url = new StringBuffer();
@@ -939,6 +937,18 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         el.addText(getName());
         docel.add(el);
 
+        el = new DOMElement("language");
+        el.addText(getLanguage());
+        docel.add(el);
+
+        el = new DOMElement("defaultLanguage");
+        el.addText(getDefaultLanguage());
+        docel.add(el);
+
+        el = new DOMElement("translation");
+        el.addText("" + getTranslation());
+        docel.add(el);
+
         el = new DOMElement("parent");
         el.addText(getParent());
         docel.add(el);
@@ -947,8 +957,12 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         el.addText(getAuthor());
         docel.add(el);
 
+        long d = getCreationDate().getTime();
+        el = new DOMElement("creationDate");
+        el.addText("" + d);
+        docel.add(el);
 
-        long d = getDate().getTime();
+        d = getDate().getTime();
         el = new DOMElement("date");
         el.addText("" + d);
         docel.add(el);
@@ -1006,10 +1020,27 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         setAuthor(docel.element("author").getText());
         setVersion(docel.element("version").getText());
         setContent(docel.element("content").getText());
+        if (docel.element("language")!=null)
+          setLanguage(docel.element("language").getText());
+         if (docel.element("defaultLanguage")!=null)
+          setDefaultLanguage(docel.element("defaultLanguage").getText());
+
+        if (docel.element("translation")!=null) {
+         String strans = docel.element("translation").getText();
+         if ((strans==null)||strans.equals(""))
+          setTranslation(0);
+         setTranslation(Integer.parseInt(strans));
+        }
 
         String sdate = docel.element("date").getText();
         Date date = new Date(Long.parseLong(sdate));
         setDate(date);
+
+        if (docel.element("creationDate")!=null) {
+          String scdate = docel.element("creationDate").getText();
+          Date cdate = new Date(Long.parseLong(scdate));
+          setCreationDate(cdate);
+        }
 
         List atels = docel.elements("attachment");
         for (int i=0;i<atels.size();i++) {
@@ -1137,11 +1168,15 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public int getIntValue(String className, String objName) {
         BaseObject obj = getObject(className, 0);
+        if (obj==null)
+            return 0;
         return obj.getIntValue(objName);
     }
 
     public String getStringValue(String className, String fieldName) {
         BaseObject obj = getObject(className);
+        if (obj==null)
+          return "";
         return obj.getStringValue(fieldName);
     }
 
@@ -1204,6 +1239,91 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
         if (name.equals(""))
             name = "WebHome";
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getDefaultLanguage() {
+        return defaultLanguage;
+    }
+
+    public void setDefaultLanguage(String defaultLanguage) {
+        this.defaultLanguage = defaultLanguage;
+    }
+
+    public int getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(int translation) {
+        this.translation = translation;
+    }
+
+    public String getTranslatedContent(XWikiContext context) {
+        String language = context.getWiki().getLanguagePreference(context);
+        return getTranslatedContent(language, context);
+    }
+
+    public String getTranslatedContent(String language, XWikiContext context) {
+        if ((language==null)||(language.equals("")))
+         return getContent();
+
+        if (language.equals(defaultLanguage))
+            return getContent();
+
+        XWikiDocInterface tdoc = new XWikiSimpleDoc(getWeb(), getName());
+        tdoc.setLanguage(language);
+        try {
+         tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
+
+         if (tdoc.isNew())
+          return getContent();
+         else
+          return tdoc.getContent();
+        } catch (Exception e) {
+            return getContent();
+        }
+    }
+
+    public XWikiDocInterface getTranslatedDocument(XWikiContext context) throws XWikiException {
+        String language = context.getWiki().getLanguagePreference(context);
+        return getTranslatedDocument(language, context);
+    }
+
+    public XWikiDocInterface getTranslatedDocument(String language, XWikiContext context) throws XWikiException {
+        if (language.equals(""))
+         return this;
+
+        XWikiDocInterface tdoc = new XWikiSimpleDoc(getWeb(), getName());
+        tdoc.setLanguage(language);
+        tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
+
+        if (tdoc.isNew())
+         return tdoc;
+        else
+         return tdoc;
+    }
+
+    public List getTranslationList(XWikiContext context) throws XWikiException {
+        List result = new ArrayList();
+        String hql = "select doc.language from XWikiSimpleDoc as doc where doc.web = '"
+                        + getWeb() + "' and doc.name = '" + getName() + "' and doc.language <> ''";
+
+        List list = context.getWiki().search(hql, context);
+        if ((list==null)||(list.size()==0)) {
+            return result;
+        }
+
+        for (int i=0;i<list.size();i++) {
+            result.add(list.get(i));
+        }
+        return result;
     }
 
 }

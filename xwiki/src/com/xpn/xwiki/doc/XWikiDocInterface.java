@@ -149,32 +149,39 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void setObjectsToRemove(ArrayList objectsToRemove);
     List getxWikiClasses(XWikiContext context);
 
-    List getIncludedPages(XWikiContext context);
 
     String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
-
     String displayEdit(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
-
     String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
-
     String displaySearch(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
-
-    String getRenderedContent(String text, XWikiContext context);
-
     String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
 
+    String getRenderedContent(String text, XWikiContext context);
+    List getIncludedPages(XWikiContext context);
     XWikiAttachment getAttachment(String filename);
-
     int getIntValue(String className, String objName);
     String getStringValue(String className, String objName);
-
     String getDatabase();
-
     void setDatabase(String database);
-
     BaseObject getObject(String classname);
-
     void setStringValue(String className, String fieldName, String value);
-
     void setIntValue(String className, String fieldName, int value);
+
+    // Internationalization
+    String getLanguage();
+    void setLanguage(String language);
+    String getDefaultLanguage();
+    void setDefaultLanguage(String defaultLanguage);
+    int getTranslation();
+    void setTranslation(int translation);
+    String getTranslatedContent(String language, XWikiContext context);
+    XWikiDocInterface getTranslatedDocument(String language, XWikiContext context) throws XWikiException;
+    List getTranslationList(XWikiContext context) throws XWikiException;
+    String getTranslatedContent(XWikiContext context);
+
+    XWikiDocInterface getTranslatedDocument(XWikiContext context) throws XWikiException;
+
+    Date getCreationDate();
+
+    void setCreationDate(Date date);
 }

@@ -14,6 +14,7 @@ $doc.getRenderedContent()
 <input type="hidden" name="parent" value="$!doc.getParent()" />
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<input type="hidden" name="language" value="$!request.getParameter("language")" />
 
 </p>
 <div id="xwikiobject">

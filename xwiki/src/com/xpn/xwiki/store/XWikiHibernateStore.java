@@ -31,10 +31,11 @@ import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import net.sf.hibernate.*;
+import net.sf.hibernate.tool.hbm2ddl.MyDatabaseMetadata;
+import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.dialect.Dialect;
 import net.sf.hibernate.impl.SessionFactoryImpl;
-import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
@@ -126,7 +127,6 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
     public void updateSchema(XWikiContext context) throws HibernateException {
         Session session;
-        Transaction transaction;
         Connection connection;
         DatabaseMetadata meta;
         Statement stmt=null;
@@ -136,13 +136,14 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 		try {
 			try {
                 bTransaction = beginTransaction(context);
-                transaction = getTransaction(context);
                 session = getSession(context);
                 connection = session.connection();
                 setDatabase(session, context);
-                // we need to get the dialect
-				meta = new DatabaseMetadata(connection, dialect);
-				stmt = connection.createStatement();
+
+                // I needed to make my own class to remove toUpperCase from
+                // the calls to the metadata tables
+				meta = new MyDatabaseMetadata(connection, dialect);
+                stmt = connection.createStatement();
 			}
 			catch (SQLException sqle) {
                 if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + sqle.getMessage());
@@ -163,6 +164,11 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                     if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
 				}
 			}
+
+            // Make sure we have no null valued in integer fields
+          	stmt.executeUpdate("update xwikidoc set xwd_translation=0 where xwd_translation is null");
+            stmt.executeUpdate("update xwikidoc set xwd_creationDate=0 where xwd_creationDate is null");
+            connection.commit();
 		}
 		catch (Exception e) {
             if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
@@ -264,38 +270,45 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
     public void endTransaction(XWikiContext context, boolean commit)
             throws HibernateException {
+        Session session = null;
+        try {
+            session = getSession(context);
+            Transaction transaction = getTransaction(context);
+            setSession(null, context);
+            setTransaction(null, context);
 
-        Session session = getSession(context);
-        Transaction transaction = getTransaction(context);
-        setSession(null, context);
-        setTransaction(null, context);
-
-        if (transaction!=null) {
-             if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
-             if (commit) {
-             transaction.commit();
-         } else {
-            // Don't commit the transaction, can be faster for read-only operations
-             transaction.rollback();
-         }
+            if (transaction!=null) {
+                if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
+                if (commit) {
+                    transaction.commit();
+                } else {
+                    // Don't commit the transaction, can be faster for read-only operations
+                    transaction.rollback();
+                }
+            }
+        } finally {
+            if (session!=null)
+             closeSession(session);
         }
-        closeSession(session);
     }
 
     private void closeSession(Session session) throws HibernateException {
         if (session!=null) {
-            if ( log.isDebugEnabled() ) log.debug("Releasing hibernate session " + session);
-             Connection connection = session.connection();
-             if ((connection!=null)) {
-              nbConnections--;
-              try {
-                 removeConnection(connection);
-              } catch (Throwable e) {
-                // This should not happen
-                e.printStackTrace();
-              }
-             }
-            session.close();
+            try {
+                if ( log.isDebugEnabled() ) log.debug("Releasing hibernate session " + session);
+                Connection connection = session.connection();
+                if ((connection!=null)) {
+                    nbConnections--;
+                    try {
+                        removeConnection(connection);
+                    } catch (Throwable e) {
+                        // This should not happen
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                session.close();
+            }
         }
     }
 

@@ -1,5 +1,20 @@
 <div id="xwikifooter">
 
+<div id="xwikidocinfo">
+#if ($tdoc)
+Language:
+#if($tdoc.language=="")
+$!msg.get("default")
+#else
+$tdoc.language
+#end
+&nbsp;Creation Date: $!formatter.formatShortDateTime($tdoc.creationDate)
+<br />
+Author: $tdoc.author
+&nbsp;Last Modification Date: $!formatter.formatShortDateTime($tdoc.date)
+#end
+</div>
+
 <div id="xwikifooterimage">
 <a href="http://validator.w3.org/check/referer">
 <img src="$xwiki.getSkinFile("xhtml-valid.png")" alt="Valid XHTML 1.0!" /></a>

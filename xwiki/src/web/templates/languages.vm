@@ -1,0 +1,16 @@
+#if ($xwiki.isMultiLingual())
+$msg.get("languages"):
+#set($preflanguage = $xwiki.languagePreference)
+#set($languageactive = (($preflanguage = "")||($preflanguage==$doc.defaultLanguage)))
+<a #if ($languageactive==1) class="xwikilanguageactive" #end href="${viewurl}?language=default">
+ #if ($doc.defaultLanguage != "")
+  $doc.defaultLanguage
+ #else
+  default
+ #end
+</a>
+#foreach ($language in $doc.translationList)
+#set($languageactive = ($preflanguage==$language))
+<span> | </span><a #if ($languageactive==1) class="xwikilanguageactive" #end href="${viewurl}?language=${language}">$language</a>
+#end
+#end

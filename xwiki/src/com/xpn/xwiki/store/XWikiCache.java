@@ -85,7 +85,11 @@ public class XWikiCache implements XWikiCacheInterface {
         String db = context.getDatabase();
         if (db==null)
             db = "";
-        return db + ":" + doc.getFullName();
+        String key = db + ":" + doc.getFullName();
+        if ("".equals(doc.getLanguage()))
+            return key;
+        else
+            return key + ":" + doc.getLanguage();
     }
 
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {

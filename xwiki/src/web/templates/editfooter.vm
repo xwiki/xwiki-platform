@@ -1,6 +1,6 @@
 <div id="xwikinav_footer">
 <div class="xwikiactions">
-#editactions($showactions)
+#template("editactions.vm")
 </div>
 </div>
 #template("footer.vm")

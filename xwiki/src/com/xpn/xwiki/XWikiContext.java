@@ -139,7 +139,10 @@ public class XWikiContext extends Hashtable {
     }
 
     public String getUser() {
-        return user.getUser();
+        if (user!=null)
+         return user.getUser();
+        else
+         return "XWiki.XWikiGuest";
     }
 
     public XWikiUser getXWikiUser() {

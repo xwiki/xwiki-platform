@@ -25,32 +25,35 @@ html, body {
 }
 
 #xwikifooter {
-   right: 5px;
    font-size: 8pt;
-   padding-top: 2px;
+   padding-top: 3px;
 }
 
 #xwikifooter img {
    float: right;
    border: 0px;
-   margin-left: 5px;
+   margin-right: 5px;
 }
 
 
 #xwikifootertext {
    float: right;
-   clear: left;
-   margin-top: 2px;
-   margin-right: 10px;
+   clear: right;
    font-size: 8pt;
+   margin: 5px;
 }
 
 #xwikifooterhelp {
    float: right;
    clear: right;
-   margin-right: 10px;
 }
 
+#xwikidocinfo {
+   float: left;
+   font-size: 8pt;
+   padding-top: 3px;
+   margin-left: 5px;
+}
 
 #xwikilogo {
     position: relative;
@@ -169,14 +172,15 @@ html, body {
 }
 
 
-.xwikiactions, #xwikiwebusermenu {
+.xwikiactions, #xwikiwebusermenu, #xwikilanguagemenu {
     display: block;
+    float: left;
     margin: 0px;
     padding: 0px;
     height: 1.4em;
 }
 
-.xwikiactions a, #xwikiwebusermenu a {
+.xwikiactions a, #xwikiwebusermenu a, xwikilanguagemenu a {
     display: block;
     float: left;
     list-style-type: none;
@@ -192,6 +196,12 @@ html, body {
 
 #xwikiwebusermenu span, .xwikiactions span {
     display: none;
+}
+
+#xwikilanguagemenu {
+    margin-top: 5px;
+    margin-right: 10px;
+    float: right;
 }
 
 #xwikinav_sidebar {
@@ -243,6 +253,18 @@ html, body {
    margin-left: 10px;
    margin-right: 5px;
    font-size: 10px;
+}
+
+#xwikipagemenulinks span.language {
+   margin-left: 10px;
+   font-size: 10px;
+}
+
+#xwikipagemenulinks a.language {
+  display: inline;
+  margin-left: 0px;
+  margin-right: 0px;
+  font-size: 10px;
 }
 
 .xwikisep {

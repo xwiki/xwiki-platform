@@ -131,6 +131,10 @@ public class MyFormAuthenticator extends FormAuthenticator {
 
     protected Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         Principal principal = null;
+
+        if (username==null)
+         return null;
+
         // If we have the context then we are using direct mode
         // then we should specify the database
         // This is needed for virtual mode to work

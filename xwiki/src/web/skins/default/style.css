@@ -12,6 +12,32 @@
     margin: 0px;
 }
 
+#xwikifooter {
+   right: 5px;
+   font-size: 8pt;
+   padding-top: 2px;
+}
+
+#xwikifooter img {
+   float: right;
+   border: 0px;
+   margin-left: 5px;
+}
+
+
+#xwikifootertext {
+   float: right;
+   clear: left;
+   margin-right: 10px;
+}
+
+#xwikifooterhelp {
+   float: right;
+   clear: right;
+   margin-right: 10px;
+}
+
+
 #xwikinav_header, #xwikinav_footer {
     position: relative;
     display: block;
@@ -35,9 +61,9 @@
     float: left;
     clear: left;
     left: 0px;
-    repeat:
+    repeat: no-repeat;
     background-image:url(horizontal.gif);
-    background-repeat: repeat-y;
+    background-repeat: no-repeat;
 }
 
 #xwikilogo img {

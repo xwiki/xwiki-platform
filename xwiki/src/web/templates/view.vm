@@ -43,5 +43,4 @@ $cdoc.getRenderedContent()
 #versions()
 </div>
 </div>
-$copyright
 #template("footer.vm")

@@ -112,7 +112,7 @@
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
         <classpath>
-            <pathelement location="${lib.dir}/cactus-1.5.jar"/>
+            <pathelement location="${lib.dir}/cactus-1.6dev.jar"/>
             <pathelement location="${lib.dir}/cactus-ant-1.5.jar"/>
             <pathelement location="${lib.dir}/commons-httpclient-2.0-rc2.jar"/>
             <pathelement location="${lib.dir}/commons-logging.jar"/>
@@ -127,6 +127,7 @@
         <property file="src/web/WEB-INF/version.properties" />
         <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
+        <property name="cactus.warfile" value="${release.dir}/xwiki.war" />
         <mkdir dir="${build.dir}" />
         <mkdir dir="${classes.dir}" />
         <mkdir dir="${release.dir}" />
@@ -260,8 +261,9 @@
     <target name="test.server" depends="release, tests">
 
         <mkdir dir="${test.reports.dir}" />
+        <copy tofile="${cactus.warfile}" file="${release.warfile}" overwrite="true" />
 
-        <cactus printsummary="yes" warfile="${release.warfile}" dir="${basedir}/test"
+        <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
             haltonfailure="no" fork="on" >
 
             <classpath>

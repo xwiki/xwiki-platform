@@ -239,50 +239,44 @@
         </javadoc>
     </target>
 
-    <target name="release" depends="xwiki, javadoc">
+    <target name="release" depends="xwiki">
         <mkdir dir="${release.dir}" />
         <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
             <exclude name="**/web.xml" />
-            <fileset dir="${basedir}" includes="doc/**"  />
             <lib dir="${basedir}/lib" />
         </war>
 
     </target>
 
-    <target name="bin.dist" depends="release">
+    <target name="bin.dist" depends="release, javadoc">
         <mkdir dir="${dist.dir}" />
-        <property name="bin.tarfile" value="${dist.dir}/xwiki-${version}.tar" />
+        <property name="bin.tarfile" value="${dist.dir}/xwiki-${version}.tar.gz" />
         <delete file="${bin.tarfile}" />
 
-        <tar tarfile="${bin.tarfile}" basedir="${basedir}">
-            <include name="${release.dir}/**/*" />
-            <include name="${doc.dir}/**/*" />
-            <include name="*.txt" />
-            <exclude name="**/CVS/*" />
+        <tar compression="gzip" tarfile="${bin.tarfile}">
+            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
+            <tarfileset dir="${lib.dir}" prefix="lib" excludes="**/CVS/*" />
+            <tarfileset dir="${doc.dir}" prefix="doc" excludes="**/CVS/*" />
+            <tarfileset dir="${basedir}" includes="license.txt,lesser.txt" />
         </tar>
-
-        <delete file="${bin.tarfile}.gz" />
-        <gzip zipfile="${bin.tarfile}.gz" src="${bin.tarfile}" />
-
-        <delete file="${bin.tarfile}" />
     </target>
 
-    <target name="src.dist" depends="release">
+    <target name="src.dist" depends="release, javadoc">
         <mkdir dir="${dist.dir}" />
-        <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar" />
+        <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar.gz" />
         <delete file="${src.tarfile}" />
 
-        <tar tarfile="${src.tarfile}" basedir="${basedir}">
-            <exclude name="**/CVS/*" />
-            <exclude name="${build.dir}/**/*" />
-            <exclude name="${dist.dir}/**/*" />
-            <exclude name="${release.dir}/**" />
+        <tar compression="gzip" tarfile="${bin.tarfile}">
+            <tarfileset dir="CVS" prefix="CVS" />
+            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
+            <tarfileset dir="${lib.dir}" prefix="lib" />
+            <tarfileset dir="${doc.dir}" prefix="doc" />
+            <tarfileset dir="${src.dir}" prefix="src" />
+            <tarfileset dir="${basedir}/test" prefix="test" excludes="reports/*" />
+            <tarfileset dir="${basedir}/tools" prefix="tools" />
+            <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
+            <tarfileset dir="${basedir}" includes="license.txt,lesser.txt" />
         </tar>
-
-        <delete file="${src.tarfile}.gz" />
-        <gzip zipfile="${src.tarfile}.gz" src="${src.tarfile}" />
-
-        <delete file="${src.tarfile}" />
     </target>
 
     <target name="all"  depends="release, test, bin.dist, src.dist" />

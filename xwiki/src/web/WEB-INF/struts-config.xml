@@ -79,6 +79,13 @@
         <forward name="edit" path="/templates/edit.vm"/>
     </action>
 
+    <action path="/inline/"
+                  type="com.xpn.xwiki.web.ViewEditAction"
+                  name="inline"
+                  scope="request">
+         <forward name="inline" path="/templates/inline.vm"/>
+    </action>
+
     <action path="/preview/"
             type="com.xpn.xwiki.web.ViewEditAction"
             name="preview"

@@ -8,23 +8,22 @@
 #end
 <div id="nav_header">
 <div id="actions">
-<a href="$editurl">$msg.get("edit")</a><span> | </span>
-<a href="$inlineurl">$msg.get("inline")</a><span> | </span>
-#versions()
-</div>
 </div>
 #if($message)
 <div id="message">
 $message
 </div>
 #end
+<form name="edit" method="post" action="$doc.getPreviewUrl($context)">
 <div id="content">
 $doc.getRenderedContent($context)
 </div>
+</form>
 <div id="nav_footer">
 <div id="actions">
-<a href="$editurl">$msg.get("edit")</a><span> | </span>
-#versions()
+<a href="$doc.getPreviewUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getSaveUrl($context)" onClick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 #parse("/templates/footer.vm")

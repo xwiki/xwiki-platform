@@ -135,11 +135,15 @@ public class RadeoxRenderTest  extends RenderTest {
                 "<a href=\"http://www.ludovic.org/\">", false, context);
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
                 "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+        renderTest(wikibase, "Test link: {link:WebHome| http://www.ludovic.org/ }",
+                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
         renderTest(wikibase, "Test link: [http://www.ludovic.org/]",
                      "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, context);
         renderTest(wikibase, "Test link: [ludovic>http://www.ludovic.org/]",
                      "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, context);
         renderTest(wikibase, "Test link: [ludovic web site>http://www.ludovic.org/]",
+                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
+        renderTest(wikibase, "Test link: [ludovic web site> http://www.ludovic.org/ ]",
                      "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
         }
 

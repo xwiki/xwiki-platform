@@ -58,7 +58,10 @@ public class LinkMacro extends BaseLocaleMacro {
       if (!"none".equals(img) && engine instanceof ImageRenderEngine) {
         writer.write(((ImageRenderEngine) engine).getExternalImageLink());
       }
-        
+
+      // A URL should not have starting and trailing white spaces
+      url = url.trim();
+
       writer.write("<a href=\"");
       writer.write(Encoder.escape(url));
       writer.write("\">");

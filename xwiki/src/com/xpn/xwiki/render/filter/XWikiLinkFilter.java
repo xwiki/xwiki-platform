@@ -104,14 +104,14 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
             String name = result.group(1);
             if (name != null) {
                 // User probably wrote [http://radeox.org] instead of http://radeox.org
-                if (name.indexOf("http://") != -1) {
+                /*if (name.indexOf("http://") != -1) {
                     try {
                         writer.write("<div class=\"error\">Do not surround URLs with [...].</div>");
                     } catch (IOException e) {
                         // Do nothing. Give up.
                     }
                     return;
-                }
+                }*/
 
                 // trim the name and unescape it
                 name = Encoder.unescape(name.trim());
@@ -126,6 +126,23 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                     name = name.substring(pipeIndex + 1);
                 }
 
+                int protocolIndex = name.indexOf("://");
+                if ((protocolIndex>=0)&&(protocolIndex<10)) {
+                    // External link
+                    String view = name;
+                        if (-1 != pipeIndex) {
+                            view = alias;
+                        }
+
+                    buffer.append("<span class=\"wikiexternallink\"><a href=\"");
+                    buffer.append(name.trim());
+                    buffer.append("\">");
+                    buffer.append(Encoder.toEntity(view.charAt(0)) + view.substring(1));
+                    buffer.append("</a></span>");
+                    return;
+                }
+
+
                 int hashIndex = name.lastIndexOf('#');
 
                 String hash = "";
@@ -134,12 +151,15 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                     name = name.substring(0, hashIndex);
                 }
 
+                /*
+                // We need to keep this in XWiki
                 int colonIndex = name.indexOf(':');
                 // typed link ?
                 if (-1 != colonIndex) {
                     // for now throw away the type information
                     name = name.substring(colonIndex + 1);
                 }
+                */
 
                 int atIndex = name.lastIndexOf('@');
                 // InterWiki link ?

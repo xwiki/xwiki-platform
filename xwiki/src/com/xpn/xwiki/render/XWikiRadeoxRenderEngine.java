@@ -98,7 +98,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         XWikiContext context = getContext();
-        buffer.append("<a href=\"");
+        buffer.append("<span class=\"wikilink\"><a href=\"");
         buffer.append(context.getWiki().getBase(context));
         buffer.append("view");
         buffer.append("/");
@@ -119,7 +119,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
         buffer.append("\">");
         buffer.append(view);
-        buffer.append("</a>");
+        buffer.append("</a></span>");
     }
 
     public void appendLink(StringBuffer buffer, String name, String view) {
@@ -128,9 +128,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public void appendCreateLink(StringBuffer buffer, String name, String view) {
         XWikiContext context = getContext();
-        buffer.append("<u>");
+        buffer.append("<span class=\"wikicreatelink\">");
         buffer.append(view);
-        buffer.append("</u>");
         buffer.append("<a href=\"");
         buffer.append(context.getWiki().getBase(context));
         buffer.append("edit");
@@ -153,7 +152,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
         buffer.append("\">");
         buffer.append("?");
-        buffer.append("</a>");
+        buffer.append("</a></span>");
     }
 
 

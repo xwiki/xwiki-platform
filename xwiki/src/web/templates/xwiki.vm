@@ -11,3 +11,4 @@
 #set($title="<a href='$viewurl'>${doc.fullName}</a>")
 #set($skin=$xwiki.getSkin())
 #set($copyright=$xwiki.getWebCopyright())
+

@@ -58,7 +58,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
     }
 
     public static VelocityContext prepareContext(XWikiContext context) {
-        VelocityContext vcontext = new VelocityContext();
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        if (vcontext==null)
+            vcontext = new VelocityContext();
         vcontext.put("formatter", new VelocityFormatter(vcontext));
         vcontext.put("xwiki", new XWiki(context.getWiki(), context));
         vcontext.put("request", context.getRequest());

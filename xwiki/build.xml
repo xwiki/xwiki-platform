@@ -202,8 +202,7 @@
 
         <mkdir dir="${test.reports.dir}" />
 
-        <cactus printsummary="yes" dir="${basedir}/test"
-            warfile="${release.warfile}" >
+        <cactus printsummary="yes" warfile="${release.warfile}" >
 
             <classpath>
                 <pathelement path="${classes.dir}" />
@@ -215,8 +214,8 @@
             <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />
 
             <containerset>
-                <tomcat4x dir="${tomcat4x.home}" port="9080"
-                    todir="${test.reports.dir}"/>
+		    <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml" 
+			    port="9080" todir="${test.reports.dir}"/>
             </containerset>
         </cactus>
     </target>

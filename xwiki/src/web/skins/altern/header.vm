@@ -1,0 +1,21 @@
+<div id="banner">
+<div id="logo">
+    <a href="../../view/Main/WebHome">
+      <img src="../../../skins/$skin/logo.gif">
+    </a>
+  </div>
+
+  <div id="version">
+    <a href="../../view/Main/WebHome">XWiki Version 0.1.11 with alternate skin</a>
+  </div>
+
+<div id="title">
+   <h1>
+#if ($doc.parent.length() > 0)
+   $parent >
+#end
+   $!title
+   </h1>
+   <h2>$!subtitle</h2>
+</div>
+</div>

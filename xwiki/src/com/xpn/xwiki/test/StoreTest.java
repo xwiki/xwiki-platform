@@ -26,8 +26,6 @@ import junit.framework.*;
 import com.xpn.xwiki.store.*;
 import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWikiException;
-import com.sun.mail.iap.ByteArray;
-
 import java.io.*;
 import java.util.List;
 

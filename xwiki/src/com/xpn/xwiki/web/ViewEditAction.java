@@ -188,7 +188,11 @@ public class ViewEditAction extends XWikiAction
         }
         else if ( action.equals("preview") )
         {
-            doc.readFromForm((EditForm)form, context);
+            XWikiDocInterface doc2 = (XWikiDocInterface)doc.clone();
+            context.put("doc", doc2);
+            vcontext.put("doc", new Document(doc2, context));
+            vcontext.put("cdoc",  vcontext.get("doc"));
+            doc2.readFromForm((EditForm)form, context);
             return parseTemplate("preview", context);
         }
         else if (action.equals("save"))

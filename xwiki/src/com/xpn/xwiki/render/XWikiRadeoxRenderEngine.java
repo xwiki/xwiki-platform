@@ -80,7 +80,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("</u>");
         buffer.append("<a href=\"");
         buffer.append(context.getWiki().getBase(context));
-        buffer.append("view");
+        buffer.append("edit");
         buffer.append("/");
 
         String newname = StringUtils.replace(name, " ", "");

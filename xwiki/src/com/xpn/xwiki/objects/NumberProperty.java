@@ -18,18 +18,26 @@
  * Created by
  * User: Ludovic Dubost
  * Date: 9 déc. 2003
- * Time: 11:37:09
+ * Time: 14:04:34
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects;
 
-public interface XWikiObjectPropertyInterface {
-    public String getName();
-    public void setName(String name);
-    public String getType();
-    public void setType(String type);
-    public String toString();
-    public XWikiObject getObject();
-    public void setObject(XWikiObject object);
-    public XWikiClassProperty getPropertyClass();
-    public void setPropertyClass(XWikiClassProperty propertyClass);
+
+public class NumberProperty extends BaseProperty {
+    private Number value;
+
+    public NumberProperty() {
+    }
+
+    public Number getValue() {
+        return value;
+    }
+
+    public void setValue(Number value) {
+        this.value = value;
+    }
+
+    public String toString() {
+        return getValue().toString();
+    }
 }

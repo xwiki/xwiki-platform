@@ -20,17 +20,28 @@
  * Date: 19 déc. 2003
  * Time: 18:49:14
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.PropertyInterface;
 
-public class XWikiMetaClass extends XWikiClass {
+public class MetaClass extends BaseClass {
 
-    public XWikiObjectPropertyInterface get(String name) {
-        return (XWikiObjectPropertyInterface)fields.get(name);
+    public void XWikiMetaClass() {
+        NumberClass numberclass = new NumberClass(this);
+        put("numberclass", numberclass);
+        StringClass stringclass = new StringClass(this);
+        put("stringclass", numberclass);
     }
 
-    public void put(String name, XWikiObjectPropertyInterface property) {
+    public PropertyInterface get(String name) {
+        return (PropertyInterface)fields.get(name);
+    }
+
+    public void put(String name, PropertyInterface property) {
         fields.put(name, property);
     }
 }

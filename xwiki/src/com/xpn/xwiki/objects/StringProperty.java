@@ -18,9 +18,28 @@
  * Created by
  * User: Ludovic Dubost
  * Date: 9 déc. 2003
- * Time: 11:57:01
+ * Time: 13:51:00
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects;
 
-public interface XWikiClassInterface extends XWikiObjectInterface {
+import com.xpn.xwiki.objects.BaseProperty;
+
+public class StringProperty extends BaseProperty {
+    private String value;
+
+
+    public StringProperty() {
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String toString() {
+        return getValue();
+    }
 }

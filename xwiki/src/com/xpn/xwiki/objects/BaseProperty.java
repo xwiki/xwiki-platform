@@ -20,43 +20,29 @@
  * Date: 9 déc. 2003
  * Time: 11:36:16
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects;
 
-public class XWikiObjectProperty extends Object implements XWikiObjectPropertyInterface {
-    private XWikiObject object;
-    private XWikiClassProperty propertyClass;
-    private String name;
-    private String type;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
-    public String getName() {
-        return name;
-    }
+public class BaseProperty extends Object implements PropertyInterface {
+    private BaseObject object;
+    private PropertyClass propertyClass;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public XWikiObject getObject() {
+    public BaseObject getObject() {
         return object;
     }
 
-    public void setObject(XWikiObject object) {
+    public void setObject(BaseObject object) {
         this.object = object;
     }
 
-    public XWikiClassProperty getPropertyClass() {
+    public PropertyClass getPropertyClass() {
         return propertyClass;
     }
 
-    public void setPropertyClass(XWikiClassProperty propertyClass) {
+    public void setPropertyClass(PropertyClass propertyClass) {
         this.propertyClass = propertyClass;
     }
+
 }

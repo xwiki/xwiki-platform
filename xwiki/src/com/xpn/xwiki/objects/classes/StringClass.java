@@ -20,34 +20,45 @@
  * Date: 9 déc. 2003
  * Time: 13:47:20
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
 
-public class XWikiClassStringProperty extends XWikiClassProperty {
+public class StringClass extends PropertyClass {
 
-    public XWikiClassStringProperty(XWikiClass wclass) {
+    public StringClass(BaseClass wclass) {
         setxWikiClass(wclass);
         setType("stringclass");
+        setName("string");
+        setPrettyName("String");
         setSize(30);
     }
 
-    public XWikiClassStringProperty() {
+    public StringClass() {
         setType("stringclass");
+        setName("string");
+        setPrettyName("String");
         setSize(30);
     }
 
-    public XWikiClass getxWikiClass() {
-        XWikiMetaClass wclass = (XWikiMetaClass)super.getxWikiClass();
+    public BaseClass getxWikiClass() {
+        BaseClass wclass = (BaseClass)super.getxWikiClass();
         if (wclass==null) {
-          wclass = new XWikiMetaClass();
+            wclass = new BaseClass();
+            wclass.setType("stringmetaclass");
+            wclass.setName("string");
+            wclass.setPrettyName("String");
 
-        XWikiClassNumberProperty size_class = new XWikiClassNumberProperty(wclass);
-        size_class.setSize(5);
-        size_class.setNumberType("integer");
-        wclass.put("size", size_class);
-        setxWikiClass(wclass);
+            NumberClass size_class = new NumberClass(wclass);
+            size_class.setSize(5);
+            size_class.setNumberType("integer");
+            wclass.put("size", size_class);
+            setxWikiClass(wclass);
         }
         return wclass;
     }
@@ -55,14 +66,14 @@ public class XWikiClassStringProperty extends XWikiClassProperty {
 
     public int getSize() {
         try {
-            return ((XWikiObjectNumberProperty)get("size")).getValue().intValue();
+            return ((NumberProperty)get("size")).getValue().intValue();
         } catch (Exception e) {
             return 30;
         }
     }
 
     public void setSize(int size) {
-        XWikiObjectNumberProperty property = new XWikiObjectNumberProperty();
+        NumberProperty property = new NumberProperty();
         property.setValue(new Integer(size));
         try {
             put("size", property);
@@ -71,26 +82,26 @@ public class XWikiClassStringProperty extends XWikiClassProperty {
         }
     }
 
-    public XWikiObjectProperty fromString(String value) {
-        XWikiObjectStringProperty property = new XWikiObjectStringProperty();
+    public BaseProperty fromString(String value) {
+        StringProperty property = new StringProperty();
         property.setValue(value);
         property.setPropertyClass(this);
         return property;
     }
 
-    public void displayHidden(StringBuffer buffer, String name, XWikiObject object, XWikiContext context) {
+    public void displayHidden(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
         super.displayHidden(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displaySearch(StringBuffer buffer, String name, XWikiObject object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
         super.displaySearch(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displayView(StringBuffer buffer, String name, XWikiObject object, XWikiContext context) {
+    public void displayView(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
         super.displayView(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displayEdit(StringBuffer buffer, String name, XWikiObject object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, BaseObject object, XWikiContext context) {
         super.displayEdit(buffer, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 }

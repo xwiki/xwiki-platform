@@ -1,6 +1,9 @@
 
-import com.xpn.xwiki.classes.*;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import junit.framework.TestCase;
 
 /**
@@ -29,44 +32,44 @@ import junit.framework.TestCase;
 public class ClassesTest extends TestCase {
 
     public void testNumber() {
-        XWikiClassNumberProperty pclass = new XWikiClassNumberProperty();
-        XWikiObjectNumberProperty property;
-        property = (XWikiObjectNumberProperty)pclass.fromString("10");
+        NumberClass pclass = new NumberClass();
+        NumberProperty property;
+        property = (NumberProperty)pclass.fromString("10");
         assertEquals("Default type long not supported", property.getValue(), new Long("10"));
         pclass.setNumberType("integer");
-        property = (XWikiObjectNumberProperty)pclass.fromString("10");
+        property = (NumberProperty)pclass.fromString("10");
         assertEquals("Integer number not supported", property.getValue(), new Integer("10"));
         pclass.setNumberType("long");
-        property = (XWikiObjectNumberProperty)pclass.fromString("10");
+        property = (NumberProperty)pclass.fromString("10");
         assertEquals("Long number not supported", property.getValue(), new Long("10"));
         pclass.setNumberType("double");
-        property = (XWikiObjectNumberProperty)pclass.fromString("10.01");
+        property = (NumberProperty)pclass.fromString("10.01");
         assertEquals("Double number not supported", property.getValue(), new Double("10.01"));
         pclass.setNumberType("float");
-        property = (XWikiObjectNumberProperty)pclass.fromString("10.01");
+        property = (NumberProperty)pclass.fromString("10.01");
         assertEquals("Float number not supported", property.getValue(), new Float("10.01"));
     }
 
     public void testString() {
-        XWikiClassStringProperty pclass = new XWikiClassStringProperty();
-        XWikiObjectStringProperty property;
-        property = (XWikiObjectStringProperty)pclass.fromString("Hello");
+        StringClass pclass = new StringClass();
+        StringProperty property;
+        property = (StringProperty)pclass.fromString("Hello");
         assertEquals("String not supported", property.getValue(), new String("Hello"));
     }
 
     public void testObject() throws XWikiException {
-        XWikiClass wclass = new XWikiClass();
-        XWikiClassStringProperty first_name_class = new XWikiClassStringProperty();
+        BaseClass wclass = new BaseClass();
+        StringClass first_name_class = new StringClass();
         first_name_class.setSize(80);
-        XWikiClassStringProperty last_name_class = new XWikiClassStringProperty();
+        StringClass last_name_class = new StringClass();
         last_name_class.setSize(80);
-        XWikiClassNumberProperty age_class = new XWikiClassNumberProperty();
+        NumberClass age_class = new NumberClass();
         age_class.setSize(5);
         age_class.setNumberType("integer");
         wclass.put("first_name", first_name_class);
         wclass.put("last_name", last_name_class);
         wclass.put("age", age_class);
-        XWikiObject object = new XWikiObject();
+        BaseObject object = new BaseObject();
         object.setxWikiClass(wclass);
         object.put("first_name", first_name_class.fromString("Ludovic"));
         object.put("last_name", last_name_class.fromString("Dubost"));

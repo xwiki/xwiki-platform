@@ -20,20 +20,34 @@
  * Date: 9 déc. 2003
  * Time: 11:51:16
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class XWikiClass extends XWikiObject implements XWikiClassInterface {
-    public XWikiObjectPropertyInterface get(String name) {
-        return (XWikiObjectPropertyInterface)fields.get(name);
+public class BaseClass extends PropertyClass implements ClassInterface {
+    public PropertyInterface get(String name) {
+        return (PropertyInterface)fields.get(name);
     }
 
-    public void put(String name, XWikiObjectPropertyInterface property) {
+    public void put(String name, PropertyInterface property) {
         fields.put(name, property);
+    }
+
+    public String[] getProperties() {
+        return (String[]) fields.keySet().toArray();
+    }
+
+    public String toString() {
+        return null;  //To change body of implemented methods use Options | File Templates.
+    }
+
+    public BaseProperty fromString(String value) {
+        return null;  //To change body of implemented methods use Options | File Templates.
     }
 }

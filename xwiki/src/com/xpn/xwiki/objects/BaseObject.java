@@ -20,18 +20,19 @@
  * Date: 9 déc. 2003
  * Time: 11:36:06
  */
-package com.xpn.xwiki.classes;
+package com.xpn.xwiki.objects;
 
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.*;
 
 import javax.mail.internet.ParameterList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XWikiObject extends XWikiObjectProperty implements XWikiObjectInterface {
-    private XWikiClass xWikiClass;
+public class BaseObject extends BaseProperty implements ObjectInterface {
+    private BaseClass xWikiClass;
     protected Map fields = new HashMap();
 
 
@@ -43,23 +44,41 @@ public class XWikiObject extends XWikiObjectProperty implements XWikiObjectInter
         }
     }
 
-    public XWikiObjectPropertyInterface get(String name) throws XWikiException {
-        checkField(name);
-        return (XWikiObjectPropertyInterface) fields.get(name);
+    public PropertyInterface safeget(String name) {
+        return (PropertyInterface) fields.get(name);
     }
 
-    public void put(String name,XWikiObjectPropertyInterface property) throws XWikiException {
+    public PropertyInterface get(String name) throws XWikiException {
         checkField(name);
+        return safeget(name);
+    }
+
+    public void safeput(String name,PropertyInterface property) {
         fields.put(name, property);
     }
 
+    public void put(String name,PropertyInterface property) throws XWikiException {
+        checkField(name);
+        safeput(name, property);
+    }
 
-    public XWikiClass getxWikiClass() {
+
+    public BaseClass getxWikiClass() {
         return xWikiClass;
     }
 
-    public void setxWikiClass(XWikiClass xWikiClass) {
+    public void setxWikiClass(BaseClass xWikiClass) {
         this.xWikiClass = xWikiClass;
+    }
+
+    protected String getStringValue(String name) {
+        return ((StringProperty)safeget(name)).getValue();
+    }
+
+    public void setStringValue(String name, String value) {
+      StringProperty property = new StringProperty();
+      property.setValue(value);
+      safeput(name, property);
     }
 
 }

@@ -18,18 +18,11 @@
  * Created by
  * User: Ludovic Dubost
  * Date: 9 déc. 2003
- * Time: 12:16:53
+ * Time: 11:57:01
  */
+package com.xpn.xwiki.objects.classes;
 
-package com.xpn.xwiki.classes;
+import com.xpn.xwiki.objects.ObjectInterface;
 
-import com.xpn.xwiki.XWikiContext;
-
-public interface XWikiClassPropertyInterface extends XWikiObjectInterface, XWikiObjectPropertyInterface {
-    public String toString(XWikiObjectProperty property);
-    public XWikiObjectProperty fromString(String value);
-    public void displayHidden(StringBuffer buffer, String name, XWikiObject object, XWikiContext context);
-    public void displaySearch(StringBuffer buffer, String name, XWikiObject object, XWikiContext context);
-    public void displayView(StringBuffer buffer, String name, XWikiObject object, XWikiContext context);
-    public void displayEdit(StringBuffer buffer, String name, XWikiObject object, XWikiContext context);
+public interface ClassInterface extends ObjectInterface {
 }

@@ -149,7 +149,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
             }
         }
         else {
-            principal = realm.authenticate(username, password);
+            principal = ((XWikiRealmAdapter)realm).authenticate(username, password, context);
         }
         return principal;
     }

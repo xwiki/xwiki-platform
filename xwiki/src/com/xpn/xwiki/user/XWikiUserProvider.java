@@ -28,6 +28,7 @@ import com.opensymphony.module.user.User;
 import com.opensymphony.module.user.provider.CredentialsProvider;
 import com.opensymphony.module.user.provider.ProfileProvider;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -51,7 +52,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     public boolean create(String name) {
         try {
             name = getName(name);
-            BaseClass bclass = getxWiki().getUserClass(context);
+            BaseClass bclass = getXWiki().getUserClass(context);
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
                 BaseObject obj = (BaseObject) bclass.newObject();
@@ -59,7 +60,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiUsers", 0, obj);
                 getPropertySets().put(getFullName(name), doc);
-                getxWiki().saveDocument(doc, context);
+                getXWiki().saveDocument(doc, context);
                 return true;
             } else
                 return false;
@@ -75,7 +76,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
             return true;
         try {
             name = getName(name);
-            List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
+            List list = getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
                     + " and obj.className='XWiki.XWikiUsers' and obj.name = '" + name + "'", context);
             boolean result = (list.size()>0);
             if (result)
@@ -89,7 +90,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     public List list() {
         try {
-            return getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiUsers'", context);
+            return getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiUsers'", context);
         } catch (XWikiException e) {
             e.printStackTrace();
             return new ArrayList();
@@ -116,7 +117,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     public boolean authenticate(String name, String password) {
         try {
             name = getName(name);
-            return getxWiki().checkPassword(name, password, context);
+            return getXWiki().checkPassword(name, password, context);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -135,4 +136,5 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         bprop.setValue(new String(password));
         return store(name, null);
     }
+
 }

@@ -98,8 +98,6 @@ public class XWiki implements XWikiNotificationInterface {
     private HttpServlet servlet;
     private String database;
 
-    private SecurityManager defaultSecurityManager;
-    private SecurityManager secureSecurityManager;
     private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
@@ -255,14 +253,6 @@ public class XWiki implements XWikiNotificationInterface {
         getGroupClass(context);
         getRightsClass(context);
         getGlobalRightsClass(context);
-
-        // Initialize User Manager
-        initUserManager();
-        initAccessManager();
-
-        // setDefaultSecurityManager(new XWikiSecurityManager(false));
-        // setSecureSecurityManager(new XWikiSecurityManager(true));
-        // System.setSecurityManager(getDefaultSecurityManager());
     }
 
     public String getVersion() {
@@ -899,24 +889,35 @@ public class XWiki implements XWikiNotificationInterface {
         return getRightsClass("XWikiGlobalRights", context);
     }
 
-    public void initUserManager() {
-        UserManager um = UserManager.getInstance();
-        ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setxWiki(this);
-        ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setxWiki(this);
-        setUsermanager(um);
+    public UserManager getUserManager(XWikiContext context) {
+        UserManager um = (UserManager) context.get("usermanager");
+        if (um==null) {
+           um = UserManager.getInstance();
+          ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setXWiki(this);
+          ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setXWiki(this);
+          ((XWikiUserProvider) um.getProfileProviders().toArray()[0]).setXWikiContext(context);
+          ((XWikiGroupProvider) um.getAccessProviders().toArray()[0]).setXWikiContext(context);
+          context.put("usermanager", um);
+        }
+        return um;
     }
 
-    public void initAccessManager() {
-        AccessManager am = AccessManager.getInstance();
-        ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setxWiki(this);
-        setAccessmanager(am);
+    public AccessManager getAccessManager(XWikiContext context) {
+        AccessManager am = (AccessManager) context.get("accessmanager");
+        if (am==null) {
+            am =AccessManager.getInstance();
+           ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setXWiki(this);
+           ((XWikiResourceProvider) am.getResourceProviders().toArray()[0]).setXWikiContext(context);
+           context.put("accessmanager", am);
+        }
+        return am;
     }
 
     public int createUser(XWikiContext context) throws XWikiException {
         return createUser(false, context);
     }
 
-    public int validateUser(XWikiContext context) throws XWikiException {
+    public int validateUser(boolean withConfirmEmail, XWikiContext context) throws XWikiException {
        try {
           HttpServletRequest request = (HttpServletRequest) context.getRequest();
           String xwikiname = request.getParameter("xwikiname");
@@ -928,10 +929,16 @@ public class XWiki implements XWikiNotificationInterface {
           XWikiDocInterface docuser = getDocument(xwikiname, context);
           BaseObject userobj = docuser.getObject("XWiki.XWikiUsers", 0);
           String validkey2 = userobj.getStringValue("validkey");
+          String email = userobj.getStringValue("email");
+          String password = userobj.getStringValue("password");
 
           if ((!validkey2.equals("")&&(validkey2.equals(validkey)))) {
               userobj.setIntValue("active", 1);
               saveDocument(docuser, context);
+
+              if (withConfirmEmail)
+               sendValidationEmail(xwikiname, password, email, validkey, "confirmation_email_content", context);
+
               return 0;
           } else
            return -1;
@@ -984,7 +991,7 @@ public class XWiki implements XWikiNotificationInterface {
 
           if ((result>0)&&(withValidation)) {
             // Send the validation email
-            sendValidationEmail(xwikiname, email, validkey, context);
+            sendValidationEmail(xwikiname, password, email, validkey, "validation_email_content", context);
           }
 
           return result;
@@ -998,14 +1005,13 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
-    public void sendValidationEmail(String xwikiname, String email, String validkey, XWikiContext context) throws XWikiException {
+    public void sendValidationEmail(String xwikiname, String password, String email, String validkey, String contentfield, XWikiContext context) throws XWikiException {
      String sender;
      String content;
 
      try {
-         XWikiDocInterface doc = getDocument("XWiki.Inscription", context);
-         sender = getXWikiPreference("validation_email_sender", context);
-         content = getXWikiPreference("validation_email_content", context);
+         sender = getXWikiPreference("admin_email", context);
+         content = getXWikiPreference(contentfield, context);
      } catch (Exception e) {
          throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG,
                                 "Exception while reading the validation email config", e, null);
@@ -1016,6 +1022,7 @@ public class XWiki implements XWikiNotificationInterface {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         vcontext.put("validkey", validkey);
         vcontext.put("email", email);
+        vcontext.put("password", password);
         vcontext.put("sender", sender);
         vcontext.put("xwikiname", xwikiname);
         content = parseContent(content, context);
@@ -1332,7 +1339,7 @@ public class XWiki implements XWikiNotificationInterface {
             else
                 docname = doc.getFullName();
 
-            if (getAccessmanager().userHasAccessLevel(username, docname, right))
+            if (getAccessManager(context).userHasAccessLevel(username, docname, right))
                 return true;
         } catch (NotFoundException e) {
             // This should not happen..
@@ -1354,22 +1361,6 @@ public class XWiki implements XWikiNotificationInterface {
             // Other user is refused
             return false;
         }
-    }
-
-    public UserManager getUsermanager() {
-        return usermanager;
-    }
-
-    public void setUsermanager(UserManager usermanager) {
-        this.usermanager = usermanager;
-    }
-
-    public AccessManager getAccessmanager() {
-        return accessmanager;
-    }
-
-    public void setAccessmanager(AccessManager accessmanager) {
-        this.accessmanager = accessmanager;
     }
 
     public String includeTopic(String topic, XWikiContext context) {
@@ -1464,10 +1455,7 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public Object getPrivateField(Object obj, String fieldName) {
-        // SecurityManager secmng = null;
         try {
-            // secmng = System.getSecurityManager();
-            // System.setSecurityManager(getDefaultSecurityManager());
             Field field = obj.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
             return field.get(obj);
@@ -1477,7 +1465,6 @@ public class XWiki implements XWikiNotificationInterface {
             e.printStackTrace();
             return null;
         } finally {
-            // System.setSecurityManager(secmng);
         }
     }
 
@@ -1486,10 +1473,7 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public Object callPrivateMethod(Object obj, String methodName, Class[] classes, Object[] args) {
-        // SecurityManager secmng = null;
         try {
-            // secmng = System.getSecurityManager();
-            // System.setSecurityManager(getDefaultSecurityManager());
             Method method = obj.getClass().getDeclaredMethod(methodName, classes);
             method.setAccessible(true);
             return method.invoke(obj, args);
@@ -1502,25 +1486,8 @@ public class XWiki implements XWikiNotificationInterface {
             e.printStackTrace();
             return null;
         } finally {
-            // System.setSecurityManager(secmng);
         }
 
-    }
-
-    public SecurityManager getDefaultSecurityManager() {
-        return defaultSecurityManager;
-    }
-
-    public void setDefaultSecurityManager(SecurityManager defaultSecurityManager) {
-        this.defaultSecurityManager = defaultSecurityManager;
-    }
-
-    public SecurityManager getSecureSecurityManager() {
-        return secureSecurityManager;
-    }
-
-    public void setSecureSecurityManager(SecurityManager secureSecurityManager) {
-        this.secureSecurityManager = secureSecurityManager;
     }
 
     public String[] split(String str, String sep) {

@@ -67,12 +67,10 @@ public class UserTest extends TestCase {
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
-        xwiki.initAccessManager();
-        xwiki.initUserManager();
         context.setWiki(xwiki);
         StoreHibernateTest.cleanUp(getHibStore(), context);
-        um = xwiki.getUsermanager();
-        am = xwiki.getAccessmanager();
+        um = xwiki.getUserManager(context);
+        am = xwiki.getAccessManager(context);
         getUserProvider(um).flushCaches();
         getGroupProvider(um).flushCaches();
         getResourceProvider(am).flushCaches();

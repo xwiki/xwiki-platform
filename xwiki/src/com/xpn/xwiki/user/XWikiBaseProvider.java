@@ -37,12 +37,20 @@ public class XWikiBaseProvider {
     private static Map propertySets;
     protected XWikiContext context = new XWikiContext();
 
-    public XWiki getxWiki() {
+    public XWiki getXWiki() {
         return xWiki;
     }
 
-    public void setxWiki(XWiki xWiki) {
+    public void setXWiki(XWiki xWiki) {
         this.xWiki = xWiki;
+    }
+
+    public void setXWikiContext(XWikiContext context) {
+        this.context = context;
+    }
+
+    public XWikiContext getXWikiContext(XWikiContext context) {
+        return context;
     }
 
     public static Map getPropertySets() {
@@ -78,7 +86,7 @@ public class XWikiBaseProvider {
         XWikiDocInterface doc = null;
         try {
             name = getName(name);
-            doc = getxWiki().getDocument(name, context);
+            doc = getXWiki().getDocument(name, context);
             getPropertySets().put(getFullName(name), doc);
             return doc;
         } catch (XWikiException e) {
@@ -96,7 +104,7 @@ public class XWikiBaseProvider {
     }
 
     public void flushCaches() {
-        getxWiki().flushCache();
+        getXWiki().flushCache();
         setHandledNames(new HashSet());
     }
 
@@ -120,7 +128,7 @@ public class XWikiBaseProvider {
             return false;
 
         try {
-            getxWiki().saveDocument(doc, context);
+            getXWiki().saveDocument(doc, context);
             return true;
         } catch (XWikiException e) {
             return false;

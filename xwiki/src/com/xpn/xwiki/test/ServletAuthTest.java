@@ -170,30 +170,38 @@ public class ServletAuthTest extends ServletTest {
     }
 
 
+
+    private void prepareEmailPreferences(String pagename, String pagecontent, XWikiHibernateStore hibstore) throws XWikiException {
+        String content = Utils.content1;
+        Utils.content1 = pagecontent;
+        Utils.createDoc(hibstore, "Main", pagename, context);
+        Utils.content1 = content;
+        // In order for createUser to work, we need programming right
+        Utils.createDoc(hibstore, "XWiki", "XWikiPreferences", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "admin_email", "ludovic@xwiki.org", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "validation_email_content",
+                        "Subject: Welcome to XWiki\n\nTest email from $sender to $email\n\nClick on http://www.xwiki.com/xwiki/bin/view/XWiki/InscriptionStep2?validkey=$validkey", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "confirmation_email_content",
+                "Subject: Welcome to XWiki\n\nConfirmation email from $sender to $email\n\nYour password is $password", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "smtp_server", "127.0.0.1", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "smtp_port", "225", context);
+    }
+
+
     public void beginCreateUserWithEmail(WebRequest webRequest) throws HibernateException, XWikiException {
 
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        String content = Utils.content1;
-        Utils.content1 = "$xwiki.createUser(true)";
-        Utils.createDoc(hibstore, "Main", "CreateUserTest", context);
-        Utils.content1 = content;
 
-        // In order for createUser to work, we need programming right
-        Utils.createDoc(hibstore, "XWiki", "XWikiPreferences", context);
+        prepareEmailPreferences("CreateUserTest", "$xwiki.createUser(true)", hibstore);
         updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "validation_email_sender", "ludovic@xwiki.org", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "validation_email_content",
-                "Subject: Welcome to XWiki\n\nTest email from $sender to $email\n\nClick on http://www.xwiki.com/xwiki/bin/view/XWiki/InscriptionStep2?validkey=$validkey", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "smtp_server", "127.0.0.1", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "smtp_port", "225", context);
 
         setUrl(webRequest, "view", "CreateUserTest");
         webRequest.addParameter("xwikiname","LudovicDubost");
         webRequest.addParameter("register_password","toto");
         webRequest.addParameter("register2_password","toto");
-        webRequest.addParameter("register_email","ludovic@xpertnet.biz");
+        webRequest.addParameter("register_email","ludovic@xwiki.org");
         webRequest.addParameter("register_fullname","Ludovic Dubost");
 
         // Let's start the email server
@@ -209,7 +217,7 @@ public class ServletAuthTest extends ServletTest {
             // Let's check the email
             assertNotNull("Email could not be retrieved", email);
             assertEquals("Email subject is not correct", "Welcome to XWiki", email.getHeaderValue("Subject"));
-            assertTrue("Email body is not correct", email.getBody().startsWith("Test email from ludovic@xwiki.org to ludovic@xpertnet.biz\n\nClick on http://www.xwiki.com/xwiki/bin/view/XWiki/InscriptionStep2?validkey="));
+            assertTrue("Email body is not correct", email.getBody().startsWith("Test email from ludovic@xwiki.org to ludovic@xwiki.org\n\nClick on http://www.xwiki.com/xwiki/bin/view/XWiki/InscriptionStep2?validkey="));
 
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -217,7 +225,7 @@ public class ServletAuthTest extends ServletTest {
             doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
-            assertEquals("Email is wrong", "ludovic@xpertnet.biz", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
+            assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
             assertEquals("Fullname is wrong", "Ludovic Dubost", doc.getObject("XWiki.XWikiUsers",0).getStringValue("fullname"));
             assertEquals("Activity is wrong", 0, doc.getObject("XWiki.XWikiUsers",0).getIntValue("active"));
 
@@ -234,20 +242,119 @@ public class ServletAuthTest extends ServletTest {
          launchTest();
     }
 
+
+    public void beginValidateUserWithEmailFail(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        prepareEmailPreferences("ValidateUserTest", "$xwiki.validateUser(true)", hibstore);
+        updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
+
+        Utils.createDoc(hibstore, "XWiki", "LudovicDubost", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "email", "ludovic@xwiki.org", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "validkey", "ABCDEFGHIJKLMNOP", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "password", "toto", context);
+
+        setUrl(webRequest, "view", "ValidateUserTest");
+        webRequest.addParameter("xwikiname","LudovicDubost");
+        webRequest.addParameter("validkey","ABCDEFGHIJKLMNOPQ");
+
+        // Let's start the email server
+        startSmtpServer();
+        assertNotNull("Could not start email server for tests", server);
+    }
+
+    public void endValidateUserWithEmailFail(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            SmtpMessage email = getLastMessage();
+            stopSmtpServer();
+
+            // Let's check the email
+            assertNull("Email could not be retrieved", email);
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+            XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki", "LudovicDubost");
+            doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+            assertFalse("User should exist", doc.isNew());
+            assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
+            assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
+            assertEquals("Activity is wrong", 0, doc.getObject("XWiki.XWikiUsers",0).getIntValue("active"));
+        } finally {
+            stopSmtpServer();
+            clientTearDown();
+        }
+    }
+
+    public void testValidateUserWithEmailFail() throws Throwable {
+         launchTest();
+    }
+
+
+
+    public void beginValidateUserWithEmail(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        prepareEmailPreferences("ValidateUserTest", "$xwiki.validateUser(true)",hibstore);
+        updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
+
+        Utils.createDoc(hibstore, "XWiki", "LudovicDubost", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "email", "ludovic@xwiki.org", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "password", "toto", context);
+        Utils.setStringValue("XWiki.LudovicDubost", "XWiki.XWikiUsers", "validkey", "ABCDEFGHIJKLMNOP", context);
+
+        setUrl(webRequest, "view", "ValidateUserTest");
+        webRequest.addParameter("xwikiname","LudovicDubost");
+        webRequest.addParameter("validkey","ABCDEFGHIJKLMNOP");
+
+        // Let's start the email server
+        startSmtpServer();
+        assertNotNull("Could not start email server for tests", server);
+    }
+
+    public void endValidateUserWithEmail(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            SmtpMessage email = getLastMessage();
+            stopSmtpServer();
+
+            // Let's check the email
+            assertNotNull("Email could not be retrieved", email);
+            assertEquals("Email subject is not correct", "Welcome to XWiki", email.getHeaderValue("Subject"));
+            assertTrue("Email body is not correct", email.getBody().startsWith("Confirmation email from ludovic@xwiki.org to ludovic@xwiki.org\n\nYour password is toto"));
+
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+            XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki", "LudovicDubost");
+            doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+            assertFalse("User should exist", doc.isNew());
+            assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
+            assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
+            assertEquals("Activity is wrong", 1, doc.getObject("XWiki.XWikiUsers",0).getIntValue("active"));
+        } finally {
+            stopSmtpServer();
+            clientTearDown();
+        }
+    }
+
+    public void testValidateUserWithEmail() throws Throwable {
+         launchTest();
+    }
+
+
     public void beginCreateUserNoRight(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        String content = Utils.content1;
-        Utils.content1 = "$xwiki.createUser()";
-        Utils.createDoc(hibstore, "Main", "CreateUserTest", context);
-        Utils.content1 = content;
+
+        prepareEmailPreferences("CreateUserTest", "$xwiki.createUser()", hibstore);
 
         setUrl(webRequest, "view", "CreateUserTest");
         webRequest.addParameter("xwikiname","LudovicDubost");
         webRequest.addParameter("register_password","toto");
         webRequest.addParameter("register2_password","toto");
-        webRequest.addParameter("register_email","ludovic@xpertnet.biz");
+        webRequest.addParameter("register_email","ludovic@xwiki.org");
         webRequest.addParameter("register_fullname","Ludovic Dubost");
     }
 
@@ -281,7 +388,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("xwikiname","LudovicDubost");
         webRequest.addParameter("register_password","toto");
         webRequest.addParameter("register2_password","tata");
-        webRequest.addParameter("register_email","ludovic@xpertnet.biz");
+        webRequest.addParameter("register_email","ludovic@xwiki.org");
         webRequest.addParameter("register_fullname","Ludovic Dubost");
     }
 

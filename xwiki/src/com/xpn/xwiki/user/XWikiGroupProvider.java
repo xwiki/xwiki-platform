@@ -42,14 +42,14 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
     public boolean create(String name) {
         name = getName(name);
         try {
-            BaseClass bclass = getxWiki().getGroupClass(context);
+            BaseClass bclass = getXWiki().getGroupClass(context);
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
                 BaseObject obj = (BaseObject) bclass.newObject();
                 obj.setClassName(bclass.getName());
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiGroups", 0, obj);
-                getxWiki().saveDocument(doc, context);
+                getXWiki().saveDocument(doc, context);
                 getPropertySets().put(getFullName(name), doc);
                 return true;
             } else
@@ -66,7 +66,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
             return true;
         try {
             name = getName(name);
-            List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
+            List list = getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
                     + " and obj.className in ('XWiki.XWikiUsers','XWiki.XWikiGroups') and obj.name = '" + name + "'", context);
             boolean result = (list.size()>0);
             if (result)
@@ -80,7 +80,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
 
     public List list() {
         try {
-            return getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups'", context);
+            return getXWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups'", context);
         } catch (XWikiException e) {
             return new ArrayList();
         }
@@ -111,13 +111,13 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
                 return true;
             XWikiDocInterface doc = getDocument(groupname);
             BaseClass bclass = null;
-            bclass = getxWiki().getGroupClass(context);
+            bclass = getXWiki().getGroupClass(context);
             BaseObject bobj = new BaseObject();
             bobj.setName(groupname);
             bobj.setStringValue("member", username);
             bobj.setClassName(bclass.getName());
             doc.addObject("XWiki.XWikiGroups", bobj);
-            getxWiki().saveDocument(doc, context);
+            getXWiki().saveDocument(doc, context);
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
@@ -149,7 +149,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
         List list;
         try {
             username = getName(username);
-            list = getxWiki().searchDocuments(", BaseObject as obj, StringProperty as prop "
+            list = getXWiki().searchDocuments(", BaseObject as obj, StringProperty as prop "
                     + "where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiGroups' "
                     + "and obj.id = prop.id.id and (prop.id.name='member' or prop.id.name='group') and prop.value='" + username + "'", context);
             // we might need to deduplicate..
@@ -199,7 +199,7 @@ public class XWikiGroupProvider extends XWikiBaseProvider implements AccessProvi
                 }
             }
             if (needsUpdate)
-                getxWiki().saveDocument(doc, context);
+                getXWiki().saveDocument(doc, context);
             return true;
         } catch (XWikiException e) {
             e.printStackTrace();

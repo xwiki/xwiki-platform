@@ -54,7 +54,7 @@ public class Api {
 
 
         try {
-            return xwiki.getAccessmanager().userHasAccessLevel(username, docname, "programming");
+            return xwiki.getAccessManager(context).userHasAccessLevel(username, docname, "programming");
         } catch (NotFoundException e) {
             e.printStackTrace();
             return false;

@@ -143,6 +143,9 @@ public class XWikiException extends Exception {
         this(module, code, message, null, null);
     }
 
+    public XWikiException() {
+    }
+
     public int getModule() {
         return module;
     }

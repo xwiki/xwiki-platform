@@ -61,7 +61,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             return true;
         try {
             name = getName(name);
-            List list = getxWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'", context);
+            List list = getXWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'", context);
             boolean result = (list.size()>0);
             if (result)
                 getHandledNames().add(name);
@@ -195,7 +195,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         // Didn't found right at this level.. Let's go to group level
         List grouplist = null;
         try {
-          grouplist = getxWiki().getAccessmanager().listGroupsForUser(name);
+          grouplist = getXWiki().getAccessManager(context).listGroupsForUser(name);
         } catch (NotFoundException e) {
         } catch (Exception e) {
             // This should not happen
@@ -238,7 +238,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             // Make sure we remove the database name and set the context
             name = getName(name);
 
-            XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences", context);
+            XWikiDocInterface xwikidoc = getXWiki().getDocument("XWiki.XWikiPreferences", context);
 
             // Verify XWiki programming right
             if (accessLevel.equals("programming")) {
@@ -262,7 +262,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
 
             // Verify Web super user
             String web = Util.getWeb(resourceKey);
-            XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences", context);
+            XWikiDocInterface webdoc = getXWiki().getDocument(web, "WebPreferences", context);
             try {
                 allow = checkRight(name, webdoc , "admin", true, true, true);
                 if (allow) return true;
@@ -270,7 +270,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
 
             // First check if this document is denied to the specific user
             resourceKey = getName(resourceKey);
-            XWikiDocInterface doc = getxWiki().getDocument(resourceKey, context);
+            XWikiDocInterface doc = getXWiki().getDocument(resourceKey, context);
             try {
                 deny = checkRight(name, doc, accessLevel, true, false, false);
                 deny_found = true;

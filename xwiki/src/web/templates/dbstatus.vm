@@ -1,14 +1,41 @@
 <html>
 <head>
 <title>Database Status</title>
+<script type="text/javascript">
+<!--
+function switchView(divname) {
+ var divel = document.getElementById(divname);
+ if (divel.style.display=='block')
+  divel.style.display = 'none';
+ else
+  divel.style.display = 'block';
+}
+// -->
+</script>
+</head>
+<body>
 <h1>Database Status</h1>
 <h2>Active Connections</h2>
-<ul><li />Active: $xwiki.store.store.nbConnections
+<ul>
+<li />Active: $xwiki.store.store.nbConnections
+<li />Map Size: $xwiki.store.store.connections.size()
 </ul>
 <br /><br />
-#foreach($pconn in $xwiki.store.store.connections)
-<h3>$pconn</h3>
+
+#foreach ($mconn in $xwiki.store.store.connections)
+<h3>$mconn</h3>
+#set($pconn = $mconn.connection)
 <ul>
+<li /><a href="" onclick="switchView('$mconn'); return false;">Time: $mconn.date</a>
+<div id="$mconn" style="display: none">
+The database connection was assigned in the following page:<br />
+$mconn.url
+<br /><br />
+StackTrace: <br />
+<pre>
+$mconn.exception.getStackTraceAsString()
+</pre>
+</div>
 <li />Closed: $pconn.isClosed()
 #if ( $pconn.closed==false)
 <li />Catalog: $!pconn.catalog

@@ -119,7 +119,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
     */
    private String getContinueToURL(HttpServletRequest request) {
       String savedURL = request.getParameter("xredirect");
-      if (savedURL==null)
+      if ((savedURL==null)||(savedURL.trim().equals("")))
          savedURL = SecurityFilter.getContinueToURL(request);
 
       if (savedURL != null) {
@@ -163,7 +163,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
             }
         }
         else {
-            principal = realm.authenticate(username, password);
+             principal = ((XWikiRealmAdapter)realm).authenticate(username, password, context);
         }
         return principal;
     }

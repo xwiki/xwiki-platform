@@ -176,8 +176,8 @@ public class XWiki extends Api {
         // TODO: We might need to send a notification email here.
     }
 
-    public int validateUser() throws XWikiException {
-        return xwiki.validateUser(context);
+    public int validateUser(boolean withConfirmEmail) throws XWikiException {
+        return xwiki.validateUser(withConfirmEmail, context);
     }
 
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {
@@ -201,7 +201,7 @@ public class XWiki extends Api {
 
     public boolean hasAccessLevel(String level) {
        try {
-           return xwiki.getAccessmanager().userHasAccessLevel(context.getUser(), context.getDoc().getFullName(), level);
+           return xwiki.getAccessManager(context).userHasAccessLevel(context.getUser(), context.getDoc().getFullName(), level);
        } catch (Exception e) {
            return false;
        }

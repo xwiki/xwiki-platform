@@ -38,7 +38,9 @@ import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.catalina.HttpRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.Serializable;
@@ -50,7 +52,7 @@ import java.util.*;
 
 public class XWikiHibernateStore implements XWikiStoreInterface {
 
-    private Collection connections = new HashSet();
+    private Map connections = new HashMap();
     private int nbConnections = 0;
     private SessionFactory sessionFactory;
     private Configuration configuration;
@@ -214,7 +216,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
          // Keep some statistics about session and connections
          nbConnections++;
-         addConnection(session.connection());
+         addConnection(session.connection(), context);
 
          setSession(session, context);
          setDatabase(session, context);
@@ -236,14 +238,17 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         return true;
     }
 
-    private void addConnection(Connection connection) {
+    private void addConnection(Connection connection, XWikiContext context) {
         if (connection!=null)
-         connections.add(connection);
+         connections.put(connection, new ConnectionMonitor(connection, context));
     }
 
     private void removeConnection(Connection connection) {
-        if (connection!=null)
-         connections.remove(connection);
+        try {
+          if (connection!=null)
+             connections.remove(connection);
+        } catch (Exception e) {
+        }
     }
 
     public void endTransaction(XWikiContext context, boolean commit)
@@ -1379,7 +1384,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
     }
 
     public Collection getConnections() {
-        return connections;
+        return connections.values();
     }
 
     public int getNbConnections() {
@@ -1390,5 +1395,58 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         this.nbConnections = nbConnections;
     }
 
+    public class ConnectionMonitor {
+        private Exception exception;
+        private Connection connection;
+        private Date date;
+        private String url = "";
 
+        public ConnectionMonitor(Connection connection, XWikiContext context) {
+            this.setConnection(connection);
+
+            try {
+            setDate(new Date());
+            setException(new XWikiException());
+            HttpServletRequest request = context.getRequest();
+            if (request!=null)
+             setUrl(XWiki.getRequestURL(context.getRequest()));
+            } catch (Throwable e) {
+            }
+
+        }
+
+        public Connection getConnection() {
+            return connection;
+        }
+
+        public void setConnection(Connection connection) {
+            this.connection = connection;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
+
+        public void setException(Exception exception) {
+            this.exception = exception;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+    }
 }
+

@@ -26,29 +26,31 @@ import com.opensymphony.module.user.EntityNotFoundException;
 import com.opensymphony.module.user.User;
 import com.opensymphony.module.user.UserManager;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import org.securityfilter.realm.SecurityRealmInterface;
 
 import java.security.Principal;
 
 public class XWikiRealmAdapter  implements SecurityRealmInterface {
     private XWiki xwiki;
+    private XWikiContext context = new XWikiContext();
 
     public XWikiRealmAdapter() {
     }
 
     public XWikiRealmAdapter(XWiki xwiki) {
-        setxWiki(xwiki);
+        setXWiki(xwiki);
     }
 
     /**
      * Set xwiki used for authentication
      */
-    public void setxWiki(XWiki xwiki) {
+    public void setXWiki(XWiki xwiki) {
         this.xwiki = xwiki;
     }
 
-    public UserManager getUserManager() {
-        return xwiki.getUsermanager();
+    public void setXWikiContext(XWikiContext context) {
+        this.context = context;
     }
 
     /**
@@ -61,7 +63,7 @@ public class XWikiRealmAdapter  implements SecurityRealmInterface {
      */
     public Principal authenticate(String username, String password) {
         try {
-            User user = getUserManager().getUser(username);
+            User user = xwiki.getUserManager(context).getUser(username);
 
             if (user.authenticate(password)) {
                 return user;
@@ -73,6 +75,29 @@ public class XWikiRealmAdapter  implements SecurityRealmInterface {
     }
 
     /**
+      * Authenticate a user.
+      *
+      * @param username a username
+      * @param password a plain text password, as entered by the user
+      *
+      * @return a Principal object representing the user if successful, false otherwise
+      */
+     public Principal authenticate(String username, String password, XWikiContext context) {
+         try {
+             User user = xwiki.getUserManager(context).getUser(username);
+
+             if (user.authenticate(password)) {
+                 return user;
+             }
+         } catch (EntityNotFoundException e) {
+         }
+
+         return null;
+     }
+
+
+    /**
+     *
      * Test for role membership.
      *
      * Use Principal.getName() to get the username from the principal object.
@@ -83,7 +108,7 @@ public class XWikiRealmAdapter  implements SecurityRealmInterface {
      */
     public boolean isUserInRole(Principal principal, String rolename) {
         try {
-            User user = getUserManager().getUser(principal.getName());
+            User user = xwiki.getUserManager(context).getUser(principal.getName());
 
             return user.inGroup(rolename);
         } catch (EntityNotFoundException e) {

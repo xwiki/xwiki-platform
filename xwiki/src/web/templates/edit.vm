@@ -22,7 +22,20 @@ $msg.get("youareediting"): $tdoc.language
 <br /><br />
 #end
 $xwiki.getTextArea($tdoc.content)
-<br/><br/>
+<br/>
+<script type="text/javascript">
+<!--
+function openHelp() {
+  win = open( "http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain",
+			   "syntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  if( win ) {
+	 win.focus();
+  }
+}
+// -->
+</script>
+$msg.get("helponsyntax") <a href="" onClick="openHelp(); return false;">$msg.get("xwikisyntax")</a>
+<br /><br />
 #if ($tdoc.language=="")
 Parent:&nbsp;<input type="text" name="parent" value="$!doc.parent" size="40" />
 <br/><br/>

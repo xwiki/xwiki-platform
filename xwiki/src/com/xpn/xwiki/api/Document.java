@@ -227,6 +227,14 @@ public class Document extends Api {
         return getObjects(objects);
     }
 
+    public Object getObject(String classname, String key, String value) {
+        BaseObject obj = doc.getObject(classname, key, value);
+        if (obj==null)
+         return null;
+        else
+         return new Object(obj, context);
+    }
+
     public Object getObject(String classname, int nb) {
         BaseObject obj = doc.getObject(classname, nb);
         if (obj==null)

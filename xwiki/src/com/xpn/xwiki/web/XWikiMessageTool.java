@@ -34,6 +34,10 @@ public class XWikiMessageTool {
     }
 
     public String get(String key) {
-        return bundle.getString(key);
+        try {
+         return bundle.getString(key);
+        } catch (Exception e) {
+            return key;
+        }
     }
 }

@@ -515,6 +515,24 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
     }
 
+
+    public BaseObject getObject(String classname, String key, String value) {
+        try {
+            Vector objects = (Vector)getxWikiObjects().get(classname);
+            if ((objects==null)||(objects.size()==0))
+                return null;
+            for (int i=0;i<objects.size();i++) {
+                BaseObject obj = (BaseObject) objects.get(i);
+                if (value.equals(obj.getStringValue(key)))
+                    return obj;
+            }
+            return getObject(classname);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
     public void addObject(String classname, BaseObject object) {
         Vector vobj = getObjects(classname);
         if (vobj==null)

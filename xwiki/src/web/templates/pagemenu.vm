@@ -40,19 +40,19 @@ function showhidemenu() {
 </div>
 <div id="xwikinav_sidebar" style="display: ${displaysidebar};">
 <div id="xwikinav_sidebarbutton"><a href="" onclick="showhidemenu(); return false;">Menu</a></div>
-<div id="xwikiusermenutitle" class="xwikimenu">$msg.get("usermenu")
-</div>
 #set( $pagemenu = $xwiki.getWebPreference("pagemenu"))
 #if ( $pagemenu != "")
 $xwiki.parseContent($pagemenu)
 #else
-<div id="xwikiusermenulinks" class="xwikimenu">
+<div id="xwikiusermenutitle" class="xwikimenutitle">$msg.get("usermenu")
+</div>
+<div id="xwikiusermenulinks" class="xwikimenulinks">
 #set ($user = $context.getUser())
 <a href="$xwiki.getActionUrl($user, "view")">$msg.get("homepage")</a><span class="xwikisep"> | </span>
 #template("stylesheetlinks.vm")
 </div>
-<div id="xwikipagemenutitle" class="xwikimenu">$msg.get("pagemenu")</div>
-<div id="xwikipagemenulinks" class="xwikimenu">
+<div id="xwikipagemenutitle" class="xwikimenutitle">$msg.get("pagemenu")</div>
+<div id="xwikipagemenulinks" class="xwikimenulinks">
 <a href="$attachurl">$msg.get("attachments") ($doc.getAttachmentList().size())</a><span class="xwikisep"> | </span>
 <a href="$inlineurl">$msg.get("editinline")</a><span class="xwikisep"> | </span>
 #if ($xwiki.isMultiLingual()==true)
@@ -76,13 +76,18 @@ $xwiki.parseContent($pagemenu)
 <a href="${viewurl}?xpage=xml">$msg.get("xml")</a><span class="xwikisep"> | </span>
 #versions()
 </div>
-<div id="xwikiwebmenutitle" class="xwikimenu">$msg.get("webmenu")</div>
-<div id="xwikiwebmenulinks" class="xwikimenu">
+<div id="xwikiwebmenutitle" class="xwikimenutitle">$msg.get("webmenu")</div>
+<div id="xwikiwebmenulinks" class="xwikimenulinks">
 <a href="../../view/${doc.web}/WebHome">$msg.get("space")</a><span class="xwikisep"> | </span>
 <a href="../../view/${doc.web}/WebPreferences">$msg.get("webprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/${doc.web}/WebPreferences?xpage=editrights&amp;global=1">$msg.get("webrights")</a><span class="xwikisep"> | </span>
 <a href="../../view/XWiki/XWikiPreferences">$msg.get("xwikiprefs")</a><span class="xwikisep"> | </span>
 <a href="../../edit/XWiki/XWikiPreferences?xpage=editrights&amp;global=1">$msg.get("xwikirights")</a><span class="xwikisep"> | </span>
+</div>
+<div id="xwikihelpmenutitle" class="xwikimenutitle">$msg.get("helpmenu")</div>
+<div id="xwikihelpmenulinks" class="xwikimenulinks">
+<a href="../../view/Doc/WebHome">$msg.get("xwikidoc")</a><span class="xwikisep"> | </span>
+<a href="../../view/Doc/XWikiSyntax">$msg.get("xwikisyntax")</a><span class="xwikisep"> | </span>
 </div>
 #end
 </div>

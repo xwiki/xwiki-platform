@@ -216,7 +216,7 @@ html, body {
 }
 
 
-#xwikinav_sidebarbutton, #xwikiusermenutitle, #xwikipagemenutitle, #xwikiwebmenutitle {
+#xwikinav_sidebarbutton, .xwikimenutitle {
    display: block;
    float: left;
    clear: left;
@@ -239,7 +239,7 @@ html, body {
     font-size: 10px;
 }
 
-#xwikiusermenulinks, #xwikipagemenulinks, #xwikiwebmenulinks {
+.xwikimenulinks {
    display: block;
    float: left;
    clear: left;
@@ -247,7 +247,7 @@ html, body {
    width: 140px;
 }
 
-#xwikiusermenulinks a, #xwikipagemenulinks a, #xwikiwebmenulinks a {
+.xwikimenulinks a {
    display: block;
    clear: both;
    margin-left: 10px;

@@ -194,4 +194,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
                                   boolean bWithAttachmentContent,
                                   boolean bWithTranslations, boolean bWithVersions,
                                   XWikiContext context);
+
+    BaseObject getObject(String classname, String key, String value);
 }

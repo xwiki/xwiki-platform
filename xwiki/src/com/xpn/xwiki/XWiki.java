@@ -699,10 +699,23 @@ public class XWiki implements XWikiNotificationInterface {
     public String getXWikiPreference(String prefname, String default_value, XWikiContext context) {
         try {
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
-            return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
+            // First we try to get a translated preference object
+            BaseObject object = doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage());
+            String result = "";
+
+            try {
+                result = ((BaseProperty)object.get(prefname)).getValue().toString();
+            } catch (Exception e) {
+            }
+            // If empty we take it from the default pref object
+            if (result.equals(""))
+                result = ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
+
+            if (!result.equals(""))
+                return result;
         } catch (Exception e) {
-            return default_value;
         }
+        return default_value;
     }
 
     public String getWebPreference(String prefname, XWikiContext context) {
@@ -713,11 +726,23 @@ public class XWiki implements XWikiNotificationInterface {
         try {
             XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
             XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences", context);
-            String result = doc.getStringValue("XWiki.XWikiUsers", prefname);
+
+            // First we try to get a translated preference object
+            BaseObject object = doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage());
+            String result = "";
+            try {
+                result = ((BaseProperty)object.get(prefname)).getValue().toString();
+                // If empty we take it from the default pref object
+            } catch (Exception e) {
+            }
+
+            if (result.equals(""))
+               result = ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
+
             if (!result.equals(""))
-                return result;
-        } catch (Exception e) {
-        }
+               return result;
+           } catch (Exception e) {
+           }
         return getXWikiPreference(prefname, default_value, context);
     }
 
@@ -1699,16 +1724,18 @@ public class XWiki implements XWikiNotificationInterface {
                 return "Topic " + topic + " does not exist";
             }
 
+            String tcontent = doc.getTranslatedContent(context);
+
             if (isForm) {
                 // We do everything in the context of the including document
                 if (database!=null)
                     context.setDatabase(database);
 
-                return "{pre}" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "{/pre}";
+                return "{pre}" + getRenderingEngine().renderText(tcontent, (XWikiDocInterface)context.get("doc"), context) + "{/pre}";
             }
             else {
                 // We stay in the context included document
-                return "{pre}" + getRenderingEngine().renderDocument(doc, context) + "{/pre}";
+                return "{pre}" + getRenderingEngine().renderText(tcontent, doc, context) + "{/pre}";
             }
         } finally {
             if (database!=null)

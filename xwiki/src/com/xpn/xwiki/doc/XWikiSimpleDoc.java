@@ -165,6 +165,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return buf.toString();
     }
 
+    public void setFullName(String name) {
+        // It is not allowed to use this..
+    }
+
     public String getFormat() {
         return format;
     }

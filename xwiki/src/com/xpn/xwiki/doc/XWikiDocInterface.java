@@ -33,13 +33,14 @@ import java.util.Map;
 import java.io.FileNotFoundException;
 
 public interface XWikiDocInterface {
-    public String getFullName();
     public long getId();
     public void setId(long id);
     public String getName();
     public void setName(String name);
     public String getWeb();
     public void setWeb(String web);
+    public String getFullName();
+    public void setFullName(String name);
     public Version getRCSVersion();
     public void setRCSVersion(Version version);
     public String getVersion();

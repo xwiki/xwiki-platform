@@ -284,6 +284,15 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
 
     public List getClassList() throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                "Exception while searching class list");
+                "Exception while searching: not implemented");
+    }
+
+    public List searchDocuments(String wheresql) throws XWikiException {
+        return searchDocuments(wheresql,0,0);
+    }
+
+    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
     }
 }

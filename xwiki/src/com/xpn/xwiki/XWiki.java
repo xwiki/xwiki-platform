@@ -142,6 +142,7 @@ public class XWiki {
 
     public String getTextArea(String content) {
         Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
         String scontent = filter.process(content);
 
         TextArea textarea = new TextArea();
@@ -153,6 +154,10 @@ public class XWiki {
         return textarea.toString();
     }
 
+    public List getClassList() throws XWikiException {
+     return store.getClassList();
+    }
+    /*
     public String[] getClassList() throws XWikiException {
       List list = store.getClassList();
       String[] array = new String[list.size()];
@@ -160,4 +165,14 @@ public class XWiki {
          array[i] = (String)list.get(i);
       return array;
     }
+    */
+
+    public List searchDocuments(String wheresql) throws XWikiException {
+      return store.searchDocuments(wheresql);
+    }
+
+    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+      return store.searchDocuments(wheresql, nb, start);
+    }
+
 }

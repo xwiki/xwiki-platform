@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-2.0.dtd">
+<hibernate-configuration>
+<session-factory>
+<property name="show_sql">true</property>
+<property name="use_outer_join">true</property>
+<property name="connection.url">jdbc:mysql://localhost/xwikitest</property>
+<property name="connection.username">xwikitest</property>
+<property name="connection.password">xwikitest</property>
+<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+<property name="connection.pool_size">50</property>
+<property name="statement_cache.size">50</property>
+<property name="dialect">net.sf.hibernate.dialect.MySQLDialect</property>
+<property name="transaction.factory_class">net.sf.hibernate.transaction.JDBCTransactionFactory</property>
+<!-- Mapping files -->
+<mapping resource="xwiki.hbm.xml"/>
+</session-factory>
+</hibernate-configuration>

@@ -1,4 +1,7 @@
 
+
+package com.xpn.xwiki.test;
+
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.BaseObject;

@@ -41,6 +41,10 @@
         <property name="parent" type="string">
             <column name="XWD_PARENT" length="511"/>
         </property>
+
+        <property name="fullName" type="string" formula="CONCAT(XWD_WEB,'.',XWD_NAME)" update="false" insert="false">
+        </property>
+
     </class>
 
     <class name="com.xpn.xwiki.objects.classes.PropertyClass" table="xwikiclassesprop">

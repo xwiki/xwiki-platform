@@ -28,27 +28,41 @@ import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWikiException;
 
 import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 import org.apache.commons.jrcs.rcs.Version;
+import net.sf.hibernate.impl.SessionImpl;
+import net.sf.hibernate.HibernateException;
 
 
 public class StoreTest extends TestCase {
 
-    String name = "WebHome";
-    String name2 = "Globals";
-    String web = "Main";
-    String content1 = "Hello 1\nHello 2\nHello 3\n";
-    String content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-    String author = "VictorHugo";
-    String author2 = "JulesVerne";
-    String parent = "Main.WebHome";
-    String version = "1.1";
-    String version2 = "1.2";
+    public static String name = "WebHome";
+    public static String name2 = "Globals";
+    public static String web = "Main";
+    public static String content1 = "Hello 1\nHello 2\nHello 3\n";
+    public static String content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
+    public static String author = "VictorHugo";
+    public static String author2 = "JulesVerne";
+    public static String parent = "Main.WebHome";
+    public static String version = "1.1";
+    public static String version2 = "1.2";
 
-    String rcspath = "./rcs";
-    String hibpath = "/hibernate-test.cfg.xml";
+    public static String rcspath = "./rcs";
+    public static String hibpath = "/hibernate-test.cfg.xml";
 
-    public void clean() {
+    public static void runSQL(XWikiHibernateStore hibstore, String sql) {
+           try {
+               Connection connection = ((SessionImpl)hibstore.getSession()).connection();
+               PreparedStatement ps = connection.prepareStatement(sql);
+               ps.execute();
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+       }
+
+    public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
         File file = new File(rcspath + "/" + web + "/" + name + ".txt");
         file.delete();
         file = new File(rcspath + "/" + web + "/" + name + ".txt,v");
@@ -57,10 +71,16 @@ public class StoreTest extends TestCase {
         file.delete();
         file = new File(rcspath + "/" + web + "/" + name2 + ".txt,v");
         file.delete();
+
+        hibstore.checkHibernate();
+        hibstore.beginTransaction();
+        StoreTest.runSQL(hibstore, "drop table xwikidoc");
+        hibstore.endTransaction(true);
     }
 
-    public void setUp() {
-        clean();
+    public void setUp() throws HibernateException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        cleanUp(hibstore);
     }
 
     public void tearDown() {

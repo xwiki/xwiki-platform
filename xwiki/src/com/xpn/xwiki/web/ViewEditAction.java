@@ -98,6 +98,7 @@ public class ViewEditAction extends XWikiAction
         XWikiContext context = new XWikiContext(xwiki);
         context.put("doc", doc);
         context.put("xwiki", xwiki);
+        context.put("request", request);
         session.setAttribute("doc", doc);
         session.setAttribute("context", context);
         session.setAttribute("xwiki", xwiki);

@@ -70,6 +70,34 @@
    <load-on-startup>10</load-on-startup>
   </servlet>
 
+        <servlet>
+      <servlet-name>ServletRedirector</servlet-name>
+      <servlet-class>
+        org.apache.cactus.server.ServletTestRedirector
+      </servlet-class>
+      <init-param>
+        <param-name>param1</param-name>
+        <param-value>value1 used for testing</param-value>
+      </init-param>
+    </servlet>
+
+    <servlet>
+      <servlet-name>ServletTestRunner</servlet-name>
+      <servlet-class>
+        org.apache.cactus.server.runner.ServletTestRunner
+      </servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+    <servlet-name>ServletRedirector</servlet-name>
+    <url-pattern>/ServletRedirector</url-pattern>
+</servlet-mapping>
+
+<servlet-mapping>
+    <servlet-name>ServletTestRunner</servlet-name>
+    <url-pattern>/ServletTestRunner</url-pattern>
+</servlet-mapping>
+
 
   <!-- Action Servlet Mapping -->
   <servlet-mapping>
@@ -82,6 +110,7 @@
       <servlet-name>velocity</servlet-name>
       <url-pattern>*.vm</url-pattern>
     </servlet-mapping>
+
 
   <!-- The Usual Welcome File List -->
   <welcome-file-list>

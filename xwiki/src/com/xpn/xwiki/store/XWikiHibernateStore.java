@@ -609,5 +609,45 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     "Exception while searching class list", e);
         }
     }
+    public List searchDocuments(String wheresql) throws XWikiException {
+        return searchDocuments(wheresql,0,0);
+    }
+
+    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+        try {
+            checkHibernate();
+            beginTransaction();
+            StringBuffer sql = new StringBuffer("select doc.web, doc.name from XWikiSimpleDoc as doc");
+            wheresql.trim();
+            if (!wheresql.equals("")) {
+                if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
+                    sql.append(" where ");
+                else
+                    sql.append(" ");
+
+                sql.append(wheresql);
+            }
+            Query query = getSession().createQuery(sql.toString());
+            if (start!=0)
+                query.setFirstResult(start);
+            if (nb!=0)
+                query.setMaxResults(nb);
+            Iterator it = query.list().iterator();
+            List list = new ArrayList();
+            while (it.hasNext()) {
+                Object[] result = (Object[]) it.next();
+                String name = (String) result[0] + "." + (String)result[1];
+                list.add(name);
+            }
+            endTransaction(false);
+            return list;
+        }
+        catch (Exception e) {
+            Object[] args = { wheresql };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                    "Exception while searching documents with sql {0}", e, args);
+        }
+    }
+
 
 }

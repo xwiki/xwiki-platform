@@ -48,6 +48,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         String name = doc.getFullName();
         content = context.getUtil().substitute("s/#include/\\\\#include/go", content);
         vcontext.put("doc", doc);
+        vcontext.put("xwiki", context.get("xwiki"));
+        vcontext.put("request", context.get("request"));
 
         try {
           boolean result =  Velocity.evaluate(vcontext, writer, name,

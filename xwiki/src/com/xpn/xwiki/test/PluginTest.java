@@ -1,4 +1,6 @@
 
+package com.xpn.xwiki.test;
+
 import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

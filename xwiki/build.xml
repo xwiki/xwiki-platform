@@ -168,7 +168,7 @@
     </target>
 
 
-    <target name="test" depends="release, tests">
+    <target name="test.client" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
 
         <junit printsummary="yes" dir="${basedir}/test" fork="on" >
@@ -190,7 +190,7 @@
         </junit>
     </target>
 
-    <target name="servertest" depends="release, tests">
+    <target name="test.server" depends="release, tests">
 
         <mkdir dir="${test.reports.dir}" />
 
@@ -212,6 +212,8 @@
             </containerset>
         </cactus>
     </target>
+
+    <target name="test"  depends="test.client, test.server" />
 
     <target name="javadoc" depends="xwiki">
         <mkdir dir="${javadoc.dir}" />
@@ -245,8 +247,8 @@
         <delete file="${bin.tarfile}" />
 
         <tar tarfile="${bin.tarfile}" basedir="${basedir}">
-            <include name="${release.dir}/**" />
-            <include name="${doc.dir}/**" />
+            <include name="${release.dir}/**/*" />
+            <include name="${doc.dir}/**/*" />
             <include name="*.txt" />
             <exclude name="**/CVS/*" />
         </tar>
@@ -274,6 +276,8 @@
 
         <delete file="${src.tarfile}" />
     </target>
+
+    <target name="all"  depends="release, test, bin.dist, src.dist" />
 
 </project>
 

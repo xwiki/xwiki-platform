@@ -367,26 +367,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public BaseClass getxWikiClass() {
         if (xWikiClass==null) {
-            /*
             xWikiClass = new BaseClass();
-            // Test data
-            StringClass cat_class = new StringClass();
-            cat_class.setName("category");
-            cat_class.setPrettyName("Category");
-            cat_class.setSize(40);
-            cat_class.setObject(xWikiClass);
-
-            NumberClass score_class = new NumberClass();
-            score_class.setSize(5);
-            score_class.setNumberType("integer");
-            score_class.setName("score");
-            score_class.setPrettyName("Score");
-            score_class.setObject(xWikiClass);
-
-            xWikiClass.safeput("category", cat_class);
-            xWikiClass.safeput("score", score_class);
-            */
-            // End test data
         }
         return xWikiClass;
     }
@@ -396,6 +377,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
     public BaseObject getxWikiObject() {
+        if (xWikiObject==null) {
+            xWikiObject = new BaseObject();
+        }
         return xWikiObject;
     }
 

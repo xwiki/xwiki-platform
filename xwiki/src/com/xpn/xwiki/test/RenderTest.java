@@ -38,6 +38,7 @@ public class RenderTest extends TestCase {
     public RenderTest() throws XWikiException {
         xwiki = new XWiki("c:/dev/java/xwiki/src/web/xwiki.cfg");
         context = new XWikiContext(xwiki);
+        context.put("xwiki", xwiki);
     }
 
     public static void renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
@@ -145,6 +146,24 @@ public class RenderTest extends TestCase {
         renderTest(wikibase, "   * List1\n      * List2",
               "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, context);
 
+    }
+
+    public void testWikiBaseLinkRenderer() throws XWikiException {
+         XWikiRenderer wikibase = new XWikiWikiBaseRenderer();
+         XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
+         context.put("doc", doc);
+
+         renderTest(wikibase, "Test link: UnknownPage",
+               ">?</a>", false, context);
+         renderTest(wikibase, "Test link: WebHome",
+                "Main/WebHome", false, context);
+         renderTest(wikibase, "Test link: Main.WebHome",
+                "Main/WebHome", false, context);
+     /*    renderTest(wikibase, "Test link: [[Web Home]]",
+               "WebHome</a>", false, context);
+         renderTest(wikibase, "Test link: [[http://link/][WebHome]]",
+               "<a href=\"http://link\">WebHome</a>", false, context);
+     */
     }
 
     public void testVelocityRenderer() throws XWikiException {

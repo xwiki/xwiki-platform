@@ -23,10 +23,13 @@
 package com.xpn.xwiki.doc;
 
 import org.apache.commons.jrcs.rcs.*;
-import org.apache.commons.jrcs.diff.DiffException;
 import com.xpn.xwiki.*;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.*;
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.Map;
 import java.io.FileNotFoundException;
 
 public interface XWikiDocInterface {
@@ -67,8 +70,31 @@ public interface XWikiDocInterface {
     public boolean isMostRecent();
     public void setMostRecent(boolean mostRecent);
 
+    public boolean isNew();
+    public void setNew(boolean aNew);
+
+    public String getTemplate();
+    public void setTemplate(String template);
+
     public XWikiStoreInterface getStore();
     public void setStore(XWikiStoreInterface store);
+
+    public BaseClass getxWikiClass();
+    public void setxWikiClass(BaseClass xWikiClass);
+    public BaseObject getxWikiObject();
+    public void setxWikiObject(BaseObject xWikiObject);
+
+    public Map getxWikiObjects();
+    public void setxWikiObjects(Map xWikiObject);
+    public void createNewObject(String classname, XWikiContext context) throws XWikiException;
+
     public XWikiDocCacheInterface getDocCache();
     public void setDocCache(XWikiDocCacheInterface doccache);
+
+    public String getActionUrl(String action, XWikiContext context);
+
+    public void mergexWikiClass(XWikiDocInterface templatedoc);
+    public void mergexWikiObject(XWikiDocInterface templatedoc);
+    public void mergexWikiObjects(XWikiDocInterface templatedoc);
+
 }

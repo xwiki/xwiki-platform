@@ -30,113 +30,48 @@ import com.xpn.xwiki.objects.classes.*;
 import javax.mail.internet.ParameterList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.io.Serializable;
 
-public class BaseObject extends BaseProperty implements ObjectInterface {
-    private BaseClass xWikiClass;
-    protected Map fields = new HashMap();
-
-    public Object[] getProperties() {
-        Object[] array = fields.values().toArray();
-        return array;
-    }
-
-    public Object[] getPropertyNames() {
-        Object[] array = fields.keySet().toArray();
-        return array;
-    }
-
-    public void checkField(String name) throws XWikiException {
-        if (getxWikiClass().safeget(name)==null) {
-            Object[] args = { name, getxWikiClass().getName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
-                    "Field {0} does not exist in class {1}", null, args);
-        }
-    }
-
-    public PropertyInterface safeget(String name) {
-        return (PropertyInterface) fields.get(name);
-    }
-
-    public PropertyInterface get(String name) throws XWikiException {
-        checkField(name);
-        return safeget(name);
-    }
-
-    public void safeput(String name,PropertyInterface property) {
-        fields.put(name, property);
-    }
-
-    public void put(String name,PropertyInterface property) throws XWikiException {
-        checkField(name);
-        safeput(name, property);
-    }
-
-
-    public BaseClass getxWikiClass() {
-        return xWikiClass;
-    }
-
-    public void setxWikiClass(BaseClass xWikiClass) {
-        this.xWikiClass = xWikiClass;
-    }
-
-    public String getStringValue(String name) {
-        return ((StringProperty)safeget(name)).getValue();
-    }
-
-    public void setStringValue(String name, String value) {
-        StringProperty property = new StringProperty();
-        property.setValue(value);
-        safeput(name, property);
-    }
-
-    public int getIntValue(String name) {
-        return ((NumberProperty)safeget(name)).getValue().intValue();
-    }
-
-    public void setIntValue(String name, int value) {
-        NumberProperty property = new NumberProperty();
-        property.setValue(new Integer(value));
-        safeput(name, property);
-    }
+public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        getxWikiClass().displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        getxWikiClass().displaySearch(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displaySearch(buffer, name, prefix, this, context);
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        getxWikiClass().displayView(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayView(buffer, name, prefix, this, context);
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        getxWikiClass().displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
     public String displayHidden(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        getxWikiClass().displayHidden(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displaySearch(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        getxWikiClass().displaySearch(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displaySearch(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displayView(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        getxWikiClass().displayView(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayView(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
     public String displayEdit(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
-        getxWikiClass().displayEdit(buffer, name, prefix, this, context);
+        ((PropertyClass)getxWikiClass().get(name)).displayEdit(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
@@ -154,5 +89,10 @@ public class BaseObject extends BaseProperty implements ObjectInterface {
 
     public String displayEdit(String name, XWikiContext context) {
         return displayEdit(name, "", context);
+    }
+
+    public Object clone() {
+        BaseObject object = (BaseObject) super.clone();
+        return object;
     }
 }

@@ -1,6 +1,17 @@
+<h2>Add a Class</h2>
+<form name="classadd" method="post" action="$doc.getActionUrl("classadd", $context)">
+<select name="classname" size="1">
+<option value="---">Select a class</option>
+#foreach ($classname in $xwiki.classList )
+<option value="$classname">$classname</option>
+#end
+</select>
+<input type="submit" value="Add Class">
+</form>
+or<br>
 <h2>Class Description</h2>
 <form name="propadd" method="post" action="$doc.getActionUrl("propadd", $context)">
-Name: <input type="text" value="" size="20">
+Name: <input type="text" name="propname" value="" size="20">
 <select name="proptype" size="1">
 <option value="---">Select a class</option>
 #foreach($prop in $xwiki.metaclass.properties)
@@ -13,12 +24,13 @@ Name: <input type="text" value="" size="20">
 <table border="0">
 #foreach($prop in $doc.xWikiClass.properties)
 <tr><th>Property</th><th>$prop.prettyName</th></tr>
-#foreach ($classprop in $prop.propertyNames)
-<tr><td>$prop.xWikiClass.safeget("meta$classprop").getPrettyName()</td>
-<td>$prop.xWikiClass.safeget("meta$classprop").displayEdit($classprop, $prop, $context)
+#foreach ($classprop in $prop.xWikiClass.propertyNames)
+<tr><td>$prop.xWikiClass.safeget("$classprop").getPrettyName()</td>
+<td>$prop.xWikiClass.safeget("$classprop").displayEdit($classprop, "${prop.name}_" , $prop, $context)
 </td>
 </tr>
 #end
 #end
+<tr><td></td><td><input type="submit" value="Modify Class"></td></tr>
 </table>
 </form>

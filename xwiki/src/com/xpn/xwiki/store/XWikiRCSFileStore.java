@@ -30,6 +30,7 @@ import org.apache.commons.jrcs.rcs.*;
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Date;
+import java.util.List;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
     private File rscpath;
@@ -159,125 +160,130 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                     content.append(line);
                     content.append("\n");
                 }
-            doc.setContent(content.toString());
+                doc.setContent(content.toString());
+            }
+        } catch (Exception e) {
+            Object[] args = { doc.getFullName(), version.toString() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_VERSION,
+                    "Exception while reading document {0} version {1}", e, args);
         }
-    } catch (Exception e) {
-        Object[] args = { doc.getFullName(), version.toString() };
-        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_VERSION,
-                "Exception while reading document {0} version {1}", e, args);
     }
-}
 
-public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
+    public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
         try {
             doc.setStore(this);
-File vfile = getVersionedFilePath(doc);
-String path = vfile.toString();
-synchronized (path) {
+            File vfile = getVersionedFilePath(doc);
+            String path = vfile.toString();
+            synchronized (path) {
                 Archive archive;
-try {
-archive= new Archive(path);
-} catch (Exception e) {
-File file = getFilePath(doc);
-if (file.exists()) {
-Version[] versions = new Version[1];
-versions[0] = new Version("1.1");
-return versions;
-}
-else {
-Object[] args = { doc.getFullName() };
-throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
-"File {0} does not exist", e, args);
-}
-}
-Node[] nodes = archive.changeLog();
-Version[] versions = new Version[nodes.length];
-for (int i=0;i<nodes.length;i++) {
-                 versions[i] = nodes[i].getVersion();
-}
-return versions;
-}
-} catch (Exception e) {
-Object[] args = { doc.getFullName() };
-throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
-"Exception while reading document {0} revisions", e, args);
-}
-}
+                try {
+                    archive= new Archive(path);
+                } catch (Exception e) {
+                    File file = getFilePath(doc);
+                    if (file.exists()) {
+                        Version[] versions = new Version[1];
+                        versions[0] = new Version("1.1");
+                        return versions;
+                    }
+                    else {
+                        Object[] args = { doc.getFullName() };
+                        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_FILENOTFOUND,
+                                "File {0} does not exist", e, args);
+                    }
+                }
+                Node[] nodes = archive.changeLog();
+                Version[] versions = new Version[nodes.length];
+                for (int i=0;i<nodes.length;i++) {
+                    versions[i] = nodes[i].getVersion();
+                }
+                return versions;
+            }
+        } catch (Exception e) {
+            Object[] args = { doc.getFullName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
+                    "Exception while reading document {0} revisions", e, args);
+        }
+    }
 
-public XWikiDocCacheInterface newDocCache() {
+    public XWikiDocCacheInterface newDocCache() {
         return new XWikiRCSDocCache();
-}
+    }
 
-public String getFullContent(XWikiDocInterface doc) {
+    public String getFullContent(XWikiDocInterface doc) {
         StringBuffer buf = new StringBuffer();
-getMetaData(doc, buf);
-buf.append(doc.getContent());
-return buf.toString();
-}
-
-public void getFullContent(XWikiDocInterface doc, StringBuffer buf) {
         getMetaData(doc, buf);
-getContent(doc, buf);
-}
-
-public void getContent(XWikiDocInterface doc, StringBuffer buf) {
         buf.append(doc.getContent());
-}
+        return buf.toString();
+    }
 
-public void getMetaData(XWikiDocInterface doc, StringBuffer buf) {
+    public void getFullContent(XWikiDocInterface doc, StringBuffer buf) {
+        getMetaData(doc, buf);
+        getContent(doc, buf);
+    }
+
+    public void getContent(XWikiDocInterface doc, StringBuffer buf) {
+        buf.append(doc.getContent());
+    }
+
+    public void getMetaData(XWikiDocInterface doc, StringBuffer buf) {
         buf.append("%META:TOPICINFO{");
-addField(buf, "author", doc.getAuthor());
-addField(buf, "date", "" + doc.getDate().getTime());
-addField(buf, "version", doc.getVersion().toString());
-addField(buf, "format", doc.getFormat());
-buf.append("}%\n");
-buf.append("%META:TOPICPARENT{");
-addField(buf, "name", doc.getParent());
-buf.append("}%\n");
-String meta = doc.getMeta();
-if (meta!=null)
-buf.append(doc.getMeta());
-}
+        addField(buf, "author", doc.getAuthor());
+        addField(buf, "date", "" + doc.getDate().getTime());
+        addField(buf, "version", doc.getVersion().toString());
+        addField(buf, "format", doc.getFormat());
+        buf.append("}%\n");
+        buf.append("%META:TOPICPARENT{");
+        addField(buf, "name", doc.getParent());
+        buf.append("}%\n");
+        String meta = doc.getMeta();
+        if (meta!=null)
+            buf.append(doc.getMeta());
+    }
 
-public void addField(StringBuffer buf,String name, String value) {
+    public void addField(StringBuffer buf,String name, String value) {
         buf.append(name);
-buf.append("=\"");
-value = (value==null) ? "" : value;
-buf.append(Util.cleanValue(value));
-buf.append("\" ");
-}
+        buf.append("=\"");
+        value = (value==null) ? "" : value;
+        buf.append(Util.cleanValue(value));
+        buf.append("\" ");
+    }
 
-public boolean parseMetaData(XWikiDocInterface doc, String line) throws IOException {
+    public boolean parseMetaData(XWikiDocInterface doc, String line) throws IOException {
         if (!line.startsWith("%META:"))
             return false;
 
-if (line.startsWith("%META:TOPICINFO{")) {
-String line2 = line.substring(16, line.length() - 2);
-Hashtable params = Util.keyValueToHashtable(line2);
-Object author = params.get("author");
-if (author!=null)
-doc.setAuthor((String)author);
-Object format = params.get("format");
-if (format!=null)
-doc.setFormat((String)format);
-Object version = params.get("version");
-if (version!=null)
-doc.setVersion((String) version);
-Object date = params.get("date");
-if (date!=null) {
-long l = Long.parseLong((String)date);
-doc.setDate(new Date(l));
-}
-} else if (line.startsWith("%META:TOPICPARENT{")) {
-String line2 = line.substring(18, line.length() - 2);
-Hashtable params = Util.keyValueToHashtable(line2);
-Object parent = params.get("name");
-if (parent!=null)
-doc.setParent((String)parent);
-} else {
-doc.appendMeta(line);
-}
+        if (line.startsWith("%META:TOPICINFO{")) {
+            String line2 = line.substring(16, line.length() - 2);
+            Hashtable params = Util.keyValueToHashtable(line2);
+            Object author = params.get("author");
+            if (author!=null)
+                doc.setAuthor((String)author);
+            Object format = params.get("format");
+            if (format!=null)
+                doc.setFormat((String)format);
+            Object version = params.get("version");
+            if (version!=null)
+                doc.setVersion((String) version);
+            Object date = params.get("date");
+            if (date!=null) {
+                long l = Long.parseLong((String)date);
+                doc.setDate(new Date(l));
+            }
+        } else if (line.startsWith("%META:TOPICPARENT{")) {
+            String line2 = line.substring(18, line.length() - 2);
+            Hashtable params = Util.keyValueToHashtable(line2);
+            Object parent = params.get("name");
+            if (parent!=null)
+                doc.setParent((String)parent);
+        } else {
+            doc.appendMeta(line);
+        }
 
-return true;
-}
+        return true;
+    }
+
+    public List getClassList() throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching class list");
+    }
 }

@@ -25,6 +25,9 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.List;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.apache.struts.action.*;
@@ -32,6 +35,12 @@ import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
 
 /**
  * <p>A simple action that handles the display and editing of an
@@ -77,54 +86,200 @@ public class ViewEditAction extends XWikiAction
 
         // ActionErrors errors = new ActionErrors();
 
-            session = request.getSession();
+        session = request.getSession();
 
-            // fetch action from mapping
-            action = mapping.getName();
+        // fetch action from mapping
+        action = mapping.getName();
 
-            servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
-            XWiki xwiki = getXWiki();
-            XWikiDocInterface doc;
-            doc = xwiki.getDocument(request.getPathInfo());
-            XWikiContext context = new XWikiContext(xwiki);
-            session.setAttribute("doc", doc);
-            session.setAttribute("context", context);
-            session.setAttribute("xwiki", xwiki);
+        servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
+        XWiki xwiki = getXWiki();
+        XWikiDocInterface doc;
+        doc = xwiki.getDocumentFromPath(request.getPathInfo());
+        XWikiContext context = new XWikiContext(xwiki);
+        context.put("doc", doc);
+        context.put("xwiki", xwiki);
+        session.setAttribute("doc", doc);
+        session.setAttribute("context", context);
+        session.setAttribute("xwiki", xwiki);
 
-            // Determine what to do
-            if ( action.equals("view") )
-            {
-                // TODO: Need to get the Wiki Document..
-                // TODO: Pass the Wiki Document through the rendering engine
-                // forward to view template
-                return (mapping.findForward("view"));
+        // Determine what to do
+        if ( action.equals("view") )
+        {
+            // forward to view template
+            return (mapping.findForward("view"));
+        }
+        else if ( action.equals("edit") )
+        {
+            PrepareEditForm eform = (PrepareEditForm) form;
+            String parent = eform.getParent();
+            if (parent!=null)
+                doc.setParent(parent);
+            String template = eform.getTemplate();
+            if ((template!=null)&&(!template.equals(""))) {
+                String content = doc.getContent();
+                if ((content==null)||(!content.equals(""))) {
+                    Object[] args = { doc.getFullName() };
+                    throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                            "Cannot add a template to document {0} because it already has content", null, args);
+                } else {
+
+                    if (template.indexOf('.')==-1) {
+                        template = doc.getWeb() + "." + template;
+                    }
+                    XWikiDocInterface templatedoc = xwiki.getDocument(template);
+                    if (templatedoc.isNew()) {
+                        Object[] args = { template, doc.getFullName() };
+                        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
+                                "Template document {0} does not exist when adding to document {1}", null, args);
+                    } else {
+                        doc.setTemplate(template);
+                        doc.setContent(templatedoc.getContent());
+                        if ((doc.getParent()==null)||(doc.getParent().equals(""))) {
+                            String tparent = templatedoc.getParent();
+                            if (tparent!=null)
+                                doc.setParent(tparent);
+                        }
+
+                        // Merge the external objects
+                        // Currently the choice is not to merge the base class and object because it is not
+                        // the prefered way of using external classes and objects.
+                        doc.mergexWikiObjects(templatedoc);
+                    }
+                }
             }
-            else if ( action.equals("edit") )
-            {
-                // TODO: Need to get the Wiki Document..
 
-                // forward to edit template
-                return (mapping.findForward("edit"));
-            }
-            else if ( action.equals("preview") )
-            {
-                // TODO: Store the edited content in a temporary object in the session
-                // TODO: Pass the edited content through the rendering engine
-                doc.setContent(request.getParameter("content"));
-                return (mapping.findForward("preview"));
-            }
-            else if (action.equals("save"))
-            {
-                // TODO: check the edited content
-                // TODO: save the content
-                // TODO: forward to 'view'..
-                doc.setContent(request.getParameter("content"));
-                xwiki.saveDocument(doc);
+            // forward to edit template
+            return (mapping.findForward("edit"));
+        }
+        else if ( action.equals("preview") )
+        {
+            EditForm eform = (EditForm)form;
+            doc.setContent(eform.getContent());
+            String parent = eform.getParent();
+            if (parent!=null)
+                doc.setParent(parent);
+            BaseClass bclass = doc.getxWikiClass();
+            if (bclass!=null)
+                doc.setxWikiObject((BaseObject)bclass.fromMap(eform.getObject("object_")));
 
-                // forward to list
-                return (mapping.findForward("save"));
+            // Get the class from the template
+            String template = eform.getTemplate();
+            if ((template!=null)&&(!template.equals(""))) {
+                if (template.indexOf('.')==-1) {
+                    template = doc.getWeb() + "." + template;
+                }
+                XWikiDocInterface templatedoc = xwiki.getDocument(template);
+                if (templatedoc.isNew()) {
+                    Object[] args = { template, doc.getFullName() };
+                    throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
+                            "Template document {0} does not exist when adding to document {1}", null, args);
+                } else {
+                    doc.setTemplate(template);
+                    doc.mergexWikiObjects(templatedoc);
+                }
             }
+
+            Iterator itobj = doc.getxWikiObjects().keySet().iterator();
+            while (itobj.hasNext()) {
+                String name = (String) itobj.next();
+                BaseObject baseobject = (BaseObject)doc.getxWikiObjects().get(name);
+                BaseClass baseclass = baseobject.getxWikiClass();
+                BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_"));
+                newobject.setName(name);
+                doc.getxWikiObjects().put(name, newobject);
+            }
+            return (mapping.findForward("preview"));
+        }
+        else if (action.equals("save"))
+        {
+            EditForm eform = (EditForm)form;
+            doc.setContent(eform.getContent());
+            String parent = eform.getParent();
+            if (parent!=null)
+                doc.setParent(parent);
+
+            BaseClass bclass = doc.getxWikiClass();
+            if (bclass!=null)
+                doc.setxWikiObject((BaseObject)bclass.fromMap(((EditForm)form).getObject("object_")));
+
+            // Get the class from the template
+            String template = eform.getTemplate();
+            if ((template!=null)&&(!template.equals(""))) {
+                if (template.indexOf('.')==-1) {
+                    template = doc.getWeb() + "." + template;
+                }
+                XWikiDocInterface templatedoc = xwiki.getDocument(template);
+                if (templatedoc.isNew()) {
+                    Object[] args = { template, doc.getFullName() };
+                    throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
+                            "Template document {0} does not exist when adding to document {1}", null, args);
+                } else {
+
+                    doc.mergexWikiObjects(templatedoc);
+                }
+            }
+
+            Iterator itobj = doc.getxWikiObjects().keySet().iterator();
+            while (itobj.hasNext()) {
+                String name = (String) itobj.next();
+                BaseObject baseobject = (BaseObject)doc.getxWikiObjects().get(name);
+                BaseClass baseclass = baseobject.getxWikiClass();
+                BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_"));
+                newobject.setName(name);
+                doc.getxWikiObjects().put(name, newobject);
+            }
+            xwiki.saveDocument(doc);
+            // forward to list
+            return (mapping.findForward("save"));
+        }
+        else if (action.equals("propupdate"))
+        {
+            BaseClass bclass = doc.getxWikiClass();
+            Iterator it = bclass.getFields().values().iterator();
+            while (it.hasNext()) {
+                PropertyClass property = (PropertyClass)it.next();
+                Map map = ((EditForm)form).getObject(property.getName() + "_");
+                property.getxWikiClass().fromMap(map, property);
+            }
+            xwiki.saveDocument(doc);
+
+            // forward to list
+            return (mapping.findForward("propupdate"));
+        }
+        else if (action.equals("propadd"))
+        {
+            String propName = ((PropAddForm) form).getPropName();
+            String propType = ((PropAddForm) form).getPropType();
+            BaseClass bclass = doc.getxWikiClass();
+            if (bclass.get(propName)!=null) {
+                // TODO: handle the error of the property already existing when we want to add a class property
+            } else {
+                MetaClass mclass = xwiki.getMetaclass();
+                PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
+                if (pmclass!=null) {
+                    PropertyClass pclass = (PropertyClass) pmclass.newObject();
+                    pclass.setObject(bclass);
+                    pclass.setName(propName);
+                    pclass.setPrettyName(propName);
+                    bclass.put(propName, pclass);
+                    xwiki.saveDocument(doc);
+                }
+            }
+            return (mapping.findForward("propadd"));
+        }
+        else if (action.equals("classadd")) {
+            String className = ((ClassAddForm) form).getClassName();
+            doc.createNewObject(className, context);
+            xwiki.saveDocument(doc);
+            return (mapping.findForward("classadd"));
+        }
         return (mapping.findForward("view"));
+    }
+
+
+    public List getClassList() throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching class list");
     }
 }
 

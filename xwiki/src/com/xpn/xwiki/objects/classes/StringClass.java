@@ -26,20 +26,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.Input;
 
 public class StringClass extends PropertyClass {
 
-    public StringClass(BaseClass wclass) {
+    public StringClass(PropertyMetaClass wclass) {
         setxWikiClass(wclass);
-        setType("stringclass");
         setName("string");
         setPrettyName("String");
         setSize(30);
     }
 
     public StringClass() {
-        setType("stringclass");
         setName("string");
         setPrettyName("String");
         setSize(30);
@@ -55,27 +54,28 @@ public class StringClass extends PropertyClass {
 
     public BaseProperty fromString(String value) {
         StringProperty property = new StringProperty();
+        property.setName(getName());
         property.setValue(value);
-        property.setPropertyClass(this);
+        // property.setPropertyClass(this);
         return property;
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         super.displayHidden(buffer, name, prefix, object, context);
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         super.displaySearch(buffer, name, prefix, object, context);
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         super.displayView(buffer, name, prefix, object, context);
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
-        PropertyInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(prop.toString());
+        ElementInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(formEncode(prop.toString()));
 
         input.setType("text");
         input.setName(prefix + name);

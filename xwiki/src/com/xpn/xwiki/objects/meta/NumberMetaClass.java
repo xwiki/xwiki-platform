@@ -25,14 +25,16 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class NumberMetaClass extends PropertyMetaClass {
 
   public NumberMetaClass() {
     super();
-    setType("numbermetaclass");
-    setName("numberclass");
+    // setType("numbermetaclass");
     setPrettyName("Number Class");
+    setName(NumberClass.class.getName());
 
     StringClass type_class = new StringClass(this);
     type_class.setName("number_type");
@@ -45,7 +47,11 @@ public class NumberMetaClass extends PropertyMetaClass {
     size_class.setSize(5);
     size_class.setNumberType("integer");
 
-    safeput("metanumber_type", type_class);
-    safeput("metasize", size_class);
+    safeput("number_type", type_class);
+    safeput("size", size_class);
+  }
+
+  public BaseCollection newObject() {
+        return new NumberClass();
   }
 }

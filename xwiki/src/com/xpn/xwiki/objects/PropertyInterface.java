@@ -25,10 +25,11 @@ package com.xpn.xwiki.objects;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public interface PropertyInterface {
-    public String toString();
-    public BaseObject getObject();
-    public void setObject(BaseObject object);
-    public PropertyClass getPropertyClass();
-    public void setPropertyClass(PropertyClass propertyClass);
+public interface PropertyInterface extends ElementInterface {
+    public int getId();
+    public void setId(int id);
+    public BaseCollection getObject();
+    public void setObject(BaseCollection object);
+    // public PropertyClass getPropertyClass();
+    // public void setPropertyClass(PropertyClass propertyClass);
 }

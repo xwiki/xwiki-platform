@@ -17,33 +17,30 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 22 déc. 2003
- * Time: 09:21:13
+ * Date: 28 déc. 2003
+ * Time: 21:24:35
  */
-package com.xpn.xwiki.objects.meta;
+package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseCollection;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 
-public class StringMetaClass extends PropertyMetaClass {
+import javax.servlet.http.HttpServletRequest;
 
-   public StringMetaClass() {
-    super();
-    // setType("stringmetaclass");
-    setPrettyName("String Class");
-    setName(StringClass.class.getName());
+public class ClassAddForm extends ActionForm {
 
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
-    safeput("size", size_class);
-  }
+        private String className;
 
-    public BaseCollection newObject() {
-          return new StringClass();
-    }
+        public String getClassName() {
+            return className;
+        }
+
+        public void setClassName(String className) {
+            this.className = className;
+        }
+
+        public void reset(ActionMapping actionMapping, HttpServletRequest httpServletRequest) {
+            setClassName(httpServletRequest.getParameter("classname"));
+        }
+
 }

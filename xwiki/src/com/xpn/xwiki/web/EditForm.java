@@ -28,6 +28,12 @@ package com.xpn.xwiki.web;
 import javax.servlet.http.*;
 import org.apache.struts.action.*;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.lang.reflect.Array;
+
 
 public class EditForm extends ActionForm
 {
@@ -36,8 +42,10 @@ public class EditForm extends ActionForm
     private String content;
     private String web;
     private String name;
-    
+    private String parent;
+    private String template;
 
+    private HttpServletRequest request;
     /**
      * Reset all properties to their default values.
      *
@@ -46,9 +54,11 @@ public class EditForm extends ActionForm
      */
     public void reset(ActionMapping mapping, HttpServletRequest request) 
     {
-        setContent("");
-        setWeb("");
-        setName("");
+        setContent(request.getParameter("content"));
+        setWeb(request.getParameter("web"));
+        setName(request.getParameter("name"));
+        setParent(request.getParameter("parent"));
+        this.request = request;
     }
 
     public String getContent() {
@@ -73,6 +83,36 @@ public class EditForm extends ActionForm
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Map getObject(String prefix) {
+        Map map = request.getParameterMap();
+        HashMap map2 = new HashMap();
+        Iterator it = map.keySet().iterator();
+        while (it.hasNext()) {
+          String name = (String) it.next();
+          if (name.startsWith(prefix)) {
+              String newname = name.substring(prefix.length());
+              map2.put(newname, map.get(name));
+          }
+        }
+        return map2;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
     }
 }
 

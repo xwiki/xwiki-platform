@@ -26,7 +26,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class MetaClass extends BaseClass {
 
@@ -34,16 +38,24 @@ public class MetaClass extends BaseClass {
 
     public MetaClass() {
         NumberMetaClass numberclass = new NumberMetaClass();
-        safeput("numberclass", numberclass);
+        safeput(numberclass.getName(), numberclass);
         StringMetaClass stringclass = new StringMetaClass();
-        safeput("stringclass", stringclass);
+        safeput(stringclass.getName(), stringclass);
     }
 
-    public PropertyInterface get(String name) {
+    public void safeput(String name, ElementInterface property) {
+        super.safeput("meta" + name, property);    //To change body of overriden methods use Options | File Templates.
+    }
+
+    public ElementInterface safeget(String name) {
+        return super.safeget("meta" + name);    //To change body of overriden methods use Options | File Templates.
+    }
+
+    public ElementInterface get(String name) {
         return safeget(name);
     }
 
-    public void put(String name, PropertyInterface property) {
+    public void put(String name, ElementInterface property) {
         safeput(name, property);
     }
 
@@ -54,4 +66,9 @@ public class MetaClass extends BaseClass {
     public static void setMetaClass(MetaClass metaClass) {
         MetaClass.metaClass = metaClass;
     }
+
+    public BaseCollection newObject() {
+        return new BaseClass();
+    }
+
 }

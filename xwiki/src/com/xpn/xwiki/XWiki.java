@@ -27,10 +27,13 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.objects.meta.MetaClass;
-
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import org.apache.ecs.html.TextArea;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.Filter;
 
 public class XWiki {
 
@@ -98,7 +101,16 @@ public class XWiki {
         return getDocument(doc);
     }
 
-    public XWikiDocInterface getDocument(String path) throws XWikiException {
+    public XWikiDocInterface getDocument(String fullname) throws XWikiException {
+        int i1 = fullname.lastIndexOf(".");
+        String web = fullname.substring(0,i1);
+        String name = fullname.substring(i1+1);
+        if (name.equals(""))
+         name = "WebHome";
+        return getDocument(web,name);
+    }
+
+    public XWikiDocInterface getDocumentFromPath(String path) throws XWikiException {
         int i1 = path.indexOf("/",1);
         int i2 = path.lastIndexOf("/");
         String web = path.substring(i1+1,i2);
@@ -126,5 +138,26 @@ public class XWiki {
 
     public void setMetaclass(MetaClass metaclass) {
         this.metaclass = metaclass;
+    }
+
+    public String getTextArea(String content) {
+        Filter filter = new CharacterFilter();
+        String scontent = filter.process(content);
+
+        TextArea textarea = new TextArea();
+        textarea.setFilter(filter);
+        textarea.setRows(20);
+        textarea.setCols(80);
+        textarea.setName("content");
+        textarea.addElement(scontent);
+        return textarea.toString();
+    }
+
+    public String[] getClassList() throws XWikiException {
+      List list = store.getClassList();
+      String[] array = new String[list.size()];
+      for (int i=0;i<list.size();i++)
+         array[i] = (String)list.get(i);
+      return array;
     }
 }

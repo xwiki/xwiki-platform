@@ -5,9 +5,9 @@
 <session-factory>
 <property name="show_sql">true</property>
 <property name="use_outer_join">true</property>
-<property name="connection.url">jdbc:mysql://localhost/xwiki</property>
-<property name="connection.username">xwiki</property>
-<property name="connection.password">xwiki</property>
+<property name="connection.url">jdbc:mysql://localhost/xwikitest</property>
+<property name="connection.username">xwikitest</property>
+<property name="connection.password">xwikitest</property>
 <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
 <property name="connection.pool_size">50</property>
 <property name="statement_cache.size">50</property>

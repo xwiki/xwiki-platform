@@ -26,22 +26,15 @@ package com.xpn.xwiki.objects.classes;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.Input;
 
 public class NumberClass  extends PropertyClass {
 
-    /*
-    public static final int TYPE_INTEGER = 0;
-    public static final int TYPE_LONG = 1;
-    public static final int TYPE_FLOAT = 2;
-    public static final int TYPE_DOUBLE = 3;
-    */
-
-    public NumberClass(BaseClass wclass) {
+    public NumberClass(PropertyMetaClass wclass) {
         setxWikiClass(wclass);
         setName("number");
         setPrettyName("Number");
-        setType("numberclass");
         setSize(30);
         setNumberType("long");
     }
@@ -49,7 +42,6 @@ public class NumberClass  extends PropertyClass {
     public NumberClass() {
         setName("number");
         setPrettyName("Number");
-        setType("numberclass");
         setSize(30);
         setNumberType("long");
     }
@@ -72,40 +64,49 @@ public class NumberClass  extends PropertyClass {
 
 
     public BaseProperty fromString(String value) {
-        NumberProperty property = new NumberProperty();
+        NumberProperty property;
         String ntype = getNumberType();
-        Number nvalue;
+        Number nvalue = null;
         if (ntype.equals("integer")) {
-            nvalue = new Integer(value);
+            property = new IntegerProperty();
+            if ((value!=null)&&(!value.equals("")))
+                nvalue = new Integer(value);
         } else if (ntype.equals("float")) {
-            nvalue = new Float(value);
+            property = new FloatProperty();
+            if ((value!=null)&&(!value.equals("")))
+                nvalue = new Float(value);
         } else if (ntype.equals("double")) {
-            nvalue = new Double(value);
+            property = new DoubleProperty();
+            if ((value!=null)&&(!value.equals("")))
+                nvalue = new Double(value);
         } else {
-            nvalue = new Long(value);
+            property = new LongProperty();
+            if ((value!=null)&&(!value.equals("")))
+                nvalue = new Long(value);
         }
+        property.setName(getName());
         property.setValue(nvalue);
-        property.setPropertyClass(this);
+        // property.setPropertyClass(this);
         return property;
     }
 
-    public void displayHidden(StringBuffer buffer, String prefix, String name, BaseObject object, XWikiContext context) {
+    public void displayHidden(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
         super.displayHidden(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displaySearch(StringBuffer buffer, String prefix, String name, BaseObject object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
         super.displaySearch(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displayView(StringBuffer buffer, String prefix, String name, BaseObject object, XWikiContext context) {
+    public void displayView(StringBuffer buffer, String prefix, String name, BaseCollection object, XWikiContext context) {
         super.displayView(buffer, prefix, name, object, context);    //To change body of overriden methods use Options | File Templates.
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
 
-        PropertyInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(prop.toString());
+        ElementInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(formEncode(prop.toString()));
 
         input.setType("text");
         input.setName(prefix + name);

@@ -47,6 +47,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         StringWriter writer = new StringWriter();
         String name = doc.getFullName();
         content = context.getUtil().substitute("s/#include/\\\\#include/go", content);
+        vcontext.put("doc", doc);
 
         try {
           boolean result =  Velocity.evaluate(vcontext, writer, name,

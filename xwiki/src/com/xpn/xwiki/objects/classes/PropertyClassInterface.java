@@ -27,13 +27,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.ObjectInterface;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.BaseCollection;
 
-public interface PropertyClassInterface extends ObjectInterface, PropertyInterface {
+public interface PropertyClassInterface extends ObjectInterface {
     public String toString(BaseProperty property);
     public BaseProperty fromString(String value);
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context);
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
 }

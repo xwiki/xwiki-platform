@@ -24,13 +24,26 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import org.apache.ecs.html.Input;
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
 
-public abstract class PropertyClass extends BaseObject implements PropertyClassInterface {
+public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
+    private BaseClass object;
+
+    public BaseCollection getObject() {
+            return object;
+   }
+
+    public void setObject(BaseCollection object) {
+            this.object = (BaseClass)object;
+    }
+
+    public int getId() {
+        return getObject().getId();
+    }
 
     public void checkField(String name) throws XWikiException {
         if ((getxWikiClass().safeget(name)==null)&&
@@ -45,74 +58,84 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
         return property.toString();  //To change body of implemented methods use Options | File Templates.
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public BaseProperty fromString(String value) {
+        return null;
+    }
+
+    public String formEncode(String value) {
+        Filter filter = new CharacterFilter();
+        String svalue = filter.process(value);
+        return svalue;
+    }
+
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
        Input input = new Input();
-       PropertyInterface prop = object.safeget(name);
-       if (prop!=null) input.setValue(prop.toString());
+       ElementInterface prop = object.safeget(name);
+       if (prop!=null) input.setValue(formEncode(prop.toString()));
 
        input.setType("hidden");
        input.setName(prefix + name);
        buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
-        PropertyInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(prop.toString());
+        ElementInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(formEncode(prop.toString()));
 
         input.setType("text");
         input.setName(prefix + name);
         buffer.append(input.toString());
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         buffer.append(object.safeget(name).toString());
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseObject object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         Input input = new Input();
 
-        PropertyInterface prop = object.safeget(name);
-        if (prop!=null) input.setValue(prop.toString());
+        ElementInterface prop = object.safeget(name);
+        if (prop!=null) input.setValue(formEncode(prop.toString()));
 
         input.setType("text");
         input.setName(prefix + name);
         buffer.append(input.toString());
     }
 
-    public String displayHidden(String name, String prefix, BaseObject object, XWikiContext context) {
+    public String displayHidden(String name, String prefix, BaseCollection object, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
       displayHidden(buffer, name, prefix, object, context);
       return buffer.toString();
     }
-    public String displayHidden(String name, BaseObject object, XWikiContext context) {
+    public String displayHidden(String name, BaseCollection object, XWikiContext context) {
       return displayHidden(name, "", object, context);
     }
 
-    public String displaySearch(String name, String prefix, BaseObject object, XWikiContext context) {
+    public String displaySearch(String name, String prefix, BaseCollection object, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
       displaySearch(buffer, name, prefix, object, context);
       return buffer.toString();
     }
-    public String displaySearch(String name, BaseObject object, XWikiContext context) {
+    public String displaySearch(String name, BaseCollection object, XWikiContext context) {
       return displaySearch(name, "", object, context);
     }
 
-    public String displayView(String name, String prefix, BaseObject object, XWikiContext context) {
+    public String displayView(String name, String prefix, BaseCollection object, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
       displayView(buffer, name, prefix, object, context);
       return buffer.toString();
     }
-    public String displayView(String name, BaseObject object, XWikiContext context) {
+    public String displayView(String name, BaseCollection object, XWikiContext context) {
       return displayView(name, "", object, context);
     }
 
-    public String displayEdit(String name, String prefix, BaseObject object, XWikiContext context) {
+    public String displayEdit(String name, String prefix, BaseCollection object, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
       displayEdit(buffer, name, prefix, object, context);
       return buffer.toString();
     }
-    public String displayEdit(String name, BaseObject object, XWikiContext context) {
+    public String displayEdit(String name, BaseCollection object, XWikiContext context) {
       return displayEdit(name, "", object, context);
     }
 
@@ -121,12 +144,14 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
         BaseClass wclass = (BaseClass)super.getxWikiClass();
         if (wclass==null) {
             MetaClass metaclass = MetaClass.getMetaClass();
-            wclass = (BaseClass)metaclass.get(getType());
+            wclass = (BaseClass)metaclass.get(getClassType());
             setxWikiClass(wclass);
         }
         return wclass;
     }
 
+    // In property classes we need to store this info in the HashMap for fields
+    // This way it is readable by the displayEdit/displayView functions..
     public String getName() {
         return getStringValue("name");
     }
@@ -135,6 +160,15 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
       setStringValue("name", name);
     }
 
+    public String getPrettyName() {
+        return getStringValue("prettyName");
+    }
+
+    public void setPrettyName(String prettyName) {
+        setStringValue("prettyName", prettyName);
+    }
+
+    /*
     public String getType() {
       return getStringValue("type");
     }
@@ -142,13 +176,20 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
     public void setType(String type) {
         setStringValue("type", type);
     }
+    */
 
-    public String getPrettyName() {
-        return getStringValue("prettyName");
+    public String getClassType() {
+        return getClass().getName();
     }
 
-    public void setPrettyName(String prettyName) {
-        setStringValue("prettyName", prettyName);
+    public void setClassType(String type) {
+    }
+
+    public Object clone() {
+        PropertyClass pclass = (PropertyClass) super.clone();
+        pclass.setObject(getObject());
+        pclass.setClassType(getClassType());
+        return pclass;
     }
 
 }

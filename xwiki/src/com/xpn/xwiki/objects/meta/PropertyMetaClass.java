@@ -25,26 +25,28 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class PropertyMetaClass extends BaseClass {
 
     public PropertyMetaClass() {
         super();
         StringClass type_class = new StringClass(this);
-        type_class.setName("type");
-        type_class.setPrettyName("Type");
+        type_class.setName("classType");
+        type_class.setPrettyName("Class Type");
         type_class.setSize(40);
-        safeput("metatype", type_class);
+        // This should not be touched
+        // safeput("classType", type_class);
         StringClass name_class = new StringClass(this);
         name_class.setName("name");
         name_class.setPrettyName("Name");
         name_class.setSize(40);
-        safeput("metaname", name_class);
+        safeput("name", name_class);
         StringClass prettyname_class = new StringClass(this);
         prettyname_class.setName("prettyName");
         prettyname_class.setPrettyName("Pretty Name");
         prettyname_class.setSize(40);
-        safeput("metaprettyName", prettyname_class);
+        safeput("prettyName", prettyname_class);
 
     }
 }

@@ -17,33 +17,10 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 22 déc. 2003
- * Time: 09:21:13
+ * Date: 24 déc. 2003
+ * Time: 10:35:20
  */
-package com.xpn.xwiki.objects.meta;
+package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseCollection;
-
-public class StringMetaClass extends PropertyMetaClass {
-
-   public StringMetaClass() {
-    super();
-    // setType("stringmetaclass");
-    setPrettyName("String Class");
-    setName(StringClass.class.getName());
-
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
-    safeput("size", size_class);
-  }
-
-    public BaseCollection newObject() {
-          return new StringClass();
-    }
+public class IntegerProperty extends NumberProperty {
 }

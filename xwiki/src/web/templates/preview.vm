@@ -9,6 +9,12 @@
 $doc.getRenderedContent($context)
 <form name="edit" method="post" action="$doc.getPreviewUrl($context)">
 <input type=hidden name="content" value="$doc.content">
+<input type="hidden" name="parent" value="$!doc.getParent()">
+<input type="hidden" name="template" value="$!doc.getTemplate()">
+Parent: $doc.getParent()
+<div id="object">
+#parse("/templates/viewobject.vm")
+</div>
 </form>
 </div>
 <div id="nav_footer">

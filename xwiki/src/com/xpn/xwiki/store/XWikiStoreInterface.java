@@ -27,10 +27,13 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiException;
 import org.apache.commons.jrcs.rcs.Version;
 
+import java.util.List;
+
 public interface XWikiStoreInterface {
   public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException;
   public void loadXWikiDoc(XWikiDocInterface doc) throws XWikiException;
   public void loadXWikiDoc(XWikiDocInterface doc, String version) throws XWikiException;
   public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException;
   public XWikiDocCacheInterface newDocCache();
+  public List getClassList() throws XWikiException;
 }

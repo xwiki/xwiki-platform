@@ -27,7 +27,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiPerlPluginRenderer;
-import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
 
@@ -46,7 +45,7 @@ public class PerlTest extends TestCase {
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0);
         wikiengine = xwiki.getRenderingEngine();
         wikirenderer = new XWikiWikiBaseRenderer();
-        perlplugin = (XWikiPerlPluginRenderer) wikiengine.getRenderer(XWikiPerlPluginRenderer.class.getName());
+        // perlplugin = (XWikiPerlPluginRenderer) wikiengine.getRenderer(XWikiPerlPluginRenderer.class.getName());
     }
 
     protected void finalize() throws Throwable {

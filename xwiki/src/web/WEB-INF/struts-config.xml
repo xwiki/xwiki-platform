@@ -35,14 +35,20 @@
 
   <!-- ========== Form Bean Definitions =================================== -->
   <form-beans>
-
-    <!-- XWiki Struts Application --> 
-    
-    <form-bean name="EditForm"
+  <!-- XWiki Struts Application -->
+    <form-bean name="edit"
+                 type="com.xpn.xwiki.web.PrepareEditForm"/>
+    <form-bean name="preview"
                type="com.xpn.xwiki.web.EditForm"/>
-
+    <form-bean name="save"
+                type="com.xpn.xwiki.web.EditForm"/>
+    <form-bean name="propupdate"
+                  type="com.xpn.xwiki.web.EditForm"/>
+    <form-bean name="propadd"
+                    type="com.xpn.xwiki.web.PropAddForm"/>
+    <form-bean name="classadd"
+                      type="com.xpn.xwiki.web.ClassAddForm"/>
   </form-beans>
-
 
   <!-- ========== Global Forward Definitions ============================== -->
   <global-forwards>
@@ -86,6 +92,34 @@
             scope="request">
         <forward name="save" path="/templates/save.vm"/>
     </action>
+
+    <action path="/propupdate/"
+              type="com.xpn.xwiki.web.ViewEditAction"
+              name="propupdate"
+              scope="request">
+          <forward name="propupdate" path="/templates/edit.vm"/>
+    </action>
+
+    <action path="/propadd/"
+                type="com.xpn.xwiki.web.ViewEditAction"
+                name="propadd"
+                scope="request">
+            <forward name="propadd" path="/templates/edit.vm"/>
+    </action>
+
+      <action path="/propdelete/"
+                  type="com.xpn.xwiki.web.ViewEditAction"
+                  name="propdelete"
+                  scope="request">
+              <forward name="propdelete" path="/templates/edit.vm"/>
+      </action>
+
+      <action path="/classadd/"
+                  type="com.xpn.xwiki.web.ViewEditAction"
+                  name="classadd"
+                  scope="request">
+              <forward name="classadd" path="/templates/edit.vm"/>
+      </action>
 
   </action-mappings>
 

@@ -10,7 +10,12 @@
   </div>
 
 <div id="title">
-   <h1>$!title</h1>
+   <h1>
+#if ($doc.parent.length() > 0)
+   $parent >
+#end
+   $!title
+   </h1>
    <h2>$!subtitle</h2>
 </div>
 </div>

@@ -46,7 +46,7 @@ public class StoreTest extends TestCase {
     String version2 = "1.2";
 
     String rcspath = "./rcs";
-    String hibpath = "/hibernate.cfg.xml";
+    String hibpath = "/hibernate-test.cfg.xml";
 
     public void clean() {
         File file = new File(rcspath + "/" + web + "/" + name + ".txt");

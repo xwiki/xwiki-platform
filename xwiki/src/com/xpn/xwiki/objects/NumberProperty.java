@@ -38,6 +38,25 @@ public class NumberProperty extends BaseProperty {
     }
 
     public String toString() {
-        return getValue().toString();
+        Number nb = getValue();
+        return (nb==null) ? "" : nb.toString();
     }
+
+    public boolean equals(Object obj) {
+        if (!super.equals(obj))
+         return false;
+
+       if ((getValue()==null)
+            && (((NumberProperty)obj).getValue()==null))
+         return true;
+
+       return getValue().equals(((NumberProperty)obj).getValue());
+    }
+
+    public Object clone() {
+        NumberProperty property = (NumberProperty) super.clone();
+        property.setValue(getValue());
+        return property;
+    }
+
 }

@@ -40,6 +40,27 @@ public class StringProperty extends BaseProperty {
     }
 
     public String toString() {
-        return getValue();
+        String value = getValue();
+        if (value!=null)
+         return value;
+        else
+         return "";
+    }
+
+    public boolean equals(Object obj) {
+        if (!super.equals(obj))
+         return false;
+
+       if ((getValue()==null)
+            && (((StringProperty)obj).getValue()==null))
+         return true;
+
+       return getValue().equals(((StringProperty)obj).getValue());
+    }
+
+    public Object clone() {
+        StringProperty property = (StringProperty) super.clone();
+        property.setValue(getValue());
+        return property;
     }
 }

@@ -22,20 +22,23 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseCollection;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
+
+import org.apache.ecs.xhtml.object;
 
 
-public class BaseClass extends PropertyClass implements ClassInterface {
-    public PropertyInterface get(String name) {
+public class BaseClass extends BaseCollection implements ClassInterface {
+    public ElementInterface get(String name) {
         return safeget(name);
     }
 
-    public void put(String name, PropertyInterface property) {
+    public void put(String name, ElementInterface property) {
         safeput(name, property);
     }
 
@@ -47,5 +50,37 @@ public class BaseClass extends PropertyClass implements ClassInterface {
         return null;  //To change body of implemented methods use Options | File Templates.
     }
 
+    public BaseCollection newObject() {
+        return new BaseObject();
+    }
+
+    public BaseCollection fromMap(Map map) {
+        BaseCollection object = newObject();
+        return fromMap(map, object);
+    }
+
+    public BaseCollection fromMap(Map map, BaseCollection object) {
+        object.setxWikiClass(this);
+        Iterator classit = getFields().values().iterator();
+        while (classit.hasNext()) {
+            PropertyClass property = (PropertyClass) classit.next();
+            String name = property.getName();
+            Object formvalues = map.get(name);
+            if ((formvalues!=null)&&(formvalues instanceof String[])) {
+             BaseProperty objprop = property.fromString(((String[])formvalues)[0]);
+             objprop.setObject(object);
+             object.safeput(name, objprop);
+            }
+        }
+        return object;
+    }
+
+    public Object clone() {
+        BaseClass bclass = (BaseClass) super.clone();
+        return bclass;
+    }
+
+    public void merge(BaseClass bclass) {
+    }
 
 }

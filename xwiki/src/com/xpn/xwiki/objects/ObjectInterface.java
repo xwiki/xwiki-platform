@@ -25,10 +25,12 @@ package com.xpn.xwiki.objects;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-public interface ObjectInterface {
-    public PropertyInterface get(String name) throws XWikiException;
+public interface ObjectInterface extends ElementInterface {
     public BaseClass getxWikiClass();
     public void setxWikiClass(BaseClass xWikiClass);
 
-    void put(String name,PropertyInterface property) throws XWikiException;
+    public ElementInterface get(String name) throws XWikiException;
+    void put(String name,ElementInterface property) throws XWikiException;
+    public ElementInterface safeget(String name);
+    void safeput(String name,ElementInterface property);
 }

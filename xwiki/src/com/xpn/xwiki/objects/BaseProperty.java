@@ -25,24 +25,37 @@ package com.xpn.xwiki.objects;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public class BaseProperty extends Object implements PropertyInterface {
-    private BaseObject object;
-    private PropertyClass propertyClass;
+import java.io.Serializable;
 
-    public BaseObject getObject() {
+public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
+    private BaseCollection object;
+
+    public BaseCollection getObject() {
         return object;
     }
 
-    public void setObject(BaseObject object) {
+    public void setObject(BaseCollection object) {
         this.object = object;
     }
 
-    public PropertyClass getPropertyClass() {
-        return propertyClass;
+    public int getId() {
+        return getObject().getId();
     }
 
-    public void setPropertyClass(PropertyClass propertyClass) {
-        this.propertyClass = propertyClass;
+    public void setId(int id) {
+    }
+
+    public String getClassType() {
+        return getClass().getName();
+    }
+
+    public void setClassType(String type) {
+    }
+
+    public Object clone() {
+        BaseProperty property = (BaseProperty) super.clone();
+        property.setObject(getObject());
+        return property;
     }
 
 }

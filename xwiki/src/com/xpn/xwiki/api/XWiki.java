@@ -2,6 +2,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 
 import java.util.List;
@@ -31,11 +32,27 @@ public class XWiki {
      }
 
      public Document getDocument(String fullname) throws XWikiException {
-         return new Document(xwiki.getDocument(fullname, context), context);
+         XWikiDocInterface doc = xwiki.getDocument(fullname, context);
+         if (xwiki.checkAccess("view", doc, context)==false) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "Access to this document is denied");
+                }
+
+         Document newdoc = new Document(doc, context);
+         return newdoc;
      }
 
      public Document getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
-         return new Document(xwiki.getDocument(web, fullname, context), context);
+         XWikiDocInterface doc = xwiki.getDocument(web, fullname, context);
+         if (xwiki.checkAccess("view", doc, context)==false) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "Access to this document is denied");
+                }
+
+         Document newdoc = new Document(doc, context);
+         return newdoc;
      }
 
      public String getBase() {
@@ -79,8 +96,12 @@ public class XWiki {
         return xwiki.searchDocuments(wheresql, nb, start, context);
     }
 
-    public String getTemplate(String template) {
-        return xwiki.getTemplate(template, context);
+    public String parseTemplate(String template) {
+        return xwiki.parseTemplate(template, context);
+    }
+
+    public String getSkinFile(String filename) {
+        return xwiki.getSkinFile(filename, context);
     }
 
     public String getSkin() {

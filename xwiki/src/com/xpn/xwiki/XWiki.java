@@ -29,6 +29,7 @@ import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.NotFoundException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.notify.PropertyChangedRule;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiCache;
 import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -48,6 +50,7 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.struts.upload.MultipartRequestWrapper;
+import org.apache.velocity.VelocityContext;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -60,6 +63,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.net.URL;
 
 public class XWiki implements XWikiNotificationInterface {
@@ -98,12 +102,12 @@ public class XWiki implements XWikiNotificationInterface {
             HttpServletRequest request = context.getRequest();
             String host = "";
             try {
-              StringBuffer requestURL = request.getRequestURL();
-              if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
-               requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
-              host = new URL(requestURL.toString()).getHost();
+                StringBuffer requestURL = request.getRequestURL();
+                if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
+                    requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
+                host = new URL(requestURL.toString()).getHost();
             } catch (Exception e) {};
-                String uri = request.getRequestURI();
+            String uri = request.getRequestURI();
             int i1 = host.indexOf(".");
             String servername = (i1!=-1) ? host.substring(0, i1) : host;
             String appname = uri.substring(1,uri.indexOf("/",2));
@@ -270,7 +274,7 @@ public class XWiki implements XWikiNotificationInterface {
         getNotificationManager().verify(doc, olddoc, 0, context);
     }
 
-    public XWikiDocInterface getDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+    private XWikiDocInterface getDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         try {
             doc = getStore().loadXWikiDoc(doc, context);
         }  catch (XWikiException e) {
@@ -289,12 +293,38 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public XWikiDocInterface getDocument(String fullname, XWikiContext context) throws XWikiException {
-        int i1 = fullname.lastIndexOf(".");
-        String web = fullname.substring(0,i1);
-        String name = fullname.substring(i1+1);
-        if (name.equals(""))
-            name = "WebHome";
-        return getDocument(new XWikiSimpleDoc(web, name), context);
+        String server = null, web = null, name = null, database = null;
+        try {
+
+            int i0 = fullname.lastIndexOf(":");
+            int i1 = fullname.lastIndexOf(".");
+
+            if (i0!=-1) {
+                server = fullname.substring(0,i0);
+                web = fullname.substring(i0+1,i1);
+                name = fullname.substring(i1+1);
+            } else {
+                server = null;
+                web = fullname.substring(0,i1);
+                name = fullname.substring(i1+1);
+            }
+
+            if (name.equals(""))
+                name = "WebHome";
+
+            if (server!=null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            XWikiDocInterface doc = getDocument(new XWikiSimpleDoc(web, name), context);
+            return doc;
+        }
+        finally {
+            if ((server!=null)&&(database!=null)) {
+                context.setDatabase(database);
+            }
+        }
     }
 
     public XWikiDocInterface getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
@@ -304,9 +334,9 @@ public class XWiki implements XWikiNotificationInterface {
             String name = fullname.substring(i1+1);
             if (name.equals(""))
                 name = "WebHome";
-            return getDocument(new XWikiSimpleDoc(web2, name), context);
+            return getDocument(web2 + "." + name, context);
         } else {
-            return getDocument(new XWikiSimpleDoc(web, fullname), context);
+            return getDocument(web + "." + fullname, context);
         }
     }
 
@@ -323,7 +353,7 @@ public class XWiki implements XWikiNotificationInterface {
             name = path.substring(i2+1,i3);
         if (name.equals(""))
             name = "WebHome";
-        return getDocument(web, name, context);
+        return getDocument(web + "." + name, context);
     }
 
     public String getBase() {
@@ -411,17 +441,89 @@ public class XWiki implements XWikiNotificationInterface {
         this.test = test;
     }
 
-    public String getTemplate(String template, XWikiContext context) {
+    public String parseTemplate(String template, XWikiContext context) {
+        String skin = "default";
         try {
-            String skin = getSkin(context);
+            skin = getSkin(context);
+        } catch (Exception e) {}
+
+        try {
             String path = "/skins/" + skin + "/" + template;
             File file = new File(getRealPath(path));
-            if (file.exists())
-                return path;
+            if (file.exists()) {
+                String content = Util.getFileContent(file);
+                return XWikiVelocityRenderer.evaluate(content, skin + "/" + template, (VelocityContext)context.get("vcontext"));
+            }
+        } catch (Exception e) {}
+
+        try {
+            XWikiDocInterface doc = getDocument(skin, context);
+            if (!doc.isNew()) {
+                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                if (object!=null) {
+                    String content = object.getStringValue(template);
+                    if ((content!=null)&&(!content.equals(""))) {
+                        // Let's use this template
+                        return XWikiVelocityRenderer.evaluate(content, skin + "/" + template, (VelocityContext)context.get("vcontext"));
+                    }
+                }
+            }
+        } catch (Exception e) {}
+
+        try {
+            File file = new File(getRealPath("/templates/" + template));
+            String content = Util.getFileContent(file);
+            return XWikiVelocityRenderer.evaluate(content, skin + "/" + template, (VelocityContext)context.get("vcontext"));
         } catch (Exception e) {
+            return "";
         }
-        return "/templates/" + template;
     }
+
+
+    public String getSkinFile(String filename, XWikiContext context) {
+        String skin = "default";
+        try {
+            skin = getSkin(context);
+        } catch (Exception e) {}
+
+        try {
+            String path = "/skins/" + skin + "/" + filename;
+            File file = new File(getRealPath(path));
+            if (file.exists())
+                return "../../.." + path;
+        } catch (Exception e) {}
+
+        try {
+            XWikiDocInterface doc = getDocument(skin, context);
+            if (!doc.isNew()) {
+                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                if (object!=null) {
+                    String content = object.getStringValue(filename);
+                    if ((content!=null)&&(!content.equals(""))) {
+                        return "../../skin/" + skin.replace('.','/') + "/" + filename;
+                    }
+                }
+
+                // Read XWikiAttachment
+                XWikiAttachment attachment = null;
+                List list = doc.getAttachmentList();
+                String shortname = filename.substring(0, filename.indexOf(".")+1);
+                for (int i=0;i<list.size();i++) {
+                    XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                    if (attach.getFilename().startsWith(shortname))
+                        attachment = attach;
+                }
+
+                if (attachment!=null) {
+                    return "../../skin/" + skin.replace('.','/') + "/" + attachment.getFilename();
+                }
+
+            }
+        } catch (Exception e) {}
+
+        return "../../../skins/default/" + filename;
+    }
+
 
     public String getSkin(XWikiContext context) {
         try {
@@ -431,10 +533,12 @@ public class XWiki implements XWikiNotificationInterface {
                 return skin;
 
             // Try to get it from URL
-            skin = context.getRequest().getParameter("skin");
-            if ((skin!=null)&&(!skin.equals(""))) {
-                context.put("skin",skin);
-                return skin;
+            if (context.getRequest()!=null) {
+                skin = context.getRequest().getParameter("skin");
+                if ((skin!=null)&&(!skin.equals(""))) {
+                    context.put("skin",skin);
+                    return skin;
+                }
             }
 
             XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
@@ -778,6 +882,10 @@ public class XWiki implements XWikiNotificationInterface {
     public Principal checkAuth(XWikiContext context) throws XWikiException {
         HttpServletRequest request = context.getRequest();
         HttpServletResponse response = context.getResponse();
+
+        if (request==null)
+            return null;
+
         Authenticator auth = getAuthenticator();
         SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
                 realm, auth.getAuthMethod());
@@ -813,7 +921,8 @@ public class XWiki implements XWikiNotificationInterface {
             user = checkAuth(context);
             if ((user==null)&&(needsAuth)) {
                 try {
-                    getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+                    if (context.getRequest()!=null)
+                     getAuthenticator().showLogin(context.getRequest(), context.getResponse());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -848,7 +957,8 @@ public class XWiki implements XWikiNotificationInterface {
         if (user==null) {
             // Denied Guest need to be authenticated
             try {
-                getAuthenticator().showLogin(context.getRequest(), context.getResponse());
+                if (context.getRequest()!=null)
+                   getAuthenticator().showLogin(context.getRequest(), context.getResponse());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -885,16 +995,46 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public String include(String topic, XWikiContext context, boolean isForm) {
-        XWikiDocInterface doc = null;
+        String database = null, incdatabase = null;
         try {
-            doc = getDocument(((XWikiDocInterface) context.get("doc")).getWeb(), topic, context);
-        } catch (XWikiException e) {
-            return "Topic " + topic + " does not exist";
-        }
-        if (isForm)
-            return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
-        else
-            return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
-    }
 
+            XWikiDocInterface doc = null;
+            try {
+
+                int i0 = topic.indexOf(":");
+                if (i0!=-1) {
+                    incdatabase = topic.substring(0,i0);
+                    topic = topic.substring(i0+1);
+                    database = context.getDatabase();
+                    context.setDatabase(incdatabase);
+                }
+
+                doc = getDocument(((XWikiDocInterface) context.get("doc")).getWeb(), topic, context);
+
+                if (checkAccess("view", doc, context)==false) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "Access to this document is denied");
+                }
+
+            } catch (XWikiException e) {
+                return "Topic " + topic + " does not exist";
+            }
+
+            if (isForm) {
+                // We do everything in the context of the including document
+                if (database!=null)
+                    context.setDatabase(database);
+
+                return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
+            }
+            else {
+                // We stay in the context included document
+                return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
+            }
+        } finally {
+            if (database!=null)
+                context.setDatabase(database);
+        }
+    }
 }

@@ -1,5 +1,5 @@
 #macro( template $tname )
-#parse($xwiki.getTemplate($tname))
+$xwiki.parseTemplate($tname)
 #end
 
 #macro( includeTopic $topic )

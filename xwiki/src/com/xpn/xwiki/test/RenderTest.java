@@ -274,4 +274,8 @@ public class RenderTest extends TestCase {
         testInclude( "#includeForm(\"Test.WebHome\")", "Test/IncludeTest");
     }
 
+    public void testIncludeFromOtherDatabase() throws XWikiException {
+        testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")", "XWiki Users");
+    }
+
 }

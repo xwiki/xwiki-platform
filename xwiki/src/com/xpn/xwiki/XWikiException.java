@@ -39,6 +39,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_PERLPLUGINS = 6;
     public static final int MODULE_XWIKI_CLASSES = 7;
     public static final int MODULE_XWIKI_USER = 8;
+    public static final int MODULE_XWIKI_ACCESS = 9;
     public static final int MODULE_XWIKI_APP = 10;
 
     // Error list
@@ -92,6 +93,8 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_USER_INIT = 8001;
     public static final int ERROR_XWIKI_USER_CREATE = 8002;
+
+    public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
 
     public static final int ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST = 10001;
     public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 10002;

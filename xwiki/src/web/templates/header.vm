@@ -1,7 +1,7 @@
 <div id="xwikibanner">
 <div id="xwikilogo">
     <a href="../../view/Main/WebHome">
-      <img src="../../../skins/$skin/logo.gif" alt="XPertNet" />
+      <img src="$xwiki.getSkinFile("logo.gif")" alt="XPertNet" />
     </a>
   </div>
 

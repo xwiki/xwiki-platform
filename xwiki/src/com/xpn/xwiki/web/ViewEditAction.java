@@ -27,6 +27,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
@@ -35,21 +36,19 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.velocity.VelocityContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.*;
 
 /**
@@ -73,6 +72,16 @@ public class ViewEditAction extends XWikiAction
         super();
     }
 
+
+    public ActionForward parseTemplate(String template, XWikiContext context) throws IOException {
+        HttpServletResponse response = context.getResponse();
+        response.setContentType("text/html");
+        String content = context.getWiki().parseTemplate(template + ".vm", context);
+        response.setContentLength(content.length());
+        response.getWriter().write(content);
+        return null;
+    }
+
     // --------------------------------------------------------- Public Methods
     /**
      * Handle server requests.
@@ -92,12 +101,8 @@ public class ViewEditAction extends XWikiAction
             throws Exception, ServletException
     {
         String action;
-        HttpSession session;
 
         // ActionErrors errors = new ActionErrors();
-        // session is needed for the velocity renderer
-        // I need to check-out why..
-        session = request.getSession();
 
         // fetch action from mapping
         action = mapping.getName();
@@ -121,13 +126,11 @@ public class ViewEditAction extends XWikiAction
         doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
         context.put("doc", doc);
 
-        // Objects available in Wiki Templates
-        // Document used in the template (always the latest version)
-        session.setAttribute("doc", new Document(doc, context));
-        // Document used for the content (old version in case of revisions)
-        session.setAttribute("cdoc", new Document(doc, context));
-        session.setAttribute("context", context);
-        session.setAttribute("xwiki", new com.xpn.xwiki.api.XWiki(xwiki, context));
+
+        // Prepare velocity context
+        VelocityContext vcontext = XWikiVelocityRenderer.prepareContext(context);
+        vcontext.put("doc", new Document(doc, context));
+        vcontext.put("cdoc",  vcontext.get("doc"));
 
         if (xwiki.checkAccess(action, doc, context)==false)
            return null;
@@ -142,13 +145,14 @@ public class ViewEditAction extends XWikiAction
                 // Let's get the revision
                 doc = xwiki.getDocument(doc, rev, context);
                 context.put("doc", doc);
-                session.setAttribute("cdoc", new Document(doc, context));
+                // We need to have the old version doc in the context
+                vcontext.put("cdoc", new Document(doc, context));
             }
             // forward to view template
             if (xwiki.getSkin(context).equals("plain"))
-                return (mapping.findForward("plain"));
+                return parseTemplate("plain", context);
             else
-                return (mapping.findForward("view"));
+                return parseTemplate("view", context);
         }
         else if ( action.equals("inline")) {
             PrepareEditForm peform = (PrepareEditForm) form;
@@ -162,7 +166,7 @@ public class ViewEditAction extends XWikiAction
             context.put("display", "edit");
 
             // forward to view template
-            return (mapping.findForward("inline"));
+            return parseTemplate("inline", context);
         }
         else if ( action.equals("edit") )
         {
@@ -174,12 +178,12 @@ public class ViewEditAction extends XWikiAction
             doc.readFromTemplateForEdit(peform, context);
 
             // forward to edit template
-            return (mapping.findForward("edit"));
+            return parseTemplate("edit", context);
         }
         else if ( action.equals("preview") )
         {
             doc.readFromForm((EditForm)form, context);
-            return (mapping.findForward("preview"));
+            return parseTemplate("preview", context);
         }
         else if (action.equals("save"))
         {
@@ -290,12 +294,24 @@ public class ViewEditAction extends XWikiAction
             response.sendRedirect(doc.getActionUrl("edit",context));
             return null;
         }
-        if (action.equals("download"))
+        else if (action.equals("download"))
         {
             String path = request.getPathInfo();
             String filename = path.substring(path.lastIndexOf("/")+1);
-            int id = Integer.parseInt(request.getParameter("id"));
-            XWikiAttachment attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+            XWikiAttachment attachment = null;
+
+            if (request.getParameter("id")!=null) {
+              int id = Integer.parseInt(request.getParameter("id"));
+              attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+            }
+            else {
+                List list = doc.getAttachmentList();
+                for (int i=0;i<list.size();i++) {
+                   attachment = (XWikiAttachment) list.get(i);
+                   if (attachment.getFilename().equals(filename))
+                       break;
+                }
+            }
 
             // Choose the right content type
             response.setContentType(servlet.getServletContext().getMimeType(filename));
@@ -304,12 +320,11 @@ public class ViewEditAction extends XWikiAction
             byte[] data = attachment.getContent(context);
             response.setContentLength(data.length);
             response.getOutputStream().write(data);
-
             return null;
         }
-        if (action.equals("attach"))
+        else if (action.equals("attach"))
         {
-            return (mapping.findForward("attach"));
+            return parseTemplate("attach", context);
         }
         else if (action.equals("upload")) {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
@@ -317,12 +332,22 @@ public class ViewEditAction extends XWikiAction
             // Get the FileUpload Data
             DiskFileUpload fileupload = new DiskFileUpload();
             fileupload.setSizeMax(1000000);
-            fileupload.setRepositoryPath(".");
+            fileupload.setSizeThreshold(0);
+
+            String tempdir = xwiki.Param("xwiki.upload.tempdir");
+            if (tempdir!=null) {
+                fileupload.setRepositoryPath(tempdir);
+                (new File(tempdir)).mkdirs();
+            }
+            else
+                fileupload.setRepositoryPath(".");
             List filelist = fileupload.parseRequest(request);
+
             DefaultFileItem fileitem = (DefaultFileItem)filelist.get(0);
 
             // Get the data
             File file = fileitem.getStoreLocation();
+            String fullpath = file.getAbsolutePath();
             byte[] data = new byte[(int)file.length()];
             FileInputStream fileis = new FileInputStream(file);
             fileis.read(data);
@@ -356,9 +381,48 @@ public class ViewEditAction extends XWikiAction
 
             // Save the document with the attachment meta data
             xwiki.saveDocument(doc, olddoc, context);
+
+            // forward to edit
+            response.sendRedirect(doc.getActionUrl("attach",context));
+            return null;
          }
-        // forward to edit
-        response.sendRedirect(doc.getActionUrl("attach",context));
+         else if (action.equals("skin"))
+            {
+                String path = request.getPathInfo();
+                String filename = path.substring(path.lastIndexOf("/")+1);
+
+                BaseObject object = doc.getObject("XWiki.XWikiSkin", 0);
+                String content = null;
+                if (object!=null) {
+                    content = object.getStringValue(filename);
+                }
+
+                if ((content!=null)&&(!content.equals(""))) {
+                    // Choose the right content type
+                    response.setContentType(servlet.getServletContext().getMimeType(filename));
+                    // Sending the content of the attachment
+                    response.setContentLength(content.length());
+                    response.getWriter().write(content);
+                }
+                else {
+                  XWikiAttachment attachment = null;
+                  List list = doc.getAttachmentList();
+                  for (int i=0;i<list.size();i++) {
+                    attachment = (XWikiAttachment) list.get(i);
+                    if (attachment.getFilename().equals(filename))
+                       break;
+                  }
+                  if (attachment!=null) {
+                      // Sending the content of the attachment
+                      byte[] data = attachment.getContent(context);
+                      response.setContentType(servlet.getServletContext().getMimeType(filename));
+                      response.setContentLength(data.length);
+                      response.getOutputStream().write(data);
+                    }
+                  }
+                return null;
+            }
+
         return null;
     }
 

@@ -153,13 +153,17 @@
                <forward name="upload" path="/templates/attach.vm"/>
       </action>
 
-            <action path="/download/"
-                              type="com.xpn.xwiki.web.ViewEditAction"
-                              name="download"
-                              scope="request">
-                     <forward name="download" path="/templates/download.vm"/>
-            </action>
+      <action path="/download/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="download"
+          scope="request">
+      </action>
 
+      <action path="/skin/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="skin"
+          scope="request">
+      </action>
 
   </action-mappings>
 

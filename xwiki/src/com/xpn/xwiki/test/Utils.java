@@ -3,7 +3,9 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -347,5 +349,29 @@ public class Utils {
         return svalue;
     }
 
+
+    public static void setStringValue(String className, String propname, String propvalue, XWikiContext context) throws XWikiException {
+        XWiki xwiki = context.getWiki();
+        XWikiDocInterface doc = xwiki.getDocument(className, context);
+        BaseClass bclass = doc.getxWikiClass();
+        if (bclass==null) {
+            bclass = new BaseClass();
+        }
+
+        bclass.setName(className);
+        StringClass propclass = new StringClass();
+        propclass.setName(propname);
+        propclass.setPrettyName(propname);
+        propclass.setSize(80);
+        propclass.setObject(bclass);
+        bclass.getFields().put(propname, propclass);
+        doc.setxWikiClass(bclass);
+        BaseObject bobject = new BaseObject();
+        bobject.setName(className);
+        bobject.setxWikiClass(bclass);
+        bobject.setStringValue(propname, propvalue);
+        doc.addObject(className, bobject);
+        xwiki.saveDocument(doc, context);
+    }
 
 }

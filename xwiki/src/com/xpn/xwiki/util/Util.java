@@ -31,10 +31,7 @@ import org.apache.oro.text.perl.Perl5Util;
 import org.apache.oro.text.regex.Perl5Matcher;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
 
 
@@ -149,6 +146,22 @@ public class Util {
 	Vector results = new Vector();
 	getP5util().split ((Collection) results,pattern,text);
 	return results;
+    }
+
+    public static String getFileContent(File file) throws IOException {
+            StringBuffer content = new StringBuffer();
+            BufferedReader fr = new BufferedReader(new FileReader(file));
+            String line;
+            line = fr.readLine();
+            while (true) {
+                 if (line==null) {
+                        fr.close();
+                        return content.toString();
+                    }
+                    content.append(line);
+                    content.append("\n");
+                    line = fr.readLine();
+                }
     }
 
 }

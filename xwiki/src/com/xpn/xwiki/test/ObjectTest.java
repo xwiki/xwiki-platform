@@ -9,6 +9,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.XWikiException;
 import junit.framework.TestCase;
 
 /**
@@ -36,62 +37,10 @@ import junit.framework.TestCase;
 
 public class ObjectTest extends TestCase {
 
-    public static IntegerProperty prepareIntegerProperty() {
-         BaseObject object = new BaseObject();
-         object.setName("Main.TestObject1");
-         IntegerProperty prop = new IntegerProperty();
-         prop.setObject(object);
-         prop.setPrettyName("Age");
-         prop.setName("age");
-         prop.setValue(new Integer(34));
-         return prop;
-     }
-
-    public static StringProperty prepareStringProperty() {
-        BaseObject object = new BaseObject();
-        object.setName("Main.TestObject1");
-        StringProperty prop = new StringProperty();
-        prop.setObject(object);
-        prop.setName("name");
-        prop.setPrettyName("Name");
-        prop.setValue(new String("Dubost"));
-        return prop;
-    }
-
-    public static BaseObject prepareObject() {
-        // Prepare class definition
-        BaseClass bclass = new BaseClass();
-        StringClass sclass = new StringClass();
-        sclass.setName("name");
-        sclass.setObject(bclass);
-        NumberClass nclass = new NumberClass();
-        nclass.setName("age");
-        nclass.setObject(bclass);
-        nclass.setNumberType("integer");
-        bclass.put("name", sclass);
-        bclass.put("age", nclass);
-        bclass.setName("Main.TestObject2");
-
-        // Prepare object
-        BaseObject object = new BaseObject();
-        object.setxWikiClass(bclass);
-        object.setName("Main.TestObject2");
-        StringProperty sprop = new StringProperty();
-        sprop.setObject(object);
-        sprop.setName("name");
-        sprop.setValue(new String("Dubost"));
-        object.safeput("name", sprop);
-        IntegerProperty iprop = new IntegerProperty();
-        iprop.setObject(object);
-        iprop.setName("age");
-        iprop.setValue(new Integer(34));
-        object.safeput("age", iprop);
-        return object;
-    }
 
     public void testEqualsNumberProperty() {
          // Test both cloning and equals
-         IntegerProperty prop = prepareIntegerProperty();
+         IntegerProperty prop = Utils.prepareIntegerProperty();
          IntegerProperty prop2 = (IntegerProperty) prop.clone();
 
          // test cloning and equals at the same time
@@ -133,7 +82,7 @@ public class ObjectTest extends TestCase {
          StringProperty sprop = new StringProperty();
          assertTrue("IntegerProperty cannot be equals to StringProperty", !iprop.equals(sprop));
 
-         StringProperty prop = prepareStringProperty();
+         StringProperty prop = Utils.prepareStringProperty();
          StringProperty prop2 = (StringProperty) prop.clone();
 
          // test cloning and equals at the same time
@@ -150,8 +99,8 @@ public class ObjectTest extends TestCase {
          assertTrue("Equals did not detect same null value", prop.equals(prop2));
      }
 
-     public void testEqualsObject() {
-         BaseObject object = prepareObject();
+     public void testEqualsObject() throws XWikiException {
+         BaseObject object = Utils.prepareObject();
          BaseObject object2 = (BaseObject)object.clone();
 
          // test cloning and equals at the same time
@@ -186,8 +135,8 @@ public class ObjectTest extends TestCase {
 
      }
 
-     public void testMergeObject() {
-         BaseObject object = prepareObject();
+     public void testMergeObject() throws XWikiException {
+         BaseObject object = Utils.prepareObject();
          BaseObject object2 = (BaseObject)object.clone();
 
          object2.merge(object);

@@ -29,8 +29,11 @@ import com.xpn.xwiki.objects.BaseCollection;
 
 import java.util.Map;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.ecs.xhtml.object;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {
@@ -85,4 +88,33 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     public void merge(BaseClass bclass) {
     }
 
+    public Element toXML() {
+        Element cel = new DOMElement("class");
+
+        Element el = new DOMElement("name");
+        el.addText(getName());
+        cel.add(el);
+
+        Iterator it = getFields().values().iterator();
+        while (it.hasNext()) {
+          PropertyClass bprop = (PropertyClass)it.next();
+          cel.add(bprop.toXML());
+        }
+        return cel;
+    }
+
+   public void fromXML(Element cel) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        setName(cel.element("name").getText());
+        List list = cel.elements();
+        for (int i=1;i<list.size();i++) {
+            Element pcel = (Element) list.get(i);
+            String name = pcel.getName();
+            String classType = pcel.element("classType").getText();
+            PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
+            property.setName(name);
+            property.setObject(this);
+            property.fromXML(pcel);
+            safeput(name, property);
+        }
+   }
 }

@@ -27,6 +27,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 import java.io.Serializable;
 
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;
 
@@ -63,6 +66,12 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     }
 
     public void setValue(Object value) {
+    }
+
+    public Element toXML() {
+        Element el = new DOMElement(getName());
+        el.setText(getValue().toString());
+        return el;
     }
 
 }

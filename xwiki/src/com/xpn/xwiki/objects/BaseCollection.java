@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.Iterator;
 import java.io.Serializable;
 
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;
     private Map fields = new HashMap();
@@ -126,7 +129,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public void setIntValue(String name, int value) {
-        NumberProperty property = new NumberProperty();
+        NumberProperty property = new IntegerProperty();
         property.setValue(new Integer(value));
         safeput(name, property);
     }

@@ -26,9 +26,21 @@ import org.apache.commons.jrcs.rcs.*;
 import org.apache.commons.jrcs.diff.DiffException;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
+import org.apache.ecs.xhtml.object;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.DocumentFactory;
+import org.dom4j.DocumentException;
+import org.dom4j.io.DOMReader;
+import org.dom4j.io.SAXReader;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.dom.DOMElement;
+import org.dom4j.dom.DOMDocumentFactory;
 
 import java.util.*;
 import java.io.FileNotFoundException;
+import java.io.StringReader;
+import java.text.*;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -329,7 +341,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         if ((content==null)||(content.equals("")))
             setContent("\n");
         if (archive==null)
-            updateArchive(content);
+            updateArchive(toXML());
         if (archive==null)
             return "";
         else {
@@ -768,5 +780,157 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         doc.setxWikiClass((BaseClass)getxWikiClass().clone());
         doc.mergexWikiObjects(this);
         return doc;
+    }
+
+    public boolean equals(Object object) {
+        XWikiSimpleDoc doc = (XWikiSimpleDoc) object;
+        if (!getName().equals(doc.getName()))
+         return false;
+
+        if (!getWeb().equals(doc.getWeb()))
+                 return false;
+
+        if (!getAuthor().equals(doc.getAuthor()))
+                 return false;
+
+        if (getDate().getTime() != doc.getDate().getTime())
+                 return false;
+
+        if (!getFormat().equals(doc.getFormat()))
+                 return false;
+
+        if (!getContent().equals(doc.getContent()))
+                 return false;
+
+        if (!getVersion().equals(doc.getVersion()))
+                 return false;
+
+        try {
+            if (!getArchive().equals(doc.getArchive()))
+                     return false;
+        } catch (XWikiException e) {
+            return false;
+        }
+
+        if (!getxWikiClass().equals(doc.getxWikiClass()))
+                 return false;
+
+        Set list1 = getxWikiObjects().keySet();
+        Set list2 = doc.getxWikiObjects().keySet();
+        if (!list1.equals(list2))
+            return false;
+
+        for (Iterator it = list1.iterator();it.hasNext();) {
+            String name = (String) it.next();
+            Vector v1 = getObjects(name);
+            Vector v2 = doc.getObjects(name);
+            if (v1.size()!=v2.size())
+                return false;
+            for (int i=0;i<v1.size();i++) {
+                if (!v1.get(i).equals(v2.get(i)))
+                    return false;
+            }
+        }
+
+
+        return true;
+    }
+
+    public String toXML() {
+        Document doc = toXMLDocument();
+        return doc.asXML();
+    }
+
+    public Document toXMLDocument() {
+        Document doc = new DOMDocument();
+        Element docel = new DOMElement("xwikidoc");
+        doc.setRootElement(docel);
+
+        Element el = new DOMElement("web");
+        el.addText(getWeb());
+        docel.add(el);
+
+        el = new DOMElement("name");
+        el.addText(getName());
+        docel.add(el);
+
+        el = new DOMElement("parent");
+        el.addText(getParent());
+        docel.add(el);
+
+        el = new DOMElement("author");
+        el.addText(getAuthor());
+        docel.add(el);
+
+
+        long d = getDate().getTime();
+        el = new DOMElement("date");
+        el.addText("" + d);
+        docel.add(el);
+
+        el = new DOMElement("version");
+        el.addText(getVersion());
+        docel.add(el);
+
+        // Add Class
+        BaseClass bclass = getxWikiClass();
+        if (bclass.getFields().size()>0) {
+          docel.add(bclass.toXML());
+        }
+
+        // Add Objects
+        Iterator it = getxWikiObjects().values().iterator();
+        while (it.hasNext()) {
+            Vector objects = (Vector) it.next();
+            for (int i=0;i<objects.size();i++) {
+                BaseObject obj = (BaseObject)objects.get(i);
+                docel.add(obj.toXML());
+            }
+        }
+
+        // Add Content
+        el = new DOMElement("content");
+        el.addText(getContent());
+        docel.add(el);
+        return doc;
+    }
+
+     public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+        StringInputStream in = new StringInputStream(xml);
+        SAXReader reader = new SAXReader();
+        Document domdoc = reader.read(in);
+        Element docel = domdoc.getRootElement();
+
+        setName(docel.element("name").getText());
+        setWeb(docel.element("web").getText());
+        setParent(docel.element("parent").getText());
+        setAuthor(docel.element("author").getText());
+        setVersion(docel.element("version").getText());
+        setContent(docel.element("content").getText());
+
+        String sdate = docel.element("date").getText();
+        Date date = new Date(Long.parseLong(sdate));
+        setDate(date);
+
+
+        Element cel = docel.element("class");
+        BaseClass bclass = new BaseClass();
+        if (cel!=null) {
+            bclass.fromXML(cel);
+            setxWikiClass(bclass);
+        }
+
+        //
+        List objels = docel.elements("object");
+        for (int i=0;i<objels.size();i++) {
+            Element objel = (Element) objels.get(i);
+            BaseObject bobject = new BaseObject();
+            bobject.fromXML(objel);
+            addObject(bobject.getClassName(), bobject);
+        }
+    }
+
+    public String toString() {
+        return toXML();
     }
 }

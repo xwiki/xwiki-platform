@@ -23,7 +23,7 @@
 package com.xpn.xwiki.objects;
 
 
-public class NumberProperty extends BaseProperty {
+public abstract class NumberProperty extends BaseProperty {
     private Number value;
 
     public NumberProperty() {

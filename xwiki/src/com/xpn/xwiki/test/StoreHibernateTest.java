@@ -48,7 +48,22 @@ public class StoreHibernateTest extends StoreTest {
        }
 
     public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
-        StoreObjectTest.cleanUp(hibstore);
+        hibstore.checkHibernate();
+        hibstore.beginTransaction();
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiobjects");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiproperties");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiintegers");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikifloats");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikilongs");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoubles");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikistrings");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclassesprop");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikistringclasses");
+        StoreHibernateTest.runSQL(hibstore, "drop table xwikinumberclasses");
+        hibstore.endTransaction(true);
+        hibstore.updateSchema();
     }
 
     public void setUp() throws HibernateException {

@@ -24,6 +24,7 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
@@ -34,13 +35,22 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.*;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 import java.io.*;
 import java.util.*;
-
 import net.sf.hibernate.*;
+import net.sf.hibernate.engine.SessionFactoryImplementor;
 import net.sf.hibernate.tool.hbm2ddl.SchemaUpdate;
 import net.sf.hibernate.cfg.*;
+
+import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 
 
 public class XWikiHibernateStore extends XWikiRCSFileStore {
@@ -126,8 +136,9 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             // Handle the latest text file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
                 doc.setDate(new Date());
+                doc.setDate(new Date());
                 doc.incrementVersion();
-                doc.updateArchive(getFullContent(doc));
+                doc.updateArchive(doc.toXML());
             }
 
             checkHibernate();
@@ -145,7 +156,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
                 if (bclass.getFields().size()>0)
-                 saveXWikiClass(bclass, false);
+                    saveXWikiClass(bclass, false);
             } else {
                 // TODO: Remove existing class
             }
@@ -161,8 +172,8 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 }
                 // Delete all objects of this class that have a bigger ID
                 String squery = "from BaseObject as bobject where bobject.name = '" + doc.getFullName()
-                                + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
-                                + "' and bobject.number >= " + objects.size();
+                        + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
+                        + "' and bobject.number >= " + objects.size();
                 int result = getSession().delete(squery);
                 System.err.println("Deleted " + result + " instances");
             }
@@ -176,6 +187,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
 
     }
+
 
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
@@ -215,10 +227,10 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     BaseClass objclass;
                     objclass = (BaseClass) bclasses.get(classname);
                     if (objclass==null) {
-                       objclass = new BaseClass();
-                       objclass.setName(classname);
-                       loadXWikiClass(objclass, false);
-                       bclasses.put(classname, objclass);
+                        objclass = new BaseClass();
+                        objclass.setName(classname);
+                        loadXWikiClass(objclass, false);
+                        bclasses.put(classname, objclass);
                     }
 
                     BaseObject object = new BaseObject();
@@ -239,26 +251,42 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         return doc;
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
-        //To change body of implemented methods use Options | File Templates.
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version) throws XWikiException {
+        XWikiDocInterface doc = new XWikiSimpleDoc(basedoc.getWeb(), basedoc.getName());
         try {
             doc.setStore(this);
-            checkHibernate();
-            beginTransaction();
-            getSession().load(doc, new Long(doc.getId()));
-            endTransaction(true);
-            Object[] text = (Object[]) doc.getRCSArchive().getRevision(version);
-            StringBuffer content = new StringBuffer();
-            boolean bMetaDataDone = false;
-            for (int i=0;i<text.length;i++) {
-                String line = text[i].toString();
-                if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+            Archive archive = basedoc.getRCSArchive();
+
+            if (archive == null) {
+               doc.updateArchive(doc.toXML());
+               archive = basedoc.getRCSArchive();
+            }
+
+            Object[] text = (Object[]) archive.getRevision(version);
+            if (text[0].toString().startsWith("<")) {
+                StringBuffer content = new StringBuffer();
+                for (int i=0;i<text.length;i++) {
+                    String line = text[i].toString();
                     content.append(line);
                     content.append("\n");
                 }
+                doc.fromXML(content.toString());
+            } else {
+                StringBuffer content = new StringBuffer();
+                boolean bMetaDataDone = false;
+                for (int i=0;i<text.length;i++) {
+                    String line = text[i].toString();
+                    if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+                        content.append(line);
+                        content.append("\n");
+                    }
+                    doc.setContent(content.toString());
+                }
             }
-            doc.setContent(content.toString());
-            doc.setVersion(version);
+            // Make sure the document has the same name
+            // as the new document (in case there was a name change
+            doc.setName(basedoc.getName());
+            doc.setWeb(basedoc.getWeb());
         } catch (Exception e) {
             Object[] args = { doc.getFullName(), version.toString() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION,

@@ -29,8 +29,8 @@ import com.xpn.xwiki.store.*;
 import java.io.Serializable;
 
 public abstract class XWikiDefaultDoc implements XWikiDocInterface, Serializable {
-  private XWikiStoreInterface store;
-  private XWikiCacheInterface docCache;
+
+    private XWikiStoreInterface store;
 
     public XWikiStoreInterface getStore() {
         return store;

@@ -1,15 +1,10 @@
 
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.test.Utils;
+import com.xpn.xwiki.test.StoreObjectTest;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiRCSFileStore;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.io.File;
-
-import net.sf.hibernate.impl.SessionImpl;
 
 /**
  * ===================================================================
@@ -30,12 +25,11 @@ import net.sf.hibernate.impl.SessionImpl;
 
  * Created by
  * User: Ludovic Dubost
- * Date: 19 janv. 2004
- * Time: 14:30:43
+ * Date: 28 janv. 2004
+ * Time: 18:22:59
  */
 
-public class StoreRCSFileTest extends StoreTest {
-
+public class StoreObjectRCSFileTest extends StoreObjectTest {
     public void cleanUp() {
         File file = new File(Utils.rcspath + "/" + Utils.web + "/" + Utils.name + ".txt");
         file.delete();

@@ -117,6 +117,11 @@ public class ViewEditAction extends XWikiAction
         // Determine what to do
         if (action.equals("view"))
         {
+            String rev = request.getParameter("rev");
+            if (rev!=null) {
+                // Let's get the revision
+                doc = xwiki.getDocument(doc, rev);
+            }
             // forward to view template
             return (mapping.findForward("view"));
         }

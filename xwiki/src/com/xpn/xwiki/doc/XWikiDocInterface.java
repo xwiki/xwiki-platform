@@ -23,6 +23,8 @@
 package com.xpn.xwiki.doc;
 
 import org.apache.commons.jrcs.rcs.*;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import com.xpn.xwiki.*;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.web.EditForm;
@@ -111,4 +113,18 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public Object clone();
 
     void addObject(String classname, BaseObject object);
+
+    String toXML();
+
+    Document toXMLDocument();
+
+    XWikiDocInterface getParentDoc();
+
+    String getRenderedContent(XWikiContext context);
+
+    Version[] getRevisions() throws XWikiException;
+
+    String[] getRecentRevisions() throws XWikiException;
+
+    void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException;
 }

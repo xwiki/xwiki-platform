@@ -29,6 +29,11 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import org.apache.ecs.html.Input;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
     private BaseClass object;
@@ -60,6 +65,11 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseProperty fromString(String value) {
         return null;
+    }
+
+    public BaseProperty newPropertyfromXML(Element ppcel) {
+        String value = ppcel.getText();
+        return fromString(value);
     }
 
     public String formEncode(String value) {
@@ -150,6 +160,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return wclass;
     }
 
+    public String getClassName() {
+        return getxWikiClass().getName();
+    }
+
     // In property classes we need to store this info in the HashMap for fields
     // This way it is readable by the displayEdit/displayView functions..
     public String getName() {
@@ -192,4 +206,32 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return pclass;
     }
 
+    public Element toXML() {
+         Element pel = new DOMElement(getName());
+         Iterator it = getFields().values().iterator();
+         while (it.hasNext()) {
+           BaseProperty bprop = (BaseProperty)it.next();
+           pel.add(bprop.toXML());
+         }
+        Element el = new DOMElement("classType");
+        el.addText(getClassType());
+        pel.add(el);
+        return pel;
+     }
+
+    public void fromXML(Element pcel) {
+     List list = pcel.elements();
+     BaseClass bclass = getxWikiClass();
+
+     for (int i=0;i<list.size();i++) {
+        Element ppcel = (Element) list.get(i);
+        String name = ppcel.getName();
+        PropertyClass pclass = (PropertyClass) bclass.safeget(name);
+        if (pclass!=null) {
+         BaseProperty bprop = pclass.newPropertyfromXML(ppcel);
+         bprop.setObject(this);
+         safeput(name, bprop);
+        }
+     }
+    }
 }

@@ -97,7 +97,7 @@ public class ClassesTest extends TestCase {
     }
 
     public void testNumberDisplayers() throws XWikiException {
-        BaseObject obj = prepareObject();
+        BaseObject obj = Utils.prepareObject();
         testDisplayer("age", obj, "33", "value=\'33\'");
         testDisplayer("first_name", obj, "Ludovic", "value=\'Ludovic\'");
         testDisplayer("last_name", obj, "von Dubost", "value=\'von Dubost\'");
@@ -105,40 +105,8 @@ public class ClassesTest extends TestCase {
         testDisplayer("comment", obj, "Hello1\nHello2\nHello3\n", "textarea");
     }
 
-
-    public BaseObject prepareObject() throws XWikiException {
-        BaseClass wclass = new BaseClass();
-        StringClass first_name_class = new StringClass();
-        first_name_class.setSize(80);
-        StringClass last_name_class = new StringClass();
-        last_name_class.setSize(80);
-        NumberClass age_class = new NumberClass();
-        age_class.setSize(5);
-        age_class.setNumberType("integer");
-        PasswordClass passwd_class = new PasswordClass();
-        passwd_class.setSize(10);
-        TextAreaClass comment_class = new TextAreaClass();
-        comment_class.setSize(80);
-        comment_class.setRows(10);
-
-        wclass.put("first_name", first_name_class);
-        wclass.put("last_name", last_name_class);
-        wclass.put("age", age_class);
-        wclass.put("password", passwd_class);
-        wclass.put("comment", comment_class);
-
-        BaseObject object = new BaseObject();
-        object.setxWikiClass(wclass);
-        object.put("first_name", first_name_class.fromString("Ludovic"));
-        object.put("last_name", last_name_class.fromString("Von Dubost"));
-        object.put("age", last_name_class.fromString("33"));
-        object.put("password", passwd_class.fromString("sesame"));
-        object.put("comment",comment_class.fromString("Hello1\nHello2\nHello3\n"));
-        return object;
-    }
-
     public void testObject() throws XWikiException {
-        BaseObject object = prepareObject();
+        BaseObject object = Utils.prepareObject();
     }
 
 }

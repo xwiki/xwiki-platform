@@ -23,11 +23,14 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.jrcs.rcs.*;
 import java.io.*;
@@ -121,17 +124,37 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             fr = new BufferedReader(new FileReader(file));
             String line;
             boolean bMetaDataDone = false;
-            while (true) {
-                line = fr.readLine();
-                if (line==null) {
-                    doc.setContent(content.toString());
-                    doc.setMostRecent(true);
-                    fr.close();
-                    break;
-                }
-                if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+            boolean bisXML = false;
+            line = fr.readLine();
+            if (line.startsWith("<"))
+                bisXML = true;
+
+            if (bisXML) {
+                while (true) {
+                    if (line==null) {
+                        fr.close();
+                        doc.fromXML(content.toString());
+                        break;
+                    }
                     content.append(line);
                     content.append("\n");
+                    line = fr.readLine();
+                }
+
+            } else
+            {
+                while (true) {
+                    if (line==null) {
+                        fr.close();
+                        doc.setContent(content.toString());
+                        doc.setMostRecent(true);
+                        break;
+                    }
+                    if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+                        content.append(line);
+                        content.append("\n");
+                    }
+                    line = fr.readLine();
                 }
             }
         } catch (Exception e) {
@@ -142,11 +165,11 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return doc;
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc,String version) throws XWikiException {
-        //To change body of implemented methods use Options | File Templates.
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version) throws XWikiException {
+        XWikiDocInterface doc = new XWikiSimpleDoc(basedoc.getWeb(), basedoc.getName());
         try {
             doc.setStore(this);
-            Archive archive = doc.getRCSArchive();
+            Archive archive = basedoc.getRCSArchive();
 
             if (archive==null) {
                 File file = getVersionedFilePath(doc);
@@ -155,17 +178,33 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                     archive = new Archive(path);
                 }
             }
+            basedoc.setRCSArchive(archive);
 
             Object[] text = (Object[]) archive.getRevision(version);
-            StringBuffer content = new StringBuffer();
-            boolean bMetaDataDone = false;
-            for (int i=0;i<text.length;i++) {
-                String line = text[i].toString();
-                if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+            if (text[0].toString().startsWith("<")) {
+                StringBuffer content = new StringBuffer();
+                for (int i=0;i<text.length;i++) {
+                    String line = text[i].toString();
                     content.append(line);
                     content.append("\n");
                 }
-                doc.setContent(content.toString());
+                doc.fromXML(content.toString());
+            } else {
+                StringBuffer content = new StringBuffer();
+                boolean bMetaDataDone = false;
+                for (int i=0;i<text.length;i++) {
+                    String line = text[i].toString();
+                    if (bMetaDataDone||(parseMetaData(doc,line)==false)) {
+                        content.append(line);
+                        content.append("\n");
+                    }
+                    doc.setContent(content.toString());
+                }
+
+                // Make sure the document has the same name
+                // as the new document (in case there was a name change
+                doc.setName(basedoc.getName());
+                doc.setWeb(basedoc.getWeb());
             }
         } catch (Exception e) {
             Object[] args = { doc.getFullName(), version.toString() };
@@ -212,10 +251,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public String getFullContent(XWikiDocInterface doc) {
-        StringBuffer buf = new StringBuffer();
-        getMetaData(doc, buf);
-        buf.append(doc.getContent());
-        return buf.toString();
+        return doc.toXML();
     }
 
     public void getFullContent(XWikiDocInterface doc, StringBuffer buf) {
@@ -299,11 +335,21 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
     }
 
     public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-           throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
-                   "Exception while searching: not implemented");
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
     }
 
     public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
+    }
+
+    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
+                "Exception while searching: not implemented");
+    }
+
+    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SEARCH,
                 "Exception while searching: not implemented");
     }

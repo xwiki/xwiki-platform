@@ -74,7 +74,11 @@
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
     <property name="libs.osuser"
+<<<<<<< build.xml
+        value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar" />
+=======
             value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar" />
+>>>>>>> 1.26
 
     <property name="libs.tests"
         value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar" />
@@ -96,10 +100,10 @@
 
     <target name="prepare">
         <propertyfile file="src/web/WEB-INF/version.properties" >
-	<entry key="build.number" type="int" value="1" operation="+" />
- 	</propertyfile>
+            <entry key="build.number" type="int" value="1" operation="+" />
+        </propertyfile>
         <property file="src/web/WEB-INF/version.properties" />
-    <property name="version" value="${xwiki.version}.${build.number}" />
+        <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <mkdir dir="${build.dir}" />
         <mkdir dir="${classes.dir}" />
@@ -147,17 +151,17 @@
                 dir="${src.dir}/perl" />
         </copy>
 
-                <copy todir="${build.dir}/web/WEB-INF">
-                    <fileset includes="license.txt"
-                        dir="${basedir}" />
-                    <fileset includes="lesser.txt"
-                        dir="${basedir}/" />
-                </copy>
+        <copy todir="${build.dir}/web/WEB-INF">
+            <fileset includes="license.txt"
+                dir="${basedir}" />
+            <fileset includes="lesser.txt"
+                dir="${basedir}/" />
+        </copy>
 
 
         <copy todir="${build.dir}/web/WEB-INF/classes">
             <fileset dir="${build.dir}/web/WEB-INF">
-            <include name="hibernate*.cfg.xml" />
+                <include name="hibernate*.cfg.xml" />
             </fileset>
         </copy>
 
@@ -213,10 +217,11 @@
             <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.PluginTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
-	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreRCSFileTest" haltonfailure="no" />
-	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateTest" haltonfailure="no" />
-	    <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateCacheTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreRCSFileTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectRCSFileTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateCacheTest" haltonfailure="no" />
+            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectHibernateTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
             <test todir="${test.reports.dir}" name="${pkg}.test.UserTest" haltonfailure="no" />
         </junit>
@@ -238,8 +243,8 @@
             <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />
 
             <containerset>
-		    <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml" 
-			    port="9080" todir="${test.reports.dir}"/>
+                <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
+                    port="9080" todir="${test.reports.dir}"/>
             </containerset>
         </cactus>
     </target>

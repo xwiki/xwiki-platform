@@ -51,15 +51,15 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     }
 
     public void testCachedReadWrite() throws XWikiException {
-        setStandardData();
+        Utils.setStandardData();
         XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, web, name);
-        XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
+        testStandardReadWrite(store, Utils.web, Utils.name);
+        XWikiSimpleDoc doc3 = new XWikiSimpleDoc(Utils.web, Utils.name);
         doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
         String content3b = doc3.getContent();
-        assertEquals(content3,content3b);
-        assertEquals(doc3.getAuthor(), author2);
-        assertEquals(doc3.getVersion(), version2);
+        assertEquals(Utils.content3,content3b);
+        assertEquals(doc3.getAuthor(), Utils.author2);
+        assertEquals(doc3.getVersion(), Utils.version2);
         assertTrue("Document should be from Cache", doc3.isFromCache());
     }
 }

@@ -244,6 +244,15 @@ public class XWiki implements XWikiNotificationInterface {
         return doc;
     }
 
+    public XWikiDocInterface getDocument(XWikiDocInterface doc, String revision) throws XWikiException {
+        try {
+            doc = getStore().loadXWikiDoc(doc, revision);
+        }  catch (XWikiException e) {
+            // TODO: log error for document version that does not exist.
+        }
+        return doc;
+    }
+
     public XWikiDocInterface getDocument(String web, String name) throws XWikiException {
         XWikiSimpleDoc doc = new XWikiSimpleDoc(web, name);
         return getDocument(doc);

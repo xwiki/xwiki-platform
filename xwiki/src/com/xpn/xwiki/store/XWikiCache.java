@@ -28,7 +28,9 @@ import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.Version;
 
 import java.util.List;
@@ -120,6 +122,14 @@ public class XWikiCache implements XWikiCacheInterface {
 
     public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
         store.loadXWikiClass(bclass, bTransaction);
+    }
+
+    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
+        store.saveXWikiProperty(property, bTransaction);
+    }
+
+    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
+        store.saveXWikiClassProperty(property, bTransaction);
     }
 
 }

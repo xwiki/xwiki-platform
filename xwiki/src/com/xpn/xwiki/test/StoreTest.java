@@ -26,115 +26,49 @@ import junit.framework.*;
 import com.xpn.xwiki.store.*;
 import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWikiException;
-
 import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import org.apache.commons.jrcs.rcs.Version;
-import net.sf.hibernate.impl.SessionImpl;
-import net.sf.hibernate.HibernateException;
 
 
 public abstract class StoreTest extends TestCase {
 
-    public static String name = "WebHome";
-    public static String name2 = "Globals";
-    public static String web = "Main";
-    public static String content1 = "Hello 1\nHello 2\nHello 3\n";
-    public static String content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-    public static String author = "VictorHugo";
-    public static String author2 = "JulesVerne";
-    public static String parent = "Main.WebHome";
-    public static String version = "1.1";
-    public static String version2 = "1.2";
-
-    public static String rcspath = "./rcs";
 
     public abstract XWikiStoreInterface getStore();
 
     public void testStandardReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
-        doc1.setContent(content1);
-        doc1.setAuthor(author);
-        doc1.setParent(parent);
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
         store.saveXWikiDoc(doc1);
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
         doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
         String content2 = doc2.getContent();
-        assertEquals(content1,content2);
-        assertEquals(doc2.getVersion(), version);
-        assertEquals(doc2.getParent(), parent);
-        assertEquals(doc2.getAuthor(), author);
-        doc2.setContent(content3);
-        doc2.setAuthor(author2);
+        assertEquals(Utils.content1,content2);
+        assertEquals(doc2.getVersion(), Utils.version);
+        assertEquals(doc2.getParent(), Utils.parent);
+        assertEquals(doc2.getAuthor(), Utils.author);
+        doc2.setContent(Utils.content3);
+        doc2.setAuthor(Utils.author2);
         store.saveXWikiDoc(doc2);
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
         doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
         String content3b = doc3.getContent();
-        assertEquals(content3,content3b);
-        assertEquals(doc3.getAuthor(), author2);
-        assertEquals(doc3.getVersion(), version2);
+        assertEquals(Utils.content3,content3b);
+        assertEquals(doc3.getAuthor(), Utils.author2);
+        assertEquals(doc3.getVersion(), Utils.version2);
     }
 
-    public void setStandardData() {
-        name = "WebHome";
-        name2 = "Globals";
-        web = "Main";
-        content1 = "Hello 1\nHello 2\nHello 3\n";
-        content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-        author = "VirtorHugo";
-        author2 = "JulesVerne";
-        parent = "Main.WebHome";
-        version = "1.1";
-        version2 = "1.2";
-    }
-
-    public void setMediumData() {
-
-        setStandardData();
-
-        while (content1.length()<1000)
-                content1 += content1;
-
-
-        while (author.length()<120)
-                author += author;
-        while (content3.length()<1000)
-                content3 += content3;
-    }
-
-    public String getData(File file) throws IOException {
-        StringBuffer content = new StringBuffer();
-        BufferedReader fr = new BufferedReader(new FileReader(file));
-        String line;
-        while ((line = fr.readLine())!=null) {
-            content.append(line);
-            content.append("\n");
-        }
-        fr.close();
-        return content.toString();
-    }
-
-    public void setBigData() throws IOException {
-        setStandardData();
-        while (author.length()<120)
-                author += author;
-
-        File file1 = new File(rcspath + "/" + web + "/" + name2 + ".txt.1");
-        File file3 = new File(rcspath + "/" + web + "/" + name2 + ".txt.2");
-        content1 = getData(file1);
-        content3 = getData(file3);
-    }
 
 
     public void testVersionedReadWrite(XWikiStoreInterface store,String web, String name) throws XWikiException {
-        XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
-        store.loadXWikiDoc(doc4,version);
+        XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
+        XWikiDocInterface doc4 = store.loadXWikiDoc(doc3,Utils.version);
         String content4 = doc4.getContent();
-        assertEquals(content1,content4);
-        assertEquals(doc4.getVersion(),version);
-        assertEquals(doc4.getAuthor(), author);
+        assertEquals(Utils.content1,content4);
+        assertEquals(doc4.getVersion(),Utils.version);
+        assertEquals(doc4.getAuthor(), Utils.author);
         Version[] versions = store.getXWikiDocVersions(doc4);
         assertTrue(versions.length==2);
     }
@@ -142,30 +76,30 @@ public abstract class StoreTest extends TestCase {
 
 
     public void testStandardReadWrite() throws XWikiException {
-        setStandardData();
+        Utils.setStandardData();
         XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, web, name);
+        testStandardReadWrite(store, Utils.web, Utils.name);
     }
 
     public void testVersionedReadWrite() throws XWikiException {
-        setStandardData();
+        Utils.setStandardData();
         XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, web, name);
-        testVersionedReadWrite(store, web, name);
+        testStandardReadWrite(store, Utils.web, Utils.name);
+        testVersionedReadWrite(store, Utils.web, Utils.name);
     }
 
     public void testMediumReadWrite() throws XWikiException {
-        setMediumData();
+        Utils.setMediumData();
         XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, web, name);
-        testVersionedReadWrite(store, web, name);
+        testStandardReadWrite(store, Utils.web, Utils.name);
+        testVersionedReadWrite(store, Utils.web, Utils.name);
     }
 
     public void testBigVersionedReadWrite() throws XWikiException, IOException {
-        setBigData();
+        Utils.setBigData();
         XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, web, name2);
-        testVersionedReadWrite(store, web, name2);
+        testStandardReadWrite(store, Utils.web, Utils.name2);
+        testVersionedReadWrite(store, Utils.web, Utils.name2);
     }
 
 }

@@ -27,21 +27,26 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.*;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
     private int number = 0;
 
     public int getId() {
-            String str = getName()+getClassName();
-            int nb = getNumber();
-            if (nb>0)
-                str += "_" + nb;
-            return str.hashCode();
-        }
+        String str = getName()+getClassName();
+        int nb = getNumber();
+        if (nb>0)
+            str += "_" + nb;
+        return str.hashCode();
+    }
 
     public void setId(int id) {
     }
-    
+
     public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context) {
         ((PropertyClass)getxWikiClass().get(name)).displayHidden(buffer, name, prefix, this, context);
     }
@@ -112,12 +117,64 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     }
 
     public boolean equals(Object obj) {
-     if (!super.equals(obj))
-      return false;
+        if (!super.equals(obj))
+            return false;
 
-     if (getNumber()!=((BaseObject)obj).getNumber())
-         return false;
+        if (getNumber()!=((BaseObject)obj).getNumber())
+            return false;
 
-     return true;
-    }   
+        return true;
+    }
+
+    public Element toXML() {
+        Element oel = new DOMElement("object");
+
+        // Add Class
+        BaseClass bclass = getxWikiClass();
+        if (bclass.getFields().size()>0) {
+          oel.add(bclass.toXML());
+        }
+
+        Element el = new DOMElement("name");
+        el.addText(getName());
+        oel.add(el);
+
+        el = new DOMElement("number");
+        el.addText(getNumber() + "");
+        oel.add(el);
+
+        el = new DOMElement("className");
+        el.addText(getClassName());
+        oel.add(el);
+
+        Iterator it = getFields().values().iterator();
+        while (it.hasNext()) {
+            Element pel = new DOMElement("property");
+            BaseProperty bprop = (BaseProperty)it.next();
+            pel.add(bprop.toXML());
+            oel.add(pel);
+        }
+        return oel;
+    }
+
+    public void fromXML(Element oel) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Element cel = oel.element("class");
+        BaseClass bclass = new BaseClass();
+        if (cel!=null) {
+            bclass.fromXML(cel);
+            setxWikiClass(bclass);
+        }
+
+        setName(oel.element("name").getText());
+        List list = oel.elements("property");
+        for (int i=0;i<list.size();i++) {
+            Element pcel = (Element)((Element) list.get(i)).elements().get(0);
+            String name = pcel.getName();
+            PropertyClass pclass = (PropertyClass) bclass.get(name);
+            BaseProperty property = pclass.newPropertyfromXML(pcel);
+            property.setName(name);
+            property.setObject(this);
+            safeput(name, property);
+        }
+    }
 }

@@ -64,38 +64,9 @@ public class ViewEditTest extends ServletTestCase {
     public void cleanUp() {
     };
 
-    public void clientSetUp(XWikiStoreInterface hibstore) throws HibernateException, XWikiException {
+    public void clientSetUp(XWikiStoreInterface store) throws XWikiException {
     }
 
-    public void createDoc(XWikiStoreInterface hibstore, String name) throws HibernateException, XWikiException {
-        createDoc(hibstore,name, null, null, null);
-    }
-
-    public void createDoc(XWikiStoreInterface hibstore, String name,
-                          BaseObject bobject, BaseClass bclass) throws HibernateException, XWikiException {
-        createDoc(hibstore, name, bobject, bclass, null);
-
-    }
-
-    public void createDoc(XWikiStoreInterface hibstore, String name,
-                          BaseObject bobject, BaseClass bclass,
-                          Map bobjects) throws HibernateException, XWikiException {
-        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", name);
-        doc1.setContent("Hello 1\nHello 2\nHello 3\n");
-        doc1.setAuthor("VictorHugo");
-        doc1.setParent("Main.WebHome");
-
-        if (bobjects!=null)
-            doc1.setxWikiObjects(bobjects);
-
-        if (bobject!=null)
-            doc1.setObject(doc1.getFullName(), 0, bobject);
-
-        if (bclass!=null)
-            doc1.setxWikiClass(bclass);
-
-        hibstore.saveXWikiDoc(doc1);
-    }
 
     private void setUrl(WebRequest webRequest, String action, String docname) {
         webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, "");
@@ -157,7 +128,7 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginViewNotOk(WebRequest webRequest) throws HibernateException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
+        StoreHibernateTest.cleanUp(hibstore);
         setUrl(webRequest, "view", "ViewNotOkTest");
     }
 
@@ -181,8 +152,8 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        createDoc(hibstore, "ViewOkTest");
+        StoreHibernateTest.cleanUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "ViewOkTest");
         setUrl(webRequest, "view", "ViewOkTest");
     }
 
@@ -218,7 +189,7 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginSave(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
+        StoreHibernateTest.cleanUp(hibstore);
         setUrl(webRequest, "save", "SaveTest");
         webRequest.addParameter("content","Hello1Hello2Hello3");
         webRequest.addParameter("parent","Main.WebHome");
@@ -252,8 +223,8 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginAddProp(WebRequest webRequest, Class cclass) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        createDoc(hibstore, "PropAddTest");
+        StoreHibernateTest.cleanUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "PropAddTest");
         setUrl(webRequest, "propadd", "PropAddTest");
         webRequest.addParameter("propname", "score");
         webRequest.addParameter("proptype", cclass.getName());
@@ -310,10 +281,10 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginAddClass(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        BaseObject bobject = ObjectTest.prepareObject();
-        createDoc(hibstore, "PropAddClassClass", bobject, bobject.getxWikiClass());
-        createDoc(hibstore, "PropAddClass");
+        StoreHibernateTest.cleanUp(hibstore);
+        BaseObject bobject = Utils.prepareObject();
+        Utils.createDoc(hibstore, "Main", "PropAddClassClass", bobject, bobject.getxWikiClass());
+        Utils.createDoc(hibstore, "Main", "PropAddClass");
         setUrl(webRequest, "classadd", "PropAddClass");
         webRequest.addParameter("classname", "Main.PropAddClassClass");
     }
@@ -335,7 +306,7 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Added Class does not have a wikiClass", bclass);
 
         assertNotNull("Added Class wikiClass should have ageclass property", bclass.safeget("age"));
-        assertNotNull("Added Class wikiClass should have nameclass property", bclass.safeget("name"));
+        assertNotNull("Added Class wikiClass should have nameclass property", bclass.safeget("first_name"));
     }
 
     public void testAddSecondClass() throws IOException, Throwable {
@@ -353,17 +324,17 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginAddSecondClass(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        BaseObject bobject = ObjectTest.prepareObject();
+        StoreHibernateTest.cleanUp(hibstore);
+        BaseObject bobject = Utils.prepareObject();
         BaseClass bclass = bobject.getxWikiClass();
         bclass.setName("PropAddSecondClassClass");
-        createDoc(hibstore, "PropAddSecondClassClass", bobject, bclass);
+        Utils.createDoc(hibstore, "Main", "PropAddSecondClassClass", bobject, bclass);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropAddSecondClass");
         bobjlist.add(bobject);
         bobjects.put("Main.PropAddSecondClassClass", bobjlist);
-        createDoc(hibstore, "PropAddSecondClass", null, null, bobjects);
+        Utils.createDoc(hibstore, "Main", "PropAddSecondClass", null, null, bobjects);
         setUrl(webRequest, "classadd", "PropAddSecondClass");
         webRequest.addParameter("classname", "Main.PropAddSecondClassClass");
     }
@@ -391,7 +362,7 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Added Class does not have a wikiClass", bclass);
 
         assertNotNull("Added Class wikiClass should have ageclass property", bclass.safeget("age"));
-        assertNotNull("Added Class wikiClass should have nameclass property", bclass.safeget("name"));
+        assertNotNull("Added Class wikiClass should have nameclass property", bclass.safeget("first_name"));
     }
 
 
@@ -409,23 +380,23 @@ public class ViewEditTest extends ServletTestCase {
 
     public void beginUpdateClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        BaseObject bobject = ObjectTest.prepareObject();
+        StoreHibernateTest.cleanUp(hibstore);
+        BaseObject bobject = Utils.prepareObject();
         BaseClass bclass = bobject.getxWikiClass();
         bclass.setName("PropUpdateClassClass");
-        createDoc(hibstore, "PropUpdateClassClass", bobject, bclass);
+        Utils.createDoc(hibstore, "Main", "PropUpdateClassClass", bobject, bclass);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropUpdateClass");
         bobjlist.add(bobject);
         bobjects.put("Main.PropUpdateClassClass", bobjlist);
-        createDoc(hibstore, "PropUpdateClass", null, null, bobjects);
+        Utils.createDoc(hibstore, "Main", "PropUpdateClass", null, null, bobjects);
         setUrl(webRequest, "save", "PropUpdateClass");
         webRequest.addParameter("content", "toto");
         webRequest.addParameter("parent", "");
         webRequest.addParameter("Main.PropUpdateClassClass_nb", "1");
         webRequest.addParameter("Main.PropUpdateClassClass_0_age", "12");
-        webRequest.addParameter("Main.PropUpdateClassClass_0_name", "john");
+        webRequest.addParameter("Main.PropUpdateClassClass_0_first_name", "john");
     }
 
     public void endUpdateClassProp(WebResponse webResponse) throws XWikiException {
@@ -445,14 +416,14 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Updated Class does not have a wikiClass", bclass);
 
         assertNotNull("Updated Class wikiClass should have age property", bclass.safeget("age"));
-        assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("name"));
+        assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
 
         assertNotNull("Updated Class should have age property", bobject.safeget("age"));
-        assertNotNull("Updated Class should have name property", bobject.safeget("name"));
+        assertNotNull("Updated Class should have name property", bobject.safeget("first_name"));
 
         Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
         assertEquals("Updated Class age property value is incorrect", new Integer(12), age);
-        String name = (String)((StringProperty)bobject.safeget("name")).getValue();
+        String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
         assertEquals("Updated Class name property value is incorrect", "john", name);
     }
 }

@@ -8,8 +8,14 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import net.sf.hibernate.HibernateException;
 import java.util.List;
+import java.util.Map;
+import java.text.ParseException;
+
+import org.dom4j.DocumentException;
 
 /**
  * ===================================================================
@@ -34,182 +40,111 @@ import java.util.List;
  * Time: 10:37:55
  */
 
-public class StoreObjectTest extends TestCase {
+public abstract class StoreObjectTest extends TestCase {
 
-    public static String hibpath = "hibernate-test.cfg.xml";
+    public static String rcspath = "./rcs";
 
-    public void setUp() throws HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        cleanUp(hibstore);
+    public abstract XWikiStoreInterface getStore();
+
+    public void testWriteObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
+        object.setName("Test.TestObject");
+        doc.setObject("Test.TestObject", 0, object);
+        store.saveXWikiDoc(doc);
     }
 
-    public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
-        hibstore.checkHibernate();
-        hibstore.beginTransaction();
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiobjects");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiproperties");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiintegers");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikifloats");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikilongs");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoubles");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikistrings");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclassesprop");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikistringclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikinumberclasses");
-        hibstore.endTransaction(true);
-        hibstore.updateSchema();
-    }
-
-    public void testNumber(XWikiHibernateStore hibstore) throws XWikiException {
-        IntegerProperty prop = ObjectTest.prepareIntegerProperty();
-        hibstore.saveXWikiProperty(prop, true);
-    }
-
-
-    public void testNumberEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testNumber(hibstore);
-    }
-
-    public void testNumberUpdate() throws XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testNumber(hibstore);
-        testNumber(hibstore);
-    }
-
-    public void testNumberBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testNumber(hibstore);
-        hibstore.beginTransaction();
-        StoreHibernateTest.runSQL(hibstore, "delete from xwikiproperties");
-        hibstore.endTransaction(true);
-        testNumber(hibstore);
-    }
-
-    public void testNumberBadDatabase2() throws XWikiException, HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testNumber(hibstore);
-        hibstore.beginTransaction();
-        StoreHibernateTest.runSQL(hibstore, "delete from xwikiintegers");
-        StoreHibernateTest.runSQL(hibstore, "delete from xwikilongs");
-        hibstore.endTransaction(true);
-        testNumber(hibstore);
-    }
-
-    public void testString(XWikiHibernateStore hibstore) throws XWikiException {
-        StringProperty prop = ObjectTest.prepareStringProperty();
-        hibstore.saveXWikiProperty(prop, true);
-    }
-
-
-    public void testStringEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testString(hibstore);
-    }
-
-    public void testStringUpdate() throws XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testString(hibstore);
-        testString(hibstore);
-    }
-
-    public void testStringBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testString(hibstore);
-        hibstore.beginTransaction();
-        StoreHibernateTest.runSQL(hibstore, "delete from xwikiproperties");
-        hibstore.endTransaction(true);
-        testString(hibstore);
-    }
-
-    public void testStringBadDatabase2() throws XWikiException, HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        testString(hibstore);
-        hibstore.beginTransaction();
-        StoreHibernateTest.runSQL(hibstore, "delete from xwikistrings");
-        hibstore.endTransaction(true);
-        testString(hibstore);
-    }
-
-
-    public void testWriteObject(XWikiHibernateStore hibstore, BaseObject object) throws HibernateException, XWikiException {
-        hibstore.saveXWikiObject(object, true);
-    }
-
-    public void testReadObject(XWikiHibernateStore hibstore, BaseObject object) throws HibernateException, XWikiException {
+    public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
         // Prepare object2 for reading
-        BaseObject object2 = new BaseObject();
-        object2.setxWikiClass(object.getxWikiClass());
-        object2.setName(object.getName());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
 
         // Read object2
-        hibstore.loadXWikiObject(object2, true);
+        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc);
+        BaseObject object2 = doc.getxWikiObject();
 
         // Verify object2
-        assertProperty(object2, object, "name");
-        assertProperty(object2, object, "age");
+        Utils.assertProperty(object2, object, "first_name");
+        Utils.assertProperty(object2, object, "age");
     }
 
-    public void testWriteObject()  throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        BaseObject object = ObjectTest.prepareObject();
-        testWriteObject(hibstore, object);
+    public void testWriteObjectInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareObject();
+        testWriteObjectInDoc(store, object);
     }
 
-    public void testReadWriteObject()  throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        BaseObject object = ObjectTest.prepareObject();
-        testWriteObject(hibstore, object);
-        testReadObject(hibstore, object);
+    public void testReadWriteObjectInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareObject();
+        testWriteObjectInDoc(store, object);
+        testReadObjectInDoc(store, object);
     }
 
-    public void assertProperty(BaseCollection object1, BaseCollection object2, String propname) {
-        BaseElement prop1 = (BaseElement)object1.safeget(propname);
-        BaseElement prop2 = (BaseElement)object2.safeget(propname);
-        assertTrue("Property " + propname + " is different (" + prop1.getName() + "," + prop2.getName() + ")",
-                prop1.equals(prop2));
+    public void testWriteClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestClass");
+        bclass.setName("Test.TestClass");
+        doc.setxWikiClass(bclass);
+        store.saveXWikiDoc(doc);
     }
 
-
-    public void testWriteClass(XWikiHibernateStore hibstore, BaseClass bclass) throws HibernateException, XWikiException {
-        hibstore.saveXWikiClass(bclass, true);
-    }
-
-    public void testReadClass(XWikiHibernateStore hibstore, BaseClass bclass) throws HibernateException, XWikiException {
+    public void testReadClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
         // Prepare object2 for reading
-        BaseClass bclass2 = new BaseClass();
-        bclass2.setName(bclass.getName());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestClass");
 
-        // Read object2
-        hibstore.loadXWikiClass(bclass2, true);
+        // Read class
+        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc);
+        BaseClass bclass2 = doc.getxWikiClass();
 
         // Verify object2
-        assertProperty(bclass2, bclass, "name");
-        assertProperty(bclass2, bclass, "age");
+        Utils.assertProperty(bclass2, bclass, "first_name");
+        Utils.assertProperty(bclass2, bclass, "age");
     }
 
-    public void testWriteClass()  throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        BaseObject object = ObjectTest.prepareObject();
-        testWriteClass(hibstore, object.getxWikiClass());
+    public void testWriteClassInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareObject();
+        testWriteClassInDoc(store, object.getxWikiClass());
     }
 
-    public void testReadWriteClass()  throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
-        BaseObject object = ObjectTest.prepareObject();
-        testWriteClass(hibstore, object.getxWikiClass());
-        testReadClass(hibstore, object.getxWikiClass());
+    public void testReadWriteClassInDoc()  throws  XWikiException {
+        XWikiStoreInterface store = getStore();
+        BaseObject object = Utils.prepareObject();
+        testWriteClassInDoc(store, object.getxWikiClass());
+        testReadClassInDoc(store, object.getxWikiClass());
     }
 
-    public void testSearchClass() throws HibernateException, XWikiException {
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
-        List list = hibstore.getClassList();
-        assertTrue("No result", (list.size()==0) );
-        testWriteClass();
-        list = hibstore.getClassList();
-        assertTrue("No result", (list.size()>0) );
-    }
+   public void testVersionedObject() throws XWikiException {
+       XWikiStoreInterface store = getStore();
+       BaseObject bobject = Utils.prepareObject("Test.TestVersion");
+       Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+       XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
+       doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
+       BaseObject bobject1 = doc1.getxWikiObject();
+       BaseProperty bprop1 = ((BaseProperty)bobject1.safeget("age"));
+       assertEquals("Age should be 33", new Integer(33), bprop1.getValue());
+       bprop1.setValue(new Integer(5));
+       store.saveXWikiDoc(doc1);
+       XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "TestVersion");
+       doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
+       BaseObject bobject2 = doc2.getxWikiObject();
+       BaseProperty bprop2 = ((BaseProperty)bobject2.safeget("age"));
+       assertEquals("Age should be 5", new Integer(5), bprop2.getValue());
+       XWikiDocInterface doc3 = store.loadXWikiDoc(doc2, "1.1");
+       BaseObject bobject3 = doc3.getxWikiObject();
+       BaseProperty bprop3 = ((BaseProperty)bobject3.safeget("age"));
+       assertEquals("Age should be 33", new Integer(33), bprop3.getValue());
+   }
+
+    public void testXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+         XWikiStoreInterface store = getStore();
+         BaseObject bobject = Utils.prepareObject("Test.TestVersion");
+         Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+         XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
+         doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
+         String xml = doc1.toXML();
+         XWikiSimpleDoc doc2 = new XWikiSimpleDoc();
+         doc2.fromXML(xml);
+         Utils.assertEquals(doc1, doc2);
+     }
+
 
 }

@@ -136,7 +136,7 @@ public class ViewEditTest extends ServletTestCase {
 
     public void endViewNotOk(WebResponse webResponse) {
         String result = webResponse.getText();
-        assertTrue("Page should have generated an error", result.indexOf("No row")!=-1);
+        assertTrue("Page should have generated an error", result.indexOf("Exception")!=-1);
     }
 
     public void testViewNotOk() throws IOException, Throwable, HibernateException {

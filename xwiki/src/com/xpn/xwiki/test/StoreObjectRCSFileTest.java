@@ -1,4 +1,6 @@
 
+package com.xpn.xwiki.test;
+
 import com.xpn.xwiki.store.XWikiRCSFileStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.StoreObjectTest;

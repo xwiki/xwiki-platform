@@ -5,9 +5,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.NumberProperty;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -459,6 +457,87 @@ public class ViewEditTest extends ServletTestCase {
         String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
         assertEquals("Updated Class name property value is incorrect", "john", name);
     }
+
+
+        public void testUpdateAdvancedClassProp() throws IOException, Throwable {
+            try {
+                ActionServlet servlet = new ActionServlet();
+                servlet.init(config);
+                servlet.service(request, response);
+                cleanSession(session);
+            } catch (ServletException e) {
+                e.getRootCause().printStackTrace();
+                throw e.getRootCause();
+            }
+        }
+
+        public void beginUpdateAdvancedClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
+            XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+            StoreHibernateTest.cleanUp(hibstore);
+            BaseObject bobject = Utils.prepareAdvancedObject();
+            BaseClass bclass = bobject.getxWikiClass();
+            bclass.setName("PropUpdateAdvClassClass");
+            Utils.createDoc(hibstore, "Main", "PropUpdateAdvClassClass", bobject, bclass);
+            Map bobjects = new HashMap();
+            Vector bobjlist = new Vector();
+            bobject.setName("Main.PropUpdateAdvClass");
+            bobjlist.add(bobject);
+            bobjects.put("Main.PropUpdateAdvClassClass", bobjlist);
+            Utils.createDoc(hibstore, "Main", "PropUpdateAdvClass", null, null, bobjects);
+            setUrl(webRequest, "save", "PropUpdateAdvClass");
+            webRequest.addParameter("content", "toto");
+            webRequest.addParameter("parent", "");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_nb", "1");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_age", "12");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_first_name", "john");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_category", "2");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_category2", "2");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_category2", "3");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_category3", "2");
+            webRequest.addParameter("Main.PropUpdateAdvClassClass_0_category3", "3");
+        }
+
+        public void endUpdateAdvancedClassProp(WebResponse webResponse) throws XWikiException {
+            String result = webResponse.getText();
+            // Verify return
+            assertTrue("Updated Class returned exception", result.indexOf("Exception")==-1);
+            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+            XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropUpdateAdvClass");
+            doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2);
+            Map bobjects = doc2.getxWikiObjects();
+            BaseObject bobject = null;
+            try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateAdvClassClass", 0); }
+            catch (Exception e) {}
+            assertNotNull("Updated Class does not exist", bobject);
+
+            BaseClass bclass = bobject.getxWikiClass();
+            assertNotNull("Updated Class does not have a wikiClass", bclass);
+
+            assertNotNull("Updated Class wikiClass should have age property", bclass.safeget("age"));
+            assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
+
+            assertNotNull("Updated Class should have age property", bobject.safeget("age"));
+            assertNotNull("Updated Class should have name property", bobject.safeget("first_name"));
+
+            Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
+            assertEquals("Updated Class age property value is incorrect", new Integer(12), age);
+            String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            assertEquals("Updated Class name property value is incorrect", "john", name);
+
+            String category = (String)((StringProperty)bobject.safeget("category")).getValue();
+            assertEquals("Updated Class category property value is incorrect", "2", category);
+
+            List category2 = (List)((ListProperty)bobject.safeget("category2")).getValue();
+            assertEquals("Updated Class category2 property size is incorrect", 2, category2.size());
+            assertEquals("Updated Class category2 property item 1 is incorrect", "2", category2.get(0));
+            assertEquals("Updated Class category2 property item 2 is incorrect", "3", category2.get(1));
+
+            List category3 = (List)((ListProperty)bobject.safeget("category3")).getValue();
+            assertEquals("Updated Class category3 property size is incorrect", 2, category3.size());
+            assertEquals("Updated Class category3 property item 1 is incorrect", "2", category3.get(0));
+            assertEquals("Updated Class category3 property item 2 is incorrect", "3", category3.get(1));
+        }
+
 
 
     public void sendMultipart(WebRequest webRequest, File file) throws IOException {

@@ -254,4 +254,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         else
          setIntValue("unmodifiable", 0);
     }
+
+    public BaseProperty fromStringArray(String[] strings) {
+        return fromString(strings[0]);
+    }
 }

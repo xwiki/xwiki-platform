@@ -117,6 +117,19 @@ public abstract class ListClass extends PropertyClass {
         return prop;
     }
 
+    public BaseProperty fromStringArray(String[] strings) {
+        if ((!isMultiSelect())||(strings.length==1))
+            return fromString(strings[0]);
+        else {
+            List list = new ArrayList();
+            for (int i=0;i<strings.length;i++)
+                list.add(strings[i]);
+            BaseProperty prop = newProperty();
+            ((ListProperty)prop).setList(list);
+            return prop;
+        }
+    }
+
 
     public BaseProperty newPropertyfromXML(Element ppcel) {
         if ((!isRelationalStorage())&&(!isMultiSelect()))

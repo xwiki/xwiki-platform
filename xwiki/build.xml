@@ -38,11 +38,13 @@
     <property name="lib.dir"   value="${basedir}/lib" />
 
     <property name="build.dir"  value="${basedir}/build" />
+
     <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
     <property name="release.dir"  value="${basedir}/release" />
     <property name="dist.dir" value="${basedir}/dist" />
 
     <property name="test.reports.dir" value="${basedir}/test/reports" />
+    <property name="test.clover.dir" value="${basedir}/test/clover" />
 
     <property name="doc.dir"   value="${basedir}/doc" />
     <property name="javadoc.dir"   value="${doc.dir}/api" />
@@ -74,14 +76,35 @@
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
     <property name="libs.osuser"
-            value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar" />
+        value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar" />
 
     <property name="libs.tests"
-        value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar" />
+        value="${lib.dir}/cactus-1.5.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0-rc2.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
 
     <property name="libs"
         value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.tests}" />
 
+
+    <property name="clover.initstring" location="${test.clover.dir}"/>
+    <available property="junit.available" classname="junit.framework.TestCase"/>
+    <available property="clover.available" classname="org.apache.tools.ant.taskdefs.CloverCompilerAdapter" />
+
+
+    <target name="junit-check" depends="prepare" unless="junit.available">
+        <fail message="Cannot run test cases. Please copy lib/build/junit-3.8.1.jar to ${ant.home}/lib"/>
+    </target>
+
+    <target name="clover-check" depends="prepare" unless="clover.available">
+        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.2.3.jar to ${ant.home}/lib"/>
+    </target>
+
+    <target name="clover-yes" depends="prepare" if="clover.available">
+        <property name="compiler" value="org.apache.tools.ant.taskdefs.CloverCompilerAdapter"/>
+    </target>
+
+    <target name="clover-no" depends="prepare" unless="clover.available">
+        <property name="compiler" value="modern"/>
+    </target>
 
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
@@ -108,10 +131,13 @@
 
     <target name="clean">
         <delete dir="${javadoc.dir}" />
+        <delete dir="${doc.dir}/junit" />
+        <delete dir="${doc.dir}/clover" />
         <delete dir="${build.dir}" />
         <delete dir="${release.dir}" />
         <delete dir="${dist.dir}" />
         <delete dir="${test.reports.dir}" />
+        <delete dir="${test.clover.dir}" />
     </target>
 
     <patternset id="non.java.sources">
@@ -130,7 +156,7 @@
         <include name="**/test/*.class" />
     </patternset>
 
-    <target name="xwiki" depends="prepare">
+    <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
             <fileset dir="${src.dir}">
                 <patternset refid="non.java.sources" />
@@ -161,18 +187,21 @@
             </fileset>
         </copy>
 
-        <javac srcdir="${src.dir}"
-            destdir="${classes.dir}"
-            classpath="${libs}"
-            debug="on" optimize="on" deprecation="on" >
-            <include name="com/xpn/xwiki/**/*.java" />
-            <exclude name="**/test/*.class" />
-        </javac>
-
     </target>
 
 
-    <target name="tests" depends="prepare,xwiki">
+    <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs}"
+            debug="on" optimize="on" deprecation="on"
+            compiler="${compiler}" >
+            <include name="com/xpn/xwiki/**/*.java" />
+            <exclude name="**/test/*.class" />
+        </javac>
+    </target>
+
+    <target name="tests" depends="junit-check,prepare,xwiki">
         <javac srcdir="${src.dir}"
             destdir="${classes.dir}"
             classpath="${libs};${classes.dir}"
@@ -183,6 +212,7 @@
 
     <target name="test.perl" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
+        <mkdir dir="${test.clover.dir}" />
 
         <junit printsummary="yes" dir="${basedir}/test" fork="on" >
 
@@ -199,7 +229,7 @@
     <target name="test.client" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
 
-        <junit printsummary="yes" dir="${basedir}/test" fork="on" >
+        <junit printsummary="yes" dir="${basedir}/test" haltonfailure="no" fork="on" >
 
             <classpath>
                 <pathelement path="${classes.dir}" />
@@ -207,19 +237,14 @@
             </classpath>
             <formatter type="xml" />
 
-            <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
-            <test todir="${test.reports.dir}" name="${pkg}.test.RenderTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.ObjectTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.PluginTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.ClassesTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreRCSFileTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectRCSFileTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreHibernateCacheTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.StoreObjectHibernateTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.SearchTest" haltonfailure="no" />
-            <test todir="${test.reports.dir}" name="${pkg}.test.UserTest" haltonfailure="no" />
+            <batchtest todir="${test.reports.dir}">
+                <fileset dir="${src.dir}">
+                    <include name="com/xpn/xwiki/test/*Test.java"/>
+                    <exclude name="**/StoreTest.java"/>
+                    <exclude name="**/StoreObjectTest.java"/>
+                    <exclude name="**/ViewEditTest.java"/>
+                </fileset>
+            </batchtest>
         </junit>
     </target>
 
@@ -245,6 +270,28 @@
     </target>
 
     <target name="test"  depends="test.client, test.server" />
+    <target name="test.clover"  depends="clover-check, test.client, test.server" />
+
+    <target name="clover.report" depends=""  if="clover.available">
+        <mkdir dir="${doc.dir}/clover" />
+        <java classname="com.cortexeb.tools.clover.reporters.html.HtmlReporter" fork="true">
+            <arg line="--outputdir ${doc.dir}/clover --showSrc --initstring ${clover.initstring} --title '${app.name}'"/>
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+        </java>
+    </target>
+
+    <target name="junit.report" depends="test">
+        <mkdir dir="${doc.dir}/junit" />
+        <junitreport todir="${doc.dir}/junit">
+            <fileset dir="${test.reports.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${doc.dir}/junit"/>
+        </junitreport>
+    </target>
 
     <target name="javadoc" depends="xwiki">
         <mkdir dir="${javadoc.dir}" />
@@ -261,6 +308,8 @@
             >
         </javadoc>
     </target>
+
+    <target name="doc" depends="javadoc, junit.report, clover.report" />
 
     <target name="release" depends="xwiki">
         <mkdir dir="${release.dir}" />
@@ -301,7 +350,7 @@
         </tar>
     </target>
 
-    <target name="all"  depends="release, test, bin.dist, src.dist" />
+    <target name="all"  depends="release, test, doc, bin.dist, src.dist" />
 
 </project>
 

@@ -262,7 +262,6 @@
 
         <mkdir dir="${test.reports.dir}" />
         <copy tofile="${cactus.warfile}" file="${release.warfile}" overwrite="true" />
-
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
             haltonfailure="no" fork="on" >
 
@@ -274,18 +273,18 @@
 
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${src.dir}">
-                    <include name="com/xpn/xwiki/test/ViewEditTest.java"/>
+		   <include name="com/xpn/xwiki/test/ViewEditTest.java"/>
                     <include name="com/xpn/xwiki/test/ServletAuthTest.java"/>
                     <include name="com/xpn/xwiki/test/ServletVirtualTest.java"/>
                     <include name="com/xpn/xwiki/test/Servleti18nTest.java"/>
-                </fileset>
+		   </fileset>
             </batchtest>
 
             <containerset>
                 <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
                     port="9080" todir="${test.reports.dir}"/>
             </containerset>
-        </cactus>
+        </cactus> 
         <delete file="${cactus.warfile}" />
     </target>
 

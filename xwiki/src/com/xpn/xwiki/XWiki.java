@@ -107,20 +107,25 @@ public class XWiki implements XWikiNotificationInterface {
                     requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
                 host = new URL(requestURL.toString()).getHost();
             } catch (Exception e) {};
-            String uri = request.getRequestURI();
-            int i1 = host.indexOf(".");
-            String servername = (i1!=-1) ? host.substring(0, i1) : host;
-            String appname = uri.substring(1,uri.indexOf("/",2));
-            if ((servername.equals("www"))
-                    ||(context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
-                if (appname.equals("xwiki"))
-                    return xwiki;
-            } else {
-                appname = servername;
+
+            String appname = findWikiServer(host, context);
+
+            if (appname==null) {
+                String uri = request.getRequestURI();
+                int i1 = host.indexOf(".");
+                String servername = (i1!=-1) ? host.substring(0, i1) : host;
+                appname = uri.substring(1,uri.indexOf("/",2));
+                if ((servername.equals("www"))
+                       ||(context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
+                    if (appname.equals("xwiki"))
+                        return xwiki;
+                } else {
+                   appname = servername;
+                }
             }
 
             // Check if this appname exists in the Database
-            String serverwikipage = getServerWikiPage(servername);
+            String serverwikipage = getServerWikiPage(appname);
             XWikiDocInterface doc = xwiki.getDocument(serverwikipage, context);
             if (doc.isNew()) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI,
@@ -131,6 +136,24 @@ public class XWiki implements XWikiNotificationInterface {
             context.setDatabase(appname);
         }
         return xwiki;
+    }
+
+    private static String findWikiServer(String host, XWikiContext context) {
+        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) "
+                    + "and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
+                    + "and prop.id.name = 'server' and prop.value='" + host + "'";
+        try {
+            List list = context.getWiki().searchDocuments(hql, context);
+            if ((list==null)||(list.size()==0))
+                return null;
+            String docname = (String) list.get(0);
+            if (!docname.startsWith("XWiki.XWikiServer"))
+                return null;
+            String wikiserver = docname.substring("XWiki.XWikiServer".length());
+            return wikiserver.toLowerCase();
+        } catch (XWikiException e) {
+            return null;
+        }
     }
 
     public static String getServerWikiPage(String servername) {

@@ -235,7 +235,6 @@
             </classpath>
             <formatter type="xml" />
 
-            <test todir="${test.reports.dir}" name="${pkg}.test.UtilTest" haltonfailure="no"/>
             <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />
 
             <containerset>

@@ -950,6 +950,10 @@ public class XWiki implements XWikiNotificationInterface {
         if (action.equals("view")||(action.equals("plain")||(action.equals("raw"))))
             right = "view";
 
+        if (action.equals("skin")||(action.equals("download")))
+            right = "view";
+
+
         needsAuth = getXWikiPreference("authenticate_" + right, context).toLowerCase().equals("yes");
         if (!needsAuth)
             needsAuth = getWebPreference("authenticate_" + right, context).toLowerCase().equals("yes");

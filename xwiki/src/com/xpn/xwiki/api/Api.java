@@ -41,10 +41,17 @@ public class Api {
         String docname;
         if (context.getDatabase()!=null) {
           docname = context.getDatabase() + ":" + doc.getFullName();
-          username = context.getDatabase() + ":" + username;
+          if (username.indexOf(":")==-1)
+           username = context.getDatabase() + ":" + username;
         }
         else
           docname = doc.getFullName();
+
+        // programming rights can only been given for user of the main wiki
+        String maindb = context.getWiki().getDatabase();
+        if (!username.startsWith(maindb))
+         return false;
+
 
         try {
             return xwiki.getAccessmanager().userHasAccessLevel(username, docname, "programming");

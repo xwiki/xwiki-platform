@@ -42,6 +42,8 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.codec.net.URLCodec;
+import org.apache.commons.codec.DecoderException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -393,8 +395,14 @@ public class ViewEditAction extends XWikiAction
     }
 
     private ActionForward executeDownload(XWikiDocInterface doc, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
-        String path = request.getPathInfo();
+        String path = request.getRequestURI();
         String filename = path.substring(path.lastIndexOf("/")+1);
+
+        try {
+            filename = (new URLCodec()).decode(filename);
+        } catch (DecoderException e) {
+        }
+
         XWikiAttachment attachment = null;
 
         if (request.getParameter("id")!=null) {
@@ -406,9 +414,10 @@ public class ViewEditAction extends XWikiAction
         }
 
         if (attachment==null) {
+            Object[] args = { filename };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                    "Attachment not found", null);
+                    "Attachment {0} not found", null, args);
         }
 
         // Choose the right content type

@@ -897,6 +897,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public String toXML(XWikiContext context) {
         Document doc = toXMLDocument(context);
         OutputFormat outputFormat = new OutputFormat("", true);
+        outputFormat.setEncoding(context.getWiki().getEncoding());
         StringWriter out = new StringWriter();
         XMLWriter writer = new XMLWriter( out, outputFormat );
         try {
@@ -1051,8 +1052,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 String origname = (String)renameit.next();
                 String newname = (String) fieldsToRename.get(origname);
                 BaseProperty origprop = (BaseProperty) bobject.safeget(origname);
-                BaseProperty prop = (BaseProperty) origprop.clone();
-                if (prop!=null) {
+                if (origprop!=null) {
+                 BaseProperty prop = (BaseProperty) origprop.clone();
                  bobject.removeField(origname);
                  prop.setName(newname);
                  bobject.addField(newname, prop);

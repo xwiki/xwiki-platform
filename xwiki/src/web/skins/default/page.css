@@ -7,6 +7,7 @@
   margin-top: 10px;
   margin-right: 20px;
   padding-left: 10px;
+  padding-right: 10px;
   width: 200px;
   border: 1px dashed #888888;
 }
@@ -25,3 +26,6 @@
   margin-bottom: 20px;
 }
 
+.centered {
+  margin: auto;02
+}

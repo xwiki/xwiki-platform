@@ -304,7 +304,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 Vector objects = (Vector) it.next();
                 for (int i=0;i<objects.size();i++) {
                     BaseObject obj = (BaseObject)objects.get(i);
-                    saveXWikiObject(obj, context, false);
+                    if (obj!=null)
+                     saveXWikiObject(obj, context, false);
                 }
             }
 
@@ -475,7 +476,8 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
                 Vector objects = (Vector) it.next();
                 for (int i=0;i<objects.size();i++) {
                     BaseObject obj = (BaseObject)objects.get(i);
-                    deleteXWikiObject(obj, context, false);
+                    if (obj!=null)
+                     deleteXWikiObject(obj, context, false);
                 }
             }
 

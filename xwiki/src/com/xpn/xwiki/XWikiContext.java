@@ -25,6 +25,7 @@ package com.xpn.xwiki;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiAction;
+import com.xpn.xwiki.user.XWikiUser;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +43,7 @@ public class XWikiContext extends Hashtable {
    private String baseUrl;
    private boolean virtual;
    private XWikiDocInterface doc;
-   private String user;
+   private XWikiUser user;
 
    public XWikiContext() {
    }
@@ -129,13 +130,19 @@ public class XWikiContext extends Hashtable {
         put("doc", doc);
     }
 
+    public void setUser(String user, boolean main) {
+        this.user = new XWikiUser(user, main);
+    }
+
     public void setUser(String user) {
-        this.user = user;
+        this.user = new XWikiUser(user);
     }
 
     public String getUser() {
-        return user;
+        return user.getUser();
     }
 
-
+    public XWikiUser getXWikiUser() {
+        return user;
+    }
 }

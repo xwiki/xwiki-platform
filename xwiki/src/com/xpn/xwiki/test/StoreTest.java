@@ -157,6 +157,12 @@ public abstract class StoreTest extends TestCase {
         testStandardReadWrite(store, Utils.web, Utils.name);
     }
 
+    public void testStandardIsoReadWrite() throws XWikiException {
+        Utils.setStandardIsoData();
+        XWikiStoreInterface store = getStore();
+        testStandardReadWrite(store, Utils.web, Utils.name);
+    }
+
     public void testStandardDelete() throws XWikiException {
             Utils.setStandardData();
             XWikiStoreInterface store = getStore();
@@ -198,7 +204,7 @@ public abstract class StoreTest extends TestCase {
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
         store.saveXWikiDoc(doc1, context);
-        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.afilename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
         doc1.saveAttachmentContent(attachment1, context);
@@ -210,6 +216,7 @@ public abstract class StoreTest extends TestCase {
         List attachlist = doc2.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attachment2 = (XWikiAttachment) attachlist.get(0);
+        assertEquals("Attachment name is not correct", Utils.afilename, attachment2.getFilename());
         assertEquals("Attachment version is not correct", "1.1", attachment2.getVersion());
         byte[] attachcontent2 = attachment2.getContent(context);
         assertEquals("Attachment content size is not correct", attachcontent1.length, attachcontent2.length);
@@ -221,6 +228,12 @@ public abstract class StoreTest extends TestCase {
 
     public void testAttachmentReadWrite() throws XWikiException, IOException {
             Utils.setStandardData();
+            XWikiStoreInterface store = getStore();
+            testAttachmentReadWrite(store, Utils.web, Utils.name);
+        }
+
+    public void testAttachmentIsoReadWrite() throws XWikiException, IOException {
+            Utils.setStandardIsoData();
             XWikiStoreInterface store = getStore();
             testAttachmentReadWrite(store, Utils.web, Utils.name);
         }

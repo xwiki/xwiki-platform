@@ -60,6 +60,7 @@ public class Utils {
     public static String rcsattachmentpath = "./rcsattachments";
     public static String filename = "test1.sxw";
     public static String filename2 = "test1.doc";
+    public static String afilename = "text1.sxw";
 
     public static void setStandardData() {
         name = "WebHome";
@@ -72,6 +73,21 @@ public class Utils {
         parent = "Main.WebHome";
         version = "1.1";
         version2 = "1.2";
+        afilename = filename;
+    }
+
+    public static void setStandardIsoData() {
+        name = "Août2002";
+        name2 = "Globals";
+        web = "Main";
+        content1 = "Hello 1\nAoût\nHello 3\n";
+        content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
+        author = "XWiki.HelêneDupont";
+        author2 = "XWiki.JulesVerne";
+        parent = "Main.WebHome";
+        version = "1.1";
+        version2 = "1.2";
+        afilename = "août.txt";
     }
 
     public static void setMediumData() {

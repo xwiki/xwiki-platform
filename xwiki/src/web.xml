@@ -82,12 +82,6 @@
         <url-pattern>/testbin/*</url-pattern>
     </servlet-mapping>
 
-    <!-- Map *.vm files to Velocity -->
-    <servlet-mapping>
-        <servlet-name>velocity</servlet-name>
-        <url-pattern>*.vm</url-pattern>
-    </servlet-mapping>
-
         <servlet-mapping>
             <servlet-name>ServletRedirector</servlet-name>
             <url-pattern>/ServletRedirector</url-pattern>

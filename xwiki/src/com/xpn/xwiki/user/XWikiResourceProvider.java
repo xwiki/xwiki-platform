@@ -238,22 +238,27 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             // Make sure we remove the database name and set the context
             name = getName(name);
 
-            // Verify XWiki super user
             XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences", context);
+
+            // Verify XWiki programming right
+            if (accessLevel.equals("programming")) {
+              // Programming right can only been given if user is from main wiki
+                try {
+                    allow = checkRight(name, xwikidoc , "programming", true, true, true);
+                    if (allow)
+                        return true;
+                    else
+                        return false;
+                } catch (NotFoundException e) {}
+                return false;
+              }
+
+
+            // Verify XWiki super user
             try {
                 allow = checkRight(name, xwikidoc , "admin", true, true, true);
                 if (allow) return true;
             } catch (NotFoundException e) {}
-
-            // Programming right can only been given at top level
-            if (accessLevel.equals("programming")) {
-                // Verify XWiki programming right
-                try {
-                    allow = checkRight(name, xwikidoc , "programming", true, true, true);
-                    if (allow) return true;
-                } catch (NotFoundException e) {}
-                return false;
-            }
 
             // Verify Web super user
             String web = Util.getWeb(resourceKey);

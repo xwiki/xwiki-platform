@@ -136,7 +136,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
                     try {
                         context.setDatabase(context.getWiki().getDatabase());
                         if (context.getWiki().checkPassword(susername, password, context))
-                            principal = new SimplePrincipal(username);
+                            principal = new SimplePrincipal("xwiki:" + username);
                     } catch (Exception e) {}
                 } finally {
                     context.setDatabase(db);

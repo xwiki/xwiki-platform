@@ -6,6 +6,8 @@ html, body {
     right: 0px;
     width: 100%;
     height: 100%;
+    font-family: verdana;
+    font-size: 10pt;
 }
 
 *, td, th, p, a, select {
@@ -40,7 +42,6 @@ html, body {
    clear: left;
    margin-top: 2px;
    margin-right: 10px;
-   font-family: verdana;
    font-size: 8pt;
 }
 
@@ -76,7 +77,6 @@ html, body {
 }
 
 #xwikititle h1, #xwikititle h2, #xwikititle h3 {
-    font-family: verdana;
 }
 
 #xwikititle h1 {
@@ -94,7 +94,6 @@ html, body {
 }
 
 #xwikititle h3 {
-    font-family: verdana;
     margin: 0px;
     padding: 0px;
     margin-top: 1.5em;
@@ -120,7 +119,6 @@ html, body {
 #xwikiversion a, #xwikimenu a {
    color:#336699;
    text-decoration:none;
-   font-family: verdana;
    font-size:7pt;
    padding: 0px;
    margin: 0px;
@@ -137,6 +135,7 @@ html, body {
 
 #xwikicontent {
    margin: 10px;
+   text-align: justify;
 }
 
 #xwikinav_footer {
@@ -186,9 +185,6 @@ html, body {
     background-repeat: repeat-x;
     background-color: #70B055;
     font-size: 11px;
-    font-weight: normal;
-    font-style: normal;
-    font-family: verdana;
     color: white;
     text-decoration: none;
     text-align: center;
@@ -203,9 +199,7 @@ html, body {
    float: right;
    border: 1px solid #BBBBBB;
    padding-bottom: 10px;
-   margin-top: 10px;
-   margin-bottom: 10px;
-   margin-right: 10px;
+   margin: 10px;
    width: 150px;
    z-index: 1;
    background-color: white;
@@ -222,7 +216,6 @@ html, body {
    text-align: left;
    font-weight: bold;
    font-size: 10px;
-   font-family: verdana;
    width: 140px;
 }
 
@@ -234,7 +227,6 @@ html, body {
     text-align: right;
     font-weight: bold;
     font-size: 10px;
-    font-family: verdana;
 }
 
 #xwikiusermenulinks, #xwikipagemenulinks, #xwikiwebmenulinks {
@@ -251,7 +243,6 @@ html, body {
    margin-left: 10px;
    margin-right: 5px;
    font-size: 10px;
-   font-family: verdana;
 }
 
 .xwikisep {

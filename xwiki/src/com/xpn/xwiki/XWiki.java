@@ -75,6 +75,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -1322,4 +1323,74 @@ public class XWiki implements XWikiNotificationInterface {
         e.printStackTrace(writer);
         return strwriter.toString();
     }
+
+    public boolean copyDocument(String docname, String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
+        String db = context.getDatabase();
+        try {
+            context.setDatabase(sourceWiki);
+            XWikiDocInterface sdoc = getDocument(docname, context);
+            if (!sdoc.isNew()) {
+                context.setDatabase(targetWiki);
+                XWikiDocInterface tdoc = getDocument(docname, context);
+                // There is already an existing document
+                if (!tdoc.isNew())
+                    return false;
+
+                tdoc = (XWikiDocInterface) sdoc.clone();
+                // forget past versions
+                tdoc.setVersion("1.1");
+                tdoc.setRCSArchive(null);
+                saveDocument(tdoc, context);
+            }
+        return true;
+        } finally {
+            context.setDatabase(db);
+        }
+    }
+
+    public void copyWikiWeb(String web, String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
+        String db = context.getDatabase();
+        try {
+            String sql = "";
+            if (web!=null)
+                sql = "where doc.web = '" + web + "'";
+
+            List list = searchDocuments(sql, context);
+            for (Iterator it=list.iterator();it.hasNext();) {
+                String docname = (String) it.next();
+                copyDocument(docname, sourceWiki, targetWiki, context);
+            }
+
+        } finally {
+            context.setDatabase(db);
+        }
+    }
+
+    public void copyWiki(String sourceWiki, String targetWiki, XWikiContext context) throws XWikiException {
+        copyWikiWeb(null, sourceWiki, targetWiki, context);
+    }
+
+    public boolean createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, XWikiContext context) throws XWikiException {
+        // Make sure user exists
+
+        // Make sure user does not have other wikis or has right to have multiple wikis
+
+        // Create Wiki Server page
+
+        // Create wiki database
+
+        // Copy base wiki
+        copyWiki("base", wikiName, context);
+
+        // Create user page in his wiki, and protect it
+
+        // Give admin and edit rights to user to his wiki
+
+        return true;
+    }
+
+    public String getEncoding() {
+        return Param("xwiki.encoding", "ISO-8859-1");
+    }
+
 }

@@ -187,8 +187,18 @@ public class XWiki extends Api {
         return xwiki.getRenderingEngine().renderText(text, doc, context);
     }
 
+    // Usefull date functions
     public Date getCurrentDate() {
         return new Date();
+    }
+
+    public int getTimeDelta(long time) {
+        Date ctime = new Date();
+        return (int)(ctime.getTime() - time);
+    }
+
+    public Date getDate(long time) {
+        return new Date(time);
     }
 
     public String[] split(String str, String sep) {
@@ -197,5 +207,9 @@ public class XWiki extends Api {
 
     public String printStrackTrace(Throwable e) {
         return xwiki.printStrackTrace(e);
+    }
+
+    public String getEncoding() {
+        return xwiki.getEncoding();
     }
 }

@@ -1,14 +1,13 @@
 #macro( template $tname )
-#parse($xwiki.getTemplate($tname, $context))
-#end
-
-
-#macro( includeTopic $topic )
-$xwiki.includeTopic($topic)
+#parse($xwiki.getTemplate($tname))
 #end
 
 #macro( includeForm $topic )
 $xwiki.includeForm($topic)
+#end
+
+#macro( includeTopic $topic )
+$xwiki.includeTopic($topic)
 #end
 
 ## Display all queued Struts errors

@@ -47,22 +47,20 @@ import com.xpn.xwiki.util.Util;
 import org.apache.ecs.Filter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.ecs.filter.CharacterFilter;
+import org.apache.struts.upload.MultipartRequestWrapper;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SecurityRealmInterface;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.Servlet;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.net.URL;
-import java.net.MalformedURLException;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -100,14 +98,17 @@ public class XWiki implements XWikiNotificationInterface {
             HttpServletRequest request = context.getRequest();
             String host = "";
             try {
-              host = new URL(request.getRequestURL().toString()).getHost();
+              StringBuffer requestURL = request.getRequestURL();
+              if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
+               requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
+              host = new URL(requestURL.toString()).getHost();
             } catch (Exception e) {};
                 String uri = request.getRequestURI();
             int i1 = host.indexOf(".");
             String servername = (i1!=-1) ? host.substring(0, i1) : host;
             String appname = uri.substring(1,uri.indexOf("/",2));
-            if ((servername.equals("www"))||
-                    (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
+            if ((servername.equals("www"))
+                    ||(context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
                 if (appname.equals("xwiki"))
                     return xwiki;
             } else {

@@ -41,6 +41,24 @@ public abstract class StoreTest extends TestCase {
     public abstract XWikiStoreInterface getStore();
     public XWikiContext context = new XWikiContext();
 
+    public void testStandardWrite(XWikiStoreInterface store, String web, String name) throws XWikiException {
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        store.saveXWikiDoc(doc1, context);
+    }
+
+    public void testStandardRead(XWikiStoreInterface store, String web, String name) throws XWikiException {
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
+        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
+        String content2 = doc2.getContent();
+        assertEquals(Utils.content1,content2);
+        assertEquals(doc2.getVersion(), Utils.version);
+        assertEquals(doc2.getParent(), Utils.parent);
+        assertEquals(doc2.getAuthor(), Utils.author);
+    }
+
     public void testStandardReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
         doc1.setContent(Utils.content1);
@@ -80,6 +98,20 @@ public abstract class StoreTest extends TestCase {
     }
 
 
+    public void testStandardRead() throws XWikiException {
+        Utils.setStandardData();
+        XWikiStoreInterface store = getStore();
+        testStandardWrite(store, Utils.web, Utils.name);
+        testStandardRead(store, Utils.web, Utils.name);
+    }
+
+    public void testStandardRead2() throws XWikiException {
+        Utils.setStandardData();
+        XWikiStoreInterface store = getStore();
+        testStandardWrite(store, Utils.web, Utils.name);
+        testStandardRead(store, Utils.web, Utils.name);
+        testStandardRead(store, Utils.web, Utils.name);
+    }
 
     public void testStandardReadWrite() throws XWikiException {
         Utils.setStandardData();

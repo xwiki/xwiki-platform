@@ -127,6 +127,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 transaction = beginTransaction(context);
                 session = getSession(context);
                 connection = session.connection();
+                setDatabase(session, context);
                 // we need to get the dialect
 				meta = new DatabaseMetadata(connection, dialect);
 				stmt = connection.createStatement();
@@ -180,15 +181,28 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
+    public void setDatabase(Session session, XWikiContext context) throws XWikiException {
+        String database = context.getDatabase();
+        try {
+            System.out.println("Switch database to: " + database);
+             if (database!=null)
+              session.connection().setCatalog(database);
+        } catch (Exception e) {
+            Object[] args = { database };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
+                    "Exception while switching to database {0}", e, args);
+        }
+    }
+
     public Transaction beginTransaction(XWikiContext context)
-            throws HibernateException {
+            throws HibernateException, XWikiException {
 
         Transaction transaction;
         Session session = getSession(context);
         if (session==null) {
          session = getSessionFactory().openSession();
          setSession(session, context);
-
+         setDatabase(session, context);
          try {
              String database = context.getDatabase();
              if ((database!=null)&&(!database.equals("")))
@@ -438,6 +452,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             else
                 session.update(object);
 
+            // Remove all existing properties
+            for (int i=0;i<object.getFieldsToRemove().size();i++) {
+                session.delete(object.getFieldsToRemove().get(i));
+            }
+
             Iterator it = object.getFields().keySet().iterator();
             while (it.hasNext()) {
                 String key = (String) it.next();
@@ -634,6 +653,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 session.save(bclass);
             else
                 session.update(bclass);
+
+            // Remove all existing properties
+            for (int i=0;i<bclass.getFieldsToRemove().size();i++) {
+                session.delete(bclass.getFieldsToRemove().get(i));
+            }
 
             Collection coll = bclass.getFields().values();
             Iterator it = coll.iterator();

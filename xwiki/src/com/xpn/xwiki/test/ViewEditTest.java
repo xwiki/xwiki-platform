@@ -68,6 +68,7 @@ public class ViewEditTest extends ServletTestCase {
     };
 
     public void clientSetUp(XWikiStoreInterface store) throws XWikiException {
+        context.setDatabase("xwikitest");
     }
 
 
@@ -136,7 +137,7 @@ public class ViewEditTest extends ServletTestCase {
         }
     }
 
-    public void beginViewNotOk(WebRequest webRequest) throws HibernateException {
+    public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         setUrl(webRequest, "view", "ViewNotOkTest");
@@ -183,6 +184,36 @@ public class ViewEditTest extends ServletTestCase {
             throw e.getRootCause();
         }
     }
+
+        public void beginEditOk(WebRequest webRequest) throws HibernateException, XWikiException {
+            XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+            StoreHibernateTest.cleanUp(hibstore, context);
+            Utils.createDoc(hibstore, "Main", "EditOkTest", context);
+            setUrl(webRequest, "edit", "EditOkTest");
+        }
+
+        public void endEditOk(WebResponse webResponse) {
+            String result = webResponse.getText();
+            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
+            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
+        }
+
+        public void testEditOk() throws IOException, Throwable {
+            try {
+                ActionServlet servlet = new ActionServlet();
+                servlet.init(config);
+                servlet.service(request, response);
+                cleanSession(session);
+            } catch (ServletException e) {
+                e.getRootCause().printStackTrace();
+                throw e.getRootCause();
+            }
+        }
 
     public void beginViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -589,9 +620,9 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Updated Class should have name property", bobject.safeget("first_name"));
 
         Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
-        assertEquals("Updated Class age property value is incorrect", new Integer(12), age);
+        assertEquals("Updated Class age property value is incorrect", new Integer(33), age);
         String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
-        assertEquals("Updated Class name property value is incorrect", "john", name);
+        assertEquals("Updated Class name property value is incorrect", "Ludovic", name);
     }
 
 
@@ -623,7 +654,7 @@ public class ViewEditTest extends ServletTestCase {
        Utils.createDoc(hibstore, "Main", "PropRenameClassProp", null, null, bobjects, context);
        setUrl(webRequest, "propupdate", "PropRenameClassPropClass");
        webRequest.addParameter("age_name", "age2");
-       webRequest.addParameter("age_size", "20");
+       webRequest.addParameter("age_size", "40");
        webRequest.addParameter("age_prettyName", "Age of person");
    }
 
@@ -635,44 +666,76 @@ public class ViewEditTest extends ServletTestCase {
        XWikiSimpleDoc doc = new XWikiSimpleDoc("Main", "PropRenameClassPropClass");
        doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
        BaseClass bclass = doc.getxWikiClass();
+       NumberClass ageclass2 = (NumberClass) bclass.safeget("age2");
+       assertNotNull("Rename Class wikiClass should have age2 property", ageclass2);
+       assertEquals("Rename Class age2 numberclass size is incorrect", 40, ageclass2.getSize());
+
        NumberClass ageclass = (NumberClass) bclass.safeget("age");
        assertNull("Rename Class wikiClass should not have age property", ageclass);
-       ageclass = (NumberClass) bclass.safeget("age2");
-       assertNotNull("Rename Class wikiClass should have age2 property", ageclass);
-       assertEquals("Rename Class age2 numberclass size is incorrect", 20, ageclass.getSize());
-       assertEquals("Rename Class age2 numberclass pretty name is incorrect", "Age of person", ageclass.getPrettyName());
+
+       assertEquals("Rename Class age2 numberclass pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
        assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
 
-
-       XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropRenameClassProp");
-       doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
-       Map bobjects = doc2.getxWikiObjects();
+       // Check object in the Class
        BaseObject bobject = null;
-       try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
+       try { bobject = (BaseObject) doc.getObject("Main.PropRenameClassPropClass", 0); }
        catch (Exception e) {}
-       assertNotNull("Rename Class does not exist", bobject);
+       assertNotNull("Rename Class object does not exist", bobject);
 
        BaseClass bclass2 = bobject.getxWikiClass();
        assertNotNull("Rename Class does not have a wikiClass", bclass2);
 
-       NumberClass ageclass2 = (NumberClass) bclass.safeget("age");
-       assertNull("Rename Class wikiClass from object should not have age property", ageclass);
-       ageclass = (NumberClass) bclass.safeget("age2");
+       ageclass2 = (NumberClass) bclass.safeget("age2");
        assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
-       assertEquals("Rename Class age numberclass from object size is incorrect", 20, ageclass2.getSize());
+
+       ageclass = (NumberClass) bclass.safeget("age");
+       assertNull("Rename Class wikiClass from object should not have age property", ageclass);
+
+       assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
        assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
 
 
        assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
 
-       assertNull("Rename Class should not have age property", bobject.safeget("age"));
-       assertNotNull("Rename Class should have age property", bobject.safeget("age2"));
-       assertNotNull("Rename Class should have name property", bobject.safeget("first_name"));
+       assertNull("Rename Class object should not have age property", bobject.safeget("age"));
+       assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
+       assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
 
        Number age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
-       assertEquals("Rename Class age property value is incorrect", new Integer(12), age);
+       assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
        String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
-       assertEquals("Rename Class name property value is incorrect", "john", name);
+       assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
+
+       XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropRenameClassProp");
+       doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+       bobject = null;
+       try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
+       catch (Exception e) {}
+       assertNotNull("Rename Class object does not exist", bobject);
+
+       bclass2 = bobject.getxWikiClass();
+       assertNotNull("Rename Class does not have a wikiClass", bclass2);
+
+       ageclass2 = (NumberClass) bclass.safeget("age2");
+       assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
+
+       ageclass = (NumberClass) bclass.safeget("age");
+       assertNull("Rename Class wikiClass from object should not have age property", ageclass);
+
+       assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
+       assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
+
+
+       assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
+
+       assertNull("Rename Class object should not have age property", bobject.safeget("age"));
+       assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
+       assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
+
+       age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
+       assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
+       name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+       assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
    }
 
 

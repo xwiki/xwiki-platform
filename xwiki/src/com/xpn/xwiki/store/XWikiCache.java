@@ -70,26 +70,37 @@ public class XWikiCache implements XWikiCacheInterface {
 
     public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         store.saveXWikiDoc(doc, context);
-        cache.putInCache(doc.getFullName(), doc);
+        String key = getKey(doc, context);
+        // We need to flush so that caches
+        // on the cluster are informed about the change
+        cache.flushEntry(key);
+        cache.putInCache(key, doc);
     }
 
     public void flushCache() {
         initCache();
     }
 
+    public String getKey(XWikiDocInterface doc, XWikiContext context) {
+        String db = context.getDatabase();
+        if (db==null)
+            db = "";
+        return db + ":" + doc.getFullName();
+    }
+
     public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
-        String docname = doc.getFullName();
+        String key = getKey(doc, context);
         try {
-            doc = (XWikiDocInterface) cache.getFromCache(docname, CacheEntry.INDEFINITE_EXPIRY);
+            doc = (XWikiDocInterface) cache.getFromCache(key, CacheEntry.INDEFINITE_EXPIRY);
             doc.setFromCache(true);
         } catch (NeedsRefreshException e) {
             try {
                 doc = store.loadXWikiDoc(doc, context);
             } catch (XWikiException xwikiexception) {
-                cache.cancelUpdate(docname);
+                cache.cancelUpdate(key);
                 throw xwikiexception;
             }
-            cache.putInCache(docname, doc);
+            cache.putInCache(key, doc);
         }
         return doc;
     }

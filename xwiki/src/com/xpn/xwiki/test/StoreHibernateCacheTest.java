@@ -35,8 +35,9 @@ import net.sf.hibernate.HibernateException;
 
 public class StoreHibernateCacheTest extends StoreHibernateTest {
 
-    public void setUp() throws HibernateException {
-        cleanUp(getHibStore());
+    public void setUp() throws HibernateException, XWikiException {
+        context.setDatabase("xwikitest");
+        cleanUp(getHibStore(), context);
     }
 
     public void tearDown() throws HibernateException {
@@ -70,4 +71,50 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
         assertEquals(doc3.getVersion(), Utils.version2);
         assertTrue("Document should be from Cache", doc3.isFromCache());
     }
+
+    public void testVirtualCachedReadWrite() throws XWikiException, HibernateException {
+        XWikiStoreInterface store = getStore();
+
+        context.setDatabase("xwikitest");
+        cleanUp(getHibStore(), context);
+
+        // We need to setup the second DB
+        context.setDatabase("xwikitest2");
+        cleanUp(getHibStore(), context);
+
+        context.setDatabase("xwikitest");
+        Utils.setStandardData();
+        testStandardWrite(store, Utils.web, Utils.name);
+        testStandardRead(store, Utils.web, Utils.name);
+        context.setDatabase("xwikitest2");
+        Utils.setMediumData();
+        testStandardWrite(store, Utils.web, Utils.name);
+        testStandardRead(store, Utils.web, Utils.name);
+    }
+
+    public void testVirtualCachedReadWrite2() throws XWikiException, HibernateException {
+        XWikiStoreInterface store = getStore();
+
+        context.setDatabase("xwikitest");
+        cleanUp(getHibStore(), context);
+        
+        context.setDatabase("xwikitest2");
+        cleanUp(getHibStore(), context);
+
+        context.setDatabase("xwikitest");
+        Utils.setStandardData();
+        testStandardWrite(store, Utils.web, Utils.name);
+        context.setDatabase("xwikitest2");
+        Utils.setMediumData();
+        testStandardWrite(store, Utils.web, Utils.name);
+
+        ((XWikiCacheInterface)store).flushCache();
+        Utils.setStandardData();
+        context.setDatabase("xwikitest");
+        testStandardRead(store, Utils.web, Utils.name);
+        Utils.setMediumData();
+        context.setDatabase("xwikitest2");
+        testStandardRead(store, Utils.web, Utils.name);
+    }
+
 }

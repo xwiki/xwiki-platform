@@ -38,6 +38,7 @@ import java.util.List;
 
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
     private BaseClass object;
+    private int id;
 
     public PropertyClass() {
     }
@@ -59,7 +60,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public int getId() {
-        return getObject().getId();
+        if (getObject()==null)
+            return id;
+        else
+            return getObject().getId();
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void checkField(String name) throws XWikiException {

@@ -107,8 +107,9 @@
         <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jakarta-oro-2.0.7.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.1-ld.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-jrcs.jar!/" />
-        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-dbcp-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />

@@ -267,11 +267,11 @@ public class RenderTest extends TestCase {
     }
 
     public void testIncludeTopic() throws XWikiException {
-        testInclude("#includeTopic(\"Test.WebHome\")", "WebHome");
+        testInclude("#includeTopic(\"Test.WebHome\")", "Test/WebHome");
     }
 
     public void testIncludeForm() throws XWikiException {
-        testInclude( "#includeForm(\"Test.WebHome\")", "IncludeTest");
+        testInclude( "#includeForm(\"Test.WebHome\")", "Test/IncludeTest");
     }
 
 }

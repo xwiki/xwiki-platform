@@ -79,6 +79,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT = 3232;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST = 3233;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT = 3234;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3235;
 
 
     public static final int ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION = 6001;

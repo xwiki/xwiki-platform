@@ -34,6 +34,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.struts.action.ActionForm;
@@ -48,9 +50,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>A simple action that handles the display and editing of an
@@ -198,15 +198,44 @@ public class ViewEditAction extends XWikiAction
         else if (action.equals("propupdate"))
         {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
+
+            // Prepare new class
             BaseClass bclass = doc.getxWikiClass();
+            BaseClass bclass2 = (BaseClass)bclass.clone();
+            bclass2.setFields(new HashMap());
+            doc.setxWikiClass(bclass2);
+
+            // Prepare a Map for field renames
+            Map fieldsToRename = new HashMap();
+
             Iterator it = bclass.getFields().values().iterator();
             while (it.hasNext()) {
                 PropertyClass property = (PropertyClass)it.next();
-                Map map = ((EditForm)form).getObject(property.getName());
+                PropertyClass origproperty = (PropertyClass) property.clone();
+                String name = property.getName();
+                Map map = ((EditForm)form).getObject(name);
                 property.getxWikiClass().fromMap(map, property);
+                String newname = property.getName();
+                bclass2.getFields().put(newname, property);
+                if (!newname.equals(name)) {
+                    fieldsToRename.put(name, newname);
+                    bclass2.addPropertyForRemoval(origproperty);
+                }
             }
+            doc.renameProperties(bclass.getName(), fieldsToRename);
             xwiki.saveDocument(doc, olddoc, context);
 
+            // We need to load all documents that use this property and rename it
+            if (fieldsToRename.size()>0) {
+               List list = xwiki.searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='" +
+                                                 bclass.getName() +  "' and CONCAT(XWD_WEB,'.',XWD_NAME)<> '" + bclass.getName() + "'", context);
+               for (int i=0;i<list.size();i++) {
+                  XWikiDocInterface doc2 = xwiki.getDocument((String)list.get(i), context);
+                  doc2.renameProperties(bclass.getName(), fieldsToRename);
+                  xwiki.saveDocument(doc2, doc2, context);
+               }
+            }
+            xwiki.flushCache();
             // forward to edit
             response.sendRedirect(doc.getActionUrl("edit",context));
             return null;

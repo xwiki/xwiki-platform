@@ -2,7 +2,6 @@
 #parse($xwiki.getTemplate($tname))
 #end
 
-
 #macro( includeTopic $topic )
 $xwiki.includeTopic($topic)
 #end

@@ -39,7 +39,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     public XWikiHibernateStore store;
     public String hibpath = "hibernate-test.cfg.xml";
 
-    public void setUp() throws HibernateException {
+    public void setUp() throws HibernateException, XWikiException {
         context.setDatabase("xwikitest");
         StoreHibernateTest.cleanUp(getHibStore(), context);
     }
@@ -65,7 +65,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
         testString(store);
         store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiproperties");
+        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", context);
         store.endTransaction(context, true);
         testString(store);
     }
@@ -74,7 +74,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
         testString(store);
         store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikistrings");
+        StoreHibernateTest.runSQL(store, "delete from xwikistrings", context);
         store.endTransaction(context, true);
         testString(store);
     }
@@ -83,7 +83,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
         testNumber(store);
         store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiproperties");
+        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", context);
         store.endTransaction(context, true);
         testNumber(store);
     }
@@ -92,8 +92,8 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
         testNumber(store);
         store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiintegers");
-        StoreHibernateTest.runSQL(store, "delete from xwikilongs");
+        StoreHibernateTest.runSQL(store, "delete from xwikiintegers", context);
+        StoreHibernateTest.runSQL(store, "delete from xwikilongs", context);
         store.endTransaction(context, true);
         testNumber(store);
     }

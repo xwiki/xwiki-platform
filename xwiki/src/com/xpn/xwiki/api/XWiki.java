@@ -2,6 +2,8 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.meta.MetaClass;
+
 import java.util.List;
 
 /**
@@ -55,6 +57,10 @@ public class XWiki {
 
     public List getClassList() throws XWikiException {
         return xwiki.getClassList(context);
+    }
+
+    public MetaClass getMetaclass() {
+        return xwiki.getMetaclass();
     }
 
     public List search(String wheresql) throws XWikiException {

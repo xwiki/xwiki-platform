@@ -58,7 +58,7 @@
         value="${lib.dir}/hibernate2.jar;${lib.dir}/c3p0.jar;${lib.dir}/cglib2.jar;${lib.dir}/dom4j.jar;${lib.dir}/ehcache.jar;${lib.dir}/hibernate-tools.jar;${lib.dir}/mysql-connector-java-3.0.9-stable-bin.jar;${lib.dir}/odmg.jar;${lib.dir}/oscache.jar;${lib.dir}/swarmcache.jar;${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis.jar;${lib.dir}/jta.jar" />
 
     <property name="libs.jakartacommons"
-        value="${lib.dir}/commons-beanutils.jar;${lib.dir}/commons-collections.jar;${lib.dir}/commons-digester.jar;${lib.dir}/commons-lang.jar;${lib.dir}/commons-logging.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/jakarta-oro-2.0.7.jar;${lib.dir}/log4j-1.2.8.jar;${lib.dir}/commons-fileupload-1.0.jar;${lib.dir}/commons-dbcp-1.1.jar;${lib.dir}/commons-pool-1.1.jar" />
+        value="${lib.dir}/commons-beanutils.jar;${lib.dir}/commons-collections.jar;${lib.dir}/commons-digester.jar;${lib.dir}/commons-lang.jar;${lib.dir}/commons-logging.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/jakarta-oro-2.0.7.jar;${lib.dir}/log4j-1.2.8.jar;${lib.dir}/commons-fileupload-1.0.jar;${lib.dir}/commons-dbcp-1.1-ld.jar;${lib.dir}/commons-pool-1.1.jar" />
 
     <property name="libs.jrcs"
         value="${lib.dir}/org.apache.commons.jrcs.rcs.jar" />

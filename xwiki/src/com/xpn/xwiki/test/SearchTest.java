@@ -52,7 +52,7 @@ public class SearchTest extends TestCase {
    }
 
 
-    public void setUp() throws HibernateException {
+    public void setUp() throws HibernateException, XWikiException {
         context.setDatabase("xwikitest");
         XWikiHibernateStore hibstore = getHibStore();
         StoreHibernateTest.cleanUp(hibstore, context);

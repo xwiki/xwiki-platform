@@ -4,6 +4,7 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.Session;
 import net.sf.hibernate.impl.SessionImpl;
@@ -38,11 +39,6 @@ public class StoreHibernateTest extends StoreTest {
 
     public String hibpath = "hibernate-test.cfg.xml";
     public XWikiStoreInterface store;
-    public static XWikiContext context = new XWikiContext();
-
-    public static void runSQL(XWikiHibernateStore hibstore, String sql) {
-            runSQL(hibstore, sql, context);
-    }
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
            try {
@@ -55,45 +51,22 @@ public class StoreHibernateTest extends StoreTest {
            }
        }
 
-    public static void cleanUp(XWikiHibernateStore hibstore) throws HibernateException {
-        cleanUp(hibstore, context);
-    }
 
-
-    public static void cleanUp(XWikiHibernateStore hibstore, XWikiContext context) throws HibernateException {
+    public static void cleanUp(XWikiHibernateStore hibstore, XWikiContext context) throws HibernateException, XWikiException {
         hibstore.checkHibernate(context);
         hibstore.beginTransaction(context);
-        StoreHibernateTest.runSQL(hibstore, "drop database if exists xwikitest", context);
-        StoreHibernateTest.runSQL(hibstore, "create database xwikitest", context);
-                /*
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoc");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment_content");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiattachment_archive");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiobjects");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiproperties");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiintegers");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikifloats");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikilongs");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikidoubles");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikistrings");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikiclassesprop");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikistringclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikinumberclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikibooleanclasses");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikilists");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikilistitems");
-        StoreHibernateTest.runSQL(hibstore, "drop table xwikislistclasses");
-        */
-
+        String database = context.getDatabase();
+        if (database==null)
+            context.setDatabase("xwikitest");
+        StoreHibernateTest.runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
+        StoreHibernateTest.runSQL(hibstore, "create database " + context.getDatabase(), context);
         hibstore.endTransaction(context, true);
         hibstore.updateSchema(context);
     }
 
-    public void setUp() throws HibernateException {
+    public void setUp() throws HibernateException, XWikiException {
         context.setDatabase("xwikitest");
-        cleanUp(getHibStore());
+        cleanUp(getHibStore(), context);
     }
 
     public void tearDown() throws HibernateException {

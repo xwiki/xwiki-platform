@@ -72,6 +72,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public String getContent();
     public void setContent(String content);
     public String getRenderedContent(XWikiContext context);
+    public String getEscapedContent(XWikiContext context);
 
     public boolean isMetaDataDirty();
     public boolean isContentDirty();
@@ -144,4 +145,6 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String displayForm(String className,String header, String format, boolean linebreak, XWikiContext context);
 
     String displayForm(String className, XWikiContext context);
+
+    void renameProperties(String className, Map fieldsToRename);
 }

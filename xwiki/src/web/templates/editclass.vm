@@ -3,7 +3,7 @@
 <p>
 <select name="classname" size="1">
 <option value="---">Select a class</option>
-#foreach ($classname in $xwiki.classList )
+#foreach ($classname in $xwiki.classList)
 <option value="$classname">$classname</option>
 #end
 </select>

@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
@@ -985,6 +986,26 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
         getStore().loadAttachmentContent(attachment, context, true);
+    }
+
+    public void renameProperties(String className, Map fieldsToRename) {
+        Vector objects = getObjects(className);
+        for (int j=0;j<objects.size();j++) {
+            BaseObject bobject = (BaseObject) objects.get(j);
+            for (Iterator renameit = fieldsToRename.keySet().iterator();renameit.hasNext();) {
+                String origname = (String)renameit.next();
+                String newname = (String) fieldsToRename.get(origname);
+                Map fields = bobject.getFields();
+                BaseProperty prop = (BaseProperty) bobject.safeget(origname);
+                BaseProperty origprop = (BaseProperty) prop.clone();
+                if (prop!=null) {
+                 fields.remove(origname);
+                 bobject.getFieldsToRemove().add(origprop);
+                 prop.setName(newname);
+                 fields.put(newname, prop);
+                }
+            }
+        }
     }
 
 }

@@ -77,6 +77,10 @@ public class Document {
         return doc.getRenderedContent(context);
     }
 
+    public String getEscapedContent() {
+        return doc.getEscapedContent(context);
+    }
+
     public Archive getRCSArchive() {
         return doc.getRCSArchive();
     }

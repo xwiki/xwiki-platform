@@ -33,7 +33,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     private BaseClass xWikiClass;
     private Map fields = new HashMap();
     private String className;
-
+    private List fieldsToRemove = new ArrayList();
 
     public int getId() {
             return (getName()+getClassName()).hashCode();
@@ -41,6 +41,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public void setId(int id) {
     }
+
+    public void addPropertyForRemoval(PropertyInterface field) {
+        getFieldsToRemove().add(field);
+    }
+
 
     public String getClassName() {
         if (xWikiClass!=null)
@@ -231,6 +236,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
           if (safeget(name)==null)
               safeput(name, (ElementInterface) ((BaseElement)object.safeget(name)).clone());
         }
+    }
+
+    public List getFieldsToRemove() {
+        return fieldsToRemove;
+    }
+
+    public void setFieldsToRemove(List fieldsToRemove) {
+        this.fieldsToRemove = fieldsToRemove;
     }
 
 }

@@ -55,7 +55,7 @@ public class UtilTest extends TestCase {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
-        context.setDatabase("dbname");
+        context.setDatabase("xwikitest");
     }
 
     public void tearDown() throws HibernateException {

@@ -71,7 +71,7 @@ public class BooleanClass extends PropertyClass {
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         select select = new select(prefix + name, 1);
-        option[] options = { new option("1" , "True" ), new option("0" , "False")};
+        option[] options = { new option("True", "1" ), new option("False", "0")};
         options[0].addElement("True");
         options[1].addElement("False");
 

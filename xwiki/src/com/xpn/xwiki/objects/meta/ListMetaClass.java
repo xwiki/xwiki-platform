@@ -22,8 +22,10 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 public class ListMetaClass extends PropertyMetaClass {
 

@@ -1,21 +1,20 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
 
 import java.io.*;
 import java.util.*;
-
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
 
 /**
  * ===================================================================
@@ -46,8 +45,8 @@ public class Utils {
     public static String web = "Main";
     public static String content1 = "Hello 1\n<Hello> 2\nHello 3\n";
     public static String content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-    public static String author = "VictorHugo";
-    public static String author2 = "JulesVerne";
+    public static String author = "XWiki.LudovicDubost";
+    public static String author2 = "XWiki.JulesVerne";
     public static String parent = "Main.WebHome";
     public static String version = "1.1";
     public static String version2 = "1.2";
@@ -64,8 +63,8 @@ public class Utils {
         web = "Main";
         content1 = "Hello 1\nHello 2\nHello 3\n";
         content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-        author = "VirtorHugo";
-        author2 = "JulesVerne";
+        author = "XWiki.LudovicDubost";
+        author2 = "XWiki.JulesVerne";
         parent = "Main.WebHome";
         version = "1.1";
         version2 = "1.2";
@@ -402,6 +401,28 @@ public class Utils {
         bobject.setxWikiClass(bclass);
         bobject.setStringValue(propname, propvalue);
         doc.addObject(className, bobject);
+        xwiki.saveDocument(doc, context);
+    }
+
+
+    public static void updateRight(XWiki xwiki, XWikiContext context, String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
+        XWikiDocInterface doc = xwiki.getDocument(fullname, context);
+        BaseObject bobj = new BaseObject();
+        bobj.setName(fullname);
+        BaseClass bclass;
+        if (global)
+            bclass = xwiki.getGlobalRightsClass(context);
+        else
+            bclass = xwiki.getRightsClass(context);
+        bobj.setxWikiClass(bclass);
+        bobj.setStringValue("users", user);
+        bobj.setStringValue("groups", group);
+        bobj.setStringValue("levels", level);
+        if (allow)
+            bobj.setIntValue("allow", 1);
+        else
+            bobj.setIntValue("allow", 0);
+        doc.setObject(bclass.getName(), 0, bobj);
         xwiki.saveDocument(doc, context);
     }
 

@@ -1,20 +1,18 @@
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import org.apache.velocity.app.Velocity;
+import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
+import org.apache.velocity.app.Velocity;
 
 /**
  * Created by IntelliJ IDEA.
@@ -84,13 +82,14 @@ public class VelocityRenderTest extends TestCase {
 
             XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "WebHome");
             doc1.setContent("This is the topic name: $doc.name");
-            doc1.setAuthor(Utils.author);
+            doc1.setAuthor("FirstAuthor");
             doc1.setParent(Utils.parent);
             store.saveXWikiDoc(doc1, context);
 
-            XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "IncludeTest");
-            context.put("doc", doc2);
-            RenderTest.renderTest(wikiengine, text, result, false, context);
+            XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Other", "IncludeTest");
+            doc2.setAuthor("SecondAuthor");
+            doc2.setContent(text);
+            RenderTest.renderTest(wikiengine, doc2, result, false, context);
         }
 
         public void testIncludeTopic() throws XWikiException {
@@ -105,5 +104,18 @@ public class VelocityRenderTest extends TestCase {
         public void testIncludeFromOtherDatabase() throws XWikiException {
             testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")", "XWiki Users");
         }
+
+        public void testIncludeTopicContext() throws XWikiException {
+           testInclude("#includeTopic(\"Test.WebHome\")\n$doc.author", "SecondAuthor");
+        }
+
+        public void testIncludeFormContext() throws XWikiException {
+            testInclude( "#includeForm(\"Test.WebHome\")\n$doc.author", "SecondAuthor");
+        }
+
+        public void testIncludeFromOtherDatabaseContext() throws XWikiException {
+            testInclude( "#includeTopic(\"xwiki:XWiki.XWikiUsers\")\n$doc.author", "SecondAuthor");
+        }
+
 
     }

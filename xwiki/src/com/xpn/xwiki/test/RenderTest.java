@@ -25,14 +25,13 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
+import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
@@ -93,24 +92,36 @@ public abstract class RenderTest extends TestCase {
     }
 
     public static void renderTest(XWikiRenderingEngine renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
-
-        // Add a line feed at the end of source and target
-        // because if one is missing at the end it will be added by the rendering engine
-        if (fullmatch) {
-            if (!source.endsWith("\n"))
-                source =  source + "\n";
-            if (!result.endsWith("\n"))
-                result =  result + "\n";
-        }
-
         XWikiDocInterface doc = new XWikiSimpleDoc("Main","WebHome");
         doc.setContent(source);
-        String res = renderer.renderDocument(doc, context);
-        assertTrue(renderer.getClass().toString() + " Failed Rendering of\n-------\n" + source
-                + "\n-------\nto\n-------\n" + result + "\n-------\nRendered output:\n-------\n"
-                + res + "\n-------\n",
-                (fullmatch) ? res.equals(result) : (res.indexOf(result)!=-1));
+        renderTest(renderer, doc, result, fullmatch, context);
     }
+
+
+    public static void renderTest(XWikiRenderingEngine renderer, XWikiDocInterface doc, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
+          // Make sure we have the doc in the context
+          context.put("doc", doc);
+          context.put("cdoc", doc);
+
+          // Add a line feed at the end of source and target
+          // because if one is missing at the end it will be added by the rendering engine
+          String source = doc.getContent();
+          if (fullmatch) {
+              if (!source.endsWith("\n"))
+                  source =  source + "\n";
+              if (!result.endsWith("\n"))
+                  result =  result + "\n";
+          }
+          doc.setContent(source);
+
+          // Render
+          String res = renderer.renderDocument(doc, context);
+          assertTrue(renderer.getClass().toString() + " Failed Rendering of\n-------\n" + source
+                  + "\n-------\nto\n-------\n" + result + "\n-------\nRendered output:\n-------\n"
+                  + res + "\n-------\n",
+                  (fullmatch) ? res.equals(result) : (res.indexOf(result)!=-1));
+      }
+
 
 
     public void testWikiBaseHeadingRenderer() throws XWikiException {

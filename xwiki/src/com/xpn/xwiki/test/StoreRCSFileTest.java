@@ -1,6 +1,7 @@
 
 package com.xpn.xwiki.test;
 
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiRCSFileStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
@@ -50,4 +51,16 @@ public class StoreRCSFileTest extends StoreTest {
         XWikiStoreInterface store = new XWikiRCSFileStore(Utils.rcspath, Utils.rcsattachmentpath);
         return store;
     }
+
+    public void testMetaData() {
+        XWikiSimpleDoc doc = new XWikiSimpleDoc();
+        doc.setContent("Hello1\r\nHello2\r\r\nHello3");
+        doc.setAuthor("LudovicDubost");
+        doc.setParent("Test.WebHome");
+        String str = ((XWikiRCSFileStore)getStore()).getMetaFullContent(doc);
+        assertTrue("Result should contain Hello", str.indexOf("Hello")!=-1);
+        assertTrue("Result should contain Author", str.indexOf("author=\"LudovicDubost\"")!=-1);
+        assertTrue("Result should contain parent", str.indexOf("%META:TOPICPARENT{name=\"Test.WebHome\" }")!=-1);
+    }
+
 }

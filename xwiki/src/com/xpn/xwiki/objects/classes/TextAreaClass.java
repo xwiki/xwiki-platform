@@ -23,7 +23,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.textarea;
 

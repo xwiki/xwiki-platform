@@ -1,13 +1,11 @@
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
-
 
 import java.util.Date;
 import java.util.List;
@@ -19,15 +17,14 @@ import java.util.List;
  * Time: 17:30:21
  * To change this template use File | Settings | File Templates.
  */
-public class Attachment {
+public class Attachment extends Api {
     private Document doc;
     private XWikiAttachment attachment;
-    private XWikiContext context;
 
     public Attachment(Document doc, XWikiAttachment attachment, XWikiContext context) {
+       super(context);
        this.doc = doc;
        this.attachment = attachment;
-       this.context = context;
     }
 
     public Document getDocument() {

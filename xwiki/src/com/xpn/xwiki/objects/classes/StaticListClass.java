@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 import java.util.List;
 

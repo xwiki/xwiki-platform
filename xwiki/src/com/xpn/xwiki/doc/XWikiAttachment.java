@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import net.sf.hibernate.ObjectNotFoundException;
 import org.apache.commons.jrcs.rcs.*;
 import org.dom4j.DocumentException;

@@ -23,17 +23,16 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.tools.struts.MessageTool;
-import org.apache.velocity.tools.view.context.ChainedContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
+import org.apache.velocity.tools.struts.MessageTool;
+import org.apache.velocity.tools.view.context.ChainedContext;
 
-import javax.servlet.ServletContext;
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -57,7 +56,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         return evaluate(content, name, vcontext);
     }
 
-    public static VelocityContext prepareContext(XWikiContext context) {
+    public static VelocityContext prepareContext(XWikiContext context, boolean bInternal) {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext==null)
             vcontext = new VelocityContext();
@@ -65,8 +64,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         vcontext.put("xwiki", new XWiki(context.getWiki(), context));
         vcontext.put("request", context.getRequest());
         vcontext.put("response", context.getResponse());
-        vcontext.put("servlet", context.getServlet());
-        vcontext.put("context", context);
+        vcontext.put("context", new Context(context));
 
         MessageTool msg =  new MessageTool();
         HttpServlet servlet = context.getServlet();

@@ -306,7 +306,13 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return doc.toXML();
     }
 
-    public void getFullContent(XWikiDocInterface doc, StringBuffer buf) {
+    public String getMetaFullContent(XWikiDocInterface doc) {
+        StringBuffer buf = new StringBuffer();
+        getMetaFullContent(doc, buf);
+        return buf.toString();
+    }
+
+    public void getMetaFullContent(XWikiDocInterface doc, StringBuffer buf) {
         getMetaData(doc, buf);
         getContent(doc, buf);
     }

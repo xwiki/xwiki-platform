@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -37,10 +38,10 @@ import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.filter.CharacterFilter;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
-import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -502,9 +503,9 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         }
         if (nb >= objects.size()) {
             objects.setSize(nb+1);
-            objects.set(nb, object);
-            object.setNumber(nb);
         }
+        objects.set(nb, object);
+        object.setNumber(nb);
     }
 
     public boolean isNew() {
@@ -1069,5 +1070,34 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public void setObjectsToRemove(ArrayList objectsToRemove) {
         this.objectsToRemove = objectsToRemove;
     }
+
+    public List getIncludedPages(XWikiContext context) {
+        try {
+         String pattern = "#include(Topic|Form)\\(\"(.*?)\"\\)";
+         List list = context.getUtil().getMatches(getContent(), pattern, 2);
+         return list;
+        } catch (Exception e) {
+            // This should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+          return pclass.displayView(pclass.getName(), prefix, object, context);
+     }
+
+     public String displayEdit(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+          return pclass.displayEdit(pclass.getName(), prefix, object, context);
+     }
+
+     public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+          return pclass.displayHidden(pclass.getName(), prefix, object, context);
+     }
+
+     public String displaySearch(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+          return pclass.displaySearch(pclass.getName(), prefix, object, context);
+     }
+
 
 }

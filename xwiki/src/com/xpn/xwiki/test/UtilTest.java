@@ -25,17 +25,18 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.util.Util;
 import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
+import org.apache.oro.text.regex.MalformedPatternException;
 
 import java.io.IOException;
 import java.util.Hashtable;
-
-import net.sf.hibernate.HibernateException;
+import java.util.List;
 
 
 public class UtilTest extends TestCase {
@@ -113,4 +114,28 @@ public class UtilTest extends TestCase {
        assertEquals("Doc name is not correct", "Titi", doc.getName());
 
     }
+
+    public void testGetMatches() throws MalformedPatternException {
+      String pattern = "#include(Topic|Form)\\(\"(.*?)\"\\)";
+      List list = context.getUtil().getMatches("", pattern, 2);
+      assertEquals("List should have not items", 0, list.size());
+      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi", pattern, 2);
+      assertEquals("List should have one items", 1, list.size());
+      assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
+      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"Main.Toto\")Hi", pattern, 2);
+      assertEquals("List should have one items", 1, list.size());
+      assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
+      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"XWiki.Tata\")Hi", pattern, 2);
+      assertEquals("List should have two items", 2, list.size());
+      assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
+      assertEquals("List item 2 should be XWiki.Tata", "XWiki.Tata", list.get(1));
+    }
+
+    public void testSubstitute() {
+      Util util = new Util();
+      String result = util.substitute("hello", "Hello", "hello how are you. hello how are you");
+      assertEquals("Wrong result", "Hello how are you. Hello how are you", result);
+
+    }
+
 }

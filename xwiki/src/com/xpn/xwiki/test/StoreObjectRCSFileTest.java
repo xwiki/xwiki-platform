@@ -3,8 +3,6 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.store.XWikiRCSFileStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.test.StoreObjectTest;
-import com.xpn.xwiki.test.Utils;
 
 import java.io.File;
 
@@ -51,4 +49,7 @@ public class StoreObjectRCSFileTest extends StoreObjectTest {
         XWikiStoreInterface store = new XWikiRCSFileStore(Utils.rcspath, Utils.rcsattachmentpath);
         return store;
     }
+
+
+
 }

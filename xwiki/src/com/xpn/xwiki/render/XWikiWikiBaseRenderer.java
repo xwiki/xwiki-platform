@@ -32,8 +32,6 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
 
 import java.util.StringTokenizer;
-import java.util.ArrayList;
-import java.util.List;
 
 public class XWikiWikiBaseRenderer implements XWikiRenderer {
     private boolean removePre = true;

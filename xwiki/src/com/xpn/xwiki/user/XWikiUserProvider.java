@@ -116,9 +116,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     public boolean authenticate(String name, String password) {
         try {
             name = getName(name);
-            XWikiDocInterface doc = getDocument(name);
-            String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
-            return (password.equals(passwd));
+            return getxWiki().checkPassword(name, password, context);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -2,7 +2,6 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;

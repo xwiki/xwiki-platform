@@ -1,20 +1,15 @@
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
-import org.apache.velocity.app.Velocity;
+import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
+import org.apache.velocity.app.Velocity;
 
 /**
  * Created by IntelliJ IDEA.

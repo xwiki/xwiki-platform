@@ -22,10 +22,9 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 public class DBListMetaClass extends ListMetaClass {
 

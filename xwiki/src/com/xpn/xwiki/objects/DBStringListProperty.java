@@ -22,14 +22,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import net.sf.hibernate.collection.PersistentCollection;
 
-import java.util.*;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.filter.CharacterFilter;
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
 
 // There is no difference..
 // This is just to get a different storage

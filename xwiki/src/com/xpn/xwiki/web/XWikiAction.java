@@ -22,9 +22,6 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import org.apache.struts.action.Action;
 
 

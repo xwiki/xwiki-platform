@@ -71,10 +71,6 @@ public class WikiSubstitution extends Perl5Substitution {
         return util.getMatcher();
     }
 
-    public void setMatcher(Perl5Matcher matcher) {
-        util.setMatcher(matcher);
-    }
-
     public Pattern getPattern() {
         return pattern;
     }

@@ -23,8 +23,8 @@
 package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 public class PropertyMetaClass extends BaseClass {
 

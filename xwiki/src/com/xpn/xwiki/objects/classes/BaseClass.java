@@ -63,12 +63,17 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             PropertyClass property = (PropertyClass) classit.next();
             String name = property.getName();
             Object formvalues = map.get(name);
-            if ((formvalues!=null)&&(formvalues instanceof String[])) {
-             BaseProperty objprop = property.fromStringArray(((String[])formvalues));
-             if (objprop!=null) {
-              objprop.setObject(object);
-              object.safeput(name, objprop);
-             }
+            if (formvalues!=null) {
+               BaseProperty objprop;
+                if (formvalues instanceof String[]) {
+                  objprop = property.fromStringArray(((String[])formvalues));
+                } else {
+                  objprop = property.fromString(formvalues.toString());
+                }
+                if (objprop!=null) {
+                 objprop.setObject(object);
+                object.safeput(name, objprop);
+                }
             }
         }
         return object;

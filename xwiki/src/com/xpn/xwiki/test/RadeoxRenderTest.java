@@ -1,10 +1,10 @@
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.render.XWikiRadeoxRenderer;
+import com.xpn.xwiki.render.XWikiRenderer;
 
 
 /**
@@ -109,7 +109,11 @@ public class RadeoxRenderTest  extends RenderTest {
                 "Other Text", false, context);
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
                 "view/Main/WebHome", false, context);
-         renderTest(wikibase, "Test link: http://www.ludovic.org/",
+        renderTest(wikibase, "Test link: [Other Text|WebHome2]",
+                "Other Text", false, context);
+        renderTest(wikibase, "Test link: [Other Text|WebHome2]",
+                "edit/Main/WebHome2?parent=", false, context);
+        renderTest(wikibase, "Test link: http://www.ludovic.org/",
                 "<a href=\"http://www.ludovic.org/\">", false, context);
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
                 "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);    }

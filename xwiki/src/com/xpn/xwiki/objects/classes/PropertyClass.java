@@ -29,9 +29,9 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
-import org.apache.ecs.xhtml.input;
 
 import java.util.Iterator;
 import java.util.List;

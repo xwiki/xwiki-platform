@@ -22,6 +22,7 @@
  */
 package com.xpn.xwiki;
 
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiAction;
 
@@ -39,6 +40,9 @@ public class XWikiContext extends Hashtable {
    private XWikiAction action;
    private String database;
    private String baseUrl;
+   private boolean virtual;
+   private XWikiDocInterface doc;
+   private String user;
 
    public XWikiContext() {
    }
@@ -106,6 +110,31 @@ public class XWikiContext extends Hashtable {
 
     public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    public boolean isVirtual() {
+        return virtual;
+    }
+
+    public void setVirtual(boolean virtual) {
+        this.virtual = virtual;
+    }
+
+    public XWikiDocInterface getDoc() {
+        return (XWikiDocInterface) get("doc");
+    }
+
+    public void setDoc(XWikiDocInterface doc) {
+        this.doc = doc;
+        put("doc", doc);
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getUser() {
+        return user;
     }
 
 

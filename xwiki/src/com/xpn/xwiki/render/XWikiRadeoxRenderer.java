@@ -1,7 +1,7 @@
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.util.Util;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseRenderContext;

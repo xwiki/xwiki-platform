@@ -22,16 +22,15 @@
  */
 package com.xpn.xwiki.objects;
 
+import net.sf.hibernate.collection.PersistentCollection;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
-import java.util.*;
-
-import net.sf.hibernate.collection.PersistentCollection;
-import com.xpn.xwiki.test.Utils;
-import com.xpn.xwiki.objects.classes.ListClass;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class ListProperty extends BaseProperty {
     protected List list = new ArrayList();

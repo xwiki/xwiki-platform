@@ -25,8 +25,10 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
@@ -138,6 +140,7 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     String displayForm(String className,String header, String format, XWikiContext context);
     String displayForm(String className,String header, String format, boolean linebreak, XWikiContext context);
     String displayForm(String className, XWikiContext context);
+    String display(String fieldname, String type, BaseObject obj, XWikiContext context);
 
     void renameProperties(String className, Map fieldsToRename);
     void addObjectsToRemove(BaseObject object);
@@ -145,6 +148,13 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     void setObjectsToRemove(ArrayList objectsToRemove);
     List getxWikiClasses();
 
-    String display(String fieldname, String type, BaseObject obj, XWikiContext context);
+    List getIncludedPages(XWikiContext context);
 
+    String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
+
+    String displayEdit(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
+
+    String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
+
+    String displaySearch(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context);
 }

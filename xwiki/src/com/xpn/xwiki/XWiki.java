@@ -23,13 +23,14 @@
 
 package com.xpn.xwiki;
 
-import com.opensymphony.user.User;
-import com.opensymphony.user.UserManager;
 import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.NotFoundException;
+import com.opensymphony.user.User;
+import com.opensymphony.user.UserManager;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.notify.PropertyChangedRule;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
@@ -46,25 +47,26 @@ import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.Filter;
-import org.apache.ecs.xhtml.textarea;
 import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.xhtml.textarea;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
-import org.apache.commons.lang.StringUtils;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SecurityRealmInterface;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
-import java.net.URL;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -83,6 +85,7 @@ public class XWiki implements XWikiNotificationInterface {
     private boolean test = false;
     private String version = null;
     private HttpServlet servlet;
+    private String database;
 
 
     public static XWiki getXWiki(XWikiContext context) throws XWikiException {
@@ -98,6 +101,7 @@ public class XWiki implements XWikiNotificationInterface {
             servlet.getServletContext().setAttribute(xwikiname, xwiki);
         }
         context.setWiki(xwiki);
+        xwiki.setDatabase(context.getDatabase());
         if ("1".equals(xwiki.Param("xwiki.virtual"))) {
             HttpServletRequest request = context.getRequest();
             String host = "";
@@ -130,7 +134,7 @@ public class XWiki implements XWikiNotificationInterface {
                         XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
                         "This wiki does not exist");
             }
-
+            context.setVirtual(true);
             context.setDatabase(appname);
         }
         return xwiki;
@@ -618,8 +622,6 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getUserPreference(String prefname, XWikiContext context) {
         try {
-            // XWikiUser user = (XWikiUser) context.get("user");
-            // return user.getPreference(prefname, context);
             return getWebPreference(prefname, context);
         } catch (Exception e) {
             return getXWikiPreference(prefname, context);
@@ -853,9 +855,21 @@ public class XWiki implements XWikiNotificationInterface {
 
     public int createUser(XWikiContext context) throws XWikiException {
         HttpServletRequest request = (HttpServletRequest) context.getRequest();
-        BaseClass baseclass = getUserClass(context);
+        Map map = Util.getObject(request, "register");
         String xwikiname = request.getParameter("xwikiname");
         String password2 = request.getParameter("register2_password");
+        String password = ((String[])map.get("password"))[0];
+
+        if (!password.equals(password2)) {
+            // TODO: throw wrong password exception
+            return -1;
+        }
+
+        return createUser(xwikiname, map, context);
+    }
+
+    public int createUser(String xwikiname, Map map, XWikiContext context) throws XWikiException {
+        BaseClass baseclass = getUserClass(context);
 
         try {
             // TODO: Verify existing user
@@ -864,23 +878,11 @@ public class XWiki implements XWikiNotificationInterface {
                 // TODO: throws Exception
                 return 0;
             }
-            // TODO: Verify XWiki Name
-
-
-            // Read map
-            Map map = Util.getObject(request, "register");
-            String password = ((String[])map.get("password"))[0];
-            if (!password.equals(password2)) {
-                // TODO: throw wrong password exception
-                return -1;
-            }
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map);
             newobject.setName("XWiki." + xwikiname);
             doc.addObject(baseclass.getName(), newobject);
             saveDocument(doc, null, context);
-
-            // TODO: send a notification email
             return 1;
         }
         catch (Exception e) {
@@ -916,6 +918,18 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
+    public boolean checkPassword(String username, String password, XWikiContext context) throws XWikiException {
+      try {
+          XWikiDocInterface doc = getDocument(username, context);
+          String passwd = ((BaseProperty)doc.getObject("XWiki.XWikiUsers", 0).get("password")).toText();
+          return (password.equals(passwd));
+      } catch (Throwable e) {
+          e.printStackTrace();
+          return false;
+      }
+    }
+
+
     public Principal checkAuth(XWikiContext context) throws XWikiException {
         HttpServletRequest request = context.getRequest();
         HttpServletResponse response = context.getResponse();
@@ -927,13 +941,22 @@ public class XWiki implements XWikiNotificationInterface {
         SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
                 realm, auth.getAuthMethod());
         try {
-            if (auth.processLogin(wrappedRequest, response)) {
-                return null;
+            // In case of virtual server we never use osuser
+            // because the fact that it is "static" doesn't
+            // allow to dynamically switch databases
+            if ((Param("xwiki.virtual").equals("1"))
+                || !Param("xwiki.authentication.osuser").equals("1")) {
+                if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
+                   return null;
+                }
+            } else {
+               if (auth.processLogin(wrappedRequest, response)) {
+                  return null;
+               }
             }
-            else {
-                Principal user = wrappedRequest.getUserPrincipal();
-                return user;
-            }
+
+            Principal user = wrappedRequest.getUserPrincipal();
+            return user;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -960,6 +983,7 @@ public class XWiki implements XWikiNotificationInterface {
 
         try {
             user = checkAuth(context);
+
             if ((user==null)&&(needsAuth)) {
                 try {
                     if (context.getRequest()!=null)
@@ -982,7 +1006,7 @@ public class XWiki implements XWikiNotificationInterface {
             username = "XWiki." + user.getName();
 
         // Save the user
-        context.put("user", username);
+        context.setUser(username);
 
         // Check Rights
         try {
@@ -1045,6 +1069,13 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String include(String topic, XWikiContext context, boolean isForm) {
         String database = null, incdatabase = null;
+        Document currentdoc = null, currentcdoc = null;
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        if (vcontext!=null) {
+         currentdoc = (Document) vcontext.get("doc");
+         currentcdoc = (Document) vcontext.get("cdoc");
+        }
+
         try {
 
             XWikiDocInterface doc = null;
@@ -1084,11 +1115,23 @@ public class XWiki implements XWikiNotificationInterface {
         } finally {
             if (database!=null)
                 context.setDatabase(database);
+            if (currentdoc!=null)
+             vcontext.put("doc", currentdoc);
+            if (currentcdoc!=null)
+             vcontext.put("cdoc", currentcdoc);
         }
     }
 
     public void deleteDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         getStore().deleteXWikiDoc(doc, context);
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
 

@@ -14,13 +14,12 @@ import java.util.List;
  * Time: 17:50:47
  * To change this template use File | Settings | File Templates.
  */
-public class XWiki {
+public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
-    private XWikiContext context;
 
     public XWiki(com.xpn.xwiki.XWiki xwiki, XWikiContext context) {
+       super(context);
        this.xwiki = xwiki;
-       this.context = context;
     }
 
      public String getVersion() {
@@ -43,7 +42,7 @@ public class XWiki {
          return newdoc;
      }
     
-     public Document getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
+     public Document getDocument(String web, String fullname) throws XWikiException {
          XWikiDocInterface doc = xwiki.getDocument(web, fullname, context);
          if (xwiki.checkAccess("view", doc, context)==false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -129,7 +128,11 @@ public class XWiki {
     }
 
     public int createUser() throws XWikiException {
-        return xwiki.createUser(context);
+        if (checkProgrammingRights())
+         return xwiki.createUser(context);
+        else
+         return -2;
+        // TODO: We might need to send a notification email here.
     }
 
     public String includeTopic(String topic) {

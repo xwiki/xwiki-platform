@@ -27,15 +27,15 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.struts.action.ActionForm;
@@ -141,7 +141,7 @@ public class ViewEditAction extends XWikiAction
         if (xwiki.checkAccess(action, doc, context)==false)
            return null;
 
-        String username = (String)context.get("user");
+        String username = context.getUser();
 
         // Determine what to do
         if (action.equals("view"))

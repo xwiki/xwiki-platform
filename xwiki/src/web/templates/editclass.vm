@@ -30,7 +30,7 @@ Name: <input type="text" name="propname" value="" size="20" />
 <tr><th>Property</th><th>$prop.prettyName</th></tr>
 #foreach ($classprop in $prop.xWikiClass.propertyNames)
 <tr><td>$prop.xWikiClass.safeget("$classprop").getPrettyName()</td>
-<td>$prop.xWikiClass.safeget("$classprop").displayEdit($classprop, "${prop.name}_" , $prop, $context)
+<td>$doc.displayEdit($prop.xWikiClass.safeget("$classprop"), "${prop.name}_" , $prop)
 </td>
 </tr>
 #end

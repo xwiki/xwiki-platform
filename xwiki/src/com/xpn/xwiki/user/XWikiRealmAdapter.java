@@ -22,14 +22,13 @@
  */
 package com.xpn.xwiki.user;
 
+import com.opensymphony.user.EntityNotFoundException;
+import com.opensymphony.user.User;
+import com.opensymphony.user.UserManager;
+import com.xpn.xwiki.XWiki;
 import org.securityfilter.realm.SecurityRealmInterface;
 
 import java.security.Principal;
-
-import com.opensymphony.user.User;
-import com.opensymphony.user.EntityNotFoundException;
-import com.opensymphony.user.UserManager;
-import com.xpn.xwiki.XWiki;
 
 public class XWikiRealmAdapter  implements SecurityRealmInterface {
     private XWiki xwiki;

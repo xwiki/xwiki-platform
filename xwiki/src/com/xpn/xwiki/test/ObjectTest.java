@@ -3,6 +3,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import junit.framework.TestCase;
@@ -195,5 +196,29 @@ public class ObjectTest extends TestCase {
 
      }
 
+    public void testSetObject() throws XWikiException {
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Test", "WebHome");
+        BaseObject bobj = new BaseObject();
+        bobj.setName("Test.WebHome");
+        doc.setObject("Test.WebHome", 0, bobj);
+        assertEquals("Object size should be 1", 1, doc.getObjects("Test.WebHome").size());
+        BaseObject bobj2 = doc.getObject("Test.WebHome", 0);
+        assertEquals("Object name should be Test.WebHome", "Test.WebHome", bobj2.getName());
+
+        BaseObject bobj3 = new BaseObject();
+        bobj3.setName("Test.Toto");
+        doc.setObject("Test.WebHome", 0, bobj3);
+        assertEquals("Object size should be 1", 1, doc.getObjects("Test.WebHome").size());
+        BaseObject bobj3b = doc.getObject("Test.WebHome", 0);
+        assertEquals("Object name should be Test.Toto", "Test.Toto", bobj3b.getName());
+
+        BaseObject bobj4 = new BaseObject();
+        bobj4.setName("Test.WebHome");
+        doc.setObject("Test.WebHome", 2, bobj4);
+        assertEquals("Object size should be 3", 3, doc.getObjects("Test.WebHome").size());
+        assertNull("Object 1 should be null", doc.getObject("Test.WebHome",1));
+        BaseObject obj5 = doc.getObject("Test.WebHome", 2);
+        assertEquals("Object name should be Test.WebHome", "Test.WebHome", obj5.getName());
+    }
 
 }

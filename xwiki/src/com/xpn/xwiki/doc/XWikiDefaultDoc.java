@@ -48,4 +48,6 @@ public abstract class XWikiDefaultDoc implements XWikiDocInterface, Serializable
         }
         return doc;
     }
+
+
 }

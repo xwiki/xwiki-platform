@@ -22,11 +22,14 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.XWikiContext;
-import org.apache.ecs.xhtml.select;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
 
 public class BooleanClass extends PropertyClass {
 

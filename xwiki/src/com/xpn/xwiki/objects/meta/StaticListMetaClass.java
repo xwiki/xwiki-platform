@@ -24,7 +24,6 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 public class StaticListMetaClass extends ListMetaClass {

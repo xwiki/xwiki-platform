@@ -1,0 +1,166 @@
+package com.xpn.xwiki.test;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import net.sf.hibernate.HibernateException;
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.apache.cactus.client.authentication.Authentication;
+import org.apache.cactus.client.authentication.BasicAuthentication;
+
+import java.util.HashMap;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: ludovic
+ * Date: 13 mars 2004
+ * Time: 15:02:45
+ * To change this template use File | Settings | File Templates.
+ */
+public class ServletAuthTest extends ServletTest {
+
+    public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
+        Utils.updateRight(xwiki, context, fullname, user, group, level, allow, global);
+    }
+
+    public void beginAuthNeeded(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        context.setDatabase("xwikitest");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "AuthNeededTest", context);
+        updateRight("Main.AuthNeededTest", "XWiki.LudovicDubost", "", "view", true, false);
+        setUrl(webRequest, "view", "AuthNeededTest");
+    }
+
+    public void endAuthNeeded(WebResponse webResponse) {
+        assertEquals("Response status should be 401", 401, webResponse.getStatusCode());
+    }
+
+    public void testAuthNeeded() throws Throwable {
+        launchTest();
+    }
+
+    public void beginAuth(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        Utils.createDoc(hibstore, "Main", "AuthTest", context);
+        HashMap map = new HashMap();
+        map.put("password", "toto");
+        xwiki.createUser("LudovicDubost", map, context);
+        updateRight("Main.AuthTest", "XWiki.LudovicDubost", "", "view", true, false);
+        setUrl(webRequest, "view", "AuthTest");
+        Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
+        webRequest.setAuthentication(auth);
+    }
+
+    public void endAuth(WebResponse webResponse) {
+        assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+    }
+
+    public void testAuth() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginCreateUser(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "$xwiki.createUser()";
+        Utils.createDoc(hibstore, "Main", "CreateUserTest", context);
+        Utils.content1 = content;
+
+        // In order for createUser to work, we need programming right
+        Utils.createDoc(hibstore, "XWiki", "XWikiPreferences", context);
+        updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
+
+        setUrl(webRequest, "view", "CreateUserTest");
+        webRequest.addParameter("xwikiname","LudovicDubost");
+        webRequest.addParameter("register_password","toto");
+        webRequest.addParameter("register2_password","toto");
+        webRequest.addParameter("register_email","ludovic@pobox.com");
+        webRequest.addParameter("register_fullname","Ludovic Dubost");
+    }
+
+    public void endCreateUser(WebResponse webResponse) throws XWikiException {
+        assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki", "LudovicDubost");
+        doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+        assertFalse("User should exist", doc.isNew());
+        assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
+        assertEquals("Email is wrong", "ludovic@pobox.com", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
+        assertEquals("Fullname is wrong", "Ludovic Dubost", doc.getObject("XWiki.XWikiUsers",0).getStringValue("fullname"));
+    }
+
+    public void testCreateUser() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginCreateUserNoRight(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "$xwiki.createUser()";
+        Utils.createDoc(hibstore, "Main", "CreateUserTest", context);
+        Utils.content1 = content;
+
+        setUrl(webRequest, "view", "CreateUserTest");
+        webRequest.addParameter("xwikiname","LudovicDubost");
+        webRequest.addParameter("register_password","toto");
+        webRequest.addParameter("register2_password","toto");
+        webRequest.addParameter("register_email","ludovic@pobox.com");
+        webRequest.addParameter("register_fullname","Ludovic Dubost");
+    }
+
+    public void endCreateUserNoRight(WebResponse webResponse) throws XWikiException {
+        assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki", "LudovicDubost");
+        doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+        assertTrue("User should not exist", doc.isNew());
+    }
+
+    public void testCreateUserNoRight() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginCreateUserFail(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "$xwiki.createUser()";
+        Utils.createDoc(hibstore, "Main", "CreateUserTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "CreateUserTest");
+        webRequest.addParameter("xwikiname","LudovicDubost");
+        webRequest.addParameter("register_password","toto");
+        webRequest.addParameter("register2_password","tata");
+        webRequest.addParameter("register_email","ludovic@pobox.com");
+        webRequest.addParameter("register_fullname","Ludovic Dubost");
+    }
+
+    public void endCreateUserFail(WebResponse webResponse) throws XWikiException {
+        assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki", "LudovicDubost");
+        doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+        assertTrue("User should not exist", doc.isNew());
+    }
+
+    public void testCreateUserFail() throws Throwable {
+        launchTest();
+    }
+
+
+}

@@ -23,7 +23,7 @@
     Remove</a>
    </td>
     #foreach($prop in $class.properties)
-     <td>$prop.displayEdit($prop.getName(), "${class.name}_${obj.number}_",  $obj, $context)
+     <td>$doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
      </td>
     #end
    </tr>

@@ -22,14 +22,14 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.dom4j.Element;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import java.io.StringWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 
 public abstract class BaseElement extends Object {
     private String name;

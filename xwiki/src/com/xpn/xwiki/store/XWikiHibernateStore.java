@@ -31,9 +31,9 @@ import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import net.sf.hibernate.*;
+import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.dialect.Dialect;
 import net.sf.hibernate.impl.SessionFactoryImpl;
-import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
@@ -42,10 +42,10 @@ import org.apache.commons.jrcs.rcs.Version;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.Serializable;
-import java.util.*;
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.*;
 
 
 public class XWikiHibernateStore implements XWikiStoreInterface {

@@ -30,13 +30,15 @@ import com.opensymphony.module.access.entities.Resource_I;
 import com.opensymphony.module.access.provider.ResourceProvider;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 
 public class XWikiResourceProvider extends XWikiBaseProvider implements ResourceProvider {
@@ -178,11 +180,15 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                 String users = bobj.getStringValue(fieldName);
                 String levels = bobj.getStringValue("levels");
                 boolean allowdeny = (bobj.getIntValue("allow")==1);
-                if ((allowdeny == allow)
-                        &&(levels.indexOf(accessLevel)!=-1)) {
-                    found = true;
-                    if (users.indexOf(name)!=-1)
-                        return true;
+
+                if (allowdeny == allow) {
+                    String[] levelsarray = StringUtils.split(bobj.getStringValue("levels")," ,|");
+                    if (ArrayUtils.contains(levelsarray, accessLevel)) {
+                        found = true;
+                        String[] userarray = StringUtils.split(users," ,|");
+                        if (ArrayUtils.contains(userarray, name))
+                           return true;
+                    }
                 }
             }
             if (found)
@@ -212,6 +218,16 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                 if (allow) return true;
             } catch (NotFoundException e) {}
 
+            // Programming right can only been given at top level
+            if (accessLevel.equals("programming")) {
+                // Verify XWiki programming right
+                try {
+                    allow = checkRight(name, xwikidoc , "programming", true, true, true);
+                    if (allow) return true;
+                } catch (NotFoundException e) {}
+                return false;
+            }
+
             // Verify Web super user
             String web = Util.getWeb(resourceKey);
             XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences", context);
@@ -236,25 +252,26 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             } catch (NotFoundException e) {}
 
 
+            // Check if this document is denied/allowed
+            // through the web WebPreferences Global Rights
             try {
                 deny =  checkRight(name, webdoc, accessLevel, true, false, true);
                 deny_found = true;
                 if (deny) return false;
             } catch (NotFoundException e) {}
-
             try {
                 allow = checkRight(name, webdoc , accessLevel, true, true, true);
                 allow_found = true;
                 if (allow) return true;
             } catch (NotFoundException e) {}
 
-            // Check if XWiki is denied
+            // Check if this document is denied/allowed
+            // through the XWiki.XWikiPreferences Global Rights
             try {
                 deny = checkRight(name, xwikidoc , accessLevel, true, false, true);
                 deny_found = true;
                 if (deny) return false;
             } catch (NotFoundException e) {}
-
             try {
                 allow = checkRight(name, xwikidoc , accessLevel, true, true, true);
                 allow_found = true;

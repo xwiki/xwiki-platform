@@ -23,12 +23,11 @@
 package com.xpn.xwiki.util;
 
 import com.xpn.xwiki.render.WikiSubstitution;
-import com.xpn.xwiki.render.PreTagSubstitution;
 import org.apache.commons.lang.StringUtils;
 import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
-import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.oro.text.regex.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -63,16 +62,21 @@ public class Util {
         return matcher;
     }
 
-    public void setMatcher(Perl5Matcher matcher) {
-        this.matcher = matcher;
-    }
-
     public Perl5Util getP5util() {
         return p5util;
     }
 
-    public void setP5util(Perl5Util p5util) {
-        this.p5util = p5util;
+    public List getMatches(String content, String spattern, int group) throws MalformedPatternException {
+        List list = new ArrayList();
+        PatternMatcherInput input = new PatternMatcherInput(content);
+        Pattern pattern = patterns.addPattern(spattern);
+        while (matcher.contains(input, pattern)) {
+            MatchResult result = matcher.getMatch();
+            String smatch = result.group(group);
+            if (!list.contains(smatch))
+             list.add(smatch);
+        }
+        return list;
     }
 
 
@@ -118,11 +122,7 @@ public class Util {
         return patterns;
     }
 
-    public static void setPatterns(PatternCache patterns) {
-        Util.patterns = patterns;
-    }
-
-       public static Map getObject(HttpServletRequest request, String prefix) {
+    public static Map getObject(HttpServletRequest request, String prefix) {
         Map map = request.getParameterMap();
         HashMap map2 = new HashMap();
         Iterator it = map.keySet().iterator();

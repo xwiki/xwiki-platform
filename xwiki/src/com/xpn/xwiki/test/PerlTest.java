@@ -25,12 +25,12 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.render.XWikiPerlPluginRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
+import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 

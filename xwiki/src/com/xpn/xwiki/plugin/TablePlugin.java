@@ -23,15 +23,15 @@
  */
 package com.xpn.xwiki.plugin;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 
-import java.util.Vector;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
 public class TablePlugin extends XWikiDefaultPlugin {
 

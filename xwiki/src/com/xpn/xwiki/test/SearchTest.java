@@ -1,13 +1,14 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
+
 import java.util.List;
 
 /**

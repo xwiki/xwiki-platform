@@ -13,6 +13,16 @@
 <p>
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 </p>
+#set( $pages = $doc.getIncludedPages() )
+#if ( $pages.size() > 0)
+<p>
+$msg.get("editincludepagemsg")
+#foreach ($page in $pages)
+#set ( $incldoc = $xwiki.getDocument($doc.web , $page) )
+<a href="../../edit/${incldoc.web}/${incldoc.name}">$page</a>&nbsp;
+#end
+</p>
+#end
 <div id="xwikitext">
 $xwiki.getTextArea($doc.content)
 <br/><br/>

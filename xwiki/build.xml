@@ -246,7 +246,10 @@
                     <exclude name="**/StoreTest.java"/>
                     <exclude name="**/RenderTest.java"/>
                     <exclude name="**/StoreObjectTest.java"/>
+                    <exclude name="**/ServletTest.java"/>
                     <exclude name="**/ViewEditTest.java"/>
+                    <exclude name="**/ServletAuthTest.java"/>
+                    <exclude name="**/ServletVirtualTest.java"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -256,7 +259,8 @@
 
         <mkdir dir="${test.reports.dir}" />
 
-        <cactus printsummary="yes" warfile="${release.warfile}" dir="${basedir}/test" fork="on" >
+        <cactus printsummary="yes" warfile="${release.warfile}" dir="${basedir}/test"
+            haltonfailure="no" fork="on" >
 
             <classpath>
                 <pathelement path="${classes.dir}" />
@@ -264,7 +268,13 @@
             </classpath>
             <formatter type="xml" />
 
-            <test todir="${test.reports.dir}" name="${pkg}.test.ViewEditTest" haltonfailure="no" />
+            <batchtest todir="${test.reports.dir}" >
+                <fileset dir="${src.dir}">
+                    <include name="com/xpn/xwiki/test/ViewEditTest.java"/>
+                    <include name="com/xpn/xwiki/test/ServletAuthTest.java"/>
+                    <include name="com/xpn/xwiki/test/ServletVirtualTest.java"/>
+                </fileset>
+            </batchtest>
 
             <containerset>
                 <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"

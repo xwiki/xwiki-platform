@@ -1,11 +1,10 @@
 package com.xpn.xwiki.render;
 
-import org.radeox.engine.BaseRenderEngine;
-import org.radeox.api.engine.WikiRenderEngine;
-import org.apache.commons.lang.StringUtils;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
+import org.apache.commons.lang.StringUtils;
+import org.radeox.api.engine.WikiRenderEngine;
+import org.radeox.engine.BaseRenderEngine;
 /**
  * Created by IntelliJ IDEA.
  * User: ludovic

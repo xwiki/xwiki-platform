@@ -1,7 +1,7 @@
 package com.xpn.xwiki.render;
 
-import org.apache.oro.text.regex.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.oro.text.regex.*;
 
 import java.util.ArrayList;
 import java.util.List;

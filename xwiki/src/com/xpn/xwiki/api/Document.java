@@ -1,15 +1,16 @@
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
-
 
 import java.util.*;
 
@@ -20,13 +21,12 @@ import java.util.*;
  * Time: 16:59:02
  * To change this template use File | Settings | File Templates.
  */
-public class Document {
+public class Document extends Api {
     private XWikiDocInterface doc;
-    private XWikiContext context;
 
     public Document(XWikiDocInterface doc, XWikiContext context) {
+       super(context);
        this.doc = doc;
-       this.context = context;
     }
 
     public long getId() {
@@ -184,5 +184,25 @@ public class Document {
 
     public String displayForm(String className) {
         return doc.displayForm(className, context);
+    }
+
+    public String displayView(PropertyClass pclass, String prefix, BaseCollection object) {
+         return doc.displayView(pclass, prefix, object, context);
+    }
+
+    public String displayEdit(PropertyClass pclass, String prefix, BaseCollection object) {
+         return doc.displayEdit(pclass, prefix, object, context);
+    }
+
+    public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object) {
+         return doc.displayHidden(pclass, prefix, object, context);
+    }
+
+    public String displaySearch(PropertyClass pclass, String prefix, BaseCollection object) {
+         return doc.displaySearch(pclass, prefix, object, context);
+    }
+
+    public List getIncludedPages() {
+        return doc.getIncludedPages(context);
     }
 }

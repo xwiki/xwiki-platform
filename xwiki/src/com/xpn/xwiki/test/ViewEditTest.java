@@ -1,36 +1,35 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
 import net.sf.hibernate.HibernateException;
-import org.apache.cactus.ServletTestCase;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.struts.action.ActionServlet;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.*;
-
-import junit.framework.TestCase;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * ===================================================================
@@ -55,89 +54,7 @@ import junit.framework.TestCase;
  * Time: 12:08:01
  */
 
-public class ViewEditTest extends ServletTestCase {
-
-    private String hibpath = "hibernate-test.cfg.xml";
-    public XWikiContext context = new XWikiContext();
-    public XWiki xwiki;
-
-    public void setUp() {
-        flushCache();
-    };
-
-    public void cleanUp() {
-    };
-
-    public void clientSetUp(XWikiStoreInterface store) throws XWikiException {
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-    }
-
-
-    private void setUrl(WebRequest webRequest, String action, String docname) {
-        setUrl(webRequest, action, docname, "");
-    }
-
-    private void setUrl(WebRequest webRequest, String action, String docname, String query) {
-        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/" + action + "/Main/" + docname, query);
-    }
-
-    private void setVirtualUrl(WebRequest webRequest, String host, String appname, String action, String docname, String query) {
-        webRequest.setURL(host + ":9080", "/" + appname , "/testbin", "/" + action + "/Main/" + docname, query);
-    }
-
-    public String getHibpath() {
-        // Usefull in case we need to understand where we are
-        String path = (new File(".")).getAbsolutePath();
-        System.out.println("Current Directory is: " + path);
-
-        File file = new File(hibpath);
-        if (file.exists())
-            return hibpath;
-
-        file = new File("WEB-INF", hibpath);
-        if (file.exists())
-            return "./WEB-INF/" + hibpath;
-
-        file = new File("test", hibpath);
-        if (file.exists())
-            return "./test/" + hibpath;
-
-        if (config!=null)
-        {
-            ServletContext context = config.getServletContext();
-            if (context!=null)
-                return context.getRealPath("WEB-INF/" + hibpath);
-        }
-
-        return hibpath;
-    }
-
-    public void cleanSession(HttpSession session) {
-        Vector names = new Vector();
-        Enumeration enum = session.getAttributeNames();
-        while (enum.hasMoreElements()) {
-            String name = (String) enum.nextElement();
-            names.add(name);
-        }
-
-        for (int i=0;i<names.size();i++)
-        {
-            session.removeAttribute((String)names.get(i));
-        }
-    }
-
-    public void flushCache() {
-        // We need to flush the server cache before running our tests
-        // because we are modifiying the database behind the scenes
-        // so if we are running the tests twice we won't necessarly
-        // get the same results..
-        try {
-            XWiki xwiki = (XWiki) config.getServletContext().getAttribute("xwikitest");
-            xwiki.flushCache();
-        } catch (Exception e) {
-        }
-    }
+public class ViewEditTest extends ServletTest {
 
     public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -150,17 +67,8 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Page should have no version", result.indexOf("1.1")==-1);
     }
 
-    public void testViewNotOk() throws IOException, Throwable, HibernateException {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testViewNotOk() throws Throwable {
+        launchTest();
     }
 
     public void beginViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -176,20 +84,12 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     public void testViewOk() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+        launchTest();
     }
 
 
 
-     public void beginViewGetDocument(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginViewGetDocument(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         Utils.createDoc(hibstore, "Main", "ViewGetDocumentContent", context);
@@ -205,78 +105,77 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Could not find content in result:\n" + result, result.indexOf("Hello")!=-1);
     }
 
-    public void testViewGetDocument() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testViewGetDocument() throws Throwable {
+        launchTest();
     }
 
 
     public void beginViewDocumentLink(WebRequest webRequest) throws HibernateException, XWikiException {
-       XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-       StoreHibernateTest.cleanUp(hibstore, context);
-       // Utils.createDoc(hibstore, "Main", "ViewDocumentTestLinkTest", context);
-       String content = Utils.content1;
-       Utils.content1 = "[Main.ViewDocumentLink]";
-       Utils.createDoc(hibstore, "Main", "ViewDocumentLink", context);
-       Utils.content1 = content;
-       setUrl(webRequest, "view", "ViewDocumentLink");
-   }
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        // Utils.createDoc(hibstore, "Main", "ViewDocumentTestLinkTest", context);
+        String content = Utils.content1;
+        Utils.content1 = "[Main.ViewDocumentLink]";
+        Utils.createDoc(hibstore, "Main", "ViewDocumentLink", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "ViewDocumentLink");
+    }
 
-   public void endViewDocumentLink(WebResponse webResponse) {
-       String result = webResponse.getText();
-       assertTrue("Could not find content in result:\n" + result, result.indexOf("<a href")!=-1);
-   }
+    public void endViewDocumentLink(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find content in result:\n" + result, result.indexOf("<a href")!=-1);
+    }
 
-   public void testViewDocumentLink() throws IOException, Throwable {
-       try {
-           ActionServlet servlet = new ActionServlet();
-           servlet.init(config);
-           servlet.service(request, response);
-           cleanSession(session);
-       } catch (ServletException e) {
-           e.getRootCause().printStackTrace();
-           throw e.getRootCause();
-       }
-   }
+    public void testViewDocumentLink() throws Throwable {
+        launchTest();
+    }
 
 
+    public void beginPreviewOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        BaseObject bobject = Utils.prepareObject("Main.PreviewOkTest");
+        Utils.createDoc(hibstore, "Main", "PreviewOkTest", bobject, bobject.getxWikiClass(), context);
+        setUrl(webRequest, "preview", "PreviewOkTest");
+    }
 
-        public void beginEditOk(WebRequest webRequest) throws HibernateException, XWikiException {
-            XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-            StoreHibernateTest.cleanUp(hibstore, context);
-            Utils.createDoc(hibstore, "Main", "EditOkTest", context);
-            setUrl(webRequest, "edit", "EditOkTest");
-        }
+    public void endPreviewOk(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.PreviewOkTest_nb\" value=\"1\"")!=-1);
+        assertTrue("Could not find object hidden form value", result.indexOf("Main.PreviewOkTest_0_first_name")!=-1);
+        assertTrue("Could not find object hidden form value", result.indexOf("Ludovic")!=-1);
+    }
 
-        public void endEditOk(WebResponse webResponse) {
-            String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
-            assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
-        }
+    public void testPreviewOk() throws Throwable {
+        launchTest();
+    }
 
-        public void testEditOk() throws IOException, Throwable {
-            try {
-                ActionServlet servlet = new ActionServlet();
-                servlet.init(config);
-                servlet.service(request, response);
-                cleanSession(session);
-            } catch (ServletException e) {
-                e.getRootCause().printStackTrace();
-                throw e.getRootCause();
-            }
-        }
+    public void beginEditOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        BaseObject bobject = Utils.prepareObject("Main.EditOkTest");
+        Utils.createDoc(hibstore, "Main", "EditOkTest", bobject, bobject.getxWikiClass(), context);
+        setUrl(webRequest, "edit", "EditOkTest");
+    }
+
+    public void endEditOk(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
+        assertTrue("Could not find Add Class", result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
+        assertTrue("Could not find object hidden form nb", result.indexOf("<input type=\"hidden\" name=\"Main.EditOkTest_nb\" value=\"1\"")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Main.EditOkTest_0_first_name")!=-1);
+        assertTrue("Could not find object form value", result.indexOf("Ludovic")!=-1);
+    }
+
+    public void testEditOk() throws Throwable {
+        launchTest();
+    }
 
     public void beginViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -294,16 +193,8 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
     }
 
-    public void testViewRevOk() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testViewRevOk() throws Throwable {
+        launchTest();
     }
 
 
@@ -342,17 +233,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testDelete() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testDelete() throws Throwable {
+        launchTest();
     }
 
     public void beginDelete(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -376,17 +258,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testDeleteWithoutConfirm() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testDeleteWithoutConfirm() throws Throwable {
+        launchTest();
     }
 
     public void beginDeleteWithoutConfirm(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -409,17 +282,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testAddProp(Class cclass) throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testAddProp(Class cclass) throws Throwable {
+        launchTest();
     }
 
     public void beginAddProp(WebRequest webRequest, String name, Class cclass) throws HibernateException, XWikiException {
@@ -468,16 +332,8 @@ public class ViewEditTest extends ServletTestCase {
         endAddProp(response, "category", StringClass.class);
     }
 
-    public void testAddObject() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testAddObject() throws Throwable {
+        launchTest();
     }
 
     public void beginAddObject(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -510,18 +366,10 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Added Object wikiClass should have nameclass property", bclass.safeget("first_name"));
     }
 
-    public void testAddSecondObject() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testAddSecondObject() throws Throwable {
+        launchTest();
     }
+
 
     public void beginAddSecondObject(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -565,17 +413,8 @@ public class ViewEditTest extends ServletTestCase {
         assertNotNull("Added Object wikiClass should have nameclass property", bclass.safeget("first_name"));
     }
 
-    public void testRemoveObject() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testRemoveObject() throws Throwable {
+        launchTest();
     }
 
     public void beginRemoveObject(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -621,16 +460,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testUpdateObjectProp() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testUpdateObjectProp() throws Throwable {
+        launchTest();
     }
 
     public void beginUpdateObjectProp(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -683,16 +514,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-     public void testUpdateClassProp() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testUpdateClassProp() throws Throwable {
+        launchTest();
     }
 
     public void beginUpdateClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -757,129 +580,113 @@ public class ViewEditTest extends ServletTestCase {
 
 
 
-    public void testRenameClassProp() throws IOException, Throwable {
-       try {
-           ActionServlet servlet = new ActionServlet();
-           servlet.init(config);
-           servlet.service(request, response);
-           cleanSession(session);
-       } catch (ServletException e) {
-           e.getRootCause().printStackTrace();
-           throw e.getRootCause();
-       }
-   }
+    public void testRenameClassProp() throws Throwable {
+        launchTest();
+    }
 
-   public void beginRenameClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
-       XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-       StoreHibernateTest.cleanUp(hibstore, context);
-       BaseObject bobject = Utils.prepareObject();
-       BaseClass bclass = bobject.getxWikiClass();
-       bclass.setName("Main.PropRenameClassPropClass");
-       Utils.createDoc(hibstore, "Main", "PropRenameClassPropClass", bobject, bclass, context);
-       Map bobjects = new HashMap();
-       Vector bobjlist = new Vector();
-       bobject.setName("Main.PropRenameClassProp");
-       bobjlist.add(bobject);
-       bobjects.put("Main.PropRenameClassPropClass", bobjlist);
-       Utils.createDoc(hibstore, "Main", "PropRenameClassProp", null, null, bobjects, context);
-       setUrl(webRequest, "propupdate", "PropRenameClassPropClass");
-       webRequest.addParameter("age_name", "age2");
-       webRequest.addParameter("age_size", "40");
-       webRequest.addParameter("age_prettyName", "Age of person");
-   }
+    public void beginRenameClassProp(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        BaseObject bobject = Utils.prepareObject();
+        BaseClass bclass = bobject.getxWikiClass();
+        bclass.setName("Main.PropRenameClassPropClass");
+        Utils.createDoc(hibstore, "Main", "PropRenameClassPropClass", bobject, bclass, context);
+        Map bobjects = new HashMap();
+        Vector bobjlist = new Vector();
+        bobject.setName("Main.PropRenameClassProp");
+        bobjlist.add(bobject);
+        bobjects.put("Main.PropRenameClassPropClass", bobjlist);
+        Utils.createDoc(hibstore, "Main", "PropRenameClassProp", null, null, bobjects, context);
+        setUrl(webRequest, "propupdate", "PropRenameClassPropClass");
+        webRequest.addParameter("age_name", "age2");
+        webRequest.addParameter("age_size", "40");
+        webRequest.addParameter("age_prettyName", "Age of person");
+    }
 
-   public void endRenameClassProp(WebResponse webResponse) throws XWikiException {
-       String result = webResponse.getText();
-       // Verify return
-       assertTrue("Rename Class returned exception", result.indexOf("Exception")==-1);
-       XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-       XWikiSimpleDoc doc = new XWikiSimpleDoc("Main", "PropRenameClassPropClass");
-       doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
-       BaseClass bclass = doc.getxWikiClass();
-       NumberClass ageclass2 = (NumberClass) bclass.safeget("age2");
-       assertNotNull("Rename Class wikiClass should have age2 property", ageclass2);
-       assertEquals("Rename Class age2 numberclass size is incorrect", 40, ageclass2.getSize());
+    public void endRenameClassProp(WebResponse webResponse) throws XWikiException {
+        String result = webResponse.getText();
+        // Verify return
+        assertTrue("Rename Class returned exception", result.indexOf("Exception")==-1);
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+        XWikiSimpleDoc doc = new XWikiSimpleDoc("Main", "PropRenameClassPropClass");
+        doc = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc, context);
+        BaseClass bclass = doc.getxWikiClass();
+        NumberClass ageclass2 = (NumberClass) bclass.safeget("age2");
+        assertNotNull("Rename Class wikiClass should have age2 property", ageclass2);
+        assertEquals("Rename Class age2 numberclass size is incorrect", 40, ageclass2.getSize());
 
-       NumberClass ageclass = (NumberClass) bclass.safeget("age");
-       assertNull("Rename Class wikiClass should not have age property", ageclass);
+        NumberClass ageclass = (NumberClass) bclass.safeget("age");
+        assertNull("Rename Class wikiClass should not have age property", ageclass);
 
-       assertEquals("Rename Class age2 numberclass pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
-       assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
+        assertEquals("Rename Class age2 numberclass pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
+        assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
 
-       // Check object in the Class
-       BaseObject bobject = null;
-       try { bobject = (BaseObject) doc.getObject("Main.PropRenameClassPropClass", 0); }
-       catch (Exception e) {}
-       assertNotNull("Rename Class object does not exist", bobject);
+        // Check object in the Class
+        BaseObject bobject = null;
+        try { bobject = (BaseObject) doc.getObject("Main.PropRenameClassPropClass", 0); }
+        catch (Exception e) {}
+        assertNotNull("Rename Class object does not exist", bobject);
 
-       BaseClass bclass2 = bobject.getxWikiClass();
-       assertNotNull("Rename Class does not have a wikiClass", bclass2);
+        BaseClass bclass2 = bobject.getxWikiClass();
+        assertNotNull("Rename Class does not have a wikiClass", bclass2);
 
-       ageclass2 = (NumberClass) bclass.safeget("age2");
-       assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
+        ageclass2 = (NumberClass) bclass.safeget("age2");
+        assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
 
-       ageclass = (NumberClass) bclass.safeget("age");
-       assertNull("Rename Class wikiClass from object should not have age property", ageclass);
+        ageclass = (NumberClass) bclass.safeget("age");
+        assertNull("Rename Class wikiClass from object should not have age property", ageclass);
 
-       assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
-       assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
+        assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
+        assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
 
 
-       assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
+        assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
 
-       assertNull("Rename Class object should not have age property", bobject.safeget("age"));
-       assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
-       assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
+        assertNull("Rename Class object should not have age property", bobject.safeget("age"));
+        assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
+        assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
 
-       Number age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
-       assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
-       String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
-       assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
+        Number age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
+        assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
+        String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+        assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
 
-       XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropRenameClassProp");
-       doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
-       bobject = null;
-       try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
-       catch (Exception e) {}
-       assertNotNull("Rename Class object does not exist", bobject);
+        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "PropRenameClassProp");
+        doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2, context);
+        bobject = null;
+        try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
+        catch (Exception e) {}
+        assertNotNull("Rename Class object does not exist", bobject);
 
-       bclass2 = bobject.getxWikiClass();
-       assertNotNull("Rename Class does not have a wikiClass", bclass2);
+        bclass2 = bobject.getxWikiClass();
+        assertNotNull("Rename Class does not have a wikiClass", bclass2);
 
-       ageclass2 = (NumberClass) bclass.safeget("age2");
-       assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
+        ageclass2 = (NumberClass) bclass.safeget("age2");
+        assertNotNull("Rename Class wikiClass from object should have age2 property", ageclass2);
 
-       ageclass = (NumberClass) bclass.safeget("age");
-       assertNull("Rename Class wikiClass from object should not have age property", ageclass);
+        ageclass = (NumberClass) bclass.safeget("age");
+        assertNull("Rename Class wikiClass from object should not have age property", ageclass);
 
-       assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
-       assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
+        assertEquals("Rename Class age numberclass from object size is incorrect", 40, ageclass2.getSize());
+        assertEquals("Rename Class age numberclass from object pretty name is incorrect", "Age of person", ageclass2.getPrettyName());
 
 
-       assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
+        assertNotNull("Rename Class wikiClass should have name property", bclass2.safeget("first_name"));
 
-       assertNull("Rename Class object should not have age property", bobject.safeget("age"));
-       assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
-       assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
+        assertNull("Rename Class object should not have age property", bobject.safeget("age"));
+        assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
+        assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
 
-       age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
-       assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
-       name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
-       assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
-   }
+        age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
+        assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
+        name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+        assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
+    }
 
 
 
-    public void testUpdateAdvancedObjectProp() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testUpdateAdvancedObjectProp() throws Throwable {
+        launchTest();
     }
 
     public void beginUpdateAdvancedObjectProp(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -969,19 +776,9 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testAttach() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
-
+    public void testAttach() throws Throwable {
+        launchTest();
     }
-
 
     public void beginAttach(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -1008,16 +805,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testAttachUpdate() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testAttachUpdate() throws Throwable {
+        launchTest();
     }
 
 
@@ -1059,16 +848,8 @@ public class ViewEditTest extends ServletTestCase {
         assertEquals("Attachment size is not correct", fattach.length(), attachment.getFilesize());
     }
 
-    public void testAttachDownload() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testAttachDownload() throws Throwable {
+        launchTest();
     }
 
 
@@ -1104,16 +885,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
 
-    public void testAttachDelete() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testAttachDelete() throws Throwable {
+        launchTest();
     }
 
 
@@ -1169,34 +942,48 @@ public class ViewEditTest extends ServletTestCase {
 
     }
 
-
-
-    public void beginVirtualViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginInclude(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
-        clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "VirtualViewOkTest", context);
-        Utils.createDoc(hibstore, "XWiki", "XWikiServerXwikitest", context);
-        Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
-        setVirtualUrl(webRequest, "127.0.0.1", "xwikitest", "view", "VirtualViewOkTest", "");
+        String content = Utils.content1;
+        Utils.content1 = "Included Page";
+        Utils.createDoc(hibstore, "Main", "IncludeTest2", context);
+        Utils.content1 = "#includeTopic(\"Main.IncludeTest2\")\n";
+        Utils.createDoc(hibstore, "Main", "IncludeTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "IncludeTest");
     }
 
-    public void endVirtualViewOk(WebResponse webResponse) {
+    public void endInclude(WebResponse webResponse) {
         String result = webResponse.getText();
-        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        assertTrue("Could not find WebHome Content", result.indexOf("Included Page")!=-1);
     }
 
-    public void testVirtualViewOk() throws IOException, Throwable {
-        try {
-            ActionServlet servlet = new ActionServlet();
-            servlet.init(config);
-            servlet.service(request, response);
-            cleanSession(session);
-        } catch (ServletException e) {
-            e.getRootCause().printStackTrace();
-            throw e.getRootCause();
-        }
+    public void testIncludeEdit() throws IOException, Throwable {
+        launchTest();
     }
 
+    public void beginIncludeEdit(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        String content = Utils.content1;
+        Utils.content1 = "Included Page";
+        Utils.createDoc(hibstore, "Main", "IncludeTest2", context);
+        Utils.content1 = "#includeTopic(\"IncludeTest2\")\n#includeForm(\"Main.IncludeTest3\")";
+        Utils.createDoc(hibstore, "Main", "IncludeTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "edit", "IncludeTest");
+    }
+
+    public void endIncludeEdit(WebResponse webResponse) {
+        String result = webResponse.getText();
+        assertTrue("Could not find WebHome Content", result.indexOf("includeTopic")!=-1);
+        assertTrue("Could not find Include page messages", result.indexOf("edit/Main/IncludeTest2")!=-1);
+        assertTrue("Could not find Include page messages", result.indexOf("edit/Main/IncludeTest3")!=-1);
+    }
+
+    public void testInclude() throws IOException, Throwable {
+        launchTest();
+    }
 
 }

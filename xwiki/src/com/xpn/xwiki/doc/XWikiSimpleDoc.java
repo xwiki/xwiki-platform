@@ -1365,21 +1365,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
 
     public String getRealLanguage(XWikiContext context) throws XWikiException {
-        XWikiDocInterface tdoc = getTranslatedDocument(context);
-
-        if (context.getAction().equals("edit")
-            ||context.getAction().equals("preview"))
-            return tdoc.getLanguage();
-        
-        if (tdoc.isNew())
+        String lang = getLanguage();
+        if ((lang.equals("")||lang.equals("default")))
             return getDefaultLanguage();
-        else {
-            String lang = tdoc.getLanguage();
-            if (lang.equals(""))
-                return getDefaultLanguage();
-            else
-                return lang;
-        }
+        else
+            return lang;
     }
 
     public List getTranslationList(XWikiContext context) throws XWikiException {

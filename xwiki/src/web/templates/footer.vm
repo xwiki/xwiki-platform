@@ -2,7 +2,7 @@
 
 <div id="xwikidocinfo">
 #if ($tdoc)
-$msg.get("language"): $doc.getRealLanguage()
+$msg.get("language"): $tdoc.getRealLanguage()
 &nbsp;Creation Date: $!formatter.formatShortDateTime($tdoc.creationDate)
 <br />
 Author: $tdoc.author

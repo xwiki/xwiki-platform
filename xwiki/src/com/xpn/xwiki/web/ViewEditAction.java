@@ -627,12 +627,13 @@ public class ViewEditAction extends XWikiAction
 
     private ActionForward executeSave(XWiki xwiki, XWikiDocInterface doc, ActionForm form, HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws XWikiException, IOException {
         String language = ((EditForm)form).getLanguage();
+        String defaultLanguage = ((EditForm)form).getDefaultLanguage();
         XWikiDocInterface tdoc;
 
         if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
+            // Need to save parent and defaultLanguage if they have changed
             tdoc = doc;
         } else {
-            // Need to save parent and defaultLanguage if they have changed
             tdoc = doc.getTranslatedDocument(language, context);
             tdoc.setLanguage(language);
             tdoc.setTranslation(1);
@@ -696,8 +697,7 @@ public class ViewEditAction extends XWikiAction
         String language = context.getWiki().getLanguagePreference(context);
         String languagefromrequest = context.getRequest().getParameter("language");
 
-        if ((doc.isNew())||
-           ((tdoc.isNew())&&(languagefromrequest==null))) {
+        if ((doc.isNew())||("default".equals(languagefromrequest))) {
                // In this case the created document is going to be the default document
                tdoc = doc;
                context.put("tdoc", doc);
@@ -706,10 +706,17 @@ public class ViewEditAction extends XWikiAction
                 doc.setDefaultLanguage(language);
                 doc.setLanguage("");
                }
-        }
-
-        if (tdoc.isNew()&&(languagefromrequest!=null)) {
-            tdoc.setContent(doc.getContent());
+        } else {
+            // If the translated doc object is the same as the doc object
+            // this means the translated doc did not exists so we need to create it
+            if (tdoc==doc) {
+                tdoc = new XWikiSimpleDoc(doc.getWeb(), doc.getName());
+                tdoc.setLanguage(language);
+                tdoc.setContent(doc.getContent());
+                tdoc.setAuthor(context.getUser());
+                context.put("tdoc", tdoc);
+                vcontext.put("tdoc", new Document(tdoc, context));
+            }
         }
 
         tdoc.readFromTemplateForEdit(peform, context);

@@ -60,7 +60,7 @@ public class EditForm extends ActionForm
         setName(request.getParameter("name"));
         setParent(request.getParameter("parent"));
         setLanguage(request.getParameter("language"));
-        setDefaultLanguage(request.getParameter("defaultLanguage"));
+        setDefaultLanguage(request.getParameter("default_language"));
         this.request = request;
     }
 

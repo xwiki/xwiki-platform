@@ -12,6 +12,7 @@ $tdoc.getRenderedContent($tdoc.content)
 <p>
 <input type="hidden" name="content" value="$xwiki.getFormEncoded($tdoc.content)" />
 <input type="hidden" name="parent" value="$!doc.getParent()" />
+<input type="hidden" name="defaultLanguage" value="$!doc.getDefaultLanguage()" />
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <input type="hidden" name="language" value="$!request.getParameter("language")" />

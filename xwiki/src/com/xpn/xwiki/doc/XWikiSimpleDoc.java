@@ -757,6 +757,10 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         String parent = eform.getParent();
         if (parent!=null)
             setParent(parent);
+        String defaultLanguage = eform.getDefaultLanguage();
+        if (defaultLanguage!=null)
+            setDefaultLanguage(defaultLanguage);
+
         readFromTemplate(eform, context);
 
         Iterator itobj = getxWikiObjects().keySet().iterator();
@@ -1369,8 +1373,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         
         if (tdoc.isNew())
             return getDefaultLanguage();
-        else
-            return tdoc.getLanguage();
+        else {
+            String lang = tdoc.getLanguage();
+            if (lang.equals(""))
+                return getDefaultLanguage();
+            else
+                return lang;
+        }
     }
 
     public List getTranslationList(XWikiContext context) throws XWikiException {

@@ -381,10 +381,13 @@ public class MyFormAuthentication extends AbstractAuthentication
     {
         if (theConnection.getResponseCode() != getExpectedAuthResponse())
         {
+
             throw new Exception("Received a status code ["
                 + theConnection.getResponseCode()
                 + "] and was expecting a ["
-                + getExpectedAuthResponse() + "]");
+                + getExpectedAuthResponse() + "]\nURL: "
+                + theConnection.getURL().toString() + "\nPost: "
+                + theConnection.getRequestProperties().toString());
         }
     }
 

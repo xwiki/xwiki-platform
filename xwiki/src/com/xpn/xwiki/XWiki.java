@@ -202,4 +202,24 @@ public class XWiki {
         this.test = test;
     }
 
+    public String getSkin(XWikiContext context) {
+        // TODO: implement a cache for the documents
+        try {
+         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+         return doc.getxWikiObject().get("skin").toString();
+        } catch (Exception e) {
+            return "default";
+        }
+    }
+
+    public String getWebCopyright(XWikiContext context) {
+        // TODO: implement a cache for the documents
+        try {
+         XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+         return doc.getxWikiObject().get("webcopyright").toString();
+        } catch (Exception e) {
+            return "Copyright 2003,2004 (c) Ludovic Dubost";
+        }
+    }
+
 }

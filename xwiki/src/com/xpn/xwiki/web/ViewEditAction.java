@@ -115,6 +115,13 @@ public class ViewEditAction extends XWikiAction
             // forward to view template
             return (mapping.findForward("view"));
         }
+        else if ( action.equals("inline")) {
+            // Set display context to 'view'
+            context.put("display", "edit");
+
+            // forward to view template
+            return (mapping.findForward("inline"));
+        }
         else if ( action.equals("edit") )
         {
             PrepareEditForm eform = (PrepareEditForm) form;
@@ -161,7 +168,9 @@ public class ViewEditAction extends XWikiAction
         else if ( action.equals("preview") )
         {
             EditForm eform = (EditForm)form;
-            doc.setContent(eform.getContent());
+            String content = eform.getContent();
+            if ((content!=null)&&(!content.equals("")))
+             doc.setContent(content);
             String parent = eform.getParent();
             if (parent!=null)
                 doc.setParent(parent);
@@ -200,7 +209,9 @@ public class ViewEditAction extends XWikiAction
         else if (action.equals("save"))
         {
             EditForm eform = (EditForm)form;
-            doc.setContent(eform.getContent());
+            String content = eform.getContent();
+            if ((content!=null)&&(!content.equals("")))
+             doc.setContent(content);
             String parent = eform.getParent();
             if (parent!=null)
                 doc.setParent(parent);

@@ -106,7 +106,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
             output.append("</span><a href=\"");
             output.append(doc.getActionUrl("edit", context));
             output.append("?parent=");
-            output.append(doc.getFullName());
+            output.append(parentdoc.getFullName());
             output.append("\">?</a>");
         } else {
             output.append(link);

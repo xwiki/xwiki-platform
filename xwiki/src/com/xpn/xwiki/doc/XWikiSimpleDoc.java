@@ -36,6 +36,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.IntegerProperty;
 
@@ -470,4 +471,41 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public void setTemplate(String template) {
         this.template = template;
     }
+
+    public String display(String fieldname, String type, XWikiContext context) {
+        try {
+            type = type.toLowerCase();
+            StringBuffer result = new StringBuffer();
+            PropertyClass pclass = (PropertyClass) getxWikiClass().get(fieldname);
+            if (type.equals("view")) {
+               pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
+            }
+            else if (type.equals("edit")) {
+                           pclass.displayEdit(result, fieldname, "object_", getxWikiObject(), context);
+                        }
+            else if (type.equals("hidden")) {
+                           pclass.displayHidden(result, fieldname, "object_", getxWikiObject(), context);
+                        }
+            else if (type.equals("search")) {
+                           pclass.displaySearch(result, fieldname, "object_", getxWikiObject(), context);
+                        }
+            else {
+                pclass.displayView(result, fieldname, "object_", getxWikiObject(), context);
+            }
+            return result.toString();
+        }
+        catch (Exception e) {
+            return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
+        }
+    }
+
+        public String display(String fieldname, XWikiContext context) {
+           String type = null;
+           try { type = (String) context.get("display"); }
+           catch (Exception e) {
+           };
+           if (type==null)
+            type = "view";
+           return display(fieldname, type, context);
+        }
 }

@@ -48,6 +48,9 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.*;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.net.smtp.SMTPClient;
+import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
@@ -68,6 +71,7 @@ import javax.servlet.FilterConfig;
 import java.io.File;
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -76,6 +80,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.Random;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -724,6 +729,26 @@ public class XWiki implements XWikiNotificationInterface {
             bclass.put("fullname", fullname_class);
         }
 
+        if (bclass.get("first_name")==null) {
+            needsUpdate = true;
+            StringClass firstname_class = new StringClass();
+            firstname_class.setName("first_name");
+            firstname_class.setPrettyName("First Name");
+            firstname_class.setSize(30);
+            firstname_class.setObject(bclass);
+            bclass.put("first_name", firstname_class);
+        }
+
+        if (bclass.get("last_name")==null) {
+            needsUpdate = true;
+            StringClass lastname_class = new StringClass();
+            lastname_class.setName("last_name");
+            lastname_class.setPrettyName("Last Name");
+            lastname_class.setSize(30);
+            lastname_class.setObject(bclass);
+            bclass.put("last_name", lastname_class);
+        }
+
         if (bclass.get("email")==null) {
             needsUpdate = true;
             StringClass email_class = new StringClass();
@@ -742,6 +767,26 @@ public class XWiki implements XWikiNotificationInterface {
             passwd_class.setSize(10);
             passwd_class.setObject(bclass);
             bclass.put("password", passwd_class);
+        }
+
+        if (bclass.get("validkey")==null) {
+            needsUpdate = true;
+            StringClass validkey_class = new StringClass();
+            validkey_class.setName("validkey");
+            validkey_class.setPrettyName("Validation Key");
+            validkey_class.setSize(10);
+            validkey_class.setObject(bclass);
+            bclass.put("validkey", validkey_class);
+        }
+
+        if (bclass.get("active")==null) {
+            needsUpdate = true;
+            BooleanClass active_class = new BooleanClass();
+            active_class.setName("active");
+            active_class.setPrettyName("Active");
+            active_class.setDisplayType("yesno");
+            active_class.setObject(bclass);
+            bclass.put("active", active_class);
         }
 
         if (bclass.get("comment")==null) {
@@ -879,18 +924,136 @@ public class XWiki implements XWikiNotificationInterface {
     }
 
     public int createUser(XWikiContext context) throws XWikiException {
+        return createUser(false, context);
+    }
+
+    public int createUser(boolean withValidation, XWikiContext context) throws XWikiException {
+        try {
         HttpServletRequest request = (HttpServletRequest) context.getRequest();
         Map map = Util.getObject(request, "register");
         String xwikiname = request.getParameter("xwikiname");
         String password2 = request.getParameter("register2_password");
         String password = ((String[])map.get("password"))[0];
+        String email = ((String[])map.get("email"))[0];
 
         if (!password.equals(password2)) {
             // TODO: throw wrong password exception
             return -1;
         }
 
+        if (withValidation) {
+            map.put("active", "0");
+            String validkey = generateValidationKey(16);
+            map.put("validkey", validkey);
+
+            // Send the validation email
+            sendValidationEmail(email, validkey, context);
+
+        } else {
+            // Mark user active
+            map.put("active", "1");
+        }
+
         return createUser(xwikiname, map, context);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_CREATE_USER,
+                                   "Exception while creating user", e, null);
+        }
+    }
+
+    public void sendValidationEmail(String email, String validkey, XWikiContext context) throws XWikiException {
+     String sender;
+     String content;
+
+     try {
+         XWikiDocInterface doc = getDocument("XWiki.Inscription", context);
+         sender = getXWikiPreference("validation_email_sender", context);
+         content = getXWikiPreference("validation_email_content", context);
+     } catch (Exception e) {
+         throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG,
+                                "Exception while reading the validation email config", e, null);
+
+     }
+
+     try {
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        vcontext.put("validkey", validkey);
+        vcontext.put("email", email);
+        vcontext.put("sender", sender);
+        content = parseContent(content, context);
+    } catch (Exception e) {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
+                               "Exception while preparing the validation email", e, null);
+
+    }
+
+        // Let's now send the message
+        sendMessage(sender, email, content, context);
+    }
+
+    public void sendMessage(String sender, String[] recipient, String message, XWikiContext context) throws XWikiException {
+        SMTPClient smtpc = null;
+        try {
+            String server = getXWikiPreference("smtp_server", context);
+            String port = getXWikiPreference("smtp_port", context);
+            String login = getXWikiPreference("smtp_login", context);
+
+            if ((server==null)||server.equals(""))
+             server = "127.0.0.1";
+            if ((port==null)||(port.equals("")))
+             port = "25";
+            if ((login==null)||login.equals(""))
+             login = "XWiki version " + getVersion();
+
+            smtpc = new SMTPClient();
+            smtpc.connect(server, Integer.parseInt(port));
+            int reply = smtpc.getReplyCode();
+            if (!SMTPReply.isPositiveCompletion(reply)) {
+                Object[] args = { server, port, new Integer(reply), smtpc.getReplyString() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
+                        "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
+            }
+
+            if (smtpc.login(login)==false) {
+                reply = smtpc.getReplyCode();
+                Object[] args = { server, port, new Integer(reply), smtpc.getReplyString() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
+                        "Could not login to mail server {0} port {1} error code {2} ({3})", null, args);
+            }
+
+            if (smtpc.sendSimpleMessage(sender, recipient, message)==false) {
+                reply = smtpc.getReplyCode();
+                Object[] args = { server, port, new Integer(reply), smtpc.getReplyString() };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
+                        "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
+            }
+        } catch (IOException e) {
+            Object[] args = { sender, recipient };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL, XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL,
+                    "Exception while sending email from {0} to {1}", e, args);
+        } finally {
+            if ((smtpc != null)&&(smtpc.isConnected())) {
+                try {
+                    smtpc.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void sendMessage(String sender, String recipient, String message, XWikiContext context) throws XWikiException {
+        String[] recip = { recipient };
+        sendMessage(sender, recip, message, context);
+    }
+
+
+    public String generateValidationKey(int size) {
+        return RandomStringUtils.randomAlphanumeric(16);
     }
 
     public int createUser(String xwikiname, Map map, XWikiContext context) throws XWikiException {

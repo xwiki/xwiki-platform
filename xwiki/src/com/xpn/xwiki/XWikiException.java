@@ -29,6 +29,12 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 
 public class XWikiException extends Exception {
+    private int module;
+    private int code;
+    private Throwable exception;
+    private Object[] args;
+    private String message;
+
     // Module list
     public static final int MODULE_XWIKI = 0;
     public static final int MODULE_XWIKI_CONFIG = 1;
@@ -40,6 +46,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_CLASSES = 7;
     public static final int MODULE_XWIKI_USER = 8;
     public static final int MODULE_XWIKI_ACCESS = 9;
+    public static final int MODULE_XWIKI_EMAIL = 10;
     public static final int MODULE_XWIKI_APP = 11;
 
     // Error list
@@ -102,16 +109,18 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
 
+    public static final int ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG = 10001;
+    public static final int ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL = 10002;
+    public static final int ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL = 10003;
+    public static final int ERROR_XWIKI_EMAIL_CONNECT_FAILED = 10004;
+    public static final int ERROR_XWIKI_EMAIL_LOGIN_FAILED = 10005;
+    public static final int ERROR_XWIKI_EMAIL_SEND_FAILED = 10006;
+
     public static final int ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST = 11001;
     public static final int ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY = 11002;
     public static final int ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND = 11003;
+    public static final int ERROR_XWIKI_APP_CREATE_USER = 11004;
 
-
-    private int module;
-    private int code;
-    private Throwable exception;
-    private Object[] args;
-    private String message;
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {
         setModule(module);

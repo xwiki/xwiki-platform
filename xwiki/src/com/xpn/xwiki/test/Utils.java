@@ -404,11 +404,15 @@ public class Utils {
         propclass.setObject(bclass);
         bclass.addField(propname, propclass);
         doc.setxWikiClass(bclass);
-        BaseObject bobject = new BaseObject();
+
+        BaseObject bobject = doc.getxWikiObject();
+        if (bobject==null) {
+          bobject = new BaseObject();
+          doc.addObject(docName, bobject);
+        }
         bobject.setName(docName);
         bobject.setClassName(bclass.getName());
         bobject.setStringValue(propname, propvalue);
-        doc.addObject(docName, bobject);
         xwiki.saveDocument(doc, context);
     }
 
@@ -435,11 +439,14 @@ public class Utils {
         xwiki.saveDocument(classdoc, context);
 
         XWikiDocInterface doc = xwiki.getDocument(docName, context);
-        BaseObject bobject = new BaseObject();
+        BaseObject bobject = doc.getObject(className, 0);
+        if (bobject==null) {
+          bobject = new BaseObject();
+          doc.addObject(className, bobject);
+        }
         bobject.setName(docName);
         bobject.setClassName(bclass.getName());
         bobject.setStringValue(propname, propvalue);
-        doc.addObject(className, bobject);
         xwiki.saveDocument(doc, context);
     }
 

@@ -111,7 +111,7 @@ public class UserTest extends TestCase {
         doc.setContent("---+ AdminGroup");
         xwiki.saveDocument(doc, context);
 
-        doc = new XWikiSimpleDoc("XWiki","TestDoc");
+        doc = new XWikiSimpleDoc("Test","TestDoc");
         doc.setContent("---+ TestDoc");
         xwiki.saveDocument(doc, context);
 
@@ -234,7 +234,7 @@ public class UserTest extends TestCase {
     }
 
     public void testUserAccessRead()  throws XWikiException, NotFoundException {
-        String docname = "XWiki.TestDoc";
+        String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
         inTest = true;
@@ -259,7 +259,7 @@ public class UserTest extends TestCase {
     }
 
       public void testUserAccessReadWithAdmin()  throws XWikiException, NotFoundException {
-        String docname = "XWiki.TestDoc";
+        String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
         inTest = true;
@@ -288,12 +288,12 @@ public class UserTest extends TestCase {
     }
 
     public void testUserAccessReadWithWebGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
       // Give positive Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
+      updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -316,13 +316,13 @@ public class UserTest extends TestCase {
   }
 
     public void testUserAccessReadWithWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
 
       // Give negative Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
+      updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -347,7 +347,7 @@ public class UserTest extends TestCase {
 
 
    public void testUserAccessReadWithXWikiGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -375,7 +375,7 @@ public class UserTest extends TestCase {
   }
 
     public void testUserAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -403,14 +403,14 @@ public class UserTest extends TestCase {
   }
 
   public void testUserAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
       // Give negative Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
+      updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -433,7 +433,7 @@ public class UserTest extends TestCase {
   }
 
     public void testUserAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -441,7 +441,7 @@ public class UserTest extends TestCase {
       // Give negative XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
       // Give postive Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
+      updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -465,16 +465,23 @@ public class UserTest extends TestCase {
 
 
     public void testGroupAccessRead()  throws XWikiException, NotFoundException {
-        String docname = "XWiki.TestDoc";
+        String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
         inTest = true;
         assertTrue("View Access should be allowed",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+
+        updateRight(docname, "", "XWiki.AdminGroup","view", true, false);
+        xwiki.flushCache();
+        assertFalse("View Access should be refused",
+                     am.userHasAccessLevel("XWiki.JohnDoe", docname, "view"));
+
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
         xwiki.flushCache();
         assertFalse("View Access should be refused",
                     am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
+
         updateRight(docname, "XWiki.Ludovic","","view", true, false);
         xwiki.flushCache();
         assertFalse("View Access should be refused",
@@ -490,7 +497,7 @@ public class UserTest extends TestCase {
     }
 
       public void testGroupAccessReadWithAdmin()  throws XWikiException, NotFoundException {
-        String docname = "XWiki.TestDoc";
+        String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
         inTest = true;
@@ -519,12 +526,12 @@ public class UserTest extends TestCase {
     }
 
     public void testGroupAccessReadWithWebGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
       // Give positive Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+      updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -547,13 +554,13 @@ public class UserTest extends TestCase {
   }
 
     public void testGroupAccessReadWithWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
 
       // Give negative Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+      updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -578,7 +585,7 @@ public class UserTest extends TestCase {
 
 
    public void testGroupAccessReadWithXWikiGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -606,7 +613,7 @@ public class UserTest extends TestCase {
   }
 
     public void testGroupAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -634,14 +641,14 @@ public class UserTest extends TestCase {
   }
 
   public void testGroupAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
       // Give negative Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
+      updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));
@@ -664,7 +671,7 @@ public class UserTest extends TestCase {
   }
 
     public void testGroupAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException, NotFoundException {
-      String docname = "XWiki.TestDoc";
+      String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
       inTest = true;
@@ -672,7 +679,7 @@ public class UserTest extends TestCase {
       // Give negative XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
       // Give postive Web Global right to LudovicDubost
-      updateRight("XWiki.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
+      updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
                   am.userHasAccessLevel("XWiki.LudovicDubost", docname, "view"));

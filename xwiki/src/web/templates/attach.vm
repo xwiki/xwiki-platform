@@ -52,7 +52,7 @@ function updateName(form) {
 }
 </script>
 Choose the target file name:
-<input type="text" name="filename" value="" size="20" "/>
+<input type="text" name="filename" value="" size="20" />
 <br /><br />
 Choose a file to upload:
 <input type="file" name="filepath" value="" size="40"  />

@@ -79,5 +79,4 @@ public class XWikiTest extends TestCase {
                 "altern", true, context);
     }
 
-
 }

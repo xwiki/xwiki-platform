@@ -159,11 +159,25 @@ public class XWiki extends Api {
     }
 
     public int createUser() throws XWikiException {
+        return createUser(false);
+    }
+
+    public int createUser(boolean withValidation) throws XWikiException {
         if (checkProgrammingRights())
-         return xwiki.createUser(context);
+         return xwiki.createUser(withValidation, context);
         else
          return -2;
         // TODO: We might need to send a notification email here.
+    }
+
+    public void sendMessage(String sender, String recipient, String message) throws XWikiException {
+        if (checkProgrammingRights())
+            xwiki.sendMessage(sender, recipient, message, context);
+    }
+
+    public void sendMessage(String sender, String[] recipient, String message) throws XWikiException {
+        if (checkProgrammingRights())
+            xwiki.sendMessage(sender, recipient, message, context);
     }
 
     public String includeTopic(String topic) {
@@ -177,7 +191,7 @@ public class XWiki extends Api {
 
     public boolean hasAccessLevel(String level) {
        try {
-           return xwiki.getAccessmanager().userHasAccessLevel(context.getUser(), context.getDoc().getFullName(), "admin");
+           return xwiki.getAccessmanager().userHasAccessLevel(context.getUser(), context.getDoc().getFullName(), level);
        } catch (Exception e) {
            return false;
        }

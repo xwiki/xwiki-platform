@@ -64,7 +64,7 @@ public class XWikiBaseProvider {
         }
 
         context.setDatabase(null);
-        if (name.startsWith("XWiki."))
+        if (name.indexOf(".") !=-1)
             return name;
         else
             return "XWiki." + name;

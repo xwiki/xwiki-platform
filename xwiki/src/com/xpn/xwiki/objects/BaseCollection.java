@@ -130,6 +130,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
+    /*
     public Set getSetValue(String name) {
         SetProperty prop = (SetProperty)safeget(name);
         if (prop==null)
@@ -143,7 +144,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         property.setValue(value);
         safeput(name, property);
     }
-
+    */
 
     public Map getFields() {
         return fields;

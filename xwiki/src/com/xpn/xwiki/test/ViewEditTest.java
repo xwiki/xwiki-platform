@@ -39,7 +39,7 @@ import com.xpn.xwiki.XWikiException;
 
 public class ViewEditTest extends ServletTestCase {
 
-    public static String hibpath = "./hibernate-test.cfg.xml";
+    public static String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() {};
     public void cleanUp() {};
@@ -47,7 +47,7 @@ public class ViewEditTest extends ServletTestCase {
     public void clientSetUp() throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
         com.xpn.xwiki.test.StoreObjectTest.cleanUp(hibstore);
-        XWikiSimpleDoc doc1 = new XWikiSimpleDoc(com.xpn.xwiki.test.StoreTest.web, com.xpn.xwiki.test.StoreTest.name);
+        XWikiSimpleDoc doc1 = new XWikiSimpleDoc(com.xpn.xwiki.test.StoreTest.web, "ViewOkTest");
         doc1.setContent(com.xpn.xwiki.test.StoreTest.content1);
         doc1.setAuthor(com.xpn.xwiki.test.StoreTest.author);
         doc1.setParent(com.xpn.xwiki.test.StoreTest.parent);
@@ -55,9 +55,8 @@ public class ViewEditTest extends ServletTestCase {
     }
 
     public void beginViewNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
-        clientSetUp();
-        webRequest.setURL("127.0.0.1:9080", "/xwiki", "/bin", "/view/" + com.xpn.xwiki.test.StoreTest.web + "/"
-                            + "Gloubiboulga", "");
+        webRequest.setURL("127.0.0.1:9080", "/xwiki", "/testbin", "/view/" + com.xpn.xwiki.test.StoreTest.web + "/"
+                            + "ViewNotOkTest", "");
     }
 
     public void endViewNotOk(WebResponse webResponse) {
@@ -65,22 +64,21 @@ public class ViewEditTest extends ServletTestCase {
         assertTrue("Page should have generated an error", result.indexOf("No row")!=-1);
     }
 
-    public void testViewNotOk() throws IOException, ServletException, HibernateException, XWikiException {
-        clientSetUp();
+    public void testViewNotOk() throws IOException, ServletException {
         ActionServlet servlet = new ActionServlet();
         servlet.init(config);
         servlet.service(request, response);
     }
 
-    public void beginViewOk(WebRequest webRequest)
-    {
-        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/bin", "/view/" + com.xpn.xwiki.test.StoreTest.web + "/"
-                            + com.xpn.xwiki.test.StoreTest.name, "");
+    public void beginViewOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        clientSetUp();
+        webRequest.setURL("127.0.0.1:9080", "/xwiki" , "/testbin", "/view/" + com.xpn.xwiki.test.StoreTest.web + "/"
+                            + "ViewOkTest", "");
     }
 
     public void endViewOk(WebResponse webResponse) {
         String result = webResponse.getText();
-        assertTrue("Could not find WebHome Content", result.indexOf("See ")!=-1);
+        assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
     }
 
     public void testViewOk() throws IOException, ServletException {

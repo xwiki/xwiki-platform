@@ -44,6 +44,7 @@ public class XWiki {
     private XWikiStoreInterface store;
     private XWikiRenderingEngine renderingEngine;
     private MetaClass metaclass = MetaClass.getMetaClass();
+    private boolean test = false;
 
     public XWiki(String path, XWikiContext context) throws XWikiException {
       config = new XWikiConfig(path);
@@ -191,6 +192,14 @@ public class XWiki {
 
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
       return store.searchDocuments(wheresql, nb, start);
+    }
+
+    public boolean isTest() {
+        return test;
+    }
+
+    public void setTest(boolean test) {
+        this.test = test;
     }
 
 }

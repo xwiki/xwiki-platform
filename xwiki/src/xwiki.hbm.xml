@@ -134,7 +134,7 @@
             </property>
         </joined-subclass>
 
-        <joined-subclass name="com.xpn.xwiki.objects.DoubleProperty" table="xwikidouble">
+        <joined-subclass name="com.xpn.xwiki.objects.DoubleProperty" table="xwikidoubles">
             <key>
                 <column name="XWD_ID"  />
                 <column name="XWD_NAME"  />

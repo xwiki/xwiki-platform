@@ -91,10 +91,16 @@ public class ViewEditAction extends XWikiAction
         // fetch action from mapping
         action = mapping.getName();
 
+        // Test works with xwiki-test.cfg instead of xwiki.cfg
+        boolean test = false;
+        if (request.getServletPath().startsWith ("/testbin")) {
+          test = true;
+        }
+
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
         XWikiContext context = new XWikiContext();
         context.setServlet(servlet);
-        XWiki xwiki = getXWiki(context);
+        XWiki xwiki = getXWiki(context, test);
         XWikiDocInterface doc;
         doc = xwiki.getDocumentFromPath(request.getPathInfo());
         context.put("doc", doc);

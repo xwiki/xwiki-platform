@@ -33,13 +33,23 @@ import javax.servlet.http.HttpServlet;
 
 public class XWikiAction extends Action {
 
-    public XWiki getXWiki(XWikiContext context) throws XWikiException {
-      XWiki xwiki = (XWiki) servlet.getServletContext().getAttribute("xwiki");
-      if (xwiki == null) {
-          String path = servlet.getServletContext().getRealPath("WEB-INF/xwiki.cfg");
-          xwiki = new XWiki(path, context);
-          servlet.getServletContext().setAttribute("xwiki", xwiki);
-      }
+    public XWiki getXWiki(XWikiContext context, boolean test) throws XWikiException {
+        String xwikicfg = "WEB-INF/xwiki.cfg";
+        String xwikiname = "xwiki";
+
+
+        if (test) {
+            xwikicfg = "WEB-INF/xwiki-test.cfg";
+            xwikiname = "xwikitest";
+        }
+
+        XWiki xwiki = (XWiki) servlet.getServletContext().getAttribute(xwikiname);
+
+        if (xwiki == null) {
+            String path = servlet.getServletContext().getRealPath(xwikicfg);
+            xwiki = new XWiki(path, context);
+            servlet.getServletContext().setAttribute(xwikiname, xwiki);
+        }
         context.setWiki(xwiki);
         return xwiki;
     }

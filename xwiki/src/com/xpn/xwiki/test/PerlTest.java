@@ -39,7 +39,7 @@ public class PerlTest extends TestCase {
 
     public PerlTest() throws XWikiException {
         context = new XWikiContext();
-        xwiki = new XWiki("c:/dev/java/xwiki/test/xwiki.cfg", context);
+        xwiki = new XWiki("./xwiki.cfg", context);
         perlplugin = new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
                         xwiki.Param("xwiki.perl.pluginspath"),
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0);

@@ -5,7 +5,7 @@
 $msg.get("language"): $tdoc.getRealLanguage()
 &nbsp;Creation Date: $!formatter.formatShortDateTime($tdoc.creationDate)
 <br />
-Author: $tdoc.author
+$msg.get("author"): $tdoc.author
 &nbsp;Last Modification Date: $!formatter.formatShortDateTime($tdoc.date)
 #end
 </div>

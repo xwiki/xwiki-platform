@@ -685,11 +685,12 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getWebCopyright(XWikiContext context) {
         try {
-            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
-            return ((BaseProperty)doc.getxWikiObject().get("webcopyright")).getValue().toString();
+            String result = getXWikiPreference("webcopyright", "", context);
+            if (!result.equals(""))
+                return result;
         } catch (Exception e) {
-            return "Copyright 2003,2004 (c) Ludovic Dubost";
         }
+        return "Copyright 2004 (c) Contributing Authors";
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context) {
@@ -950,7 +951,7 @@ public class XWiki implements XWikiNotificationInterface {
             doc.setWeb("XWiki");
             doc.setName("XWikiUsers");
         }
-        BaseClass bclass = doc.getxWikiClass();
+        iBaseClass bclass = doc.getxWikiClass();
         bclass.setName("XWiki.XWikiUsers");
         if (bclass.get("fullname")==null) {
             needsUpdate = true;

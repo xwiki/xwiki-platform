@@ -57,40 +57,19 @@ public class NumberClass  extends PropertyClass {
     }
 
     public int getSize() {
-        try {
-            return ((NumberProperty)get("size")).getValue().intValue();
-        } catch (Exception e) {
-            // This should not happen
-            return 30;
-        }
+        return getIntValue("size");
     }
 
     public void setSize(int size) {
-        NumberProperty property = new NumberProperty();
-        property.setValue(new Integer(size));
-        try {
-            put("size", property);
-        } catch (XWikiException e) {
-            // This should never happen because size has been declared in the meta-class
-        };
+        setIntValue("size", size);
     }
 
     public String getNumberType() {
-        try {
-            return ((StringProperty)get("number_type")).getValue();
-        } catch (Exception e) {
-            return "long";
-        }
+        return getStringValue("number_type");
     }
 
     public void setNumberType(String ntype) {
-        StringProperty property = new StringProperty();
-        property.setValue(ntype);
-        try {
-            put("number_type", property);
-        } catch (XWikiException e) {
-            // This should never happen because number_type has been declared in the meta-class
-        }
+        setStringValue("number_type", ntype);
     }
 
 

@@ -30,6 +30,15 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 
 public abstract class PropertyClass extends BaseObject implements PropertyClassInterface {
 
+    public void checkField(String name) throws XWikiException {
+        if ((getxWikiClass().safeget(name)==null)&&
+            (getxWikiClass().safeget("meta" + name)==null)){
+            Object[] args = { name, getxWikiClass().getName() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
+                    "Field {0} does not exist in class {1}", null, args);
+        }
+    }
+
     public String toString(BaseProperty property) {
         return property.toString();  //To change body of implemented methods use Options | File Templates.
     }
@@ -49,7 +58,8 @@ public abstract class PropertyClass extends BaseObject implements PropertyClassI
     public BaseClass getxWikiClass() {
         BaseClass wclass = (BaseClass)super.getxWikiClass();
         if (wclass==null) {
-            wclass = new MetaClass();
+            MetaClass metaclass = MetaClass.getMetaClass();
+            wclass = (BaseClass)metaclass.get(getType());
             setxWikiClass(wclass);
         }
         return wclass;

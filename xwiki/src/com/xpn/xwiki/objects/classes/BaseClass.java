@@ -32,15 +32,11 @@ import java.util.Map;
 
 public class BaseClass extends PropertyClass implements ClassInterface {
     public PropertyInterface get(String name) {
-        return (PropertyInterface)fields.get(name);
+        return safeget(name);
     }
 
     public void put(String name, PropertyInterface property) {
-        fields.put(name, property);
-    }
-
-    public String[] getProperties() {
-        return (String[]) fields.keySet().toArray();
+        safeput(name, property);
     }
 
     public String toString() {
@@ -50,4 +46,6 @@ public class BaseClass extends PropertyClass implements ClassInterface {
     public BaseProperty fromString(String value) {
         return null;  //To change body of implemented methods use Options | File Templates.
     }
+
+
 }

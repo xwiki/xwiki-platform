@@ -48,21 +48,11 @@ public class StringClass extends PropertyClass {
     }
 
     public int getSize() {
-        try {
-            return ((NumberProperty)get("size")).getValue().intValue();
-        } catch (Exception e) {
-            return 30;
-        }
+        return getIntValue("size");
     }
 
     public void setSize(int size) {
-        NumberProperty property = new NumberProperty();
-        property.setValue(new Integer(size));
-        try {
-            put("size", property);
-        } catch (XWikiException e) {
-            // This should not happen
-        }
+        setIntValue("size", size);
     }
 
     public BaseProperty fromString(String value) {

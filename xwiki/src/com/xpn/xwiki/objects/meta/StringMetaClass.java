@@ -28,14 +28,17 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class StringMetaClass extends PropertyMetaClass {
 
-   public void StringMetaClass() {
+   public StringMetaClass() {
+    super();
     setType("stringmetaclass");
     setName("stringclass");
     setPrettyName("String Class");
 
     NumberClass size_class = new NumberClass(this);
+    size_class.setName("size");
+    size_class.setPrettyName("Size");
     size_class.setSize(5);
     size_class.setNumberType("integer");
-    safeput("size", size_class);
+    safeput("metasize", size_class);
   }
 }

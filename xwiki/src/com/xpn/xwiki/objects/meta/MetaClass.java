@@ -30,18 +30,28 @@ import com.xpn.xwiki.objects.PropertyInterface;
 
 public class MetaClass extends BaseClass {
 
-    public void XWikiMetaClass() {
+    private static MetaClass metaClass = new MetaClass();
+
+    public MetaClass() {
         NumberMetaClass numberclass = new NumberMetaClass();
-        put("numberclass", numberclass);
+        safeput("numberclass", numberclass);
         StringMetaClass stringclass = new StringMetaClass();
-        put("stringclass", stringclass);
+        safeput("stringclass", stringclass);
     }
 
     public PropertyInterface get(String name) {
-        return (PropertyInterface)fields.get(name);
+        return safeget(name);
     }
 
     public void put(String name, PropertyInterface property) {
-        fields.put(name, property);
+        safeput(name, property);
+    }
+
+    public static MetaClass getMetaClass() {
+        return metaClass;
+    }
+
+    public static void setMetaClass(MetaClass metaClass) {
+        MetaClass.metaClass = metaClass;
     }
 }

@@ -32,6 +32,10 @@ import java.io.FileNotFoundException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.BaseObject;
 
 
 public class XWikiSimpleDoc extends XWikiDefaultDoc {
@@ -52,6 +56,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     private boolean isContentDirty = false;
     // Used to make sure the MetaData String is regenerated
     private boolean isMetaDataDirty = false;
+
+    // Meta Data
+    private BaseClass xWikiClass;
+    private BaseObject xWikiObject;
+
 
     public long getId() {
         if (id==0) {
@@ -329,6 +338,45 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void setMostRecent(boolean mostRecent) {
         this.mostRecent = mostRecent;
+    }
+
+    public BaseClass getxWikiClass() {
+        if (xWikiClass==null) {
+            xWikiClass = new BaseClass();
+            // Test data
+            StringClass cat_class = new StringClass();
+            cat_class.setName("category");
+            cat_class.setPrettyName("Category");
+            cat_class.setSize(40);
+
+            NumberClass score_class = new NumberClass();
+            score_class.setSize(5);
+            score_class.setNumberType("integer");
+            score_class.setName("score");
+            score_class.setPrettyName("Score");
+
+            xWikiClass.safeput("category", cat_class);
+            xWikiClass.safeput("score", score_class);
+
+            // End test data
+        }
+        return xWikiClass;
+    }
+
+    public void setxWikiClass(BaseClass xWikiClass) {
+        this.xWikiClass = xWikiClass;
+    }
+
+    public BaseObject getxWikiObject() {
+        if (xWikiObject==null) {
+            xWikiObject = new BaseObject();
+            xWikiObject.setxWikiClass(getxWikiClass());
+        }
+        return xWikiObject;
+    }
+
+    public void setxWikiObject(BaseObject xWikiObject) {
+        this.xWikiObject = xWikiObject;
     }
 
 }

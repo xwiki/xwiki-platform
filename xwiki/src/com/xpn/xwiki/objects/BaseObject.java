@@ -35,9 +35,18 @@ public class BaseObject extends BaseProperty implements ObjectInterface {
     private BaseClass xWikiClass;
     protected Map fields = new HashMap();
 
+    public Object[] getProperties() {
+        Object[] array = fields.values().toArray();
+        return array;
+    }
+
+    public Object[] getPropertyNames() {
+        Object[] array = fields.keySet().toArray();
+        return array;
+    }
 
     public void checkField(String name) throws XWikiException {
-        if (getxWikiClass().get(name)==null) {
+        if (getxWikiClass().safeget(name)==null) {
             Object[] args = { name, getxWikiClass().getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST,
                     "Field {0} does not exist in class {1}", null, args);
@@ -71,14 +80,25 @@ public class BaseObject extends BaseProperty implements ObjectInterface {
         this.xWikiClass = xWikiClass;
     }
 
-    protected String getStringValue(String name) {
+    public String getStringValue(String name) {
         return ((StringProperty)safeget(name)).getValue();
     }
 
     public void setStringValue(String name, String value) {
-      StringProperty property = new StringProperty();
-      property.setValue(value);
-      safeput(name, property);
+        StringProperty property = new StringProperty();
+        property.setValue(value);
+        safeput(name, property);
     }
+
+    public int getIntValue(String name) {
+        return ((NumberProperty)safeget(name)).getValue().intValue();
+    }
+
+    public void setIntValue(String name, int value) {
+        NumberProperty property = new NumberProperty();
+        property.setValue(new Integer(value));
+        safeput(name, property);
+    }
+
 
 }

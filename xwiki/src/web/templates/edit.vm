@@ -6,11 +6,19 @@
 </div>
 </div>
 <div id="content">
+<div id="text">
 <form name="edit" method="post" action="$doc.getPreviewUrl($context)">
 <textarea name="content" cols="80" rows="20" >
 $doc.content
 </textarea>
 </form>
+</div>
+<div id="object">
+#parse("/templates/editobject.vm")
+</div>
+<div id="class">
+#parse("/templates/editclass.vm")
+</div>
 </div>
 <div id="nav_footer">
 <div id="actions">

@@ -28,6 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.objects.meta.MetaClass;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -36,6 +37,7 @@ public class XWiki {
     private XWikiConfig config;
     private XWikiStoreInterface store;
     private XWikiRenderingEngine renderingEngine;
+    private MetaClass metaclass = MetaClass.getMetaClass();
 
     public XWiki(String path) throws XWikiException {
       config = new XWikiConfig(path);
@@ -116,5 +118,13 @@ public class XWiki {
 
     public void setRenderingEngine(XWikiRenderingEngine renderingEngine) {
         this.renderingEngine = renderingEngine;
+    }
+
+    public MetaClass getMetaclass() {
+        return metaclass;
+    }
+
+    public void setMetaclass(MetaClass metaclass) {
+        this.metaclass = metaclass;
     }
 }

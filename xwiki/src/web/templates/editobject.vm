@@ -1,0 +1,5 @@
+<h2>Properties</h2>
+#foreach($prop in $doc.class.properties)
+Property: $prop.prettyName: [edit field]<br>
+#end
+</form>

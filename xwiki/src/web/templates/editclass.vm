@@ -1,0 +1,22 @@
+<h2>Class Description</h2>
+<form name="propadd" method="post" action="$doc.getActionUrl("propadd", $context)">
+Name: <input type="text" value="" size="20">
+<select name="proptype" size="1">
+<option value="---">Select a class</option>
+#foreach($prop in $xwiki.metaclass.properties)
+<option value="$prop.name">$prop.prettyName</option>
+#end
+</select>
+<input type="submit" value="Add Property">
+</form>
+<form name="propupdate" method="post" action="$doc.getActionUrl("propupdate", $context)">
+<br>Current Properties<br>
+#foreach($prop in $doc.xWikiClass.properties)
+Property: $prop.prettyName<br>
+<div id="proplist">
+#foreach ($classprop in $prop.propertyNames)
+Param $prop.xWikiClass.safeget("meta$classprop").getPrettyName(): $prop.get($classprop)<br>
+#end
+</div>
+#end
+</form>

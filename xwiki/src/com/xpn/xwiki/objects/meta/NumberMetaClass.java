@@ -28,19 +28,24 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class NumberMetaClass extends PropertyMetaClass {
 
-  public void NumberMetaClass() {
+  public NumberMetaClass() {
+    super();
     setType("numbermetaclass");
     setName("numberclass");
     setPrettyName("Number Class");
 
     StringClass type_class = new StringClass(this);
+    type_class.setName("number_type");
+    type_class.setPrettyName("Number Type");
     type_class.setSize(20);
 
     NumberClass size_class = new NumberClass(this);
+    size_class.setName("size");
+    size_class.setPrettyName("Size");
     size_class.setSize(5);
     size_class.setNumberType("integer");
 
-    safeput("number_type", type_class);
-    safeput("size", size_class);
+    safeput("metanumber_type", type_class);
+    safeput("metasize", size_class);
   }
 }

@@ -22,8 +22,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+
 
 public interface PropertyInterface extends ElementInterface {
     public int getId();

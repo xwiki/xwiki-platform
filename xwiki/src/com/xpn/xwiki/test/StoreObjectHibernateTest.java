@@ -1,16 +1,13 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.test.StoreTest;
-import com.xpn.xwiki.test.StoreObjectTest;
-import com.xpn.xwiki.test.StoreHibernateTest;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import net.sf.hibernate.HibernateException;
 
 import java.util.List;
@@ -40,18 +37,26 @@ import java.util.List;
 
 public class StoreObjectHibernateTest extends StoreObjectTest {
 
+    public XWikiHibernateStore store;
     public static String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() throws HibernateException {
         StoreHibernateTest.cleanUp(getHibStore());
     }
 
+    public void cleanUp() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+    
     public XWikiHibernateStore getHibStore() {
         return (XWikiHibernateStore) getStore();
     }
 
     public XWikiStoreInterface getStore() {
-       XWikiStoreInterface store = new XWikiHibernateStore(hibpath);
+       if (store!=null)
+        return store;
+       store = new XWikiHibernateStore(hibpath);
        return store;
    }
 

@@ -22,12 +22,12 @@
  */
 package com.xpn.xwiki.notify;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
-import java.util.Vector;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 public class DocObjectChangedRule extends DocChangeRule {
     private String className;

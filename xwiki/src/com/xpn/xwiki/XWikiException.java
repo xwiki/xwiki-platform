@@ -22,12 +22,11 @@
  */
 package com.xpn.xwiki;
 
-import net.sf.hibernate.HibernateException;
 import net.sf.hibernate.JDBCException;
 
-import java.text.MessageFormat;
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 
 public class XWikiException extends Exception {
     // Module list

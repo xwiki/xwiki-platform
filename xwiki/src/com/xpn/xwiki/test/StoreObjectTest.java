@@ -2,20 +2,17 @@
 
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import net.sf.hibernate.HibernateException;
-import java.util.List;
-import java.util.Map;
-import java.text.ParseException;
-
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
 import org.dom4j.DocumentException;
+
+import java.text.ParseException;
 
 /**
  * ===================================================================

@@ -24,14 +24,12 @@ package com.xpn.xwiki.objects;
 
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-import java.io.Serializable;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     private BaseClass xWikiClass;

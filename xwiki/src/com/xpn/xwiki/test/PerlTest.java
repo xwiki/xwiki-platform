@@ -22,11 +22,11 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiPerlPluginRenderer;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import junit.framework.TestCase;
 

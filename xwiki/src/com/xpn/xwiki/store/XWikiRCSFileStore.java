@@ -22,23 +22,26 @@
  */
 package com.xpn.xwiki.store;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.jrcs.rcs.*;
+import org.apache.commons.jrcs.rcs.Archive;
+import org.apache.commons.jrcs.rcs.Lines;
+import org.apache.commons.jrcs.rcs.Node;
+import org.apache.commons.jrcs.rcs.Version;
+
 import java.io.*;
-import java.util.Hashtable;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
-import java.util.ArrayList;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
     private File rscpath;

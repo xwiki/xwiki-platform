@@ -1,19 +1,18 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
 
+import java.io.*;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
 import java.util.Vector;
-import java.io.*;
-
-import junit.framework.TestCase;
 
 /**
  * ===================================================================

@@ -23,15 +23,14 @@
 
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import org.apache.oro.text.regex.*;
-import org.apache.ecs.html.A;
+import com.xpn.xwiki.util.Util;
+
 import java.util.StringTokenizer;
 
 public class XWikiWikiBaseRenderer implements XWikiRenderer {

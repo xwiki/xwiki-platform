@@ -22,9 +22,6 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.struts.action.RequestProcessor;
-import org.apache.commons.lang.StringUtils;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

@@ -22,9 +22,7 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.*;
-import com.xpn.xwiki.objects.BaseElement;
-import com.xpn.xwiki.store.*;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 import java.io.Serializable;
 

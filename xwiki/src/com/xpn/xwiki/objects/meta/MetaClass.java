@@ -22,12 +22,11 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.*;
 
 public class MetaClass extends BaseClass {
 

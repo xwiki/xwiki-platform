@@ -22,11 +22,7 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Lines;
-import org.apache.tools.ant.filters.StringInputStream;
-import java.util.List;
-import com.xpn.xwiki.XWikiException;
+
 
 public class XWikiAttachmentContent {
 

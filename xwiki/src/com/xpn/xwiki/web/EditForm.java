@@ -25,14 +25,13 @@
 
 package com.xpn.xwiki.web;
 
-import javax.servlet.http.*;
-import org.apache.struts.action.*;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
 
-import java.util.Hashtable;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.lang.reflect.Array;
+import java.util.Map;
 
 
 public class EditForm extends ActionForm

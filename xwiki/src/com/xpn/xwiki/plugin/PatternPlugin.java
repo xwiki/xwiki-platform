@@ -22,29 +22,19 @@
  */
 package com.xpn.xwiki.plugin;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.notify.XWikiNotificationInterface;
-import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.notify.DocObjectChangedRule;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.render.HeadingSubstitution;
-import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 import com.xpn.xwiki.render.WikiSubstitution;
-import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.util.Util;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.tools.ant.util.StringUtils;
 
 import java.util.Vector;
-
-import org.apache.oro.text.regex.MatchResult;
-import org.apache.oro.text.regex.PatternMatcherInput;
-import org.apache.oro.text.regex.PatternMatcher;
-import org.apache.oro.text.regex.Pattern;
-import org.apache.tools.ant.util.StringUtils;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.Entities;
 
 public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificationInterface {
     Vector patterns = new Vector();

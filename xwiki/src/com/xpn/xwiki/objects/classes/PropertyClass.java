@@ -24,11 +24,14 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import org.apache.ecs.html.Input;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.html.Input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 

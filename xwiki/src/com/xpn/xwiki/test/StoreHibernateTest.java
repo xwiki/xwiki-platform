@@ -3,12 +3,11 @@ package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
+import net.sf.hibernate.HibernateException;
+import net.sf.hibernate.impl.SessionImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import net.sf.hibernate.impl.SessionImpl;
-import net.sf.hibernate.HibernateException;
 
 /**
  * ===================================================================
@@ -36,6 +35,7 @@ import net.sf.hibernate.HibernateException;
 public class StoreHibernateTest extends StoreTest {
 
     public static String hibpath = "hibernate-test.cfg.xml";
+    public XWikiStoreInterface store;
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql) {
            try {
@@ -73,12 +73,20 @@ public class StoreHibernateTest extends StoreTest {
         cleanUp(getHibStore());
     }
 
+    public void cleanUp() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
+    }
+
     public XWikiHibernateStore getHibStore() {
         return (XWikiHibernateStore) getStore();
     }
 
     public XWikiStoreInterface getStore() {
-       XWikiStoreInterface store = new XWikiHibernateStore(hibpath);
+       if (store!=null)
+        return store;
+
+       store = new XWikiHibernateStore(hibpath);
        return store;
    }
 

@@ -22,9 +22,8 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 
 public class PasswordMetaClass extends StringMetaClass {
 

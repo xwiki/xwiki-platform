@@ -1,23 +1,22 @@
 
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
+import com.opensymphony.user.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.XWikiUserProvider;
-import com.xpn.xwiki.user.XWikiGroupProvider;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiCacheInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
-import com.opensymphony.user.*;
+import com.xpn.xwiki.user.XWikiGroupProvider;
+import com.xpn.xwiki.user.XWikiUserProvider;
+import junit.framework.TestCase;
+import net.sf.hibernate.HibernateException;
 
 import java.util.Collection;
-
-import net.sf.hibernate.HibernateException;
 
 /**
  * ===================================================================
@@ -47,7 +46,7 @@ public class UserTest extends TestCase {
     private static XWiki xwiki;
     private static XWikiContext context;
     private static UserManager um;
-
+    
     public UserTest() throws XWikiException {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
@@ -69,6 +68,11 @@ public class UserTest extends TestCase {
         getUserProvider(um).setxWiki(xwiki);
         getGroupProvider(um).setxWiki(xwiki);
         xwiki.flushCache();
+    }
+
+    public void cleanUp() throws HibernateException {
+        getHibStore().shutdownHibernate();
+        System.gc();
     }
 
     public void prepareData() throws XWikiException {

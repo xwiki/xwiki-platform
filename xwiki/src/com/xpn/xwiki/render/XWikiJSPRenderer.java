@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
 public class XWikiJSPRenderer implements XWikiRenderer {
     public XWikiJSPRenderer() {

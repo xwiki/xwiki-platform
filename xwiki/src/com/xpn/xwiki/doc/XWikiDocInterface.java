@@ -22,19 +22,25 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.apache.commons.jrcs.rcs.*;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import com.xpn.xwiki.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.*;
+import org.apache.commons.jrcs.rcs.Archive;
+import org.apache.commons.jrcs.rcs.ParseException;
+import org.apache.commons.jrcs.rcs.Version;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
 
-import java.util.*;
 import java.io.FileNotFoundException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 public interface XWikiDocInterface extends XWikiNotificationInterface {
     public long getId();

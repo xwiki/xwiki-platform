@@ -22,17 +22,17 @@
  */
 package com.xpn.xwiki.user;
 
-import com.opensymphony.user.provider.ProfileProvider;
-import com.opensymphony.user.provider.CredentialsProvider;
-import com.opensymphony.user.User;
 import com.opensymphony.module.propertyset.PropertySet;
 import com.opensymphony.module.propertyset.PropertySetManager;
+import com.opensymphony.user.User;
+import com.opensymphony.user.provider.CredentialsProvider;
+import com.opensymphony.user.provider.ProfileProvider;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 import java.util.*;
 

@@ -23,7 +23,9 @@
 
 package com.xpn.xwiki.render;
 
-import org.perl.inline.java.* ;
+import org.perl.inline.java.InlineJavaException;
+import org.perl.inline.java.InlineJavaPerlCaller;
+import org.perl.inline.java.InlineJavaPerlException;
 
 public class XWikiPerlPluginCaller extends InlineJavaPerlCaller {
 

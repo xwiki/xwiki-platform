@@ -1,15 +1,10 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiRCSFileStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.io.File;
-
-import net.sf.hibernate.impl.SessionImpl;
 
 /**
  * ===================================================================

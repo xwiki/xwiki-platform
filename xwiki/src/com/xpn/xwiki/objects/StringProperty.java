@@ -22,7 +22,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.objects.BaseProperty;
+
 
 public class StringProperty extends BaseProperty {
     private String value;

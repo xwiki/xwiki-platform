@@ -22,15 +22,10 @@
  */
 package com.xpn.xwiki.notify;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-
-import java.util.Vector;
-import java.util.Map;
-import java.util.Iterator;
 
 public class PropertyChangedRule extends DocChangeRule {
     private String className;

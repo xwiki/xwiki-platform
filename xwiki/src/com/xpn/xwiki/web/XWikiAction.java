@@ -22,13 +22,10 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.struts.action.Action;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
-
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
+import com.xpn.xwiki.XWikiException;
+import org.apache.struts.action.Action;
 
 
 public class XWikiAction extends Action {

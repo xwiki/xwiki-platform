@@ -23,10 +23,9 @@
 
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;

@@ -23,22 +23,26 @@
 
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.*;
+import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import org.apache.commons.jrcs.rcs.*;
-import java.io.*;
-import java.util.*;
 import net.sf.hibernate.*;
+import net.sf.hibernate.cfg.Configuration;
 import net.sf.hibernate.tool.hbm2ddl.SchemaUpdate;
-import net.sf.hibernate.cfg.*;
+import org.apache.commons.jrcs.rcs.Archive;
+import org.apache.commons.jrcs.rcs.Node;
+import org.apache.commons.jrcs.rcs.Version;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.util.*;
 
 
 public class XWikiHibernateStore extends XWikiRCSFileStore {
@@ -78,6 +82,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         sessionFactory = configuration.buildSessionFactory();
     }
 
+    public void shutdownHibernate() throws HibernateException {
+        if (session!=null) {
+            session.close();
+        }
+    }
 
     public void updateSchema() throws HibernateException {
         SchemaUpdate schemaupdate = new SchemaUpdate(configuration);

@@ -1,16 +1,13 @@
 
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.test.RenderTest;
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.plugin.PatternPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
+import junit.framework.TestCase;
 
 /**
  * ===================================================================

@@ -22,15 +22,14 @@
  */
 package com.xpn.xwiki.user;
 
+import com.opensymphony.user.Entity;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.opensymphony.user.User;
-import com.opensymphony.user.Entity;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.HashMap;
 
 public class XWikiBaseProvider {
 

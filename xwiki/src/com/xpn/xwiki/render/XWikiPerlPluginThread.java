@@ -22,10 +22,10 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWiki;
 import org.perl.inline.java.InlineJavaServer;
-import java.net.Socket;
+
 import java.io.IOException;
+import java.net.Socket;
 
 public class XWikiPerlPluginThread extends Thread {
 

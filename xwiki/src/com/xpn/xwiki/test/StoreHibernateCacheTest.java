@@ -2,13 +2,13 @@
 
 package com.xpn.xwiki.test;
 
-import net.sf.hibernate.HibernateException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheInterface;
-import com.xpn.xwiki.store.XWikiCache;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.store.XWikiCache;
+import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import net.sf.hibernate.HibernateException;
 
 /**
  * ===================================================================
@@ -45,9 +45,12 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     }
 
     public XWikiStoreInterface getStore() {
-        XWikiStoreInterface store = new XWikiHibernateStore(hibpath);
-        XWikiCacheInterface cache = new XWikiCache(store);
-        return cache;
+        if (store!=null)
+         return store;
+
+        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
+        store = new XWikiCache(hibstore);
+        return store;
     }
 
     public void testCachedReadWrite() throws XWikiException {

@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.render;
 
-import org.apache.oro.text.regex.*;
 import com.xpn.xwiki.util.Util;
+import org.apache.oro.text.regex.*;
 
 public class WikiSubstitution extends Perl5Substitution {
 

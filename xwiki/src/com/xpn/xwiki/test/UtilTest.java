@@ -22,14 +22,15 @@
  */
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
-import java.io.*;
-import java.util.*;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.util.Util;
+import junit.framework.TestCase;
+
+import java.io.IOException;
+import java.util.Hashtable;
 
 
 public class UtilTest extends TestCase {

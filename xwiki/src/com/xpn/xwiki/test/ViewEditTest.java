@@ -1,32 +1,34 @@
 
 package com.xpn.xwiki.test;
 
-import org.apache.cactus.WebRequest;
-import org.apache.cactus.ServletTestCase;
-import org.apache.cactus.WebResponse;
-import org.apache.struts.action.ActionServlet;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-
-import javax.servlet.ServletException;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.util.*;
-
-import net.sf.hibernate.HibernateException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import net.sf.hibernate.HibernateException;
+import org.apache.cactus.ServletTestCase;
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.struts.action.ActionServlet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.*;
 
 /**
  * ===================================================================
@@ -561,8 +563,9 @@ public class ViewEditTest extends ServletTestCase {
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "AttachTest");
         doc2 = (XWikiSimpleDoc) hibstore.loadXWikiDoc(doc2);
         List list = doc2.getAttachmentList();
-        assertEquals("Document has no attachement", 2, list.size());
+        assertEquals("Document has no attachement", 1, list.size());
         XWikiAttachment attachment = (XWikiAttachment) list.get(0);
+        assertEquals("Attachment version is not correct", attachment.getVersion(), "1.2");
         assertEquals("Attachment size is not correct", fattach.length(), attachment.getFilesize());
     }
 

@@ -24,29 +24,32 @@
 
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.List;
-import java.security.Principal;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import org.apache.struts.action.*;
-import org.apache.struts.upload.MultipartRequestWrapper;
-import org.apache.commons.fileupload.FileUpload;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.DefaultFileItem;
-import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>A simple action that handles the display and editing of an
@@ -252,7 +255,6 @@ public class ViewEditAction extends XWikiAction
         }
         else if (action.equals("upload")) {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            XWikiAttachment attachment = new XWikiAttachment();
 
             // Get the FileUpload Data
             DiskFileUpload fileupload = new DiskFileUpload();
@@ -261,12 +263,27 @@ public class ViewEditAction extends XWikiAction
             List filelist = fileupload.parseRequest(request);
             DefaultFileItem fileitem = (DefaultFileItem)filelist.get(0);
 
-            // Get the data in the Attachment object
+            // Get the data
             File file = fileitem.getStoreLocation();
             byte[] data = new byte[(int)file.length()];
             FileInputStream fileis = new FileInputStream(file);
             fileis.read(data);
             fileis.close();
+
+            // Read XWikiAttachment
+            XWikiAttachment attachment = null;
+            List list = doc.getAttachmentList();
+            String filename = fileitem.getName();
+            for (int i=0;i<list.size();i++) {
+                XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                if (attach.getFilename().equals(filename))
+                    attachment = attach;
+            }
+
+            if (attachment==null) {
+             attachment = new XWikiAttachment();
+             doc.getAttachmentList().add(attachment);
+            }
             attachment.setContent(data);
             attachment.setFilename(fileitem.getName());
 
@@ -274,7 +291,6 @@ public class ViewEditAction extends XWikiAction
             attachment.setAuthor(username);
 
             // Add the attachment to the document
-            doc.getAttachmentList().add(attachment);
             attachment.setDoc(doc);
 
             // Save the content and the archive

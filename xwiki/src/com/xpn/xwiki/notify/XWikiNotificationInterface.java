@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.notify;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
 public interface XWikiNotificationInterface {
     public static int EVENT_CHANGE = 0;

@@ -2,14 +2,12 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.XWikiException;
 import junit.framework.TestCase;
 
 /**

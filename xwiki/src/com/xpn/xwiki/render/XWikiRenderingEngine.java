@@ -22,14 +22,12 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
 import java.util.Vector;
-import java.util.Hashtable;
-import java.io.File;
 
 public class XWikiRenderingEngine {
 

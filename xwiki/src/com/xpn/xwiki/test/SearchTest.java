@@ -1,11 +1,11 @@
 
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
 
 import java.util.List;
@@ -35,14 +35,32 @@ import java.util.List;
 
 public class SearchTest extends TestCase {
 
+    public XWikiHibernateStore store;
     public static String hibpath = "hibernate-test.cfg.xml";
+    public XWikiHibernateStore getHibStore() {
+        return (XWikiHibernateStore) getStore();
+    }
+
+    public XWikiStoreInterface getStore() {
+       if (store!=null)
+        return store;
+
+       store = new XWikiHibernateStore(hibpath);
+       return store;
+   }
+
 
     public SearchTest() throws XWikiException {
     }
 
     public void setUp() throws HibernateException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = getHibStore();
         StoreHibernateTest.cleanUp(hibstore);
+        hibstore.shutdownHibernate();
+    }
+
+    public void cleanUp() throws HibernateException {
+        System.gc();
     }
 
     public void testSearch(XWikiStoreInterface hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
@@ -57,7 +75,7 @@ public class SearchTest extends TestCase {
     }
 
     public void testSearch() throws HibernateException, XWikiException {
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibpath);
+        XWikiHibernateStore hibstore = getHibStore();
         testSearch(hibstore, "", new String[] {} );
         testSearch(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {} );
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Main", "WebHome");

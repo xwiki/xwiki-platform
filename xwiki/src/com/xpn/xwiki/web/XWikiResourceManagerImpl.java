@@ -22,10 +22,10 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.runtime.resource.ResourceManagerImpl;
-import org.apache.velocity.runtime.resource.Resource;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.resource.Resource;
+import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 
 public class XWikiResourceManagerImpl extends ResourceManagerImpl {
 

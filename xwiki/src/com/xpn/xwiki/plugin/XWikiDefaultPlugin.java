@@ -23,7 +23,6 @@
 package com.xpn.xwiki.plugin;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
 
 public class XWikiDefaultPlugin implements XWikiPluginInterface {
     private String name;

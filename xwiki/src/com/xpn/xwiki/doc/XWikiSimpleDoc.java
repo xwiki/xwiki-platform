@@ -22,45 +22,34 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.apache.commons.jrcs.rcs.*;
-import org.apache.commons.jrcs.diff.DiffException;
-import org.apache.tools.ant.filters.StringInputStream;
-import org.apache.velocity.VelocityContext;
-import org.apache.ecs.xhtml.object;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentException;
-import org.dom4j.io.DOMReader;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.dom.DOMElement;
-import org.dom4j.dom.DOMDocumentFactory;
-
-import java.util.*;
-import java.io.FileNotFoundException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.IOException;
-import java.text.*;
-
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.IntegerProperty;
+import org.apache.commons.jrcs.rcs.Archive;
+import org.apache.commons.jrcs.rcs.Lines;
+import org.apache.commons.jrcs.rcs.Version;
+import org.apache.tools.ant.filters.StringInputStream;
+import org.apache.velocity.VelocityContext;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.dom.DOMElement;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 
 public class XWikiSimpleDoc extends XWikiDefaultDoc {

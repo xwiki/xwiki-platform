@@ -22,15 +22,13 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.*;
+import org.apache.velocity.app.Velocity;
 
-import java.io.StringWriter;
 import java.io.StringReader;
-import java.io.IOException;
+import java.io.StringWriter;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
 

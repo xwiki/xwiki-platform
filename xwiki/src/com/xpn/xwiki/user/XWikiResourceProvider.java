@@ -22,12 +22,12 @@
  */
 package com.xpn.xwiki.user;
 
-import com.opensymphony.module.access.provider.ResourceProvider;
-import com.opensymphony.module.access.NotFoundException;
-import com.opensymphony.module.access.ImmutableException;
 import com.opensymphony.module.access.DuplicateKeyException;
+import com.opensymphony.module.access.ImmutableException;
+import com.opensymphony.module.access.NotFoundException;
 import com.opensymphony.module.access.entities.Acl_I;
 import com.opensymphony.module.access.entities.Resource_I;
+import com.opensymphony.module.access.provider.ResourceProvider;
 import com.opensymphony.module.propertyset.PropertySet;
 
 import java.util.ArrayList;

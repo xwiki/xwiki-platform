@@ -25,9 +25,7 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.doc.*;
-
-import java.util.Properties;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 
 
 

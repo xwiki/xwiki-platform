@@ -24,11 +24,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.Input;
-import org.dom4j.Element;
 
 public class NumberClass  extends PropertyClass {
 

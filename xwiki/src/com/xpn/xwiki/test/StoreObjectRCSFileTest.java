@@ -1,8 +1,8 @@
 
-import com.xpn.xwiki.test.Utils;
-import com.xpn.xwiki.test.StoreObjectTest;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiRCSFileStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.test.StoreObjectTest;
+import com.xpn.xwiki.test.Utils;
 
 import java.io.File;
 

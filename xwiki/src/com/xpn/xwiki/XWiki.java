@@ -23,54 +23,48 @@
 
 package com.xpn.xwiki;
 
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCache;
-import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.opensymphony.user.User;
+import com.opensymphony.user.UserManager;
+import com.opensymphony.user.adapter.catalina.OSUserRealm;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.user.XWikiUserProvider;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.store.XWikiCache;
+import com.xpn.xwiki.store.XWikiCacheInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.XWikiGroupProvider;
+import com.xpn.xwiki.user.XWikiUserProvider;
 import com.xpn.xwiki.util.Util;
-import com.opensymphony.user.UserManager;
-import com.opensymphony.user.ImmutableException;
-import com.opensymphony.user.DuplicateEntityException;
-import com.opensymphony.user.User;
-import com.opensymphony.user.adapter.catalina.OSUserRealm;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.io.File;
-import java.io.IOException;
-import java.security.Principal;
-
-import org.apache.ecs.html.TextArea;
-import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.Filter;
-import org.securityfilter.authenticator.BasicAuthenticator;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.ecs.html.TextArea;
 import org.securityfilter.authenticator.Authenticator;
-import org.securityfilter.filter.SavedRequest;
+import org.securityfilter.authenticator.BasicAuthenticator;
+import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SecurityRealmInterface;
 import org.securityfilter.realm.catalina.CatalinaRealmAdapter;
-import org.securityfilter.config.SecurityConfig;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
 
 public class XWiki implements XWikiNotificationInterface {
 

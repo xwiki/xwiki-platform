@@ -22,11 +22,9 @@
  */
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 public class NumberMetaClass extends PropertyMetaClass {
 

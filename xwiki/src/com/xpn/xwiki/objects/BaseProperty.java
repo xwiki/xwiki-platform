@@ -22,13 +22,10 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-
-import java.io.Serializable;
-
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+
+import java.io.Serializable;
 
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;

@@ -25,11 +25,10 @@ package com.xpn.xwiki;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiAction;
 
-import java.util.Hashtable;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Hashtable;
 
 public class XWikiContext extends Hashtable {
 

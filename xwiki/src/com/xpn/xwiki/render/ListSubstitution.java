@@ -23,12 +23,10 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.util.Util;
-import org.apache.oro.text.PatternCache;
-import org.apache.oro.text.regex.*;
-import org.apache.ecs.MultiPartElement;
-import org.apache.ecs.html.DL;
-
-import java.util.Vector;
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternMatcher;
+import org.apache.oro.text.regex.PatternMatcherInput;
 
 public class ListSubstitution  extends WikiSubstitution {
     private static final int TYPE_DL = 1;

@@ -22,20 +22,22 @@
  */
 package com.xpn.xwiki.util;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.oro.text.*;
-import org.apache.oro.text.perl.*;
-import org.apache.oro.text.regex.*;
-
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.io.*;
-
 import com.xpn.xwiki.render.WikiSubstitution;
+import org.apache.commons.lang.StringUtils;
+import org.apache.oro.text.PatternCache;
+import org.apache.oro.text.PatternCacheLRU;
+import org.apache.oro.text.perl.Perl5Util;
+import org.apache.oro.text.regex.Perl5Matcher;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class Util {

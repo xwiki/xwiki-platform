@@ -22,17 +22,12 @@
  */
 package com.xpn.xwiki.plugin;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.util.Util;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.Vector;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.Vector;
 
 public class XWikiPluginManager {
     private Vector plugins = new Vector();

@@ -22,18 +22,16 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseCollection;
-
-import java.util.Map;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.ecs.xhtml.object;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {

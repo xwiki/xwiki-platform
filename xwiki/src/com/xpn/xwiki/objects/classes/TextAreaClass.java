@@ -22,13 +22,11 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.XWikiContext;
-import org.apache.ecs.html.Input;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.TextArea;
 
 public class TextAreaClass extends StringClass {

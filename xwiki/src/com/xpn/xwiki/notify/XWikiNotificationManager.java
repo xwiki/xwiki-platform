@@ -24,13 +24,10 @@ package com.xpn.xwiki.notify;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
-import java.util.Vector;
-import java.util.Map;
 import java.util.HashMap;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.Map;
+import java.util.Vector;
 
 public class XWikiNotificationManager {
     private Vector generalrules = new Vector();

@@ -22,13 +22,16 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.doc.XWikiDocInterface;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
-import org.perl.inline.java.InlineJavaPerlCaller;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocInterface;
 import org.apache.tools.ant.taskdefs.Execute;
+import org.perl.inline.java.InlineJavaPerlCaller;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Hashtable;
 
 public class XWikiPerlPluginRenderer implements XWikiRenderer {

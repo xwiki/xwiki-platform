@@ -22,18 +22,20 @@
  */
 package com.xpn.xwiki.test;
 
-import junit.framework.*;
-import com.xpn.xwiki.store.*;
-import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.XWikiException;
-import java.io.*;
-import java.util.List;
-
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocInterface;
+import com.xpn.xwiki.doc.XWikiSimpleDoc;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
 import org.apache.commons.jrcs.rcs.Version;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 
 public abstract class StoreTest extends TestCase {
-
 
     public abstract XWikiStoreInterface getStore();
 

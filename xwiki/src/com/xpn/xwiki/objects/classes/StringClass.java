@@ -23,12 +23,12 @@
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementInterface;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.html.Input;
-import org.dom4j.Element;
 
 public class StringClass extends PropertyClass {
 

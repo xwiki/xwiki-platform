@@ -25,7 +25,6 @@ package com.xpn.xwiki;
 
 import com.opensymphony.user.User;
 import com.opensymphony.user.UserManager;
-import com.opensymphony.user.adapter.catalina.OSUserRealm;
 import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.NotFoundException;
 import com.xpn.xwiki.doc.XWikiDocInterface;
@@ -45,6 +44,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.XWikiGroupProvider;
 import com.xpn.xwiki.user.XWikiUserProvider;
 import com.xpn.xwiki.user.XWikiResourceProvider;
+import com.xpn.xwiki.user.XWikiRealmAdapter;
 import com.xpn.xwiki.util.Util;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -54,13 +54,10 @@ import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SecurityRealmInterface;
-import org.securityfilter.realm.catalina.CatalinaRealmAdapter;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
@@ -692,8 +689,7 @@ public class XWiki implements XWikiNotificationInterface {
 
         try {
             authenticator = new BasicAuthenticator();
-            realm = new CatalinaRealmAdapter();
-            ((CatalinaRealmAdapter)realm).setRealm(new OSUserRealm());
+            realm = new XWikiRealmAdapter(this);
             SecurityConfig sconfig = new SecurityConfig(false);
             sconfig.setRealmName("XWiki");
             sconfig.addRealm(realm);

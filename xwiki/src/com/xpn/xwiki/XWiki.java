@@ -951,7 +951,7 @@ public class XWiki implements XWikiNotificationInterface {
             doc.setWeb("XWiki");
             doc.setName("XWikiUsers");
         }
-        iBaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getxWikiClass();
         bclass.setName("XWiki.XWikiUsers");
         if (bclass.get("fullname")==null) {
             needsUpdate = true;

@@ -2006,9 +2006,9 @@ public class XWiki implements XWikiNotificationInterface {
             // Modify rights in user wiki
             context.setDatabase(wikiName);
             XWikiDocInterface wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
-            wikiprefdoc.setStringValue("XWiki.XWikiRights", "users", getDatabase() + ":" + wikiAdmin);
-            wikiprefdoc.setStringValue("XWiki.XWikiRights", "levels", "admin, edit");
-            wikiprefdoc.setIntValue("XWiki.XWikiRights", "allow", 1);
+            wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "users", wikiAdmin);
+            wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "levels", "admin, edit");
+            wikiprefdoc.setIntValue("XWiki.XWikiGlobalRights", "allow", 1);
             saveDocument(wikiprefdoc, context);
             return 1;
         } catch (Exception e) {

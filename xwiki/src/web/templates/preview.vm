@@ -10,11 +10,10 @@
 $doc.getRenderedContent($context)
 <form id="edit" method="post" action="$doc.getPreviewUrl($context)">
 <p>
-<input type=hidden name="content" value="$xwiki.getFormEncoded($doc.content)" />
+<input type="hidden" name="content" value="$xwiki.getFormEncoded($doc.content)" />
 <input type="hidden" name="parent" value="$!doc.getParent()" />
 <input type="hidden" name="template" value="$!doc.getTemplate()" />
 </p>
-Parent: $doc.getParent()
 <div id="xwikiobject">
 #template("hiddenobject.vm")
 </div>

@@ -18,7 +18,7 @@
     <option name="DEFAULT_COMPILER" value="Javac" />
     <option name="CLEAR_OUTPUT_DIRECTORY" value="true" />
     <resourceExtensions>
-      <entry name=".+\.(properties|xml|html|dtd|tld|cfg|txt.1|txt.2|sxw|doc)" />
+      <entry name=".+\.(properties|xml|html|dtd|tld|cfg|txt.1|txt.2|sxw|doc|vm)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
     </resourceExtensions>
   </component>
@@ -79,7 +79,7 @@
       <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="false" project-jdk-name="java version &quot;1.3.1_08&quot;" />
+  <component name="ProjectRootManager" version="2" assert-keyword="false" project-jdk-name="java version &quot;1.4.2_03&quot;" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />
@@ -107,12 +107,15 @@
         <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jakarta-oro-2.0.7.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-jrcs.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-dbcp-1.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />
       </JAVADOC>
       <SOURCES>
         <root url="file://C:/dev/java/commons-fileupload-1.0/src/java" />
+        <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
       </SOURCES>
     </library>
     <library name="Unit Tests">
@@ -220,7 +223,6 @@
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/catalina.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-beanutils.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-digester.jar!/" />
-        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-fileupload-1.0-beta-1.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-logging.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-modeler.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/jaas.jar!/" />
@@ -240,7 +242,6 @@
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/activation.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/ant.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-collections.jar!/" />
-        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-dbcp.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-logging-api.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-pool.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jasper-compiler.jar!/" />
@@ -256,7 +257,9 @@
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/tools.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
+      </SOURCES>
     </library>
   </component>
   <component name="uidesigner-configuration">

@@ -15,7 +15,6 @@
     <orderEntry type="library" name="Perl" level="project" />
     <orderEntry type="library" name="Velocity" level="project" />
     <orderEntry type="library" name="Unit Tests" level="project" />
-    <orderEntry type="library" name="Tomcat 4.1" level="application" />
     <orderEntry type="library" name="Jakarta Commons" level="project" />
     <orderEntry type="module-library">
       <library>
@@ -110,12 +109,6 @@
           <option name="value" value="1" />
         </key>
         <value predicate="dependencyModule" moduleName="xwikibase" />
-      </pairs>
-      <pairs>
-        <key>
-          <option name="value" value="12" />
-        </key>
-        <value predicate="higherLibrary" level="application" libraryName="Tomcat 4.1" />
       </pairs>
     </orderEntriesWatcher>
     <order-entry-info>
@@ -218,16 +211,8 @@
           <setting name="URI" value="" />
         </value>
       </info>
-      <info>
-        <key>
-          <option name="value" value="12" />
-        </key>
-        <value>
-          <setting name="copy" value="false" />
-          <setting name="URI" value="" />
-        </value>
-      </info>
     </order-entry-info>
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/web.xml" version="2.3" />
   </component>
 </module>
 

@@ -341,6 +341,7 @@ public class Utils {
 
     public static String formEncode(String value) {
         Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
         String svalue = filter.process(value);
         return svalue;
     }

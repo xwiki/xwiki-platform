@@ -204,7 +204,7 @@
         </joined-subclass>
 
 
-        <joined-subclass name="com.xpn.xwiki.objects.classes.DBListClass" table="xwikislistclasses">
+        <joined-subclass name="com.xpn.xwiki.objects.classes.DBListClass" table="xwikidblistclasses">
             <key>
                 <column name="XWL_ID"  />
                 <column name="XWL_NAME"  />

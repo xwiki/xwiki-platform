@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class DBListClass extends ListClass {
-
-    private String sql;
-
     public DBListClass(PropertyMetaClass wclass) {
         super("dblist", "DB List", wclass);
     }
@@ -52,10 +49,10 @@ public class DBListClass extends ListClass {
     }
 
     public String getSql() {
-        return sql;
+        return getStringValue("sql");
     }
 
     public void setSql(String sql) {
-        this.sql = sql;
+        setStringValue("sql", sql);
     }
 }

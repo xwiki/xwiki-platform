@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SearchTest extends TestCase {
 
-    public static String hibpath = "/hibernate-test.cfg.xml";
+    public static String hibpath = "hibernate-test.cfg.xml";
 
     public SearchTest() throws XWikiException {
     }

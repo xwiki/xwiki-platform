@@ -35,7 +35,7 @@ import java.util.List;
 
 public class StoreObjectTest extends TestCase {
 
-    public static String hibpath = "/hibernate-test.cfg.xml";
+    public static String hibpath = "hibernate-test.cfg.xml";
 
     public void setUp() throws HibernateException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);

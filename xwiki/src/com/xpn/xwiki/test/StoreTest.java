@@ -50,7 +50,7 @@ public class StoreTest extends TestCase {
     public static String version2 = "1.2";
 
     public static String rcspath = "./rcs";
-    public static String hibpath = "/hibernate-test.cfg.xml";
+    public static String hibpath = "hibernate-test.cfg.xml";
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql) {
            try {

@@ -50,6 +50,8 @@ import java.util.*;
 
 public class XWikiHibernateStore implements XWikiStoreInterface {
 
+    private Collection connections = new HashSet();
+    private int nbConnections = 0;
     private SessionFactory sessionFactory;
     private Configuration configuration;
 
@@ -111,11 +113,7 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
 
     public void shutdownHibernate(XWikiContext context) throws HibernateException {
-        Session session = getSession(context);
-
-        if (session!=null) {
-            session.close();
-        }
+        closeSession(getSession(context));
         if (getSessionFactory()!=null) {
             ((SessionFactoryImpl)getSessionFactory()).getConnectionProvider().close();
         }
@@ -210,7 +208,12 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
           return false;
         Session session = getSession(context);
         if (session==null) {
-         session = getSessionFactory().openSession();
+          session = getSessionFactory().openSession();
+
+         // Keep some statistics about session and connections
+         nbConnections++;
+         addConnection(session.connection());
+
          setSession(session, context);
          setDatabase(session, context);
          try {
@@ -231,6 +234,15 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
         return true;
     }
 
+    private void addConnection(Connection connection) {
+        if (connection!=null)
+         connections.add(connection);
+    }
+
+    private void removeConnection(Connection connection) {
+        if (connection!=null)
+         connections.remove(connection);
+    }
 
     public void endTransaction(XWikiContext context, boolean commit)
             throws HibernateException {
@@ -248,8 +260,23 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
             if (transaction!=null)
              transaction.rollback();
         }
-        if (session!=null)
-         session.close();
+        closeSession(session);
+    }
+
+    private void closeSession(Session session) throws HibernateException {
+        if (session!=null) {
+             Connection connection = session.connection();
+             if ((connection!=null)) {
+              nbConnections--;
+              try {
+                 removeConnection(connection);
+              } catch (Throwable e) {
+                // This should not happen
+                e.printStackTrace();
+              }
+             }
+            session.close();
+        }
     }
 
 
@@ -1332,6 +1359,18 @@ public class XWikiHibernateStore implements XWikiStoreInterface {
 
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
+    }
+
+    public Collection getConnections() {
+        return connections;
+    }
+
+    public int getNbConnections() {
+        return nbConnections;
+    }
+
+    public void setNbConnections(int nbConnections) {
+        this.nbConnections = nbConnections;
     }
 
 

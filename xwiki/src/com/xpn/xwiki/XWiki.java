@@ -77,6 +77,7 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -101,10 +102,9 @@ public class XWiki implements XWikiNotificationInterface {
     private SecurityManager secureSecurityManager;
     private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
-    public static XWiki getXWiki(XWikiContext context) throws XWikiException {
+    public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = "WEB-INF/xwiki.cfg";
         String xwikiname = "xwiki";
-
         HttpServlet servlet = context.getServlet();
         XWiki xwiki = (XWiki) servlet.getServletContext().getAttribute(xwikiname);
 
@@ -115,6 +115,12 @@ public class XWiki implements XWikiNotificationInterface {
         }
         context.setWiki(xwiki);
         xwiki.setDatabase(context.getDatabase());
+        return xwiki;
+    }
+
+    public static XWiki getXWiki(XWikiContext context) throws XWikiException {
+        XWiki xwiki = getMainXWiki(context);
+
         if ("1".equals(xwiki.Param("xwiki.virtual"))) {
             HttpServletRequest request = context.getRequest();
             String host = "";
@@ -1641,4 +1647,17 @@ public class XWiki implements XWikiNotificationInterface {
         return url.toString();
     }
 
+    // Usefull date functions
+    public Date getCurrentDate() {
+        return new Date();
+    }
+
+    public int getTimeDelta(long time) {
+        Date ctime = new Date();
+        return (int)(ctime.getTime() - time);
+    }
+
+    public Date getDate(long time) {
+        return new Date(time);
+    }
 }

@@ -213,16 +213,15 @@ public class XWiki extends Api {
 
     // Usefull date functions
     public Date getCurrentDate() {
-        return new Date();
+        return xwiki.getCurrentDate();
     }
 
     public int getTimeDelta(long time) {
-        Date ctime = new Date();
-        return (int)(ctime.getTime() - time);
+        return xwiki.getTimeDelta(time);
     }
 
     public Date getDate(long time) {
-        return new Date(time);
+        return xwiki.getDate(time);
     }
 
     public String[] split(String str, String sep) {

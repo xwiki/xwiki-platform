@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>Database Status</title>
+<h1>Database Status</h1>
+<h2>Active Connections</h2>
+<ul><li />Active: $xwiki.store.store.nbConnections
+</ul>
+<br /><br />
+#foreach($pconn in $xwiki.store.store.connections)
+<h3>$pconn</h3>
+<ul>
+<li />Closed: $pconn.isClosed()
+#if ( $pconn.closed==false)
+<li />Catalog: $!pconn.catalog
+<li />AutoCommit: $!pconn.autoCommit
+<li />ReadOnline: $!pconn.readOnly
+<li />Warnings: $!pconn.warnings
+#end
+</ul>
+#end
+
+<h2>Current Pool</h2>
+
+#set($provider = $xwiki.store.store.sessionFactory.connectionProvider)
+#set($pool = $xwiki.getPrivateField($provider,"connectionPool"))
+
+<h3>Before gc</h3>
+<ul>
+<li />Max Active: $pool.maxActive
+<li />Max Idle: $pool.maxIdle
+<li />Max Wait: $pool.maxWait
+<li />Active: $pool.numActive
+<li />Idle: $pool.numIdle
+</ul>
+
+$xwiki.gc()
+$xwiki.gc()
+$xwiki.gc()
+
+<h3>After gc</h3>
+<ul>
+<li />Max Active: $pool.maxActive
+<li />Max Idle: $pool.maxIdle
+<li />Max Wait: $pool.maxWait
+<li />Active: $pool.numActive
+<li />Idle: $pool.numIdle
+</ul>
+
+
+#set($list = $xwiki.getPrivateField($pool,"_pool"))
+#foreach ($element in $list)
+#set($pconn = $xwiki.getPrivateField($element, "value"))
+#set($timea = $xwiki.currentDate.time)
+#set($timeb = $xwiki.getPrivateField($element, "tstamp"))
+<h3>$pconn</h3>
+#set($conn = $pconn.delegate.delegate)
+<ul>
+<li />CurrentTime: $timea
+<li />LastActiveTime: $timeb
+<li />$conn
+<li />Closed: $conn.isClosed()
+#if ( $conn.closed==false)
+<li />Catalog: $!conn.catalog
+<li />AutoCommit: $!conn.autoCommit
+<li />ReadOnline: $!conn.readOnly
+<li />Warnings: $!conn.warnings
+#end
+</ul>
+#end

@@ -201,6 +201,13 @@
          <forward name="logout" path="/templates/logout.vm"/>
       </action>
 
+      <action path="/dbstatus/"
+              type="com.xpn.xwiki.web.ViewEditAction"
+              name="dbstatus"
+              scope="request">
+          <forward name="dbstatus" path="/templates/dbstatus.vm"/>
+      </action>
+
   </action-mappings>
 
   <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"

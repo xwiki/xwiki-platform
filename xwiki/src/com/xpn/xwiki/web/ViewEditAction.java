@@ -186,12 +186,19 @@ public class ViewEditAction extends XWikiAction
         context.setAction(this);
         context.setDatabase(dbname);
 
+        // We should not go further for the Database Status
+        // To make sure we don't have more database connections
+        if (action.equals("dbstatus"))
+           return executeDatabaseStatus(context);
+
+
         XWiki xwiki = XWiki.getXWiki(context);
         // Any error before this will be treated using a redirection to an error page
 
         VelocityContext vcontext = null;
         // Prepare velocity context
         vcontext = XWikiVelocityRenderer.prepareContext(context);
+
 
         try {
             // From there we will try to catch any exceptions and show a nice page
@@ -276,6 +283,14 @@ public class ViewEditAction extends XWikiAction
         }
 
         // Let's redirect to an error page here..
+        return null;
+    }
+
+    private ActionForward executeDatabaseStatus(XWikiContext context) throws IOException, XWikiException {
+        XWiki xwiki = XWiki.getMainXWiki(context);
+        VelocityContext vcontext = XWikiVelocityRenderer.prepareContext(context);
+        vcontext.put("xwiki", xwiki);
+        parseTemplate("dbstatus", context);
         return null;
     }
 

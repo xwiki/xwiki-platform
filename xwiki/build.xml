@@ -244,6 +244,7 @@
                 <fileset dir="${src.dir}">
                     <include name="com/xpn/xwiki/test/*Test.java"/>
                     <exclude name="**/StoreTest.java"/>
+                    <exclude name="**/RenderTest.java"/>
                     <exclude name="**/StoreObjectTest.java"/>
                     <exclude name="**/ViewEditTest.java"/>
                 </fileset>

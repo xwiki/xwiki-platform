@@ -154,6 +154,15 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
     }
 
 
+    public String getPerlCommand() {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().indexOf("windows")!=-1)
+          return "cmd.exe /c " + getPluginspath().substring(0,2) + " && cd "
+                               + getPluginspath().substring(2) + " && " + getPerlpath() + " perlplugins.pl 7890 true";
+        else
+          return "cd " + getPluginspath() + " && " + getPerlpath() + " perlplugins.pl 7890 true";
+    }
+
     public void startPerlEngine() throws XWikiException {
 
         Process perlProcess = getPerlProcess();
@@ -176,10 +185,8 @@ public class XWikiPerlPluginRenderer implements XWikiRenderer {
 
 
         try {
-            String command = "cmd.exe /c " + getPluginspath().substring(0,2) + " && cd "
-                    + getPluginspath().substring(2) + " && " + getPerlpath() + " perlplugins.pl 7890 true";
             launchcounter++;
-            perlProcess = Runtime.getRuntime().exec(command);
+            perlProcess = Runtime.getRuntime().exec(getPerlCommand());
             setPerlProcess(perlProcess);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PERLPLUGINS, XWikiException.ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION,

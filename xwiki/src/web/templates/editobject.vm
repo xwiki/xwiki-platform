@@ -1,17 +1,10 @@
-<h2>Properties</h2>
-<table border="0">
-#foreach($prop in $doc.xWikiObject.xWikiClass.properties)
- <tr><td>$prop.prettyName</td>
- <td>$prop.displayEdit($prop.getName(), "object_",  $doc.xWikiObject, $context)
- </td></tr>
- </table>
 #end
 #foreach($objlist in $doc.xWikiObjects)
 #set( $class = $objlist.elementAt(0).xWikiClass)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb">
 <br>
-*$class.name*
+<b>$class.name</b>
 <br>
  <table>
  <tr>

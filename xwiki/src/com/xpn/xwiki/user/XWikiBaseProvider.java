@@ -25,6 +25,7 @@ package com.xpn.xwiki.user;
 import com.opensymphony.user.Entity;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 
 import java.util.*;
@@ -34,6 +35,7 @@ public class XWikiBaseProvider {
     private XWiki xWiki;
     private Set handledNames = new HashSet();
     private static Map propertySets;
+    protected XWikiContext context = new XWikiContext();
 
     public XWiki getxWiki() {
         return xWiki;
@@ -61,7 +63,7 @@ public class XWikiBaseProvider {
     public XWikiDocInterface getDocument(String name) {
         XWikiDocInterface doc = null;
         try {
-            doc = getxWiki().getDocument(name);
+            doc = getxWiki().getDocument(name, context);
             getPropertySets().put(name, doc);
             return doc;
         } catch (XWikiException e) {
@@ -104,7 +106,7 @@ public class XWikiBaseProvider {
             return false;
 
         try {
-            getxWiki().saveDocument(doc);
+            getxWiki().saveDocument(doc, context);
             return true;
         } catch (XWikiException e) {
             return false;

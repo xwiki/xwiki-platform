@@ -23,6 +23,7 @@
 package com.xpn.xwiki.doc;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 
@@ -49,9 +50,14 @@ public class XWikiAttachmentArchive {
     public void setRCSArchive(Archive archive) {
         this.archive = archive;
     }
+
     public byte[] getArchive() throws XWikiException {
+     return getArchive(null);      
+    }
+
+    public byte[] getArchive(XWikiContext context) throws XWikiException {
         if (archive==null)
-            updateArchive(attachment.getContent());
+            updateArchive(attachment.getContent(context));
         if (archive==null)
             return new byte[0];
         else {

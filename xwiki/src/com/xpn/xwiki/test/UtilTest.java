@@ -55,10 +55,11 @@ public class UtilTest extends TestCase {
         context = new XWikiContext();
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
+        context.setDatabase("dbname");
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         xwiki = null;
         context = null;
         System.gc();
@@ -95,19 +96,19 @@ public class UtilTest extends TestCase {
 
     public void testgetDocumentFromPath() throws XWikiException {
         String path = "/view/Main/WebHome";
-        XWikiDocInterface doc = xwiki.getDocumentFromPath(path);
+        XWikiDocInterface doc = xwiki.getDocumentFromPath(path, context);
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/taratata.doc";
-        doc = xwiki.getDocumentFromPath(path);
+        doc = xwiki.getDocumentFromPath(path, context);
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/blabla/tfdfdf.doc";
-        doc = xwiki.getDocumentFromPath(path);
+        doc = xwiki.getDocumentFromPath(path, context);
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
         path = "/view/Test/Titi/taratata.doc";
-       doc = xwiki.getDocumentFromPath(path);
+       doc = xwiki.getDocumentFromPath(path, context);
        assertEquals("Doc web is not correct", "Test", doc.getWeb());
        assertEquals("Doc name is not correct", "Titi", doc.getName());
 

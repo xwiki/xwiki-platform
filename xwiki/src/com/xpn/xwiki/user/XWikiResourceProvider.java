@@ -59,7 +59,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
             return true;
         try {
             name = getName(name);
-            List list = getxWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'");
+            List list = getxWiki().searchDocuments("where CONCAT(XWD_WEB,'.',XWD_NAME) ='" + name + "'", context);
             boolean result = (list.size()>0);
             if (result)
                 getHandledNames().add(name);
@@ -201,7 +201,7 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         boolean deny_found = false;
         try {
             // Verify XWiki super user
-            XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences");
+            XWikiDocInterface xwikidoc = getxWiki().getDocument("XWiki.XWikiPreferences", context);
             try {
                 allow = checkRight(name, xwikidoc , "admin", true, true, true);
                 if (allow) return true;
@@ -209,14 +209,14 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
 
             // Verify Web super user
             String web = Util.getWeb(resourceKey);
-            XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences");
+            XWikiDocInterface webdoc = getxWiki().getDocument(web, "WebPreferences", context);
             try {
                 allow = checkRight(name, webdoc , "admin", true, true, true);
                 if (allow) return true;
             } catch (NotFoundException e) {}
 
             // First check if this document is denied to the specific user
-            XWikiDocInterface doc = getxWiki().getDocument(resourceKey);
+            XWikiDocInterface doc = getxWiki().getDocument(resourceKey, context);
             try {
                 deny = checkRight(name, doc, accessLevel, true, false, false);
                 deny_found = true;

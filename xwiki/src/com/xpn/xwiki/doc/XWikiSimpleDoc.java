@@ -30,7 +30,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import org.apache.commons.jrcs.rcs.Archive;
@@ -283,6 +282,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return url.toString();
     }
 
+    /*
     public String getViewUrl(XWikiContext context) {
         return getActionUrl("view", context);
     }
@@ -302,7 +302,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     public String getAttachUrl(XWikiContext context) {
         return getActionUrl("attach", context);
     }
-
+    */
+    
     public String getParentUrl(XWikiContext context) {
         StringBuffer url = new StringBuffer();
         url.append(context.getWiki().getBase());
@@ -315,13 +316,13 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
     }
 
 
-    public Version[] getRevisions() throws XWikiException {
-        return getStore().getXWikiDocVersions(this);
+    public Version[] getRevisions(XWikiContext context) throws XWikiException {
+        return getStore().getXWikiDocVersions(this, context);
     }
 
-    public String[] getRecentRevisions() throws XWikiException {
+    public String[] getRecentRevisions(XWikiContext context) throws XWikiException {
         try {
-        Version[] revisions = getStore().getXWikiDocVersions(this);
+        Version[] revisions = getStore().getXWikiDocVersions(this, context);
         int length = 5;
         if (revisions.length<5)
             length = revisions.length;
@@ -418,9 +419,8 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
 
     public void createNewObject(String classname, XWikiContext context) throws XWikiException {
         XWiki xwiki = (XWiki) context.getWiki();
-        BaseClass objclass = new BaseClass();
-        objclass.setName(classname);
-        ((XWikiStoreInterface)xwiki.getStore()).loadXWikiClass(objclass, true);
+        XWikiDocInterface doc = xwiki.getDocument(classname, context);
+        BaseClass objclass = (BaseClass) doc.getxWikiClass().clone();
         BaseObject object = new BaseObject();
         object.setName(getFullName());
         object.setxWikiClass(objclass);
@@ -714,7 +714,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 template = getWeb() + "." + template;
             }
             XWiki xwiki = context.getWiki();
-            XWikiDocInterface templatedoc = xwiki.getDocument(template);
+            XWikiDocInterface templatedoc = xwiki.getDocument(template, context);
             if (templatedoc.isNew()) {
                 Object[] args = { template, getFullName() };
                 throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
@@ -741,7 +741,7 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                     template = getWeb() + "." + template;
                 }
                 XWiki xwiki = context.getWiki();
-                XWikiDocInterface templatedoc = xwiki.getDocument(template);
+                XWikiDocInterface templatedoc = xwiki.getDocument(template, context);
                 if (templatedoc.isNew()) {
                     Object[] args = { template, getFullName() };
                     throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
@@ -979,12 +979,12 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
         return attachmentList;
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment) throws XWikiException {
-        getStore().saveAttachmentContent(attachment, true);
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
+        getStore().saveAttachmentContent(attachment, context, true);
     }
 
-    public void loadAttachmentContent(XWikiAttachment attachment) throws XWikiException {
-        getStore().loadAttachmentContent(attachment,  true);
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
+        getStore().loadAttachmentContent(attachment, context, true);
     }
 
 }

@@ -28,9 +28,8 @@ import java.io.IOException;
 
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor {
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
-        String result = super.processPath(httpServletRequest, httpServletResponse);    //To change body of overriden methods use Options | File Templates.
+        String result = super.processPath(httpServletRequest, httpServletResponse);
         String res = result.substring(0,result.indexOf("/",1)+1);
-        // res = StringUtils.replace(res, "auth", "");
         return res;
     }
 }

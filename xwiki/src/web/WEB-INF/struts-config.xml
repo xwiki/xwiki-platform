@@ -48,8 +48,8 @@
                   type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="propadd"
                     type="com.xpn.xwiki.web.PropAddForm"/>
-    <form-bean name="classadd"
-                      type="com.xpn.xwiki.web.ClassAddForm"/>
+    <form-bean name="objectadd"
+                      type="com.xpn.xwiki.web.ObjectAddForm"/>
   </form-beans>
 
   <!-- ========== Global Forward Definitions ============================== -->
@@ -123,11 +123,11 @@
               <forward name="propdelete" path="/templates/edit.vm"/>
       </action>
 
-      <action path="/classadd/"
+      <action path="/objectadd/"
                   type="com.xpn.xwiki.web.ViewEditAction"
-                  name="classadd"
+                  name="objectadd"
                   scope="request">
-              <forward name="classadd" path="/templates/edit.vm"/>
+              <forward name="objectadd" path="/templates/edit.vm"/>
       </action>
 
       <action path="/attach/"

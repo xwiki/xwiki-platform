@@ -51,7 +51,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
     public boolean create(String name) {
         try {
             name = getName(name);
-            BaseClass bclass = getxWiki().getUserClass();
+            BaseClass bclass = getxWiki().getUserClass(context);
             XWikiDocInterface doc = getDocument(name);
             if (doc.isNew()) {
                 BaseObject obj = (BaseObject) bclass.newObject();
@@ -59,7 +59,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
                 obj.setName(name);
                 doc.setObject("XWiki.XWikiUsers", 0, obj);
                 getPropertySets().put(name, doc);
-                getxWiki().saveDocument(doc);
+                getxWiki().saveDocument(doc, context);
                 return true;
             } else
                 return false;
@@ -76,7 +76,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
         try {
             name = getName(name);
             List list = getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME)"
-                    + " and obj.className='XWiki.XWikiUsers' and obj.name = '" + name + "'");
+                    + " and obj.className='XWiki.XWikiUsers' and obj.name = '" + name + "'", context);
             boolean result = (list.size()>0);
             if (result)
                 getHandledNames().add(name);
@@ -89,7 +89,7 @@ public class XWikiUserProvider extends XWikiBaseProvider implements ProfileProvi
 
     public List list() {
         try {
-            return getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiUsers'");
+            return getxWiki().searchDocuments(", BaseObject as obj where obj.name=CONCAT(XWD_WEB,'.',XWD_NAME) and obj.className='XWiki.XWikiUsers'", context);
         } catch (XWikiException e) {
             e.printStackTrace();
             return new ArrayList();

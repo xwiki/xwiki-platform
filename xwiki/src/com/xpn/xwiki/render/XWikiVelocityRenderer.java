@@ -23,6 +23,8 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -45,8 +47,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         StringWriter writer = new StringWriter();
         String name = doc.getFullName();
         content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
-        vcontext.put("doc", doc);
-        vcontext.put("xwiki", context.getWiki());
+        vcontext.put("doc", new Document(doc, context));
+        vcontext.put("xwiki", new XWiki(context.getWiki(), context));
         vcontext.put("request", context.getRequest());
         vcontext.put("context", context);
 

@@ -26,6 +26,7 @@ import com.opensymphony.oscache.base.Cache;
 import com.opensymphony.oscache.base.CacheEntry;
 import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
@@ -67,8 +68,8 @@ public class XWikiCache implements XWikiCacheInterface {
         this.store = store;
     }
 
-    public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException {
-        store.saveXWikiDoc(doc);
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        store.saveXWikiDoc(doc, context);
         cache.putInCache(doc.getFullName(), doc);
     }
 
@@ -76,14 +77,14 @@ public class XWikiCache implements XWikiCacheInterface {
         initCache();
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         String docname = doc.getFullName();
         try {
             doc = (XWikiDocInterface) cache.getFromCache(docname, CacheEntry.INDEFINITE_EXPIRY);
             doc.setFromCache(true);
         } catch (NeedsRefreshException e) {
             try {
-                doc = store.loadXWikiDoc(doc);
+                doc = store.loadXWikiDoc(doc, context);
             } catch (XWikiException xwikiexception) {
                 cache.cancelUpdate(docname);
                 throw xwikiexception;
@@ -93,67 +94,40 @@ public class XWikiCache implements XWikiCacheInterface {
         return doc;
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version) throws XWikiException {
-        return store.loadXWikiDoc(doc, version);
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version, XWikiContext context) throws XWikiException {
+        return store.loadXWikiDoc(doc, version, context);
     }
 
-    public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
-        return store.getXWikiDocVersions(doc);
+    public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        return store.getXWikiDocVersions(doc, context);
     }
 
-    public List getClassList() throws XWikiException {
-        return store.getClassList();
+    public List getClassList(XWikiContext context) throws XWikiException {
+        return store.getClassList(context);
     }
 
-    public List searchDocuments(String wheresql) throws XWikiException {
-        return store.searchDocuments(wheresql);
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
+        return store.searchDocuments(wheresql, context);
     }
 
-    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-        return store.searchDocuments(wheresql, nb, start);
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
+        return store.searchDocuments(wheresql, nb, start, context);
     }
 
-    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        store.saveXWikiObject(object, bTransaction);
+
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.saveAttachmentContent(attachment, context, bTransaction);
     }
 
-    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        store.loadXWikiObject(object, bTransaction);
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.loadAttachmentContent(attachment, context, bTransaction);
     }
 
-    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        store.saveXWikiClass(bclass, bTransaction);
+    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.loadAttachmentArchive(attachment, context, bTransaction);
     }
 
-    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        store.loadXWikiClass(bclass, bTransaction);
-    }
-
-    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        store.saveXWikiProperty(property, bTransaction);
-    }
-
-    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
-        store.saveXWikiClassProperty(property, bTransaction);
-    }
-
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        store.saveAttachmentContent(attachment, bTransaction);
-    }
-
-    public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        store.loadAttachmentContent(attachment, bTransaction);
-    }
-
-    public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
-        store.loadAttachmentArchive(attachment, bTransaction);
-    }
-
-    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        store.loadXWikiProperty(property, bTransaction);
-    }
-
-    public List search(String sql, int nb, int start) throws XWikiException {
-        return store.search(sql, nb, start);
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+        return store.search(sql, nb, start, context);
     }
 }

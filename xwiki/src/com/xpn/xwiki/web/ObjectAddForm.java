@@ -27,7 +27,7 @@ import org.apache.struts.action.ActionMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ClassAddForm extends ActionForm {
+public class ObjectAddForm extends ActionForm {
 
         private String className;
 

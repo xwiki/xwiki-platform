@@ -8,9 +8,9 @@
 #end
 <div id="xwikinav_header">
 <div class="xwikiactions">
-<a href="$doc.getPreviewUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
 <span> | </span>
-<a href="$doc.getSaveUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 #if($message)
@@ -18,7 +18,7 @@
 $message
 </div>
 #end
-<form id="edit" method="post" action="$doc.getPreviewUrl($context)">
+<form id="edit" method="post" action="$doc.getActionUrl("preview")">
 #foreach($objlist in $doc.xWikiObjects)
 #set( $class = $objlist.elementAt(0).xWikiClass)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
@@ -27,14 +27,14 @@ $message
 </p>
 #end
 <div id="xwikicontent">
-$doc.getRenderedContent($context)
+$doc.getRenderedContent()
 </div>
 </form>
 <div id="xwikinav_footer">
 <div class="xwikiactions">
-<a href="$doc.getPreviewUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<a href="$doc.getActionUrl("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
 <span> | </span>
-<a href="$doc.getSaveUrl($context)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+<a href="$doc.getActionUrl("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 </div>
 </div>
 #template("footer.vm")

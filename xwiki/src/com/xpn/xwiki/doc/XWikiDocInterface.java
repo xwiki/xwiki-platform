@@ -125,11 +125,23 @@ public interface XWikiDocInterface extends XWikiNotificationInterface {
     public Document toXMLDocument();
     public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException;
 
-    public Version[] getRevisions() throws XWikiException;
-    public String[] getRecentRevisions() throws XWikiException;
+    public Version[] getRevisions(XWikiContext context) throws XWikiException;
+    public String[] getRecentRevisions(XWikiContext context) throws XWikiException;
 
     public void setAttachmentList(List list);
     public List getAttachmentList();
-    public void saveAttachmentContent(XWikiAttachment attachment) throws XWikiException;
-    public void loadAttachmentContent(XWikiAttachment xWikiAttachment) throws XWikiException;
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException;
+    public void loadAttachmentContent(XWikiAttachment xWikiAttachment, XWikiContext context) throws XWikiException;
+
+    String getParentUrl(XWikiContext context);
+
+    String display(String fieldname, BaseObject obj, XWikiContext context);
+
+    String display(String fieldname, XWikiContext context);
+
+    String displayForm(String className,String header, String format, XWikiContext context);
+
+    String displayForm(String className,String header, String format, boolean linebreak, XWikiContext context);
+
+    String displayForm(String className, XWikiContext context);
 }

@@ -67,18 +67,18 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return rscpath.toString();
     }
 
-    public File getFilePath(XWikiDocInterface doc) {
+    public File getFilePath(XWikiDocInterface doc, XWikiContext context) {
         File webdir = new File(getPath(), doc.getWeb().replace('.','/'));
         webdir.mkdirs();
         return new File(webdir, doc.getName() + ".txt");
     }
 
-    public File getVersionedFilePath(XWikiDocInterface doc) {
+    public File getVersionedFilePath(XWikiDocInterface doc, XWikiContext context) {
         File webfile = new File(getPath(), doc.getWeb().replace('.','/'));
         return new File(webfile, doc.getName() + ".txt,v");
     }
 
-    public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         try {
             doc.setStore(this);
@@ -87,7 +87,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 doc.setDate(new Date());
                 doc.incrementVersion();
             }
-            File file = getFilePath(doc);
+            File file = getFilePath(doc, context);
             FileWriter wr = new FileWriter(file);
             wr.write(getFullContent(doc));
             wr.flush();
@@ -95,7 +95,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
 
             // Now handle the versioned file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
-                File vfile = getVersionedFilePath(doc);
+                File vfile = getVersionedFilePath(doc, context);
                 Archive archive;
                 Lines lines = new Lines(getFullContent(doc));
                 try {
@@ -119,12 +119,12 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         }
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
         try {
             doc.setStore(this);
-            File file = getFilePath(doc);
+            File file = getFilePath(doc, context);
             StringBuffer content = new StringBuffer();
             fr = new BufferedReader(new FileReader(file));
             String line;
@@ -170,14 +170,14 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return doc;
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocInterface doc = new XWikiSimpleDoc(basedoc.getWeb(), basedoc.getName());
         try {
             doc.setStore(this);
             Archive archive = basedoc.getRCSArchive();
 
             if (archive==null) {
-                File file = getVersionedFilePath(doc);
+                File file = getVersionedFilePath(doc, context);
                 String path = file.toString();
                 synchronized (path) {
                     archive = new Archive(path);
@@ -219,17 +219,17 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return doc;
     }
 
-    public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
+    public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         try {
             doc.setStore(this);
-            File vfile = getVersionedFilePath(doc);
+            File vfile = getVersionedFilePath(doc, context);
             String path = vfile.toString();
             synchronized (path) {
                 Archive archive;
                 try {
                     archive= new Archive(path);
                 } catch (Exception e) {
-                    File file = getFilePath(doc);
+                    File file = getFilePath(doc, context);
                     if (file.exists()) {
                         Version[] versions = new Version[1];
                         versions[0] = new Version("1.1");
@@ -325,75 +325,40 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         return true;
     }
 
-    public XWikiAttachment loadAttachment(XWikiAttachment attachment) {
+    public XWikiAttachment loadAttachment(XWikiAttachment attachment, XWikiContext context) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public List getClassList() throws XWikiException {
+    public List getClassList(XWikiContext context) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
     }
 
-    public List searchDocuments(String wheresql) throws XWikiException {
-        return searchDocuments(wheresql,0,0);
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
+        return searchDocuments(wheresql,0,0, context);
     }
 
-    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
     }
 
-    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-        public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
-        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "objects function not needed");
-    }
-
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
-    public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
-    public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Attachment not implemented");
     }
 
-    public List search(String sql, int nb, int start) throws XWikiException {
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Search not implemented");
     }

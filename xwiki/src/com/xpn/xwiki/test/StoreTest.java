@@ -23,6 +23,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
@@ -38,15 +39,16 @@ import java.util.List;
 public abstract class StoreTest extends TestCase {
 
     public abstract XWikiStoreInterface getStore();
+    public XWikiContext context = new XWikiContext();
 
     public void testStandardReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1);
+        store.saveXWikiDoc(doc1, context);
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
-        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
+        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
         String content2 = doc2.getContent();
         assertEquals(Utils.content1,content2);
         assertEquals(doc2.getVersion(), Utils.version);
@@ -54,9 +56,9 @@ public abstract class StoreTest extends TestCase {
         assertEquals(doc2.getAuthor(), Utils.author);
         doc2.setContent(Utils.content3);
         doc2.setAuthor(Utils.author2);
-        store.saveXWikiDoc(doc2);
+        store.saveXWikiDoc(doc2, context);
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
-        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
         String content3b = doc3.getContent();
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);
@@ -67,13 +69,13 @@ public abstract class StoreTest extends TestCase {
 
     public void testVersionedReadWrite(XWikiStoreInterface store,String web, String name) throws XWikiException {
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
-        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
-        XWikiDocInterface doc4 = store.loadXWikiDoc(doc3,Utils.version);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
+        XWikiDocInterface doc4 = store.loadXWikiDoc(doc3,Utils.version, context);
         String content4 = doc4.getContent();
         assertEquals(Utils.content1,content4);
         assertEquals(doc4.getVersion(),Utils.version);
         assertEquals(doc4.getAuthor(), Utils.author);
-        Version[] versions = store.getXWikiDocVersions(doc4);
+        Version[] versions = store.getXWikiDocVersions(doc4, context);
         assertTrue(versions.length==2);
     }
 
@@ -112,21 +114,21 @@ public abstract class StoreTest extends TestCase {
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1);
+        store.saveXWikiDoc(doc1, context);
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
-        doc1.saveAttachmentContent(attachment1);
+        doc1.saveAttachmentContent(attachment1, context);
         doc1.getAttachmentList().add(attachment1);
-        store.saveXWikiDoc(doc1);
+        store.saveXWikiDoc(doc1, context);
 
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc(web, name);
-        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
+        doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
         List attachlist = doc2.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attachment2 = (XWikiAttachment) attachlist.get(0);
         assertEquals("Attachment version is not correct", "1.1", attachment2.getVersion());
-        byte[] attachcontent2 = attachment2.getContent();
+        byte[] attachcontent2 = attachment2.getContent(context);
         assertEquals("Attachment content size is not correct", attachcontent1.length, attachcontent2.length);
         for (int i=0;i<attachcontent1.length;i++) {
             assertEquals("Attachment content byte " + i + " is not correct", attachcontent1[i], attachcontent2[i]);
@@ -143,21 +145,21 @@ public abstract class StoreTest extends TestCase {
     public void testSecondAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
-        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
         XWikiAttachment attachment2 = new XWikiAttachment(doc3, Utils.filename2);
         byte[] attachcontent2 = Utils.getDataAsBytes(new File(Utils.filename2));
         attachment2.setContent(attachcontent2);
-        doc3.saveAttachmentContent(attachment2);
+        doc3.saveAttachmentContent(attachment2, context);
         doc3.getAttachmentList().add(attachment2);
-        store.saveXWikiDoc(doc3);
+        store.saveXWikiDoc(doc3, context);
 
         XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
-        doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4);
+        doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4, context);
         List attachlist = doc4.getAttachmentList();
         assertEquals("Attachment is not listed", 2, attachlist.size());
         XWikiAttachment attachment4 = (XWikiAttachment) attachlist.get(1);
         assertEquals("Attachment version is not correct", "1.1", attachment4.getVersion());
-        byte[] attachcontent4 = attachment4.getContent();
+        byte[] attachcontent4 = attachment4.getContent(context);
         assertEquals("Attachment content size is not correct", attachcontent2.length, attachcontent4.length);
         for (int i=0;i<attachcontent2.length;i++) {
             assertEquals("Attachment content byte " + i + " is not correct", attachcontent2[i], attachcontent4[i]);
@@ -175,21 +177,21 @@ public abstract class StoreTest extends TestCase {
     public void testUpdateAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(web, name);
-        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
         List attachlist = doc3.getAttachmentList();
         XWikiAttachment attachment3 = (XWikiAttachment) attachlist.get(0);
         byte[] attachcontent3 = Utils.getDataAsBytes(new File(Utils.filename2));
         attachment3.setContent(attachcontent3);
-        doc3.saveAttachmentContent(attachment3);
-        store.saveXWikiDoc(doc3);
+        doc3.saveAttachmentContent(attachment3, context);
+        store.saveXWikiDoc(doc3, context);
 
         XWikiSimpleDoc doc4 = new XWikiSimpleDoc(web, name);
-        doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4);
+        doc4 = (XWikiSimpleDoc) store.loadXWikiDoc(doc4, context);
         attachlist = doc4.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attachment4 = (XWikiAttachment) attachlist.get(0);
         assertEquals("Attachment version is not correct", "1.2", attachment4.getVersion());
-        byte[] attachcontent4 = attachment4.getContent();
+        byte[] attachcontent4 = attachment4.getContent(context);
         assertEquals("Attachment content size is not correct", attachcontent3.length, attachcontent4.length);
         for (int i=0;i<attachcontent3.length;i++) {
             assertEquals("Attachment content byte " + i + " is not correct", attachcontent3[i], attachcontent4[i]);

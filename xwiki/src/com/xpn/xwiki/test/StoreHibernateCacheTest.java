@@ -40,7 +40,7 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         System.gc();
     }
 
@@ -63,7 +63,7 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
         XWikiStoreInterface store = getStore();
         testStandardReadWrite(store, Utils.web, Utils.name);
         XWikiSimpleDoc doc3 = new XWikiSimpleDoc(Utils.web, Utils.name);
-        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3);
+        doc3 = (XWikiSimpleDoc) store.loadXWikiDoc(doc3, context);
         String content3b = doc3.getContent();
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);

@@ -60,7 +60,7 @@ public class PatternPlugin extends XWikiDefaultPlugin implements XWikiNotificati
             patterns = new Vector();
             results = new Vector();
             descriptions = new Vector();
-            XWikiDocInterface pattern_doc = xwiki.getDocument("Plugins", "PatternPlugin");
+            XWikiDocInterface pattern_doc = xwiki.getDocument("Plugins", "PatternPlugin", context);
             Vector patternlist = pattern_doc.getObjects("Plugins.PatternPlugin");
             if (patternlist!=null) {
             for (int i=0;i<patternlist.size();i++) {

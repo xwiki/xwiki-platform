@@ -64,7 +64,7 @@ public class PerlTest extends TestCase {
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         xwiki = null;
         context = null;
         wikirenderer = null;

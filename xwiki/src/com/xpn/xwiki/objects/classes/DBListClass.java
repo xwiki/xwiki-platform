@@ -41,7 +41,7 @@ public class DBListClass extends ListClass {
     public List getList(XWikiContext context) {
         XWiki xwiki = context.getWiki();
         try {
-            return xwiki.search(getSql());
+            return xwiki.search(getSql(), context);
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList();

@@ -15,7 +15,7 @@
 #versions()
 </div>
 <div id="xwikiwebmenu">
-$!xwiki.getWebPreference("menu", $context)
+$!xwiki.getWebPreference("menu")
 </div>
 </div>
 #if($message)
@@ -26,10 +26,10 @@ $message
 <div id="xwikicontent">
 #if ($request.getParameter("raw").equals("1"))
 <pre>
-$cdoc.getEscapedContent($context)
+$cdoc.getEscapedContent()
 </pre>
 #else
-$cdoc.getRenderedContent($context)
+$cdoc.getRenderedContent()
 #end
 </div>
 <div id="xwikinav_footer">

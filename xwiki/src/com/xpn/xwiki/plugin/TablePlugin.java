@@ -79,7 +79,7 @@ public class TablePlugin extends XWikiDefaultPlugin {
         try {
 
             XWiki xwiki = context.getWiki();
-            XWikiDocInterface doc = xwiki.getDocument("Plugins","TablePlugin");
+            XWikiDocInterface doc = xwiki.getDocument("Plugins","TablePlugin", context);
             BaseObject pluginconf = (BaseObject) doc.getxWikiObject();
 
             if (pluginconf!=null) {

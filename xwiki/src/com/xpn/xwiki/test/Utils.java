@@ -2,6 +2,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
@@ -53,7 +54,6 @@ public class Utils {
     public static String rcspath = "./rcs";
     public static String filename = "test1.sxw";
     public static String filename2 = "test1.doc";
-
 
     public static void setStandardData() {
         name = "WebHome";
@@ -114,19 +114,19 @@ public class Utils {
     }
 
 
-    public static XWikiSimpleDoc createDoc(XWikiStoreInterface store, String web, String name) throws XWikiException {
-        return createDoc(store,web, name, null, null, null);
+    public static XWikiSimpleDoc createDoc(XWikiStoreInterface store, String web, String name, XWikiContext context) throws XWikiException {
+        return createDoc(store,web, name, null, null, null, context);
     }
 
     public static XWikiSimpleDoc createDoc(XWikiStoreInterface store, String web, String name,
-                                 BaseObject bobject, BaseClass bclass) throws XWikiException {
-        return createDoc(store,web, name, bobject, bclass, null);
+                                 BaseObject bobject, BaseClass bclass, XWikiContext context) throws XWikiException {
+        return createDoc(store,web, name, bobject, bclass, null, context);
 
     }
 
     public static XWikiSimpleDoc createDoc(XWikiStoreInterface store, String web, String name,
                                  BaseObject bobject, BaseClass bclass,
-                                 Map bobjects) throws XWikiException {
+                                 Map bobjects, XWikiContext context) throws XWikiException {
         XWikiSimpleDoc doc1 = new XWikiSimpleDoc(web, name);
         String fullname = doc1.getFullName();
         doc1.setContent(Utils.content1);
@@ -145,7 +145,7 @@ public class Utils {
             doc1.setxWikiClass(bclass);
         }
 
-        store.saveXWikiDoc(doc1);
+        store.saveXWikiDoc(doc1, context);
         return doc1;
     }
 

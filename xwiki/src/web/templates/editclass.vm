@@ -1,4 +1,4 @@
-<form id="classadd" method="post" action="$doc.getActionUrl("classadd", $context)">
+<form id="objectadd" method="post" action="$doc.getActionUrl("objectadd")">
 <h2>Add a Class</h2>
 <p>
 <select name="classname" size="1">
@@ -12,7 +12,7 @@
 </form>
 or<br />
 <h2>Class Description</h2>
-<form id="propadd" method="post" action="$doc.getActionUrl("propadd", $context)">
+<form id="propadd" method="post" action="$doc.getActionUrl("propadd")">
 <p>
 Name: <input type="text" name="propname" value="" size="20" />
 <select name="proptype" size="1">
@@ -24,7 +24,7 @@ Name: <input type="text" name="propname" value="" size="20" />
 <input type="submit" value="Add Property" />
 </p>
 </form>
-<form id="propupdate" method="post" action="$doc.getActionUrl("propupdate", $context)">
+<form id="propupdate" method="post" action="$doc.getActionUrl("propupdate")">
 <table border="0">
 #foreach($prop in $doc.xWikiClass.properties)
 <tr><th>Property</th><th>$prop.prettyName</th></tr>

@@ -27,6 +27,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -102,9 +103,9 @@ public class ViewEditAction extends XWikiAction
         action = mapping.getName();
 
         // Test works with xwiki-test.cfg instead of xwiki.cfg
-        boolean test = false;
+        String dbname = "xwiki";
         if (request.getServletPath().startsWith ("/testbin")) {
-          test = true;
+          dbname = "xwikitest";
         }
 
         servlet.log("[DEBUG] ViewEditAction at perform(): Action ist " + action);
@@ -113,19 +114,20 @@ public class ViewEditAction extends XWikiAction
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(this);
+        context.setDatabase(dbname);
 
-        XWiki xwiki = getXWiki(context, test);
+        XWiki xwiki = XWiki.getXWiki(context);
         XWikiDocInterface doc;
-        doc = xwiki.getDocumentFromPath(request.getPathInfo());
+        doc = xwiki.getDocumentFromPath(request.getPathInfo(), context);
         context.put("doc", doc);
 
         // Objects available in Wiki Templates
         // Document used in the template (always the latest version)
-        session.setAttribute("doc", doc);
+        session.setAttribute("doc", new Document(doc, context));
         // Document used for the content (old version in case of revisions)
-        session.setAttribute("cdoc", doc);
+        session.setAttribute("cdoc", new Document(doc, context));
         session.setAttribute("context", context);
-        session.setAttribute("xwiki", xwiki);
+        session.setAttribute("xwiki", new com.xpn.xwiki.api.XWiki(xwiki, context));
 
         if (xwiki.checkAccess(action, doc, context)==false)
            return null;
@@ -138,9 +140,9 @@ public class ViewEditAction extends XWikiAction
             String rev = request.getParameter("rev");
             if (rev!=null) {
                 // Let's get the revision
-                doc = xwiki.getDocument(doc, rev);
+                doc = xwiki.getDocument(doc, rev, context);
                 context.put("doc", doc);
-                session.setAttribute("cdoc", doc);
+                session.setAttribute("cdoc", new Document(doc, context));
             }
             // forward to view template
             if (xwiki.getSkin(context).equals("plain"))
@@ -234,12 +236,12 @@ public class ViewEditAction extends XWikiAction
             response.sendRedirect(doc.getActionUrl("edit",context));
             return null;
         }
-        else if (action.equals("classadd")) {
+        else if (action.equals("objectadd")) {
             XWikiDocInterface olddoc = (XWikiDocInterface) doc.clone();
-            String className = ((ClassAddForm) form).getClassName();
+            String className = ((ObjectAddForm) form).getClassName();
             doc.createNewObject(className, context);
             xwiki.saveDocument(doc, olddoc, context);
-            return (mapping.findForward("classadd"));
+            return (mapping.findForward("objectadd"));
         }
         if (action.equals("download"))
         {
@@ -252,7 +254,7 @@ public class ViewEditAction extends XWikiAction
             response.setContentType(servlet.getServletContext().getMimeType(filename));
 
             // Sending the content of the attachment
-            byte[] data = attachment.getContent();
+            byte[] data = attachment.getContent(context);
             response.setContentLength(data.length);
             response.getOutputStream().write(data);
 
@@ -303,7 +305,7 @@ public class ViewEditAction extends XWikiAction
             attachment.setDoc(doc);
 
             // Save the content and the archive
-            doc.saveAttachmentContent(attachment);
+            doc.saveAttachmentContent(attachment, context);
 
             // Save the document with the attachment meta data
             xwiki.saveDocument(doc, olddoc, context);

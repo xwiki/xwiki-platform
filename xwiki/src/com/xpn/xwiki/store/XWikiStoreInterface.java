@@ -24,6 +24,7 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,26 +36,17 @@ import org.apache.commons.jrcs.rcs.Version;
 import java.util.List;
 
 public interface XWikiStoreInterface {
-    public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException;
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException;
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version) throws XWikiException;
-    public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException;
-    public List getClassList() throws XWikiException;
-    public List searchDocuments(String wheresql) throws XWikiException;
-    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException;
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, String version, XWikiContext context) throws XWikiException;
+    public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException;
+    public List getClassList(XWikiContext context) throws XWikiException;
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException;
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
 
-    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException;
-    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException;
-    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
-    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException;
-    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
-    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException;
+    void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
+    void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
 
-    void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
-    void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
-    void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException;
-
-    void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException;
-
-    List search(String sql, int nb, int start) throws XWikiException;
+    List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
 }

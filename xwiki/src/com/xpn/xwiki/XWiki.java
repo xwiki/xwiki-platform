@@ -55,11 +55,14 @@ import org.securityfilter.realm.SecurityRealmInterface;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.Servlet;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 public class XWiki implements XWikiNotificationInterface {
 
@@ -78,6 +81,45 @@ public class XWiki implements XWikiNotificationInterface {
     private boolean test = false;
     private String version = null;
     private HttpServlet servlet;
+
+
+    public static XWiki getXWiki(XWikiContext context) throws XWikiException {
+        String xwikicfg = "WEB-INF/xwiki.cfg";
+        String xwikiname = "xwiki";
+
+        HttpServlet servlet = context.getServlet();
+        XWiki xwiki = (XWiki) servlet.getServletContext().getAttribute(xwikiname);
+
+        if (xwiki == null) {
+            String path = servlet.getServletContext().getRealPath(xwikicfg);
+            xwiki = new XWiki(path, context, servlet);
+            servlet.getServletContext().setAttribute(xwikiname, xwiki);
+        }
+        context.setWiki(xwiki);
+        if ("1".equals(xwiki.Param("xwiki.virtual"))) {
+            HttpServletRequest request = context.getRequest();
+            String host = "";
+            try {
+              host = new URL(request.getRequestURL().toString()).getHost();
+            } catch (Exception e) {};
+                String uri = request.getRequestURI();
+            int i1 = host.indexOf(".");
+            String servername = (i1!=-1) ? host.substring(0, i1) : host;
+            String appname = uri.substring(1,uri.indexOf("/",2));
+            if ((servername.equals("www"))||
+                    (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
+                if (appname.equals("xwiki"))
+                    return xwiki;
+            } else {
+                appname = servername;
+            }
+
+            // Check if this appname exists in the Database
+            context.setDatabase(appname);
+        }
+        return xwiki;
+    }
+
 
     public XWiki(String path, XWikiContext context) throws XWikiException {
         this(path,context,null);
@@ -134,10 +176,10 @@ public class XWiki implements XWikiNotificationInterface {
                 new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
 
         // Make sure these classes exists
-        getUserClass();
-        getGroupClass();
-        getRightsClass();
-        getGlobalRightsClass();
+        getUserClass(context);
+        getGroupClass(context);
+        getRightsClass(context);
+        getGlobalRightsClass(context);
 
         // Initialize User Manager
         initUserManager();
@@ -218,62 +260,57 @@ public class XWiki implements XWikiNotificationInterface {
         return store;
     }
 
-    public void saveDocument(XWikiDocInterface doc) throws XWikiException {
-        getStore().saveXWikiDoc(doc);
+    public void saveDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
+        getStore().saveXWikiDoc(doc, context);
     }
 
     public void saveDocument(XWikiDocInterface doc, XWikiDocInterface olddoc, XWikiContext context) throws XWikiException {
-        getStore().saveXWikiDoc(doc);
+        getStore().saveXWikiDoc(doc, context);
         getNotificationManager().verify(doc, olddoc, 0, context);
     }
 
-    public XWikiDocInterface getDocument(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface getDocument(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         try {
-            doc = getStore().loadXWikiDoc(doc);
+            doc = getStore().loadXWikiDoc(doc, context);
         }  catch (XWikiException e) {
             throw e;
         }
         return doc;
     }
 
-    public XWikiDocInterface getDocument(XWikiDocInterface doc, String revision) throws XWikiException {
+    public XWikiDocInterface getDocument(XWikiDocInterface doc, String revision, XWikiContext context) throws XWikiException {
         try {
-            doc = getStore().loadXWikiDoc(doc, revision);
+            doc = getStore().loadXWikiDoc(doc, revision, context);
         }  catch (XWikiException e) {
             // TODO: log error for document version that does not exist.
         }
         return doc;
     }
 
-    public XWikiDocInterface getDocument(String web, String name) throws XWikiException {
-        XWikiSimpleDoc doc = new XWikiSimpleDoc(web, name);
-        return getDocument(doc);
-    }
-
-    public XWikiDocInterface getDocument(String fullname) throws XWikiException {
+    public XWikiDocInterface getDocument(String fullname, XWikiContext context) throws XWikiException {
         int i1 = fullname.lastIndexOf(".");
         String web = fullname.substring(0,i1);
         String name = fullname.substring(i1+1);
         if (name.equals(""))
             name = "WebHome";
-        return getDocument(web,name);
+        return getDocument(new XWikiSimpleDoc(web, name), context);
     }
 
-    public XWikiDocInterface getDocument(String fullname, XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
         int i1 = fullname.lastIndexOf(".");
         if (i1!=-1) {
-         String web = fullname.substring(0,i1);
-         String name = fullname.substring(i1+1);
-         if (name.equals(""))
-             name = "WebHome";
-         return getDocument(web,name);
+            String web2 = fullname.substring(0,i1);
+            String name = fullname.substring(i1+1);
+            if (name.equals(""))
+                name = "WebHome";
+            return getDocument(new XWikiSimpleDoc(web2, name), context);
         } else {
-         return getDocument(doc.getWeb(), fullname);
+            return getDocument(new XWikiSimpleDoc(web, fullname), context);
         }
     }
 
 
-    public XWikiDocInterface getDocumentFromPath(String path) throws XWikiException {
+    public XWikiDocInterface getDocumentFromPath(String path, XWikiContext context) throws XWikiException {
         String web, name;
         int i1 = path.indexOf("/",1);
         int i2 = path.indexOf("/", i1+1);
@@ -285,7 +322,7 @@ public class XWiki implements XWikiNotificationInterface {
             name = path.substring(i2+1,i3);
         if (name.equals(""))
             name = "WebHome";
-        return getDocument(web,name);
+        return getDocument(web, name, context);
     }
 
     public String getBase() {
@@ -335,8 +372,8 @@ public class XWiki implements XWikiNotificationInterface {
         return textarea.toString();
     }
 
-    public List getClassList() throws XWikiException {
-        return getStore().getClassList();
+    public List getClassList(XWikiContext context) throws XWikiException {
+        return getStore().getClassList(context);
     }
     /*
     public String[] getClassList() throws XWikiException {
@@ -348,21 +385,21 @@ public class XWiki implements XWikiNotificationInterface {
     }
     */
 
-    public List search(String wheresql) throws XWikiException {
-        return getStore().search(wheresql, 0, 0);
+    public List search(String wheresql, XWikiContext context) throws XWikiException {
+        return getStore().search(wheresql, 0, 0, context);
     }
 
-    public List search(String wheresql, int nb, int start) throws XWikiException {
-        return getStore().search(wheresql, nb, start);
+    public List search(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
+        return getStore().search(wheresql, nb, start, context);
     }
 
 
-    public List searchDocuments(String wheresql) throws XWikiException {
-        return getStore().searchDocuments(wheresql);
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
+        return getStore().searchDocuments(wheresql, context);
     }
 
-    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-        return getStore().searchDocuments(wheresql, nb, start);
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
+        return getStore().searchDocuments(wheresql, nb, start, context);
     }
 
     public boolean isTest() {
@@ -399,7 +436,7 @@ public class XWiki implements XWikiNotificationInterface {
                 return skin;
             }
 
-            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
             skin = ((BaseProperty)doc.getxWikiObject().get("skin")).getValue().toString();
             context.put("skin",skin);
             return skin;
@@ -411,7 +448,7 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getWebCopyright(XWikiContext context) {
         try {
-            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
             return ((BaseProperty)doc.getxWikiObject().get("webcopyright")).getValue().toString();
         } catch (Exception e) {
             return "Copyright 2003,2004 (c) Ludovic Dubost";
@@ -420,7 +457,7 @@ public class XWiki implements XWikiNotificationInterface {
 
     public String getXWikiPreference(String prefname, XWikiContext context) {
         try {
-            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences");
+            XWikiDocInterface doc = getDocument("XWiki.XWikiPreferences", context);
             return ((BaseProperty)doc.getxWikiObject().get(prefname)).getValue().toString();
         } catch (Exception e) {
             return "";
@@ -430,7 +467,7 @@ public class XWiki implements XWikiNotificationInterface {
     public String getWebPreference(String prefname, XWikiContext context) {
         try {
             XWikiDocInterface currentdoc = (XWikiDocInterface) context.get("doc");
-            XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences");
+            XWikiDocInterface doc = getDocument(currentdoc.getWeb() + ".WebPreferences", context);
             return ((BaseProperty)doc.getObject("XWiki.XWikiPreferences", 0).get(prefname)).getValue().toString();
         } catch (Exception e) {
             return getXWikiPreference(prefname, context);
@@ -495,12 +532,12 @@ public class XWiki implements XWikiNotificationInterface {
         }
     }
 
-    public BaseClass getUserClass() throws XWikiException {
+    public BaseClass getUserClass(XWikiContext context) throws XWikiException {
         XWikiDocInterface doc;
         boolean needsUpdate = false;
 
         try {
-            doc = getDocument("XWiki.XWikiUsers");
+            doc = getDocument("XWiki.XWikiUsers", context);
         } catch (Exception e) {
             doc = new XWikiSimpleDoc();
             doc.setWeb("XWiki");
@@ -554,16 +591,16 @@ public class XWiki implements XWikiNotificationInterface {
             doc.setContent("---+ XWiki Users");
 
         if (needsUpdate)
-            saveDocument(doc);
+            saveDocument(doc, context);
         return bclass;
     }
 
-    public BaseClass getGroupClass() throws XWikiException {
+    public BaseClass getGroupClass(XWikiContext context) throws XWikiException {
         XWikiDocInterface doc;
         boolean needsUpdate = false;
 
         try {
-            doc = getDocument("XWiki.XWikiGroups");
+            doc = getDocument("XWiki.XWikiGroups", context);
         } catch (Exception e) {
             doc = new XWikiSimpleDoc();
             doc.setWeb("XWiki");
@@ -586,17 +623,17 @@ public class XWiki implements XWikiNotificationInterface {
             doc.setContent("---+ XWiki Groups");
 
         if (needsUpdate)
-            saveDocument(doc);
+            saveDocument(doc, context);
         return bclass;
     }
 
 
-    public BaseClass getRightsClass(String pagename) throws XWikiException {
+    public BaseClass getRightsClass(String pagename,XWikiContext context) throws XWikiException {
         XWikiDocInterface doc;
         boolean needsUpdate = false;
 
         try {
-            doc = getDocument("XWiki." + pagename );
+            doc = getDocument("XWiki." + pagename, context);
         } catch (Exception e) {
             doc = new XWikiSimpleDoc();
             doc.setWeb("XWiki");
@@ -647,16 +684,16 @@ public class XWiki implements XWikiNotificationInterface {
             doc.setContent("---+ XWiki " + pagename);
 
         if (needsUpdate)
-            saveDocument(doc);
+            saveDocument(doc, context);
         return bclass;
     }
 
-    public BaseClass getRightsClass() throws XWikiException {
-        return getRightsClass("XWikiRights");
+    public BaseClass getRightsClass(XWikiContext context) throws XWikiException {
+        return getRightsClass("XWikiRights", context);
     }
 
-    public BaseClass getGlobalRightsClass() throws XWikiException {
-        return getRightsClass("XWikiGlobalRights");
+    public BaseClass getGlobalRightsClass(XWikiContext context) throws XWikiException {
+        return getRightsClass("XWikiGlobalRights", context);
     }
 
     public void initUserManager() {
@@ -674,13 +711,13 @@ public class XWiki implements XWikiNotificationInterface {
 
     public int createUser(XWikiContext context) throws XWikiException {
         HttpServletRequest request = (HttpServletRequest) context.getRequest();
-        BaseClass baseclass = getUserClass();
+        BaseClass baseclass = getUserClass(context);
         String xwikiname = request.getParameter("xwikiname");
         String password2 = request.getParameter("register2_password");
 
         try {
             // TODO: Verify existing user
-            XWikiDocInterface doc = getDocument("XWiki." + xwikiname);
+            XWikiDocInterface doc = getDocument("XWiki." + xwikiname, context);
             if (!doc.isNew()) {
                 // TODO: throws Exception
                 return 0;
@@ -849,14 +886,14 @@ public class XWiki implements XWikiNotificationInterface {
     public String include(String topic, XWikiContext context, boolean isForm) {
         XWikiDocInterface doc = null;
         try {
-            doc = getDocument(topic, (XWikiDocInterface) context.get("doc"));
+            doc = getDocument(((XWikiDocInterface) context.get("doc")).getWeb(), topic, context);
         } catch (XWikiException e) {
             return "Topic " + topic + " does not exist";
         }
         if (isForm)
-         return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
+            return "<pre>" + getRenderingEngine().renderDocument(doc, (XWikiDocInterface)context.get("doc"), context) + "</pre>";
         else
-         return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
+            return "<pre>" + getRenderingEngine().renderDocument(doc, context) + "</pre>";
     }
 
 }

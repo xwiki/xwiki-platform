@@ -37,6 +37,7 @@ public class XWikiContext extends Hashtable {
    private HttpServletRequest request;
    private HttpServletResponse response;
    private XWikiAction action;
+   private String database;
     
    public XWikiContext() {
    }
@@ -88,6 +89,14 @@ public class XWikiContext extends Hashtable {
 
     public void setResponse(HttpServletResponse response) {
         this.response = response;
+    }
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
 

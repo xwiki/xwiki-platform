@@ -2,12 +2,12 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import net.sf.hibernate.HibernateException;
-
 import java.util.List;
 
 /**
@@ -37,7 +37,7 @@ public class SearchTest extends TestCase {
 
     public XWikiHibernateStore store;
     public String hibpath = "hibernate-test.cfg.xml";
-
+    public XWikiContext context = new XWikiContext();
 
     public XWikiHibernateStore getHibStore() {
         return (XWikiHibernateStore) getStore();
@@ -53,20 +53,20 @@ public class SearchTest extends TestCase {
 
 
     public void setUp() throws HibernateException {
+        context.setDatabase("xwikitest");
         XWikiHibernateStore hibstore = getHibStore();
-        StoreHibernateTest.cleanUp(hibstore);
-        // hibstore.shutdownHibernate();
+        StoreHibernateTest.cleanUp(hibstore, context);
     }
 
     public void tearDown() throws HibernateException {
         XWikiHibernateStore hibstore = getHibStore();
-        hibstore.shutdownHibernate();
+        hibstore.shutdownHibernate(context);
         hibstore = null;
         System.gc();
     }
 
     public void testSearch(XWikiStoreInterface hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
-        List lresult = hibstore.searchDocuments(wheresql);
+        List lresult = hibstore.searchDocuments(wheresql, context);
         String[] result = {};
         result = (String[]) lresult.toArray(result);
         assertEquals("Number of results of search " + wheresql + " is different", result.length, expected.length);
@@ -84,13 +84,13 @@ public class SearchTest extends TestCase {
         doc1.setContent("no content");
         doc1.setAuthor("Ludovic Dubost");
         doc1.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc1);
+        hibstore.saveXWikiDoc(doc1, context);
         testSearch(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Main", "WebHome2");
         doc2.setContent("no content");
         doc2.setAuthor("Ludovic Dubost");
         doc2.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc2);
+        hibstore.saveXWikiDoc(doc2, context);
         testSearch(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         testSearch(hibstore, "doc.web='Main'", new String[] {"Main.WebHome", "Main.WebHome2"});
     }

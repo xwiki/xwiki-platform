@@ -31,9 +31,10 @@ import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import net.sf.hibernate.*;
+import net.sf.hibernate.dialect.Dialect;
 import net.sf.hibernate.impl.SessionFactoryImpl;
 import net.sf.hibernate.cfg.Configuration;
-import net.sf.hibernate.tool.hbm2ddl.SchemaUpdate;
+import net.sf.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
@@ -42,13 +43,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.Serializable;
 import java.util.*;
+import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.Statement;
 
 
 public class XWikiHibernateStore extends XWikiRCSFileStore {
-    protected SessionFactory sessionFactory;
-    private Session session;
-    protected Transaction transaction;
-    protected Configuration configuration;
+    private SessionFactory sessionFactory;
+    private Configuration configuration;
 
     private String hibpath;
 
@@ -75,48 +77,144 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         // Load Configuration and build SessionFactory
         String path = getPath();
         if (path!=null)
-            configuration =  (new Configuration()).configure(new File(path));
+            setConfiguration((new Configuration()).configure(new File(path)));
         else
-            configuration = new Configuration().configure();
-        sessionFactory = configuration.buildSessionFactory();
+            setConfiguration(new Configuration().configure());
+        setSessionFactory(getConfiguration().buildSessionFactory());
     }
 
-    public void shutdownHibernate() throws HibernateException {
+    public Session getSession(XWikiContext context) {
+        Session session = (Session) context.get("hibsession");
+        return session;
+    }
+
+    public void setSession(Session session, XWikiContext context) {
+        context.put("hibsession", session);
+    }
+
+
+    public Transaction getTransaction(XWikiContext context) {
+        Transaction transaction = (Transaction) context.get("hibtransaction");
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction, XWikiContext context) {
+        context.put("hibtransaction", transaction);
+    }
+
+
+    public void shutdownHibernate(XWikiContext context) throws HibernateException {
+        Session session = getSession(context);
+
         if (session!=null) {
             session.close();
         }
-        if (sessionFactory!=null) {
-            ((SessionFactoryImpl)sessionFactory).getConnectionProvider().close();
+        if (getSessionFactory()!=null) {
+            ((SessionFactoryImpl)getSessionFactory()).getConnectionProvider().close();
         }
     }
 
-    public void updateSchema() throws HibernateException {
-        SchemaUpdate schemaupdate = new SchemaUpdate(configuration);
-        schemaupdate.execute(true);
+    public void updateSchema(XWikiContext context) throws HibernateException {
+        Session session;
+        Transaction transaction;
+        Connection connection;
+        DatabaseMetadata meta;
+        Statement stmt=null;
+        Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
+
+		try {
+			try {
+                transaction = beginTransaction(context);
+                session = getSession(context);
+                connection = session.connection();
+                // we need to get the dialect
+				meta = new DatabaseMetadata(connection, dialect);
+				stmt = connection.createStatement();
+			}
+			catch (SQLException sqle) {
+                System.err.println("Failed updating schema: " + sqle.getMessage());
+				throw sqle;
+			}
+
+			String[] createSQL = configuration.generateSchemaUpdateScript(dialect, meta);
+			for (int j = 0; j < createSQL.length; j++) {
+
+				final String sql = createSQL[j];
+				try {
+					System.out.println(sql);
+					stmt.executeUpdate(sql);
+                    connection.commit();
+				}
+				catch (SQLException e) {
+                    connection.rollback();
+                    System.err.println("Failed updating schema: " + e.getMessage());
+					// log.error( "Unsuccessful: " + sql );
+					//log.error( e.getMessage() );
+				}
+			}
+		}
+		catch (Exception e) {
+			  System.err.println("Failed updating schema: " + e.getMessage());
+		}
+		finally {
+
+			try {
+				if (stmt!=null) stmt.close();
+                endTransaction(context, true);
+			}
+			catch (Exception e) {
+			}
+		}
     }
 
 
-    public void checkHibernate() throws HibernateException {
+    public void checkHibernate(XWikiContext context) throws HibernateException {
 
-        if (sessionFactory==null) {
+        if (getSessionFactory()==null) {
             initHibernate();
 
             /* Check Schema */
-            if (sessionFactory!=null) {
-                updateSchema();
+            if (getSessionFactory()!=null) {
+                updateSchema(context);
             }
         }
     }
 
-    public void beginTransaction()
+    public Transaction beginTransaction(XWikiContext context)
             throws HibernateException {
 
-        setSession(sessionFactory.openSession());
-        transaction = getSession().beginTransaction();
+        Transaction transaction;
+        Session session = getSession(context);
+        if (session==null) {
+         session = getSessionFactory().openSession();
+         setSession(session, context);
+
+         try {
+             String database = context.getDatabase();
+             if ((database!=null)&&(!database.equals("")))
+              session.connection().setCatalog(database);
+         } catch (Exception e) {
+             System.err.println("Failed to setup catalog " + context.getDatabase());
+         }
+
+         transaction = session.beginTransaction();
+         setTransaction(transaction, context);
+        } else {
+           transaction = getTransaction(context);
+           // transaction = session.beginTransaction();
+           // setTransaction(transaction, context);
+        }
+        return transaction;
     }
 
-    public void endTransaction(boolean commit)
+
+    public void endTransaction(XWikiContext context, boolean commit)
             throws HibernateException {
+
+        Session session = getSession(context);
+        Transaction transaction = getTransaction(context);
+        context.remove("hibsession");
+        context.remove("hibtransaction");
 
         if (commit) {
             transaction.commit();
@@ -124,19 +222,19 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             // Don't commit the transaction, can be faster for read-only operations
             transaction.rollback();
         }
-        getSession().close();
+        session.close();
     }
 
 
-    public void saveXWikiDoc(XWikiDocInterface doc) throws XWikiException {
-        //To change body of implemented methods use Options | File Templates.
+    public void saveXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         try {
             doc.setStore(this);
 
-            checkHibernate();
-            beginTransaction();
+            checkHibernate(context);
+            beginTransaction(context);
+            Session session = getSession(context);
 
-            saveAttachmentList(doc, false);
+            saveAttachmentList(doc, context, false);
 
             // Handle the latest text file
             if (doc.isContentDirty()||doc.isMetaDataDirty()) {
@@ -146,18 +244,18 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             // Verify if the document already exists
-            Query query = getSession().createQuery("select xwikidoc.id from XWikiSimpleDoc as xwikidoc where xwikidoc.id = :id");
+            Query query = session.createQuery("select xwikidoc.id from XWikiSimpleDoc as xwikidoc where xwikidoc.id = :id");
             query.setLong("id", doc.getId());
             if (query.uniqueResult()==null)
-                getSession().save(doc);
+                session.save(doc);
             else
-                getSession().update(doc);
+                session.update(doc);
 
             BaseClass bclass = doc.getxWikiClass();
             if (bclass!=null) {
                 bclass.setName(doc.getFullName());
                 if (bclass.getFields().size()>0)
-                    saveXWikiClass(bclass, false);
+                    saveXWikiClass(bclass, context, false);
             } else {
                 // TODO: Remove existing class
             }
@@ -169,17 +267,17 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 Vector objects = (Vector) it.next();
                 for (int i=0;i<objects.size();i++) {
                     BaseObject obj = (BaseObject)objects.get(i);
-                    saveXWikiObject(obj, false);
+                    saveXWikiObject(obj, context, false);
                 }
                 // Delete all objects of this class that have a bigger ID
                 String squery = "from BaseObject as bobject where bobject.name = '" + doc.getFullName()
                         + "' and bobject.className = '" + ((BaseObject)objects.get(0)).getxWikiClass().getName()
                         + "' and bobject.number >= " + objects.size();
-                int result = getSession().delete(squery);
+                int result = session.delete(squery);
                 System.err.println("Deleted " + result + " instances");
             }
 
-            endTransaction(true);
+            endTransaction(context, true);
             doc.setNew(false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -190,16 +288,17 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
         try {
             doc.setStore(this);
-            checkHibernate();
-            beginTransaction();
+            checkHibernate(context);
+            beginTransaction(context);
+            Session session = getSession(context);
 
             try {
-                getSession().load(doc, new Long(doc.getId()));
+                session.load(doc, new Long(doc.getId()));
                 doc.setNew(false);
             } catch (ObjectNotFoundException e)
             { // No document
@@ -209,17 +308,17 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             Map bclasses = new HashMap();
 
             // Loading the attachment list
-            loadAttachmentList(doc, false);
+            loadAttachmentList(doc, context, false);
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
             bclass.setName(doc.getFullName());
-            loadXWikiClass(bclass, false);
+            loadXWikiClass(bclass, context, false);
             doc.setxWikiClass(bclass);
             bclasses.put(doc.getFullName(), bclass);
 
             // Find the list of classes for which we have an object
-            Query query = getSession().createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name order by bobject.number");
+            Query query = session.createQuery("select bobject.name, bobject.className, bobject.number from BaseObject as bobject where bobject.name = :name order by bobject.number");
             query.setText("name", doc.getFullName());
             Iterator it = query.list().iterator();
 
@@ -234,7 +333,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     if (objclass==null) {
                         objclass = new BaseClass();
                         objclass.setName(classname);
-                        loadXWikiClass(objclass, false);
+                        loadXWikiClass(objclass, context, false);
                         bclasses.put(classname, objclass);
                     }
 
@@ -242,12 +341,12 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     object.setNumber(nb.intValue());
                     object.setName(doc.getFullName());
                     object.setxWikiClass(objclass);
-                    loadXWikiObject(object, false);
+                    loadXWikiObject(object, context, false);
                     doc.setObject(objclass.getName(), nb.intValue(), object);
                 }
             }
 
-            endTransaction(false);
+            endTransaction(context, false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_FILE,
@@ -256,7 +355,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         return doc;
     }
 
-    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version) throws XWikiException {
+    public XWikiDocInterface loadXWikiDoc(XWikiDocInterface basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocInterface doc = new XWikiSimpleDoc(basedoc.getWeb(), basedoc.getName());
         try {
             doc.setStore(this);
@@ -300,11 +399,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
         return doc;
     }
-
     public Version[] getXWikiDocVersions(XWikiDocInterface doc) throws XWikiException {
+        return getXWikiDocVersions(doc, null);
+    }
+
+    public Version[] getXWikiDocVersions(XWikiDocInterface doc, XWikiContext context) throws XWikiException {
         try {
             if (doc.getStore()==null) {
-                doc = loadXWikiDoc(doc);
+                doc = loadXWikiDoc(doc, context);
             }
             Node[] nodes = doc.getRCSArchive().changeLog();
             Version[] versions = new Version[nodes.length];
@@ -319,21 +421,22 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
+    public void saveXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
 
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
 
             // Verify if the property already exists
-            Query query = getSession().createQuery("select obj.id from BaseObject as obj where obj.id = :id");
+            Query query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             query.setInteger("id", object.getId());
             if (query.uniqueResult()==null)
-                getSession().save(object);
+                session.save(object);
             else
-                getSession().update(object);
+                session.update(object);
 
             Iterator it = object.getFields().keySet().iterator();
             while (it.hasNext()) {
@@ -344,11 +447,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
                             "Field {0} in object {1} has an invalid name", null, args);
                 }
-                saveXWikiProperty(prop, false);
+                saveXWikiProperty(prop, context, false);
             }
 
             if (bTransaction) {
-                endTransaction(true);
+                endTransaction(context, true);
             }
         } catch (XWikiException xe) {
             throw xe;
@@ -361,15 +464,17 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
-    public void loadXWikiObject(BaseObject object, boolean bTransaction) throws XWikiException {
+    public void loadXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
             try {
-                getSession().load(object, new Integer(object.getId()));
+                session.load(object, new Integer(object.getId()));
             }
             catch (ObjectNotFoundException e) {
                 // There is no object data saved
@@ -388,13 +493,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 BaseProperty property = (BaseProperty) Class.forName(classType).newInstance();
                 property.setObject(object);
                 property.setName(name);
-                loadXWikiProperty(property, false);
+                loadXWikiProperty(property, context, false);
                 map.put(name, property);
             }
             object.setFields(map);
 
             if (bTransaction) {
-                    endTransaction(false);
+                    endTransaction(context, false);
             }
         } catch (Exception e) {
             Object[] args = { object.getName() };
@@ -405,18 +510,20 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
-    public void loadXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException
+    public void loadXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
 
-            getSession().load(property, (Serializable) property);
+
+            session.load(property, (Serializable) property);
 
             if (bTransaction) {
-                endTransaction(false);
+                endTransaction(context, false);
             }
         }
         catch (Exception e) {
@@ -429,34 +536,35 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
 
-    public void saveXWikiProperty(PropertyInterface property, boolean bTransaction) throws XWikiException
+    public void saveXWikiProperty(PropertyInterface property, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
 
 // I'm using a local transaction
 // There might be implications to this for a wider transaction
-            Transaction ltransaction = getSession().beginTransaction();
+            Transaction ltransaction = session.beginTransaction();
 
 // Use to chose what to delete
             boolean isSave = false;
             try
             {
-                Query query = getSession().createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
+                Query query = session.createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
                 query.setInteger("id", property.getId());
                 query.setString("name", property.getName());
                 if (query.uniqueResult()==null) {
                     isSave = true;
-                getSession().save(property);
+                session.save(property);
                 }
                 else {
                     isSave = false;
-                    getSession().update(property);
+                    session.update(property);
                 }
-                getSession().flush();
+                session.flush();
                 ltransaction.commit();
             } catch (Exception e) {
 // We can't clean-up ListProperties
@@ -483,7 +591,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
 // We need to run the delete in a separate session
 // This is not a problem since this is cleaning up
-                Session session2 = sessionFactory.openSession();
+                Session session2 = getSessionFactory().openSession();
                 Transaction transaction2 = session2.beginTransaction();
                 session2.delete(prop2);
                 session2.flush();
@@ -497,7 +605,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             if (bTransaction)
-                endTransaction(true);
+                endTransaction(context, true);
 
         }
         catch (Exception e) {
@@ -509,31 +617,33 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
+    public void saveXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
 
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
 // Verify if the property already exists
-            Query query = getSession().createQuery("select obj.id from BaseClass as obj where obj.id = :id");
+            Query query = session.createQuery("select obj.id from BaseClass as obj where obj.id = :id");
             query.setInteger("id", bclass.getId());
             if (query.uniqueResult()==null)
-                getSession().save(bclass);
+                session.save(bclass);
             else
-                getSession().update(bclass);
+                session.update(bclass);
 
             Collection coll = bclass.getFields().values();
             Iterator it = coll.iterator();
             while (it.hasNext()) {
                 PropertyClass prop = (PropertyClass) it.next();
-                saveXWikiClassProperty(prop, false);
+                saveXWikiClassProperty(prop, context, false);
             }
 
             if (bTransaction) {
-                endTransaction(true);
+                endTransaction(context, true);
             }
         } catch (Exception e) {
             Object[] args = { bclass.getName() };
@@ -543,15 +653,17 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
 
-    public void loadXWikiClass(BaseClass bclass, boolean bTransaction) throws XWikiException {
+    public void loadXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
             try {
-                getSession().load(bclass, new Integer(bclass.getId()));
+                session.load(bclass, new Integer(bclass.getId()));
             }
             catch (ObjectNotFoundException e) {
 // There is no class data saved
@@ -570,13 +682,13 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
                 property.setName(name);
                 property.setObject(bclass);
-                getSession().load(property, property);
+                session.load(property, property);
                 map.put(name, property);
             }
             bclass.setFields(map);
 
             if (bTransaction) {
-                endTransaction(true);
+                endTransaction(context, true);
             }
         } catch (Exception e) {
             Object[] args = { bclass.getName() };
@@ -585,35 +697,37 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveXWikiClassProperty(PropertyClass property, boolean bTransaction) throws XWikiException
+    public void saveXWikiClassProperty(PropertyClass property, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
 // I'm using a local transaction
 // There might be implications to this for a wider transaction
-            Transaction ltransaction = getSession().beginTransaction();
+            Transaction ltransaction = session.beginTransaction();
 
 // Use to chose what to delete
             boolean isSave = false;
             try
             {
-                Query query = getSession().createQuery("select prop.name from PropertyClass as prop where prop.id.id = :id and prop.id.name= :name");
+                Query query = session.createQuery("select prop.name from PropertyClass as prop where prop.id.id = :id and prop.id.name= :name");
                 query.setInteger("id", property.getId());
                 query.setString("name", property.getName());
                 if (query.uniqueResult()==null) {
                     isSave = true;
-                    getSession().save(property);
+                    session.save(property);
                 }
                 else {
                     isSave = false;
-                    getSession().update(property);
+                    session.update(property);
                 }
 
-                getSession().flush();
+                session.flush();
                 ltransaction.commit();
             } catch (Exception e) {
 // This seems to have failed..
@@ -636,7 +750,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
 // We need to run the delete in a separate session
 // This is not a problem since this is cleaning up
-                Session session2 = sessionFactory.openSession();
+                Session session2 = getSessionFactory().openSession();
                 Transaction transaction2 = session2.beginTransaction();
                 session2.delete(prop2);
                 session2.flush();
@@ -650,7 +764,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
 
             if (bTransaction)
-                endTransaction(true);
+                endTransaction(context, true);
 
         }
         catch (Exception e) {
@@ -661,13 +775,15 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void loadAttachmentList(XWikiDocInterface doc, boolean bTransaction) throws XWikiException {
+    public void loadAttachmentList(XWikiDocInterface doc, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
-            Query query = getSession().createQuery("from XWikiAttachment as attach where attach.docId=:docid");
+            Session session = getSession(context);
+
+            Query query = session.createQuery("from XWikiAttachment as attach where attach.docId=:docid");
             query.setLong("docid", doc.getId());
             List list = query.list();
             for (int i=0;i<list.size();i++) {
@@ -675,7 +791,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             }
             doc.setAttachmentList(list);
             if (bTransaction)
-                endTransaction(false);
+                endTransaction(context, false);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -685,21 +801,23 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveAttachmentList(XWikiDocInterface doc, boolean bTransaction) throws XWikiException {
+    public void saveAttachmentList(XWikiDocInterface doc, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
             List list = doc.getAttachmentList();
             for (int i=0;i<list.size();i++) {
                 XWikiAttachment attachment = (XWikiAttachment) list.get(i);
-                saveAttachment(attachment, false);
+                saveAttachment(attachment, context, false);
             }
 
             if (bTransaction)
-                endTransaction(true);
+                endTransaction(context, true);
         }
         catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -708,14 +826,16 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveAttachment(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void saveAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
 
-            Query query = getSession().createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
+
+            Query query = session.createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
             query.setLong("id", attachment.getId());
             if (query.uniqueResult()==null)
                 session.save(attachment);
@@ -723,7 +843,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 session.update(attachment);
 
             if (bTransaction)
-                endTransaction(true);
+                endTransaction(context, true);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -732,27 +852,29 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             XWikiAttachmentContent content = attachment.getAttachment_content();
             if (content.isContentDirty()) {
-                attachment.updateContentArchive();
+                attachment.updateContentArchive(context);
             }
             XWikiAttachmentArchive archive = attachment.getAttachment_archive();
 
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
 
-            Query query = getSession().createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
+
+            Query query = session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
             query.setLong("id", content.getId());
             if (query.uniqueResult()==null)
                 session.save(content);
             else
                 session.update(content);
 
-            query = getSession().createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
+            query = session.createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
             query.setLong("id", archive.getId());
             if (query.uniqueResult()==null)
                 session.save(archive);
@@ -760,7 +882,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 session.update(archive);
 
             if (bTransaction)
-                endTransaction(true);
+                endTransaction(context, true);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -770,12 +892,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
     }
 
-    public void loadAttachmentContent(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
             XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
             attachment.setAttachment_content(content);
@@ -783,7 +907,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             session.load(content, new Long(content.getId()));
 
             if (bTransaction)
-                endTransaction(false);
+                endTransaction(context, false);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -792,12 +916,14 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public void loadAttachmentArchive(XWikiAttachment attachment, boolean bTransaction) throws XWikiException {
+    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
-                checkHibernate();
-                beginTransaction();
+              checkHibernate(context);
+              beginTransaction(context);
             }
+            Session session = getSession(context);
+
 
             XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
             archive.setAttachment(attachment);
@@ -806,7 +932,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             session.load(archive, new Long(archive.getId()));
 
             if (bTransaction)
-                endTransaction(false);
+                endTransaction(context, false);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -819,26 +945,20 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         buf.append(doc.getContent());
     }
 
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    public List getClassList() throws XWikiException {
+    public List getClassList(XWikiContext context) throws XWikiException {
         try {
-            checkHibernate();
-            beginTransaction();
-            Query query = getSession().createQuery("select bclass.name from BaseClass as bclass");
+             checkHibernate(context);
+             beginTransaction(context);
+             Session session = getSession(context);
+
+            Query query = session.createQuery("select bclass.name from BaseClass as bclass");
             Iterator it = query.list().iterator();
             List list = new ArrayList();
             while (it.hasNext()) {
                 String name = (String)it.next();
                 list.add(name);
             }
-            endTransaction(false);
+            endTransaction(context, false);
             return list;
         }
         catch (Exception e) {
@@ -847,15 +967,16 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
         }
     }
 
-    public List searchDocuments(String wheresql) throws XWikiException {
-        return searchDocuments(wheresql,0,0);
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
+        return searchDocuments(wheresql,0,0, context);
     }
 
-    public List search(String sql, int nb, int start) throws XWikiException {
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
         try {
-            checkHibernate();
-            beginTransaction();
-            Query query = getSession().createQuery(sql.toString());
+            checkHibernate(context);
+            beginTransaction(context);
+            Session session = getSession(context);
+            Query query = session.createQuery(sql.toString());
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -865,7 +986,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             while (it.hasNext()) {
                 list.add(it.next());
             }
-            endTransaction(false);
+            endTransaction(context, false);
             return list;
         }
         catch (Exception e) {
@@ -876,10 +997,11 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
     }
 
 
-    public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
         try {
-            checkHibernate();
-            beginTransaction();
+            checkHibernate(context);
+            beginTransaction(context);
+            Session session = getSession(context);
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name from XWikiSimpleDoc as doc");
             wheresql.trim();
             if (!wheresql.equals("")) {
@@ -890,7 +1012,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
 
                 sql.append(wheresql);
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query query = session.createQuery(sql.toString());
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -902,7 +1024,7 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
                 String name = (String) result[0] + "." + (String)result[1];
                 list.add(name);
             }
-            endTransaction(false);
+            endTransaction(context, false);
             return list;
         }
         catch (Exception e) {
@@ -910,6 +1032,22 @@ public class XWikiHibernateStore extends XWikiRCSFileStore {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
                     "Exception while searching documents with sql {0}", e, args);
         }
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 
 

@@ -23,6 +23,7 @@
 package com.xpn.xwiki.doc;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import net.sf.hibernate.ObjectNotFoundException;
 import org.apache.commons.jrcs.rcs.*;
 import org.dom4j.DocumentException;
@@ -295,9 +296,9 @@ public class XWikiAttachment {
         this.attachment_archive = attachment_archive;
     }
 
-    public byte[] getContent() throws XWikiException {
+    public byte[] getContent(XWikiContext context) throws XWikiException {
         if (attachment_content==null) {
-            doc.loadAttachmentContent(this);
+            doc.loadAttachmentContent(this, context);
         }
 
         return attachment_content.getContent();
@@ -341,13 +342,13 @@ public class XWikiAttachment {
         attachment_content.setContent(data);
     }
 
-    public void updateContentArchive() throws XWikiException {
+    public void updateContentArchive(XWikiContext context) throws XWikiException {
         if (attachment_content == null)
          return;
 
         if (attachment_archive==null) {
             try {
-             getDoc().getStore().loadAttachmentArchive(this, true);
+             getDoc().getStore().loadAttachmentArchive(this, context, true);
             } catch (XWikiException e) {
                 if (!(e.getException() instanceof ObjectNotFoundException))
                     throw e;
@@ -359,7 +360,7 @@ public class XWikiAttachment {
             attachment_archive.setAttachment(this);
         }
 
-        attachment_archive.updateArchive(getContent());
+        attachment_archive.updateArchive(getContent(context));
     }
 
 }

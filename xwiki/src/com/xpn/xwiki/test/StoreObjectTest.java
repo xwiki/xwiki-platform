@@ -3,6 +3,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocInterface;
 import com.xpn.xwiki.doc.XWikiSimpleDoc;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,6 +41,7 @@ import java.text.ParseException;
 public abstract class StoreObjectTest extends TestCase {
 
     public String rcspath = "./rcs";
+    public XWikiContext context = new XWikiContext();
 
     public abstract XWikiStoreInterface getStore();
 
@@ -47,7 +49,7 @@ public abstract class StoreObjectTest extends TestCase {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
         object.setName("Test.TestObject");
         doc.setObject("Test.TestObject", 0, object);
-        store.saveXWikiDoc(doc);
+        store.saveXWikiDoc(doc, context);
     }
 
     public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
@@ -55,7 +57,7 @@ public abstract class StoreObjectTest extends TestCase {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestObject");
 
         // Read object2
-        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc);
+        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc, context);
         BaseObject object2 = doc.getxWikiObject();
 
         // Verify object2
@@ -95,7 +97,7 @@ public abstract class StoreObjectTest extends TestCase {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestClass");
         bclass.setName("Test.TestClass");
         doc.setxWikiClass(bclass);
-        store.saveXWikiDoc(doc);
+        store.saveXWikiDoc(doc, context);
     }
 
     public void testReadClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
@@ -103,7 +105,7 @@ public abstract class StoreObjectTest extends TestCase {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("Test","TestClass");
 
         // Read class
-        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc);
+        doc = (XWikiSimpleDoc) store.loadXWikiDoc(doc, context);
         BaseClass bclass2 = doc.getxWikiClass();
 
         // Verify object2
@@ -140,20 +142,20 @@ public abstract class StoreObjectTest extends TestCase {
 
     public void testVersionedObject(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
 
-       Utils.createDoc(store, "Test", "TestVersion", object, object.getxWikiClass(), null);
+       Utils.createDoc(store, "Test", "TestVersion", object, object.getxWikiClass(), null, context);
        XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
-       doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
+       doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1, context);
        BaseObject bobject1 = doc1.getxWikiObject();
        BaseProperty bprop1 = ((BaseProperty)bobject1.safeget("age"));
        assertEquals("Age should be 33", new Integer(33), bprop1.getValue());
        bprop1.setValue(new Integer(5));
-       store.saveXWikiDoc(doc1);
+       store.saveXWikiDoc(doc1, context);
        XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "TestVersion");
-       doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2);
+       doc2 = (XWikiSimpleDoc) store.loadXWikiDoc(doc2, context);
        BaseObject bobject2 = doc2.getxWikiObject();
        BaseProperty bprop2 = ((BaseProperty)bobject2.safeget("age"));
        assertEquals("Age should be 5", new Integer(5), bprop2.getValue());
-       XWikiDocInterface doc3 = store.loadXWikiDoc(doc2, "1.1");
+       XWikiDocInterface doc3 = store.loadXWikiDoc(doc2, "1.1", context);
        BaseObject bobject3 = doc3.getxWikiObject();
        BaseProperty bprop3 = ((BaseProperty)bobject3.safeget("age"));
        assertEquals("Age should be 33", new Integer(33), bprop3.getValue());
@@ -172,10 +174,10 @@ public abstract class StoreObjectTest extends TestCase {
      }
 
     public void testXML(XWikiStoreInterface store, BaseObject bobject) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
-         XWikiSimpleDoc doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null);
+         XWikiSimpleDoc doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bobject.getxWikiClass(), null, context);
          String xml0 = doc0.toXML();
          XWikiSimpleDoc doc1 = new XWikiSimpleDoc("Test", "TestVersion");
-         doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1);
+         doc1 = (XWikiSimpleDoc) store.loadXWikiDoc(doc1, context);
          Utils.assertEquals(doc0, doc1);
          String xml1 = doc1.toXML();
          // Cannot test this because XML tags can be ordered differently

@@ -66,7 +66,7 @@ public class RenderTest extends TestCase {
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         xwiki = null;
         context = null;
         System.gc();
@@ -259,7 +259,7 @@ public class RenderTest extends TestCase {
         doc1.setContent("This is the topic name: $doc.name");
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1);
+        store.saveXWikiDoc(doc1, context);
 
         XWikiSimpleDoc doc2 = new XWikiSimpleDoc("Test", "IncludeTest");
         context.put("doc", doc2);

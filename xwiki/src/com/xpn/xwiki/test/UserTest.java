@@ -62,9 +62,10 @@ public class UserTest extends TestCase {
 
     public void setUp() throws HibernateException, XWikiException {
         context = new XWikiContext();
+        context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(getHibStore());
+        StoreHibernateTest.cleanUp(getHibStore(), context);
         um = xwiki.getUsermanager();
         am = xwiki.getAccessmanager();
         getUserProvider(um).flushCaches();
@@ -74,7 +75,7 @@ public class UserTest extends TestCase {
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         xwiki = null;
         context = null;
         um = null;
@@ -84,7 +85,7 @@ public class UserTest extends TestCase {
 
     public void prepareData() throws XWikiException {
         XWikiSimpleDoc doc = new XWikiSimpleDoc("XWiki","LudovicDubost");
-        BaseClass bclass = xwiki.getUserClass();
+        BaseClass bclass = xwiki.getUserClass(context);
         BaseObject bobj = new BaseObject();
         bobj.setName("XWiki.LudovicDubost");
         bobj.setxWikiClass(bclass);
@@ -93,33 +94,33 @@ public class UserTest extends TestCase {
         bobj.setStringValue("password", "toto");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ Ludovic Dubost HomePage");
-        xwiki.saveDocument(doc);
+        xwiki.saveDocument(doc, context);
 
         doc = new XWikiSimpleDoc("XWiki","AdminGroup");
-        bclass = xwiki.getGroupClass();
+        bclass = xwiki.getGroupClass(context);
         bobj = new BaseObject();
         bobj.setName("XWiki.AdminGroup");
         bobj.setxWikiClass(bclass);
         bobj.setStringValue("member", "XWiki.LudovicDubost");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ AdminGroup");
-        xwiki.saveDocument(doc);
+        xwiki.saveDocument(doc, context);
 
         doc = new XWikiSimpleDoc("XWiki","TestDoc");
         doc.setContent("---+ TestDoc");
-        xwiki.saveDocument(doc);
+        xwiki.saveDocument(doc, context);
 
     }
 
     public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
-        XWikiDocInterface doc = xwiki.getDocument(fullname);
+        XWikiDocInterface doc = xwiki.getDocument(fullname, context);
         BaseObject bobj = new BaseObject();
         bobj.setName(fullname);
         BaseClass bclass;
         if (global)
-            bclass = xwiki.getGlobalRightsClass();
+            bclass = xwiki.getGlobalRightsClass(context);
         else
-            bclass = xwiki.getRightsClass();
+            bclass = xwiki.getRightsClass(context);
         bobj.setxWikiClass(bclass);
         bobj.setStringValue("users", user);
         bobj.setStringValue("groups", group);
@@ -129,7 +130,7 @@ public class UserTest extends TestCase {
         else
             bobj.setIntValue("allow", 0);
         doc.setObject(bclass.getName(), 0, bobj);
-        xwiki.saveDocument(doc);
+        xwiki.saveDocument(doc, context);
     }
 
     public XWikiUserProvider getUserProvider(UserManager um) {

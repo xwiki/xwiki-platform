@@ -16,7 +16,7 @@
 
 <div id="xwikilinks">
   <div id="xwikimenu">
-    $!xwiki.getXWikiPreference("menu", $context)
+    $!xwiki.getXWikiPreference("menu")
   </div>
   <div id="xwikiversion">
     <a href="../../view/Main/WebHome">XWiki Version $xwiki.version</a>

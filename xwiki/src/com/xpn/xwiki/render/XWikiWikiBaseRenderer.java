@@ -83,7 +83,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         XWiki xwiki = context.getWiki();
         XWikiDocInterface doc;
         try {
-         doc = xwiki.getDocument(web, topic);
+         doc = xwiki.getDocument(web, topic, context);
         } catch (XWikiException e) {
          doc = new XWikiSimpleDoc();
          doc.setName(topic);

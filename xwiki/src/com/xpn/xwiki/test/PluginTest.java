@@ -50,7 +50,7 @@ public class PluginTest extends TestCase {
     }
 
     public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate();
+        getHibStore().shutdownHibernate(context);
         xwiki = null;
         context = null;
         System.gc();

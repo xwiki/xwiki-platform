@@ -1370,17 +1370,17 @@ public class XWiki implements XWikiNotificationInterface {
         BaseClass gclass = getGroupClass(context);
 
         try {
-            String fullwikiname =  context.getDatabase() + ":XWiki." + xwikiname;
+            String fullwikiname =  "XWiki." + xwikiname;
 
             // TODO: Verify existing user
-            XWikiDocInterface doc = getDocument("XWiki." + xwikiname, context);
+            XWikiDocInterface doc = getDocument(fullwikiname, context);
             if (!doc.isNew()) {
                 // TODO: throws Exception
                 return -3;
             }
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map);
-            newobject.setName("XWiki." + xwikiname);
+            newobject.setName(fullwikiname);
             doc.addObject(baseclass.getName(), newobject);
             doc.setParent(parent);
             doc.setContent(content);
@@ -1388,7 +1388,7 @@ public class XWiki implements XWikiNotificationInterface {
             // Add protection to the page
             BaseObject newrightsobject = (BaseObject) rclass.newObject();
             newrightsobject.setClassName(rclass.getName());
-            newrightsobject.setName("XWiki." + xwikiname);
+            newrightsobject.setName(fullwikiname);
             newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
             newrightsobject.setStringValue("levels", "view, edit");
             newrightsobject.setIntValue("allow", 1);
@@ -1396,7 +1396,7 @@ public class XWiki implements XWikiNotificationInterface {
 
             BaseObject newuserrightsobject = (BaseObject) rclass.newObject();
             newuserrightsobject.setClassName(rclass.getName());
-            newuserrightsobject.setName("XWiki." + xwikiname);
+            newuserrightsobject.setName(fullwikiname);
             newuserrightsobject.setStringValue("users", fullwikiname);
             newuserrightsobject.setStringValue("levels", "view");
             newuserrightsobject.setIntValue("allow", 1);

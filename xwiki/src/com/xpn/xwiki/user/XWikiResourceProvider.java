@@ -25,6 +25,7 @@ package com.xpn.xwiki.user;
 import com.opensymphony.module.access.DuplicateKeyException;
 import com.opensymphony.module.access.ImmutableException;
 import com.opensymphony.module.access.NotFoundException;
+import com.opensymphony.module.access.AccessManager;
 import com.opensymphony.module.access.entities.Acl_I;
 import com.opensymphony.module.access.entities.Resource_I;
 import com.opensymphony.module.access.provider.ResourceProvider;
@@ -39,10 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.*;
 
 public class XWikiResourceProvider extends XWikiBaseProvider implements ResourceProvider {
 
@@ -158,6 +156,10 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
         String fieldName = user ? "users" : "groups";
         boolean found = false;
 
+        if (log.isDebugEnabled())
+         log.debug("Checking right: " + name + "," + doc.getFullName() + "," + accessLevel
+                            + "," + user + "," + allow + "," + global);
+
         Vector vobj = doc.getObjects(className);
         if (vobj!=null)
         {
@@ -170,31 +172,66 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                 boolean allowdeny = (bobj.getIntValue("allow")==1);
 
                 if (allowdeny == allow) {
-                    String[] levelsarray = StringUtils.split(bobj.getStringValue("levels")," ,|");
+                    String[] levelsarray = StringUtils.split(levels," ,|");
                     if (ArrayUtils.contains(levelsarray, accessLevel)) {
+                        if (log.isDebugEnabled())
+                            log.debug("Found a right for " + allow);
                         found = true;
                         String[] userarray = StringUtils.split(users," ,|");
-                        if (ArrayUtils.contains(userarray, name))
-                           return true;
+                        if (ArrayUtils.contains(userarray, name)) {
+                            if (log.isDebugEnabled())
+                                log.debug("Found matching right in " + users + " for " + name);
+                            return true;
+                        }
 
-                          if ((context.getDatabase()!=null)&&
-                              (ArrayUtils.contains(userarray, context.getDatabase() + ":" + name)))
-                               return true;
-                       }
+                        if ((context.getDatabase()!=null)&&
+                                (ArrayUtils.contains(userarray, context.getDatabase() + ":" + name))) {
+                            if (log.isDebugEnabled())
+                                log.debug("Found matching right in " + users + " for " + context.getDatabase() + ":" + name);
+                            return true;
+                        }
+                    }
                 }
             }
         }
 
+        if (log.isDebugEnabled())
+         log.debug("Searching for matching rights at group level");
+
         // Didn't found right at this level.. Let's go to group level
-        List grouplist = null;
-        try {
-          grouplist = getXWiki().getAccessManager(context).listGroupsForUser(name);
-        } catch (NotFoundException e) {
-        } catch (Exception e) {
-            // This should not happen
-            e.printStackTrace();
+        Map grouplistcache = (Map)context.get("grouplist");
+        if (grouplistcache==null) {
+            grouplistcache = new HashMap();
+            context.put("grouplist", grouplistcache);
+        }
+        List grouplist = (List) grouplistcache.get(name);
+        AccessManager am = getXWiki().getAccessManager(context);
+
+         if (grouplist==null) {
+            try {
+                // We need to reconstruct the full username otherwise this will not
+                // work in virtual servers
+                grouplist = am.listGroupsForUser(name);
+            } catch (Exception e) {}
+
+            try {
+                if ((context.getDatabase()!=null)&&(!context.getDatabase().equals(""))) {
+                    List grouplist2 = am.listGroupsForUser(context.getDatabase() + ":" + name);
+                    if (grouplist==null)
+                      grouplist = grouplist2;
+                    else
+                     grouplist.addAll(grouplist2);
+                }
+            } catch (Exception e) {}
+
+            if (grouplist!=null)
+                grouplistcache.put(name, grouplist);
+            else
+                grouplistcache.put(name, new ArrayList());
         }
 
+        if (log.isDebugEnabled())
+         log.debug("Searching for matching rights for " + grouplist.size() + " groups: " + grouplist);
 
         if (grouplist!=null) {
             for (int i=0;i<grouplist.size();i++) {
@@ -211,6 +248,9 @@ public class XWikiResourceProvider extends XWikiBaseProvider implements Resource
                 }
             }
         }
+
+        if (log.isDebugEnabled())
+         log.debug("Finished searching for rights for " + name + ": " + found);
 
         if (found)
            return false;

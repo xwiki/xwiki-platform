@@ -755,7 +755,11 @@ public class XWikiSimpleDoc extends XWikiDefaultDoc {
                 first = false;
               else
                 result.append("|");
-              result.append(display((String)it.next(), object, context));
+              String data = display((String)it.next(), object, context);
+              if (data.trim().equals(""))
+               result.append("&nbsp;");
+              else
+               result.append(data);
           }
           result.append("\n");
       }

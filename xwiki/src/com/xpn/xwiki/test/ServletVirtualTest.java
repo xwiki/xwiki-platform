@@ -32,11 +32,11 @@ import net.sf.hibernate.HibernateException;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.apache.cactus.client.authentication.Authentication;
-import org.apache.cactus.client.authentication.BasicAuthentication;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 
 public class ServletVirtualTest extends ServletTest {
@@ -99,7 +99,7 @@ public class ServletVirtualTest extends ServletTest {
     }
 
 
-    public void beginAuth(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginAuth(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
@@ -122,7 +122,8 @@ public class ServletVirtualTest extends ServletTest {
 
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthTest", "");
-        Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
+        MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -136,14 +137,12 @@ public class ServletVirtualTest extends ServletTest {
         }
     }
 
-    /*
     // Deactivate the test until I know how to pass the parameters
     public void testAuth() throws Throwable {
         launchTest();
     }
-    */
 
-    public void beginAuthForWikiOwner(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginAuthForWikiOwner(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
@@ -165,7 +164,8 @@ public class ServletVirtualTest extends ServletTest {
 
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthOwnerTest", "");
-        Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
+        MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -179,13 +179,11 @@ public class ServletVirtualTest extends ServletTest {
         }
     }
 
-    /*
     // Deactivate the test until I know how to pass the parameters
     public void testAuthForWikiOwner() throws Throwable {
         launchTest();
     }
-    */
-    
+
     public void testAddVirtualObject() throws Throwable {
         launchTest();
     }
@@ -306,6 +304,52 @@ public class ServletVirtualTest extends ServletTest {
     public void testCreateNewWiki() throws Throwable {
         launchTest();
     }
+
+
+
+    public void beginAuthGroup(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        // Create virtual server page
+        Utils.createDoc(hibstore, "XWiki", "XWikiServerXwikitest2", context);
+        Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
+
+        context.setDatabase("xwikitest2");
+        StoreHibernateTest.cleanUp(hibstore, context);
+
+        // Create User in the virtual wiki database
+        HashMap map = new HashMap();
+        map.put("password", "toto");
+        xwiki.createUser("LudovicDubost", map, "", "", context);
+
+        // Setup Authentication rights
+        Utils.createDoc(hibstore, "Main", "VirtualAuthTest", context);
+        updateRight("Main.VirtualAuthTest", "", "XWiki.XWikiAllGroup", "view", true, false);
+
+        // Use a virtual server URL
+        setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthTest", "");
+        MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        webRequest.setAuthentication(auth);
+    }
+
+    public void endAuthGroup(WebResponse webResponse) throws HibernateException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            String result = webResponse.getText();
+            assertTrue("Could not find WebHome Content", result.indexOf("Hello")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    // Deactivate the test until I know how to pass the parameters
+    public void testAuthGroup() throws Throwable {
+        launchTest();
+    }
+
 
 
 }

@@ -1,0 +1,56 @@
+#if($context.getMode()==0)
+<div id="xwikibanner">
+<div id="xwikilogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")">
+#set($prefdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
+#set($logo = $prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.gif"))
+<img src="$logourl" alt="XWiki" width="150" height="40" />
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+<img src="$logourl" alt="XWiki" />
+#end
+    </a>
+  </div>
+
+<div id="xwikititle">
+#if ($doc.parent.length() > 0)
+<h1>$parent &gt; $!headertitle</h1>
+#else
+<h1>$!headertitle</h1>
+#end
+   <h2>$!headersubtitle</h2>
+</div>
+<div id="xwikilinks">
+  <div id="xwikimenu">
+#if($context.getMode()==0)
+#set( $logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
+#if ($context.getUser().equals("XWiki.XWikiGuest"))
+<a href="../../login/XWiki/XWikiLogin?xredirect=$logredir">$msg.get("login")</a><br />
+<a href="../../view/XWiki/RegisterNewUser">$msg.get("register")</a>
+#else
+#set($docuser = $xwiki.getDocument($context.user))
+#set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
+$msg.get("hello") <a href="$docuser.getURL("view")">$docuser.display("first_name", "view", $objuser)</a><br />
+<a href="../../logout/XWiki/XWikiLogout?xredirect=$logredir">$msg.get("logout")</a>
+#end
+#end
+  </div>
+  <div id="xwikiversion">
+    <a href="http://www.xwiki.org">XWiki</a>
+    <a href="$xwiki.getURL("Main.WebHome", "view")">
+#set( $version = $!xwiki.getWebPreference("version"))
+#if ( $version != "")
+$xwiki.parseContent($version)
+#else
+Version $xwiki.version
+#end
+    </a>
+  </div>
+</div>
+<div id="xwikiad">
+#template("ad.vm")
+</div>
+</div>
+#end

@@ -1,0 +1,24 @@
+#if($context.getMode()==0)
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>
+#set( $title = $!xwiki.getWebPreference("title"))
+#if ( $title != "")
+$xwiki.parseContent($title)
+#else
+XWiki . $!doc.web . $!doc.name
+#end
+</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+$!xwiki.getWebPreference("meta")
+#template("stylesheets.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+</head>
+<body>
+#else
+#template("stylesheets2.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+#end

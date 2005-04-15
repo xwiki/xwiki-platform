@@ -1,0 +1,91 @@
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+#if($xwiki.exists("Menu"))
+#set($menudoc = "Menu")
+#else
+#if($xwiki.exists("XWiki.Menu"))
+#set($menudoc = "XWiki.Menu")
+#end
+#end
+#set($showtoolbar = $xwiki.getWebPreferenceAsInt("showtoolbar",1))
+#if($showtoolbar)
+#if($xwiki.exists("Toolbar"))
+#set($toolbardoc = "Toolbar")
+#else
+#if($xwiki.exists("XWiki.Toolbar"))
+#set($toolbardoc = "XWiki.Toolbar")
+#else
+#if($xwiki.exists("xwiki:XWiki.Toolbar"))
+#set($toolbardoc = "xwiki:XWiki.Toolbar")
+#end
+#end
+#end
+#if($menudoc)
+#set($colsclass = "show-all")
+#else
+#set($colsclass = "hide-left")
+#end
+#else
+#if($menudoc)
+#set($colsclass = "hide-right")
+#else
+#set($colsclass = "hide-all")
+#end
+#end
+<div id="xwikicontent" class="$colsclass">
+       <div id="columns">
+        <div class="cols-wrapper">
+          <div class="float-wrapper">
+            <div id="col-a">
+              <div class="main-content">
+$cdoc.getRenderedContent()
+         </div>
+            </div>
+            <div id="col-b" class="sidecol">
+              <div class="box">
+#if($menudoc)
+$xwiki.includeForm("$menudoc",false)
+#end
+              </div>
+            </div>
+<div id="xwikidata" class="clear">
+#template("comments2.vm")
+#template("attachments.vm")
+</div>
+          </div>
+          <div id="col-c" class="sidecol">
+         <div class="box">
+#if($showtoolbar)
+#if($toolbardoc)
+$xwiki.includeForm("$toolbardoc",false)
+#else
+#template("viewtoolbar.vm")
+#end
+#end
+          </div>
+          </div>
+          <div class="clear" id="em"></div>
+          </div>
+          </div>
+</div>
+<script type="text/javascript">
+<!--
+function showhide(divname) {
+ var style = document.getElementById(divname).style;
+ if ((style.display=='block')||(style.display=='')) {
+  style.display='none';
+  }
+ else {
+  style.display='block';
+  }
+}
+// -->
+</script>
+#template("basefooter.vm")
+#template("footer.vm")
+#end

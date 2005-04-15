@@ -1,0 +1,98 @@
+head	1.4;
+access;
+symbols;
+locks; strict;
+comment	@# @;
+
+
+1.4
+date	2004.12.28.21.00.13;	author Ludovic_Dubost;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2004.12.28.21.00.13;	author Ludovic_Dubost;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2004.12.28.21.00.13;	author Ludovic_Dubost;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2004.12.28.21.00.13;	author Ludovic_Dubost;	state Exp;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.4
+log
+@@
+text
+@<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.LudovicDubost</author>
+<creationDate>1104264013465</creationDate>
+<date>1104264013465</date>
+<version>1.1</version>
+<content>Hello 1
+Hello 2
+Hello 3
+</content>
+</xwikidoc>
+@
+
+
+1.3
+log
+@@
+text
+@d11 2
+a12 8
+<creationDate>1104264013385</creationDate>
+<date>1104264013405</date>
+<version>1.3</version>
+<attachment>
+<filename>test1.sxw</filename>
+<filesize>13550</filesize>
+<author></author>
+<date>1104264013395</date>
+a13 2
+<comment></comment>
+</attachment>
+@
+
+
+1.2
+log
+@@
+text
+@d12 6
+d19 3
+a21 1
+<version>1.2</version>
+@
+
+
+1.1
+log
+@Main.WebHome
+@
+text
+@d12 2
+a13 2
+<date>1104264013385</date>
+<version>1.1</version>
+@

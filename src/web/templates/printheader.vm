@@ -1,0 +1,8 @@
+<div id="xwikibanner">
+<img src="$xwiki.getSkinFile("logovert.jpg")" alt="XWiki" width="150" height="40" />
+#if ($doc.parent.length() > 0)
+<h3>$parent &gt; $!headertitle</h3>
+#else
+<h3>$!headertitle</h3>
+#end
+</div>

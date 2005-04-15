@@ -1,0 +1,47 @@
+
+XWiki Installation Instructions
+
+1. Setup of the XWiki Sample Database
+
+The sample database has been updated for XWiki 0.7/0.9 and is now a good database to start an XWiki installation and is now a SQL dump of an Mysql database.
+
+   * MySQL4 SQL Dump: http://prdownloads.sourceforge.net/xwiki/xwiki-db-0.7.460.zip?download
+
+2 Installation Instructions
+
+   * Install JDK 1.4.2
+   * Install Tomcat 4.1
+   * Verify installation of tomcat on port 8080
+   * *IMPORTANT* For versioning of international characters to work, you need to launch your tomcat
+     engine with -Dfile.encoding=iso-8859-1 and add LANG=fr_FR.ISO8859-1 as an environment variable
+     (Thanks to Erwan Arzur for the tip).
+     The test database contains international characters so you need these settings.
+   * Copy xwiki-0-9-xx.war to xwiki.war in the tomcat/webapps directory
+   * Unzip xwiki-db-0.x.yyy.zip
+   * Load database using mysql -u xwiki -pxwiki xwiki < xwiki-db-0.x.yyy.txt
+   * Grant mysql access with the following command:
+     grant all privileges on xwiki.* to xwiki@127.0.0.1 identified by 'xwiki' ;
+     (if you get connections problems try localhost instead of the IP address)
+   * If decide to use a different password or a different machine than the web server machine
+     for you database, edit hibernate.cfg.xml to change the database configuration.
+   * Copy your database driver to the tomcat/common/lib directory
+   * *IMPORTANT*: in xwiki.cfg change the line xwiki.virtual=1 to xwiki.virtual=0
+   * If you want to use bigger attachments than 1Mb you need to change the packet size setting in Mysql. See http://www.xwiki.org/xwiki/bin/view/Dev/BigAttachments.
+   * Connect to the xwiki application at: http://127.0.0.1:8080/xwiki/bin/view/Main/WebHome
+
+3. What you can do
+
+   * View users at http://127.0.0.1:8080/xwiki/bin/view/XWiki/XWikiUsers
+    (all users have their own name in small characters as their password.)
+   * The default admin user is Admin with password admin
+   * Add a user at http://127.0.0.1:8080/xwiki/bin/view/XWiki/RegisterNewUser
+   * You can edit global rights at: http://127.0.0.1:8080/xwiki/bin/edit/XWiki/XWikiPreferences?xpage=editrights&global=1
+
+
+4. For eXo Platform Users
+
+This version is intended for eXoPlatform 1.0 RCOW or later.
+Make sure used the xwiki-exo-0.x.yyy.war file.
+
+For eXo 1.0RC4 or earlier, you should use xwiki v0.8.
+

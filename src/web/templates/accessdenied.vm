@@ -1,0 +1,9 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+<div id="xwikicontent">
+$msg.get("notallowed")
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

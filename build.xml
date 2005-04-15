@@ -1,0 +1,415 @@
+<!--
+/**
+* ===================================================================
+*
+* Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details, published at
+* http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
+* root folder of this distribution.
+-->
+
+<project name="XWiki Content and Application Management Framework"
+    default="release"
+    basedir="." >
+
+    <!-- Allow any user specific values to override the defaults -->
+    <property file="${user.home}/build.properties" />
+    <!-- Allow user defaults for this project -->
+    <property file="build.properties" />
+
+    <!-- The following line is used to read the version -->
+    <property file="src/web/WEB-INF/xwiki.cfg" />
+
+
+    <property name="app.name" value="xwiki" />
+    <property name="pkg"  value="com.xpn.xwiki" />
+
+    <property name="src.dir"   value="${basedir}/src" />
+    <property name="lib.dir"   value="${basedir}/lib" />
+
+    <property name="build.dir"  value="${basedir}/build" />
+
+    <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
+    <property name="release.dir"  value="${basedir}/release" />
+    <property name="dist.dir" value="${basedir}/dist" />
+
+    <property name="test.reports.dir" value="${basedir}/test/reports" />
+    <property name="test.clover.dir" value="${basedir}/test/clover" />
+
+    <property name="doc.dir"   value="${basedir}/doc" />
+    <property name="javadoc.dir"   value="${doc.dir}/api" />
+
+    <property name="javacc.lib.dir" value="${javacc.home}/bin/lib" />
+
+    <property name="libs.servlet"
+        value="${lib.dir}/servlet.jar" />
+
+    <property name="libs.hibernate"
+        value="${lib.dir}/hibernate2.jar;${lib.dir}/c3p0.jar;${lib.dir}/cglib2.jar;${lib.dir}/dom4j.jar;${lib.dir}/ehcache.jar;${lib.dir}/hibernate-tools.jar;${lib.dir}/mysql-connector-java-3.0.15-ga-bin.jar;${lib.dir}/odmg.jar;${lib.dir}/oscache.jar;${lib.dir}/jgroups-all.jar;${lib.dir}/swarmcache.jar;${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis.jar;${lib.dir}/jta.jar" />
+
+    <property name="libs.jakartacommons"
+        value="${lib.dir}/commons-beanutils.jar;${lib.dir}/commons-collections.jar;${lib.dir}/commons-digester.jar;${lib.dir}/commons-lang.jar;${lib.dir}/commons-logging.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/jakarta-oro-2.0.7.jar;${lib.dir}/log4j-1.2.8.jar;${lib.dir}/commons-fileupload-1.0.jar;${lib.dir}/commons-dbcp-1.1-ld.jar;${lib.dir}/commons-pool-1.1.jar;${lib.dir}/commons-net-1.1.0.jar" />
+
+    <property name="libs.jrcs"
+        value="${lib.dir}/org.apache.commons.jrcs.rcs.jar" />
+
+    <property name="libs.struts"
+        value="${lib.dir}/struts.jar" />
+
+    <property name="libs.velocity"
+        value="${lib.dir}/velocity-1.4.jar;${lib.dir}/velocity-tools-1.1.jar" />
+
+    <property name="libs.ant"
+        value="${lib.dir}/ant.jar" />
+
+    <property name="libs.inlinejava"
+        value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
+
+    <property name="libs.osuser"
+        value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar;${lib.dir}/ejb.jar" />
+    
+    <property name="libs.exo"
+	    value="${lib.dir}/picocontainer-1.0.jar;${lib.dir}/exoplatform.container-1.0.jar;${lib.dir}/exoplatform.services.chart.api-1.0.jar;${lib.dir}/exoplatform.services.chart.impl-1.0.jar;${lib.dir}/exoplatform.services.common.api-1.0.jar;${lib.dir}/exoplatform.services.organization.api-1.0.jar;${lib.dir}/exoplatform.services.organization.impl-1.0.jar;${lib.dir}/exoplatform.services.security.api-1.0.jar;${lib.dir}/exoplatform.services.security.impl-1.0.jar;${lib.dir}/exoplatform.services.database.api-1.0.jar;${lib.dir}/exoplatform.services.database.impl-1.0.jar" />
+
+    <property name="libs.tests"
+        value="${lib.dir}/cactus-1.6dev.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0.1.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
+
+    <property name="libs.radeox"
+	value="${lib.dir}/radeox.jar" />
+
+    <property name="libs.portlet"
+	value="${lib.dir}/portlet.jar" />
+
+    <property name="libs.api"
+	    value="${lib.dir}/xmlrpc.jar;${lib.dir}/soap.jar" />
+
+    <property name="libs.groovy"
+    	value="${lib.dir}/groovy-all-1.0-jsr-01.jar" />
+
+    <property name="libs.fop"
+    	value="${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis;${lib.dir}/jimi.jar;${lib.dir}/avalon-framework.jar;${lib.dir}/batik.jar;${lib.dir}/fop.jar;${lib.dir}/jtidy.jar" />
+
+    <property name="libs"
+	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.tests}" />
+
+
+    <property name="clover.initstring" location="${test.clover.dir}/clover"/>
+    <available property="junit.available" classname="junit.framework.TestCase"/>
+    <available property="clover.available" classname="org.apache.tools.ant.taskdefs.CloverCompilerAdapter" />
+
+    <target name="junit-check" depends="prepare" unless="junit.available">
+        <fail message="Cannot run test cases. Please copy lib/build/junit-3.8.1.jar to ${ant.home}/lib"/>
+    </target>
+
+    <target name="clover-check" depends="prepare" unless="clover.available">
+        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.2.3.jar to ${ant.home}/lib"/>
+    </target>
+
+    <target name="clover-yes" depends="prepare" if="clover.available">
+        <property name="compiler" value="org.apache.tools.ant.taskdefs.CloverCompilerAdapter"/>
+        <mkdir dir="${test.clover.dir}" />
+    </target>
+
+    <target name="clover-no" depends="prepare" unless="clover.available">
+        <property name="compiler" value="modern"/>
+    </target>
+
+    <!-- Define the Cactus tasks -->
+    <taskdef resource="cactus.tasks">
+        <classpath>
+            <pathelement location="${lib.dir}/cactus-1.6dev.jar"/>
+            <pathelement location="${lib.dir}/cactus-ant-1.5.jar"/>
+            <pathelement location="${lib.dir}/commons-httpclient-2.0-rc2.jar"/>
+            <pathelement location="${lib.dir}/commons-logging.jar"/>
+            <pathelement location="${lib.dir}/aspectjrt-1.1.1.jar"/>
+        </classpath>
+    </taskdef>
+
+    <target name="prepare">
+        <propertyfile file="src/web/WEB-INF/version.properties" >
+            <entry key="build.number" type="int" value="1" operation="+" />
+        </propertyfile>
+        <property file="src/web/WEB-INF/version.properties" />
+        <property name="version" value="${xwiki.version}.${build.number}" />
+        <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
+        <property name="exo.warfile" value="${release.dir}/xwiki-exo-${version}.war" />
+        <property name="cactus.warfile" value="${release.dir}/xwiki.war" />
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${classes.dir}" />
+        <mkdir dir="${release.dir}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${javadoc.dir}" />
+        <delete dir="${doc.dir}/junit" />
+        <delete dir="${doc.dir}/clover" />
+        <delete dir="${build.dir}" />
+        <delete dir="${release.dir}" />
+        <delete dir="${dist.dir}" />
+        <delete dir="${test.reports.dir}" />
+        <delete dir="${test.clover.dir}" />
+    </target>
+
+    <patternset id="non.java.sources">
+        <include name="**/*.properties" />
+        <include name="**/*.xml" />
+        <include name="**/*.xsl" />
+        <include name="**/*.dtd" />
+        <include name="**/*.ent" />
+        <include name="**/*.tld" />
+        <include name="**/*.vm" />
+        <include name="**/*.cfg" />
+        <include name="**/*.txt" />
+        <include name="META-INF/services/com.*" />
+        <exclude name="web/**" />
+        <exclude name="perl/**" />
+        <exclude name="${src.dir}/web.xml" />
+    </patternset>
+
+    <patternset id="test.classes">
+        <include name="**/test/*.class" />
+    </patternset>
+
+    <target name="xwiki.nonjava" depends="prepare">
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <patternset refid="non.java.sources" />
+            </fileset>
+        </copy>
+
+        <copy todir="${build.dir}/web">
+            <fileset includes="**"
+                dir="${src.dir}/web" />
+        </copy>
+
+        <copy todir="${build.dir}/web/WEB-INF/perl">
+            <fileset includes="**"
+                dir="${src.dir}/perl" />
+        </copy>
+
+        <copy todir="${build.dir}/web/WEB-INF">
+            <fileset includes="license.txt"
+                dir="${basedir}" />
+            <fileset includes="gpl.txt"
+                dir="${basedir}/" />
+        </copy>
+
+
+        <copy todir="${build.dir}/web/WEB-INF/classes">
+            <fileset dir="${build.dir}/web/WEB-INF">
+                <include name="hibernate*.cfg.xml" />
+            </fileset>
+        </copy>
+
+    </target>
+
+
+    <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs}"
+            debug="on" optimize="on" deprecation="on"
+            compiler="${compiler}" >
+            <include name="com/xpn/xwiki/**/*.java" />
+            <exclude name="**/test/*.class" />
+        </javac>
+    </target>
+
+    <target name="tests" depends="junit-check,prepare,xwiki">
+        <javac srcdir="${src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs};${classes.dir}"
+            debug="on" optimize="on" deprecation="on">
+            <include name="**/test/*.java" />
+        </javac>
+    </target>
+
+    <target name="test.perl" depends="xwiki, tests">
+        <mkdir dir="${test.reports.dir}" />
+        <mkdir dir="${test.clover.dir}" />
+
+        <junit printsummary="yes" dir="${basedir}/test" fork="on" >
+
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="xml" />
+
+            <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no"/>
+        </junit>
+    </target>
+
+    <target name="test.client" depends="xwiki, tests">
+        <mkdir dir="${test.reports.dir}" />
+
+        <junit printsummary="yes" dir="${basedir}/test" haltonfailure="no" fork="on" >
+
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="xml" />
+
+            <batchtest todir="${test.reports.dir}">
+                <fileset dir="${src.dir}">
+                    <include name="com/xpn/xwiki/test/*Test.java"/>
+                    <exclude name="**/StoreTest.java"/>
+                    <exclude name="**/RenderTest.java"/>
+                    <exclude name="**/StoreObjectTest.java"/>
+                    <exclude name="**/ServletTest.java"/>
+                    <exclude name="**/ViewEditTest.java"/>
+                    <exclude name="**/XMLRpcTest.java" />
+                    <exclude name="**/ServletAuthTest.java"/>
+                    <exclude name="**/ServletVirtualTest.java"/>
+                    <exclude name="**/Servleti18nTest.java"/>
+                    <exclude name="**/ServletStatsTest.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="test.server" depends="release, tests">
+
+        <mkdir dir="${test.reports.dir}" />
+        <copy tofile="${cactus.warfile}" file="${release.warfile}" overwrite="true" />
+        <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
+            haltonfailure="no" fork="on" >
+
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+            <formatter type="xml" />
+
+            <batchtest todir="${test.reports.dir}" >
+                <fileset dir="${src.dir}">
+                    <include name="com/xpn/xwiki/test/ViewEditTest.java"/>
+                    <include name="com/xpn/xwiki/test/ServletAuthTest.java"/>
+                    <include name="com/xpn/xwiki/test/ServletVirtualTest.java"/>
+                    <include name="com/xpn/xwiki/test/Servleti18nTest.java"/>
+                    <include name="com/xpn/xwiki/test/ServletStatsTest.java"/>
+                    <include name="com/xpn/xwiki/test/XMLRpcTest.java" />
+                </fileset>
+            </batchtest>
+
+            <containerset>
+                <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
+                    port="9080" todir="${test.reports.dir}"/>
+            </containerset>
+        </cactus> 
+        <delete file="${cactus.warfile}" />
+    </target>
+
+    <target name="test"  depends="test.client, test.server" />
+    <target name="test.clover"  depends="clover-check, test.client, test.server" />
+
+    <target name="clover.report" depends=""  if="clover.available">
+        <mkdir dir="${doc.dir}/clover" />
+        <java classname="com.cortexeb.tools.clover.reporters.html.HtmlReporter" fork="true">
+            <arg line="--outputdir ${doc.dir}/clover --showSrc --initstring ${clover.initstring} --title '${app.name}'"/>
+            <classpath>
+                <pathelement path="${classes.dir}" />
+                <pathelement path="${libs}" />
+            </classpath>
+        </java>
+    </target>
+
+    <target name="junit.report" depends="">
+        <mkdir dir="${doc.dir}/junit" />
+        <junitreport todir="${doc.dir}/junit">
+            <fileset dir="${test.reports.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${doc.dir}/junit"/>
+        </junitreport>
+    </target>
+
+    <target name="javadoc" depends="xwiki">
+        <mkdir dir="${javadoc.dir}" />
+        <javadoc packagenames="com.xpn.xwiki.*"
+            sourcepath="${src.dir}"
+            destdir="${javadoc.dir}"
+            classpath="${libs}"
+            author="true"
+            version="true"
+            private="yes"
+            windowtitle="${app.name} API"
+            doctitle="${app.name}"
+            bottom="Copyright 2003 Ludovic Dubost"
+            >
+        </javadoc>
+    </target>
+
+    <target name="doc" depends="javadoc, junit.report, clover.report" />
+
+    <target name="release" depends="xwiki">
+        <mkdir dir="${release.dir}" />
+        <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
+            <exclude name="**/web*.xml" />
+            <exclude name="**/xwiki-*.cfg" />
+	    <lib dir="${basedir}/lib">
+        <exclude name="**/servlet.jar" />
+        <exclude name="**/xpertnet*.jar" />
+        </lib>
+        </war>
+        <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
+        <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+        <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web-exo.xml" >
+            <exclude name="**/web*.xml" />
+            <exclude name="**/xwiki-*.cfg" />
+	    <lib dir="${basedir}/lib">
+        <exclude name="**/exo*.jar" />
+        <exclude name="**/picocontainer*.jar" />
+        <exclude name="**/nanocontainer*.jar" />
+        <exclude name="**/jcommon*.jar" />
+        <exclude name="**/jfreechart*.jar" />
+        <exclude name="**/servlet.jar" />
+        <exclude name="**/xpertnet*.jar" />
+        </lib>
+        </war>
+        <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+    </target>
+
+    <target name="bin.dist" depends="release, test, javadoc">
+        <mkdir dir="${dist.dir}" />
+        <property name="bin.tarfile" value="${dist.dir}/xwiki-${version}.tar.gz" />
+        <delete file="${bin.tarfile}" />
+
+        <tar compression="gzip" tarfile="${bin.tarfile}">
+            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
+            <tarfileset dir="${lib.dir}" prefix="lib" excludes="**/CVS/*" />
+            <tarfileset dir="${doc.dir}" prefix="doc" excludes="**/CVS/*" />
+            <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
+        </tar>
+    </target>
+
+    <target name="src.dist" depends="release, test, javadoc">
+        <mkdir dir="${dist.dir}" />
+        <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar.gz" />
+        <delete file="${src.tarfile}" />
+
+        <tar compression="gzip" tarfile="${src.tarfile}">
+            <tarfileset dir="CVS" prefix="CVS" />
+            <tarfileset dir="${lib.dir}" prefix="lib" />
+            <tarfileset dir="${doc.dir}" prefix="doc" />
+            <tarfileset dir="${src.dir}" prefix="src" />
+            <tarfileset dir="${basedir}/test" prefix="test" excludes="reports/*" />
+            <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
+            <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
+        </tar>
+    </target>
+
+    <target name="all"  depends="release, test, doc, src.dist" />
+
+</project>
+

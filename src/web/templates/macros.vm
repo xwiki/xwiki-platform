@@ -1,0 +1,141 @@
+#macro( template $tname )
+$xwiki.parseTemplate($tname)
+#end
+
+#macro( includeTopic $topic )
+$xwiki.includeTopic($topic)
+#end
+
+#macro( includeForm $topic )
+$xwiki.includeForm($topic)
+#end
+
+#macro( includeMacros $topic )
+$xwiki.includeForm($topic)
+#end
+
+#macro(editactions)
+<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#end
+
+#macro( versions )
+#foreach( $rev in $tdoc.getRecentRevisions(4) )
+<a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
+#end
+#if ($tdoc.realLanguage!="")
+<a href="$doc.getURL("view", "xpage=diff&language=${tdoc.realLanguage}")">$msg.get("diff")</a><span class="xwikisep"> | </span>
+#else
+<a href="$doc.getURL("view", "xpage=diff")">$msg.get("history")</a><span class="xwikisep"> | </span>
+#end
+#end
+
+## Display all queued Struts errors
+#macro (errorMarkup)
+    #if ($errors.exist() )
+        <ul>
+        #foreach ($e in $errors.all )
+            $e
+        #end
+        </ul>
+    #end
+#end
+
+## Display all queued Struts errors for a particular property
+#macro (errorMarkupForProperty $property)
+    #if ($errors.exist($property) )
+        <ul>
+        #foreach ($er in $errors.get($property))
+            $er
+        #end
+        </ul>
+    #end
+#end
+
+#macro(jabber $id)
+<img src="http://edgar.netflint.net/status.php?jid=${id}&amp;type=image&amp;iconset=phpbb" alt="jabber $id" />
+#end
+
+#macro(skype $id)
+<a href="callto://${id}"><img width="70" height="20" src="http://jyvepresence1.com/qzoxy/${id}.png" border="0"></a>
+#end
+
+#macro(yahoo $id)
+<img border="0" src="http://opi.yahoo.com/online?u=${id}&amp;m=g&amp;t=1" alt="yahoo $id" />
+#end
+
+#macro(aim $id)
+#set($onurl = "http://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
+#set($offurl = "http://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
+<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&off_url=${offurl}" alt="Online detector"></a>
+#end
+
+#macro(msn $id)
+#set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
+#set($offurl = "${request.serverName}${xwiki.getSkinFile('msnoffline.gif')}")
+<img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${id}/onurl=${onurl}/offurl=${offurl}/unknownurl=${offurl}" />
+#end
+
+#macro(im $user)
+#set($userdoc = $xwiki.getDocument($user))
+#set($userobj = $userdoc.getObject("XWiki.XWikiUsers"))
+#set($imtype = $userdoc.display("imtype","view",$userobj))
+#set($imaccount = $userdoc.display("imaccount","view",$userobj))
+#if($imtype=="Yahoo")
+#yahoo("$imaccount")
+#end
+#if($imtype=="AIM")
+#aim("$imaccount")
+#end
+#if($imtype=="MSN")
+#msn("$imaccount")
+#end
+#if($imtype=="Jabber")
+#jabber("$imaccount")
+#end
+#if($imtype=="Skype")
+#skype("$imaccount")
+#end
+#end
+
+#macro(sign $username)
+#if($username.indexOf(".")==-1)
+#set($username = "XWiki.${username}")
+#end
+#if($xwiki.exists("$username"))
+$xwiki.getUserName("$username")
+#else
+$xwiki.getUserName("xwiki:${username}")
+#end
+#end
+
+#macro(includeHelp $pagename)
+#if($xwiki.exists("xwiki:XWiki.${pagename}"))
+$xwiki.includeForm("xwiki:XWiki.${pagename}",false)
+#else
+#if($xwiki.exists("XWiki.${pagename}"))
+$xwiki.includeForm("XWiki.${pagename}",false)
+#end
+#end
+#end
+
+#macro(flickr $rss)
+{rss:feed=${rss}|full=1}
+#end
+
+#macro(flickrtag $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?tags=${tag}&format=rss_200")
+#end
+
+#macro(flickruser $id)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=${id}&format=rss_200")
+#end
+
+#macro(flickrusertag $id $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=${id}&tags=${tag}&format=rss_200")
+#end
+
+#macro(map $address $cp $linktext)
+<a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&strLocation=&strCP=${cp}&strCountry=1424&x=30&y=9">${linktext}</a>
+#end

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.LudovicDubost</author>
+<creationDate>1104264013465</creationDate>
+<date>1104264013465</date>
+<version>1.1</version>
+<content>Hello 1
+Hello 2
+Hello 3
+</content>
+</xwikidoc>

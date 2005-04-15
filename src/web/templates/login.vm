@@ -1,0 +1,28 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<form id="loginForm" action="" method="POST">
+<input type="hidden" name="j_rememberme" value="true" />
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<table border="0">
+<tr><td>$msg.get("username"):</td>
+<td><input type="text" name="j_username" value="" /></td>
+</tr>
+<tr><td>$msg.get("password"):</td>
+<td><input type="password" name="j_password" value="" /></td>
+</tr>
+<tr>
+<td colspan="2"><input type="submit" value="$msg.get("login")"/></td>
+</tr>
+</table>
+</form>
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

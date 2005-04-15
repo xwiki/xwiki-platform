@@ -1,0 +1,45 @@
+
+@import "xwiki.css";
+@import "wiki.css";
+@import "page.css";
+@import "rss.css";
+
+/* Default is a Blue StyleSheet */
+/* Light Blue */
+#xwikinav_footer, #xwikinav_header, .heading-1, .heading-1-1 {
+ border-color: #B6C5F2;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: #B6C5F2;
+}
+
+
+/* Dark Blue */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #5368A6;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #5368A6;
+}
+
+.heading-1, .heading-1-1 {
+ border-color: #5368A6;
+ color: #5368A6;
+}
+
+/* Comments colors */
+.xwikidata, .xwikidatafooter, .xwikidatafooter1, .xwikidatefooter2 {
+  background-color: #B6C5F2;
+}
+
+.xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
+ background-color: #5368A6;
+}
+
+/* Logo */
+#xwikilogo img {
+ background-image: url("logobleu.jpg");
+}

@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4" relativePaths="false">
+  <component name="AntConfiguration">
+    <defaultAnt bundledAnt="true" />
+  </component>
+  <component name="CodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS" />
+    <option name="USE_PER_PROJECT_SETTINGS" value="false" />
+  </component>
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+    <option name="CLEAR_OUTPUT_DIRECTORY" value="true" />
+    <option name="DEPLOY_AFTER_MAKE" value="2" />
+    <resourceExtensions>
+      <entry name=".+\.(properties|xml|html|dtd|tld|cfg|txt.1|txt.2|sxw|doc|vm|xsl)" />
+      <entry name=".+\.(gif|png|jpeg|jpg|ent)" />
+      <entry name="com.xpn.xwiki.render.filter.XWikiFilter" />
+      <entry name="com.xpn.xwiki.render.macro.XWikiMacro" />
+      <entry name="org.radeox.macro.code.SourceCodeFormatter" />
+    </resourceExtensions>
+    <wildcardResourcePatterns>
+      <entry name="*.properties" />
+      <entry name="*.xml" />
+      <entry name="*.html" />
+      <entry name="*.dtd" />
+      <entry name="*.tld" />
+      <entry name="*.cfg" />
+      <entry name="*.txt.1" />
+      <entry name="*.txt.2" />
+      <entry name="*.sxw" />
+      <entry name="*.doc" />
+      <entry name="*.vm" />
+      <entry name="*.xsl" />
+      <entry name="*.gif" />
+      <entry name="*.png" />
+      <entry name="*.jpeg" />
+      <entry name="*.jpg" />
+      <entry name="*.ent" />
+      <entry name="com.xpn.xwiki.render.filter.XWikiFilter" />
+      <entry name="com.xpn.xwiki.render.macro.XWikiMacro" />
+      <entry name="org.radeox.macro.code.SourceCodeFormatter" />
+    </wildcardResourcePatterns>
+  </component>
+  <component name="DataSourceManager" />
+  <component name="DataSourceManagerImpl" />
+  <component name="DependencyValidationManager" />
+  <component name="EntryPointsManager">
+    <entry_points />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="PRINT_LINE_NUMBERS" value="false" />
+    <option name="OPEN_IN_BROWSER" value="false" />
+    <option name="OUTPUT_DIRECTORY" />
+  </component>
+  <component name="GUI Designer component loader factory" />
+  <component name="ImportConfiguration">
+    <option name="VENDOR" value="XPERTNET" />
+    <option name="RELEASE_TAG" value="XPERTNET_0_1" />
+    <option name="LOG_MESSAGE" value="Initial import" />
+    <option name="CHECKOUT_AFTER_IMPORT" value="true" />
+    <option name="KEYWORD_SUBSTITUTION_WRAPPERS" value="aj kv;bat kv;cfg kv;cgi kv;class b;cmd kv;conf kv;css kv;dtd kv;ear b;form kv;hs kv;htm kv;html kv;idl kv;iml kv;ipr kv;iws kv;jar b;java kv;jhm kv;jnlp kv;js kv;jsf kv;jsp kv;jspf kv;log kv;mf kv;pl kv;pm kv;policy kv;properties kv;sh kv;sht kv;shtm kv;shtml kv;sql kv;tld kv;txt kv;vm kv;war b;wsdl kv;xhtml kv;xml kv;xsd kv;xsl kv;zip b;" />
+    <option name="MAKE_NEW_FILES_READ_ONLY" value="false" />
+  </component>
+  <component name="J2EEManager" />
+  <component name="JavacSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="false" />
+    <option name="DEPRECATION" value="true" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+    <option name="USE_GENERICS_COMPILER" value="false" />
+  </component>
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" />
+    <option name="OPTION_SCOPE" value="protected" />
+    <option name="OPTION_HIERARCHY" value="true" />
+    <option name="OPTION_NAVIGATOR" value="true" />
+    <option name="OPTION_INDEX" value="true" />
+    <option name="OPTION_SEPARATE_INDEX" value="true" />
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
+    <option name="OPTION_DEPRECATED_LIST" value="true" />
+    <option name="OTHER_OPTIONS" value="" />
+    <option name="HEAP_SIZE" />
+    <option name="OPEN_IN_BROWSER" value="true" />
+  </component>
+  <component name="JikesSettings">
+    <option name="JIKES_PATH" value="" />
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="DEPRECATION" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="false" />
+    <option name="IS_EMACS_ERRORS_MODE" value="true" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="Palette2">
+    <group name="Swing">
+      <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false">
+        <default-constraints vsize-policy="1" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="com.intellij.uiDesigner.VSpacer" tooltip-text="Vertical Spacer" icon="/com/intellij/uiDesigner/icons/vspacer.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="1" anchor="0" fill="2" />
+      </item>
+      <item class="javax.swing.JPanel" icon="/com/intellij/uiDesigner/icons/panel.png" removable="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.png" removable="false">
+        <default-constraints vsize-policy="7" hsize-policy="7" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JButton" icon="/com/intellij/uiDesigner/icons/button.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="0" fill="1" />
+        <initial-values>
+          <property name="text" value="Button" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JRadioButton" icon="/com/intellij/uiDesigner/icons/radioButton.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="RadioButton" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JCheckBox" icon="/com/intellij/uiDesigner/icons/checkBox.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="CheckBox" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JLabel" icon="/com/intellij/uiDesigner/icons/label.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="Label" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JTextField" icon="/com/intellij/uiDesigner/icons/textField.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JPasswordField" icon="/com/intellij/uiDesigner/icons/passwordField.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JFormattedTextField" icon="/com/intellij/uiDesigner/icons/formattedTextField.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextArea" icon="/com/intellij/uiDesigner/icons/textArea.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextPane" icon="/com/intellij/uiDesigner/icons/textPane.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JEditorPane" icon="/com/intellij/uiDesigner/icons/editorPane.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JComboBox" icon="/com/intellij/uiDesigner/icons/comboBox.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="2" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JTable" icon="/com/intellij/uiDesigner/icons/table.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JList" icon="/com/intellij/uiDesigner/icons/list.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="2" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTree" icon="/com/intellij/uiDesigner/icons/tree.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTabbedPane" icon="/com/intellij/uiDesigner/icons/tabbedPane.png" removable="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSplitPane" icon="/com/intellij/uiDesigner/icons/splitPane.png" removable="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSpinner" icon="/com/intellij/uiDesigner/icons/spinner.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+    </group>
+  </component>
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/xwiki.iml" filepath="$PROJECT_DIR$/xwiki.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
+    </modules>
+  </component>
+  <component name="ProjectRootManager" version="2" assert-keyword="false" jdk-15="false" project-jdk-name="java version &quot;1.4.2_03&quot;" />
+  <component name="RegexPlugin">
+    <option name="pos1" value="92" />
+    <option name="pos2" value="100" />
+    <option name="pos3" value="100" />
+    <option name="pos4" value="100" />
+    <option name="pos5" value="68" />
+  </component>
+  <component name="RmicSettings">
+    <option name="IS_EANABLED" value="false" />
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="false" />
+    <option name="GENERATE_IIOP_STUBS" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="UI designer component loader factory" />
+  <component name="WebManager">
+    <option enabled="true" />
+  </component>
+  <component name="WebRootContainer">
+    <root url="file://$PROJECT_DIR$/src/web" name="xwiki" validate="false" />
+  </component>
+  <component name="libraryTable">
+    <library name="Jakarta Commons">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/commons-logging.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-collections.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-digester.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-lang.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-beanutils.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ecs-1.4.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jakarta-oro-2.0.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.1-ld.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.diff.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-net-1.1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-httpclient-2.0.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />
+        <root url="file://C:/dev/java/commons-net-1.1.0/docs/apidocs" />
+        <root url="file://C:/dev/java/commons-httpclient-2.0.1/docs/apidocs" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/commons-fileupload-1.0/src/java" />
+        <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
+        <root url="file://C:/dev/java/jrcs-full-0.1.7/src/java" />
+        <root url="file://C:/dev/java/commons-logging-1.0.3-src/src/java" />
+      </SOURCES>
+    </library>
+    <library name="Unit Tests">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/commons-beanutils.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/aspectjrt-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/nekohtml-0.7.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/httpunit-1.5.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/junit.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/share" />
+        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/j2ee13" />
+      </SOURCES>
+    </library>
+    <library name="Hibernate">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-tools.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/odmg.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/dom4j.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oscache.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cglib2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/c3p0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ehcache.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/swarmcache.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.15-ga-bin.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/asm-util.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/hibernate-2.1/doc/api" />
+        <root url="file://C:/dev/java/oscache/docs/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/hibernate-2.1/src" />
+        <root url="file://C:/dev/java/oscache/src/core/java" />
+      </SOURCES>
+    </library>
+    <library name="Perl">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/InlineJavaServer.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/InlineJavaUser.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://C:/dev/perl/Inline-Java-0.44/Java/sources" />
+      </SOURCES>
+    </library>
+    <library name="Velocity">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/velocity-tools-1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/velocity-1.4.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/velocity-1.4/docs/api" />
+        <root url="file://C:/dev/java/velocity-tools-1.1/docs/javadoc" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/velocity-1.4/src/java" />
+      </SOURCES>
+    </library>
+    <library name="Struts">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/struts.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/share" />
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/upload/org" />
+        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/validator/org" />
+      </SOURCES>
+    </library>
+    <library name="Ant">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/ant.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/tools/apache-ant-1.6.0/docs/manual/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/apache-ant-1.6.0/src/main" />
+      </SOURCES>
+    </library>
+    <library name="OSUser">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/oscore.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/osuser.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/osuserpropertyset.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/osaccess.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/securityfilter.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-codec.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ejb.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/osuser/dist/docs/api" />
+        <root url="file://C:/dev/java/ospropertyset/docs/api" />
+        <root url="file://C:/dev/java/osaccess/dist/docs/api" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/build/documentation/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/osuser/src/java" />
+        <root url="file://C:/dev/java/ospropertyset/src/java" />
+        <root url="file://C:/dev/java/osaccess/src/java" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/src/share" />
+        <root url="file://C:/dev/java/securityfilter-2.0-src/src/catalina" />
+      </SOURCES>
+    </library>
+    <library name="TomCat 4.1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/servlet.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/catalina-ant.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/catalina.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-beanutils.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-digester.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-logging.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-modeler.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/jaas.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/jakarta-regexp-1.2.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/mx4j-jmx.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-common.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-default.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-invoker.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-manager.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/servlets-webdav.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-coyote.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-http11.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-jk.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-jk2.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-util.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/tomcat-warp.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/activation.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/ant.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-collections.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-logging-api.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/commons-pool.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jasper-compiler.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jasper-runtime.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jdbc2_0-stdext.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jndi.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/jta.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/mail.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-common.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-factory.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-resources.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/servlet.jar!/" />
+        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/tools.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/Program Files/Apache Group/Tomcat 4.1/webapps/tomcat-docs/catalina/docs" />
+        <root url="file://C:/Program Files/Apache Group/Tomcat 4.1/webapps/tomcat-docs/servletapi" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
+      </SOURCES>
+    </library>
+    <library name="Radeox">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/asm-util.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/radeox.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/radeox/docs/api" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/radeox/src" />
+      </SOURCES>
+    </library>
+    <library name="Portlets">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/portlet.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="TomCat 5.0">
+      <CLASSES>
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jakarta-regexp-1.3.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-webdav.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-common.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-beanutils.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-http11.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jkconfig.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-cluster.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-ant.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jkshm.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-default.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-optional.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-modeler.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jk2.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-ja.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-fr.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-es.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-invoker.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-coyote.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jni.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jk.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-digester.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-util.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-base-services-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-organization-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jstl_el.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/relaxngDatatype-20020414.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-collections.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-resources.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/wsdl4j-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-api-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-logging-1.0.3.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/ant.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portlet-container-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-communication-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mx4j-jmx-1.1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jasper-compiler.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-commons-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jstl.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-libs-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/pop3.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/c3p0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-services-container-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-wsrp-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/oro-2.0.8.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/dom4j-1.4.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/nanocontainer-1.0-beta-1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-publish-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-publish-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jsf-api-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/xsdlib-20030225.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-dbcp-1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/servlet-api.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portlet-container-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-beanutils-1.6.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-wsrp-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/hibernate-2.1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/ehcache-0.7.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/portlet-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-ri-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/axis-1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/hsqldb-build.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-lang-2.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/tools.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-communication-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-base-services-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/saaj-1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-java.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/namespace-1.2.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-pool-1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jta-spec-1.0.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-factory.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portal-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portal-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jasper-runtime.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mx4j-tools-1.1.1.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mail.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-el.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-common.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-xml-processing-services-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/soap-2.3.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/odmg-3.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-ecommerce-service-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jsp-api.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/cglib2.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-ecommerce-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-xml-processing-services-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-organization-service-impl-1.0.jar!/" />
+        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxrpc-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="ExoPlatform">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jcommon-0.9.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jfreechart-0.9.16.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/picocontainer-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.impl-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.impl-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.organization.api-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.api-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.organization.impl-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.api-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.common.api-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.container-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.impl-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.api-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://C:/dev/java/exoplatform/exo-services-container/src/java" />
+      </SOURCES>
+    </library>
+    <library name="XMLRPC">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/xmlrpc.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/xmlrpc/xmlrpc-1.2-b1/docs/apidocs" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/xmlrpc/xmlrpc-1.2-b1/src/java" />
+      </SOURCES>
+    </library>
+    <library name="Groovy">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-01.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="fop">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jtidy.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/fop.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/avalon-framework.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xalan.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jimi.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xerces.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xml-apis.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="file://C:/dev/java/fop/fop-0.20.5/docs" />
+        <root url="file://C:/dev/java/jtidy/jtidy-r8-SNAPSHOT/docs/apidocs" />
+        <root url="file://C:/dev/java/xalan/xalan-j_2_6_0/docs/apidocs" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="file://C:/dev/java/fop/fop-0.20.5/src" />
+        <root url="file://C:/dev/java/jtidy/jtidy-r8-SNAPSHOT/src/main" />
+        <root url="file://C:/dev/java/xerces/xerces-2_6_2/src" />
+        <root url="file://C:/dev/java/xerces/xerces-2_6_2/src/dom3/org" />
+        <root url="file://C:/dev/java/xalan/xalan-j_2_6_0/src" />
+      </SOURCES>
+    </library>
+    <library name="yourkit">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/yjp.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
+  <component name="uidesigner-configuration">
+    <option name="INSTRUMENT_CLASSES" value="true" />
+    <option name="COPY_FORMS_RUNTIME_TO_OUTPUT" value="true" />
+  </component>
+</project>
+

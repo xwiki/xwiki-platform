@@ -1,0 +1,5 @@
+<div class="xwiki${xwikimode}b" id="xwikinav_footer">
+<div class="xwikiactions">
+<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+</div>
+</div>

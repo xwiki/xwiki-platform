@@ -1,0 +1,542 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+<hibernate-mapping auto-import="true">
+
+    <!-- com.xpn.xwiki.doc.XWikiDocument root -->
+    <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWD_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+        <property name="fullName" type="string">
+            <column name="XWD_FULLNAME" length="255" not-null="true"/>
+        </property>
+
+        <property name="name" type="string">
+            <column name="XWD_NAME" length="255" not-null="true"/>
+        </property>
+
+        <property name="language" type="string">
+            <column name="XWD_LANGUAGE" length="5" />
+        </property>
+
+        <property name="defaultLanguage" type="string">
+            <column name="XWD_DEFAULT_LANGUAGE" length="5" />
+        </property>
+
+        <property name="translation" type="integer">
+            <column name="XWD_TRANSLATION"  not-null="true" />
+        </property>
+
+        <property name="date" type="timestamp">
+            <column name="XWD_DATE" not-null="true"/>
+        </property>
+
+        <property name="creationDate" type="timestamp">
+            <column name="XWD_CREATION_DATE" />
+        </property>
+
+        <property name="author" type="string">
+            <column name="XWD_AUTHOR" length="255"/>
+        </property>
+
+        <property name="creator" type="string">
+            <column name="XWD_CREATOR" length="255"/>
+        </property>
+
+        <property name="web" type="string">
+            <column name="XWD_WEB" length="255" not-null="true"/>
+        </property>
+
+        <property name="content" type="string">
+            <column name="XWD_CONTENT" length="200000" not-null="true"/>
+        </property>
+
+        <property name="archive" type="string">
+            <column name="XWD_ARCHIVE" length="200000" not-null="true"/>
+        </property>
+
+        <property name="version" type="string">
+            <column name="XWD_VERSION" length="255" not-null="true"/>
+        </property>
+
+        <property name="parent" type="string">
+            <column name="XWD_PARENT" length="511"/>
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
+        <id name="docId" type="long" unsaved-value="any">
+            <column name="XWL_DOC_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+        <property name="userName" type="string">
+            <column name="XWL_AUTHOR" length="255"/>
+        </property>
+        <property name="date" type="timestamp">
+            <column name="XWL_DATE" not-null="true" />
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+
+        <property name="docId" type="long">
+            <column name="XWA_DOC_ID" />
+        </property>
+
+        <property name="filename" type="string">
+            <column name="XWA_FILENAME" length="255" not-null="true"/>
+        </property>
+
+        <property name="filesize" type="integer">
+            <column name="XWA_SIZE" />
+        </property>
+
+        <property name="date" type="timestamp">
+            <column name="XWA_DATE" not-null="true" />
+        </property>
+
+        <property name="author" type="string">
+            <column name="XWA_AUTHOR" length="255"/>
+        </property>
+
+        <property name="version" type="string">
+            <column name="XWA_VERSION" length="255" not-null="true"/>
+        </property>
+
+        <property name="comment" type="string">
+            <column name="XWA_COMMENT" length="255" />
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+
+        <property name="content" type="binary">
+            <column name="XWA_CONTENT" length="4000000" not-null="true"/>
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
+        <id name="id" type="long" unsaved-value="any">
+            <column name="XWA_ID" not-null="true"/>
+            <generator class="assigned" />
+        </id>
+        <property name="archive" type="binary">
+            <column name="XWA_ARCHIVE" length="4000000" />
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.objects.classes.PropertyClass" table="xwikiclassesprop">
+        <composite-id unsaved-value="any">
+            <key-property name="id" column="XWP_ID" type="integer" />
+            <key-property name="name" column="XWP_NAME" type="string" />
+        </composite-id>
+        <property name="prettyName" type="string">
+            <column name="XWP_PRETTYNAME" length="255"/>
+        </property>
+        <property name="classType" type="string">
+            <column name="XWP_CLASSTYPE" length="255"/>
+        </property>
+        <property name="unmodifiable" type="boolean">
+            <column name="XWP_UNMODIFIABLE" />
+        </property>
+        <property name="number" type="integer">
+            <column name="XWP_NUMBER" />
+        </property>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.NumberClass" table="xwikinumberclasses">
+            <key>
+                <column name="XWN_ID"  />
+                <column name="XWN_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWN_SIZE" />
+            </property>
+            <property name="numberType" type="string">
+                <column name="XWN_NUMBERTYPE" length="20" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.StringClass" table="xwikistringclasses">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.DateClass" table="xwikidateclasses">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+            <property name="emptyIsToday" type="integer">
+                <column name="XWS_EMPTY_IS_TODAY" />
+            </property>
+
+            <property name="dateFormat" type="string">
+                <column name="XWS_DATE_FORMAT" length="255"/>
+            </property>
+
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.PasswordClass" table="xwikistringclasses">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.TextAreaClass" table="xwikistringclasses">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="size" type="integer">
+                <column name="XWS_SIZE" />
+            </property>
+            <property name="rows" type="integer">
+                <column name="XWS_ROWS" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.BooleanClass" table="xwikibooleanclasses">
+            <key>
+                <column name="XWN_ID"  />
+                <column name="XWN_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWN_DISPLAYTYPE" length="20" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.StaticListClass" table="xwikislistclasses">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWL_DISPLAYTYPE" length="20" />
+            </property>
+
+            <property name="multiSelect" type="boolean">
+                <column name="XWL_MULTISELECT" />
+            </property>
+
+            <property name="size" type="integer">
+                <column name="XWL_SIZE" />
+            </property>
+
+            <property name="relationalStorage" type="boolean">
+                <column name="XWL_RELATIONAL" />
+            </property>
+
+            <property name="values" type="string">
+                <column name="XWL_VALUES" length="2000" />
+            </property>
+
+        </joined-subclass>
+
+
+        <joined-subclass name="com.xpn.xwiki.objects.classes.DBListClass" table="xwikidblistclasses">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="displayType" type="string">
+                <column name="XWL_DISPLAYTYPE" length="20" />
+            </property>
+
+            <property name="multiSelect" type="boolean">
+                <column name="XWL_MULTISELECT" />
+            </property>
+
+            <property name="size" type="integer">
+                <column name="XWL_SIZE" />
+            </property>
+
+            <property name="relationalStorage" type="boolean">
+                <column name="XWL_RELATIONAL" />
+            </property>
+
+            <property name="sql" type="string">
+                <column name="XWL_SQL" length="2000" />
+            </property>
+
+        </joined-subclass>
+
+    </class>
+
+    <class name="com.xpn.xwiki.objects.classes.BaseClass" table="xwikiclasses">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWO_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="name" type="string">
+            <column name="XWO_NAME" not-null="true" length="255"/>
+        </property>
+    </class>
+
+
+    <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
+        <composite-id unsaved-value="any">
+            <key-property name="id" column="XWP_ID" type="integer" />
+            <key-property name="name" column="XWP_NAME" type="string" />
+        </composite-id>
+        <property name="classType" type="string">
+            <column name="XWP_CLASSTYPE" length="255"/>
+        </property>
+
+        <joined-subclass name="com.xpn.xwiki.objects.IntegerProperty" table="xwikiintegers">
+            <key>
+                <column name="XWI_ID"  />
+                <column name="XWI_NAME"  />
+            </key>
+            <property name="value" type="integer">
+                <column name="XWI_VALUE" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.LongProperty" table="xwikilongs">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="value" type="long">
+                <column name="XWL_VALUE" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.FloatProperty" table="xwikifloats">
+            <key>
+                <column name="XWF_ID"  />
+                <column name="XWF_NAME"  />
+            </key>
+            <property name="value" type="float">
+                <column name="XWF_VALUE" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DoubleProperty" table="xwikidoubles">
+            <key>
+                <column name="XWD_ID"  />
+                <column name="XWD_NAME"  />
+            </key>
+            <property name="value" type="double">
+                <column name="XWD_VALUE" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.StringProperty" table="xwikistrings">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="value" type="string">
+                <column name="XWS_VALUE" length="255" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DateProperty" table="xwikidates">
+            <key>
+                <column name="XWS_ID"  />
+                <column name="XWS_NAME"  />
+            </key>
+            <property name="value" type="timestamp">
+                <column name="XWS_VALUE" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.LargeStringProperty" table="xwikilargestrings">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="value" type="string">
+                <column name="XWL_VALUE" length="60000" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.StringListProperty" table="xwikilargestrings">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <property name="textValue" type="string">
+                <column name="XWL_VALUE" length="60000" />
+            </property>
+        </joined-subclass>
+
+        <joined-subclass name="com.xpn.xwiki.objects.DBStringListProperty" table="xwikilists">
+            <key>
+                <column name="XWL_ID"  />
+                <column name="XWL_NAME"  />
+            </key>
+            <list name="list" table="xwikilistitems" batch-size="10">
+                <key>
+                    <column name="XWL_ID"  />
+                    <column name="XWL_NAME"  />
+                </key>
+                <index column="XWL_NUMBER"/>
+                <element column="XWL_VALUE" type="string" />
+            </list>
+        </joined-subclass>
+    </class>
+    <class name="com.xpn.xwiki.objects.BaseObject" table="xwikiobjects">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWO_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="number" type="integer">
+            <column name="XWO_NUMBER" not-null="false" />
+        </property>
+        <property name="name" type="string">
+            <column name="XWO_NAME" not-null="true" length="255"/>
+        </property>
+        <property name="className" type="string">
+            <column name="XWO_CLASSNAME" not-null="true" length="255"/>
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWS_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+
+        <property name="number" type="integer">
+            <column name="XWS_NUMBER" not-null="false" />
+        </property>
+        <property name="name" type="string">
+            <column name="XWS_NAME" not-null="true" length="255"/>
+        </property>
+        <property name="className" type="string">
+            <column name="XWS_CLASSNAME" not-null="true" length="255"/>
+        </property>
+
+        <property name="action" type="string">
+            <column name="XWS_ACTION" not-null="true" length="255"/>
+        </property>
+
+        <property name="pageViews" type="integer">
+            <column name="XWS_PAGE_VIEWS" not-null="false" />
+        </property>
+
+        <property name="uniqueVisitors" type="integer">
+            <column name="XWS_UNIQUE_VISITORS" not-null="false" />
+        </property>
+
+        <property name="period" type="integer">
+            <column name="XWS_PERIOD" not-null="false" />
+        </property>
+
+        <property name="visits" type="integer">
+            <column name="XWS_VISITS" not-null="false" />
+        </property>
+    </class>
+
+    <class name="com.xpn.xwiki.stats.impl.RefererStats" table="xwikistatsreferer">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWR_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+
+        <property name="number" type="integer">
+            <column name="XWR_NUMBER" not-null="false" />
+        </property>
+        <property name="name" type="string">
+            <column name="XWR_NAME" not-null="true" length="255"/>
+        </property>
+        <property name="className" type="string">
+            <column name="XWR_CLASSNAME" not-null="true" length="255"/>
+        </property>
+
+        <property name="referer" type="string">
+            <column name="XWR_REFERER" not-null="true" length="255"/>
+        </property>
+
+        <property name="pageViews" type="integer">
+            <column name="XWR_PAGE_VIEWS" not-null="false" />
+        </property>
+
+        <property name="period" type="integer">
+            <column name="XWR_PERIOD" not-null="false" />
+        </property>
+    </class>
+
+
+    <class name="com.xpn.xwiki.stats.impl.VisitStats" table="xwikistatsvisit">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWV_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+
+        <property name="number" type="integer">
+            <column name="XWV_NUMBER" not-null="false" />
+        </property>
+        <property name="name" type="string">
+            <column name="XWV_NAME" not-null="true" length="255"/>
+        </property>
+        <property name="className" type="string">
+            <column name="XWV_CLASSNAME" not-null="true" length="255"/>
+        </property>
+
+        <property name="IP" type="string">
+            <column name="XWV_IP" not-null="true" length="32"/>
+        </property>
+
+        <property name="userAgent" type="string">
+            <column name="XWV_USER_AGENT" not-null="true" length="255"/>
+        </property>
+
+        <property name="cookie" type="string">
+            <column name="XWV_COOKIE" not-null="true" length="255"/>
+        </property>
+
+        <property name="uniqueID" type="string">
+            <column name="XWV_UNIQUE_ID" not-null="true" length="255"/>
+        </property>
+
+        <property name="pageViews" type="integer">
+            <column name="XWV_PAGE_VIEWS" not-null="false" />
+        </property>
+
+        <property name="pageSaves" type="integer">
+            <column name="XWV_PAGE_SAVES" not-null="false" />
+        </property>
+
+        <property name="downloads" type="integer">
+            <column name="XWV_DOWNLOADS" not-null="false" />
+        </property>
+
+        <property name="startDate" type="timestamp">
+            <column name="XWV_START_DATE" not-null="false" />
+        </property>
+
+        <property name="endDate" type="timestamp">
+            <column name="XWV_END_DATE" not-null="false" />
+        </property>
+    </class>
+
+</hibernate-mapping>
+

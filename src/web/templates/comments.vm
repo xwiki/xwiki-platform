@@ -1,0 +1,60 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<div id="xwikiaddcomment">
+#if($context.hasAccessLevel("comment", $doc.fullName)==false)
+$msg.get("nocommentswithoutright")
+#else
+#set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())
+#set($comment = $cclass.newObject())
+<form action="$doc.getURL("commentadd")" method="post">
+<p>
+<input type="hidden" name="xredirect" value="${doc.getURL("view")}" />
+<br /><br />
+$msg.get("author"): $xwiki.renderText("[${context.user}]", $doc)
+<input type="hidden" name="XWiki.XWikiComments_author" value="$context.user" />
+<input type="hidden" name="XWiki.XWikiComments_date" value="" />
+<br />
+<!--
+#set($pclass = $comment.getxWikiClass().get("highlight"))
+<br />$msg.get("highlight"):<br />
+$doc.displayEdit($pclass,"XWiki.XWikiComments_",$comment)
+<br /><br />
+-->
+$msg.get("newcomment")<br />
+#set($pclass = $comment.getxWikiClass().get("comment"))
+$doc.displayEdit($pclass,"XWiki.XWikiComments_",$comment)
+<br />
+<input type="submit" value="$msg.get("addcomment")" />
+</p>
+</form>
+#end
+#includeHelp("CommentHelp")
+<div id="xwikidata" class="clear">
+#set($showcomments = "open")
+#template("comments2.vm")
+</div>
+</div>
+</div>
+<script type="text/javascript">
+<!--
+function showhide(divname) {
+ var style = document.getElementById(divname).style;
+ if ((style.display=='block')||(style.display=='')) {
+  style.display='none';
+  }
+ else {
+  style.display='block';
+  }
+}
+// -->
+</script>
+#template("basefooter.vm")
+#template("footer.vm")

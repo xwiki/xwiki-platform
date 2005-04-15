@@ -1,0 +1,82 @@
+#set($showactions=1)
+#template("editheader.vm")
+<script type="text/javascript">
+  _editor_url = "../../../htmlarea/";
+  _editor_lang = "${xwiki.languagePreference}";
+</script>
+<!-- load the main HTMLArea file, this will take care of loading the CSS and
+    other required core scripts. -->
+<script type="text/javascript" src="../../../htmlarea/htmlarea.js"></script>
+
+<script type="text/javascript">
+      HTMLArea.loadPlugin("ContextMenu");
+      HTMLArea.loadPlugin("TableOperations");
+      HTMLArea.loadPlugin("CSS");
+
+      function initDocument() {
+        var editor = new HTMLArea("content");
+        editor.registerPlugin(ContextMenu);
+        editor.registerPlugin(TableOperations);
+        editor.generate();
+      }
+</script>
+
+<div id="xwikieditcontent">
+<form id="edit" method="post" action="$doc.getURL("preview")">
+<p>
+<input type="hidden" name="template" value="$!doc.getTemplate()" />
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<input type="hidden" name="language" value="$!tdoc.language" />
+</p>
+#set( $pages = $doc.includedPages)
+#if ( $pages.size() > 0)
+<p>
+$msg.get("editincludepagemsg")
+#foreach ($page in $pages)
+<a href="$xwiki.getURL($page, "edit")">$page</a>&nbsp;
+#end
+</p>
+#end
+<div id="xwikitext">
+#if ($xwiki.isMultiLingual()==true)
+$msg.get("youareediting"): $tdoc.language
+<br /><br />
+#end
+$xwiki.getHTMLArea($tdoc.content)
+<br/>
+<script type="text/javascript">
+<!--
+initDocument();
+// -->
+</script>
+
+<script type="text/javascript">
+<!--
+function openHelp() {
+  win = open( "http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain",
+			   "syntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  if( win ) {
+	 win.focus();
+  }
+}
+// -->
+</script>
+$msg.get("helponsyntax") <a href="" onClick="openHelp(); return false;">$msg.get("xwikisyntax")</a>
+<br /><br />
+#if ($tdoc.language=="")
+$msg.get("parent"):&nbsp;<input type="text" name="parent" value="$!doc.parent" size="40" />
+<br/><br/>
+$msg.get("defaultlanguage"):&nbsp;<input type="text" name="default_language" value="$!doc.defaultLanguage" size="10" />
+<br/><br/>
+#if(($doc.creator.equals($context.user))
+     ||($context.hasAdminRights()))
+$msg.get("creator"):&nbsp;<input type="text" name="creator" value="$!doc.creator" size="40" />
+#else
+$msg.get("creator"):&nbsp;$!doc.creator
+#end
+#end
+
+</div>
+</form>
+</div>
+#template("editfooter.vm")

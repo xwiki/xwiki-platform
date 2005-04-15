@@ -1,0 +1,7 @@
+#if ($showactions == 1)
+0<a href="$doc.getURL("cancel")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("cancel")</a>
+<span> | </span>
+<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#end

@@ -1,0 +1,14 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+<div id="xwikicontent">
+$msg.get("problemoccured")
+<br /><br />
+$msg.get("detailedinformation"):<br />
+<pre>
+$exp.getFullMessage()
+</pre>
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

@@ -1,0 +1,90 @@
+/* Layout stylesheet */
+
+body {
+  font-size: 100.01%; /* [1] */
+}
+#col-a {
+  float: right;
+  width: 100%;
+}
+#col-a[id] { /* [2] */
+  margin-left: -1px;
+}
+#col-b {
+  float: left;
+  margin-left: -15em;
+  z-index: 10; /* [3] */
+}
+#col-b[id] { /* [2] */
+  margin-right: 1px;
+}
+#col-c {
+  float: right;
+  margin-right: -15em;
+  z-index: 0; /* [3] */
+}
+#col-c[id] { /* [2] */
+  margin-left: 1px;
+}
+.show-all #columns {
+  padding: 0 15em;
+}
+.hide-left #columns {
+  padding: 0 15em 0 0;
+}
+.hide-right #columns {
+  padding: 0 0 0 15em;
+}
+.cols-wrapper {
+  width: 100%;
+}
+.cols-wrapper[class] {
+  padding-bottom: 0.1px; /* [4] */
+}
+.float-wrapper {
+  float: left;
+  width: 100%;
+  /* position: relative; if we put this the drop down menu shows behind !!*/
+  z-index: 0;
+}
+.float-wrapper[class] { /* [2] */
+  margin-right: -1px;
+}
+.sidecol {
+  width: 15em;
+  overflow: hidden;
+  position: relative;
+}
+.box,
+.main-content {
+  margin: 0 1em;
+}
+.clear {
+  clear: both;
+}
+.none {
+  display: none;
+}
+
+/*
+  [1] Play nice with EMs in Opera 6 and IE Win.
+  [2] Support for Mozilla, but IE doesn't likes it.
+  [3] Z indices needed for link clickability in IE Mac and Opera 6.
+  [4] Mozilla needs a non zero value, seems to be a bug.
+*/
+
+.large #col-b {
+  margin-left: -20em;
+}
+
+.large #col-c {
+  margin-right: -20em;
+}
+
+.large #columns {
+  padding: 0 20em 0 0;
+}
+
+.large .sidecol {
+  width: 20em;
+}

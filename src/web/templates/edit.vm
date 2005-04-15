@@ -1,0 +1,105 @@
+#set($hasedit = $xwiki.hasAccessLevel("edit"))
+#set($hasadmin = $xwiki.hasAdminRights())
+#set($showactions=1)
+#template("editheader.vm")
+#if($xwiki.exists("EditToolbar"))
+#set($toolbardoc = "EditToolbar")
+#else
+#if($xwiki.exists("XWiki.EditToolbar"))
+#set($toolbardoc = "XWiki.EditToolbar")
+#else
+#if($xwiki.exists("xwiki:XWiki.EditToolbar"))
+#set($toolbardoc = "xwiki:XWiki.EditToolbar")
+#end
+#end
+#end
+#if($toolbardoc)
+#set($colsclass = "hide-left")
+#else
+#set($colsclass = "hide-both")
+#end
+<div id="xwikieditcontent" class="large">
+       <div id="columns">
+        <div class="cols-wrapper">
+          <div class="float-wrapper">
+            <div id="col-a">
+            </div>
+              <div class="main-content">
+<form id="edit" method="post" action="$doc.getURL("preview")">
+<p>
+<input type="hidden" name="template" value="$!doc.getTemplate()" />
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<input type="hidden" name="language" value="$!tdoc.language" />
+</p>
+#set( $pages = $tdoc.includedPages)
+#if ( $pages.size() > 0)
+<p>
+$msg.get("editincludepagemsg")
+#foreach ($page in $pages)
+<a href="$xwiki.getURL($page, "edit")">$page</a>&nbsp;
+#end
+</p>
+#end
+#if (($tdoc.Locked==true)&&($!request.force!="1"))
+<p>
+$msg.get("doclockedby"): $tdoc.LockingUser
+</p>
+#else
+<div id="xwikitext">
+#if ($xwiki.isMultiLingual()==true)
+$msg.get("youareediting"): $tdoc.language
+<br /><br />
+#end
+#includeHelp("EditWikiToolbar")
+$xwiki.getTextArea($tdoc.content)
+<br/>
+<script type="text/javascript">
+<!--
+function openHelp() {
+  win = open( "http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain",
+			   "syntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  if( win ) {
+	 win.focus();
+  }
+}
+// -->
+</script>
+$msg.get("helponsyntax") <a href="" onClick="openHelp(); return false;">$msg.get("xwikisyntax")</a>
+<br /><br />
+#if ($tdoc.language=="")
+$msg.get("parent"):&nbsp;<input type="text" name="parent" value="$!doc.parent" size="40" />
+<br/><br/>
+$msg.get("defaultlanguage"):&nbsp;<input type="text" name="default_language" value="$!doc.defaultLanguage" size="10" />
+<br/><br/>
+#if(($doc.creator.equals($context.user))
+     ||($hasadmin))
+$msg.get("creator"):&nbsp;<input type="text" name="creator" value="$!doc.creator" size="40" />
+#else
+$msg.get("creator"):&nbsp;$!doc.creator
+#end
+#end
+#end
+</div>
+</form>
+#includeHelp("EditHelp")
+         </div>
+            </div>
+            <div id="col-b" class="sidecol">
+              <div class="box">
+              </div>
+            </div>
+          </div>
+          <div id="col-c" class="sidecol">
+         <div class="box">
+#if($toolbardoc)
+$xwiki.includeForm("$toolbardoc",false)
+#else
+#template("edittoolbar.vm")
+#end
+          </div>
+          </div>
+          <div class="clear" id="em"></div>
+          </div>
+          </div>
+</div>
+#template("editfooter.vm")

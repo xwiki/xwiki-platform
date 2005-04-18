@@ -748,15 +748,22 @@ public class XWikiService {
                 tdoc.setLanguage(languagetoedit);
                 tdoc.setContent(doc.getContent());
                 tdoc.setAuthor(context.getUser());
+                tdoc.setStore(doc.getStore());
                 context.put("tdoc", tdoc);
                 vcontext.put("tdoc", new Document(tdoc, context));
             }
         }
 
         /* Setup a lock */
+        try {
         XWikiLock lock = tdoc.getLock(context);
         if (lock == null || lock.getUserName().equals(context.getUser()) || peform.isLockForce())
             tdoc.setLock(context.getUser(),context);
+        } catch (Exception e) {
+            // Lock should never make XWiki fail
+            // But we should log any related information
+            log.error("Exception while setting up lock", e);
+        }
         tdoc.readFromTemplateForEdit(peform, context);
         return "edit";
     }

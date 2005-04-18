@@ -64,6 +64,7 @@
 
     <xsl:attribute-set name="body">
         <!-- specified on fo:flow's only child fo:block -->
+        <xsl:attribute name="font-size">0.75em</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="page-header">
@@ -85,55 +86,67 @@
     <xsl:attribute-set name="h1">
         <xsl:attribute name="font-size">2em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
         <xsl:attribute name="space-before">0.67em</xsl:attribute>
-        <xsl:attribute name="space-after">0.67em</xsl:attribute>
+        <xsl:attribute name="space-after">0.07em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">1mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h2">
         <xsl:attribute name="font-size">1.5em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
         <xsl:attribute name="space-before">0.83em</xsl:attribute>
-        <xsl:attribute name="space-after">0.83em</xsl:attribute>
+        <xsl:attribute name="space-after">0.13em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">2mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h3">
         <xsl:attribute name="font-size">1.17em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
-        <xsl:attribute name="space-before">1em</xsl:attribute>
-        <xsl:attribute name="space-after">1em</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
+        <xsl:attribute name="space-before">1.0em</xsl:attribute>
+        <xsl:attribute name="space-after">0.3em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">3mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h4">
         <xsl:attribute name="font-size">1em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
         <xsl:attribute name="space-before">1.17em</xsl:attribute>
-        <xsl:attribute name="space-after">1.17em</xsl:attribute>
+        <xsl:attribute name="space-after">0.47em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">4mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h5">
-        <xsl:attribute name="font-size">0.83em</xsl:attribute>
+        <xsl:attribute name="font-size">0.85em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
         <xsl:attribute name="space-before">1.33em</xsl:attribute>
-        <xsl:attribute name="space-after">1.33em</xsl:attribute>
+        <xsl:attribute name="space-after">0.63em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">5mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="h6">
-        <xsl:attribute name="font-size">0.67em</xsl:attribute>
+        <xsl:attribute name="font-size">0.75em</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="font-style">italic</xsl:attribute>
         <xsl:attribute name="space-before">1.67em</xsl:attribute>
-        <xsl:attribute name="space-after">1.67em</xsl:attribute>
+        <xsl:attribute name="space-after">0.97em</xsl:attribute>
         <xsl:attribute name="keep-with-next.within-column">always</xsl:attribute>
         <xsl:attribute name="keep-together.within-column">always</xsl:attribute>
+        <xsl:attribute name="start-indent">6mm</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="p">
@@ -185,8 +198,8 @@
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
     <xsl:attribute-set name="ul">
-        <xsl:attribute name="space-before">1em</xsl:attribute>
-        <xsl:attribute name="space-after">1em</xsl:attribute>
+        <xsl:attribute name="space-before">0.5em</xsl:attribute>
+        <xsl:attribute name="space-after">0.5em</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="ul-nested">
@@ -195,8 +208,8 @@
     </xsl:attribute-set>
 
     <xsl:attribute-set name="ol">
-        <xsl:attribute name="space-before">1em</xsl:attribute>
-        <xsl:attribute name="space-after">1em</xsl:attribute>
+        <xsl:attribute name="space-before">0.5em</xsl:attribute>
+        <xsl:attribute name="space-after">0.5em</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="ol-nested">
@@ -307,9 +320,11 @@
     </xsl:attribute-set>
 
     <xsl:attribute-set name="th">
-        <xsl:attribute name="font-weight">bolder</xsl:attribute>
-        <xsl:attribute name="text-align">center</xsl:attribute>
+        <xsl:attribute name="font-size">90%</xsl:attribute>
+        <xsl:attribute name="font-weight">bold</xsl:attribute>
+        <xsl:attribute name="text-align">left</xsl:attribute>
         <xsl:attribute name="border">1px solid black</xsl:attribute>
+        <xsl:attribute name="background-color">lightgrey</xsl:attribute>
         <!--
         <xsl:attribute name="border-style">inset</xsl:attribute>
     -->
@@ -317,6 +332,7 @@
     </xsl:attribute-set>
 
     <xsl:attribute-set name="td">
+        <xsl:attribute name="font-size">90%</xsl:attribute>
         <xsl:attribute name="border">1px solid b</xsl:attribute>
         <!--
         <xsl:attribute name="border-style">inset</xsl:attribute>
@@ -329,14 +345,14 @@
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
     <xsl:attribute-set name="b">
-        <xsl:attribute name="font-weight">bolder</xsl:attribute>
+        <xsl:attribute name="font-weight">bold</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="strong">
-        <xsl:attribute name="font-weight">bolder</xsl:attribute>
+        <xsl:attribute name="font-weight">bold</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="strong-em">
-        <xsl:attribute name="font-weight">bolder</xsl:attribute>
+        <xsl:attribute name="font-weight">bold</xsl:attribute>
         <xsl:attribute name="font-style">italic</xsl:attribute>
     </xsl:attribute-set>
 
@@ -683,37 +699,37 @@
     Block-level
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:h1">
+    <xsl:template match="html:h3[@class='heading-1']">
         <fo:block xsl:use-attribute-sets="h1">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h2">
+    <xsl:template match="html:h3[@class='heading-1-1']">
         <fo:block xsl:use-attribute-sets="h2">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3">
+    <xsl:template match="html:h3[@class='heading-1-1-1']">
         <fo:block xsl:use-attribute-sets="h3">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
-
-    <xsl:template match="html:h4">
+    
+    <xsl:template match="html:h3[@class='heading-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h4">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h5">
+    <xsl:template match="html:h3[@class='heading-1-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h5">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h6">
+    <xsl:template match="html:h3[@class='heading-1-1-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h6">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -1490,15 +1506,15 @@
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
-                    <xsl:text>ã€Œ</xsl:text>
+                    <xsl:text>???</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>ã€?</xsl:text>
+                    <xsl:text>???</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
-                    <xsl:text>â€œ</xsl:text>
+                    <xsl:text>â??</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>â€?</xsl:text>
+                    <xsl:text>â??</xsl:text>
                     <!-- todo: other languages ...-->
                 </xsl:otherwise>
             </xsl:choose>
@@ -1510,15 +1526,15 @@
             <xsl:call-template name="process-common-attributes"/>
             <xsl:choose>
                 <xsl:when test="lang('ja')">
-                    <xsl:text>ã€Ž</xsl:text>
+                    <xsl:text>???</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>ã€?</xsl:text>
+                    <xsl:text>???</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- lang('en') -->
-                    <xsl:text>â€˜</xsl:text>
+                    <xsl:text>â??</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>â€™</xsl:text>
+                    <xsl:text>â??</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
         </fo:inline>
@@ -1690,4 +1706,4 @@
             </xsl:if>
         </fo:inline-container>
     </xsl:template>
-</xsl:stylesheet>
+</xsl:stylesheet> 

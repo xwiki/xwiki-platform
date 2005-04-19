@@ -33,6 +33,7 @@
     <orderEntry type="library" name="Groovy" level="project" />
     <orderEntry type="library" name="fop" level="project" />
     <orderEntry type="library" name="TomCat 4.1" level="project" />
+    <orderEntry type="library" name="ldap" level="project" />
     <orderEntryProperties />
   </component>
 </module>

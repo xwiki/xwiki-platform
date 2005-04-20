@@ -13,7 +13,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.opensymphony.module.access.provider.osuser.OSUserUserProvider;
 import com.novell.ldap.*;
-import org.hibernate.HibernateException;
+import net.sf.hibernate.HibernateException;
 
 import java.security.Principal;
 import java.io.UnsupportedEncodingException;
@@ -32,11 +32,18 @@ import java.util.ArrayList;
  * NEVER USE IT WITH PRODUCTION SERVER !
  * ***********************************************************************
  * If you use OpenLDAP server, the sldap.conf must containts the statements :
+ *
+ *       include	/etc/schema/cosine.schema
  *       include	/etc/schema/inetorgperson.schema
+ *       access to *
+ *          by self read
+ *          by anonymous auth
+ *          by * none
  *       suffix		"dc=xwiki,dc=com"
  *       rootdn		"cn=Manager,dc=xwiki,dc=com"
  *       rootpw		secret
  * Other default values should work
+ *
  * Test works with out of the box ldap database.
  */
 public class LDAPTest  extends TestCase {
@@ -53,7 +60,7 @@ public class LDAPTest  extends TestCase {
             return (XWikiHibernateStore) store;
     }
 
-    public void prepareLDAP()
+    public void prepareLDAP(boolean addUser)
     {
         int ldapPort = context.getWiki().getXWikiPreferenceAsInt("ldap_port", LDAPConnection.DEFAULT_PORT, context);
         int ldapVersion = LDAPConnection.LDAP_V3;
@@ -133,24 +140,27 @@ public class LDAPTest  extends TestCase {
             newEntry = new LDAPEntry( dn, attributeSet );
             lc.add( newEntry );
 
-            attributeSet = new LDAPAttributeSet();
-            attributeSet.add( new LDAPAttribute(
-                                 "cn", new String("akartmann")));
-            attributeSet.add( new LDAPAttribute(
-                                 "uid", new String("akartmann")));
-            attributeSet.add( new LDAPAttribute(
-                                 "sn", new String("KARTMANN")));
-            attributeSet.add( new LDAPAttribute(
-                                 "displayName", new String("Alexis KARTMANN")));
-            attributeSet.add( new LDAPAttribute(
-                                 "mail", new String("alexis@xwiki.com")));
-            attributeSet.add( new LDAPAttribute(
-                                 "userPassword", new String("alexis")));
-            attributeSet.add( new LDAPAttribute("objectClass",
-                    new String[]{"inetOrgPerson", "top", "uidObject"}));
-            dn  = "cn=akartmann,cn=Manager," + containerName;
-            newEntry = new LDAPEntry( dn, attributeSet );
-            lc.add( newEntry );
+            if (addUser)
+            {
+                attributeSet = new LDAPAttributeSet();
+                attributeSet.add( new LDAPAttribute(
+                                     "cn", new String("akartmann")));
+                attributeSet.add( new LDAPAttribute(
+                                     "uid", new String("akartmann")));
+                attributeSet.add( new LDAPAttribute(
+                                     "sn", new String("KARTMANN")));
+                attributeSet.add( new LDAPAttribute(
+                                     "displayName", new String("Alexis KARTMANN")));
+                attributeSet.add( new LDAPAttribute(
+                                     "mail", new String("alexis@xwiki.com")));
+                attributeSet.add( new LDAPAttribute(
+                                     "userPassword", new String("alexis")));
+                attributeSet.add( new LDAPAttribute("objectClass",
+                        new String[]{"inetOrgPerson", "top", "uidObject"}));
+                dn  = "cn=akartmann,cn=Manager," + containerName;
+                newEntry = new LDAPEntry( dn, attributeSet );
+                lc.add( newEntry );
+            }
 
 
             lc.disconnect();
@@ -163,7 +173,7 @@ public class LDAPTest  extends TestCase {
         }
     }
 
-    public void prepareData() throws XWikiException {
+    public void prepareData(boolean withLDAPDN, boolean withpassword) throws XWikiException {
         XWikiDocument doc = new XWikiDocument("XWiki","akartmann");
         BaseClass bclass = xwiki.getUserClass(context);
         BaseObject bobj = new BaseObject();
@@ -171,7 +181,10 @@ public class LDAPTest  extends TestCase {
         bobj.setClassName(bclass.getName());
         bobj.setStringValue("fullname", "Alexis KARTMANN");
         bobj.setStringValue("email", "alexis@xwiki.com");
-//        bobj.setStringValue("password", "toto");
+        if (withLDAPDN)
+            bobj.setStringValue("ldap_dn", "cn=akartmann,cn=Manager,dc=xwiki,dc=com");
+        if (withpassword)
+            bobj.setStringValue("password", "toto");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ Alexis KARTMANN HomePage");
         xwiki.saveDocument(doc, context);
@@ -207,6 +220,7 @@ public class LDAPTest  extends TestCase {
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=Manager,dc=xwiki,dc=com", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "secret", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_UID_attr", "uid", context);
+
     }
 
     public void tearDown() throws HibernateException {
@@ -216,14 +230,74 @@ public class LDAPTest  extends TestCase {
         System.gc();
     }
 
-    public void testCheckLogon() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+    public void testCheckLogonWithBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
 
-        prepareLDAP();
-        prepareData();
+        prepareLDAP(true);
+        prepareData(false, false);
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
         Principal principal = service.authenticate("akartmann", "alexis", context);
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
+    public void testCheckLogonWithoutBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(true);
+        prepareData(true, false);
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "", context);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "alexis", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
+    public void testCheckLogonWithBadBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(true);
+        prepareData(true, false);
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=nothere", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "bad", context);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "alexis", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
+    public void testCheckLogonFromWiki() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(false);
+        prepareData(false, true);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "toto", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
+    public void testCheckLogonFromWikiBadLDAP() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(false);
+        prepareData(true, true);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "toto", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
+    public void testCheckLogonKOFromWikiPassword() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(true);
+        prepareData(true, true);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "toto", context);
+        assertNull("Authenticate failed", principal);
     }
 }

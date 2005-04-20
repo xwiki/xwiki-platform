@@ -33,10 +33,17 @@
     <property name="app.name" value="xwiki" />
     <property name="pkg"  value="com.xpn.xwiki" />
 
-    <property name="src.dir"   value="${basedir}/src" />
+    <property name="src.dir"   value="${basedir}/src/" />
+    <property name="main.src.dir"   value="${src.dir}/main/" />
+    <property name="web.src.dir" value="${src.dir}/web" />
+	  <property name="perl.src.dir" value="${src.dir}/perl"/>
+	  <property name="test.src.dir" value="${src.dir}/test" />
+    <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
+	
     <property name="lib.dir"   value="${basedir}/lib" />
 
     <property name="build.dir"  value="${basedir}/build" />
+    <property name="tests.build.dir"  value="${build.dir}/test" />
 
     <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
     <property name="release.dir"  value="${basedir}/release" />
@@ -51,37 +58,37 @@
     <property name="javacc.lib.dir" value="${javacc.home}/bin/lib" />
 
     <property name="libs.servlet"
-        value="${lib.dir}/servlet.jar" />
+        value="${lib.dir}/servlet-api-2.4.jar" />
 
     <property name="libs.hibernate"
-        value="${lib.dir}/hibernate2.jar;${lib.dir}/c3p0.jar;${lib.dir}/cglib2.jar;${lib.dir}/dom4j.jar;${lib.dir}/ehcache.jar;${lib.dir}/hibernate-tools.jar;${lib.dir}/mysql-connector-java-3.0.15-ga-bin.jar;${lib.dir}/odmg.jar;${lib.dir}/oscache.jar;${lib.dir}/jgroups-all.jar;${lib.dir}/swarmcache.jar;${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis.jar;${lib.dir}/jta.jar" />
+        value="${lib.dir}/hibernate-3.0.1.jar;${lib.dir}/c3p0-0.8.4.5.jar;${lib.dir}/cglib-2.1.jar;${lib.dir}/dom4j-1.6.jar;${lib.dir}/ehcache-1.1.jar;${lib.dir}/hibernate-tools-2.1.3.jar;${lib.dir}/mysql-connector-java-3.1.7-bin.jar;${lib.dir}/odmg-3.0.jar;${lib.dir}/oscache-2.0.2.jar;${lib.dir}/jgroups-2.2.5.jar;${lib.dir}/swarmcache.jar;${lib.dir}/xalan-2.6.0.jar;${lib.dir}/xerces-2.4.0.jar;${lib.dir}/xml-apis-2.0.2.jar;${lib.dir}/jta.jar;${lib.dir}/antlr-2.7.5.jar" />
 
     <property name="libs.jakartacommons"
-        value="${lib.dir}/commons-beanutils.jar;${lib.dir}/commons-collections.jar;${lib.dir}/commons-digester.jar;${lib.dir}/commons-lang.jar;${lib.dir}/commons-logging.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/jakarta-oro-2.0.7.jar;${lib.dir}/log4j-1.2.8.jar;${lib.dir}/commons-fileupload-1.0.jar;${lib.dir}/commons-dbcp-1.1-ld.jar;${lib.dir}/commons-pool-1.1.jar;${lib.dir}/commons-net-1.1.0.jar" />
+        value="${lib.dir}/commons-beanutils-1.7.0.jar;${lib.dir}/commons-codec-1.3.jar;${lib.dir}/commons-collections-3.1.jar;${lib.dir}/commons-dbcp-1.1-ld.jar;${lib.dir}/commons-digester-1.6.jar;${lib.dir}/commons-fileupload-1.0.jar;${lib.dir}/commons-lang-2.0.jar;${lib.dir}/commons-logging-1.0.4.jar;${lib.dir}/commons-pool-1.1.jar;${lib.dir}/commons-net-1.1.0.jar;${lib.dir}/ecs-1.4.2.jar;${lib.dir}/oro-2.0.8.jar;${lib.dir}/log4j-1.2.8.jar" />
 
     <property name="libs.jrcs"
         value="${lib.dir}/org.apache.commons.jrcs.rcs.jar" />
 
     <property name="libs.struts"
-        value="${lib.dir}/struts.jar" />
+        value="${lib.dir}/struts-1.2.4.jar" />
 
     <property name="libs.velocity"
         value="${lib.dir}/velocity-1.4.jar;${lib.dir}/velocity-tools-1.1.jar" />
 
     <property name="libs.ant"
-        value="${lib.dir}/ant.jar" />
+        value="${lib.dir}/ant-1.6.2.jar" />
 
     <property name="libs.inlinejava"
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
     <property name="libs.osuser"
-        value="${lib.dir}/oscore.jar;${lib.dir}/osuser.jar;${lib.dir}/osuserpropertyset.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter.jar;${lib.dir}/commons-codec.jar;${lib.dir}/ejb.jar" />
+        value="${lib.dir}/oscore-2.2.4.jar;${lib.dir}/osuser.jar;${lib.dir}/propertyset-1.3.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter-2.0.jar;${lib.dir}/ejb.jar" />
     
     <property name="libs.exo"
 	    value="${lib.dir}/picocontainer-1.0.jar;${lib.dir}/exoplatform.container-1.0.jar;${lib.dir}/exoplatform.services.chart.api-1.0.jar;${lib.dir}/exoplatform.services.chart.impl-1.0.jar;${lib.dir}/exoplatform.services.common.api-1.0.jar;${lib.dir}/exoplatform.services.organization.api-1.0.jar;${lib.dir}/exoplatform.services.organization.impl-1.0.jar;${lib.dir}/exoplatform.services.security.api-1.0.jar;${lib.dir}/exoplatform.services.security.impl-1.0.jar;${lib.dir}/exoplatform.services.database.api-1.0.jar;${lib.dir}/exoplatform.services.database.impl-1.0.jar" />
 
     <property name="libs.tests"
-        value="${lib.dir}/cactus-1.6dev.jar;${lib.dir}/cactus-ant-1.5.jar;${lib.dir}/aspectjrt-1.1.1.jar;${lib.dir}/commons-httpclient-2.0.1.jar;${lib.dir}/httpunit-1.5.3.jar;${lib.dir}/junit.jar;${lib.dir}/nekohtml-0.7.4.jar;${lib.dir}/clover-1.2.3.jar" />
+        value="${lib.dir}/cactus-1.7.jar;${lib.dir}/cactus-ant-1.7.jar;${lib.dir}/aspectjrt-1.2.1.jar;${lib.dir}/commons-httpclient-2.0.2.jar;${lib.dir}/httpunit-1.6.jar;${lib.dir}/junit3.8.1.jar;${lib.dir}/nekohtml-0.9.1.jar;${lib.dir}/clover-1.3.6.jar;${lib.dir}/jmock-1.0.1.jar;${lib.dir}/jmock-cglib-1.0.1.jar;${lib.dir}/asm-1.5.3.jar;${lib.dir}/asm-util-1.5.3.jar" />
 
     <property name="libs.radeox"
 	value="${lib.dir}/radeox.jar" />
@@ -90,19 +97,22 @@
 	value="${lib.dir}/portlet.jar" />
 
     <property name="libs.api"
-	    value="${lib.dir}/xmlrpc.jar;${lib.dir}/soap.jar" />
+	    value="${lib.dir}/xmlrpc-1.2.jar;${lib.dir}/soap-2.3.1.jar" />
 
     <property name="libs.groovy"
     	value="${lib.dir}/groovy-all-1.0-jsr-01.jar" />
 
     <property name="libs.fop"
-    	value="${lib.dir}/xalan.jar;${lib.dir}/xerces.jar;${lib.dir}/xml-apis;${lib.dir}/jimi.jar;${lib.dir}/avalon-framework.jar;${lib.dir}/batik.jar;${lib.dir}/fop.jar;${lib.dir}/jtidy.jar" />
+    	value="${lib.dir}/xalan-2.6.0.jar;${lib.dir}/xerces.jar-2.4.0;${lib.dir}/xml-apis-2.0.2;${lib.dir}/jimi.jar;${lib.dir}/avalon-framework-4.1.5.jar;${lib.dir}/batik-1.5.jar;${lib.dir}/fop-0.20.5.jar;${lib.dir}/jtidy.jar" />
 
     <property name="libs.ldap"
         value="${lib.dir}/ldap.jar" />
 
+  <property name="libs.rome"
+      value="${lib.dir}/rome-0.6.jar;${lib.dir}/jdom-1.0.jar" />
+
     <property name="libs"
-	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.tests}" />
+	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.rome};${libs.tests}" />
 
 
     <property name="clover.initstring" location="${test.clover.dir}/clover"/>
@@ -114,7 +124,7 @@
     </target>
 
     <target name="clover-check" depends="prepare" unless="clover.available">
-        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.2.3.jar to ${ant.home}/lib"/>
+        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.3.6.jar to ${ant.home}/lib"/>
     </target>
 
     <target name="clover-yes" depends="prepare" if="clover.available">
@@ -129,11 +139,12 @@
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
         <classpath>
-            <pathelement location="${lib.dir}/cactus-1.6dev.jar"/>
-            <pathelement location="${lib.dir}/cactus-ant-1.5.jar"/>
-            <pathelement location="${lib.dir}/commons-httpclient-2.0-rc2.jar"/>
-            <pathelement location="${lib.dir}/commons-logging.jar"/>
-            <pathelement location="${lib.dir}/aspectjrt-1.1.1.jar"/>
+        	  <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
+            <pathelement location="${lib.dir}/cactus-1.7.jar"/>
+            <pathelement location="${lib.dir}/cactus-ant-1.7.jar"/>
+            <pathelement location="${lib.dir}/commons-httpclient-2.0.2.jar"/>
+            <pathelement location="${lib.dir}/commons-logging-1.0.4.jar"/>
+            <pathelement location="${lib.dir}/aspectjrt-1.2.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -147,6 +158,7 @@
         <property name="exo.warfile" value="${release.dir}/xwiki-exo-${version}.war" />
         <property name="cactus.warfile" value="${release.dir}/xwiki.war" />
         <mkdir dir="${build.dir}" />
+        <mkdir dir="${tests.build.dir}" />
         <mkdir dir="${classes.dir}" />
         <mkdir dir="${release.dir}" />
     </target>
@@ -191,12 +203,12 @@
 
         <copy todir="${build.dir}/web">
             <fileset includes="**"
-                dir="${src.dir}/web" />
+                dir="${web.src.dir}" />
         </copy>
 
         <copy todir="${build.dir}/web/WEB-INF/perl">
             <fileset includes="**"
-                dir="${src.dir}/perl" />
+                dir="${perl.src.dir}" />
         </copy>
 
         <copy todir="${build.dir}/web/WEB-INF">
@@ -217,22 +229,23 @@
 
 
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
-        <javac srcdir="${src.dir}"
+        <javac srcdir="${main.src.dir}"
             destdir="${classes.dir}"
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"
             compiler="${compiler}" >
-            <include name="com/xpn/xwiki/**/*.java" />
-            <exclude name="**/test/*.class" />
+          <include name="com/xpn/xwiki/**/*.java" />
+          <include name="org/**/*.java" />
+        	<exclude name="**/test/*.class" />
         </javac>
     </target>
 
     <target name="tests" depends="junit-check,prepare,xwiki">
-        <javac srcdir="${src.dir}"
-            destdir="${classes.dir}"
-            classpath="${libs};${classes.dir}"
+        <javac destdir="${tests.build.dir}"
+            classpath="${libs};${tests.build.dir};${classes.dir}"
             debug="on" optimize="on" deprecation="on">
-            <include name="**/test/*.java" />
+        	<src path="${test.src.dir}" />
+        	<src path="${test-cactus.src.dir}" />
         </javac>
     </target>
 
@@ -258,24 +271,14 @@
         <junit printsummary="yes" dir="${basedir}/test" haltonfailure="no" fork="on" >
 
             <classpath>
+                <pathelement path="${tests.build.dir}" />
                 <pathelement path="${classes.dir}" />
                 <pathelement path="${libs}" />
             </classpath>
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}">
-                <fileset dir="${src.dir}">
-                    <include name="com/xpn/xwiki/test/*Test.java"/>
-                    <exclude name="**/StoreTest.java"/>
-                    <exclude name="**/RenderTest.java"/>
-                    <exclude name="**/StoreObjectTest.java"/>
-                    <exclude name="**/ServletTest.java"/>
-                    <exclude name="**/ViewEditTest.java"/>
-                    <exclude name="**/XMLRpcTest.java" />
-                    <exclude name="**/ServletAuthTest.java"/>
-                    <exclude name="**/ServletVirtualTest.java"/>
-                    <exclude name="**/Servleti18nTest.java"/>
-                    <exclude name="**/ServletStatsTest.java"/>
+                <fileset dir="${test.src.dir}">
                 </fileset>
             </batchtest>
         </junit>
@@ -295,13 +298,7 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}" >
-                <fileset dir="${src.dir}">
-                    <include name="com/xpn/xwiki/test/ViewEditTest.java"/>
-                    <include name="com/xpn/xwiki/test/ServletAuthTest.java"/>
-                    <include name="com/xpn/xwiki/test/ServletVirtualTest.java"/>
-                    <include name="com/xpn/xwiki/test/Servleti18nTest.java"/>
-                    <include name="com/xpn/xwiki/test/ServletStatsTest.java"/>
-                    <include name="com/xpn/xwiki/test/XMLRpcTest.java" />
+                <fileset dir="${test-cactus.src.dir}">
                 </fileset>
             </batchtest>
 
@@ -361,7 +358,7 @@
             <exclude name="**/web*.xml" />
             <exclude name="**/xwiki-*.cfg" />
 	    <lib dir="${basedir}/lib">
-        <exclude name="**/servlet.jar" />
+        <exclude name="**/servlet-api*.jar" />
         <exclude name="**/xpertnet*.jar" />
         </lib>
         </war>
@@ -376,7 +373,7 @@
         <exclude name="**/nanocontainer*.jar" />
         <exclude name="**/jcommon*.jar" />
         <exclude name="**/jfreechart*.jar" />
-        <exclude name="**/servlet.jar" />
+        <exclude name="**/servlet-api*.jar" />
         <exclude name="**/xpertnet*.jar" />
         </lib>
         </war>

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
-                                         "http://hibernate.sourceforge.net/hibernate-configuration-2.0.dtd">
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 <session-factory>
 <property name="show_sql">false</property>
@@ -23,7 +23,7 @@
 <property name="connection.pool_size">50</property>
 
 <property name="statement_cache.size">50</property>
-<property name="dialect">net.sf.hibernate.dialect.MySQLDialect</property>
+<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 <!-- Mapping files -->
 <mapping resource="xwiki.hbm.xml"/>
 </session-factory>

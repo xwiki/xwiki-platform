@@ -78,6 +78,10 @@
     <property name="libs.ant"
         value="${lib.dir}/ant-1.6.2.jar" />
 
+    <property name="libs.securityfilter"
+        value="${lib.dir}/securityfilter-2.0.jar" />
+
+
     <property name="libs.inlinejava"
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
@@ -109,7 +113,7 @@
       value="${lib.dir}/rome-0.6.jar;${lib.dir}/jdom-1.0.jar" />
 
     <property name="libs"
-	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.rome};${libs.tests}" />
+	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.securityfilter};${libs.rome};${libs.tests}" />
 
 
     <property name="clover.initstring" location="${test.clover.dir}/clover"/>

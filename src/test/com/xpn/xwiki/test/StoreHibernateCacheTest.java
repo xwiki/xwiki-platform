@@ -3,6 +3,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -34,8 +35,11 @@ import org.hibernate.HibernateException;
  */
 
 public class StoreHibernateCacheTest extends StoreHibernateTest {
+    public XWiki xwiki;
 
     public void setUp() throws HibernateException, XWikiException {
+        xwiki = new XWiki("./xwiki.cfg", context);
+        context.setWiki(xwiki);
         context.setDatabase("xwikitest");
         cleanUp(getHibStore(), context);
     }

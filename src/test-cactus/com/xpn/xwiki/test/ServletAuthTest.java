@@ -22,7 +22,6 @@
 
 package com.xpn.xwiki.test;
 
-import com.opensymphony.module.access.NotFoundException;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -470,7 +469,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.setAuthentication(auth);
     }
 
-    public void endCreateUser(WebResponse webResponse) throws XWikiException, HibernateException, NotFoundException {
+    public void endCreateUser(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -520,7 +519,7 @@ public class ServletAuthTest extends ServletTest {
             webRequest.addParameter("register_last_name","Dubost");
         }
 
-        public void endCreateUserProg(WebResponse webResponse) throws XWikiException, HibernateException, NotFoundException {
+        public void endCreateUserProg(WebResponse webResponse) throws XWikiException, HibernateException {
             try {
                 assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
                 XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -580,7 +579,7 @@ public class ServletAuthTest extends ServletTest {
         context.put("timer", new Date());
     }
 
-    public void endCreateUserWithManyUsers(WebResponse webResponse) throws XWikiException, HibernateException, NotFoundException {
+    public void endCreateUserWithManyUsers(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             Date starttime = (Date) context.get("timer");
             Date endtime = new Date();

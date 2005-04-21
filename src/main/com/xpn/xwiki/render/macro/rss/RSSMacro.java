@@ -128,7 +128,6 @@ public class RSSMacro extends BaseLocaleMacro {
      * and the number of items in the feed.
      * @param writer the output writer
      * @param paramObj our parameter helper object
-     * @param channel the RSS Channel we retrieved via the Feed URL
      * @throws java.io.IOException
      */
     private void renderEntries(SyndFeed feed, Writer writer, RSSMacroParameters paramObj) throws java.io.IOException
@@ -144,7 +143,6 @@ public class RSSMacro extends BaseLocaleMacro {
     /**
      * Render the given RSS <code>Item</code> according to whether or not the
      * parameters call for CSS processing.
-     * @param item the RSS item to be rendered
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException from calls to <code>writer.write()</code>
@@ -167,7 +165,6 @@ public class RSSMacro extends BaseLocaleMacro {
      * <li>The link is rendered using the <code>{link}</code> macro.</li>
      * <li>If present, the item description is wrapped in <code>{quote}</code> macro tags.</li>
      * </ul>
-     * @param item the RSS item to be rendered
      * @param buf the StringBuffer we're using to prepare the output
      * @param paramObj our parameter helper object
      */
@@ -198,7 +195,6 @@ public class RSSMacro extends BaseLocaleMacro {
      * <li>The item title link is wrapped in <code>&lt;a class='rss.item.title'&gt;</code></li>
      * <li>If present, the item description is wrapped in <code>&lt;div class='rss.item.description'&gt;</li>
      * </ul>
-     * @param item the RSS item to be rendered
      * @param buf the StringBuffer we're using to prepare the output
      * @param paramObj our parameter helper object
      * TODO Figure out how to stop Radeox from filtering the URLs
@@ -226,7 +222,7 @@ public class RSSMacro extends BaseLocaleMacro {
 
     /**
      * Render the 'title' of the given RSS Channel to the <code>Writer</code>.
-     * @param channel the RSS Channel we retrieved via the Feed URL
+     * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException from calls to <code>writer.write()</code>
@@ -246,7 +242,7 @@ public class RSSMacro extends BaseLocaleMacro {
     /**
      * Render the title from the given Channel to the given StringBuffer,
      * using standard Radeox filtering tags.
-     * @param channel the RSS Channel we retrieved via the Feed URL
+     * @param feed the RSS Channel we retrieved via the Feed URL
      * @param buf the StringBuffer we're using to prepare the output
      */
     private void renderTitleDefault(SyndFeed feed, StringBuffer buf) {
@@ -269,7 +265,7 @@ public class RSSMacro extends BaseLocaleMacro {
      * the channel includes a link, the title will be rendered as a link to
      * that URL, and the &lt;a&gt; tag will also be of class
      * <code>rss.channel.title</code>
-     * @param channel the RSS Channel we retrieved via the Feed URL
+     * @param feed the RSS Channel we retrieved via the Feed URL
      * @param buf the StringBuffer we're using to prepare the output
      * TODO Figure out how to stop Radeox from filtering the URLs
      */
@@ -290,7 +286,7 @@ public class RSSMacro extends BaseLocaleMacro {
      * If a parameter was passed with the name "img" and the literal value "true",
      * render the image from the channel (if it has one.)  This requires the use
      * of named parameters.
-     * @param channel the RSS Channel we retrieved via the Feed URL
+     * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException from calls to <code>writer.write()</code>
@@ -325,7 +321,7 @@ public class RSSMacro extends BaseLocaleMacro {
      * Field will be an HTML &lt;input&gt; (type text) tag, class 'rss.textinput.field'.
      * Submit button will be an HTML &lt;input&gt; (type submit), class
      * 'rss.textinput.submit'.
-     * @param channel the RSS Channel we retrieved via the Feed URL
+     * @param feed the RSS Channel we retrieved via the Feed URL
      * @param writer the output writer
      * @param paramObj our parameter helper object
      * @throws java.io.IOException from calls to <code>writer.write()</code>

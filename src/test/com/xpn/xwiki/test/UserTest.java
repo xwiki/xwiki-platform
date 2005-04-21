@@ -1,8 +1,6 @@
 
 package com.xpn.xwiki.test;
 
-import com.opensymphony.module.access.NotFoundException;
-import com.opensymphony.module.access.provider.osuser.OSUserUserProvider;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -54,7 +52,6 @@ public class UserTest extends TestCase {
     }
 
     public void setUp() throws HibernateException, XWikiException {
-        OSUserUserProvider toto = new OSUserUserProvider();
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
@@ -205,7 +202,7 @@ public class UserTest extends TestCase {
         assertTrue("This should work", user2.inGroup(group2));
     } */
 
-    public void testUserAccessRead()  throws XWikiException, NotFoundException {
+    public void testUserAccessRead()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
@@ -230,7 +227,7 @@ public class UserTest extends TestCase {
                     xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
     }
 
-      public void testUserAccessReadWithAdmin()  throws XWikiException, NotFoundException {
+      public void testUserAccessReadWithAdmin()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
@@ -259,7 +256,7 @@ public class UserTest extends TestCase {
                     xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
     }
 
-    public void testUserAccessReadWithWebGlobalRight()  throws XWikiException, NotFoundException {
+    public void testUserAccessReadWithWebGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -291,7 +288,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testUserAccessReadWithWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+    public void testUserAccessReadWithWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -322,7 +319,7 @@ public class UserTest extends TestCase {
 
 
 
-   public void testUserAccessReadWithXWikiGlobalRight()  throws XWikiException, NotFoundException {
+   public void testUserAccessReadWithXWikiGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -352,7 +349,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testUserAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException, NotFoundException {
+    public void testUserAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -380,7 +377,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-  public void testUserAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+  public void testUserAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -410,7 +407,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testUserAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException, NotFoundException {
+    public void testUserAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -444,7 +441,7 @@ public class UserTest extends TestCase {
   }
 
 
-    public void testGroupAccessRead()  throws XWikiException, NotFoundException {
+    public void testGroupAccessRead()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
@@ -476,7 +473,7 @@ public class UserTest extends TestCase {
                     xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
     }
 
-      public void testGroupAccessReadWithAdmin()  throws XWikiException, NotFoundException {
+      public void testGroupAccessReadWithAdmin()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
         xwiki.flushCache();
@@ -505,7 +502,7 @@ public class UserTest extends TestCase {
                     xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
     }
 
-    public void testGroupAccessReadWithWebGlobalRight()  throws XWikiException, NotFoundException {
+    public void testGroupAccessReadWithWebGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -535,7 +532,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testGroupAccessReadWithWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+    public void testGroupAccessReadWithWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -566,7 +563,7 @@ public class UserTest extends TestCase {
 
 
 
-   public void testGroupAccessReadWithXWikiGlobalRight()  throws XWikiException, NotFoundException {
+   public void testGroupAccessReadWithXWikiGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -596,7 +593,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testGroupAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException, NotFoundException {
+    public void testGroupAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -624,7 +621,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-  public void testGroupAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException, NotFoundException {
+  public void testGroupAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();
@@ -654,7 +651,7 @@ public class UserTest extends TestCase {
                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
   }
 
-    public void testGroupAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException, NotFoundException {
+    public void testGroupAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
       xwiki.flushCache();

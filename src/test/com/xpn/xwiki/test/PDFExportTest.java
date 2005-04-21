@@ -29,7 +29,6 @@ import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.opensymphony.module.access.provider.osuser.OSUserUserProvider;
 import org.hibernate.HibernateException;
 import junit.framework.TestCase;
 
@@ -51,7 +50,6 @@ public class PDFExportTest extends TestCase {
     }
 
     public void setUp() throws HibernateException, XWikiException {
-        OSUserUserProvider toto = new OSUserUserProvider();
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);

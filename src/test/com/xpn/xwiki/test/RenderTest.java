@@ -33,8 +33,8 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 import junit.framework.TestCase;
-import org.hibernate.HibernateException;
 import org.apache.velocity.app.Velocity;
+import org.hibernate.HibernateException;
 
 import java.net.URL;
 

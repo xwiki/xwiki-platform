@@ -73,14 +73,21 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         }
     }
 
+    /*
+       Adding the user to the group cache
+    */
     public void addUserToGroup(String username, String database, String group) {
         String shortname = Util.getName(username);
         List list = null;
+        String key = database + ":" + shortname;
         try {
-            list = (List) groupCache.getFromCache("database:" + shortname);
-            list.add(group);
+            list = (List) groupCache.getFromCache(key);
         } catch (XWikiCacheNeedsRefreshException e) {
+            list = new ArrayList();
+            groupCache.putInCache(key, list);
+            groupCache.cancelUpdate(key);
         }
+        list.add(group);
     }
 
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {

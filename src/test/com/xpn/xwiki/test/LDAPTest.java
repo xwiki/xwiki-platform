@@ -11,13 +11,13 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.opensymphony.module.access.provider.osuser.OSUserUserProvider;
 import com.novell.ldap.*;
-import net.sf.hibernate.HibernateException;
 
 import java.security.Principal;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+
+import org.hibernate.HibernateException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -205,7 +205,6 @@ public class LDAPTest  extends TestCase {
 
     }
     public void setUp() throws HibernateException, XWikiException {
-        OSUserUserProvider toto = new OSUserUserProvider();
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);

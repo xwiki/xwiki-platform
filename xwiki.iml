@@ -26,7 +26,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="OSUser" level="project" />
+    <orderEntry type="library" name="SecurityFilter" level="project" />
     <orderEntry type="library" name="Radeox" level="project" />
     <orderEntry type="library" name="Portlets" level="project" />
     <orderEntry type="library" name="ExoPlatform" level="project" />
@@ -36,6 +36,11 @@
     <orderEntry type="library" name="TomCat 4.1" level="project" />
     <orderEntry type="module" module-name="xwikibase" />
     <orderEntry type="module" module-name="portal" />
+    <orderEntry type="library" name="LDAP" level="project" />
+    <orderEntry type="library" name="RSS" level="project" />
+    <orderEntry type="library" name="Dom4J" level="project" />
+    <orderEntry type="library" name="Servlet API" level="project" />
+    <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
@@ -77,7 +82,11 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <containerElement type="library" level="project" name="OSUser">
+    <containerElement type="library" level="project" name="JMock">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="LDAP">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
@@ -86,6 +95,14 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="Radeox">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="RSS">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="SecurityFilter">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>

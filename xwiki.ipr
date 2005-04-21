@@ -204,7 +204,7 @@
       <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="false" jdk-15="false" project-jdk-name="java version &quot;1.4.2_05&quot;" />
+  <component name="ProjectRootManager" version="2" assert-keyword="false" jdk-15="false" project-jdk-name="java version &quot;1.4.2_03&quot;" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />
@@ -229,21 +229,23 @@
   <component name="libraryTable">
     <library name="Jakarta Commons">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/commons-logging.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-collections.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-digester.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-lang.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-beanutils.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ecs-1.4.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/jakarta-oro-2.0.7.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-fileupload-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.1-ld.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.diff.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-net-1.1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-httpclient-2.0.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oro-2.0.8.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-logging-api-1.0.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-httpclient-2.0.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-logging-1.0.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-digester-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-beanutils-1.7.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-collections-3.1.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />
@@ -259,12 +261,12 @@
     </library>
     <library name="Unit Tests">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/commons-beanutils.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/aspectjrt-1.1.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/nekohtml-0.7.4.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/httpunit-1.5.3.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/junit.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cactus-1.6dev.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/junit-3.8.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-1.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/nekohtml-0.9.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/aspectjrt-1.2.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cactus-ant-1.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/httpunit-1.6.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>
@@ -274,17 +276,17 @@
     </library>
     <library name="Hibernate">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/hibernate-tools.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hibernate2.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/odmg.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/dom4j.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/oscache.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cglib2.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/c3p0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/ehcache.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/swarmcache.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.0.15-ga-bin.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/asm-util.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/asm-util-1.5.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ehcache-1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cglib-2.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/odmg-3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/asm-1.5.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/c3p0-0.8.4.5.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-tools-2.1.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate-2.1/doc/api" />
@@ -297,7 +299,6 @@
     </library>
     <library name="Perl">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/InlineJavaServer.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/InlineJavaUser.jar!/" />
       </CLASSES>
@@ -321,7 +322,7 @@
     </library>
     <library name="Struts">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/struts.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/struts-1.2.4.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>
@@ -332,7 +333,8 @@
     </library>
     <library name="Ant">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/ant.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ant-1.6.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/antlr-2.7.5.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/tools/apache-ant-1.6.0/docs/manual/api" />
@@ -341,33 +343,20 @@
         <root url="file://C:/dev/java/apache-ant-1.6.0/src/main" />
       </SOURCES>
     </library>
-    <library name="OSUser">
+    <library name="SecurityFilter">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/oscore.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/osuser.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/osuserpropertyset.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/osaccess.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/securityfilter.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/commons-codec.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/ejb.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/securityfilter-2.0.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="file://C:/dev/java/osuser/dist/docs/api" />
-        <root url="file://C:/dev/java/ospropertyset/docs/api" />
-        <root url="file://C:/dev/java/osaccess/dist/docs/api" />
         <root url="file://C:/dev/java/securityfilter-2.0-src/build/documentation/api" />
       </JAVADOC>
       <SOURCES>
-        <root url="file://C:/dev/java/osuser/src/java" />
-        <root url="file://C:/dev/java/ospropertyset/src/java" />
-        <root url="file://C:/dev/java/osaccess/src/java" />
         <root url="file://C:/dev/java/securityfilter-2.0-src/src/share" />
         <root url="file://C:/dev/java/securityfilter-2.0-src/src/catalina" />
       </SOURCES>
     </library>
     <library name="TomCat 4.1">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/servlet.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/catalina-ant.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/catalina.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/server/lib/commons-beanutils.jar!/" />
@@ -402,7 +391,6 @@
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-common.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-factory.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/naming-resources.jar!/" />
-        <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/servlet.jar!/" />
         <root url="jar://C:/Program Files/Apache Group/Tomcat 4.1/common/lib/tools.jar!/" />
       </CLASSES>
       <JAVADOC>
@@ -415,8 +403,8 @@
     </library>
     <library name="Radeox">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/asm-util.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/radeox.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/asm-util-1.5.3.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/radeox/docs/api" />
@@ -434,97 +422,43 @@
     </library>
     <library name="TomCat 5.0">
       <CLASSES>
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jakarta-regexp-1.3.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-webdav.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-common.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-beanutils.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-http11.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jkconfig.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-cluster.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-ant.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/jkshm.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-default.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-optional.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-modeler.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jk2.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-ja.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-fr.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/catalina-i18n-es.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/servlets-invoker.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-coyote.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jni.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-jk.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-digester.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/tomcat-util.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/server/lib/commons-fileupload-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-base-services-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-organization-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jstl_el.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/relaxngDatatype-20020414.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-collections.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-resources.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/wsdl4j-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-api-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-logging-1.0.3.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/ant.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portlet-container-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-communication-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mx4j-jmx-1.1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jasper-compiler.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-commons-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jstl.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-libs-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/pop3.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/c3p0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-services-container-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-wsrp-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/oro-2.0.8.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/dom4j-1.4.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/nanocontainer-1.0-beta-1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-publish-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-publish-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jsf-api-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/xsdlib-20030225.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-dbcp-1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/servlet-api.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portlet-container-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-beanutils-1.6.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-wsrp-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/hibernate-2.1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/ehcache-0.7.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/portlet-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxb-ri-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/axis-1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-fileupload-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/hsqldb-build.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-lang-2.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/tools.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-communication-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-base-services-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/saaj-1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-java.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/namespace-1.2.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-pool-1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jta-spec-1.0.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-factory.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portal-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-portal-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jasper-runtime.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mx4j-tools-1.1.1.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/mail.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/commons-el.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/naming-common.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-xml-processing-services-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/soap-2.3.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/odmg-3.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-ecommerce-service-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jsp-api.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/cglib2.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-ecommerce-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-xml-processing-services-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/exo-organization-service-impl-1.0.jar!/" />
-        <root url="jar://C:/dev/java/exo-tomcat/common/lib/jaxrpc-1.0.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/servlets-invoker.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-i18n-ja.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/jkshm.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/jakarta-regexp-1.3.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-i18n-fr.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-coyote.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/servlets-common.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-jk.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-jni.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-i18n-es.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/servlets-default.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-optional.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-http11.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/servlets-webdav.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-ant.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/jkconfig.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/commons-beanutils.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/commons-modeler.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/catalina-cluster.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-jk2.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/commons-fileupload-1.0.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/commons-digester.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/server/lib/tomcat-util.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/naming-common.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/naming-factory.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/commons-el.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/naming-resources.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/ant.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/jasper-runtime.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/naming-java.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/jsp-api.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/jasper-compiler.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/commons-collections.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/commons-pool-1.1.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/tools.jar!/" />
+        <root url="jar://C:/Program Files/Apache Software Foundation/Tomcat 5.0/common/lib/commons-dbcp-1.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -552,7 +486,7 @@
     </library>
     <library name="XMLRPC">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/xmlrpc.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-1.2.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/xmlrpc/xmlrpc-1.2-b1/docs/apidocs" />
@@ -571,13 +505,13 @@
     <library name="fop">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/jtidy.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/fop.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/avalon-framework.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/batik.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/xalan.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jimi.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/xerces.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/xml-apis.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-1.5.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/avalon-framework-4.1.5.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xalan-2.6.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xml-apis-2.0.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/fop-0.20.5.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xerces-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/fop/fop-0.20.5/docs" />
@@ -592,16 +526,46 @@
         <root url="file://C:/dev/java/xalan/xalan-j_2_6_0/src" />
       </SOURCES>
     </library>
-    <library name="yourkit">
+    <library name="YourKit">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/yjp.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="ldap">
+    <library name="LDAP">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/ldap.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="RSS">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/rome-0.6.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="Dom4J">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/dom4j-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jdom-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="Servlet API">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/servlet-api-2.4.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="JMock">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jmock-1.0.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jmock-cglib-1.0.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

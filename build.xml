@@ -81,9 +81,6 @@
     <property name="libs.inlinejava"
         value="${lib.dir}/InlineJavaServer.jar;${lib.dir}/InlineJavaUser.jar" />
 
-    <property name="libs.osuser"
-        value="${lib.dir}/oscore-2.2.4.jar;${lib.dir}/osuser.jar;${lib.dir}/propertyset-1.3.jar;${lib.dir}/osaccess.jar;${lib.dir}/securityfilter-2.0.jar;${lib.dir}/ejb.jar" />
-    
     <property name="libs.exo"
 	    value="${lib.dir}/picocontainer-1.0.jar;${lib.dir}/exoplatform.container-1.0.jar;${lib.dir}/exoplatform.services.chart.api-1.0.jar;${lib.dir}/exoplatform.services.chart.impl-1.0.jar;${lib.dir}/exoplatform.services.common.api-1.0.jar;${lib.dir}/exoplatform.services.organization.api-1.0.jar;${lib.dir}/exoplatform.services.organization.impl-1.0.jar;${lib.dir}/exoplatform.services.security.api-1.0.jar;${lib.dir}/exoplatform.services.security.impl-1.0.jar;${lib.dir}/exoplatform.services.database.api-1.0.jar;${lib.dir}/exoplatform.services.database.impl-1.0.jar" />
 
@@ -112,7 +109,7 @@
       value="${lib.dir}/rome-0.6.jar;${lib.dir}/jdom-1.0.jar" />
 
     <property name="libs"
-	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.osuser};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.rome};${libs.tests}" />
+	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.rome};${libs.tests}" />
 
 
     <property name="clover.initstring" location="${test.clover.dir}/clover"/>

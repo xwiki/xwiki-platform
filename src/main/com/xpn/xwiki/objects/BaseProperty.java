@@ -22,7 +22,6 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.test.Utils;  //TODO : This dependency on the test package is a bit ugly, should be fixed.
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
@@ -33,6 +32,8 @@ import org.dom4j.io.XMLWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
+
+import com.xpn.xwiki.web.Utils;
 
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;

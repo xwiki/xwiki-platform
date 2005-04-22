@@ -3,6 +3,10 @@ package com.xpn.xwiki.atom.lifeblog;
 import java.text.ParseException;
 import java.util.Calendar;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.apache.cactus.extension.jetty.JettyTestSetup;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -12,6 +16,18 @@ import com.xpn.xwiki.atom.WSSEHttpHeader;
 import com.xpn.xwiki.atom.XWikiHelper;
 
 public class LifeblogContextIntegrationTest extends XWikiIntegrationTest {
+  
+  public static Test suite () {
+    
+    System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    
+    TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogContextIntegrationTest");
+    //$JUnit-BEGIN$
+    suite.addTestSuite(LifeblogContextIntegrationTest.class);
+    //$JUnit-END$
+    
+    return new JettyTestSetup(suite);
+  }
 
   public void testIsAuthenticatedNullHeader() throws LifeblogServiceException, XWikiException, ParseException {
     String header = null;

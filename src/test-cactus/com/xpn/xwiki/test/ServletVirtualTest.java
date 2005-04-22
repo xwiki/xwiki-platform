@@ -521,7 +521,7 @@ public class ServletVirtualTest extends ServletTest {
         updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost", "", "programming", true, true);
 
         context.setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(hibstore, false, context);
+        StoreHibernateTest.cleanUp(hibstore, true, false, context);
         context.setDatabase("xwikitest");
 
         setUrl(webRequest, "view", "CreateNewWikiTest");

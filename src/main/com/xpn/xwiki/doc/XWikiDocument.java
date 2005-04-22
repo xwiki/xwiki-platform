@@ -816,7 +816,7 @@ public class XWikiDocument {
           PropertyClass pclass = (PropertyClass) it.next();
           vcontext.put(pclass.getName(), pclass.getPrettyName());
       }
-      result.append(renderer.evaluate(header, context.getDoc().getFullName(), vcontext));
+      result.append(renderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
       if (linebreak)
          result.append("\n");
 
@@ -828,7 +828,7 @@ public class XWikiDocument {
               String name = (String) it.next();
               vcontext.put(name, display(name, object, context));
           }
-          result.append(renderer.evaluate(format, context.getDoc().getFullName(), vcontext));
+          result.append(renderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
           if (linebreak)
              result.append("\n");
       }

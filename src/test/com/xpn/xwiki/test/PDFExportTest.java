@@ -52,7 +52,7 @@ public class PDFExportTest extends TestCase {
     public void setUp() throws HibernateException, XWikiException {
         context = new XWikiContext();
         context.setDatabase("xwikitest");
-        xwiki = new XWiki("./xwiki.cfg", context);
+        xwiki = new XWiki("./xwiki.cfg", context, null, false);
         xwiki.setDatabase("xwikitest");
         context.setWiki(xwiki);
         StoreHibernateTest.cleanUp(getHibStore(), context);

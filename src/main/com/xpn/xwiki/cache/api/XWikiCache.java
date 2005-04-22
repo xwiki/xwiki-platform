@@ -29,6 +29,7 @@ public interface XWikiCache {
     void flushEntry(String key);
     void putInCache(String key, Object obj);
     Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
+    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
     void cancelUpdate(String key);
     void flushAll();
 }

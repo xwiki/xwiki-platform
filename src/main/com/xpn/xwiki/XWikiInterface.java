@@ -54,7 +54,7 @@ public interface XWikiInterface {
 
     List getVirtualWikiList();
 
-    void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException;
+    void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException;
 
     String getVersion();
 

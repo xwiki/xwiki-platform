@@ -26,6 +26,7 @@ import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.opensymphony.oscache.base.Cache;
 import com.opensymphony.oscache.base.NeedsRefreshException;
+import com.opensymphony.oscache.base.EntryRefreshPolicy;
 
 import java.util.Date;
 
@@ -52,9 +53,21 @@ public class OSCacheCache implements XWikiCache {
      cache.putInCache(key, obj);
     }
 
+    public void putInCache(String key, Object obj, EntryRefreshPolicy expiry) {
+     cache.putInCache(key, obj, expiry);
+    }
+
     public Object getFromCache(String key) throws XWikiCacheNeedsRefreshException {
         try {
          return cache.getFromCache(key);
+        } catch (NeedsRefreshException e) {
+            throw new XWikiCacheNeedsRefreshException(e);
+        }
+    }
+
+    public Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException {
+        try {
+         return cache.getFromCache(key, refeshPeriod);
         } catch (NeedsRefreshException e) {
             throw new XWikiCacheNeedsRefreshException(e);
         }

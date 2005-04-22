@@ -64,11 +64,11 @@ public class XWikiTest extends TestCase {
 
      public void setUp() throws Exception {
          context = new XWikiContext();
-         xwiki = new XWiki("./xwiki.cfg", context);
-         context.setWiki(xwiki);
          context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
-         Velocity.init("velocity.properties");
+         xwiki = new XWiki("./xwiki.cfg", context, null, false);
+         context.setWiki(xwiki);
          StoreHibernateTest.cleanUp(getHibStore(), context);
+         Velocity.init("velocity.properties");
      }
 
      public void tearDown() throws HibernateException {

@@ -63,7 +63,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
             try {
                 vcontext.put("doc", new Document(doc, context));
-                return evaluate(content, name, vcontext);
+                return evaluate(content, name, vcontext, context);
             } finally {
                 if (previousdoc!=null)
                     vcontext.put("doc", previousdoc);
@@ -93,7 +93,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         return vcontext;
     }
 
-    public static String evaluate(String content, String name, VelocityContext vcontext) {
+    public static String evaluate(String content, String name, VelocityContext vcontext, XWikiContext context) {
         StringWriter writer = new StringWriter();
         try {
             boolean result;
@@ -105,7 +105,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
             Object[] args =  { name };
             XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
                                                         "Error while parsing velocity page {0}", e, args);
-            return Util.getHTMLExceptionMessage(xe, ((Context)vcontext.get("context")).getContext());
+            return Util.getHTMLExceptionMessage(xe, context);
         }
     }
 
@@ -142,7 +142,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
      *  use Velocity as a token replacer.
      *
      *  @param context context to use in rendering input string
-     *  @param out  Writer in which to render the output
+     *  @param writer  Writer in which to render the output
      *  @param logTag  string to be used as the template name for log messages
      *                 in case of error
      *  @param reader Reader containing the VTL to be rendered

@@ -54,7 +54,7 @@ public class VelocityRenderTest extends TestCase {
 
         public void setUp() throws Exception {
             context = new XWikiContext();
-            xwiki = new XWiki("./xwiki.cfg", context);
+            xwiki = new XWiki("./xwiki.cfg", context, null, false);
             context.setWiki(xwiki);
             StoreHibernateTest.cleanUp(getHibStore(), context);
             Velocity.init("velocity.properties");

@@ -33,6 +33,7 @@ public interface XWikiPluginInterface {
     void setName(String name);
     void init(XWikiContext context);
     void virtualInit(XWikiContext context);
+    void flushCache();
 
     String commonTagsHandler(String line, XWikiContext context);
     String startRenderingHandler(String line, XWikiContext context);

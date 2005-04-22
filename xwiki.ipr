@@ -506,12 +506,17 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/jtidy.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jimi.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/batik-1.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/avalon-framework-4.1.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xalan-2.6.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xml-apis-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/fop-0.20.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xerces-2.4.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-svg-dom-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-util-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-bridge-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-gvt-1.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/batik-awt-util-1.6.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/fop/fop-0.20.5/docs" />

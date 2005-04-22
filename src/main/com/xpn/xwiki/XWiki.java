@@ -327,12 +327,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
 
     public XWiki(String xwikicfgpath, XWikiContext context) throws XWikiException {
-        this(xwikicfgpath,context,null);
+        this(xwikicfgpath, context, null, false);
     }
 
-    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException {
+    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
         try {
-            initXWiki(new FileInputStream(xwikicfgpath), context, engine_context);
+            initXWiki(new FileInputStream(xwikicfgpath), context, engine_context, noupdate);
         } catch (FileNotFoundException e) {
             Object[] args = { xwikicfgpath };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
@@ -342,10 +342,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException {
-        initXWiki(is, context, engine_context);
+        initXWiki(is, context, engine_context, true);
     }
 
-    public void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException {
+    public void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
         setEngineContext(engine_context);
         context.setWiki(this);
 
@@ -408,14 +408,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
 
         // Make sure these classes exists
-        getPrefsClass(context);
-        getUserClass(context);
-        getGroupClass(context);
-        getRightsClass(context);
-        getCommentsClass(context);
-        getSkinClass(context);
-        getGlobalRightsClass(context);
-        getStatsService(context);
+        if (noupdate) {
+            getPrefsClass(context);
+            getUserClass(context);
+            getGroupClass(context);
+            getRightsClass(context);
+            getCommentsClass(context);
+            getSkinClass(context);
+            getGlobalRightsClass(context);
+            getStatsService(context);
+        }
     }
 
     private void preparePlugins(XWikiContext context) {
@@ -754,7 +756,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public String parseContent(String content, XWikiContext context) {
         if ((content!=null)&&(!content.equals("")))
         // Let's use this template
-            return XWikiVelocityRenderer.evaluate(content, context.getDoc().getFullName(), (VelocityContext)context.get("vcontext"));
+            return XWikiVelocityRenderer.evaluate(content, context.getDoc().getFullName(), (VelocityContext)context.get("vcontext"), context);
         else
             return "";
     }
@@ -787,7 +789,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         try {
             String content = getResourceContent("/templates/" + template);
-            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
+            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"), context);
         } catch (Exception e) {
             return "";
         }
@@ -797,7 +799,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             String path = "/skins/" + skin + "/" + template;
             String content = getResourceContent(path);
-            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
+            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"), context);
         } catch (Exception e) {}
 
         try {
@@ -808,7 +810,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     String content = object.getStringValue(template);
                     if ((content!=null)&&(!content.equals(""))) {
                         // Let's use this template
-                        return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"));
+                        return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext)context.get("vcontext"), context);
                     }
                 }
             }
@@ -1210,6 +1212,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiRenderingEngine rengine = getRenderingEngine();
         if (rengine!=null)
             rengine.flushCache();
+
+        XWikiPluginManager pmanager = getPluginManager();
+        if (pmanager!=null)
+            pmanager.flushCache();
+
     }
 
     public XWikiPluginManager getPluginManager() {
@@ -2566,7 +2573,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     String propname = (String) it.next();
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
-                text = XWikiVelocityRenderer.evaluate(format, "", vcontext);
+                text = XWikiVelocityRenderer.evaluate(format, "", vcontext, context);
             }
 
             if (link==false)

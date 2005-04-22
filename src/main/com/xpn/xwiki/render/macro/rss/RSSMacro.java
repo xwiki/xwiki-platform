@@ -96,7 +96,6 @@ public class RSSMacro extends BaseLocaleMacro {
 
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = null;
-
         try {
             feed = input.build(new XmlReader(feedURL));
         }

@@ -95,6 +95,11 @@ public class XWikiPluginManager {
             ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).virtualInit(context);
     }
 
+    public void flushCache() {
+        for (int i=0;i<plugins.size();i++)
+            ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).flushCache();
+    }
+
     public String commonTagsHandler(String text, XWikiContext context) {
         for (int i=0;i<plugins.size();i++)
             text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).commonTagsHandler(text,context);

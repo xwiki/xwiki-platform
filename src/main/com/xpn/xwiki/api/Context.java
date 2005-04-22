@@ -106,6 +106,10 @@ public class Context extends Api {
          return null;
     }
 
+    protected XWikiContext getProtectedContext() {
+         return context;
+    }
+
     public java.lang.Object get(String key) {
         if (checkProgrammingRights())
             return context.get(key);

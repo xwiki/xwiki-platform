@@ -38,9 +38,9 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     public XWiki xwiki;
 
     public void setUp() throws HibernateException, XWikiException {
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
         context.setDatabase("xwikitest");
+        xwiki = new XWiki("./xwiki.cfg", context, null, false);
+        context.setWiki(xwiki);
         cleanUp(getHibStore(), context);
     }
 

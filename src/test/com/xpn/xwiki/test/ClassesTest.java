@@ -195,9 +195,11 @@ public class ClassesTest extends TestCase {
 
     public void testDBListDisplayers() throws XWikiException, HibernateException {
         XWikiContext context = new XWikiContext();
-        StoreHibernateTest.cleanUp(new XWikiHibernateStore(StoreHibernateTest.hibpath), context);
         XWiki xwiki = new XWiki("./xwiki.cfg", context);
-
+        context.setWiki(xwiki);
+        StoreHibernateTest.cleanUp(new XWikiHibernateStore(StoreHibernateTest.hibpath), context);
+        xwiki.getUserClass(context);
+        
         try {
             XWikiDocument doc = new XWikiDocument();
             Utils.prepareAdvancedObject(doc);

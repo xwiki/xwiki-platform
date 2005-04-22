@@ -181,31 +181,27 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             String[] createSQL = configuration.generateSchemaUpdateScript(dialect, meta);
             MonitorPlugin monitor  = getMonitorPlugin(context);
-            for (int j = 0; j < createSQL.length; j++) {
-
-                final String sql = createSQL[j];
-
-                try {
-                    // Start monitoring timer
-                    if (monitor!=null)
-                     monitor.startTimer("sqlupgrade", sql);
-
+            // Start monitoring timer
+            if (monitor!=null)
+                monitor.startTimer("sqlupgrade");
+            try {
+                for (int j = 0; j < createSQL.length; j++) {
+                    final String sql = createSQL[j];
                     if ( log.isDebugEnabled() ) log.debug("Update Schema sql: " + sql);
                     stmt.executeUpdate(sql);
-                    connection.commit();
                 }
-                catch (SQLException e) {
-                    connection.rollback();
-                    if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
-                }
-                finally {
-                    // End monitoring timer
-                    if (monitor!=null)
-                     monitor.endTimer("sqlupgrade");
-                }
-
+                connection.commit();
             }
-
+            catch (SQLException e) {
+                connection.rollback();
+                if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
+            }
+            finally {
+                // End monitoring timer
+                if (monitor!=null)
+                    monitor.endTimer("sqlupgrade");
+            }
+                
             // Make sure we have no null valued in integer fields
             stmt.executeUpdate("update xwikidoc set xwd_translation=0 where xwd_translation is null");
             stmt.executeUpdate("update xwikidoc set xwd_language='' where xwd_language is null");

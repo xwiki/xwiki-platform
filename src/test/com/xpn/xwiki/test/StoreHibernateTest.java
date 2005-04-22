@@ -40,6 +40,7 @@ public class StoreHibernateTest extends StoreTest {
 
     public static String hibpath = "hibernate-test.cfg.xml";
     public XWikiStoreInterface store;
+    public boolean cleanup = false;
 
     public static void runSQL(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
            try {
@@ -53,19 +54,52 @@ public class StoreHibernateTest extends StoreTest {
        }
 
     public static void cleanUp(XWikiHibernateStore hibstore, XWikiContext context) throws HibernateException, XWikiException {
-        cleanUp(hibstore, true, context);
+        cleanUp(hibstore, false, false, context);
     }
 
-    public static void cleanUp(XWikiHibernateStore hibstore, boolean bSchemaUpdate, XWikiContext context) throws HibernateException, XWikiException {
+    public static void cleanUp(XWikiHibernateStore hibstore, boolean bFullCleanup, boolean bSchemaUpdate, XWikiContext context) throws HibernateException, XWikiException {
         hibstore.checkHibernate(context);
         hibstore.beginTransaction(context);
         String database = context.getDatabase();
         if (database==null)
             context.setDatabase("xwikitest");
-        StoreHibernateTest.runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
-        StoreHibernateTest.runSQL(hibstore, "create database " + context.getDatabase(), context);
+        if (bFullCleanup) {
+            try {
+            StoreHibernateTest.runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
+            } catch (Exception e) {}
+            StoreHibernateTest.runSQL(hibstore, "create database " + context.getDatabase(), context);
+        } else {
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikibooleanclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikinumberclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikislistclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikidateclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikistringclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikidblistclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiclassesprop", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiclasses", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikidates", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikidoubles", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikifloats", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikilongs", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiintegers", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikilargestrings", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikilistitems", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikilists", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikistrings", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiproperties", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiobjects", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiattachment_content", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiattachment_archive", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikiattachment", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikidoc", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikilock", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikistatsdoc", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikistatsreferer", context);
+            StoreHibernateTest.runSQL(hibstore, "delete from xwikistatsvisit", context);
+        }
         hibstore.endTransaction(context, true);
-        if (bSchemaUpdate)
+
+        if (bFullCleanup&&bSchemaUpdate)
          hibstore.updateSchema(context);
     }
 
@@ -77,6 +111,7 @@ public class StoreHibernateTest extends StoreTest {
     public void tearDown() throws HibernateException {
         getHibStore().shutdownHibernate(context);
         store = null;
+        context = null;
         System.gc();
     }
 

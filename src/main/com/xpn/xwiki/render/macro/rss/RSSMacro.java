@@ -330,7 +330,7 @@ public class RSSMacro extends BaseLocaleMacro {
     {
         if (!(paramObj.isSearch())) return;
         WireFeed wireFeed = feed.createWireFeed();
-        if (!wireFeed.getFeedType().equals("RSS")) return;
+        if (!(wireFeed instanceof Channel)) return;
         TextInput textInput = ((Channel)wireFeed).getTextInput();
         if (textInput == null) return;
         writer.write(NEWLINE);

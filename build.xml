@@ -104,7 +104,7 @@
     	value="${lib.dir}/groovy-all-1.0-jsr-01.jar" />
 
     <property name="libs.fop"
-    	value="${lib.dir}/xalan-2.6.0.jar;${lib.dir}/xerces.jar-2.4.0;${lib.dir}/xml-apis-2.0.2;${lib.dir}/jimi.jar;${lib.dir}/avalon-framework-4.1.5.jar;${lib.dir}/batik-1.5.jar;${lib.dir}/fop-0.20.5.jar;${lib.dir}/jtidy.jar" />
+    	value="${lib.dir}/xalan-2.6.0.jar;${lib.dir}/xerces.jar-2.4.0;${lib.dir}/xml-apis-2.0.2;${lib.dir}/jimi.jar;${lib.dir}/avalon-framework-4.1.5.jar;${lib.dir}/batik-1.6.jar;${lib.dir}/batik-awt-util-1.6.jar;${lib.dir}/batik-bridge-1.6.jar;${lib.dir}/batik-gvt-1.6.jar;${lib.dir}/batik-svg-dom-1.6.jar;${lib.dir}/batik-util-1.6.jar;${lib.dir}/fop-0.20.5.jar;${lib.dir}/jtidy.jar" />
 
     <property name="libs.ldap"
         value="${lib.dir}/ldap.jar" />
@@ -197,7 +197,7 @@
 
     <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
-            <fileset dir="${src.dir}">
+            <fileset dir="${main.src.dir}">
                 <patternset refid="non.java.sources" />
             </fileset>
         </copy>

@@ -1,23 +1,47 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.store.XWikiStoreInterface;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.Revision;
 import org.apache.commons.jrcs.util.ToString;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 
-import java.io.*;
-import java.util.*;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseElement;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * ===================================================================

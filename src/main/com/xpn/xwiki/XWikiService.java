@@ -358,7 +358,21 @@ public class XWikiService {
 
         String confirm = request.getParameter("confirm");
         if ((confirm!=null)&&(confirm.equals("1"))) {
-            xwiki.deleteDocument(doc, context);
+            String language = xwiki.getLanguagePreference(context);
+            if ((language==null)||(language.equals(""))||language.equals(doc.getDefaultLanguage())) {
+                // Delete all documents
+                List list = doc.getTranslationList(context);
+                for (int i=0;i<list.size();i++) {
+                    String lang = (String) list.get(i);
+                    XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
+                    xwiki.deleteDocument(tdoc, context);
+                }
+                xwiki.deleteDocument(doc, context);
+            } else {
+                // Only delete the translation
+                XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+                xwiki.deleteDocument(tdoc, context);
+            }
             return true;
         } else {
             String redirect = Utils.getRedirect(request, null);

@@ -1078,6 +1078,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
                     context.getResponse().addCookie(cookie);
+                    language = "";
                 } else {
                     // setting language cookie
                     Cookie cookie = new Cookie("language", language);
@@ -2006,6 +2007,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     }
                     saveDocument(tdoc, context);
 
+                    List attachlist = tdoc.getAttachmentList();
+                    if (attachlist.size()>0) {
+                        for (int i=0;i<attachlist.size();i++) {
+                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
+                            getStore().saveAttachmentContent(attachment, false, context, true);
+                        }
+                    }
+
                     // Now we need to copy the translations
                     if (sourceWiki!=null)
                         context.setDatabase(sourceWiki);
@@ -2056,6 +2065,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         tdoc.setRCSArchive(null);
                     }
                     saveDocument(tdoc, context);
+                    List attachlist = tdoc.getAttachmentList();
+                    if (attachlist.size()>0) {
+                        for (int i=0;i<attachlist.size();i++) {
+                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
+                            getStore().saveAttachmentContent(attachment, false, context, true);
+                        }
+                    }
                 }
             }
             return true;

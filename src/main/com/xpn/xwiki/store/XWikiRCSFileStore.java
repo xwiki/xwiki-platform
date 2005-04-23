@@ -450,7 +450,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 "Not implemented");
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             File file = getAttachmentPath(attachment, context);
             FileOutputStream os = new FileOutputStream(file);
@@ -467,12 +467,17 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
             }
 
             // We need to save the attachment info
-            saveXWikiDoc(attachment.getDoc(), context, false);
+            if (bParentUpdate)
+             saveXWikiDoc(attachment.getDoc(), context, false);
         } catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_RCS_SAVING_ATTACHMENT,
                     "Exception while saving attachment {0} from document {1}", e, args);
         }
+    }
+
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
+        saveAttachmentContent(attachment, true, context, bTransaction);
     }
 
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {

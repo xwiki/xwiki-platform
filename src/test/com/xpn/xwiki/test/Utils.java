@@ -374,34 +374,66 @@ public class Utils {
         return prop;
     }
 
-
-    public static void assertEquals(String msg, Object o1, Object o2) {
+    public static boolean testEqualsNoName(BaseElement o1, BaseElement o2) {
+        String name = o2.getName();
         try {
-            TestCase.assertEquals(msg, o1, o2);
-        } catch (AssertionFailedError e) {
-            try {
-             String so1 = o1.toString();
-             String so2 = o2.toString();
-             Revision rev = Diff.diff(ToString.stringToArray(so1), ToString.stringToArray(so2));
-             throw new AssertionFailedError(msg + ":\n" + rev.toString());
-            } catch (Exception e2) {}
-            throw e;
+            o2.setName(o1.getName());
+            return o2.equals(o1);
+        } finally {
+            o2.setName(name);
         }
     }
 
+    public static void assertEquals(String msg, BaseElement o1, BaseElement o2, boolean bInclName) {
+        AssertionFailedError e1;
+        try {
+            if (!bInclName) {
+                if (testEqualsNoName(o1, o2))
+                    return;
+            }
+
+            TestCase.assertEquals(msg, o1, o2);
+            return;
+        } catch (AssertionFailedError e) {
+            e1 = e;
+        }
+        try {
+            String so1 = o1.toString();
+            String so2 = o2.toString();
+            Revision rev = Diff.diff(ToString.stringToArray(so1), ToString.stringToArray(so2));
+            if ((!bInclName)&&(rev.size()==1)) {
+                if (rev.getDelta(0).getOriginal().toString().matches("<name>.*</name>"))
+                    return;
+            }
+            String srev = rev.toString();
+            throw new AssertionFailedError(msg + ":\n" + srev);
+        } catch (Exception e2) {}
+        throw e1;
+    }
+
     public static void assertEquals(XWikiDocument doc1, XWikiDocument doc2) {
-        assertEquals("Name is different", doc1.getName(), doc2.getName());
-        assertEquals("Web is different", doc1.getWeb(), doc2.getWeb());
-        assertEquals("Author is different", doc1.getAuthor(), doc2.getAuthor());
-        // assertEquals("Date is different", doc1.getDate().getTime(), doc2.getDate().getTime());
-        assertEquals("Format is different", doc1.getFormat(), doc2.getFormat());
-        assertEquals("Version is different", doc1.getVersion(), doc2.getVersion());
-        assertEquals("Content is different", doc1.getContent(), doc2.getContent());
-        assertEquals("xWikiClass is different", doc1.getxWikiClass(), doc2.getxWikiClass());
+      assertEquals(doc1, doc2, true, true, false);
+    }
+
+    public static void assertEquals(XWikiDocument doc1, XWikiDocument doc2, boolean bInclName, boolean bInclVersion, boolean bInclTime) {
+        if (bInclName) {
+        TestCase.assertEquals("Name is different", doc1.getName(), doc2.getName());
+        TestCase.assertEquals("Web is different", doc1.getWeb(), doc2.getWeb());
+        }
+        TestCase.assertEquals("Author is different", doc1.getAuthor(), doc2.getAuthor());
+        if (bInclTime) {
+            TestCase.assertEquals("Date is different", doc1.getDate().getTime(), doc2.getDate().getTime());
+        }
+        TestCase.assertEquals("Format is different", doc1.getFormat(), doc2.getFormat());
+        if (bInclVersion) {
+            TestCase.assertEquals("Version is different", doc1.getVersion(), doc2.getVersion());
+        }
+        TestCase.assertEquals("Content is different", doc1.getContent(), doc2.getContent());
+        assertEquals("xWikiClass is different", doc1.getxWikiClass(), doc2.getxWikiClass(), bInclName);
 
         Set list1 = doc1.getxWikiObjects().keySet();
         Set list2 = doc2.getxWikiObjects().keySet();
-        assertEquals("Object list is different", list1, list2);
+        TestCase.assertEquals("Object list is different", list1, list2);
 
         for (Iterator it = list1.iterator();it.hasNext();) {
             String name = (String) it.next();
@@ -410,7 +442,7 @@ public class Utils {
             TestCase.assertEquals("Object number for " + name + " is different", v1.size(), v2.size());
 
             for (int i=0;i<v1.size();i++) {
-                assertEquals("Object " + i + " for " + name + " is different\n", v1.get(i), v2.get(i));
+                assertEquals("Object " + i + " for " + name + " is different\n", (BaseElement)v1.get(i), (BaseElement)v2.get(i), bInclName);
             }
         }
     }
@@ -418,7 +450,7 @@ public class Utils {
     public static void assertProperty(BaseCollection object1, BaseCollection object2, String propname) {
         BaseElement prop1 = (BaseElement)object1.safeget(propname);
         BaseElement prop2 = (BaseElement)object2.safeget(propname);
-        assertEquals("Property " + propname + " is different", prop1, prop2);
+        TestCase.assertEquals("Property " + propname + " is different", prop1, prop2);
     }
 
 

@@ -279,8 +279,11 @@ public class Servleti18nTest extends ServletTest {
             // Verify return
             assertTrue("Delete returned exception: " + result, result.indexOf("Exception")==-1);
 
+            // Flush cache to check deletions
+            xwiki.flushCache();
+
             XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "DeleteWithTranslationTest");
+            XWikiDocument doc2 = new XWikiDocument("Test", "DeleteWithTranslationTest");
             doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
             assertTrue("Document should not exist", doc2.isNew());
 
@@ -325,6 +328,9 @@ public class Servleti18nTest extends ServletTest {
             // Verify return
             assertTrue("Delete returned exception: " + result, result.indexOf("Exception")==-1);
 
+            // Flush cache to check deletions
+            xwiki.flushCache();
+
             XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc2 = new XWikiDocument("Test", "DeleteTranslationTest");
             doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
@@ -338,7 +344,9 @@ public class Servleti18nTest extends ServletTest {
         }
     }
 
-
+    // TODO: Switch translation to change the default language of a document
+    // We haven't implemented switch translation yet.
+    /*
     public void testSwitchTranslation() throws Throwable {
         launchTest();
     }
@@ -372,6 +380,9 @@ public class Servleti18nTest extends ServletTest {
             // Verify return
             assertTrue("Switch returned exception: " + result, result.indexOf("Exception")==-1);
 
+            // Flush cache to check deletions
+            xwiki.flushCache();
+
             XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc2 = new XWikiDocument("Main", "SwitchTranslationTest");
             doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
@@ -388,5 +399,5 @@ public class Servleti18nTest extends ServletTest {
             clientTearDown();
         }
     }
-
+    */
 }

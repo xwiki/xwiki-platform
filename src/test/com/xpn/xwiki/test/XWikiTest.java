@@ -26,6 +26,8 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -35,9 +37,12 @@ import org.hibernate.HibernateException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -189,4 +194,78 @@ public class XWikiTest extends TestCase {
         assertNull("Lock really removed", doc.getLock(context));
 
     }
+
+    public void testCopyDocument() throws XWikiException {
+        Utils.createDoc(getHibStore(), "Test", "CopyDocument", context);
+        xwiki.copyDocument("Test.CopyDocument", "Test.CopyDocument2", context);
+        xwiki.flushCache();
+
+        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocument", context);
+        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocument2", context);
+        assertEquals("Copied doc name is not correct", "Test.CopyDocument2", doc2.getFullName());
+        assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
+        // Compare documents except the name and date
+        Utils.assertEquals(doc1, doc2, false, false, false);
+    }
+
+    public void testCopyDocumentWithObject() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument("Test", "CopyDocumentWithObject");
+        Utils.prepareObject(doc, "Test.CopyDocumentWithObject");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithObject", bobject, bclass, context);
+        xwiki.copyDocument("Test.CopyDocumentWithObject", "Test.CopyDocumentWithObject2", context);
+        xwiki.flushCache();
+
+        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithObject", context);
+        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithObject2", context);
+        assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithObject2", doc2.getFullName());
+        assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
+        // Compare documents except the name and date
+        Utils.assertEquals(doc1, doc2, false, false, false);
+    }
+
+    public void testCopyDocumentWithAdvancedObject() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument("Test", "CopyDocumentWithAdvObject");
+        Utils.prepareAdvancedObject(doc, "Test.CopyDocumentWithAdvObject");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithAdvObject", bobject, bclass, context);
+        xwiki.copyDocument("Test.CopyDocumentWithAdvObject", "Test.CopyDocumentWithAdvObject2", context);
+        xwiki.flushCache();
+
+        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithAdvObject", context);
+        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithAdvObject2", context);
+        assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithAdvObject2", doc2.getFullName());
+        assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
+        // Compare documents except the name and date
+        Utils.assertEquals(doc1, doc2, false, false, false);
+    }
+
+    public void testCopyDocumentWithAttachment() throws XWikiException, IOException {
+        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithAttachment", context);
+        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithAttachment", context);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
+        attachment1.setContent(attachcontent1);
+        doc1.saveAttachmentContent(attachment1, context);
+        doc1.getAttachmentList().add(attachment1);
+        getHibStore().saveXWikiDoc(doc1, context);
+
+        xwiki.copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", context);
+        xwiki.flushCache();
+
+        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithAttachment2", context);
+        assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithAttachment2", doc2.getFullName());
+        assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
+        // Compare documents except the name and date
+        Utils.assertEquals(doc1, doc2, false, false, false);
+        assertEquals("Attachment number is incorrect", doc1.getAttachmentList().size(), doc2.getAttachmentList().size());
+        XWikiAttachment attachment2 = doc2.getAttachment(attachment1.getFilename());
+        assertEquals("Attachment filename incorrect", attachment1.getFilename(), attachment2.getFilename());
+        assertEquals("Attachment file size", attachment1.getFilesize(), attachment2.getFilesize());
+        assertEquals("Attachment author incorrect", attachment1.getAuthor(), attachment2.getAuthor());
+        assertEquals("Attachment content incorrect", new String(attachment1.getContent(context)), new String(attachment2.getContent(context)));
+    }
+
 }

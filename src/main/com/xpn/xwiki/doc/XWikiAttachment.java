@@ -99,10 +99,14 @@ public class XWikiAttachment {
         attachment.setFilename(getFilename());
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
-        if (getAttachment_content()!=null)
+        if (getAttachment_content()!=null) {
          attachment.setAttachment_content((XWikiAttachmentContent)getAttachment_content().clone());
-        if (getAttachment_archive()!=null)
+         attachment.getAttachment_content().setAttachment(attachment);
+        }
+        if (getAttachment_archive()!=null) {
          attachment.setAttachment_archive((XWikiAttachmentArchive)getAttachment_archive().clone());
+         attachment.getAttachment_archive().setAttachment(attachment);
+        }
         return attachment;
     }
 

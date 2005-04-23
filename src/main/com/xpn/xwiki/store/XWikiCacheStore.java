@@ -187,6 +187,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.saveAttachmentContent(attachment, context, bTransaction);
     }
 
+    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
+    }
+
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         store.loadAttachmentContent(attachment, context, bTransaction);
     }

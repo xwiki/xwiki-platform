@@ -1,8 +1,0 @@
-<opensymphony-access>
-  <provider class="com.xpn.xwiki.user.impl.xwiki.XWikiResourceProvider">
-      <property name="realm">default</property>
-  </provider>
-  <provider class="com.xpn.xwiki.user.impl.xwiki.XWikiAccessUserProvider">
-    <property name="realm">default</property>
-  </provider>
-</opensymphony-access>

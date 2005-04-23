@@ -280,6 +280,7 @@
 
             <batchtest todir="${test.reports.dir}">
                 <fileset dir="${test.src.dir}">
+                 <exclude name="**/AllTests.java"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -300,6 +301,7 @@
 
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${test-cactus.src.dir}">
+                    <exclude name="**/AllServletTests.java"/>
                 </fileset>
             </batchtest>
 

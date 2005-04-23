@@ -392,7 +392,7 @@
                 <column name="XWL_ID"  />
                 <column name="XWL_NAME"  />
             </key>
-            <list name="list" table="xwikilistitems" batch-size="10">
+            <list name="list" table="xwikilistitems" lazy="false">
                 <key>
                     <column name="XWL_ID"  />
                     <column name="XWL_NAME"  />

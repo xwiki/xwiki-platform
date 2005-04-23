@@ -991,6 +991,14 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
             session.load(property, (Serializable) property);
 
+            // TODO: understand why collections are lazy loaded
+            // Let's force reading lists if there is a list
+            // This seems to be an issue since Hibernate 3.0
+            // Without this test ViewEditTest.testUpdateAdvanceObjectProp fails
+            if (property instanceof ListProperty) {
+                ((ListProperty)property).getList();
+            }
+
             if (bTransaction) {
                 endTransaction(context, false);
             }

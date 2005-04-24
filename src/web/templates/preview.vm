@@ -10,7 +10,7 @@ $tdoc.getRenderedContent($tdoc.content)
 <input type="hidden" name="parent" value="$!doc.getParent()" />
 <input type="hidden" name="creator" value="$!doc.getCreator()" />
 <input type="hidden" name="defaultLanguage" value="$!doc.getDefaultLanguage()" />
-<input type="hidden" name="template" value="$!doc.getTemplate()" />
+<input type="hidden" name="template" value="$!tdoc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <input type="hidden" name="language" value="$!request.getParameter("language")" />
 

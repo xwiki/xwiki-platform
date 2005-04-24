@@ -285,6 +285,7 @@
                     <exclude name="**/MyFormAuthentication.java"/>
                     <exclude name="**/RenderTest.java"/>
                     <exclude name="**/StoreObjectTest.java"/>
+                    <exclude name="**/StoreTest.java"/>
                     <exclude name="**/Utils.java"/>
                 </fileset>
             </batchtest>

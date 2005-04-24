@@ -436,6 +436,7 @@ public class XWikiService {
         }
 
         XWikiDocument olddoc = (XWikiDocument) tdoc.clone();
+        tdoc.readFromTemplate(((EditForm)form).getTemplate(), context);
         tdoc.readFromForm((EditForm)form, context);
 
         // TODO: handle Author
@@ -694,12 +695,15 @@ public class XWikiService {
 
         // Make sure it is not considered as new
         XWikiDocument doc2 = (XWikiDocument)doc.clone();
+        context.put("doc", doc2);
 
         if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
-            context.put("doc", doc2);
+            tdoc = doc2;
+            context.put("tdoc", doc2);
             vcontext.put("doc", new Document(doc2, context));
             vcontext.put("tdoc", vcontext.get("doc"));
             vcontext.put("cdoc",  vcontext.get("doc"));
+            doc2.readFromTemplate(((EditForm)form).getTemplate(), context);
             doc2.readFromForm((EditForm)form, context);
         } else {
             // Need to save parent and defaultLanguage if they have changed
@@ -707,11 +711,12 @@ public class XWikiService {
             tdoc.setLanguage(language);
             tdoc.setTranslation(1);
             XWikiDocument tdoc2 = (XWikiDocument)tdoc.clone();
+            context.put("tdoc", tdoc2);
             vcontext.put("tdoc", new Document(tdoc2, context));
             vcontext.put("cdoc",  vcontext.get("tdoc"));
+            tdoc2.readFromTemplate(((EditForm)form).getTemplate(), context);
             tdoc2.readFromForm((EditForm)form, context);
         }
-
         return "preview";
     }
 
@@ -778,7 +783,11 @@ public class XWikiService {
             // But we should log any related information
             log.error("Exception while setting up lock", e);
         }
-        tdoc.readFromTemplateForEdit(peform, context);
+
+        XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
+        context.put("tdoc", tdoc2);
+        vcontext.put("tdoc", new Document(tdoc2, context));
+        tdoc2.readFromTemplate(peform, context);
         return "edit";
     }
 
@@ -800,7 +809,7 @@ public class XWikiService {
         if (doc.getDefaultLanguage().equals(""))
             doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
 
-        doc.readFromTemplateForEdit(peform, context);
+        doc.readFromTemplate(peform, context);
 
         // Set display context to 'view'
         context.put("display", "edit");

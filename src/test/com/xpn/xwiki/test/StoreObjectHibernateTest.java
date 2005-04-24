@@ -359,7 +359,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
         if (monitor!=null)
           monitor.endRequest();
-        assertTrue("Creation delay is way too long (over 2s): " + delay, (delay < 2000));
+        assertTrue("Creation delay is way too long (over 10s): " + delay, (delay < 10000));
     }
 
     public void testObjectReadPerf() throws XWikiException {

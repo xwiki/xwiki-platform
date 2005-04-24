@@ -918,7 +918,8 @@ public class XWikiDocument {
         if (defaultLanguage!=null)
             setDefaultLanguage(defaultLanguage);
 
-        readFromTemplate(eform, context);
+        // This is now done before
+        // readFromTemplate(eform, context);
 
         Iterator itobj = getxWikiObjects().keySet().iterator();
         while (itobj.hasNext()) {
@@ -941,6 +942,7 @@ public class XWikiDocument {
            }
     }
 
+    /*
     public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException {
         // Get the class from the template
         String template = eform.getTemplate();
@@ -960,10 +962,14 @@ public class XWikiDocument {
             }
         }
     }
+    */
 
-    public void readFromTemplateForEdit(PrepareEditForm eform, XWikiContext context) throws XWikiException {
-
+    public void readFromTemplate(PrepareEditForm eform, XWikiContext context) throws XWikiException {
         String template = eform.getTemplate();
+        readFromTemplate(template, context);
+    }
+
+    public void readFromTemplate(String template, XWikiContext context) throws XWikiException {
         if ((template!=null)&&(!template.equals(""))) {
             String content = getContent();
             if ((!content.equals("\n"))&&(!content.equals(""))&&!isNew()) {

@@ -27,7 +27,7 @@
               <div class="main-content">
 <form id="edit" method="post" action="$doc.getURL("preview")">
 <p>
-<input type="hidden" name="template" value="$!doc.getTemplate()" />
+<input type="hidden" name="template" value="$!tdoc.getTemplate()" />
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <input type="hidden" name="language" value="$!tdoc.language" />
 </p>

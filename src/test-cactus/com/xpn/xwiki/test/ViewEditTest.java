@@ -449,13 +449,21 @@ public class ViewEditTest extends ServletTest {
         setUrl(webRequest, "save", "SaveOkWithTestTemplate");
         webRequest.addParameter("template", "Main.SaveOkTestTemplate");
         webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+        webRequest.addParameter("content", "Template content");
     }
 
-    public void endSaveWithTemplateOk(WebResponse webResponse) throws HibernateException {
+    public void endSaveWithTemplateOk(WebResponse webResponse) throws HibernateException, XWikiException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Template content")!=-1);
-            assertTrue("Could not find parent: " + result, result.indexOf("TestParentComesFromTemplate")!=-1);
+            // Verify return
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+
+            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+            XWikiDocument doc2 = new XWikiDocument("Main", "SaveOkWithTestTemplate");
+            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            String content2 = doc2.getContent();
+            assertEquals("Content is not identical", "Template content",content2);
+            assertEquals("Parent is not identical", "XWiki.TestParentComesFromTemplate", doc2.getParent());
         } finally {
             clientTearDown();
         }

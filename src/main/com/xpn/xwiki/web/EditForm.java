@@ -49,6 +49,7 @@ public class EditForm extends XWikiForm
         setWeb(request.getParameter("web"));
         setName(request.getParameter("name"));
         setParent(request.getParameter("parent"));
+        setTemplate(request.getParameter("template"));
         setCreator(request.getParameter("creator"));
         setLanguage(request.getParameter("language"));
         setDefaultLanguage(request.getParameter("default_language"));

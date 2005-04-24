@@ -148,7 +148,7 @@ public class VelocityRenderTest extends TestCase {
                 "hello", false, context);
     }
 
-/*    public void testIncludeMacro() throws XWikiException {
+    public void testIncludeMacro() throws Exception {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
         XWikiStoreInterface store = getStore();
 
@@ -164,5 +164,5 @@ public class VelocityRenderTest extends TestCase {
         store.saveXWikiDoc(doc2, context);
         RenderTest.renderTest(wikiengine, doc2, "coucou", false, context);
     }
-  */
-    }
+
+ }

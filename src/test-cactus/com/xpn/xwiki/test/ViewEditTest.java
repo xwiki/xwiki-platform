@@ -357,8 +357,8 @@ public class ViewEditTest extends ServletTest {
     }
 
     public void testEditClassOk() throws Throwable {
-        launchTest();
-    }
+           launchTest();
+       }
 
 
     public void beginEditWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -387,6 +387,11 @@ public class ViewEditTest extends ServletTest {
             clientTearDown();
         }
     }
+
+    public void testEditWithTemplateOk() throws Throwable {
+        launchTest();
+    }
+
 
     public void testEditWithTemplateNotOk() throws Throwable {
         try {
@@ -424,10 +429,37 @@ public class ViewEditTest extends ServletTest {
         }
     }
 
-    public void testEditWithTemplateOk() throws Throwable {
+    public void testSaveWithTemplateOk() throws Throwable {
         launchTest();
     }
 
+
+    public void beginSaveWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.SaveOkTestTemplate");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        String content = Utils.content1;
+        Utils.content1 = "Template content";
+        Utils.createDoc(hibstore, "Main", "SaveOkTestTemplate", bobject, bclass, context);
+        Utils.content1 = content;
+        setUrl(webRequest, "save", "SaveOkWithTestTemplate");
+        webRequest.addParameter("template", "Main.SaveOkTestTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+    }
+
+    public void endSaveWithTemplateOk(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Template content")!=-1);
+            assertTrue("Could not find parent: " + result, result.indexOf("TestParentComesFromTemplate")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
 
     public void beginViewLatestRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());

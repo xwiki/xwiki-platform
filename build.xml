@@ -280,7 +280,12 @@
 
             <batchtest todir="${test.reports.dir}">
                 <fileset dir="${test.src.dir}">
-                 <exclude name="**/AllTests.java"/>
+                    <exclude name="**/AllTests.java"/>
+                    <exclude name="**/AllTests.java"/>
+                    <exclude name="**/MyFormAuthentication.java"/>
+                    <exclude name="**/RenderTest.java"/>
+                    <exclude name="**/StoreObjectTest.java"/>
+                    <exclude name="**/Utils.java"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -302,6 +307,7 @@
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${test-cactus.src.dir}">
                     <exclude name="**/AllServletTests.java"/>
+                    <exclude name="**/ServletTest.java"/>
                 </fileset>
             </batchtest>
 

@@ -1551,6 +1551,31 @@ public class XWikiDocument {
         }
     }
 
+    public List getIncludedMacros(XWikiContext context) {
+        try {
+         String pattern = "#includeMacros\\(\"(.*?)\"\\)";
+         List list = context.getUtil().getMatches(getContent(), pattern, 1);
+         for (int i=0;i<list.size();i++) {
+             try {
+                 String name = (String)list.get(i);
+                 if (name.indexOf(".")==-1) {
+                     list.set(i, context.getDoc().getWeb() + "." + name);
+                 }
+             } catch (Exception e) {
+                 // This should never happen
+                   e.printStackTrace();
+                   return null;
+               }
+         }
+
+         return list;
+        } catch (Exception e) {
+            // This should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
           String result = pclass.displayView(pclass.getName(), prefix, object, context);
           return getRenderedContent(result, context);

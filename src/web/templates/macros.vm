@@ -6,11 +6,11 @@ $xwiki.parseTemplate($tname)
 $xwiki.includeTopic($topic)
 #end
 
-#macro( includeForm $topic )
+#macro( includeMacros $topic )
 $xwiki.includeForm($topic)
 #end
 
-#macro( includeMacros $topic )
+#macro( includeForm $topic )
 $xwiki.includeForm($topic)
 #end
 

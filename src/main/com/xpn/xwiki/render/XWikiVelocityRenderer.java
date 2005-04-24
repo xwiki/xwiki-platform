@@ -41,6 +41,7 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
 
 import java.io.*;
+import java.util.List;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
 
@@ -63,6 +64,22 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
             try {
                 vcontext.put("doc", new Document(doc, context));
+
+                try {
+                    // We need to do this in case there are any macros in the content
+                    List macrolist = doc.getIncludedMacros(context);
+                    if (macrolist!=null) {
+                        com.xpn.xwiki.XWiki xwiki = context.getWiki();
+                        for (int i=0;i<macrolist.size();i++) {
+                            String docname = (String) macrolist.get(i);
+                            XWikiDocument idoc = xwiki.getDocument(docname, context);
+                            String icontent = idoc.getTranslatedContent(context);
+                            evaluate(icontent, name, vcontext, context);
+                        }
+                    }
+                } catch (Exception e) {
+                }
+
                 return evaluate(content, name, vcontext, context);
             } finally {
                 if (previousdoc!=null)

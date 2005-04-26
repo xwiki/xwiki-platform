@@ -84,7 +84,7 @@ public class LifeblogServices {
       writer.println(userBlog.getFeedHref());
       writer.println(userBlog.getAlternateHref());
     }
-    writer.append("</feed>");
+    writer.print("</feed>");
     writer.flush();
     return stringWriter.toString();
   }

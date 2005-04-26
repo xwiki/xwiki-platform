@@ -1758,12 +1758,15 @@ public class XWikiDocument {
         if (name.equals(""))
             name = "WebHome";
 
+        /*
+        // Now anything is allowed..
         Util util = context.getUtil();
         if ((!util.isAlphaNumeric(name))||(!util.isAlphaNumeric(web))) {
             Object[] args = { fullname };
             throw new XWikiException( XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
                     "Document name {0} contains invalid characters", null, args);
         }
+        */
 
     }
 

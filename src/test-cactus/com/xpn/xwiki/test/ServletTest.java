@@ -149,22 +149,28 @@ public abstract class ServletTest extends ServletTestCase {
     }
 
     public void launchTest() throws Throwable {
+      launchTest(true);
+    }
+
+    public void launchTest(boolean checkActive) throws Throwable {
         try {
             ActionServlet servlet = new ActionServlet();
             servlet.init(config);
             servlet.service(request, response);
 
-            // Let's verify that we didn't let any connections behind..
-            XWiki xwiki = (XWiki) config.getServletContext().getAttribute("xwiki");
-            if (xwiki != null) {
-             XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheStoreInterface) xwiki.getStore()).getStore();
-             assertEquals("Active connections in xwiki should be zero", 0, store.getConnections().size());
-            }
+            if (checkActive) {
+                // Let's verify that we didn't let any connections behind..
+                XWiki xwiki = (XWiki) config.getServletContext().getAttribute("xwiki");
+                if (xwiki != null) {
+                    XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheStoreInterface) xwiki.getStore()).getStore();
+                    assertEquals("Active connections in xwiki should be zero", 0, store.getConnections().size());
+                }
 
-            xwiki = (XWiki) config.getServletContext().getAttribute("xwikitest");
-            if (xwiki != null) {
-             XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheStoreInterface) xwiki.getStore()).getStore();
-             assertEquals("Active connections in xwikitest should be zero", 0, store.getConnections().size());
+                xwiki = (XWiki) config.getServletContext().getAttribute("xwikitest");
+                if (xwiki != null) {
+                    XWikiHibernateStore store = (XWikiHibernateStore) ((XWikiCacheStoreInterface) xwiki.getStore()).getStore();
+                    assertEquals("Active connections in xwikitest should be zero", 0, store.getConnections().size());
+                }
             }
 
             cleanSession(session);

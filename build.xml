@@ -236,7 +236,7 @@
             compiler="${compiler}" >
           <include name="com/xpn/xwiki/**/*.java" />
           <include name="org/**/*.java" />
-        	<exclude name="**/test/*.class" />
+          <exclude name="**/test/*.class" />
         </javac>
     </target>
 
@@ -280,7 +280,6 @@
             <batchtest todir="${test.reports.dir}">
                 <fileset dir="${test.src.dir}">
                     <exclude name="**/AllTests.java"/>
-                    <exclude name="**/AllTests.java"/>
                     <exclude name="**/MyFormAuthentication.java"/>
                     <exclude name="**/RenderTest.java"/>
                     <exclude name="**/StoreObjectTest.java"/>
@@ -315,6 +314,7 @@
 
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${test-cactus.src.dir}">
+                    <exclude name="**/AllTests.java"/>
                     <exclude name="**/AllServletTests.java"/>
                     <exclude name="**/ServletTest.java"/>
                 </fileset>
@@ -357,7 +357,7 @@
     <target name="javadoc" depends="xwiki">
         <mkdir dir="${javadoc.dir}" />
         <javadoc packagenames="com.xpn.xwiki.*"
-            sourcepath="${src.dir}"
+            sourcepath="${main.src.dir}"
             destdir="${javadoc.dir}"
             classpath="${libs}"
             author="true"
@@ -406,7 +406,7 @@
         <delete file="${bin.tarfile}" />
 
         <tar compression="gzip" tarfile="${bin.tarfile}">
-            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*" />
+            <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*"  />
             <tarfileset dir="${lib.dir}" prefix="lib" excludes="**/CVS/*" />
             <tarfileset dir="${doc.dir}" prefix="doc" excludes="**/CVS/*" />
             <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
@@ -419,7 +419,6 @@
         <delete file="${src.tarfile}" />
 
         <tar compression="gzip" tarfile="${src.tarfile}">
-            <tarfileset dir="CVS" prefix="CVS" />
             <tarfileset dir="${lib.dir}" prefix="lib" />
             <tarfileset dir="${doc.dir}" prefix="doc" />
             <tarfileset dir="${src.dir}" prefix="src" />

@@ -491,7 +491,7 @@ public class ServletAuthTest extends ServletTest {
     }
 
     public void testCreateUser() throws Throwable {
-        launchTest();
+        launchTest(false);
     }
 
     public void beginCreateUserProg(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
@@ -606,7 +606,7 @@ public class ServletAuthTest extends ServletTest {
     }
 
     public void testCreateUserWithManyUsers() throws Throwable {
-        launchTest();
+        launchTest(false);
     }
 
 
@@ -687,7 +687,7 @@ public class ServletAuthTest extends ServletTest {
     }
 
     public void testCreateUserWithEmail() throws Throwable {
-         launchTest();
+        launchTest(false);
     }
 
 
@@ -783,7 +783,7 @@ public class ServletAuthTest extends ServletTest {
     }
 
     public void testValidateUserWithEmail() throws Throwable {
-         launchTest();
+        launchTest(false);
     }
 
 }

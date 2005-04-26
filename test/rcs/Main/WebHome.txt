@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>Main</web>
@@ -8,8 +8,8 @@
 <translation>0</translation>
 <parent>Main.WebHome</parent>
 <author>XWiki.LudovicDubost</author>
-<creationDate>1104264013465</creationDate>
-<date>1104264013465</date>
+<creationDate>1114520893374</creationDate>
+<date>1114520893374</date>
 <version>1.1</version>
 <content>Hello 1
 Hello 2

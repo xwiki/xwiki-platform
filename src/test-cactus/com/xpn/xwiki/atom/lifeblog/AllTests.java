@@ -14,7 +14,7 @@ public class AllTests {
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom");
     //$JUnit-BEGIN$
     suite.addTestSuite(LifeblogActionIntegrationTest.class);
-    suite.addTestSuite(LifeblogContextIntegrationTest.class);
+    suite.addTestSuite(LifeblogServicesIntegrationTest.class);
     //$JUnit-END$
     
     return new JettyTestSetup(suite);

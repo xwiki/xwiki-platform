@@ -108,4 +108,15 @@ public class UserBlog {
   public void setTitle(String title) {
     this.title = title;
   }
+
+  public boolean equals(Object arg0) {
+    // TODO Auto-generated method stub
+    if (arg0 instanceof UserBlog) {
+      UserBlog userBlog = (UserBlog) arg0;
+      return this.postHref.equals(userBlog.postHref)
+        && this.feedHref.equals(userBlog.feedHref)
+        && this.alternateHref.equals(userBlog.alternateHref);
+    }
+    return false;
+  }
 }

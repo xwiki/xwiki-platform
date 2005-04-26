@@ -5,7 +5,7 @@ import junit.framework.TestSuite;
 
 import org.apache.cactus.extension.jetty.JettyTestSetup;
 
-import com.xpn.xwiki.XWikiIntegrationTest;
+import com.xpn.xwiki.test.XWikiIntegrationTest;
 
 
 public class LifeblogActionIntegrationTest extends XWikiIntegrationTest {

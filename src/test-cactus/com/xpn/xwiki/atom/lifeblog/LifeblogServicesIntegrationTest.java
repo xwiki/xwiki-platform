@@ -11,19 +11,19 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiIntegrationTest;
 import com.xpn.xwiki.atom.WSSEHttpHeader;
 import com.xpn.xwiki.atom.XWikiHelper;
+import com.xpn.xwiki.test.XWikiIntegrationTest;
 
-public class LifeblogContextIntegrationTest extends XWikiIntegrationTest {
+public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
   
   public static Test suite () {
     
     System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
     
-    TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogContextIntegrationTest");
+    TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogServicesIntegrationTest");
     //$JUnit-BEGIN$
-    suite.addTestSuite(LifeblogContextIntegrationTest.class);
+    suite.addTestSuite(LifeblogServicesIntegrationTest.class);
     //$JUnit-END$
     
     return new JettyTestSetup(suite);
@@ -33,10 +33,11 @@ public class LifeblogContextIntegrationTest extends XWikiIntegrationTest {
     String header = null;
     
     XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext();
-    lifeblogContext.setXWikiHelper(xwikiHelper);
+    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
+    
+    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
 
-    boolean authenticated = lifeblogContext.isAuthenticated(header);
+    boolean authenticated = lifeblogServices.isAuthenticated(header);
     
     assertFalse("Not authenticated if no WSSE header", authenticated);
   }
@@ -51,10 +52,11 @@ public class LifeblogContextIntegrationTest extends XWikiIntegrationTest {
     String header = "UsernameToken Username=\"" + login +"\", PasswordDigest=\"" + passwordDigest + "\", Nonce=\""+ nonce + "\", Created=\""+ created + "\"";
     
     XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext();
-    lifeblogContext.setXWikiHelper(xwikiHelper);
+    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
+    
+    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
 
-    boolean authenticated = lifeblogContext.isAuthenticated(header);
+    boolean authenticated = lifeblogServices.isAuthenticated(header);
     
     assertTrue(authenticated);
   }
@@ -69,13 +71,24 @@ public class LifeblogContextIntegrationTest extends XWikiIntegrationTest {
     String header = "UsernameToken Username=\"" + login +"\", PasswordDigest=\"" + passwordDigest + "\", Nonce=\""+ nonce + "\", Created=\""+ created + "\"";
     
     XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext();
-    lifeblogContext.setXWikiHelper(xwikiHelper);
+    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
+    
+    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
 
-    boolean authenticated = lifeblogContext.isAuthenticated(header);    
+    boolean authenticated = lifeblogServices.isAuthenticated(header);    
     assertTrue(authenticated);
     
-    authenticated = lifeblogContext.isAuthenticated(header);   
+    authenticated = lifeblogServices.isAuthenticated(header);   
     assertFalse("Same Nonce twice", authenticated);
+  }
+  
+  public void testListUserBlogs() {
+    XWikiHelper xwikiHelper = new XWikiHelper(context);
+    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
+    
+    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
+    lifeblogContext.setUserName("UnknownUser");
+    
+    
   }
 }

@@ -89,7 +89,7 @@
 	    value="${lib.dir}/picocontainer-1.0.jar;${lib.dir}/exoplatform.container-1.0.jar;${lib.dir}/exoplatform.services.chart.api-1.0.jar;${lib.dir}/exoplatform.services.chart.impl-1.0.jar;${lib.dir}/exoplatform.services.common.api-1.0.jar;${lib.dir}/exoplatform.services.organization.api-1.0.jar;${lib.dir}/exoplatform.services.organization.impl-1.0.jar;${lib.dir}/exoplatform.services.security.api-1.0.jar;${lib.dir}/exoplatform.services.security.impl-1.0.jar;${lib.dir}/exoplatform.services.database.api-1.0.jar;${lib.dir}/exoplatform.services.database.impl-1.0.jar" />
 
     <property name="libs.tests"
-        value="${lib.dir}/cactus-1.7.jar;${lib.dir}/cactus-ant-1.7.jar;${lib.dir}/aspectjrt-1.2.1.jar;${lib.dir}/commons-httpclient-2.0.2.jar;${lib.dir}/httpunit-1.6.jar;${lib.dir}/junit3.8.1.jar;${lib.dir}/nekohtml-0.9.1.jar;${lib.dir}/clover-1.3.6.jar;${lib.dir}/jmock-1.0.1.jar;${lib.dir}/jmock-cglib-1.0.1.jar;${lib.dir}/asm-1.5.3.jar;${lib.dir}/asm-util-1.5.3.jar" />
+        value="${lib.dir}/cactus-1.7.jar;${lib.dir}/cactus-ant-1.7.jar;${lib.dir}/aspectjrt-1.2.1.jar;${lib.dir}/commons-httpclient-2.0.2.jar;${lib.dir}/httpunit-1.6.jar;${lib.dir}/junit3.8.1.jar;${lib.dir}/nekohtml-0.9.1.jar;${lib.dir}/clover-1.3.6.jar;${lib.dir}/jmock-1.0.1.jar;${lib.dir}/jmock-cglib-1.0.1.jar;${lib.dir}/asm-1.5.3.jar;${lib.dir}/asm-util-1.5.3.jar;${lib.dir}/org.mortbay.jetty-5.1.3.jar" />
 
     <property name="libs.radeox"
 	value="${lib.dir}/radeox.jar" />
@@ -114,7 +114,6 @@
 
     <property name="libs"
 	    value="${libs.servlet};${libs.hibernate};${libs.jakartacommons};${libs.jrcs};${libs.struts};${libs.velocity};${libs.ant};${libs.inlinejava};${libs.radeox};${libs.portlet};${libs.exo};${libs.api};${libs.groovy};${libs.fop};${libs.ldap};${libs.securityfilter};${libs.rome};${libs.tests}" />
-
 
     <property name="clover.initstring" location="${test.clover.dir}/clover"/>
     <available property="junit.available" classname="junit.framework.TestCase"/>
@@ -292,14 +291,23 @@
         </junit>
     </target>
 
-    <target name="test.server" depends="release, tests">
+    <target name="test.server.prepare" depends="release">
+      
+      <!-- Cactify the web-app archive -->
+      <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
+        <classes dir="${tests.build.dir}"/>
+      </cactifywar>
+    
+    </target>
+
+    <target name="test.server" depends="test.server.prepare, tests">
 
         <mkdir dir="${test.reports.dir}" />
-        <copy tofile="${cactus.warfile}" file="${release.warfile}" overwrite="true" />
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
             haltonfailure="no" fork="on" >
 
             <classpath>
+                <pathelement path="${tests.build.dir}" />
                 <pathelement path="${classes.dir}" />
                 <pathelement path="${libs}" />
             </classpath>
@@ -313,8 +321,10 @@
             </batchtest>
 
             <containerset>
-                <tomcat4x dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
-                    port="9080" todir="${test.reports.dir}"/>
+              <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
+                  port="9080" todir="${test.reports.dir}"/>                
+              <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${basedir}/test/server.xml"
+                  port="9080" todir="${test.reports.dir}"/>
             </containerset>
         </cactus> 
         <delete file="${cactus.warfile}" />
@@ -363,31 +373,31 @@
     <target name="doc" depends="javadoc, junit.report, clover.report" />
 
     <target name="release" depends="xwiki">
-        <mkdir dir="${release.dir}" />
-        <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
-            <exclude name="**/web*.xml" />
-            <exclude name="**/xwiki-*.cfg" />
-	    <lib dir="${basedir}/lib">
-        <exclude name="**/servlet-api*.jar" />
-        <exclude name="**/xpertnet*.jar" />
+      <mkdir dir="${release.dir}" />
+      <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
+        <exclude name="**/web*.xml" />
+        <exclude name="**/xwiki-*.cfg" />
+        <lib dir="${basedir}/lib">
+          <exclude name="**/servlet-api*.jar" />
+          <exclude name="**/xpertnet*.jar" />
         </lib>
-        </war>
-        <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
-        <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-        <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web-exo.xml" >
-            <exclude name="**/web*.xml" />
-            <exclude name="**/xwiki-*.cfg" />
-	    <lib dir="${basedir}/lib">
-        <exclude name="**/exo*.jar" />
-        <exclude name="**/picocontainer*.jar" />
-        <exclude name="**/nanocontainer*.jar" />
-        <exclude name="**/jcommon*.jar" />
-        <exclude name="**/jfreechart*.jar" />
-        <exclude name="**/servlet-api*.jar" />
-        <exclude name="**/xpertnet*.jar" />
-        </lib>
-        </war>
-        <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+      </war>
+      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
+      <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web-exo.xml" >
+        <exclude name="**/web*.xml" />
+        <exclude name="**/xwiki-*.cfg" />
+        <lib dir="${basedir}/lib">
+          <exclude name="**/exo*.jar" />
+          <exclude name="**/picocontainer*.jar" />
+          <exclude name="**/nanocontainer*.jar" />
+          <exclude name="**/jcommon*.jar" />
+          <exclude name="**/jfreechart*.jar" />
+          <exclude name="**/servlet-api*.jar" />
+          <exclude name="**/xpertnet*.jar" />
+          </lib>
+      </war>
+      <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
     </target>
 
     <target name="bin.dist" depends="release, test, javadoc">

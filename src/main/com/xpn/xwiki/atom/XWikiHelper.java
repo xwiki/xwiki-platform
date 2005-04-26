@@ -3,7 +3,9 @@
  */
 package com.xpn.xwiki.atom;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,6 +36,7 @@ import com.xpn.xwiki.web.XWikiServletResponse;
 public class XWikiHelper {
 
   private XWikiContext xwikiContext;
+  private static final int MAX_BLOGS = 10;
 
   /**
    * @return Returns the xwikiContext.
@@ -81,6 +84,25 @@ public class XWikiHelper {
     return passwd;
   }
 
+  public List listUserBlogs(String userName) throws XWikiException, MalformedURLException {
+    List userBlogs = new ArrayList();
+    XWiki xwiki = xwikiContext.getWiki();
+    XWikiRequest request = xwikiContext.getRequest();
+    List searchResults = xwiki.search("select doc from XWikiDocument as doc, BaseObject as obj where obj.className='XWiki.BlogPreferences' and obj.name <> 'XWiki.BlogPreferences' and obj.name = doc.fullName order by obj.name", MAX_BLOGS, 0, xwikiContext);
+    Iterator it = searchResults.iterator();
+    while (it.hasNext()) {
+      XWikiDocument doc = (XWikiDocument)it.next();
+      if (xwiki.getRightService().hasAccessLevel("edit", userName, doc.getFullName(), xwikiContext)) {
+        UserBlog userBlog = new UserBlog();
+        userBlog.setPostHref(doc.getExternalURL("lifeblog", "", xwikiContext));
+        userBlog.setFeedHref(doc.getExternalURL("view", "xpage=rdf", xwikiContext));
+        userBlog.setAlternateHref(doc.getExternalURL("view", "", xwikiContext));
+        userBlogs.add(userBlog);
+      }
+    }
+    return userBlogs;
+  }
+  
   /**
    * Initializes the XWiki context from a Struts action.
    * 
@@ -89,14 +111,14 @@ public class XWikiHelper {
    * @throws XWikiException 
    */
   public void initXWikiContext(
-      ActionMapping actionMapping, 
+      String action, 
       HttpServletRequest request, 
       HttpServletResponse response,
       ServletContext servletContext) throws XWikiException {
     XWikiRequest xwikiRequest = new XWikiServletRequest(request);
     XWikiResponse xwikiResponse = new XWikiServletResponse(response);
     XWikiContext xwikiContext = Utils.prepareContext(
-      actionMapping.getName(), 
+      action, 
       xwikiRequest, 
       xwikiResponse, 
       new XWikiServletContext(servletContext));
@@ -128,6 +150,16 @@ public class XWikiHelper {
 
   public HttpSession getSession() {
     return xwikiContext.getRequest().getSession();
+  }
+
+  public HttpServletRequest getRequest() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public HttpServletResponse getResponse() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

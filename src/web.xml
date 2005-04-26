@@ -83,19 +83,6 @@
         <load-on-startup>10</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>ServletRedirector</servlet-name>
-        <servlet-class>org.apache.cactus.server.ServletTestRedirector</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>ServletTestRunner</servlet-name>
-        <servlet-class>org.apache.cactus.server.runner.ServletTestRunner</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>JspRedirector</servlet-name>
-        <jsp-file>/jspRedirector.jsp</jsp-file>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>action</servlet-name>
         <url-pattern>/bin/*</url-pattern>
@@ -104,19 +91,6 @@
     <servlet-mapping>
         <servlet-name>action</servlet-name>
         <url-pattern>/testbin/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>ServletRedirector</servlet-name>
-        <url-pattern>/ServletRedirector</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>JspRedirector</servlet-name>
-        <url-pattern>/JspRedirector</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ServletTestRunner</servlet-name>
-        <url-pattern>/ServletTestRunner</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

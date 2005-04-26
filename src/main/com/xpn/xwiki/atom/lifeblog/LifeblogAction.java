@@ -52,15 +52,17 @@ public class LifeblogAction extends XWikiAction {
           throws Exception, ServletException {
     
     XWikiHelper xwikiHelper = new XWikiHelper();
-    xwikiHelper.initXWikiContext(mapping, request, response, servlet.getServletContext());
+    xwikiHelper.initXWikiContext(mapping.getName(), request, response, servlet.getServletContext());
     
-    LifeblogContext context = new LifeblogContext();
-    context.setXWikiHelper(xwikiHelper);
+    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
+    
+    LifeblogServices services = new LifeblogServices(lifeblogContext);
     
     // Check Authentication
-    if (!context.isAuthenticated(request.getHeader("X-WSSE"))) {
+    if (!services.isAuthenticated()) {
       respondNotAuthorized(response);      
     } else {
+      services.listUserBlogs();
     }
 
     return null;

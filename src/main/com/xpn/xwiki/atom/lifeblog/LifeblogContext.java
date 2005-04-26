@@ -3,13 +3,10 @@
  */
 package com.xpn.xwiki.atom.lifeblog;
 
-import java.text.ParseException;
-import java.util.Calendar;
-
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.atom.WSSEHttpHeader;
 import com.xpn.xwiki.atom.XWikiHelper;
 
 /**
@@ -22,13 +19,19 @@ public class LifeblogContext {
   
   private XWikiHelper xwikiHelper;
 
-  private static final long NONCE_TIMEOUT = 1200000L;
+  private HttpServletRequest request;
+
+  private HttpServletResponse response;
 
   /**
+   * @param response 
    * 
    */
-  public LifeblogContext() {
+  public LifeblogContext(XWikiHelper xwikiHelper) {
     super();
+    this.xwikiHelper = xwikiHelper;
+    this.request = xwikiHelper.getRequest();
+    this.response = xwikiHelper.getResponse();
   }
 
   public UserBlog getUserBlog(String web, String doc) throws XWikiException {
@@ -71,11 +74,6 @@ public class LifeblogContext {
     this.userName = userName;
   }
 
-  public void setXWikiHelper(XWikiHelper xwikiHelper) {
-    this.xwikiHelper = xwikiHelper;
-    
-  }
-
   public XWikiHelper getXWikiHelper() {
     return xwikiHelper;
   }
@@ -84,42 +82,9 @@ public class LifeblogContext {
     return xwikiHelper.getAtomAuthenticationToken(userName);
   }
 
-  public boolean isAuthenticated(String header) throws LifeblogServiceException, XWikiException, ParseException {
-    if (header != null) {
-      // Interpret WSSE Header and Authenticate User
-      WSSEHttpHeader wsseHeader = WSSEHttpHeader.parseHttpHeader(header);
-      
-      if (nonceIsNotTooOld(wsseHeader.parseCreated())
-          && !nonceAlreadyUsedByUser(wsseHeader.getNonce())) {
-        setUserName("XWiki." + wsseHeader.getUserName());
-        
-            String authenticationToken = getAtomAuthenticationToken();
-
-            if (authenticationToken !=null ) {
-              if (wsseHeader.isAuthenticated(authenticationToken)) {
-                return true;
-              }        
-            }        
-      }
-    }
-    return false;
+  public String getWSSEHeader() {
+    // TODO Auto-generated method stub
+    return request.getHeader("X-WSSE");
   }
 
-  private boolean nonceIsNotTooOld(Calendar createdDate) throws ParseException {
-    return Calendar.getInstance().getTimeInMillis() - createdDate.getTimeInMillis() <= NONCE_TIMEOUT;
-  }
-
-  private boolean nonceAlreadyUsedByUser(String nonce) {
-    boolean alreadyUsed = false;
-    HttpSession session = xwikiHelper.getSession();
-    String lastNonce = (String) session.getAttribute("lastNonce");
-    if (lastNonce != null) {
-      alreadyUsed = lastNonce.equals(nonce);
-    }
-    if (!alreadyUsed) {
-      session.setAttribute("lastNonce", nonce);
-    }
-    return alreadyUsed;
-  }
-  
 }

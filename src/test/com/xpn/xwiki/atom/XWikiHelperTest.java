@@ -27,14 +27,13 @@ public class XWikiHelperTest extends org.jmock.cglib.MockObjectTestCase {
     Mock mockServletContext = mock(ServletContext.class, "mockServletContext");
     
     // Set expectations
-    mockActionMapping.expects(once()).method("getName").will(returnValue("lifeblog"));
     mockServletRequest.expects(once()).method("getRequestURL").will(returnValue(new StringBuffer("http://localhost:8080/xwiki/bin/lifeblog")));
     mockServletRequest.expects(once()).method("getQueryString").will(returnValue(""));
     mockServletRequest.expects(once()).method("getServletPath").will(returnValue("/bin/lifeblog"));
     
     XWikiHelper xwikiHelper = new XWikiHelper();
     xwikiHelper.initXWikiContext(
-        (ActionMapping)mockActionMapping.proxy(),
+        "lifeblog",
         (HttpServletRequest)mockServletRequest.proxy(),
         (HttpServletResponse)mockServletResponse.proxy(),
         (ServletContext)mockServletContext.proxy());

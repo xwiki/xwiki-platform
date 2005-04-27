@@ -23,7 +23,11 @@ public class LifeblogActionIntegrationTest extends XWikiIntegrationTest {
     suite.addTestSuite(LifeblogActionIntegrationTest.class);
     //$JUnit-END$
     
-    return inContainer ? suite : new JettyTestSetup(suite);
+    if (inContainer) {
+      return suite;
+    } else {
+      return new JettyTestSetup(suite);
+    }
   }
   
   /*

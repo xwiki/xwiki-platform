@@ -233,7 +233,7 @@
             destdir="${classes.dir}"
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"
-            compiler="${compiler}" >
+            compiler="${compiler}" source="1.4">
           <include name="com/xpn/xwiki/**/*.java" />
           <include name="org/**/*.java" />
           <exclude name="**/test/*.class" />
@@ -243,7 +243,7 @@
     <target name="tests" depends="junit-check,prepare,xwiki">
         <javac destdir="${tests.build.dir}"
             classpath="${libs};${tests.build.dir};${classes.dir}"
-            debug="on" optimize="on" deprecation="on">
+            debug="on" optimize="on" deprecation="on" source="1.4">
         	<src path="${test.src.dir}" />
         	<src path="${test-cactus.src.dir}" />
         </javac>

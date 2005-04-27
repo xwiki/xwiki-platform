@@ -41,7 +41,11 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
     suite.addTestSuite(LifeblogServicesIntegrationTest.class);
     //$JUnit-END$
     
-    return inContainer ? suite : new JettyTestSetup(suite);
+    if (inContainer) {
+      return suite;
+    } else {
+      return new JettyTestSetup(suite);
+    }
   }
 
   public void testIsAuthenticatedNullHeader() throws LifeblogServiceException, XWikiException, ParseException {

@@ -30,8 +30,11 @@ public class XWikiHelperIntegrationTest extends XWikiIntegrationTest {
     //$JUnit-BEGIN$
     suite.addTestSuite(XWikiHelperIntegrationTest.class);
     //$JUnit-END$
-   
-    return inContainer ? suite : new JettyTestSetup(suite);
+    if (inContainer) {
+      return suite;
+    } else {
+      return new JettyTestSetup(suite);
+    }
   }
 
   public void testGetAtomAuthenticationTokenUnknownUser() throws XWikiException {

@@ -80,9 +80,21 @@ public class LifeblogServices {
     Iterator it = userBlogs.iterator();
     while (it.hasNext()) {
       UserBlog userBlog = (UserBlog)it.next();
-      writer.println(userBlog.getPostHref());
-      writer.println(userBlog.getFeedHref());
-      writer.println(userBlog.getAlternateHref());
+      writer.print("<link type=\"application/atom+xml\" rel=\"service.post\" href=\"");
+      writer.print(userBlog.getPostHref());
+      writer.print("\" title=\"");
+      writer.print(userBlog.getTitle());
+      writer.println("\"/>");
+      writer.print("<link type=\"application/atom+xml\" rel=\"service.feed\" href=\"");
+      writer.print(userBlog.getFeedHref());
+      writer.print("\" title=\"");
+      writer.print(userBlog.getTitle());
+      writer.println("\"/>");
+      writer.print("<link type=\"application/atom+xml\" rel=\"service.alternate\" href=\"");
+      writer.print(userBlog.getAlternateHref());
+      writer.print("\" title=\"");
+      writer.print(userBlog.getTitle());
+      writer.println("\"/>");
     }
     writer.print("</feed>");
     writer.flush();

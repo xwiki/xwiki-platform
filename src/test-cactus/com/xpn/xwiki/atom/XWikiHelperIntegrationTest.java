@@ -19,15 +19,19 @@ import com.xpn.xwiki.test.XWikiIntegrationTest;
 public class XWikiHelperIntegrationTest extends XWikiIntegrationTest {
 
   public static Test suite () {
-    
-    System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
-    
+    boolean inContainer = System.getProperty("cactus.contextURL") != null;
+
+    if (!inContainer) {
+      // Will use Jetty
+      System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    }
+      
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.XWikiHelperIntegrationTest");
     //$JUnit-BEGIN$
     suite.addTestSuite(XWikiHelperIntegrationTest.class);
     //$JUnit-END$
-    
-    return new JettyTestSetup(suite);
+   
+    return inContainer ? suite : new JettyTestSetup(suite);
   }
 
   public void testGetAtomAuthenticationTokenUnknownUser() throws XWikiException {

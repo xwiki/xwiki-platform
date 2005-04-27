@@ -3,6 +3,9 @@
  */
 package com.xpn.xwiki.atom.lifeblog;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * @author Luis
  * 
@@ -71,14 +74,6 @@ public class UserBlog {
    */
   public String getTitle() {
     return title;
-  }
-
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    sb.append("<link type=\"application/atom+xml\" rel=\"service.post\" href=\"");
-    sb.append(getPostHref());
-    sb.append("\"/>\n");
-    return sb.toString();
   }
 
   /**

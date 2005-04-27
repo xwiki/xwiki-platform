@@ -34,7 +34,7 @@ public abstract class XWikiIntegrationTest extends ServletTestCase {
   public void setUp() throws Exception {
       context = new XWikiContext();
       context.setDatabase("xwikitest");
-      xwiki = new XWiki("test/xwiki-integration.cfg", context);
+      xwiki = new XWiki("./test/xwiki-integration.cfg", context);
       xwiki.setDatabase("xwikitest");
       
       context.setWiki(xwiki);

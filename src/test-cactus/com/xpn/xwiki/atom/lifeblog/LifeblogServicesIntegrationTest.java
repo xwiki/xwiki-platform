@@ -1,5 +1,8 @@
 package com.xpn.xwiki.atom.lifeblog;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -16,17 +19,29 @@ import com.xpn.xwiki.atom.XWikiHelper;
 import com.xpn.xwiki.test.XWikiIntegrationTest;
 
 public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
+
+  private static final String TEST_ATOM_USER_BLOG_LIST = 
+    "<?xml version=\"1.0\"?>\r\n"
+    + "<feed xmlns=\"http://purl.org/atom/ns#\">\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.post\" href=\"http://localhost:8080/xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.feed\" href=\"http://localhost:8080/xwiki/bin/view/Blog/WebHome?xpage=rdf\" title=\"Blog.WebHome\"/>\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.alternate\" href=\"http://localhost:8080/xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
+    + "</feed>";
   
   public static Test suite () {
-    
-    System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    boolean inContainer = System.getProperty("cactus.contextURL") != null;
+
+    if (!inContainer) {
+      // Will use Jetty
+      System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    }
     
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogServicesIntegrationTest");
     //$JUnit-BEGIN$
     suite.addTestSuite(LifeblogServicesIntegrationTest.class);
     //$JUnit-END$
     
-    return new JettyTestSetup(suite);
+    return inContainer ? suite : new JettyTestSetup(suite);
   }
 
   public void testIsAuthenticatedNullHeader() throws LifeblogServiceException, XWikiException, ParseException {
@@ -80,15 +95,5 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
     
     authenticated = lifeblogServices.isAuthenticated(header);   
     assertFalse("Same Nonce twice", authenticated);
-  }
-  
-  public void testListUserBlogs() {
-    XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
-    
-    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
-    lifeblogContext.setUserName("UnknownUser");
-    
-    
   }
 }

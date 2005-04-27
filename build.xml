@@ -295,11 +295,17 @@
       <!-- Cactify the web-app archive -->
       <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
         <classes dir="${tests.build.dir}"/>
+        <zipfileset dir="test" prefix="WEB-INF/classes/test">
+          <include name="hibernate-integration.cfg.xml"/>
+        </zipfileset>
+        <zipfileset dir="test" prefix="WEB-INF/test">
+          <include name="xwiki-integration.cfg"/>
+        </zipfileset>
       </cactifywar>
     
     </target>
 
-    <target name="test.server" depends="test.server.prepare, tests">
+    <target name="test.server" depends="tests, test.server.prepare">
 
         <mkdir dir="${test.reports.dir}" />
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
@@ -317,6 +323,7 @@
                     <exclude name="**/AllTests.java"/>
                     <exclude name="**/AllServletTests.java"/>
                     <exclude name="**/ServletTest.java"/>
+                    <exclude name="**/XWikiIntegrationTest.java"/>
                 </fileset>
             </batchtest>
 

@@ -61,7 +61,7 @@ public class LifeblogAction extends XWikiAction {
     // Check Authentication
     if (!services.isAuthenticated()) {
       respondNotAuthorized(response);      
-    } else {
+    } else if (request.getPathInfo().equals("/lifeblog")) {
       services.listUserBlogs();
     }
 

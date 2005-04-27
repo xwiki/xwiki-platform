@@ -11,15 +11,19 @@ import com.xpn.xwiki.test.XWikiIntegrationTest;
 public class LifeblogActionIntegrationTest extends XWikiIntegrationTest {
 
   public static Test suite () {
-    
-    System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
-    
+    boolean inContainer = System.getProperty("cactus.contextURL") != null;
+
+    if (!inContainer) {
+      // Will use Jetty
+      System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    }
+     
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogActionIntegrationTest");
     //$JUnit-BEGIN$
     suite.addTestSuite(LifeblogActionIntegrationTest.class);
     //$JUnit-END$
     
-    return new JettyTestSetup(suite);
+    return inContainer ? suite : new JettyTestSetup(suite);
   }
   
   /*

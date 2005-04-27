@@ -154,12 +154,12 @@ public class XWikiHelper {
 
   public HttpServletRequest getRequest() {
     // TODO Auto-generated method stub
-    return null;
+    return xwikiContext.getRequest();
   }
 
   public HttpServletResponse getResponse() {
     // TODO Auto-generated method stub
-    return null;
+    return xwikiContext.getResponse();
   }
 
 }

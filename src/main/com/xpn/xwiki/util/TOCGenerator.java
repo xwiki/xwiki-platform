@@ -17,7 +17,6 @@ public class TOCGenerator {
   
   
   public static Map generateTOC(String content, int init, int max, boolean numbered) {
-    int last = 3; 
     OrderedMap tocData = ListOrderedMap.decorate(new HashMap());
     List processedHeadings = new ArrayList();
     int previousNumbers[] = { 0, 0, 0, 0, 0, 0 };

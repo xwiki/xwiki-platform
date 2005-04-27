@@ -15,56 +15,6 @@ public class TOCGenerator {
   public static final String TOC_DATA_LEVEL = "level";
   public static final String TOC_DATA_TEXT = "text";
   
-  public static void main(String args[]) {
-    TOCGenerator.testLevel1();
-    TOCGenerator.testLevel2();
-    TOCGenerator.testLevel3();
-  }
-  
-  private static void testLevel1() {
-    String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i";
-    Map result = TOCGenerator.generateTOC(content, 1, 6, true);
-    System.out.println(result);
-    assert (((Map) result.get("a")).get(TOC_DATA_NUMBERING)).equals("1.1");
-    assert ((Map) result.get("b")).get(TOC_DATA_NUMBERING).equals("1.2");
-    assert ((Map) result.get("c")).get(TOC_DATA_NUMBERING).equals("1.2.1");
-    assert ((Map) result.get("d")).get(TOC_DATA_NUMBERING).equals("1.3");
-    assert ((Map) result.get("a-1")).get(TOC_DATA_NUMBERING).equals("2");
-    assert ((Map) result.get("f")).get(TOC_DATA_NUMBERING).equals("2.1.1.1");
-    assert ((Map) result.get("g")).get(TOC_DATA_NUMBERING).equals("2.1.1.2");
-    assert ((Map) result.get("h")).get(TOC_DATA_NUMBERING).equals("2.2");
-    assert (((Map) result.get("i")).get(TOC_DATA_NUMBERING)).equals("2.3");
-  }
-  
-  private static void testLevel2() {
-    String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 e\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i";
-    Map result = TOCGenerator.generateTOC(content, 2, 6, true);
-    System.out.println(result);
-    assert (((Map) result.get("a")).get(TOC_DATA_NUMBERING)).equals("1");
-    assert ((Map) result.get("b")).get(TOC_DATA_NUMBERING).equals("2");
-    assert ((Map) result.get("c")).get(TOC_DATA_NUMBERING).equals("2.1");
-    assert ((Map) result.get("d")).get(TOC_DATA_NUMBERING).equals("3");
-    assert result.get("a-1") == null; 
-    assert ((Map) result.get("f")).get(TOC_DATA_NUMBERING).equals("3.1.1");
-    assert ((Map) result.get("g")).get(TOC_DATA_NUMBERING).equals("3.1.2");
-    assert ((Map) result.get("h")).get(TOC_DATA_NUMBERING).equals("4");
-    assert (((Map) result.get("i")).get(TOC_DATA_NUMBERING)).equals("5");
-  }
-  
-  private static void testLevel3() {
-    String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i";
-    Map result = TOCGenerator.generateTOC(content, 1, 3, true);
-    System.out.println(result);
-    assert (((Map) result.get("a")).get(TOC_DATA_NUMBERING)).equals("1.1");
-    assert ((Map) result.get("b")).get(TOC_DATA_NUMBERING).equals("1.2");
-    assert ((Map) result.get("c")).get(TOC_DATA_NUMBERING).equals("1.2.1");
-    assert ((Map) result.get("d")).get(TOC_DATA_NUMBERING).equals("1.3");
-    assert ((Map) result.get("a-1")).get(TOC_DATA_NUMBERING).equals("2");
-    assert result.get("f") == null;
-    assert result.get("g") == null;
-    assert ((Map) result.get("h")).get(TOC_DATA_NUMBERING).equals("2.1");
-    assert (((Map) result.get("i")).get(TOC_DATA_NUMBERING)).equals("2.2");
-  }
   
   public static Map generateTOC(String content, int init, int max, boolean numbered) {
     int last = 3; 

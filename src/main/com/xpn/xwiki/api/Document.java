@@ -24,6 +24,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.stats.api.DocStats;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -626,7 +627,17 @@ public class Document extends Api {
     public String getTextArea() {
         return com.xpn.xwiki.XWiki.getTextArea(doc.getContent(), context);
     }
+    
 
-
-
+    /**
+     * Returns data needed for a generation of Table of Content for this document.
+     * @param init an intial level where the TOC generation should start at
+     * @param max maximum level TOC is generated for
+     * @param numbered if should generate numbering for headings
+     * @return a map where an heading (title) ID is the key and 
+     *          value is another map with two keys: text, level and numbering 
+     */
+    public Map getTOC(int init, int max, boolean numbered) {
+        return TOCGenerator.generateTOC(getContent(), init, max, numbered);
+    }
 }

@@ -1,7 +1,7 @@
 org.radeox.filter.ParamFilter
 com.xpn.xwiki.render.filter.MacroFilter
 com.xpn.xwiki.render.filter.MacroFilter
-org.radeox.filter.HeadingFilter
+com.xpn.xwiki.render.filter.XWikiHeadingFilter
 org.radeox.filter.LineFilter
 org.radeox.filter.ListFilter
 org.radeox.filter.StrikeThroughFilter

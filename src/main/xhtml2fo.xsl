@@ -248,13 +248,13 @@
         <xsl:attribute name="font">1em serif</xsl:attribute>
     </xsl:attribute-set>
 
-    <xsl:param name="ul-label-2">o</xsl:param>
+    <xsl:param name="ul-label-2">&#xB0;</xsl:param>
     <xsl:attribute-set name="ul-label-2">
         <xsl:attribute name="font">0.67em monospace</xsl:attribute>
         <xsl:attribute name="baseline-shift">0.25em</xsl:attribute>
     </xsl:attribute-set>
 
-    <xsl:param name="ul-label-3">-</xsl:param>
+    <xsl:param name="ul-label-3">&#xB7;</xsl:param>
     <xsl:attribute-set name="ul-label-3">
         <xsl:attribute name="font">bold 0.9em sans-serif</xsl:attribute>
         <xsl:attribute name="baseline-shift">0.05em</xsl:attribute>

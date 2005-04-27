@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -41,6 +42,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 
 public class UtilTest extends TestCase {
@@ -163,5 +165,44 @@ public class UtilTest extends TestCase {
                      factory.createURL("XWiki", "Toto", "edit", "raw=1", null, context));
     }
 
+    
+    public static void testTOCGeneration() {
+      String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i";
 
+      // test init level 1
+      Map result = TOCGenerator.generateTOC(content, 1, 6, true);
+      assertEquals (((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.1");
+      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
+      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
+      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
+      assertEquals (((Map) result.get("a-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertEquals (((Map) result.get("f")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.1");
+      assertEquals (((Map) result.get("g")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.2");
+      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.2");
+      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3");
+      
+      // test init level 2
+      result = TOCGenerator.generateTOC(content, 2, 6, true);
+      assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1");
+      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
+      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "3");
+      assertNull(result.get("a-1")); 
+      assertEquals (((Map) result.get("f")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.1");
+      assertEquals (((Map) result.get("g")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.2");
+      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "4");
+      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5");
+      
+      // test max level 3
+      result = TOCGenerator.generateTOC(content, 1, 3, true);
+      assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1.1");
+      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
+      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
+      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
+      assertEquals (((Map) result.get("a-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertNull(result.get("f"));
+      assertNull(result.get("g"));
+      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
+      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.2");
+    }
 }

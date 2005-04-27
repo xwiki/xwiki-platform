@@ -139,3 +139,53 @@ $xwiki.includeForm("XWiki.${pagename}",false)
 #macro(map $address $cp $linktext)
 <a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&strLocation=&strCP=${cp}&strCountry=1424&x=30&y=9">${linktext}</a>
 #end
+
+#macro (toc $init $max $numbered)
+ #set ($int = 0)
+ #set ($boolean = false)
+ #if ($init == "")
+  #set ($init = 2)
+ #else
+  #set ($init = $int.valueOf($init))
+ #end
+ #if ($max == "")
+  #set ($max = 6)
+ #else
+  #set ($max = $int.valueOf($max))
+ #end
+ #if ($numbered == "")
+  #set ($numbered = false) 
+ #else
+  #set ($numbered = $boolean.valueOf($numbered))
+  #set ($context.context.tocNumbered = $numbered)
+ #end
+ #set ($tocData = ${doc.getTOC($init, $max, $numbered)})
+ #set ($context.context.tocData = $tocData)
+ #set ($lastLevel = $init - 1)
+ #set ($depth = 0)
+ #foreach ($tocEntry in $tocData.entrySet())
+  #set ($level = $tocEntry.value.level)
+  #if ($level > $lastLevel)
+   #set ($to = $lastLevel + 1)
+   #set ($iter = [$level .. $to])
+   #foreach ($n in $iter)
+<ul>
+    #set ($depth = $depth + 1)
+   #end
+  #elseif ($level < $lastLevel)
+   #set ($to = $level + 1)
+   #set ($iter = [$lastLevel .. $to])
+   #foreach ($n in $iter)
+</ul>
+    #set ($depth = $depth - 1)
+   #end
+  #end
+ <li><a href="#$tocEntry.key">$!tocEntry.value.numbering $tocEntry.value.text</a> 
+  #set ($lastLevel = $level)
+ #end
+ #if ($depth > 0)
+  #set ($levels = [1 .. $depth])
+  #foreach($level in $levels)
+</ul>#end
+ #end
+#end

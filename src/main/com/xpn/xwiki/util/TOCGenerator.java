@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.OrderedMap;
 import org.apache.commons.collections.map.ListOrderedMap;
 
+import com.xpn.xwiki.XWiki;
+
 
 public class TOCGenerator {
   public static final String TOC_DATA_NUMBERING = "numbering";
@@ -86,6 +88,9 @@ public class TOCGenerator {
   }
 
   public static String makeHeadingID (String text, int occurence) {
+    // Encode to convert unsafe chars
+    text = XWiki.getURLEncoded(text);
+    
     if (occurence > 0) {
       return text + "-" + occurence;
     } else {

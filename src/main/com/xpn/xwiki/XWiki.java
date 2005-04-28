@@ -1703,8 +1703,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights, XWikiContext context) throws XWikiException {
         BaseClass baseclass = getUserClass(context);
-        BaseClass rclass = getRightsClass(context);
-        BaseClass gclass = getGroupClass(context);
 
         try {
             String fullwikiname =  "XWiki." + xwikiname;
@@ -1722,22 +1720,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc.setParent(parent);
             doc.setContent(content);
 
-            // Add protection to the page
-            BaseObject newrightsobject = (BaseObject) rclass.newObject();
-            newrightsobject.setClassName(rclass.getName());
-            newrightsobject.setName(fullwikiname);
-            newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
-            newrightsobject.setStringValue("levelsye", userRights);
-            newrightsobject.setIntValue("allow", 1);
-            doc.addObject(rclass.getName(), newrightsobject);
-
-            BaseObject newuserrightsobject = (BaseObject) rclass.newObject();
-            newuserrightsobject.setClassName(rclass.getName());
-            newuserrightsobject.setName(fullwikiname);
-            newuserrightsobject.setStringValue("users", fullwikiname);
-            newuserrightsobject.setStringValue("levels", userRights);
-            newuserrightsobject.setIntValue("allow", 1);
-            doc.addObject(rclass.getName(), newuserrightsobject);
+            ProtectUserPage(context, fullwikiname, userRights, doc);
 
             saveDocument(doc, null, context);
 
@@ -1745,27 +1728,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 log.warn("createUser: before get All Group");
 
             // Now let's add the user to XWiki.XWikiAllGroup
-            XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
+            SetUserDefaultGroup(context, fullwikiname);
 
 
-            BaseObject memberobj = (BaseObject) gclass.newObject();
-            memberobj.setClassName(gclass.getName());
-            memberobj.setName(allgroupdoc.getFullName());
-            memberobj.setStringValue("member", fullwikiname);
-            allgroupdoc.addObject(gclass.getName(), memberobj);
-            if (allgroupdoc.isNew()) {
-                saveDocument(allgroupdoc, null, context);
-            }
-            else {
-                getHibernateStore().saveXWikiObject(memberobj, context, true);
-            }
-
-            try {
-            XWikiGroupService gservice = (XWikiGroupService) getGroupService();
-            gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             return 1;
         }
         catch (Exception e) {
@@ -1774,6 +1739,51 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     XWikiException.ERROR_XWIKI_USER_CREATE,
                     "Cannot create user {0}", e, args);
         }
+    }
+
+    public void SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException {
+        BaseClass gclass = getGroupClass(context);
+
+        XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
+
+        BaseObject memberobj = (BaseObject) gclass.newObject();
+        memberobj.setClassName(gclass.getName());
+        memberobj.setName(allgroupdoc.getFullName());
+        memberobj.setStringValue("member", fullwikiname);
+        allgroupdoc.addObject(gclass.getName(), memberobj);
+        if (allgroupdoc.isNew()) {
+            saveDocument(allgroupdoc, null, context);
+        }
+        else {
+            getHibernateStore().saveXWikiObject(memberobj, context, true);
+        }
+
+        try {
+        XWikiGroupService gservice = (XWikiGroupService) getGroupService();
+        gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc) throws XWikiException {
+        BaseClass rclass = getRightsClass(context);
+        // Add protection to the page
+        BaseObject newrightsobject = (BaseObject) rclass.newObject();
+        newrightsobject.setClassName(rclass.getName());
+        newrightsobject.setName(fullwikiname);
+        newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
+        newrightsobject.setStringValue("levelsye", userRights);
+        newrightsobject.setIntValue("allow", 1);
+        doc.addObject(rclass.getName(), newrightsobject);
+
+        BaseObject newuserrightsobject = (BaseObject) rclass.newObject();
+        newuserrightsobject.setClassName(rclass.getName());
+        newuserrightsobject.setName(fullwikiname);
+        newuserrightsobject.setStringValue("users", fullwikiname);
+        newuserrightsobject.setStringValue("levels", userRights);
+        newuserrightsobject.setIntValue("allow", 1);
+        doc.addObject(rclass.getName(), newuserrightsobject);
     }
 
     public User getUser(XWikiContext context) {

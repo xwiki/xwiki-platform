@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -16,6 +17,8 @@ import com.novell.ldap.*;
 import java.security.Principal;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.hibernate.HibernateException;
 
@@ -150,6 +153,8 @@ public class LDAPTest  extends TestCase {
                 attributeSet.add( new LDAPAttribute(
                                      "sn", new String("KARTMANN")));
                 attributeSet.add( new LDAPAttribute(
+                                     "givenName", new String("Alexis")));
+                attributeSet.add( new LDAPAttribute(
                                      "displayName", new String("Alexis KARTMANN")));
                 attributeSet.add( new LDAPAttribute(
                                      "mail", new String("alexis@xwiki.com")));
@@ -175,6 +180,12 @@ public class LDAPTest  extends TestCase {
 
     public void prepareData(boolean withLDAPDN, boolean withpassword) throws XWikiException {
         XWikiDocument doc = new XWikiDocument("XWiki","akartmann");
+        try {
+            xwiki.getDocument(doc, null, context);
+            xwiki.deleteDocument(doc, context);
+        } catch (XWikiException e) {
+        }
+
         BaseClass bclass = xwiki.getUserClass(context);
         BaseObject bobj = new BaseObject();
         bobj.setName("XWiki.akartmann");
@@ -204,7 +215,7 @@ public class LDAPTest  extends TestCase {
         xwiki.saveDocument(doc, context);
 
     }
-    public void setUp() throws HibernateException, XWikiException {
+    public void setUp() throws HibernateException, XWikiException, MalformedURLException {
         context = new XWikiContext();
         context.setDatabase("xwikitest");
         xwiki = new XWiki("./xwiki.cfg", context);
@@ -212,6 +223,7 @@ public class LDAPTest  extends TestCase {
         context.setWiki(xwiki);
         StoreHibernateTest.cleanUp(getHibStore(), context);
         xwiki.flushCache();
+        context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
 
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_server", "localhost", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_port", "389", context);
@@ -298,5 +310,42 @@ public class LDAPTest  extends TestCase {
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
         Principal principal = service.authenticate("akartmann", "toto", context);
         assertNull("Authenticate failed", principal);
+    }
+
+    public void testTransfertUserFromLDAP() throws ClassNotFoundException, XWikiException, IllegalAccessException, InstantiationException {
+        XWikiDocument doc = new XWikiDocument("XWiki","akartmann");
+        try {
+            xwiki.getDocument(doc, null, context);
+            xwiki.deleteDocument(doc, context);
+        } catch (XWikiException e) {
+        }
+        prepareLDAP(true);
+        assertEquals("getUserName failed", "akartmann", xwiki.getUserName("XWiki.akartmann", context));
+        assertEquals("getUserName failed", "akartmann", xwiki.getLocalUserName("XWiki.akartmann", context));
+        assertEquals("getUserName failed", "akartmann", xwiki.getLocalUserName("xwiki:XWiki.akartmann", context));
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_fields_mapping",
+                "name=cn,last_name=sn,first_name=givenName,fullname=displayName,mail=mail,ldap_dn=dn", context);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "alexis", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+        String result = xwiki.getUserName("XWiki.akartmann", context);
+        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result );
+        result = xwiki.getUserName("xwikitest:XWiki.akartmann", context);
+        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
+        result = xwiki.getLocalUserName("XWiki.akartmann", context);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
+        result = xwiki.getLocalUserName("xwikitest:XWiki.akartmann", context);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
+        result = xwiki.getLocalUserName("XWiki.akartmann", "$last_name", context);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">KARTMANN</a></span>", result);
+        result = xwiki.getLocalUserName("XWiki.akartmann", "$last_name", false, context);
+        assertEquals("getLocalUserName failed", "KARTMANN", result);
+        result = xwiki.getLocalUserName("XWiki.akartmann", "$first_name", context);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis</a></span>", result);
+        result = xwiki.getLocalUserName("XWiki.akartmann", "$first_name", false, context);
+        assertEquals("getLocalUserName failed", "Alexis", result);
     }
 }

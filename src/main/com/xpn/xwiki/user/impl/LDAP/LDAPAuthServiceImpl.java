@@ -6,11 +6,15 @@ import com.xpn.xwiki.user.impl.xwiki.*;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.novell.ldap.*;
+import com.novell.ldap.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.fieldset;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
@@ -21,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -70,13 +74,69 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
            }
            else
             {
-               if (checkUserPassword(susername, password, context))
+               HashMap attributes = new HashMap();
+               if (checkUserPassword(susername, password, attributes, context))
                {
                    principal = GetUserPrincipal(susername, context);
+                   if (principal == null && attributes.size() > 0)
+                   {
+                       CreateUserFromLDAP(susername, attributes, context);
+                       principal = GetUserPrincipal(susername, context);
+                   }
                }
             }
         }
         return principal;
+    }
+
+    private void CreateUserFromLDAP(String susername, HashMap attributes, XWikiContext context) throws XWikiException {
+        String ldapFieldMapping = context.getWiki().getXWikiPreference("ldap_fields_mapping",context);
+        if (ldapFieldMapping != null && ldapFieldMapping.length() > 0)
+        {
+            String[] fields = ldapFieldMapping.split(",");
+            BaseClass bclass = context.getWiki().getUserClass(context);
+            BaseObject bobj = new BaseObject();
+            bobj.setClassName(bclass.getName());
+            String name = null;
+            String fullwikiname = null;
+            for(int i = 0; i < fields.length; i++ )
+            {
+                String[] field = fields[i].split("=");
+                if (2 == field.length)
+                {
+                   String fieldName = field[0];
+                   if (attributes.containsKey(field[1]))
+                   {
+                       String fieldValue;
+                       fieldValue = (String)attributes.get(field[1]);
+                       if (fieldName.equals("name"))
+                       {
+                           name = fieldValue;
+                           fullwikiname = "XWiki." + name;
+                           bobj.setName(fullwikiname);
+                       }
+                       else
+                       {
+                           bobj.setStringValue(fieldName, fieldValue);
+                       }
+                   }
+                }
+            }
+
+            if (name != null && name.length() > 0)
+            {
+                XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
+                doc.setParent("");
+                doc.addObject(bclass.getName(), bobj);
+                doc.setContent("#includeForm(\"XWiki.XWikiUserTemplate\")");
+
+                context.getWiki().ProtectUserPage(context, fullwikiname, "edit", doc);
+
+                context.getWiki().saveDocument(doc, null, context);
+
+                context.getWiki().SetUserDefaultGroup(context, fullwikiname);
+            }
+        }
     }
 
     protected Principal GetUserPrincipal(String susername, XWikiContext context) {
@@ -154,10 +214,11 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         return DN;
     }
 
-    protected boolean checkUserPassword(String username, String password, XWikiContext context) throws XWikiException {
+    protected boolean checkUserPassword(String username, String password, HashMap attributes, XWikiContext context) throws XWikiException {
         LDAPConnection lc = new LDAPConnection();
         boolean result = false;
         boolean notinLDAP = false;
+        String foundDN = null;
 
         try {
 
@@ -185,11 +246,32 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             {
                 LDAPEntry nextEntry = searchResults.next();
 
-                String objectDN = nextEntry.getDN();
+                foundDN = nextEntry.getDN();
 
                 LDAPAttribute attr = new LDAPAttribute(
                                                 "userPassword", password );
-                result = lc.compare( objectDN, attr );
+                result = lc.compare( foundDN, attr );
+                if (result)
+                {
+                    LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
+                    Iterator allAttributes = attributeSet.iterator();
+
+                    while(allAttributes.hasNext()) {
+                        LDAPAttribute attribute =
+                                    (LDAPAttribute)allAttributes.next();
+                        String attributeName = attribute.getName();
+
+                        Enumeration allValues = attribute.getStringValues();
+
+                        if( allValues != null) {
+                            while(allValues.hasMoreElements()) {
+                                String Value = (String) allValues.nextElement();
+                                attributes.put(attributeName, Value);
+                            }
+                        }
+                    }
+                    attributes.put("dn", foundDN);
+                }
             }
             else
                 notinLDAP = true;
@@ -224,6 +306,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         {
             // Use XWiki password if user not in LDAP
             result = checkPassword(username, password, context);
+            foundDN = null;
         }
 
         return result;

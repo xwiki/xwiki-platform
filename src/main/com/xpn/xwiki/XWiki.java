@@ -2322,6 +2322,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "1".equals(Param("xwiki.exo"));
     }
 
+    public boolean isLDAP() {
+        return "1".equals(Param("xwiki.authentication.ldap"));
+    }
+
     public int checkActive(XWikiContext context) throws XWikiException {
         int active = 1;
         String checkactivefield = getXWikiPreference("auth_active_check", context);
@@ -2430,6 +2434,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             String authClass;
             if (isExo())
                 authClass = Param("xwiki.authentication.authclass","com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl");
+            else if (isLDAP())
+                authClass = Param("xwiki.authentication.authclass","com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl");
             else
                 authClass = Param("xwiki.authentication.authclass","com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl");
 

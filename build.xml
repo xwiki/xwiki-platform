@@ -285,6 +285,8 @@
                     <exclude name="**/StoreObjectTest.java"/>
                     <exclude name="**/StoreTest.java"/>
                     <exclude name="**/Utils.java"/>
+                    <exclude name="**/PerlTest.java"/>
+                    <exclude name="**/StoreRCSFileTest.java"/>
                 </fileset>
             </batchtest>
         </junit>

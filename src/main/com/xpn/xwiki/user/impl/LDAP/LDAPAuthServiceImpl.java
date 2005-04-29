@@ -90,7 +90,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
     }
 
     private void CreateUserFromLDAP(String susername, HashMap attributes, XWikiContext context) throws XWikiException {
-        String ldapFieldMapping = context.getWiki().getXWikiPreference("ldap_fields_mapping",context);
+        String ldapFieldMapping = getParam("ldap_fields_mapping",context);
         if (ldapFieldMapping != null && ldapFieldMapping.length() > 0)
         {
             String[] fields = ldapFieldMapping.split(",");
@@ -222,12 +222,13 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
         try {
 
-            int ldapPort = context.getWiki().getXWikiPreferenceAsInt("ldap_port", LDAPConnection.DEFAULT_PORT, context);
+            int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
-            String ldapHost = context.getWiki().getXWikiPreference("ldap_server",context);
-            String bindDN = context.getWiki().getXWikiPreference("ldap_bind_DN",context);
-            String bindPassword = context.getWiki().getXWikiPreference("ldap_bind_pass",context);
-            String baseDN = context.getWiki().getXWikiPreference("ldap_base_DN",context);
+            String ldapHost = getParam("ldap_server", context);
+            String bindDN = getParam("ldap_bind_DN",context);
+            String bindPassword = getParam("ldap_bind_pass",context);
+            String baseDN = getParam("ldap_base_DN",context);
+
 
             lc.connect( ldapHost, ldapPort );
 
@@ -237,7 +238,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             LDAPSearchResults searchResults =
                 lc.search(  baseDN,
                             LDAPConnection.SCOPE_SUB ,
-                            "("+ context.getWiki().getXWikiPreference("ldap_UID_attr",context) +
+                            "("+ getParam("ldap_UID_attr",context) +
                                "=" + username + ")",
                             null,          // return all attributes
                             false);        // return attrs and values
@@ -312,18 +313,36 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         return result;
     }
 
+    private String getParam(String name, XWikiContext context) {
+        String param = "";
+        try {
+         param = context.getWiki().getXWikiPreference(name,context);
+        } catch (Exception e) {}
+        if ("".equals(param))
+         param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "ldap_","ldap."));
+        return param;
+    }
+
+    private int getLDAPPort(XWikiContext context) {
+        try {
+         return context.getWiki().getXWikiPreferenceAsInt("ldap_port", context);
+        } catch (Exception e) {
+         return (int)context.getWiki().ParamAsLong("xwiki.authentication.ldap.port", LDAPConnection.DEFAULT_PORT);
+        }
+    }
+
     protected boolean checkDNPassword(String DN, String username, String password, XWikiContext context) throws XWikiException {
         LDAPConnection lc = new LDAPConnection();
         boolean result = false;
         boolean notinLDAP = false;
         try {
 
-            int ldapPort = context.getWiki().getXWikiPreferenceAsInt("ldap_port", LDAPConnection.DEFAULT_PORT, context);
+            int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
-            String ldapHost = context.getWiki().getXWikiPreference("ldap_server",context);
-            String bindDN = context.getWiki().getXWikiPreference("ldap_bind_DN",context);
-            String bindPassword = context.getWiki().getXWikiPreference("ldap_bind_pass",context);
-            String baseDN = context.getWiki().getXWikiPreference("ldap_base_DN",context);
+            String ldapHost = getParam("ldap_server", context);
+            String bindDN = getParam("ldap_bind_DN",context);
+            String bindPassword = getParam("ldap_bind_pass",context);
+            String baseDN = getParam("ldap_base_DN",context);
 
             lc.connect( ldapHost, ldapPort );
 
@@ -367,6 +386,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         }
         return result;
     }
+
 
     private boolean Bind(String bindDN, String bindPassword, String userDN, String userPassword, LDAPConnection lc, int ldapVersion) throws UnsupportedEncodingException {
         boolean bound = false;

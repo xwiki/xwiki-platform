@@ -266,6 +266,20 @@ public class LDAPTest  extends TestCase {
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
 
+    public void testCheckLogonWithUserBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
+
+        prepareLDAP(true);
+        prepareData(false, false);
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn={0},cn=Manager,dc=xwiki,dc=com", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "{1}", context);
+
+        XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
+        Principal principal = service.authenticate("akartmann", "alexis", context);
+        assertNotNull("Authenticate failed", principal);
+        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+    }
+
     public void testCheckLogonWithBadBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
 
         prepareLDAP(true);
@@ -298,8 +312,7 @@ public class LDAPTest  extends TestCase {
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
         Principal principal = service.authenticate("akartmann", "toto", context);
-        assertNotNull("Authenticate failed", principal);
-        assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
+        assertNull("Authenticate failed", principal);
     }
 
     public void testCheckLogonKOFromWikiPassword() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {

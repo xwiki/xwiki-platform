@@ -26,6 +26,8 @@ import java.security.Principal;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.text.Format;
+import java.text.MessageFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -225,15 +227,23 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
             String ldapHost = getParam("ldap_server", context);
-            String bindDN = getParam("ldap_bind_DN",context);
-            String bindPassword = getParam("ldap_bind_pass",context);
+            String bindDNFormat = getParam("ldap_bind_DN",context);
+            String bindPasswordFormat = getParam("ldap_bind_pass",context);
+
+            Object[] arguments = {
+                username,
+                password
+             };
+            String bindDN = MessageFormat.format(bindDNFormat, arguments);
+            String bindPassword =  MessageFormat.format(bindPasswordFormat, arguments);
+
             String baseDN = getParam("ldap_base_DN",context);
 
 
             lc.connect( ldapHost, ldapPort );
 
             // authenticate to the server
-            Bind(bindDN, bindPassword, "", "", lc, ldapVersion);
+            Bind(bindDN, bindPassword, lc, ldapVersion);
 
             LDAPSearchResults searchResults =
                 lc.search(  baseDN,
@@ -347,11 +357,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             lc.connect( ldapHost, ldapPort );
 
             // authenticate to the server
-            Bind(bindDN, bindPassword, DN, password, lc, ldapVersion);
-
-            LDAPAttribute attr = new LDAPAttribute(
-                                                "userPassword", password );
-            result = lc.compare( DN, attr );
+            result = Bind(DN, password, lc, ldapVersion);
 
             if (log.isDebugEnabled()) {
                 if (result)
@@ -388,24 +394,13 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
     }
 
 
-    private boolean Bind(String bindDN, String bindPassword, String userDN, String userPassword, LDAPConnection lc, int ldapVersion) throws UnsupportedEncodingException {
+    private boolean Bind(String bindDN, String bindPassword, LDAPConnection lc, int ldapVersion) throws UnsupportedEncodingException {
         boolean bound = false;
         if (bindDN != null && bindDN.length() > 0 && bindPassword != null)
         {
             try
             {
                 lc.bind( ldapVersion, bindDN, bindPassword.getBytes("UTF8") );
-                bound = true;
-            }
-            catch(LDAPException e) { };
-        }
-
-        if (!bound)
-        {
-            try
-            {
-                // Anonymously connect if no bind info is not set or incorrect
-                lc.bind( ldapVersion, userDN, userPassword.getBytes("UTF8") );
                 bound = true;
             }
             catch(LDAPException e) { };

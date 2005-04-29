@@ -336,12 +336,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         try {
          param = context.getWiki().getXWikiPreference(name,context);
         } catch (Exception e) {}
-        if ("".equals(param))
+        if (param == null || "".equals(param))
         {
             try{
              param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "ldap_","ldap."));
             } catch (Exception e) {}
         }
+        if (param == null)
+            param = "";
         return param;
     }
 

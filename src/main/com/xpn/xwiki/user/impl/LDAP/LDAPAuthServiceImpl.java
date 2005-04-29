@@ -230,6 +230,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             String bindDNFormat = getParam("ldap_bind_DN",context);
             String bindPasswordFormat = getParam("ldap_bind_pass",context);
 
+            int checkLevel = GetCheckLevel(context);
+
             Object[] arguments = {
                 username,
                 password
@@ -243,55 +245,61 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             lc.connect( ldapHost, ldapPort );
 
             // authenticate to the server
-            Bind(bindDN, bindPassword, lc, ldapVersion);
+            result = Bind(bindDN, bindPassword, lc, ldapVersion);
 
-            LDAPSearchResults searchResults =
-                lc.search(  baseDN,
-                            LDAPConnection.SCOPE_SUB ,
-                            "("+ getParam("ldap_UID_attr",context) +
-                               "=" + username + ")",
-                            null,          // return all attributes
-                            false);        // return attrs and values
-
-            if (searchResults.hasMore())
+            if (result && checkLevel > 0)
             {
-                LDAPEntry nextEntry = searchResults.next();
+                LDAPSearchResults searchResults =
+                    lc.search(  baseDN,
+                                LDAPConnection.SCOPE_SUB ,
+                                "("+ getParam("ldap_UID_attr",context) +
+                                   "=" + username + ")",
+                                null,          // return all attributes
+                                false);        // return attrs and values
 
-                foundDN = nextEntry.getDN();
-
-                LDAPAttribute attr = new LDAPAttribute(
-                                                "userPassword", password );
-                result = lc.compare( foundDN, attr );
-                if (result)
+                if (searchResults.hasMore())
                 {
-                    LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
-                    Iterator allAttributes = attributeSet.iterator();
+                    LDAPEntry nextEntry = searchResults.next();
 
-                    while(allAttributes.hasNext()) {
-                        LDAPAttribute attribute =
-                                    (LDAPAttribute)allAttributes.next();
-                        String attributeName = attribute.getName();
+                    foundDN = nextEntry.getDN();
 
-                        Enumeration allValues = attribute.getStringValues();
+                    if (checkLevel > 1)
+                    {
+                        LDAPAttribute attr = new LDAPAttribute(
+                                                        "userPassword", password );
+                        result = lc.compare( foundDN, attr );
+                    }
+                    if (result)
+                    {
+                        LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
+                        Iterator allAttributes = attributeSet.iterator();
 
-                        if( allValues != null) {
-                            while(allValues.hasMoreElements()) {
-                                String Value = (String) allValues.nextElement();
-                                attributes.put(attributeName, Value);
+                        while(allAttributes.hasNext()) {
+                            LDAPAttribute attribute =
+                                        (LDAPAttribute)allAttributes.next();
+                            String attributeName = attribute.getName();
+
+                            Enumeration allValues = attribute.getStringValues();
+
+                            if( allValues != null) {
+                                while(allValues.hasMoreElements()) {
+                                    String Value = (String) allValues.nextElement();
+                                    attributes.put(attributeName, Value);
+                                }
                             }
                         }
+                        attributes.put("dn", foundDN);
                     }
-                    attributes.put("dn", foundDN);
                 }
-            }
-            else
-                notinLDAP = true;
-
-            if (log.isDebugEnabled()) {
-                if (result)
-                 log.debug("(debug) Password check for user " + username + " successfull");
                 else
-                 log.debug("(debug) Password check for user " + username + " failed");
+                    notinLDAP = true;
+
+                if (log.isDebugEnabled()) {
+                    if (result)
+                     log.debug("(debug) Password check for user " + username + " successfull");
+                    else
+                     log.debug("(debug) Password check for user " + username + " failed");
+                }
             }
         }
         catch( LDAPException e ) {
@@ -329,8 +337,23 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
          param = context.getWiki().getXWikiPreference(name,context);
         } catch (Exception e) {}
         if ("".equals(param))
-         param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "ldap_","ldap."));
+        {
+            try{
+             param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "ldap_","ldap."));
+            } catch (Exception e) {}
+        }
         return param;
+    }
+
+    protected int GetCheckLevel(XWikiContext context)
+    {
+        String checkLevel = getParam("ldap_check_level",  context);
+        int val = 2;
+        if ("1".equals(checkLevel))
+            val = 1;
+        else if ("0".equals(checkLevel))
+            val = 0;
+        return val;
     }
 
     private int getLDAPPort(XWikiContext context) {

@@ -56,6 +56,9 @@ import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+
 import java.io.IOException;
 import java.io.Writer;
 
@@ -144,6 +147,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                 if (-1 != hashIndex && hashIndex != name.length() -1) {
                     hash = name.substring(hashIndex + 1);
                     name = name.substring(0, hashIndex);
+                    if (name.length() == 0) {
+                        XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) wikiEngine).getContext();
+                        name = xcontext.getDoc().getFullName();
+                    }
                 }
 
                 /*

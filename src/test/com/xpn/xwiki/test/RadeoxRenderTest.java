@@ -78,7 +78,7 @@ public class RadeoxRenderTest  extends RenderTest {
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
         "This is a text with *strong* text", false, context);
         renderTest(wikibase, "1 Title {pre}\n*strong*\n{/pre}",
-        "<h3 class=\"heading-1\"><a id=\"Title+%25_0_%25\" name=\"Title+%25_0_%25\"/>Title \n*strong*\n</a></h3>", false, context);
+        "<h3 class=\"heading-1\"><a id=\"Title+%25_0_%25\" name=\"Title+%25_0_%25\">Title \n*strong*\n</a></h3>", false, context);
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
         "<li>Item *strong*</li>", false, context);
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",

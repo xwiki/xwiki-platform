@@ -536,6 +536,81 @@ public class ViewEditTest extends ServletTest {
     }
 
 
+    public void beginViewRevWithObjOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.ViewRevWithObjOkTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        String content = Utils.content1;
+        Utils.content1 = "Hello First name is $doc.first_name";
+        Utils.createDoc(hibstore, "Main", "ViewRevWithObjOkTest", bobject, bclass, context);
+        Utils.content1 = content;
+
+        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRevWithObjOkTest");
+        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+        hibstore.saveXWikiDoc(doc2, context);
+        doc2.setStringValue("Main.ViewRevWithObjOkTest", "first_name", "John");
+        doc2.setContent("Hello First name now is $doc.last_name");
+        hibstore.saveXWikiDoc(doc2, context);
+        setUrl(webRequest, "view", "ViewRevWithObjOkTest", "");
+        webRequest.addParameter("rev", "1.2");
+    }
+
+
+
+    public void endViewRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("First name is Ludovic")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testRollbackRevWithObjOk() throws Throwable {
+        launchTest();
+    }
+
+    public void beginRollbackRevWithObjOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.RollbackRevWithObjOkTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        String content = Utils.content1;
+        Utils.content1 = "Hello First name is $doc.first_name";
+        Utils.createDoc(hibstore, "Main", "RollbackRevWithObjOkTest", bobject, bclass, context);
+        Utils.content1 = content;
+
+        XWikiDocument doc2 = new XWikiDocument("Main", "RollbackRevWithObjOkTest");
+        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+        hibstore.saveXWikiDoc(doc2, context);
+        doc2.setStringValue("Main.RollbackRevWithObjOkTest", "first_name", "John");
+        doc2.setContent("Hello First name now is $doc.last_name");
+        hibstore.saveXWikiDoc(doc2, context);
+        setUrl(webRequest, "rollback", "RollbackRevWithObjOkTest", "");
+        webRequest.addParameter("rev", "1.2");
+    }
+
+    public void endRollbackRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("First name is Ludovic")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewRevWithObjOk() throws Throwable {
+        launchTest();
+    }
 
     public void beginViewRawRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());

@@ -769,20 +769,28 @@ public class XWikiDocument {
     }
 
     public String display(String fieldname, XWikiContext context) {
-        BaseObject object = getxWikiObject();
-        if (object==null)
-         object = getFirstObject(fieldname);
-        return display(fieldname, object, context);
+        try {
+            BaseObject object = getxWikiObject();
+            if (object==null)
+                object = getFirstObject(fieldname);
+            return display(fieldname, object, context);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public String display(String fieldname, String mode, XWikiContext context) {
-        BaseObject object = getxWikiObject();
-        if (object==null)
-         object = getFirstObject(fieldname);
-        if (object==null)
-         return "";
-        else
-         return display(fieldname, mode, object, context);
+        try {
+            BaseObject object = getxWikiObject();
+            if (object==null)
+                object = getFirstObject(fieldname);
+            if (object==null)
+                return "";
+            else
+                return display(fieldname, mode, object, context);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public String displayForm(String className,String header, String format, XWikiContext context) {
@@ -824,13 +832,15 @@ public class XWikiDocument {
       for (int i=0;i<objects.size();i++) {
           vcontext.put("id", new Integer(i+1));
           BaseObject object = (BaseObject) objects.get(i);
-          for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
-              String name = (String) it.next();
-              vcontext.put(name, display(name, object, context));
+          if (object!=null) {
+              for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
+                  String name = (String) it.next();
+                  vcontext.put(name, display(name, object, context));
+              }
+              result.append(renderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
+              if (linebreak)
+                  result.append("\n");
           }
-          result.append(renderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
-          if (linebreak)
-             result.append("\n");
       }
       return result.toString();
     }
@@ -868,19 +878,21 @@ public class XWikiDocument {
       result.append("\n");
       for (int i=0;i<objects.size();i++) {
           BaseObject object = (BaseObject) objects.get(i);
-          first = true;
-          for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
-              if (first==true)
-                first = false;
-              else
-                result.append("|");
-              String data = display((String)it.next(), object, context);
-              if (data.trim().equals(""))
-               result.append("&nbsp;");
-              else
-               result.append(data);
+          if (object!=null) {
+              first = true;
+              for (Iterator it = bclass.getPropertyList().iterator();it.hasNext();) {
+                  if (first==true)
+                      first = false;
+                  else
+                      result.append("|");
+                  String data = display((String)it.next(), object, context);
+                  if (data.trim().equals(""))
+                      result.append("&nbsp;");
+                  else
+                      result.append(data);
+              }
+              result.append("\n");
           }
-          result.append("\n");
       }
        result.append("{table}\n");
        return result.toString();
@@ -1807,13 +1819,15 @@ public class XWikiDocument {
 
     public String getTranslatedContent(String language, XWikiContext context) throws XWikiException {
         XWikiDocument tdoc = getTranslatedDocument(language, context);
-
+        return tdoc.getContent();
+        /*
         String rev = (String)context.get("rev");
         if (rev==null)
             return tdoc.getContent();
 
         XWikiDocument cdoc = context.getWiki().getDocument(tdoc, rev, context);
         return cdoc.getContent();
+        */
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException {

@@ -25,6 +25,7 @@ package com.xpn.xwiki.render.groovy;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -70,12 +71,25 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
 
     public String evaluate(String content, String name, Map gcontext) {
         Template template = null;
+        boolean refresh = false;
+        try {
+            XWikiRequest request = (XWikiRequest) gcontext.get("request");
+            refresh = "1".equals(request.get("refresh"));
+        } catch(Exception e) {
+        }
         try {
             try {
-             template = (Template) cache.getFromCache(content);
+                if (refresh) {
+                    template = engine.createTemplate(content);
+                    cache.putInCache(content, template);
+                } else {
+                    template = (Template) cache.getFromCache(content);
+                }
             } catch (XWikiCacheNeedsRefreshException e) {
                 template = engine.createTemplate(content);
                 cache.putInCache(content, template);
+            } finally {
+                cache.cancelUpdate(content);
             }
             return template.make(gcontext).toString();
         } catch (Exception e) {

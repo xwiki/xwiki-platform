@@ -822,8 +822,18 @@ public class XWikiService {
 
         if (rev!=null) {
             context.put("rev", rev);
+            XWikiDocument doc = (XWikiDocument) context.get("doc");
+            XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+            XWikiDocument rdoc = context.getWiki().getDocument(doc, rev, context);
+            XWikiDocument rtdoc = context.getWiki().getDocument(tdoc, rev, context);
+            context.put("tdoc", rtdoc);
+            context.put("cdoc", rdoc);
+            context.put("doc", rdoc);
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            vcontext.put("doc", new Document(rdoc, context));
+            vcontext.put("cdoc", vcontext.get("doc"));
+            vcontext.put("tdoc", new Document(rtdoc, context));
         }
-
         return "view";
     }
 

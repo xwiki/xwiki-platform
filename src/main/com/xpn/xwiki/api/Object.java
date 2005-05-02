@@ -53,4 +53,15 @@ public class Object extends Collection {
             return null;
         }
     }
+
+    public java.lang.Object display(String name, String mode) {
+        String docname = getCollection().getName();
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(docname, context);
+            return doc.display(name, mode, this.getBaseObject(), context);
+        } catch (XWikiException e) {
+            return null;
+        }
+    }
+
 }

@@ -54,7 +54,8 @@ public class AllTests {
         suite.addTestSuite(PluginTest.class);
         suite.addTestSuite(RadeoxRenderTest.class);
         suite.addTestSuite(VelocityRenderTest.class);
-        suite.addTestSuite(WikiWikiBaseRenderTest.class);
+        suite.addTestSuite(VelocityRenderTest.class);
+        suite.addTestSuite(GroovyRenderTest.class);
         suite.addTestSuite(StatsTest.class);
         suite.addTestSuite(StoreRCSFileTest.class);
         suite.addTestSuite(StoreHibernateTest.class);

@@ -256,8 +256,11 @@ public class MyFormAuthentication extends AbstractAuthentication
                 String value = nameValue.substring(equalsChar + 1);
                 if (name.equalsIgnoreCase(theTarget))
                 {
-                    return new Cookie(theConnection.getURL().getHost(),
-                        name, value);
+                      String host = theConnection.getURL().getHost();
+                      // Let's force it to localhost as it seems to fail on Linux
+                      host = "locahost";
+                      return new Cookie(host,
+                         name, value);
                 }
             }
             key = theConnection.getHeaderFieldKey(++i);
@@ -286,8 +289,10 @@ public class MyFormAuthentication extends AbstractAuthentication
                 int equalsChar = nameValue.indexOf("=");
                 String name = nameValue.substring(0, equalsChar);
                 String value = nameValue.substring(equalsChar + 1);
-                Cookie cookie = new Cookie(theConnection.getURL().getHost(),
-                                            name, value);
+                String host = theConnection.getURL().getHost();
+                // Let's force it to localhost as it seems to fail on Linux
+                host = "locahost";
+                Cookie cookie = new Cookie(host, name, value);
                 cookie.setPath("/");
                 cookies.add(cookie);
             }

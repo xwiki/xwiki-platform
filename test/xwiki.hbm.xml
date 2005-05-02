@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
 	"-//Hibernate/Hibernate Mapping DTD//EN"
-	"http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd">
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
@@ -392,7 +392,7 @@
                 <column name="XWL_ID"  />
                 <column name="XWL_NAME"  />
             </key>
-            <list name="list" table="xwikilistitems" batch-size="10">
+            <list name="list" table="xwikilistitems" lazy="false">
                 <key>
                     <column name="XWL_ID"  />
                     <column name="XWL_NAME"  />

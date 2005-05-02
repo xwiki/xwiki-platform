@@ -126,52 +126,64 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     }
 
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
-        String database = context.getDatabase();
-        XWikiContext context = getContext();
-
-        try {
-            String db = null;
-            int colonIndex = name.indexOf(":");
-            if (colonIndex!=-1) {
-                db = name.substring(0,colonIndex);
-                name = name.substring(colonIndex + 1);
-                context.setDatabase(db);
-            }
-
-            String querystring = null;
-            int qsIndex = name.indexOf("?");
-            if (qsIndex!=-1) {
-                querystring = name.substring(qsIndex+1);
-                name = name.substring(0, qsIndex);
-            }
-
-            buffer.append("<span class=\"wikilink\"><a href=\"");
-            String newname = noaccents(name);
-            XWikiDocument newdoc = new XWikiDocument();
-            if (newname.indexOf(".")!=-1) {
-                try {
-                    newdoc.setFullName(newname, context);
-                } catch (XWikiException e) {
+        if (name.length() == 0 && anchor != null) {
+            appendInternalLink(buffer, view, anchor); 
+        } else {
+            String database = context.getDatabase();
+            XWikiContext context = getContext();
+    
+            try {
+                String db = null;
+                int colonIndex = name.indexOf(":");
+                if (colonIndex!=-1) {
+                    db = name.substring(0,colonIndex);
+                    name = name.substring(colonIndex + 1);
+                    context.setDatabase(db);
                 }
-            } else {
-                newdoc.setWeb(context.getDoc().getWeb());
-                newdoc.setName(newname);
+    
+                String querystring = null;
+                int qsIndex = name.indexOf("?");
+                if (qsIndex!=-1) {
+                    querystring = name.substring(qsIndex+1);
+                    name = name.substring(0, qsIndex);
+                }
+    
+                buffer.append("<span class=\"wikilink\"><a href=\"");
+                String newname = noaccents(name);
+                XWikiDocument newdoc = new XWikiDocument();
+                if (newname.indexOf(".")!=-1) {
+                    try {
+                        newdoc.setFullName(newname, context);
+                    } catch (XWikiException e) {
+                    }
+                } else {
+                    newdoc.setWeb(context.getDoc().getWeb());
+                    newdoc.setName(newname);
+                }
+    
+                URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
+                        "view", querystring, anchor, context);
+                buffer.append(context.getURLFactory().getURL(url, context));
+                buffer.append("\">");
+                buffer.append(view);
+                buffer.append("</a></span>");
+            } finally {
+                context.setDatabase(database);
             }
-
-            URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
-                    "view", querystring, anchor, context);
-            buffer.append(context.getURLFactory().getURL(url, context));
-            buffer.append("\">");
-            buffer.append(view);
-            buffer.append("</a></span>");
-        } finally {
-            context.setDatabase(database);
         }
     }
 
 
     public void appendLink(StringBuffer buffer, String name, String view) {
         appendLink(buffer, name, view, null);
+    }
+    
+    public void appendInternalLink(StringBuffer buffer, String view, String anchor) {
+        buffer.append("<span class=\"wikilink\"><a href=\"#");
+        buffer.append(anchor);
+        buffer.append("\">");
+        buffer.append(view);
+        buffer.append("</a></span>");
     }
 
     public void appendCreateLink(StringBuffer buffer, String name, String view) {

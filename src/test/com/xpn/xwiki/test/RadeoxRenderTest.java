@@ -148,6 +148,12 @@ public class RadeoxRenderTest  extends RenderTest {
                      "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
         renderTest(wikibase, "Test link: [ludovic>mailto:ludovic@xwiki.org]",
                      "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, context);
+        
+        // test internal links
+        renderTest(wikibase, "Test link: [#anchorname]",
+            "<a href=\"#anchorname\"></a>", false, context);
+        renderTest(wikibase, "Test link: [internal link>#anchorname]",
+            "<a href=\"#anchorname\">internal link</a>", false, context);
         }
 
 

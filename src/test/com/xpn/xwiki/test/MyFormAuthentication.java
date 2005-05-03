@@ -258,7 +258,7 @@ public class MyFormAuthentication extends AbstractAuthentication
                 {
                       String host = theConnection.getURL().getHost();
                       // Let's force it to localhost as it seems to fail on Linux
-                      host = "locahost";
+                      host = "localhost";
                       return new Cookie(host,
                          name, value);
                 }
@@ -291,7 +291,7 @@ public class MyFormAuthentication extends AbstractAuthentication
                 String value = nameValue.substring(equalsChar + 1);
                 String host = theConnection.getURL().getHost();
                 // Let's force it to localhost as it seems to fail on Linux
-                host = "locahost";
+                host = "localhost";
                 Cookie cookie = new Cookie(host, name, value);
                 cookie.setPath("/");
                 cookies.add(cookie);

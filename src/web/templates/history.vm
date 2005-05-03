@@ -14,16 +14,14 @@
 #else
 #set($lang = "")
 #end
-#set($firstrev = $tdoc.getVersion())
-#set($nextversion = $firstrev)
 <ul class="star">
 #foreach ($version in $tdoc.getRecentRevisions(0))
-#if($version != $firstrev)
 #set($origdoc = "")
 #set($newdoc = "")
+#set($nextversion = $version)
 #set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
 <li>
-$msg.get("version") <a href="$tdoc.getURL("view","rev=$nextversion")">$nextversion</a>
+$msg.get("version") <a href="" onclick="location='$tdoc.getURL("view","rev=$nextversion")'; return false;">$nextversion</a> (<a href="" onclick="if (confirm('$msg.get("readytorollback") $nextversion')) location='$tdoc.getURL("rollback","rev=$nextversion")'; return false;">$msg.get("rollback")</a>)
 <input type="radio" name="rev2" value="$nextversion" />
 <input type="radio" name="rev1" value="$nextversion" />
 #if($newdoc=="")
@@ -32,8 +30,6 @@ $msg.get("version") <a href="$tdoc.getURL("view","rev=$nextversion")">$nextversi
 $msg.get("editedby") $xwiki.getLocalUserName($newdoc.author) $msg.get("on") $xwiki.formatDate($newdoc.date)
 #end
 </li>
-#set($nextversion = $version)
-#end
 #end
 </ul>
 </p>

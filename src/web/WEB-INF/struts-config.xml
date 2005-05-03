@@ -44,6 +44,8 @@
                type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="save"
                 type="com.xpn.xwiki.web.EditForm"/>
+    <form-bean name="rollback"
+                  type="com.xpn.xwiki.web.RollbackForm"/>
     <form-bean name="cancel"
                 type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="propupdate"
@@ -122,6 +124,13 @@
             scope="request">
         <forward name="save" path="/templates/save.vm"/>
     </action>
+
+      <action path="/rollback/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="rollback"
+          scope="request">
+          <forward name="edit" path="/templates/rollback.vm"/>
+      </action>
 
     <action path="/cancel/"
             type="com.xpn.xwiki.web.ViewEditAction"

@@ -137,6 +137,8 @@ public class XWikiPortlet extends GenericPortlet {
 
 				if (action.equals("save"))
 					form = new EditForm();
+                else if (action.equals("rollback"))
+                    form = new RollbackForm();
 				else if (action.equals("objectadd"))
 					form = new ObjectAddForm();
 				else if (action.equals("commentadd"))
@@ -154,9 +156,12 @@ public class XWikiPortlet extends GenericPortlet {
 				if (action.equals("save")) {
 					xwikiservice.actionSave(context);
 				}
-            else if (action.equals("cancel")) {
-                xwikiservice.actionCancel(context);
-            }
+                else if (action.equals("rollback")) {
+                    xwikiservice.actionRollback(context);
+                }
+                else if (action.equals("cancel")) {
+                    xwikiservice.actionCancel(context);
+                }
 				else if (action.equals("delete")) {
 					xwikiservice.actionDelete(context);
 				}

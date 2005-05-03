@@ -601,8 +601,16 @@ public class ViewEditTest extends ServletTest {
     public void endRollbackRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("First name is Ludovic")!=-1);
+
+            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
+            XWikiDocument doc2 = new XWikiDocument("Main", "RollbackRevWithObjOkTest");
+            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            String content2 = doc2.getContent();
+            String name = doc2.getStringValue("Main.RollbackRevWithObjOkTest", "first_name");
+
+            assertEquals("Content has not been rolled back", "Hello First name is $doc.first_name", content2);
+            assertEquals("First name had not been rolledback", "Ludovic", name);
+            assertEquals("Version is incorrect", "1.4", doc2.getVersion());
         } finally {
             clientTearDown();
         }

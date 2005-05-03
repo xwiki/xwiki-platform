@@ -30,6 +30,9 @@ $msg.get("currentdifftype"): $type (
 #set($nextversion = $version)
 #end
 #end
+#set($newdoc = $origdoc)
+#set($origdoc = $xwiki.getDocument($tdoc,"1.0"))
+#template("changesdoc.vm")
 </div>
 #template("basefooter.vm")
 #template("footer.vm")

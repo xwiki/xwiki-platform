@@ -1,10 +1,15 @@
 <div style="width: 100%; background-color: #DDDDDD">
+#if($origdoc.getVersion().equals("1"))
+<h3>$msg.get("initialversion") $newdoc.version
+#else
 <h3>$msg.get("From") $msg.get("version") $origdoc.version $msg.get("to") $newdoc.version
+#end
 #if(($origdoc=="")||($newdoc==""))
 #if($newdoc!="")
 $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
 #end
  ($msg.get("cannotreaddocumentversion") $newdoc.version)</h3>
+</div>
 #else
 $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author), $doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
 </h3>

@@ -663,6 +663,11 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
                 archive = basedoc.getRCSArchive();
             }
 
+            Version v = archive.getRevisionVersion(version);
+            if (!version.equals(v.toString())) {
+                doc.setVersion(version);
+                return doc;
+            }
             Object[] text = (Object[]) archive.getRevision(version);
             if (text[0].toString().startsWith("<")) {
                 StringBuffer content = new StringBuffer();

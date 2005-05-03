@@ -154,6 +154,9 @@ public class ViewEditAction extends XWikiAction
                 else if (action.equals("save")) {
                     xwikiservice.actionSave(context);
                 }
+                else if (action.equals("rollback")) {
+                    xwikiservice.actionRollback(context);
+                }
                 else if (action.equals("cancel")) {
                     xwikiservice.actionCancel(context);
                 }

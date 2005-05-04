@@ -39,11 +39,14 @@ import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
 import java.util.List;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
+    private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.XWikiVelocityRenderer.class);
 
     public XWikiVelocityRenderer() {
         try {
@@ -67,17 +70,18 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
                 try {
                     // We need to do this in case there are any macros in the content
-                    List macrolist = doc.getIncludedMacros(context);
+                    List macrolist = contentdoc.getIncludedMacros(context);
                     if (macrolist!=null) {
                         com.xpn.xwiki.XWiki xwiki = context.getWiki();
                         for (int i=0;i<macrolist.size();i++) {
                             String docname = (String) macrolist.get(i);
-                            XWikiDocument idoc = xwiki.getDocument(docname, context);
-                            String icontent = idoc.getTranslatedContent(context);
-                            evaluate(icontent, name, vcontext, context);
+                            log.debug("Pre-including macro topic " + docname);
+                            xwiki.include(docname, context, true);
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    // Make sure we never fail
+                    log.warn("Exception while pre-including macro topics", e);
                 }
 
                 return evaluate(content, name, vcontext, context);

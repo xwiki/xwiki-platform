@@ -131,11 +131,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }*/
 
     public String getStringValue(String name) {
-        StringProperty prop = (StringProperty)safeget(name);
+        BaseProperty prop = (BaseProperty) safeget(name);
         if (prop==null)
          return "";
         else
-         return (String)prop.getValue();
+         return prop.getValue().toString();
     }
 
     public String getLargeStringValue(String name) {

@@ -193,3 +193,24 @@ ol.HEBREW { list-style-type: hebrew; }
 .wiki-calendar-today{
  background-color: #BBBBBB;
 }
+
+.article_title {
+ font-size: 120%;
+ border-bottom: 1px;
+}
+
+.article_content {
+ padding: 10px;
+}
+
+.article_date {
+ font-size: 120%;
+ border-bottom: 1px solid;
+}
+
+.article_footer {
+ border-top: 1px dotted;
+ font-size: 75%;
+ font-weight: bold;
+ color: gray;
+}

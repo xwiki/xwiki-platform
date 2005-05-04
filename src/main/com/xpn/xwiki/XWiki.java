@@ -1836,6 +1836,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             XWikiDocument doc = null;
             try {
+                log.debug("Including Topic " + topic);
 
                 int i0 = topic.indexOf(":");
                 if (i0!=-1) {
@@ -1843,6 +1844,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     topic = topic.substring(i0+1);
                     database = context.getDatabase();
                     context.setDatabase(incdatabase);
+                }
+
+                try {
+                    Integer includecounter = ((Integer)context.get("include_counter"));
+                    if (includecounter!=null) {
+                        context.put("include_counter", new Integer(1+includecounter.intValue()));
+                    } else {
+                        includecounter = new Integer(1);
+                        context.put("include_counter", includecounter);
+                    }
+
+                    if ((includecounter.intValue()>30)
+                            ||((database.equals(incdatabase)&&(topic.equals(currentdoc.getFullName()))))) {
+                        log.warn("Error on too many recursive includes for topic " + topic);
+                        return "Cannot make recursive include";
+                    }
+                } catch (Exception e) {
                 }
 
                 doc = getDocument(((XWikiDocument) context.get("doc")).getWeb(), topic, context);
@@ -1854,7 +1872,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
 
             } catch (XWikiException e) {
-                e.printStackTrace();
+                log.warn("Exception Including Topic " + topic, e);
                 return "Topic " + topic + " does not exist";
             }
 
@@ -1874,6 +1892,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } finally {
             if (database!=null)
                 context.setDatabase(database);
+
+            try {
+                Integer includecounter = ((Integer)context.get("include_counter"));
+                if (includecounter!=null) {
+                    context.put("include_counter", new Integer(includecounter.intValue()-1));
+                }
+            } catch(Exception e) {}
+
             if (currentdoc!=null) {
                 if (vcontext!=null)
                     vcontext.put("doc", currentdoc);

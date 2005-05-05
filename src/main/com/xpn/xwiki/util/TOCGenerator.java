@@ -21,7 +21,7 @@ public class TOCGenerator {
   public static Map generateTOC(String content, int init, int max, boolean numbered) {
     OrderedMap tocData = ListOrderedMap.decorate(new HashMap());
     List processedHeadings = new ArrayList();
-    int previousNumbers[] = { 0, 0, 0, 0, 0, 0 };
+    int previousNumbers[] = { 0, 0, 0, 0, 0, 0, 0 };
 
     Pattern pattern = Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
     Matcher matcher = pattern.matcher(content);

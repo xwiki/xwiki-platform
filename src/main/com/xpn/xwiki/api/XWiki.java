@@ -16,7 +16,7 @@
  * root folder of this distribution.
  *
  * User: ludovic
- * Date: 26 févr. 2004
+ * Date: 26 fï¿½vr. 2004
  * Time: 17:50:47
  */
 
@@ -334,6 +334,12 @@ public class XWiki extends Api {
         if (checkProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
     }
+
+    public void saveDocument(XWikiDocument doc) throws XWikiException {
+        if (checkAccess(doc.getName(), "edit"))
+            xwiki.saveDocument(doc, context);
+    }
+    
 
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {
         if (checkProgrammingRights())

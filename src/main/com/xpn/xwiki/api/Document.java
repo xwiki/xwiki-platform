@@ -16,7 +16,7 @@
  * root folder of this distribution.
  *
  * User: ludovic
- * Date: 26 févr. 2004
+ * Date: 26 fï¿½vr. 2004
  * Time: 16:59:02
  */
 
@@ -640,4 +640,9 @@ public class Document extends Api {
     public Map getTOC(int init, int max, boolean numbered) {
         return TOCGenerator.generateTOC(getContent(), init, max, numbered);
     }
+
+    public void saveDocument() throws XWikiException {
+       if (hasAccessLevel("edit"))
+           context.getWiki().saveDocument(doc, context);
+   }
 }

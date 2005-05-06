@@ -334,11 +334,6 @@ public class XWiki extends Api {
         if (checkProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
     }
-
-    public void saveDocument(XWikiDocument doc) throws XWikiException {
-        if (checkAccess(doc.getName(), "edit"))
-            xwiki.saveDocument(doc, context);
-    }
     
 
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {

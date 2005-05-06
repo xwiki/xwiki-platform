@@ -203,7 +203,7 @@ public class ServletAuthTest extends ServletTest {
         map.put("password", "toto");
         xwiki.createUser("LudovicDubost", map, "", "", "view, edit", context);
         updateRight("Main.WebHome", "XWiki.LudovicDubost", "", "view", true, false);
-        setUrl(webRequest, "login", "XWiki", "XWikiLogin", "");
+        setUrl(webRequest, "view", "Main", "WebHome", "");
         Authentication auth = new BasicAuthentication("LudovicDubost", "toto");
         webRequest.setAuthentication(auth);
     }
@@ -220,11 +220,10 @@ public class ServletAuthTest extends ServletTest {
     }
 
 
-   // Deactivate the test until I know how to pass the parameters
-   /* public void testBasicAuth() throws Throwable {
+   public void testBasicAuth() throws Throwable {
     launchTest();
    }
-   */
+
 
 
     public void beginFormAuth(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {

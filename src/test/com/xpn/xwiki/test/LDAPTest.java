@@ -225,7 +225,7 @@ public class LDAPTest  extends TestCase {
         xwiki.flushCache();
         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
 
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_server", "localhost", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_server", "192.168.0.4", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_port", "389", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_base_DN", "dc=xwiki,dc=com", context);
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=Manager,dc=xwiki,dc=com", context);

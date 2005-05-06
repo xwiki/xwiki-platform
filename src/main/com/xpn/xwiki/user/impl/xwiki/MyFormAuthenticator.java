@@ -33,10 +33,28 @@ import org.securityfilter.filter.SecurityRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
+import java.io.IOException;
 
-public class MyFormAuthenticator extends FormAuthenticator {
-
+public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator {
     private static final Log log = LogFactory.getLog(MyFormAuthenticator.class);
+
+    /**
+     * Show the login page.
+     *
+     * @param request  the current request
+     * @param response the current response
+     */
+    public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException {
+        if ("1".equals(request.getParameter("basicauth"))) {
+            String realName = context.getWiki().Param("xwiki.authentication.realname");
+            if (realName==null)
+                realName = "XWiki";
+            MyBasicAuthenticator.showLogin(request, response, realName);
+        } else {
+            showLogin(request, response);
+        }
+    }
+
 
 
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception {
@@ -53,6 +71,20 @@ public class MyFormAuthenticator extends FormAuthenticator {
      * @return true if the filter should return after this method ends, false otherwise
      */
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
+
+        try {
+            Principal principal = MyBasicAuthenticator.checkLogin(request, response, context);
+            if (principal!=null) {
+                return false;
+            } else {
+                if ("1".equals(request.getParameter("basicauth")))
+                 return true;
+            }
+        } catch (Exception e) {
+            // in case of exception we continue on Form Auth.
+            // we don't want this to interfere with the most common behavior
+        }
+
         // process any persistent login information, if user is not already logged in,
         // persistent logins are enabled, and the persistent login info is present in this request
         if (
@@ -137,7 +169,7 @@ public class MyFormAuthenticator extends FormAuthenticator {
       }
    }
 
-    protected Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
+    public static Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         return context.getWiki().getAuthService().authenticate(username, password, context);
     }
 }

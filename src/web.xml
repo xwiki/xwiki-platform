@@ -14,7 +14,7 @@
             <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
             <init-param>
                 <param-name>encoding</param-name>
-                <param-value>UTF-8</param-value>
+                <param-value>ISO-8859-1</param-value>
             </init-param>
    </filter>
 
@@ -22,18 +22,6 @@
             <filter-name>Set Character Encoding</filter-name>
             <url-pattern>/*</url-pattern>
       </filter-mapping>
-    
-    <!--
-    <listener>
-        <listener-class>exo.services.portletcontainer.impl.servlet.PortletApplicationListener</listener-class>
-    </listener>
-    -->
-
-    <servlet>
-        <servlet-name>PortletWrapper</servlet-name>
-        <servlet-class>exo.services.portletcontainer.impl.servlet.ServletWrapper</servlet-class>
-    </servlet>
-
 
     <servlet>
         <servlet-name>action</servlet-name>
@@ -91,11 +79,6 @@
     <servlet-mapping>
         <servlet-name>action</servlet-name>
         <url-pattern>/testbin/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>PortletWrapper</servlet-name>
-        <url-pattern>/PortletWrapper</url-pattern>
     </servlet-mapping>
 
     <!-- The Usual Welcome File List -->

@@ -46,9 +46,9 @@ import java.util.List;
 public class XWikiAuthServiceImpl implements XWikiAuthService {
     private static final Log log = LogFactory.getLog(XWikiAuthServiceImpl.class);
 
-    protected Authenticator authenticator;
+    protected XWikiAuthenticator authenticator;
 
-    protected Authenticator getAuthenticator(XWikiContext context) throws XWikiException {
+    protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException {
         if (authenticator!=null)
             return authenticator;
 
@@ -145,7 +145,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
         if (request==null)
             return null;
 
-        Authenticator auth = getAuthenticator(context);
+        XWikiAuthenticator auth = getAuthenticator(context);
         SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
                 null, auth.getAuthMethod());
         try {
@@ -157,14 +157,8 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                 return null;
             }
 
-            if (auth.getAuthMethod().equals("BASIC")) {
-                if (((MyBasicAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
-                    return null;
-                }
-            } else {
-                if (((MyFormAuthenticator)auth).processLogin(wrappedRequest, response, context)) {
-                    return null;
-                }
+            if (auth.processLogin(wrappedRequest, response, context)) {
+                return null;
             }
 
            Principal user = wrappedRequest.getUserPrincipal();
@@ -187,7 +181,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
         try {
             if (context.getMode()==XWikiContext.MODE_SERVLET) {
              getAuthenticator(context).showLogin(context.getRequest().getHttpServletRequest(),
-                                         context.getResponse().getHttpServletResponse());
+                                     context.getResponse().getHttpServletResponse(), context);
             }
         } catch (IOException e) {
             // If this fails we continue

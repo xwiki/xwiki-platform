@@ -43,6 +43,7 @@ import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
@@ -157,6 +158,13 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void updateSchema(XWikiContext context) throws HibernateException {
+
+        // No updating of schema if we have a config parameter saying so
+        try {
+        if ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))
+         return;
+        } catch (Exception e) {}
+
         Session session;
         Connection connection;
         DatabaseMetadata meta;

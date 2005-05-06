@@ -114,6 +114,10 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         return vcontext;
     }
 
+    public static String evaluate(String content, String name, VelocityContext vcontext) {
+      return evaluate(content, name, vcontext, null);
+    }
+
     public static String evaluate(String content, String name, VelocityContext vcontext, XWikiContext context) {
         StringWriter writer = new StringWriter();
         try {

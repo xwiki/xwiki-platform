@@ -24,7 +24,10 @@ package com.xpn.xwiki.plugin.feed;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.calendar.CalendarPluginApi;
+import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheCache;
@@ -46,7 +49,16 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         public FeedPlugin(String name, String className, XWikiContext context) {
             super(name, className, context);
+            init(context);
         }
+
+    public String getName() {
+        return "feed";
+    }
+
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+        return new FeedPluginApi((FeedPlugin) plugin, context);
+    }
 
     public void flushCache() {
         if (feedCache!=null)

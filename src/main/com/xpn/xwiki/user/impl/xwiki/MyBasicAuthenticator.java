@@ -28,19 +28,36 @@ import com.xpn.xwiki.XWikiException;
 import org.apache.commons.codec.binary.Base64;
 import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.filter.SecurityFilter;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.io.IOException;
 
-public class MyBasicAuthenticator extends BasicAuthenticator {
+public class MyBasicAuthenticator extends BasicAuthenticator  implements XWikiAuthenticator {
 
 
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception {
         return processLogin(request, response, null);
     }
 
+
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
+                Principal principal = checkLogin(request, response, context);
+
+                if (principal == null) {
+                    // login failed
+                    // show the basic authentication window again.
+                    showLogin(request.getCurrentRequest(), response);
+                    return true;
+                }
+
+                return false;
+    }
+
+    public static Principal checkLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
             // Always verify authentication
             String authorizationHeader = request.getHeader("Authorization");
             HttpSession session = request.getSession();
@@ -55,14 +72,10 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
                     // login successful
                     request.getSession().removeAttribute(LOGIN_ATTEMPTS);
                     request.setUserPrincipal(principal);
-                } else {
-                    // login failed
-                    // show the basic authentication window again.
-                    showLogin(request.getCurrentRequest(), response);
-                    return true;
+                    return principal;
                 }
             }
-        return false;
+            return null;
     }
 
     /**
@@ -70,7 +83,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
      * @param decoded
      * @return username parsed out of decoded string
      */
-    private String parseUsername(String decoded) {
+    public static String parseUsername(String decoded) {
         if (decoded == null) {
             return null;
         } else {
@@ -88,7 +101,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
      * @param decoded
      * @return password parsed out of decoded string
      */
-    private String parsePassword(String decoded) {
+    public static String parsePassword(String decoded) {
         if (decoded == null) {
             return null;
         } else {
@@ -107,7 +120,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
      * @param authorization
      * @return decoded string
      */
-    private String decodeBasicAuthorizationString(String authorization) {
+    public static String decodeBasicAuthorizationString(String authorization) {
         if (authorization == null || !authorization.toLowerCase().startsWith("basic ")) {
             return null;
         } else {
@@ -117,7 +130,34 @@ public class MyBasicAuthenticator extends BasicAuthenticator {
         }
     }
 
-    protected Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
+    public static Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         return context.getWiki().getAuthService().authenticate(username, password, context);
+    }
+
+    public static void showLogin(HttpServletRequest request, HttpServletResponse response, String realmName) throws IOException {
+       // save this request
+       SecurityFilter.saveRequestInformation(request);
+
+       // determine the number of login attempts
+       int loginAttempts;
+       if (request.getSession().getAttribute(LOGIN_ATTEMPTS) != null) {
+          loginAttempts = ((Integer) request.getSession().getAttribute(LOGIN_ATTEMPTS)).intValue();
+          loginAttempts += 1;
+       } else {
+          loginAttempts = 1;
+       }
+       request.getSession().setAttribute(LOGIN_ATTEMPTS, new Integer(loginAttempts));
+
+       if (loginAttempts <= MAX_ATTEMPTS) {
+          response.setHeader("WWW-Authenticate", "BASIC realm=\"" + realmName + "\"");
+          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+       } else {
+          request.getSession().removeAttribute(LOGIN_ATTEMPTS);
+          response.sendError(HttpServletResponse.SC_UNAUTHORIZED, LOGIN_FAILED_MESSAGE);
+       }
+    }
+
+    public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException {
+            showLogin(request, response, realmName);
     }
 }

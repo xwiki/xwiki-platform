@@ -32,6 +32,8 @@ import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import org.apache.commons.logging.Log;
@@ -39,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.net.URL;
 import java.io.IOException;
+import java.util.*;
 
 public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =
@@ -46,6 +49,25 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         private XWikiCache feedCache;
         private int refreshPeriod;
+
+      public static class SyndEntryComparator
+      implements Comparator {
+    public int compare(Object element1, Object element2) {
+        SyndEntry entrie1 = (SyndEntry) element1;
+        SyndEntry entrie2 = (SyndEntry) element2;
+
+        if ((entrie1.getPublishedDate() == null) &&  (entrie2.getPublishedDate() == null))
+            return 0;
+        if (entrie1.getPublishedDate() == null)
+            return 1;
+        if (entrie1.getPublishedDate() == null)
+            return -1;
+        return (-entrie1.getPublishedDate().compareTo(entrie2.getPublishedDate()));
+    }
+  }
+
+
+
 
         public FeedPlugin(String name, String className, XWikiContext context) {
             super(name, className, context);
@@ -70,6 +92,27 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         feedCache = new OSCacheCache();
         refreshPeriod = (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.cacherefresh", 3600);
     }
+
+    public SyndFeed getFeeds(String sfeeds, XWikiContext context) throws IOException {
+        String[] feeds = sfeeds.split("\\|");
+        List entries = new ArrayList();
+        SyndFeed outputFeed = new SyndFeedImpl();
+        outputFeed.setTitle("XWiki Feeds");
+        outputFeed.setAuthor("XWiki Team");
+        outputFeed.setEntries(entries);
+        TreeMap entriesMap = new TreeMap();
+
+        for (int i = 0; i < feeds.length; i++)
+        {
+            SyndFeed feed = getFeed(feeds[i], context);
+            if (feed != null)
+                entries.addAll(feed.getEntries());
+        }
+        SyndEntryComparator comp = new SyndEntryComparator();
+        Collections.sort(entries, comp);
+        return outputFeed;
+    }
+
 
     public SyndFeed getFeed(String sfeed, XWikiContext context) throws IOException {
         return getFeed(sfeed, false, context);

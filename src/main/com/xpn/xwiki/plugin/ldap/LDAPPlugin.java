@@ -24,28 +24,13 @@ package com.xpn.xwiki.plugin.ldap;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.feed.FeedPluginApi;
-import com.xpn.xwiki.plugin.feed.FeedPlugin;
-import com.xpn.xwiki.plugin.calendar.CalendarPluginApi;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.impl.OSCacheCache;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 import com.novell.ldap.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
-
-import java.net.URL;
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Iterator;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {

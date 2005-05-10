@@ -48,7 +48,6 @@ import org.apache.commons.jrcs.util.ToString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.Filter;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;

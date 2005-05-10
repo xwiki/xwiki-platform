@@ -595,35 +595,21 @@
     <first-group selected-file="file://$PROJECT_DIR$/build.xml">
       <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/XWikiHibernateStore.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.26845637">
+          <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.24922119">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionImpl.class" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.26845637">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/JDBCContext.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="43" column="0" selection-start="1450" selection-end="1450" vertical-scroll-proportion="0.26845637">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/AbstractBatcher.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="108" column="0" selection-start="4541" selection-end="4541" vertical-scroll-proportion="1.0134228">
+          <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.24922119">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.5704698">
+          <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.529595">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
@@ -632,35 +618,51 @@
       </entry>
       <entry file="file://$PROJECT_DIR$/build.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <state line="364" column="0" selection-start="15710" selection-end="15710" vertical-scroll-proportion="0.682243">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/doc/XWikiDocument.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="466" column="4" selection-start="13443" selection-end="13443" vertical-scroll-proportion="0.12149533">
+            <folding>
+              <element signature="imports" expanded="true" />
+            </folding>
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://C:/dev/java/apache-ant-1.6.0/src/main/org/apache/tools/ant/filters/StringInputStream.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="64" column="13" selection-start="2765" selection-end="2765" vertical-scroll-proportion="0.30952382">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate-test.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.3489933">
+          <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.32398754">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/test/hibernate-test.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.45637584">
+          <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.423676">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/test/hibernate-integration.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.5201342">
+          <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.48286605">
             <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.45637584">
+          <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.423676">
             <folding />
           </state>
         </provider>
@@ -766,6 +768,7 @@
     <expanded_node url="file://$PROJECT_DIR$/src/test-cactus/com/xpn/xwiki" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/com" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/main/com/xpn" module="xwikibase" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/doc" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test" module="xwikibase" type="directory" />
     <expanded_node url="com.xpn.xwiki.XWikiService" module="xwikibase" type="class" />
     <expanded_node url="file://$PROJECT_DIR$/src/main" module="xwikibase" type="directory" />
@@ -1706,20 +1709,6 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionFactoryImpl.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="180" column="0" selection-start="8098" selection-end="8098" vertical-scroll-proportion="0.3625">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/cfg/Settings.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="109" column="0" selection-start="3985" selection-end="3985" vertical-scroll-proportion="0.3625">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/connection/DriverManagerConnectionProvider.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="27" column="0" selection-start="843" selection-end="843" vertical-scroll-proportion="0.975">
@@ -1757,42 +1746,42 @@
     </entry>
     <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionImpl.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.26845637">
+        <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.24922119">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate-test.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.3489933">
+        <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.32398754">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/hibernate-integration.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.5201342">
+        <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.48286605">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/XWikiHibernateStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.26845637">
+        <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.24922119">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/hibernate-test.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.45637584">
+        <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.423676">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.5704698">
+        <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.529595">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1801,14 +1790,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.45637584">
+        <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.423676">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="364" column="0" selection-start="15710" selection-end="15710" vertical-scroll-proportion="0.682243">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/doc/XWikiDocument.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="466" column="4" selection-start="13443" selection-end="13443" vertical-scroll-proportion="0.12149533">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/dev/java/apache-ant-1.6.0/src/main/org/apache/tools/ant/filters/StringInputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="13" selection-start="2765" selection-end="2765" vertical-scroll-proportion="0.30952382">
           <folding />
         </state>
       </provider>

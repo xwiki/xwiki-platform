@@ -72,8 +72,9 @@
      	ldap.jar,
      	rome-0.6.jar,jdom-1.0.jar,
      	axis-1.2RC2.jar,jaxrpc-1.1.jar,saaj-1.2.jar,wsdl4j-1.5.jar,common-discovery-0.2.jar,googleapi.jar,googleadwords.jar,alexa.jar,terraservice.jar,ipresolver.jar,flipper.jar,
-     	mail-1.3.2.jar,ical4j-0.9.12.jar,flickrapi-1.0a7.jar" />
-     <!-- ant-1.6.2.jar,InlineJavaServer.jar,InlineJavaUser.jar, -->
+     	mail-1.3.2.jar,ical4j-0.9.12.jar,flickrapi-1.0a7.jar,
+        ant-1.6.2.jar" />
+     <!-- ,InlineJavaServer.jar,InlineJavaUser.jar, -->
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />

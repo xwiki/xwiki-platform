@@ -288,6 +288,45 @@
         <option name="myCondition" value="" />
         <option name="myLogMessage" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java" line="142">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="myCondition" value="" />
+        <option name="myLogMessage" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java" line="134">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="myCondition" value="" />
+        <option name="myLogMessage" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java" line="109">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="myCondition" value="" />
+        <option name="myLogMessage" value="" />
+      </breakpoint>
     </line_breakpoints>
     <exception_breakpoints>
       <breakpoint_any>
@@ -553,80 +592,76 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/XWiki.java">
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/flickr/FlickrPlugin.java" pinned="false">
+    <first-group selected-file="file://$PROJECT_DIR$/build.xml">
+      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/XWikiHibernateStore.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="34" column="20" selection-start="1339" selection-end="1339" vertical-scroll-proportion="0.59302324">
+          <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.26845637">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionImpl.class" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.26845637">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/JDBCContext.class" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="43" column="0" selection-start="1450" selection-end="1450" vertical-scroll-proportion="0.26845637">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/AbstractBatcher.class" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="108" column="0" selection-start="4541" selection-end="4541" vertical-scroll-proportion="1.0134228">
+            <folding />
+          </state>
+        </provider>
+      </entry>
+      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java" pinned="false">
+        <provider selected="true" editor-type-id="text-editor">
+          <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.5704698">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/flickr/FlickrPluginApi.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="47" column="21" selection-start="1522" selection-end="1522" vertical-scroll-proportion="0.45787546">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/Flickr.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="28" column="20" selection-start="1194" selection-end="1194" vertical-scroll-proportion="0.124542125">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/people/PeopleInterface.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="24" column="14" selection-start="920" selection-end="920" vertical-scroll-proportion="0.3604651">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/people/User.class" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="74" column="13" selection-start="2207" selection-end="2207" vertical-scroll-proportion="0.83150184">
-            <folding />
           </state>
         </provider>
       </entry>
       <entry file="file://$PROJECT_DIR$/build.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="382" column="0" selection-start="16633" selection-end="16633" vertical-scroll-proportion="0.4728682">
+          <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/XWikiHibernateStore.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate-test.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="169" column="0" selection-start="5339" selection-end="5339" vertical-scroll-proportion="0.86821705">
+          <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.3489933">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/XWiki.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/test/hibernate-test.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="197" column="52" selection-start="7998" selection-end="7998" vertical-scroll-proportion="0.33333334">
+          <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.45637584">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/alexa/AlexaPlugin.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/test/hibernate-integration.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="31" column="13" selection-start="1160" selection-end="1160" vertical-scroll-proportion="0.32945737">
+          <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.5201342">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/alexa/AlexaPluginApi.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate.cfg.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="132" column="0" selection-start="6786" selection-end="6786" vertical-scroll-proportion="1.0193799">
-            <folding>
-              <element signature="imports" expanded="true" />
-            </folding>
+          <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.45637584">
+            <folding />
           </state>
         </provider>
       </entry>
@@ -738,12 +773,15 @@
     <expanded_node url="" module="xwiki" type="module" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/com/xpn/xwiki" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/com/xpn" module="xwikibase" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/src/web/WEB-INF" module="xwiki" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/com" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test-cactus/com/xpn/xwiki/test" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$/src/test/com/xpn/xwiki/test" module="xwikibase" type="directory" />
     <expanded_node url="" module="xwikibase" type="module" />
+    <expanded_node url="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store" module="xwikibase" type="directory" />
     <expanded_node url="file://$PROJECT_DIR$" module="xwikibase" type="directory" />
+    <expanded_node url="file://$PROJECT_DIR$/test" module="xwikibase" type="directory" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" splitterProportion="0.43551797">
@@ -1556,22 +1594,22 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1019" height="748" extended-state="7" />
+    <frame x="-4" y="-4" width="1019" height="748" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.37833333" order="6" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.30196485" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.2533609" order="0" x="-87" y="100" width="469" height="491" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.30731708" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23529412" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3804878" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.28003973" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.40162602" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.20162602" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.1509434" order="2" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.31544715" order="8" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.500813" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.299187" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.40038684" order="0" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.330033" order="10" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
@@ -1668,113 +1706,109 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/render/XWikiWikiBaseRenderer.java">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionFactoryImpl.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="30" selection-start="1155" selection-end="1155" vertical-scroll-proportion="0.4214876">
+        <state line="180" column="0" selection-start="8098" selection-end="8098" vertical-scroll-proportion="0.3625">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/render/XWikiRenderingEngine.java">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/cfg/Settings.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="107" column="53" selection-start="4127" selection-end="4127" vertical-scroll-proportion="0.7848101">
+        <state line="109" column="0" selection-start="3985" selection-end="3985" vertical-scroll-proportion="0.3625">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/XWikiPluginManager.java">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/connection/DriverManagerConnectionProvider.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="163" column="83" selection-start="5371" selection-end="5371" vertical-scroll-proportion="0.8607595">
+        <state line="27" column="0" selection-start="843" selection-end="843" vertical-scroll-proportion="0.975">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/XWikiPluginInterface.java">
+    <entry file="file://C:/dev/java/commons-logging-1.0.3-src/src/java/org/apache/commons/logging/impl/Log4JLogger.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="18" selection-start="1840" selection-end="1840" vertical-scroll-proportion="1.4725275">
+        <state line="230" column="0" selection-start="7191" selection-end="7191" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/XWikiDefaultPlugin.java">
+    <entry file="jar://C:/tools/j2sdk1.4.2_03/src.zip!/java/util/ArrayList.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="91" column="0" selection-start="2279" selection-end="2400" vertical-scroll-proportion="1.4542124">
+        <state line="402" column="0" selection-start="14360" selection-end="14360" vertical-scroll-proportion="0.40865386">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/flickr/FlickrPlugin.java">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/AbstractBatcher.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="20" selection-start="1339" selection-end="1339" vertical-scroll-proportion="0.59302324">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/flickr/FlickrPluginApi.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="21" selection-start="1522" selection-end="1522" vertical-scroll-proportion="0.45787546">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/Flickr.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="20" selection-start="1194" selection-end="1194" vertical-scroll-proportion="0.124542125">
+        <state line="108" column="0" selection-start="4541" selection-end="4541" vertical-scroll-proportion="1.0134228">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/people/PeopleInterface.class">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/jdbc/JDBCContext.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="24" column="14" selection-start="920" selection-end="920" vertical-scroll-proportion="0.3604651">
+        <state line="43" column="0" selection-start="1450" selection-end="1450" vertical-scroll-proportion="0.26845637">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/com/aetrion/flickr/people/User.class">
+    <entry file="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/org/hibernate/impl/SessionImpl.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="13" selection-start="2207" selection-end="2207" vertical-scroll-proportion="0.83150184">
+        <state line="87" column="0" selection-start="3368" selection-end="3368" vertical-scroll-proportion="0.26845637">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/alexa/AlexaPlugin.java">
+    <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate-test.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="13" selection-start="1160" selection-end="1160" vertical-scroll-proportion="0.32945737">
+        <state line="21" column="0" selection-start="1018" selection-end="1018" vertical-scroll-proportion="0.3489933">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/plugin/alexa/AlexaPluginApi.java">
+    <entry file="file://$PROJECT_DIR$/test/hibernate-integration.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="132" column="0" selection-start="6786" selection-end="6786" vertical-scroll-proportion="1.0193799">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="382" column="0" selection-start="16633" selection-end="16633" vertical-scroll-proportion="0.4728682">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/XWiki.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="197" column="52" selection-start="7998" selection-end="7998" vertical-scroll-proportion="0.33333334">
+        <state line="22" column="62" selection-start="1154" selection-end="1154" vertical-scroll-proportion="0.5201342">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/XWikiHibernateStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="169" column="0" selection-start="5339" selection-end="5339" vertical-scroll-proportion="0.86821705">
+        <state line="303" column="0" selection-start="10734" selection-end="10734" vertical-scroll-proportion="0.26845637">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/hibernate-test.cfg.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.45637584">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/com/xpn/xwiki/store/DBCPConnectionProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="173" column="0" selection-start="7443" selection-end="7443" vertical-scroll-proportion="0.5704698">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/web/WEB-INF/hibernate.cfg.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="0" selection-start="727" selection-end="727" vertical-scroll-proportion="0.45637584">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

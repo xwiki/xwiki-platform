@@ -158,10 +158,16 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void updateSchema(XWikiContext context) throws HibernateException {
+            updateSchema(context, false);
+
+    }
+
+    // Let's synchronize this, to only update one schema at a time
+    public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException {
 
         // No updating of schema if we have a config parameter saying so
         try {
-        if ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))
+        if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
          return;
         } catch (Exception e) {}
 

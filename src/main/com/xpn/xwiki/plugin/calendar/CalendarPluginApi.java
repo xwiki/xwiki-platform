@@ -26,10 +26,20 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
+import net.fortuna.ical4j.data.ParserException;
+import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.PropertyList;
+import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.Recur;
+import net.fortuna.ical4j.model.parameter.Value;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.*;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
+import java.text.SimpleDateFormat;
 
 public class CalendarPluginApi extends Api {
     private CalendarPlugin plugin;
@@ -103,6 +113,107 @@ public class CalendarPluginApi extends Api {
         Calendar cal = Calendar.getInstance(context.getResponse().getLocale());
         cal.setTime(new Date());
         return cal;
+    }
+
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl) throws ParserException, IOException {
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, context);
+        return calendar;
+    }
+
+
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password) throws ParserException, IOException {
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, context);
+        return calendar;
+    }
+
+    public CalendarData getCalendarEvents(String surl, String user) throws ParserException, IOException {
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, context);
+        return fromCalendar(calendar, user);
+    }
+
+    public CalendarData getCalendarEvents(String surl, String user, String username, String password) throws ParserException, IOException {
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, context);
+        return fromCalendar(calendar, user);
+    }
+
+    public CalendarData fromCalendar(net.fortuna.ical4j.model.Calendar calendar, String user) {
+        CalendarData data = new CalendarData();
+        Iterator it = calendar.getComponents().iterator();
+        while (it.hasNext()) {
+            Component component = (Component) it.next();
+            if (component instanceof VEvent) {
+                VEvent event = (VEvent) component;
+                Calendar sdate = Calendar.getInstance();
+                sdate.setTime(event.getStartDate().getTime());
+                Calendar edate = Calendar.getInstance();
+                edate.setTime(event.getEndDate().getTime());
+                PropertyList prop = event.getProperties();
+                Property summary = prop.getProperty("SUMMARY");
+                StringBuffer newsummary = new StringBuffer((summary!=null) ? summary.getValue() : "");
+                if ((sdate.get(Calendar.HOUR)!=0)||(sdate.get(Calendar.MINUTE)!=0)
+                        ||(edate.get(Calendar.HOUR)!=0)||(edate.get(Calendar.MINUTE)!=0)) {
+                           SimpleDateFormat sformat = new SimpleDateFormat("HH:mm");
+                           newsummary.append(" ");
+                           newsummary.append(sformat.format(sdate.getTime()));
+                           newsummary.append("-");
+                           newsummary.append(sformat.format(edate.getTime()));
+                        }
+
+                CalendarEvent cevent = new CalendarEvent(sdate, edate, user, newsummary.toString());
+                data.addCalendarData(cevent);
+            }
+        }
+        return data;
+    }
+
+    public net.fortuna.ical4j.model.Calendar toCalendar(CalendarData data) {
+        Iterator it = data.getCalendarData().iterator();
+        net.fortuna.ical4j.model.Calendar cal = new net.fortuna.ical4j.model.Calendar();
+        while (it.hasNext()) {
+            CalendarEvent cevent = (CalendarEvent) it.next();
+            Calendar datestart = cevent.getDateStart();
+            Calendar dateend = cevent.getDateEnd();
+
+            VEvent vevent = new VEvent();
+            float duration = (dateend.getTimeInMillis() - datestart.getTimeInMillis())/1000/60/60/24;
+            if (duration>=1) {
+              dateend = ((Calendar)datestart.clone());
+              dateend.add(Calendar.HOUR, 24);
+              RRule rule = new RRule(new Recur("DAILY", Math.round(duration)));
+              vevent.getProperties().add(rule);
+            }
+            DtStart dtstart = new DtStart(cevent.getDateStart().getTime());
+            DtEnd dtend = new DtEnd(cevent.getDateEnd().getTime());
+            dtstart.getParameters().add(Value.DATE);
+            dtend.getParameters().add(Value.DATE);
+            vevent.getProperties().add(dtstart);
+            vevent.getProperties().add(dtend);
+            vevent.getProperties().add(new Summary(cevent.getDescription()));
+            cal.getComponents().add(vevent);
+            }
+        return cal;
+    }
+
+    public String toICal(CalendarData data) {
+        return toCalendar(data).toString();
+    }
+
+    public String toICal(Document doc, String user) throws XWikiException {
+      CalendarData cData = new CalendarData(doc.getDocument(), user, context);
+      return toICal(cData);
+    }
+
+    public String toICal(String user) throws XWikiException {
+      CalendarData cData = new CalendarData(context.getDoc(), user, context);
+      return toICal(cData);
+    }
+
+    public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user) throws XWikiException, ParserException, IOException {
+        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user), context);
+    }
+
+    public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user, String username, String password) throws XWikiException, ParserException, IOException {
+        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user, username, password), context);
     }
 
 }

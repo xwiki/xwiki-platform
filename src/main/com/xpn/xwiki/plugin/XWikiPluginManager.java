@@ -91,43 +91,89 @@ public class XWikiPluginManager {
     }
 
     public void virtualInit(XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).virtualInit(context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).virtualInit(context);
+            } catch (Exception e)
+            {}
+        }
     }
 
     public void flushCache() {
-        for (int i=0;i<plugins.size();i++)
-            ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).flushCache();
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).flushCache();
+            } catch (Exception e)
+            {}
+        }
     }
 
     public String commonTagsHandler(String text, XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).commonTagsHandler(text,context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).commonTagsHandler(text,context);
+            } catch (Exception e)
+            {}
+        }
         return text;
     }
 
     public String startRenderingHandler(String text, XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).startRenderingHandler(text,context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).startRenderingHandler(text,context);
+            } catch (Exception e)
+            {}
+        }
         return text;
     }
 
     public String outsidePREHandler(String text, XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).outsidePREHandler(text,context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).outsidePREHandler(text,context);
+            } catch (Exception e)
+            {}
+        }
         return text;
     }
 
     public String insidePREHandler(String text, XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).insidePREHandler(text,context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).insidePREHandler(text,context);
+            } catch (Exception e)
+            {}
+        }
         return text;
     }
 
     public String endRenderingHandler(String text, XWikiContext context) {
-        for (int i=0;i<plugins.size();i++)
-            text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).endRenderingHandler(text,context);
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).endRenderingHandler(text,context);
+            } catch (Exception e)
+            {}
+        }
         return text;
+    }
+
+    public void beginRendering(XWikiContext context) {
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).beginRendering(context);
+            } catch (Exception e)
+            {}
+        }
+    }
+
+    public void endRendering(XWikiContext context) {
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).endRendering(context);
+            } catch (Exception e)
+            {}
+        }
     }
 
 }

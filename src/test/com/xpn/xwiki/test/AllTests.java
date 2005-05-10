@@ -54,7 +54,6 @@ public class AllTests {
         suite.addTestSuite(PluginTest.class);
         suite.addTestSuite(RadeoxRenderTest.class);
         suite.addTestSuite(VelocityRenderTest.class);
-        suite.addTestSuite(VelocityRenderTest.class);
         suite.addTestSuite(GroovyRenderTest.class);
         suite.addTestSuite(StatsTest.class);
         suite.addTestSuite(StoreRCSFileTest.class);
@@ -67,7 +66,7 @@ public class AllTests {
         suite.addTestSuite(UtilTest.class);
         suite.addTestSuite(PDFExportTest.class);
         suite.addTestSuite(LDAPTest.class);
-        suite.addTestSuite(PerlTest.class);
+        // suite.addTestSuite(PerlTest.class);
         //$JUnit-END$
 
         return suite;

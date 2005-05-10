@@ -41,6 +41,7 @@
     <orderEntry type="library" name="Dom4J" level="project" />
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="JMock" level="project" />
+    <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
@@ -124,6 +125,10 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="Velocity">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="WebServices">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>

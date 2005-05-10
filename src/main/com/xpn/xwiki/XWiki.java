@@ -93,6 +93,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
@@ -192,7 +195,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 wikilist.add(appname);
                 XWikiHibernateStore store = getHibernateStore();
                 if (store!=null)
-                    store.updateSchema(context);
+                    store.updateSchema(context, true);
             }
 
             // Make sure these classes exists
@@ -2806,6 +2809,60 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
         return cacheService;
+    }
+
+    public String getURLContent(String surl) throws IOException {
+        HttpClient client = new HttpClient();
+
+        // create a GET method that reads a file over HTTPS, we're assuming
+        // that this file requires basic authentication using the realm above.
+        GetMethod get = new GetMethod(surl);
+
+        try {            
+            // execute the GET
+            int status = client.executeMethod( get );
+
+            // print the status and response
+            return get.getResponseBodyAsString();
+        } finally {
+            // release any connection resources used by the method
+            get.releaseConnection();
+        }
+    }
+
+    public String getURLContent(String surl, String username, String password) throws IOException {
+        HttpClient client = new HttpClient();
+
+        // pass our credentials to HttpClient, they will only be used for
+        // authenticating to servers with realm "realm", to authenticate agains
+        // an arbitrary realm change this to null.
+        client.getState().setCredentials(
+                null,
+                null,
+                new UsernamePasswordCredentials(username, password)
+        );
+
+        // create a GET method that reads a file over HTTPS, we're assuming
+        // that this file requires basic authentication using the realm above.
+        GetMethod get = new GetMethod(surl);
+
+        try {
+            // Tell the GET method to automatically handle authentication. The
+            // method will use any appropriate credentials to handle basic
+            // authentication requests.  Setting this value to false will cause
+            // any request for authentication to return with a status of 401.
+            // It will then be up to the client to handle the authentication.
+            get.setDoAuthentication( true );
+
+            // execute the GET
+            int status = client.executeMethod( get );
+
+            // print the status and response
+            return get.getResponseBodyAsString();
+        } finally {
+            // release any connection resources used by the method
+            get.releaseConnection();
+        }
     }
 }
 

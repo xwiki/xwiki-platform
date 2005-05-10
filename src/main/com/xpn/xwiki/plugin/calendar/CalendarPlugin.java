@@ -23,21 +23,26 @@
  */
 package com.xpn.xwiki.plugin.calendar;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import net.fortuna.ical4j.data.CalendarBuilder;
+import net.fortuna.ical4j.data.ParserException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import java.util.*;
-import java.text.SimpleDateFormat;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
     private static Log mLogger =
@@ -329,6 +334,22 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
         return new CalendarPluginApi((CalendarPlugin) plugin, context);
+    }
+
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context) throws ParserException, IOException {
+            CalendarBuilder builder = new CalendarBuilder();
+            String sical = context.getWiki().getURLContent(surl);
+            StringReader reader = new StringReader(sical);
+            net.fortuna.ical4j.model.Calendar calendar = builder.build(reader);
+            return calendar;
+    }
+
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password, XWikiContext context) throws ParserException, IOException {
+            CalendarBuilder builder = new CalendarBuilder();
+            String sical = context.getWiki().getURLContent(surl, username, password);
+            StringReader reader = new StringReader(sical);
+            net.fortuna.ical4j.model.Calendar calendar = builder.build(reader);
+            return calendar;
     }
 
 }

@@ -22,18 +22,21 @@
  */
 package com.xpn.xwiki.plugin.calendar;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.StringProperty;
 
 import java.util.*;
 
 public class CalendarData {
     private List cdata = new ArrayList();
+
+    public CalendarData() {
+    }
 
     public CalendarData(String user, XWikiContext context) throws XWikiException {
         addCalendarData(context.getDoc(), user);
@@ -65,6 +68,10 @@ public class CalendarData {
             cdata.add(new CalendarEvent(cdate, cdate, "",
                     "[" + doc.getName() + ">" + doc.getFullName() + "] by " + context.getWiki().getLocalUserName(doc.getAuthor(), context) ));
         }
+    }
+
+    public List getCalendarData() {
+        return cdata;
     }
 
     public void addCalendarData(XWikiDocument doc, String defaultUser) throws XWikiException {
@@ -147,16 +154,20 @@ public class CalendarData {
             CalendarEvent event = (CalendarEvent) cdata.get(i);
             int idate = tddate.get(Calendar.YEAR) * 1000 + tddate.get(Calendar.DAY_OF_YEAR);
             int isdate = event.getDateStart().get(Calendar.YEAR) * 1000 + event.getDateStart().get(Calendar.DAY_OF_YEAR);
-            int iedate = event.getDateEnd().get(Calendar.YEAR) * 1000 + event.getDateEnd().get(Calendar.DAY_OF_YEAR);
-            if ((idate>= isdate)&&(idate<= iedate)) {
+            Calendar dtend = (Calendar) event.getDateEnd().clone();
+            // dtend.add(Calendar.SECOND, -1);
+            int iedate = dtend.get(Calendar.YEAR) * 1000 + dtend.get(Calendar.DAY_OF_YEAR);
+            if ((idate>= isdate)&&(idate<=iedate)) {
+                    StringBuffer message = new StringBuffer();
                     String user = event.getUser();
                     if ((user!=null)&&(!user.equals("")))
-                     result.append(context.getWiki().getLocalUserName(event.getUser(), context));
+                     message.append(context.getWiki().getLocalUserName(event.getUser(), context));
                     String desc = event.getDescription();
-                    if ((desc!=null)&&(!desc.trim().equals(""))&&(!result.toString().trim().equals("")))
-                      result.append(": ");
-                    result.append(desc);
-                    result.append("<br />");
+                    if ((desc!=null)&&(!desc.trim().equals(""))&&(!message.toString().trim().equals("")))
+                      message.append(": ");
+                    message.append(desc);
+                    message.append("<br />");
+                    result.append(message);
                 }
         }
         return result.toString();

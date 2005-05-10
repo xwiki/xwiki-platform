@@ -431,6 +431,7 @@ public class XWikiService {
             if (tdoc == doc) {
                 tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
                 tdoc.setLanguage(language);
+                tdoc.setStore(doc.getStore());
             }
             tdoc.setTranslation(1);
         }
@@ -511,6 +512,7 @@ public class XWikiService {
             if (tdoc == doc) {
                 tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
                 tdoc.setLanguage(language);
+                tdoc.setStore(doc.getStore());
             }
             tdoc.setTranslation(1);
         }

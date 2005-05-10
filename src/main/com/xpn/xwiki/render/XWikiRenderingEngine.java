@@ -35,10 +35,11 @@ public class XWikiRenderingEngine {
     private Vector renderers = new Vector();
 
     public XWikiRenderingEngine(XWiki xwiki) throws XWikiException {
-        addRenderer(new XWikiJSPRenderer());
+        // addRenderer(new XWikiJSPRenderer());
         addRenderer(new XWikiVelocityRenderer());
         addRenderer(new XWikiGroovyRenderer());
         addRenderer(new XWikiPluginRenderer());
+        /*
         if (xwiki.Param("xwiki.perl.active", "1").equals("1")) {
             boolean hasPerl = true;
             String pluginspath = xwiki.ParamAsRealPathVerified("xwiki.perl.pluginspath");
@@ -53,6 +54,7 @@ public class XWikiRenderingEngine {
                         xwiki.Param("xwiki.perl.javaserverport", "7890"), 0));
             }
         }
+        */
 
         // The first should not removePre
         // The last one should removePre
@@ -94,9 +96,18 @@ public class XWikiRenderingEngine {
         XWikiDocument doc = context.getDoc();
         XWikiDocument cdoc = context.getDoc();
 
+        // Let's call the beginRendering loop
+        context.getWiki().getPluginManager().beginRendering(context);
+
         String content = text;
-        for (int i=0;i<renderers.size();i++)
-            content = ((XWikiRenderer)renderers.elementAt(i)).render(content, contentdoc, includingdoc, context);
+        try {
+            for (int i=0;i<renderers.size();i++)
+                content = ((XWikiRenderer)renderers.elementAt(i)).render(content, contentdoc, includingdoc, context);
+        } finally {
+            // Let's call the endRendering loop
+            context.getWiki().getPluginManager().endRendering(context);
+        }
+
         return content;
     }
 

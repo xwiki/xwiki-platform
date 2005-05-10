@@ -40,6 +40,7 @@
     <orderEntry type="library" name="Dom4J" level="project" />
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="JMock" level="project" />
+    <orderEntry type="library" name="WebServices" level="project" />
     <orderEntryProperties />
   </component>
 </module>

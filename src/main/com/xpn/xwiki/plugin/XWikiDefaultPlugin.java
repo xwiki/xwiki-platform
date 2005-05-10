@@ -83,4 +83,10 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface {
     public void setClassName(String name) {
         this.name = name;
     }
+
+    public void beginRendering(XWikiContext context) {
+    }
+
+    public void endRendering(XWikiContext context) {
+    }
 }

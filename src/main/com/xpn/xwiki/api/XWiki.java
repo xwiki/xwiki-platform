@@ -614,4 +614,20 @@ public class XWiki extends Api {
         }
     }
 
+    public String getURLContent(String surl, String username, String password) throws IOException {
+        try {
+            return xwiki.getURLContent(surl, username, password);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String getURLContent(String surl) throws IOException {
+        try {
+            return xwiki.getURLContent(surl);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 }

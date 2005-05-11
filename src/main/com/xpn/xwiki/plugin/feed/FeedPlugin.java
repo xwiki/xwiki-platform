@@ -60,7 +60,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             return 0;
         if (entrie1.getPublishedDate() == null)
             return 1;
-        if (entrie1.getPublishedDate() == null)
+        if (entrie2.getPublishedDate() == null)
             return -1;
         return (-entrie1.getPublishedDate().compareTo(entrie2.getPublishedDate()));
     }
@@ -100,7 +100,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         outputFeed.setTitle("XWiki Feeds");
         outputFeed.setAuthor("XWiki Team");
         outputFeed.setEntries(entries);
-        TreeMap entriesMap = new TreeMap();
 
         for (int i = 0; i < feeds.length; i++)
         {

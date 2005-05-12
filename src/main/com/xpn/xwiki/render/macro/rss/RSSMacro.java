@@ -132,9 +132,11 @@ public class RSSMacro extends BaseLocaleMacro {
     private void renderEntries(SyndFeed feed, Writer writer, RSSMacroParameters paramObj) throws java.io.IOException
     {
         List listEntries = feed.getEntries();
-        Iterator it = listEntries.iterator();
-        while(it.hasNext()) {
-          renderEntry((SyndEntry)it.next(), writer, paramObj);
+
+        int max = paramObj.evalCount(listEntries.size());
+
+        for (int i = 0; i < max; i++) {
+          renderEntry((SyndEntry)listEntries.get(i), writer, paramObj);
         }
     }
 

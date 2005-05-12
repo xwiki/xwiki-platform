@@ -50,20 +50,20 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         private XWikiCache feedCache;
         private int refreshPeriod;
 
-      public static class SyndEntryComparator
-      implements Comparator {
-    public int compare(Object element1, Object element2) {
-        SyndEntry entrie1 = (SyndEntry) element1;
-        SyndEntry entrie2 = (SyndEntry) element2;
+      public static class SyndEntryComparator implements Comparator {
 
-        if ((entrie1.getPublishedDate() == null) &&  (entrie2.getPublishedDate() == null))
-            return 0;
-        if (entrie1.getPublishedDate() == null)
-            return 1;
-        if (entrie2.getPublishedDate() == null)
-            return -1;
-        return (-entrie1.getPublishedDate().compareTo(entrie2.getPublishedDate()));
-    }
+          public int compare(Object element1, Object element2) {
+            SyndEntry entry1 = (SyndEntry) element1;
+            SyndEntry entry2 = (SyndEntry) element2;
+
+            if ((entry1.getPublishedDate() == null) &&  (entry2.getPublishedDate() == null))
+                return 0;
+            if (entry1.getPublishedDate() == null)
+                return 1;
+            if (entry2.getPublishedDate() == null)
+                return -1;
+            return (-entry1.getPublishedDate().compareTo(entry2.getPublishedDate()));
+        }
   }
 
 
@@ -94,7 +94,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     public SyndFeed getFeeds(String sfeeds, XWikiContext context) throws IOException {
-        String[] feeds = sfeeds.split("\\|");
+        String[] feeds;
+        if (sfeeds.indexOf("\n") != -1)
+            feeds = sfeeds.split("\n");
+        else
+            feeds = sfeeds.split("\\|");
         List entries = new ArrayList();
         SyndFeed outputFeed = new SyndFeedImpl();
         outputFeed.setTitle("XWiki Feeds");

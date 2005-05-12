@@ -1072,6 +1072,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (language!=null)
             return language;
 
+        if (!context.getWiki().isMultiLingual(context)) {
+            language = context.getWiki().getXWikiPreference("language", "", context);
+            context.setLanguage(language);
+            return language;
+        }
+
         try {
             language = context.getRequest().getParameter("language");
             if ((language!=null)&&(!language.equals(""))) {

@@ -34,13 +34,13 @@
     <orderEntry type="library" name="XMLRPC" level="project" />
     <orderEntry type="library" name="Groovy" level="project" />
     <orderEntry type="library" name="fop" level="project" />
-    <orderEntry type="library" name="TomCat 4.1" level="project" />
     <orderEntry type="library" name="LDAP" level="project" />
     <orderEntry type="library" name="RSS" level="project" />
     <orderEntry type="library" name="Dom4J" level="project" />
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
+    <orderEntry type="library" name="Tomcat 5.0" level="application" />
     <orderEntryProperties />
   </component>
 </module>

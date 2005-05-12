@@ -33,7 +33,6 @@
     <orderEntry type="library" name="XMLRPC" level="project" />
     <orderEntry type="library" name="Groovy" level="project" />
     <orderEntry type="library" name="fop" level="project" />
-    <orderEntry type="library" name="TomCat 4.1" level="project" />
     <orderEntry type="module" module-name="xwikibase" />
     <orderEntry type="module" module-name="portal" />
     <orderEntry type="library" name="LDAP" level="project" />
@@ -42,6 +41,7 @@
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
+    <orderEntry type="library" name="Tomcat 5.0" level="application" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>

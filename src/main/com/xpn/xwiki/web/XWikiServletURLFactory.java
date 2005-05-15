@@ -88,9 +88,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         newpath.append(actionPath);
         newpath.append(action);
         newpath.append("/");
-        newpath.append(web);
+        newpath.append(encode(web, context));
+
         newpath.append("/");
-        newpath.append(name);
+        newpath.append(encode(name, context));
 
         if ((querystring!=null)&&(!querystring.equals(""))) {
             newpath.append("?");
@@ -108,6 +109,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
+        }
+    }
+
+    private String encode(String name, XWikiContext context) {
+        try {
+         return URLEncoder.encode(name, context.getWiki().getEncoding());
+        } catch (Exception e) {
+         return name;
         }
     }
 
@@ -133,9 +142,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
         newpath.append("skin/");
-        newpath.append(web);
+        newpath.append(encode(web, context));
         newpath.append("/");
-        newpath.append(name);
+        newpath.append(encode(name, context));
         newpath.append("/");
         newpath.append(filename);
         try {
@@ -164,9 +173,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         newpath.append(actionPath);
         newpath.append(action);
         newpath.append("/");
-        newpath.append(web);
+        newpath.append(encode(web, context));
         newpath.append("/");
-        newpath.append(name);
+        newpath.append(encode(name, context));
         newpath.append("/");
         try {
             newpath.append(URLEncoder.encode(filename, "UTF-8"));

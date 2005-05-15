@@ -121,9 +121,9 @@ public class RadeoxRenderTest  extends RenderTest {
         renderTest(wikibase, "Test link: [Web Home]",
                 "view/Main/WebHome", false, context);
         renderTest(wikibase, "Test link: [Web Home12]",
-                "Web Home12", false, context);
+                "Web+Home12", false, context);
         renderTest(wikibase, "Test link: [Web Home12]",
-                "edit/Main/WebHome12?parent=", false, context);
+                "edit/Main/Web+Home12?parent=", false, context);
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
                 "Other Text", false, context);
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
@@ -180,7 +180,7 @@ public class RadeoxRenderTest  extends RenderTest {
            renderTestInTable(wikibase, "Test link: [Web Home12]",
                    "Web Home12", false, context);
            renderTestInTable(wikibase, "Test link: [Web Home12]",
-                   "edit/Main/WebHome12?parent=", false, context);
+                   "edit/Main/Web+Home12?parent=", false, context);
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
                    "Other Text", false, context);
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",

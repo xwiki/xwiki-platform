@@ -110,6 +110,16 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             XWikiDocument doc = new XWikiDocument(
                     (currentdoc!=null) ? currentdoc.getWeb() : "Main",
                     newname);
+            boolean exists = context.getWiki().exists(doc.getFullName(), context);
+
+            // If the document exists with the spaces and accents converted then we use this one
+            if (exists)
+                return true;
+
+            // if the document does not exists then we check the one not converted
+            doc = new XWikiDocument(
+                    (currentdoc!=null) ? currentdoc.getWeb() : "Main",
+                     name);
             return context.getWiki().exists(doc.getFullName(), context);
         }
         catch (Exception e) {
@@ -149,6 +159,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 }
     
                 buffer.append("<span class=\"wikilink\"><a href=\"");
+                // If the document exists with the conversion of spaces and accents
+                // then we use this one
                 String newname = noaccents(name);
                 XWikiDocument newdoc = new XWikiDocument();
                 if (newname.indexOf(".")!=-1) {
@@ -160,7 +172,20 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     newdoc.setWeb(context.getDoc().getWeb());
                     newdoc.setName(newname);
                 }
-    
+
+                // If the document does not exist, then we use the normal name as is
+                if (!context.getWiki().exists(newdoc.getFullName(), context)) {
+                    if (name.indexOf(".")!=-1) {
+                        try {
+                            newdoc.setFullName(name, context);
+                        } catch (XWikiException e) {
+                        }
+                    } else {
+                        newdoc.setWeb(context.getDoc().getWeb());
+                        newdoc.setName(name);
+                    }
+                }
+
                 URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
                         "view", querystring, anchor, context);
                 buffer.append(context.getURLFactory().getURL(url, context));
@@ -204,8 +229,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 name = name.substring(0, qsIndex);
             }
 
-
-            String newname = noaccents(name);
+            String newname = name;
             XWikiDocument newdoc = new XWikiDocument();
             if (newname.indexOf(".")!=-1) {
                 try {

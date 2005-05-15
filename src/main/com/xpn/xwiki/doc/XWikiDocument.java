@@ -1629,11 +1629,19 @@ public class XWikiDocument {
 
                  // generate the link
                  Util util = context.getUtil();
-                 name = StringUtils.replace( util.noaccents(name), " ", "");
+                 String newname = StringUtils.replace( util.noaccents(name), " ", "");
 
                  // If it is a local link let's add the space
-                 if (name.indexOf(".")==-1) {
-                     name = getWeb() + "." + name;
+                 if (newname.indexOf(".")==-1) {
+                     newname = getWeb() + "." + name;
+                 }
+                 if (context.getWiki().exists(newname, context)) {
+                      name = newname;
+                 } else {
+                     // If it is a local link let's add the space
+                     if (name.indexOf(".")==-1) {
+                         name = getWeb() + "." + name;
+                     }
                  }
 
                  // Let's finally ignore the autolinks

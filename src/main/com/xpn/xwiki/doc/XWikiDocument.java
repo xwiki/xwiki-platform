@@ -38,6 +38,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.ObjectAddForm;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
@@ -61,6 +62,7 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.StringReader;
@@ -2141,4 +2143,29 @@ public class XWikiDocument {
             getStore().deleteLock(lock, context, true);
         }
     }
+
+       // This functions adds an object from an new object creation form
+   public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException {
+    // Read info in object
+    ObjectAddForm form = new ObjectAddForm();
+    form.setRequest((HttpServletRequest)context.getRequest());
+    form.readRequest();
+
+    XWikiDocument newdoc = (XWikiDocument) clone();
+    String className = form.getClassName();
+    int nb = newdoc.createNewObject(className, context);
+    BaseObject oldobject = newdoc.getObject(className, nb);
+    BaseClass baseclass = oldobject.getxWikiClass(context);
+    BaseObject newobject = (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
+    newobject.setNumber(oldobject.getNumber());
+    newobject.setName(newdoc.getFullName());
+    newdoc.setObject(className, nb, newobject);
+    context.getWiki().saveDocument(newdoc, context);
+    return newobject;
+   }
+
+   public void insertText(String text, String marker, XWikiContext context) throws XWikiException {
+      setContent(getContent().replaceFirst(marker, text + marker));
+      context.getWiki().saveDocument(this, context);
+   }
 }

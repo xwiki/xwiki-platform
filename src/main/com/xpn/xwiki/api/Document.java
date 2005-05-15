@@ -24,6 +24,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.stats.api.DocStats;
@@ -39,6 +40,7 @@ import org.apache.commons.jrcs.diff.Delta;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Version;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 
@@ -653,4 +655,16 @@ public class Document extends Api {
        if (hasAccessLevel("edit"))
            context.getWiki().saveDocument(doc, context);
    }
+
+    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException {
+        if (hasAccessLevel("edit"))
+            return doc.addObjectFromRequest(context);
+        else
+            return null;
+      }
+
+      public void insertText(String text, String marker, XWikiContext context) throws XWikiException {
+          if (hasAccessLevel("edit"))
+            doc.insertText(text, marker, context);  
+      }
 }

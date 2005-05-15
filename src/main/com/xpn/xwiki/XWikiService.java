@@ -36,6 +36,7 @@ import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.pdf.api.PdfExport;
+import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.fileupload.DiskFileUpload;
@@ -698,6 +699,25 @@ public class XWikiService {
         response.setContentLength(data.length);
         try {
             response.getOutputStream().write(data);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                    "Exception while sending response", e);
+        }
+        return null;
+    }
+
+    public String renderDot(XWikiContext context) throws XWikiException {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
+        String path = request.getRequestURI();
+        String filename = null;
+        try {
+            filename = URLDecoder.decode(path.substring(path.lastIndexOf("/")+1),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+        try {
+           ((GraphVizPlugin)context.getWiki().getPlugin("graphviz",context)).outputDotImageFromFile(filename, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,

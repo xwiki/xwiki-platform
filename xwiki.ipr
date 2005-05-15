@@ -287,6 +287,7 @@
         <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/oscache/docs/api" />
@@ -295,6 +296,7 @@
       <SOURCES>
         <root url="file://C:/dev/java/oscache/src/core/java" />
         <root url="file://C:/dev/java/hibernate/hibernate-3.0/src" />
+        <root url="file://E:/dev/java/hibernate/hibernate-3.0/src" />
       </SOURCES>
     </library>
     <library name="Perl">

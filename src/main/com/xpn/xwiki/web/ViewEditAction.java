@@ -185,6 +185,9 @@ public class ViewEditAction extends XWikiAction
                 else if (action.equals("download")) {
                     renderResult = xwikiservice.renderDownload(context);
                 }
+                else if (action.equals("dot")) {
+                    renderResult = xwikiservice.renderDot(context);
+                }
                 else if (action.equals("attach")) {
                     renderResult = xwikiservice.renderAttach(context);
                 }

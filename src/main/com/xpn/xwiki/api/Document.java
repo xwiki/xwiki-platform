@@ -417,6 +417,14 @@ public class Document extends Api {
         return doc.getIncludedPages(context);
     }
 
+    public List getIncludedMacros() {
+        return doc.getIncludedMacros(context);
+    }
+
+    public List getLinkedPages() {
+        return doc.getLinkedPages(context);
+    }
+
     public Attachment getAttachment(String filename) {
         XWikiAttachment attach = doc.getAttachment(filename);
         if (attach==null)

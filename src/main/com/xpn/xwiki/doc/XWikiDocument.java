@@ -47,6 +47,7 @@ import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.jrcs.util.ToString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
@@ -1551,7 +1552,7 @@ public class XWikiDocument {
              try {
                  String name = (String)list.get(i);
                  if (name.indexOf(".")==-1) {
-                     list.set(i, context.getDoc().getWeb() + "." + name);
+                     list.set(i, getWeb() + "." + name);
                  }
              } catch (Exception e) {
                  // This should never happen
@@ -1576,7 +1577,7 @@ public class XWikiDocument {
              try {
                  String name = (String)list.get(i);
                  if (name.indexOf(".")==-1) {
-                     list.set(i, context.getDoc().getWeb() + "." + name);
+                     list.set(i, getWeb() + "." + name);
                  }
              } catch (Exception e) {
                  // This should never happen
@@ -1586,6 +1587,65 @@ public class XWikiDocument {
          }
 
          return list;
+        } catch (Exception e) {
+            // This should never happen
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List getLinkedPages(XWikiContext context) {
+        try {
+         String pattern = "\\[(.*?)\\]";
+         List newlist = new ArrayList();
+         List list = context.getUtil().getMatches(getContent(), pattern, 1);
+         for (int i=0;i<list.size();i++) {
+             try {
+                 String name = (String)list.get(i);
+                 int i1 = name.indexOf(">");
+                 if (i1!=-1) {
+                     name = name.substring(i1+1);
+                 }
+                 i1 = name.indexOf("&gt;");
+                 if (i1!=-1) {
+                     name = name.substring(i1+4);
+                 }
+                 i1 = name.indexOf("#");
+                 if (i1!=-1) {
+                     name = name.substring(0,i1);
+                 }
+                 i1 = name.indexOf("?");
+                 if (i1!=-1) {
+                     name = name.substring(0,i1);
+                 }
+
+                 // Let's get rid of anything that's not a real link
+                 if (name.trim().equals("")||(name.indexOf("$")!=-1)||(name.indexOf("://")!=-1)
+                      ||(name.indexOf("\"")!=-1)||(name.indexOf("\'")!=-1)
+                      ||(name.indexOf("..")!=-1)||(name.indexOf(":")!=-1)||(name.indexOf("=")!=-1))
+                  continue;
+
+                 // generate the link
+                 Util util = context.getUtil();
+                 name = StringUtils.replace( util.noaccents(name), " ", "");
+
+                 // If it is a local link let's add the space
+                 if (name.indexOf(".")==-1) {
+                     name = getWeb() + "." + name;
+                 }
+
+                 // Let's finally ignore the autolinks
+                 if (!name.equals(getFullName()))
+                     newlist.add(name);
+
+             } catch (Exception e) {
+                 // This should never happen
+                   e.printStackTrace();
+                   return null;
+               }
+         }
+
+         return newlist;
         } catch (Exception e) {
             // This should never happen
             e.printStackTrace();

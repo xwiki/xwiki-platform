@@ -58,8 +58,6 @@
                       type="com.xpn.xwiki.web.ObjectAddForm"/>
     <form-bean name="objectremove"
                       type="com.xpn.xwiki.web.ObjectRemoveForm"/>
-    <form-bean name="register"
-                 type="com.xpn.xwiki.web.RegisterForm"/>
   </form-beans>
 
   <!-- ========== Global Forward Definitions ============================== -->
@@ -213,6 +211,12 @@
       <action path="/download/"
           type="com.xpn.xwiki.web.ViewEditAction"
           name="download"
+          scope="request">
+      </action>
+
+      <action path="/dot/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="dot"
           scope="request">
       </action>
 

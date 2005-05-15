@@ -106,8 +106,12 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         File ofile = getTempFile(hashCode, extension);
         if (!ofile.exists()) {
             Runtime rt = Runtime.getRuntime();
-            String command = dotPath + " -T" + extension + " \"" + dfile.getAbsolutePath()
-                    +"\" -o\"" + ofile.getAbsolutePath() + "\"";
+            String[] command = new String[5];
+            command[0] = dotPath;
+            command[1] = "-T" + extension;
+            command[2] = dfile.getAbsolutePath();
+            command[3] = "-o";
+            command[4] = ofile.getAbsolutePath();
             Process p = rt.exec(command);
             try {
                 int i = 0;

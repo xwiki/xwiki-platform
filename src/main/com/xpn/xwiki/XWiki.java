@@ -636,6 +636,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             name = path.substring(i2+1,i3);
         if (name.equals(""))
             name = "WebHome";
+
+        web = web.replace('+',' ');
+        name = name.replace('+',' ');
         return getDocument(web + "." + name, context);
     }
 

@@ -25,6 +25,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.user.api.XWikiAuthService;
@@ -251,7 +252,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
         if (context.getWiki().exists("XWiki."  + susername, context))
             return "XWiki." + susername;
 
-        String sql = "select distinct doc.web, doc.name from XWikiDocument as doc where doc.web='XWiki' and doc.name like '" + susername + "'";
+        String sql = "select distinct doc.web, doc.name from XWikiDocument as doc where doc.web='XWiki' and doc.name like '" + Utils.SQLFilter(susername) + "'";
         List list = context.getWiki().search(sql, context);
         if (list.size()==0)
             return null;

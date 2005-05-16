@@ -26,6 +26,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
@@ -630,4 +631,7 @@ public class XWiki extends Api {
         }
     }
 
+    public String sqlfilter(String text) {
+        return Utils.SQLFilter(text);
+    }
 }

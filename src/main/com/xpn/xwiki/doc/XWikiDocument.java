@@ -1942,7 +1942,7 @@ public class XWikiDocument {
     public List getTranslationList(XWikiContext context) throws XWikiException {
         List result = new ArrayList();
         String hql = "select doc.language from XWikiDocument as doc where doc.web = '"
-                        + getWeb() + "' and doc.name = '" + getName() + "' and doc.language <> ''";
+                        + Utils.SQLFilter(getWeb()) + "' and doc.name = '" + Utils.SQLFilter(getName()) + "' and doc.language <> ''";
 
         List list = context.getWiki().search(hql, context);
         if ((list==null)||(list.size()==0)) {

@@ -25,6 +25,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
@@ -64,7 +65,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 list = context.getWiki().getStore().searchDocumentsNames(", BaseObject as obj, StringProperty as prop "
                         + "where obj.name=" + context.getWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiGroups' "
                         + "and obj.id = prop.id.id and prop.id.name='member' "
-                        + "and (prop.value='" + username + "' or prop.value='" + shortname + "' or prop.value='" + veryshortname + "')", context);
+                        + "and (prop.value='" + Utils.SQLFilter(username)
+                        + "' or prop.value='" + Utils.SQLFilter(shortname) + "' or prop.value='"
+                        + Utils.SQLFilter(veryshortname) + "')", context);
                 groupCache.putInCache(key, list);
             }
             return list;

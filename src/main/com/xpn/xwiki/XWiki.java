@@ -74,10 +74,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
@@ -2134,7 +2131,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             String sql = "";
             if (web!=null)
-                sql = "where doc.web = '" + web + "'";
+                sql = "where doc.web = '" + Utils.SQLFilter(web) + "'";
 
             context.setDatabase(sourceWiki);
             List list = getStore().searchDocumentsNames(sql, context);

@@ -51,6 +51,7 @@ import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiStatsServiceImpl implements XWikiStatsService {
 
@@ -123,7 +124,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     public List getRefMonthStats(String docname, Date month, XWikiContext context) throws XWikiException {
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
-        List solist = store.search("from RefererStats as obj where obj.name='" + docname + "'", 0, 0, context);
+        List solist = store.search("from RefererStats as obj where obj.name='" + Utils.SQLFilter(docname) + "'", 0, 0, context);
         return solist;
     }
 

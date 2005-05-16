@@ -336,8 +336,8 @@ public class XWikiService {
         if (fieldsToRename.size()>0) {
             List list = xwiki.getStore().searchDocumentsNames(", BaseObject as obj where obj.name="
                                                               + xwiki.getFullNameSQL() + " and obj.className='"
-                                                              + bclass.getName() +  "' and " + xwiki.getFullNameSQL() + "<> '"
-                                                              + bclass.getName() + "'", context);
+                                                              + Utils.SQLFilter(bclass.getName()) +  "' and " + xwiki.getFullNameSQL() + "<> '"
+                                                              + Utils.SQLFilter(bclass.getName()) + "'", context);
             for (int i=0;i<list.size();i++) {
                 XWikiDocument doc2 = xwiki.getDocument((String)list.get(i), context);
                 doc2.renameProperties(bclass.getName(), fieldsToRename);

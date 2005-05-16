@@ -363,5 +363,12 @@ public class Utils {
         String svalue = filter.process(value);
         return svalue;
     }
-    
+
+    public static String SQLFilter(String text) {
+        try {
+            return text.replaceAll("'","''");
+        } catch (Exception e) {
+            return text;
+        }
+    }
 }

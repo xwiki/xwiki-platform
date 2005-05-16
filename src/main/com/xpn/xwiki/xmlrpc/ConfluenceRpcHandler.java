@@ -31,6 +31,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.velocity.VelocityContext;
 
@@ -193,7 +194,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         checkToken(token, context);
 
         Vector pages = new Vector();
-        List docs = xwiki.getStore().searchDocumentsNames("where doc.web='" + spaceKey + "'", context);
+        List docs = xwiki.getStore().searchDocumentsNames("where doc.web='" + Utils.SQLFilter(spaceKey) + "'", context);
         if (docs==null)
             return null;
         for (int i=0;i<docs.size();i++) {
@@ -243,8 +244,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         checkToken(token, context);
 
         Vector result = new Vector();
-        List doclist = xwiki.getStore().searchDocumentsNames("where doc.content like '%" + query +
-                "%' or doc.name like '%" + query + "%'", context);
+        List doclist = xwiki.getStore().searchDocumentsNames("where doc.content like '%" + Utils.SQLFilter(query) +
+                "%' or doc.name like '%" + Utils.SQLFilter(query) + "%'", context);
         if (doclist == null)
             return result;
 

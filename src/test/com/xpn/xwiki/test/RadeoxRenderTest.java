@@ -220,12 +220,12 @@ public class RadeoxRenderTest  extends RenderTest {
        }
 
       public void testWikiBaseVirtualLinkRenderer() throws XWikiException, HibernateException {
-        StoreHibernateTest.cleanUp(getHibStore(), context);
+        StoreHibernateTest.cleanUp(getHibStore(), true, true, context);
         Utils.createDoc(getHibStore(), "XWiki", "XWikiServerXwikitest2", context);
         Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
 
         context.setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(getHibStore(), context);
+        StoreHibernateTest.cleanUp(getHibStore(), false, true, context);
         Utils.createDoc(getHibStore(), "Main", "WebHome", context);
         context.setDatabase("xwikitest");
 

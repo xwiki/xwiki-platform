@@ -127,7 +127,7 @@ public class VelocityRenderTest extends TestCase {
 
         public void testIncludeFromOtherDatabase() throws XWikiException, HibernateException {
           context.setDatabase("xwikitest2");
-          StoreHibernateTest.cleanUp(getHibStore(), context);
+          StoreHibernateTest.cleanUp(getHibStore(), true, true, context);
           String content = Utils.content1;
           Utils.content1 = "XWiki Users";
           Utils.createDoc(getHibStore(),"XWiki", "XWikiUsers", context);

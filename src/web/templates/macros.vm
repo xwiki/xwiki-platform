@@ -140,6 +140,34 @@ $xwiki.includeForm("XWiki.${pagename}",false)
 <a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&strLocation=&strCP=${cp}&strCountry=1424&x=30&y=9">${linktext}</a>
 #end
 
+#macro(mindmap $mindmap $width $height)
+#if(!$width)
+#set($width="100%")
+#end
+#if(!$height)
+#set($height="600")
+#end
+#if(!$mindmap)
+#set($mindmap = "")
+#set($mmurl = "")
+#else
+#if($mindmap.startsWith("http"))
+#set($mmurl = $mindmap)
+#else
+#set($mmurl1 = $doc.getAttachmentURL($mindmap,"download"))
+#set($mmurl = "http://${request.serverName}${mmurl1}")
+#end
+#end
+<applet code="freemind.main.FreeMindApplet.class" archive="/xwiki/freemind/freemind.jar" width="${width}" height="${height}">
+<param name="type" value="application/x-java-applet;version=1.4" />
+<param name="scriptable" value="false" />
+<param name="modes" value="freemind.modes.browsemode.BrowseMode" />
+<param name="browsemode_initial_map" value="$mmurl" />
+<param name="initial_mode" value="Browse" />
+<param name="selection_method" value="selection_method_direct" />
+</applet>
+#end
+
 #macro (toc $init $max $numbered)
  #set ($int = 0)
  #set ($boolean = false)

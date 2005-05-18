@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCURLFactory;
+import com.novell.ldap.util.Base64;
 import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.log4j.MDC;
 import org.apache.ecs.Filter;
@@ -36,6 +37,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -371,4 +374,28 @@ public class Utils {
             return text;
         }
     }
+
+    public static String encode(String name, XWikiContext context) {
+        try {
+            //byte[] bytes = name.getBytes("UTF-8");
+            ///String result = new String(bytes);
+            return URLEncoder.encode(name, context.getWiki().getEncoding());
+        } catch (Exception e) {
+         return name;
+        }
+    }
+
+    public static String decode(String name, XWikiContext context) {
+        try {
+            String result = name.replace('+',' ');
+            // It seems Internet Explorer can send us back UTF-8
+            // instead of ISO-8859-1 for URLs
+             if (Base64.isValidUTF8(result.getBytes(), false))
+               result = new String(result.getBytes(), "UTF-8");
+            return result;
+        } catch (Exception e) {
+         return name;
+        }
+    }
+
 }

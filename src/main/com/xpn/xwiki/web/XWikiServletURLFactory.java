@@ -113,11 +113,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     }
 
     private String encode(String name, XWikiContext context) {
-        try {
-         return URLEncoder.encode(name, context.getWiki().getEncoding());
-        } catch (Exception e) {
-         return name;
-        }
+        return Utils.encode(name, context);
     }
 
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor, String xwikidb, XWikiContext context) {

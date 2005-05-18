@@ -164,7 +164,7 @@ public class ViewEditAction extends XWikiAction
                     if (xwikiservice.actionDelete(context))
                         renderResult = xwikiservice.renderDelete(context);
                 }
-                else if (action.equals("pdf")) {
+                else if (action.equals("pdf")) {                                                                                            
                     renderResult = xwikiservice.renderPDF(context);
                 }
                 else if (action.equals("propupdate")) {

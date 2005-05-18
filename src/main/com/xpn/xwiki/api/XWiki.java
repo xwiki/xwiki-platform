@@ -31,6 +31,7 @@ import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.BaseObject;
@@ -66,7 +67,12 @@ public class XWiki extends Api {
          return com.xpn.xwiki.XWiki.getRequestURL(context.getRequest()).toString();
      }
 
-
+     /**
+      * Loads an Document from the database. Rights are checked before sending back the document.
+      * @param fullname Fullname of the XWiki document to be loaded
+      * @return a Document object or null if it is not accessible
+      * @throws XWikiException
+      */
      public Document getDocument(String fullname) throws XWikiException {
          XWikiDocument doc = xwiki.getDocument(fullname, context);
          if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)==false) {
@@ -77,10 +83,22 @@ public class XWiki extends Api {
          return newdoc;
      }
 
+    /**
+     * Returns wether a document exists or not
+     * @param fullname Fullname of the XWiki document to be loaded
+     * @return true if the document exists, false if not
+     * @throws XWikiException
+     */
     public boolean exists(String fullname) throws XWikiException {
         return xwiki.exists(fullname, context);
     }
 
+    /**
+     * Verify the rights the current user has on a document
+     * @param docname fullname of the document
+     * @param right right to check ("view", "edit", "admin", "delete")
+     * @return true if it exists
+     */
     public boolean checkAccess(String docname, String right) {
         try {
             XWikiDocument doc =new XWikiDocument();
@@ -92,7 +110,14 @@ public class XWiki extends Api {
     }
 
 
-
+    /**
+     * Loads an Document from the database. Rights are checked before sending back the document.
+     *
+     * @param web  Space to use in case no space is defined in the fullname
+     * @param fullname Fullname or relative name of the document to load
+     * @return a Document object or null if it is not accessible
+     * @throws XWikiException
+     */
      public Document getDocument(String web, String fullname) throws XWikiException {
          XWikiDocument doc = xwiki.getDocument(web, fullname, context);
          if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)==false) {
@@ -103,6 +128,13 @@ public class XWiki extends Api {
          return newdoc;
      }
 
+    /**
+     * Load a specific revision of a document
+     * @param doc Document for which to load a specific revision
+     * @param rev Revision number
+     * @return  Specific revision of a document
+     * @throws XWikiException
+     */
     public Document getDocument(Document doc, String rev) throws XWikiException {
         if ((doc==null)||(doc.getDoc()==null))
             return null;
@@ -123,30 +155,65 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Transform a text in a form compatible text
+     * @param content text to transform
+     * @return  encoded result
+     */
      public String getFormEncoded(String content) {
         return xwiki.getFormEncoded(content);
      }
+
+    /**
+     * Transform a text in a URL compatible text
+     * @param content text to transform
+     * @return  encoded result
+     */
 
     public String getURLEncoded(String content) {
        return xwiki.getURLEncoded(content);
     }
 
+    /**
+     * Transform a text in a XML compatible text
+     * @param content text to transform
+     * @return  encoded result
+     */
      public String getXMLEncoded(String content) {
         return xwiki.getXMLEncoded(content);
      }
 
+    /**
+     * Output content in the edit content textarea
+     * @param content content to output
+     * @return the textarea text content
+     */
      public String getTextArea(String content) {
         return xwiki.getTextArea(content, context);
      }
 
+    /**
+     * Output content in the edit content htmlarea
+     * @param content content to output
+     * @return the htmlarea text content
+     */
     public String getHTMLArea(String content) {
         return xwiki.getHTMLArea(content, context);
     }
 
+    /**
+     * Get the list of available classes in the wiki
+     * @return list of classes names
+     * @throws XWikiException
+     */
     public List getClassList() throws XWikiException {
         return xwiki.getClassList(context);
     }
 
+    /**
+     * Get the global MetaClass object
+     * @return MetaClass object
+     */
     public MetaClass getMetaclass() {
         return xwiki.getMetaclass();
     }
@@ -297,7 +364,7 @@ public class XWiki extends Api {
                 return xwiki.createUser(withValidation, userRights, context);
             else
                 return -1;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             return -2;
@@ -335,7 +402,7 @@ public class XWiki extends Api {
         if (checkProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
     }
-    
+
 
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {
         if (checkProgrammingRights())
@@ -479,7 +546,7 @@ public class XWiki extends Api {
         else
          return null;
     }
-    
+
     public java.lang.Object getPortalService(String className) throws XWikiException {
         if (hasProgrammingRights())
          return xwiki.getPortalService(className);
@@ -555,30 +622,64 @@ public class XWiki extends Api {
         return xwiki.formatDate(date, null, context);
     }
 
+
     public String formatDate(Date date, String format) {
         return xwiki.formatDate(date, format, context);
     }
 
+    /**
+     * Returns a plugin from the plugin API. Plugin Rights can be verified.
+     * @param name Name of the plugin to retrieve (either short of full class name)
+     * @return a plugin object
+     */
     public Api get(String name) {
         return xwiki.getPluginApi(name, context);
     }
 
+    /**
+     * Returns a plugin from the plugin API. Plugin Rights can be verified.
+     * @param name Name of the plugin to retrieve (either short of full class name)
+     * @return a plugin object
+     */
     public Api getPlugin(String name) {
         return xwiki.getPluginApi(name, context);
     }
 
+    /**
+     * Returns the recently visited pages for a specific action
+     * @param action ("view" or "edit")
+     * @param size how many recent actions to retrieve
+     * @return a ArrayList of document names
+     */
     public java.util.Collection getRecentActions(String action, int size) {
-        return context.getWiki().getStatsService(context).getRecentActions(action, size, context);
+        XWikiStatsService stats = context.getWiki().getStatsService(context);
+        if (stats==null)
+            return new ArrayList();
+        else
+            return stats.getRecentActions(action, size, context);
     }
 
+    /**
+     * Returns the Advertisement system from the preferences
+     * @return "google" or "none"
+     */
     public String getAdType() {
         return xwiki.getAdType(context);
     }
 
+    /**
+     * Returns the Advertisement client ID from the preferences
+     * @return an Ad affiliate ID
+     */
     public String getAdClientId() {
         return xwiki.getAdClientId(context);
     }
 
+    /**
+     * Retrieves a int from a String
+     * @param str String to convert to int
+     * @return  the int or zero in case of exception
+     */
     public int parseInt(String str) {
         try {
             return Integer.parseInt(str);
@@ -587,10 +688,20 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Retrieves a int from a String
+     * @param str String to convert to int
+     * @return  the int or zero in case of exception
+     */
     public Integer parseInteger(String str) {
         return new Integer(parseInt(str));
     }
 
+    /**
+     * Retrieves a long from a String
+     * @param str String to convert to long
+     * @return  the long or zero in case of exception
+     */
     public long parseLong(String str) {
         try {
             return Long.parseLong(str);
@@ -599,6 +710,11 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Retrieves a float from a String
+     * @param str String to convert to float
+     * @return  the float or zero in case of exception
+     */
     public float parseFloat(String str) {
         try {
             return Float.parseFloat(str);
@@ -607,6 +723,11 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Retrieves a double from a String
+     * @param str String to convert to double
+     * @return  the double or zero in case of exception
+     */
     public double parseDouble(String str) {
         try {
             return Double.parseDouble(str);
@@ -615,6 +736,14 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
+     * @param surl url to retrieve
+     * @param username username for the basic authentication
+     * @param password password for the basic authentication
+     * @return Content of the specified URL
+     * @throws IOException
+     */
     public String getURLContent(String surl, String username, String password) throws IOException {
         try {
             return xwiki.getURLContent(surl, username, password);
@@ -623,6 +752,12 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Returns the content of an HTTP/HTTPS URL
+     * @param surl url to retrieve
+     * @return Content of the specified URL
+     * @throws IOException
+     */
     public String getURLContent(String surl) throws IOException {
         try {
             return xwiki.getURLContent(surl);
@@ -631,6 +766,11 @@ public class XWiki extends Api {
         }
     }
 
+    /**
+     * Filters text to be include in = or like clause in SQL
+     * @param text text to filter
+     * @return filtered text
+     */
     public String sqlfilter(String text) {
         return Utils.SQLFilter(text);
     }

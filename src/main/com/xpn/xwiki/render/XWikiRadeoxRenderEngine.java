@@ -106,6 +106,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 name = name.substring(0, qsIndex);
             }
 
+            // + is use for spaces
+            name = name.replace('+',' ');
             String newname = noaccents(name);
             XWikiDocument doc = new XWikiDocument(
                     (currentdoc!=null) ? currentdoc.getWeb() : "Main",
@@ -159,6 +161,9 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 }
     
                 buffer.append("<span class=\"wikilink\"><a href=\"");
+
+                // + is use for spaces
+                name = name.replace('+',' ');
                 // If the document exists with the conversion of spaces and accents
                 // then we use this one
                 String newname = noaccents(name);
@@ -228,6 +233,9 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if (qsIndex!=-1) {
                 name = name.substring(0, qsIndex);
             }
+
+            // + is use for spaces
+            name = name.replace('+',' ');
 
             String newname = name;
             XWikiDocument newdoc = new XWikiDocument();

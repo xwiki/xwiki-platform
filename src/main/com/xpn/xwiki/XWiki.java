@@ -634,8 +634,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (name.equals(""))
             name = "WebHome";
 
-        web = web.replace('+',' ');
-        name = name.replace('+',' ');
+        web = Utils.decode(web, context);
+        name = Utils.decode(name, context);
         return getDocument(web + "." + name, context);
     }
 

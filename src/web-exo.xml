@@ -13,11 +13,6 @@
         <filter-class>com.xpn.xwiki.user.impl.exo.ExoFilter</filter-class>
     </filter>
 
-    <filter-mapping>
-        <filter-name>ExoFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
     <filter>
             <filter-name>Set Character Encoding</filter-name>
             <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
@@ -31,7 +26,13 @@
             <filter-name>Set Character Encoding</filter-name>
             <url-pattern>/*</url-pattern>
       </filter-mapping>
-    
+
+
+    <filter-mapping>
+        <filter-name>ExoFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <listener>
         <listener-class>org.exoplatform.services.portletcontainer.impl.servlet.PortletApplicationListener</listener-class>
     </listener>

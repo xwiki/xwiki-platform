@@ -42,7 +42,10 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         Principal principal = null;
 
-        if (username==null)
+        if ((username==null)||(username.trim().equals("")))
+            return null;
+
+        if ((password==null)||(password.trim().equals("")))
             return null;
 
         String superadmin = "superadmin";

@@ -23,7 +23,6 @@
         <div class="cols-wrapper">
           <div class="float-wrapper">
             <div id="col-a">
-            </div>
               <div class="main-content">
 #set($xredirect=$!request.getParameter("xredirect"))
 <form id="edit" method="post" action="$doc.getURL("preview")">

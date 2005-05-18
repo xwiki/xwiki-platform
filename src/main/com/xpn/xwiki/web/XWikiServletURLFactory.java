@@ -125,7 +125,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         newpath.append("skins/");
         newpath.append(skin);
         newpath.append("/");
-        newpath.append(filename);
+        newpath.append(encode(filename, context));
         try {
             return new URL(getServerURL(context), newpath.toString());
         } catch (MalformedURLException e) {
@@ -142,7 +142,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         newpath.append("/");
         newpath.append(encode(name, context));
         newpath.append("/");
-        newpath.append(filename);
+        newpath.append(encode(filename, context));
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
         } catch (MalformedURLException e) {
@@ -155,7 +155,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public URL createTemplateURL(String filename, XWikiContext context) {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append("templates/");
-        newpath.append(filename);
+        newpath.append(encode(filename, context));
         try {
             return new URL(getServerURL(context), newpath.toString());
         } catch (MalformedURLException e) {
@@ -173,11 +173,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         newpath.append("/");
         newpath.append(encode(name, context));
         newpath.append("/");
-        try {
-            newpath.append(URLEncoder.encode(filename, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            newpath.append(filename);
-        }
+        newpath.append(encode(filename, context));
+
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
         } catch (MalformedURLException e) {

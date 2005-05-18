@@ -387,12 +387,16 @@ public class Utils {
 
     public static String decode(String name, XWikiContext context) {
         try {
+            // Make sure + is considered as a space
             String result = name.replace('+',' ');
+
             // It seems Internet Explorer can send us back UTF-8
             // instead of ISO-8859-1 for URLs
              if (Base64.isValidUTF8(result.getBytes(), false))
                result = new String(result.getBytes(), "UTF-8");
-            return result;
+
+            // Still need to decode URLs
+            return URLDecoder.decode(result, context.getWiki().getEncoding());
         } catch (Exception e) {
          return name;
         }

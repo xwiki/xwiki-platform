@@ -47,9 +47,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.ecs.html.P;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.net.URLDecoder;
 import java.util.*;
 
 public class XWikiService {
@@ -92,11 +89,7 @@ public class XWikiService {
         XWikiDocument doc = context.getDoc();
 
         String path = request.getPathInfo();
-        String filename = null;
-        try {
-            filename = URLDecoder.decode(path.substring(path.lastIndexOf("/")+1),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
+        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
         XWikiAttachment attachment = null;
 
         if (request.getParameter("id")!=null) {
@@ -561,7 +554,7 @@ public class XWikiService {
         XWikiDocument doc = context.getDoc();
 
         String path = request.getPathInfo();
-        String filename = path.substring(path.lastIndexOf("/")+1);
+        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
 
         if (renderSkin(filename, doc, context))
             return null;
@@ -667,11 +660,7 @@ public class XWikiService {
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
-        String filename = null;
-        try {
-            filename = URLDecoder.decode(path.substring(path.lastIndexOf("/")+1),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
+        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
          XWikiAttachment attachment = null;
 
         if (request.getParameter("id")!=null) {
@@ -711,11 +700,7 @@ public class XWikiService {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         String path = request.getRequestURI();
-        String filename = null;
-        try {
-            filename = URLDecoder.decode(path.substring(path.lastIndexOf("/")+1),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
+        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
         try {
            ((GraphVizPlugin)context.getWiki().getPlugin("graphviz",context)).outputDotImageFromFile(filename, context);
         } catch (IOException e) {

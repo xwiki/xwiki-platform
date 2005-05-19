@@ -1680,9 +1680,8 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         }
     }
 
-
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
-        boolean bTransaction = true;
+     public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
+               boolean bTransaction = true;
 
         if (sql==null)
             return null;
@@ -1695,7 +1694,14 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             checkHibernate(context);
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
-            Query query = session.createQuery(sql.toString());
+            if (whereParams != null)
+                sql = sql + generateWhereStatement(sql, whereParams);
+            Query query = session.createQuery(sql);
+            if (whereParams != null)
+            {
+                for (int i = 0; i < whereParams.length; i++)
+                    query.setString(i, (String) whereParams[i][1]);
+            }
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -1723,6 +1729,42 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             if (monitor!=null)
                 monitor.endTimer("hibernate");
         }
+     }
+
+    private String generateWhereStatement(String sql, Object[][] whereParams) {
+        StringBuffer str =  new StringBuffer();
+
+        str.append(" where ");
+        for (int i = 0; i < whereParams.length; i++)
+        {
+            if (i > 0)
+            {
+                if (whereParams[i - 1].length >= 4 && whereParams[i - 1][3] != "" && whereParams[i - 1][3] != null)
+                {
+                    str.append(" ");
+                    str.append(whereParams[i - 1][3]);
+                    str.append(" ");
+                }
+                else
+                    str.append(" and ");
+            }
+            str.append(whereParams[i][0]);
+            if (whereParams[i].length >= 3 && whereParams[i][2] != "" && whereParams[i][2] != null)
+            {
+                str.append(" ");
+                str.append(whereParams[i][2]);
+                str.append(" ");
+            }
+            else
+                str.append(" = ");
+            str.append(" ?");
+        }
+        return str.toString();
+    }
+
+
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+        return search(sql, nb, start, null, context);
     }
 
     public List search(Query query, int nb, int start, XWikiContext context) throws XWikiException {

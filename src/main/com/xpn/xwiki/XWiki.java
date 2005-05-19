@@ -740,12 +740,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
     */
 
-    public List search(String wheresql, XWikiContext context) throws XWikiException {
-        return getStore().search(wheresql, 0, 0, context);
+    public List search(String sql, XWikiContext context) throws XWikiException {
+        return getStore().search(sql, 0, 0, context);
     }
 
-    public List search(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
-        return getStore().search(wheresql, nb, start, context);
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+        return getStore().search(sql, nb, start, context);
+    }
+
+    public List search(String sql, Object[][] whereParams,  XWikiContext context) throws XWikiException {
+        return getStore().search(sql, 0, 0, whereParams,  context);
+    }
+
+    public List search(String sql, int nb, int start, Object[][] whereParams,  XWikiContext context) throws XWikiException {
+        return getStore().search(sql, nb, start, whereParams,  context);
     }
 
     public boolean isTest() {
@@ -2869,6 +2877,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             // release any connection resources used by the method
             get.releaseConnection();
         }
+    }
+
+   public List getSpaces(XWikiContext context) throws XWikiException {
+
+        List webs = this.search("select distinct doc.web from XWikiDocument doc", context);
+        return webs;
+    }
+
+   public List getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException {
+       
+        List docs = this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.web", spaceName}}, context);
+        return docs;
     }
 }
 

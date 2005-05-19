@@ -521,6 +521,11 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 "Not implemented");
     }
 
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
+         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Not implemented") ;
+    }
+
     public void cleanUp(XWikiContext context) {
     }
 

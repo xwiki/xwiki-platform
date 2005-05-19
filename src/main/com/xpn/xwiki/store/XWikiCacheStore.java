@@ -219,6 +219,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.search(sql, nb, start, context);
     }
 
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
+        return store.search(sql, nb, start, whereParams, context);
+    }
+
     public void cleanUp(XWikiContext context) {
         store.cleanUp(context);
     }

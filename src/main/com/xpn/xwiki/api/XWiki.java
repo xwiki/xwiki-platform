@@ -491,6 +491,14 @@ public class XWiki extends Api {
         }
     }
 
+    public List getSpaces() throws XWikiException {
+        return xwiki.getSpaces(context);
+    }
+
+    public List getSpaceDocsName(String SpaceName) throws XWikiException {
+        return xwiki.getSpaceDocsName(SpaceName, context);
+    }
+
     // Usefull date functions
     public Date getCurrentDate() {
         return xwiki.getCurrentDate();

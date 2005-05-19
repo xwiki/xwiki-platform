@@ -55,6 +55,7 @@ public interface XWikiStoreInterface {
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;
     public void cleanUp(XWikiContext context);
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;

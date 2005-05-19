@@ -1,0 +1,9 @@
+# $Id$
+# Build properties for com.xpn.xwiki
+# You should declare these variables in your own file named build.properties
+
+# On Unix:
+#tomcat4x.home=/usr/local/tomcat
+
+# On Windows (Home dir is usually c:\Document and Settings\UserName\)
+tomcat4x.home=c:/apps/jakarta-tomcat-4.1.31

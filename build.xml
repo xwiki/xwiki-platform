@@ -2,7 +2,7 @@
 /**
 * ===================================================================
 *
-* Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+* Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -54,8 +54,6 @@
 
     <property name="doc.dir"   value="${basedir}/doc" />
     <property name="javadoc.dir"   value="${doc.dir}/api" />
-
-    <property name="javacc.lib.dir" value="${javacc.home}/bin/lib" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
       includes="hibernate-3.0.3.jar,c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,odmg-3.0.jar,oscache-2.0.2.jar,jgroups-2.2.5.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,

@@ -33,8 +33,9 @@
     <property name="app.name" value="xwiki" />
     <property name="pkg"  value="com.xpn.xwiki" />
 
-    <property name="src.dir"   value="${basedir}/src/" />
-    <property name="main.src.dir"   value="${src.dir}/main/" />
+    <property name="src.dir" value="${basedir}/src/" />
+    <property name="main.src.dir" value="${src.dir}/main/" />
+    <property name="java.main.src.dir" value="${main.src.dir}/java/" />
     <property name="web.src.dir" value="${src.dir}/web" />
 	  <property name="perl.src.dir" value="${src.dir}/perl"/>
 	  <property name="test.src.dir" value="${src.dir}/test" />
@@ -171,7 +172,7 @@
 
     <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
-            <fileset dir="${main.src.dir}">
+            <fileset dir="${java.main.src.dir}">
                 <patternset refid="non.java.sources" />
             </fileset>
         </copy>
@@ -206,7 +207,7 @@
 
 
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
-        <javac srcdir="${main.src.dir}"
+        <javac srcdir="${java.main.src.dir}"
             destdir="${classes.dir}"
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"
@@ -350,7 +351,7 @@
     <target name="javadoc" depends="xwiki">
         <mkdir dir="${javadoc.dir}" />
         <javadoc packagenames="com.xpn.xwiki.*"
-            sourcepath="${main.src.dir}"
+            sourcepath="${java.main.src.dir}"
             destdir="${javadoc.dir}"
             classpath="${libs}"
             author="true"

@@ -37,7 +37,7 @@
     <property name="main.src.dir" value="${src.dir}/main/" />
     <property name="java.main.src.dir" value="${main.src.dir}/java/" />
     <property name="web.src.dir" value="${src.dir}/web" />
-	  <property name="perl.src.dir" value="${src.dir}/perl"/>
+	  <property name="perl.main.src.dir" value="${main.src.dir}/perl"/>
 	  <property name="test.src.dir" value="${src.dir}/test" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
 	
@@ -185,7 +185,7 @@
         <!--
         <copy todir="${build.dir}/web/WEB-INF/perl">
             <fileset includes="**"
-                dir="${perl.src.dir}" />
+                dir="${perl.main.src.dir}" />
         </copy>
         -->
 

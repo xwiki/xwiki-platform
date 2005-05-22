@@ -163,7 +163,7 @@
         <include name="META-INF/services/com.*" />
         <exclude name="web/**" />
         <exclude name="perl/**" />
-        <exclude name="${src.dir}/web.xml" />
+        <exclude name="${main.src.dir}/web.xml" />
     </patternset>
 
     <patternset id="test.classes">
@@ -368,7 +368,7 @@
 
     <target name="release" depends="xwiki">
       <mkdir dir="${release.dir}" />
-      <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web.xml" >
+      <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web.xml" >
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
         <lib refid="libs.main.fileset" />
@@ -376,7 +376,7 @@
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${src.dir}/web-exo.xml" >
+      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web-exo.xml" >
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
           <lib refid="libs.main.fileset" />

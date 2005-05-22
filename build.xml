@@ -27,7 +27,7 @@
     <property file="build.properties" />
 
     <!-- The following line is used to read the version -->
-    <property file="src/web/WEB-INF/xwiki.cfg" />
+    <property file="src/main/web/WEB-INF/xwiki.cfg" />
 
 
     <property name="app.name" value="xwiki" />
@@ -36,7 +36,7 @@
     <property name="src.dir" value="${basedir}/src/" />
     <property name="main.src.dir" value="${src.dir}/main/" />
     <property name="java.main.src.dir" value="${main.src.dir}/java/" />
-    <property name="web.src.dir" value="${src.dir}/web" />
+    <property name="web.main.src.dir" value="${main.src.dir}/web" />
 	  <property name="perl.main.src.dir" value="${main.src.dir}/perl"/>
 	  <property name="test.src.dir" value="${src.dir}/test" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
@@ -125,10 +125,10 @@
     </taskdef>
 
     <target name="prepare">
-        <propertyfile file="src/web/WEB-INF/version.properties" >
+        <propertyfile file="src/main/web/WEB-INF/version.properties" >
             <entry key="build.number" type="int" value="1" operation="+" />
         </propertyfile>
-        <property file="src/web/WEB-INF/version.properties" />
+        <property file="src/main/web/WEB-INF/version.properties" />
         <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <property name="exo.warfile" value="${release.dir}/xwiki-exo-${version}.war" />
@@ -179,7 +179,7 @@
 
         <copy todir="${build.dir}/web">
             <fileset includes="**"
-                dir="${web.src.dir}" />
+                dir="${web.main.src.dir}" />
         </copy>
 
         <!--

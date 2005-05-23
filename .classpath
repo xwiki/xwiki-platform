@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main">
+	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java">
 		<attributes>
 		</attributes>
 	</classpathentry>

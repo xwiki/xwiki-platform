@@ -7,3 +7,6 @@
 
 # On Windows (Home dir is usually c:\Document and Settings\UserName\)
 tomcat4x.home=c:/apps/jakarta-tomcat-4.1.31
+
+# use hsqldb instead of mysql for tests
+tests.filtersfile=test/hsqldb_filters.properties

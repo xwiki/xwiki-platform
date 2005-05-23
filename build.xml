@@ -25,6 +25,8 @@
     <property file="${user.home}/build.properties" />
     <!-- Allow user defaults for this project -->
     <property file="build.properties" />
+    
+    <property name="tests.filtersfile" value="${basedir}/test/mysql_filters.properties" />
 
     <!-- The following line is used to read the version -->
     <property file="src/main/web/WEB-INF/xwiki.cfg" />
@@ -81,7 +83,7 @@
      	includes="picocontainer-1.0.jar,exoplatform.container-1.0.jar,exoplatform.services.chart.api-1.0.jar,exoplatform.services.chart.impl-1.0.jar,exoplatform.services.common.api-1.0.jar,exoplatform.services.organization.api-1.0.jar,exoplatform.services.organization.impl-1.0.jar,exoplatform.services.security.api-1.0.jar,exoplatform.services.security.impl-1.0.jar,exoplatform.services.database.api-1.0.jar,exoplatform.services.database.impl-1.0.jar" />
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
-        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.6.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />
+        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.6.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar,hsqldb-1.7.3.jar" />
 
     <pathconvert pathsep=";" property="libs.main" refid="libs.main.fileset" />
     <pathconvert pathsep=";" property="libs.exo" refid="libs.exo.fileset" />
@@ -160,6 +162,9 @@
         <include name="**/*.cfg" />
         <include name="**/*.txt" />
         <include name="META-INF/services/com.*" />
+        <exclude name="web/**" />
+        <exclude name="perl/**" />
+        <exclude name="${main.src.dir}/web.xml" />
     </patternset>
 
     <patternset id="test.classes">
@@ -177,6 +182,13 @@
             <fileset includes="**"
                 dir="${web.main.src.dir}" />
         </copy>
+
+        <!--
+        <copy todir="${build.dir}/web/WEB-INF/perl">
+            <fileset includes="**"
+                dir="${perl.main.src.dir}" />
+        </copy>
+        -->
 
         <copy todir="${build.dir}/web/WEB-INF">
             <fileset includes="license.txt"
@@ -201,7 +213,8 @@
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"
             compiler="${compiler}" source="1.4"
-            sourcepath="" >
+            sourcepath="" 
+            encoding="ISO-8859-1" >
             <include name="com/xpn/xwiki/**/*.java" />
             <exclude name="**/XWikiPerl*.java" />
         </javac>
@@ -211,11 +224,14 @@
         <javac destdir="${tests.build.dir}"
             classpath="${libs};${libs.tests};${tests.build.dir};${classes.dir}"
             debug="on" optimize="on" deprecation="on" source="1.4"
-            sourcepath="" >
+            sourcepath="" 
+            encoding="ISO-8859-1" >
         	<src path="${test.src.dir}" />
         	<src path="${test-cactus.src.dir}" />
             <exclude name="com/xpn/xwiki/test/PerlTest.java" />
         </javac>
+        <filter filtersfile="${tests.filtersfile}"/>
+        <copy file="${basedir}/test/hibernate-test-template.cfg.xml" tofile="${basedir}/test/hibernate-test.cfg.xml" filtering="true" overwrite="true" />
     </target>
 
     <target name="test.perl" depends="xwiki, tests">

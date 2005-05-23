@@ -37,8 +37,7 @@
     <property name="main.src.dir" value="${src.dir}/main/" />
     <property name="java.main.src.dir" value="${main.src.dir}/java/" />
     <property name="web.main.src.dir" value="${main.src.dir}/web" />
-	  <property name="perl.main.src.dir" value="${main.src.dir}/perl"/>
-	  <property name="test.src.dir" value="${src.dir}/test" />
+    <property name="test.src.dir" value="${src.dir}/test" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
 	
     <property name="lib.dir"   value="${basedir}/lib" />
@@ -181,13 +180,6 @@
             <fileset includes="**"
                 dir="${web.main.src.dir}" />
         </copy>
-
-        <!--
-        <copy todir="${build.dir}/web/WEB-INF/perl">
-            <fileset includes="**"
-                dir="${perl.main.src.dir}" />
-        </copy>
-        -->
 
         <copy todir="${build.dir}/web/WEB-INF">
             <fileset includes="license.txt"

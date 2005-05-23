@@ -16,7 +16,7 @@
 <property name="dbcp.ps.maxWait">120000</property>
 <property name="dbcp.ps.maxIdle">20</property>
 
-<property name="connection.url">jdbc:hsqldb:/tmp/data</property>
+<property name="connection.url">jdbc:hsqldb:mem:.</property>
 <property name="connection.username">sa</property>
 <property name="connection.password"></property>
 <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>

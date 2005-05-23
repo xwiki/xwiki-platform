@@ -162,9 +162,6 @@
         <include name="**/*.cfg" />
         <include name="**/*.txt" />
         <include name="META-INF/services/com.*" />
-        <exclude name="web/**" />
-        <exclude name="perl/**" />
-        <exclude name="${main.src.dir}/web.xml" />
     </patternset>
 
     <patternset id="test.classes">
@@ -182,13 +179,6 @@
             <fileset includes="**"
                 dir="${web.main.src.dir}" />
         </copy>
-
-        <!--
-        <copy todir="${build.dir}/web/WEB-INF/perl">
-            <fileset includes="**"
-                dir="${perl.main.src.dir}" />
-        </copy>
-        -->
 
         <copy todir="${build.dir}/web/WEB-INF">
             <fileset includes="license.txt"

@@ -1888,15 +1888,15 @@ public class XWikiDocument {
 
     public String getTranslatedContent(String language, XWikiContext context) throws XWikiException {
         XWikiDocument tdoc = getTranslatedDocument(language, context);
-        return tdoc.getContent();
-        /*
+        //return tdoc.getContent();
+
         String rev = (String)context.get("rev");
-        if (rev==null)
+        if (rev==null || rev.length() == 0)
             return tdoc.getContent();
 
         XWikiDocument cdoc = context.getWiki().getDocument(tdoc, rev, context);
         return cdoc.getContent();
-        */
+
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException {

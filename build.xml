@@ -160,9 +160,6 @@
         <include name="**/*.cfg" />
         <include name="**/*.txt" />
         <include name="META-INF/services/com.*" />
-        <exclude name="web/**" />
-        <exclude name="perl/**" />
-        <exclude name="${main.src.dir}/web.xml" />
     </patternset>
 
     <patternset id="test.classes">

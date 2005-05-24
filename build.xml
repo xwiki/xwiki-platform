@@ -26,7 +26,7 @@
     <!-- Allow user defaults for this project -->
     <property file="build.properties" />
     
-    <property name="tests.filtersfile" value="${basedir}/test/mysql_filters.properties" />
+    <property name="tests.filtersfile" value="${basedir}/test/hsqldb_filters.properties" />
 
     <!-- The following line is used to read the version -->
     <property file="src/main/web/WEB-INF/xwiki.cfg" />

@@ -111,13 +111,13 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 #macro(includeHelp $pagename)
-#if($xwiki.exists("xwiki:XWiki.${pagename}"))
-$xwiki.includeForm("xwiki:XWiki.${pagename}",false)
-#else
-#if($xwiki.exists("XWiki.${pagename}"))
-$xwiki.includeForm("XWiki.${pagename}",false)
-#end
-#end
+  #if($xwiki.exists("xwiki:XWiki.${pagename}"))
+    $xwiki.includeForm("xwiki:XWiki.${pagename}",false)
+  #else
+    #if($xwiki.exists("XWiki.${pagename}"))
+      $xwiki.includeForm("XWiki.${pagename}",false)
+    #end
+  #end
 #end
 
 #macro(flickr $rss)
@@ -216,4 +216,185 @@ $xwiki.includeForm("XWiki.${pagename}",false)
   #foreach($level in $levels)
 </ul>#end
  #end
+#end
+
+
+#macro(testmacro)
+ bla bli
+#end
+
+
+#macro (exportPackage)
+#set($export = $request.get("export"))
+#if ($export == "1")
+  #set($dateFormat = "dd MMM yyyy ? HH:mm")
+  #set($diff = $request.get("diff"))
+  #set($SpaceName = $request.get("SpaceName"))
+
+  1.1 Space : $SpaceName
+
+  <form method="POST" action="ExportApp?export=2">
+
+
+
+#set($docs = $xwiki.getSpaceDocsName($SpaceName))
+  <table border="1" style="text-align:center;">
+  <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+  <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+  #foreach ($doc in $docs)
+    #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${SpaceName}.${doc}"))
+
+    <tr><td>[${doc}>${SpaceName}.${doc}]</td><td><input type="checkbox" name="ToExport" value="${SpaceName}.${doc}" /></td><td><input type="radio" name="${SpaceName}.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="merge" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="skip" /></td> </tr>
+
+    #end
+  #end
+  </table>
+
+  #if($SpaceName != "XWiki")
+
+
+    1.1 Space : XWiki
+
+    #set($docs = $xwiki.getSpaceDocsName("XWiki"))
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+    #foreach ($doc in $docs)
+      #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:XWiki.${doc}"))
+
+      <tr><td>[${doc}>XWiki.${doc}]</td><td><input type="checkbox" name="ToExport" value="XWiki.${doc}" /></td><td><input type="radio" name="XWiki.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="merge" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="skip" /></td> </tr>
+
+      #end
+    #end
+    </table>
+  #end
+
+  <input type="submit" name="submitted" value="Valider">
+  </form>
+
+
+
+#elseif ($export == "2")
+  #set($ToExport = $request.getParameterValues("ToExport"))
+  $response.setContentType("application/zip")
+  #set($export = $xwiki.export)
+  #foreach ($itemexp in $ToExport)
+    #set($defaultAction = $request.get("${itemexp}_default"))
+    $export.add($itemexp, $defaultAction)
+  #end
+  $export.export()
+#else
+  <form method="POST" action="ExportApp?export=1">
+  Select the space you want to export : <br />
+  #set($spaces = $xwiki.getSpaces())
+  <select name="SpaceName">
+  #foreach ($space in $spaces)
+    <option value="$space">$space</option>
+  #end
+
+  </select>
+  <input type="submit" name="submitted" value="Valider">
+  </form>
+#end
+
+#end
+
+
+#macro (importPackage)
+#set($toexport = $request.get("export"))
+#if($toexport == "1")
+  #set($appName = $request.get("App"))
+  #set($alist = $doc.getAttachmentList())
+  #foreach ($oAttach in $alist)
+    #if ($oAttach.getFilename() == $appName)
+      #set($import = $xwiki.import)
+      $import.importPackage($oAttach.getContent())
+
+      #set($docs = $import.getDocuments())
+
+      #foreach($docInfo in $docs)
+        #set($right = "")
+        #set($right = $request.get("$docInfo.getFullName()_default"))
+        #if($right)
+          $import.setDocumentAction($docInfo.getFullName(), $right)
+        #end
+      #end
+
+
+      #set($ret = $import.install())
+      $import.getTestInstallToString($ret)
+    #end
+  #end
+
+
+#else
+  #set($alist = $doc.getAttachmentList())
+  #if ($alist.size() == 0)
+    Add the package in attachment
+  #end
+  #foreach ($oAttach in $alist)
+    #set($import = $xwiki.import)
+
+    1.1 $oAttach.getFilename()
+
+    $import.importPackage($oAttach.getContent())
+
+    1.1.1 Infos
+
+    Author : $import.getAuthor() <br />
+    Name : $import.getName() <br />
+    Description : $import.getDescription() <br />
+    Licence : $import.getLicence() <br />
+    Version : $import.getVersion() <br />
+
+    #set($canInstall = $import.testInstall())
+    install : $import.getTestInstallToString($canInstall)
+
+    1.1.1 Status of each Files
+    #set($docs = $import.getDocuments())
+
+    <form method="POST" action="$request.getRequestURL()?export=1">
+    <input type="hidden" name="App" value="$oAttach.getFilename()" />
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>infos</td><td colspan="3">Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+
+
+    #foreach($docInfo in $docs)
+
+
+      <tr><td>[$docInfo.getFullName()>$docInfo.getFullName()]</td> <td>__$import.getTestInstallToString($docInfo.isInstallable())__</td>
+#if($import.getTestInstallToString($docInfo.isInstallable()) == "Already exist")
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "overwrite")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" checked="true" /></td>
+  #else
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" /></td>
+  #end
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "merge")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" checked="true" /></td>
+  #else
+   <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" /></td>
+  #end
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "skip")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" checked="true" /></td> </tr>
+  #else
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" /></td> </tr>
+  #end
+#else
+  <td colspan="3"></td>
+#end
+
+
+    #end
+    </table>
+    #if ($canInstall != 0)
+      1.1.1 You are can [Install this application >$doc.getName()?import=1&App=$oAttach.getFilename()]
+      <input type="submit" name="submitted" value="Valider">
+    #else
+      1.1.1 You can't install this application.
+    #end
+    </form>
+  #end
+#end
+
 #end

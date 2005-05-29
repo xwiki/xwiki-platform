@@ -203,9 +203,7 @@
             debug="on" optimize="on" deprecation="on"
             compiler="${compiler}" source="1.4"
             sourcepath="" 
-            encoding="ISO-8859-1" >
-            <exclude name="**/XWikiPerl*.java" />
-        </javac>
+            encoding="ISO-8859-1"/>
     </target>
 
     <target name="tests" depends="junit-check,prepare,xwiki">
@@ -216,26 +214,9 @@
             encoding="ISO-8859-1" >
         	<src path="${test.src.dir}" />
         	<src path="${test-cactus.src.dir}" />
-            <exclude name="com/xpn/xwiki/test/PerlTest.java" />
         </javac>
         <filter filtersfile="${tests.filtersfile}"/>
         <copy file="${basedir}/test/hibernate-test-template.cfg.xml" tofile="${basedir}/test/hibernate-test.cfg.xml" filtering="true" overwrite="true" />
-    </target>
-
-    <target name="test.perl" depends="xwiki, tests">
-        <mkdir dir="${test.reports.dir}" />
-        <mkdir dir="${test.clover.dir}" />
-
-        <junit printsummary="yes" dir="${basedir}/test" fork="on" >
-
-            <classpath>
-                <pathelement path="${classes.dir}" />
-                <pathelement path="${libs}" />
-            </classpath>
-            <formatter type="xml" />
-
-            <test todir="${test.reports.dir}" name="${pkg}.test.PerlTest" haltonfailure="no"/>
-        </junit>
     </target>
 
     <target name="test.client" depends="xwiki, tests">
@@ -259,7 +240,6 @@
                     <exclude name="**/StoreObjectTest.java"/>
                     <exclude name="**/StoreTest.java"/>
                     <exclude name="**/Utils.java"/>
-                    <exclude name="**/PerlTest.java"/>
                     <exclude name="**/StoreRCSFileTest.java"/>
                     <exclude name="**/GroovyTestRightService.java" />
                 </fileset>

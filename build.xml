@@ -38,6 +38,7 @@
     <property name="src.dir" value="${basedir}/src/" />
     <property name="main.src.dir" value="${src.dir}/main/" />
     <property name="java.main.src.dir" value="${main.src.dir}/java/" />
+    <property name="resources.main.src.dir" value="${main.src.dir}/resources/" />
     <property name="web.main.src.dir" value="${main.src.dir}/web" />
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
@@ -170,9 +171,7 @@
 
     <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
-            <fileset dir="${java.main.src.dir}">
-                <patternset refid="non.java.sources" />
-            </fileset>
+            <fileset dir="${resources.main.src.dir}"/>
         </copy>
 
         <copy todir="${build.dir}/web">
@@ -205,7 +204,6 @@
             compiler="${compiler}" source="1.4"
             sourcepath="" 
             encoding="ISO-8859-1" >
-            <include name="com/xpn/xwiki/**/*.java" />
             <exclude name="**/XWikiPerl*.java" />
         </javac>
     </target>

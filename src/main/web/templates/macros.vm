@@ -233,7 +233,7 @@ $xwiki.getUserName("xwiki:${username}")
 
   1.1 Space : $SpaceName
 
-  <form method="POST" action="ExportApp?export=2">
+  <form method="POST" action="$doc.getName()?export=2">
 
 
 
@@ -284,7 +284,7 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   $export.export()
 #else
-  <form method="POST" action="ExportApp?export=1">
+  <form method="POST" action="$doc.getName()?export=1">
   Select the space you want to export : <br />
   #set($spaces = $xwiki.getSpaces())
   <select name="SpaceName">
@@ -296,7 +296,6 @@ $xwiki.getUserName("xwiki:${username}")
   <input type="submit" name="submitted" value="Valider">
   </form>
 #end
-
 #end
 
 
@@ -388,7 +387,7 @@ $xwiki.getUserName("xwiki:${username}")
     #end
     </table>
     #if ($canInstall != 0)
-      1.1.1 You are can [Install this application >$doc.getName()?import=1&App=$oAttach.getFilename()]
+      1.1.1 You are can install this applications
       <input type="submit" name="submitted" value="Valider">
     #else
       1.1.1 You can't install this application.

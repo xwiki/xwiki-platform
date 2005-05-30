@@ -258,6 +258,12 @@
           <forward name="status" path="/templates/status.vm"/>
       </action>
 
+    <action path="/lifeblog/"
+            type="com.xpn.xwiki.web.ViewEditAction"
+            name="lifeblog"
+            scope="request">
+    </action>
+
   </action-mappings>
 
   <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"

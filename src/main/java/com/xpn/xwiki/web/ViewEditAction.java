@@ -210,6 +210,9 @@ public class ViewEditAction extends XWikiAction
                 else if (action.equals("logout")) {
                     xwikiservice.actionLogout(context);
                 }
+                else if (action.equals("lifeblog")) {
+                    renderResult = xwikiservice.renderLifeblog(context);
+                }
 
                 if (renderResult!=null) {
                     String page = Utils.getPage(request, renderResult);

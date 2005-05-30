@@ -23,6 +23,7 @@
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.atom.lifeblog.LifeblogServices;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
@@ -47,6 +48,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.ecs.html.P;
 
 import java.io.*;
+import java.text.ParseException;
 import java.util.*;
 
 public class XWikiService {
@@ -897,4 +899,24 @@ public class XWikiService {
         }
         return null;
     }
+
+	public String renderLifeblog(XWikiContext context) throws XWikiException {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
+        LifeblogServices services = new LifeblogServices(context);
+        try {
+    	    // Check Authentication
+    	    if (!services.isAuthenticated()) {
+    	      response.setHeader("WWW-Authenticate", "WSSE realm=\"foo\", profile=\"UsernameToken\"");
+    	      response.sendError(401, "Unauthorized");  
+    	    } else if (request.getPathInfo().equals("/lifeblog")) {
+    	      services.listUserBlogs();
+    	    }		        	
+	    } catch (IOException e) {
+	        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+	             XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+	             "Exception while sending response", e);
+        }
+		return null;
+	}
 }

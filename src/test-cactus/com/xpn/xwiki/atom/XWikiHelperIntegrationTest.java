@@ -10,7 +10,6 @@ import org.apache.cactus.extension.jetty.JettyTestSetup;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.atom.lifeblog.LifeblogActionIntegrationTest;
 import com.xpn.xwiki.atom.lifeblog.UserBlog;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;

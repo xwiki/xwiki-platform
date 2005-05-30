@@ -3,6 +3,7 @@
  */
 package com.xpn.xwiki.atom;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,8 +13,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-
-import com.xpn.xwiki.atom.lifeblog.LifeblogServiceException;
 
 /**
  * @author Luis
@@ -101,7 +100,7 @@ public class WSSEHttpHeader {
     return userName;
   }
 
-  public static WSSEHttpHeader parseHttpHeader(String httpHeader) throws LifeblogServiceException {
+  public static WSSEHttpHeader parseHttpHeader(String httpHeader) throws IOException {
     WSSEHttpHeader wsseHeader = null;
     Matcher matcher = getHeaderPattern().matcher(httpHeader);
     if (matcher.matches()) {
@@ -112,10 +111,10 @@ public class WSSEHttpHeader {
         wsseHeader.setCreated(matcher.group(4));
         
         if (!Base64.isArrayByteBase64(wsseHeader.getPasswordDigest().getBytes())) {
-          throw new LifeblogServiceException("Invalid Password Digest : " + wsseHeader.getPasswordDigest());
+          throw new IOException("Invalid Password Digest : " + wsseHeader.getPasswordDigest());
         }
         if (!Base64.isArrayByteBase64(wsseHeader.getNonce().getBytes())) {
-          throw new LifeblogServiceException("Invalid Nonce : " + wsseHeader.getPasswordDigest());
+          throw new IOException("Invalid Nonce : " + wsseHeader.getPasswordDigest());
         }
     }
     return wsseHeader;

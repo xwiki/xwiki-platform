@@ -1,9 +1,6 @@
 package com.xpn.xwiki.atom.lifeblog;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.ParseException;
 import java.util.Calendar;
 
 import junit.framework.Test;
@@ -15,7 +12,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.atom.WSSEHttpHeader;
-import com.xpn.xwiki.atom.XWikiHelper;
 import com.xpn.xwiki.test.XWikiIntegrationTest;
 
 public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
@@ -48,20 +44,17 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
     }
   }
 
-  public void testIsAuthenticatedNullHeader() throws LifeblogServiceException, XWikiException, ParseException {
+  public void testIsAuthenticatedNullHeader() throws XWikiException, IOException {
     String header = null;
     
-    XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
-    
-    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
+    LifeblogServices lifeblogServices = new LifeblogServices(context);
 
     boolean authenticated = lifeblogServices.isAuthenticated(header);
     
     assertFalse("Not authenticated if no WSSE header", authenticated);
   }
 
-  public void testIsAuthenticated() throws LifeblogServiceException, XWikiException, ParseException {
+  public void testIsAuthenticated() throws XWikiException, IOException {
     String nonce = "d36e316282959a9ed4c89851497a717f";
     String created = WSSEHttpHeader.CalendarToW3CDSTFormat(Calendar.getInstance());
     String login = "Admin";
@@ -70,17 +63,14 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
 
     String header = "UsernameToken Username=\"" + login +"\", PasswordDigest=\"" + passwordDigest + "\", Nonce=\""+ nonce + "\", Created=\""+ created + "\"";
     
-    XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
-    
-    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
+    LifeblogServices lifeblogServices = new LifeblogServices(context);
 
     boolean authenticated = lifeblogServices.isAuthenticated(header);
     
     assertTrue(authenticated);
   }
 
-  public void testIsAuthenticatedSameNonceTwice() throws LifeblogServiceException, XWikiException, ParseException {
+  public void testIsAuthenticatedSameNonceTwice() throws XWikiException, IOException {
     String nonce = "d36e316282959a9ed4c89851497a717f";
     String created = WSSEHttpHeader.CalendarToW3CDSTFormat(Calendar.getInstance());
     String login = "Admin";
@@ -89,10 +79,7 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
 
     String header = "UsernameToken Username=\"" + login +"\", PasswordDigest=\"" + passwordDigest + "\", Nonce=\""+ nonce + "\", Created=\""+ created + "\"";
     
-    XWikiHelper xwikiHelper = new XWikiHelper(context);
-    LifeblogContext lifeblogContext = new LifeblogContext(xwikiHelper);
-    
-    LifeblogServices lifeblogServices = new LifeblogServices(lifeblogContext);
+    LifeblogServices lifeblogServices = new LifeblogServices(context);
 
     boolean authenticated = lifeblogServices.isAuthenticated(header);    
     assertTrue(authenticated);

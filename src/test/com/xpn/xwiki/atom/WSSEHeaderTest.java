@@ -1,5 +1,6 @@
 package com.xpn.xwiki.atom;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,8 +9,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-
-import com.xpn.xwiki.atom.lifeblog.LifeblogServiceException;
 
 public class WSSEHeaderTest extends TestCase {
 
@@ -41,7 +40,7 @@ public class WSSEHeaderTest extends TestCase {
     assertEquals("d36e316282959a9ed4c89851497a717f", matcher.group(1));
   }  
 
-  public void testParseHttpHeaderNotAuthenticated() throws LifeblogServiceException {
+  public void testParseHttpHeaderNotAuthenticated() throws IOException {
     String nonce = "d36e316282959a9ed4c89851497a717f";
     String created = "2003-12-15T14:43:07Z";
     String password = "Toto";
@@ -54,7 +53,7 @@ public class WSSEHeaderTest extends TestCase {
     assertFalse(wsseHeader.isAuthenticated(password));
   }
   
-  public void testParseHttpHeaderAuthenticated() throws LifeblogServiceException {
+  public void testParseHttpHeaderAuthenticated() throws IOException {
     String nonce = "d36e316282959a9ed4c89851497a717f";
     String created = "2003-12-15T14:43:07Z";
     String password = "Toto";
@@ -67,7 +66,7 @@ public class WSSEHeaderTest extends TestCase {
     assertTrue(wsseHeader.isAuthenticated(password));
   }
   
-  public void testParseHeaderInvalidHeader() throws LifeblogServiceException {
+  public void testParseHeaderInvalidHeader() throws IOException {
     String httpHeader = " sqdljfqsdlk dlsqfjqmlskdjf";
     
     WSSEHttpHeader wsseHeader = WSSEHttpHeader.parseHttpHeader(httpHeader);

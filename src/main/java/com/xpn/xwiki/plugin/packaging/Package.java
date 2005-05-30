@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin.packaging;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -47,18 +48,19 @@ import org.dom4j.dom.DOMElement;
 
 
 public class Package {
-    String  name = "My package";
-    String  description = "";
-    String  version = "1.0.0";
-    String  licence = "GPL";
-    String  authorName = "XWiki";
-    String  spaceName = null;
-    List    files = null;
-    boolean upgradePossible = false;
+    private String  name = "My package";
+    private String  description = "";
+    private String  version = "1.0.0";
+    private String  licence = "GPL";
+    private String  authorName = "XWiki";
+    private String  spaceName = null;
+    private List    files = null;
+    private boolean upgradePossible = false;
+    private boolean backupPack = false;
+
 
     public static final int OK = 0;
     public static final int Right = 1;
-
     public static final String DefaultPackageFileName = "package.xml";
 
     public String getName() {
@@ -99,6 +101,14 @@ public class Package {
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
+    }
+
+    public boolean isBackupPack() {
+        return backupPack;
+    }
+
+    public void setBackupPack(boolean backupPack) {
+        this.backupPack = backupPack;
     }
 
     public String getSpaceName() {
@@ -145,8 +155,8 @@ public class Package {
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException {
-        if ((doc.getWeb().compareTo("XWiki") != 0) && (spaceName != null) && (doc.getWeb().compareTo(spaceName) != 0))
-            return false;
+//        if ((doc.getWeb().compareTo("XWiki") != 0) && (spaceName != null) && (doc.getWeb().compareTo(spaceName) != 0))
+//            return false;
         if (!context.getWiki().checkAccess("edit", doc, context))
             return false;
         if (spaceName == null && (doc.getWeb().compareTo("XWiki") != 0))
@@ -215,6 +225,7 @@ public class Package {
         ZipInputStream          zis = new ZipInputStream(bais);
         ZipEntry                entry;
         Document                description = null;
+        ArrayList               docs = new ArrayList();
 
         while ((entry = zis.getNextEntry()) != null)
         {
@@ -230,10 +241,16 @@ public class Package {
             }
             else
             {
-                XWikiDocument doc = ReadZipDoc(zis);
-                this.add(doc, context);
+                docs.add(readZipFile(zis));
             }
         }
+
+        for (int i = 0; i < docs.size(); i++)
+        {
+            XWikiDocument doc = readZipDoc((String) docs.get(i));
+            this.add(doc, context);
+        }
+
         if (description == null)
                 files.clear();
             else
@@ -298,16 +315,23 @@ public class Package {
     }
 
 
-    private XWikiDocument ReadZipDoc(ZipInputStream zis) throws IOException{
+    private String readZipFile(ZipInputStream zis) throws IOException{
         byte[] data = new byte[4096];
         StringBuffer XmlFile = new StringBuffer();
         int Cnt;
         while ((Cnt = zis.read(data, 0, 4096)) != -1) {
           XmlFile.append(new String(data, 0, Cnt)) ;
         }
+        return XmlFile.toString();
+    }
+
+    private XWikiDocument readZipDoc(String XmlFile) throws IOException{
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
         try {
-            doc.fromXML(XmlFile.toString());
+            if (backupPack)
+                doc.fromXML(XmlFile.toString(), true);
+            else
+                doc.fromXML(XmlFile.toString());
         } catch (Exception e) {
             return null;
         }
@@ -368,6 +392,10 @@ public class Package {
         el.addText(version);
         elInfos.add(el);
 
+        el = new DOMElement("backupPack");
+        el.addText(new Boolean(backupPack).toString());
+        elInfos.add(el);
+
 
         Element elfiles = new DOMElement("files");
         docel.add(elfiles);
@@ -417,10 +445,22 @@ public class Package {
         licence  = getElementText(infosEl, "licence");
         authorName = getElementText(infosEl, "author");
         version = getElementText(infosEl, "version");
-
+        backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         return domdoc;
     }
 
+
+    public void backupWiki(XWikiContext context) throws XWikiException {
+        XWiki wiki = context.getWiki();
+        List spaces = wiki.getSpaces(context);
+        for(int i = 0; i < spaces.size(); i++)
+        {
+            List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);
+            for(int j = 0; j < DocsName.size(); j++)
+                this.add(spaces.get(i) + "." + DocsName.get(j), context);
+        }
+        this.backupPack = true;
+    }
 
 
     public static Package OpenInformations(String PackageName)

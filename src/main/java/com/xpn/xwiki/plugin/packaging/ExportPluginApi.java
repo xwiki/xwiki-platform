@@ -97,4 +97,8 @@ public class ExportPluginApi  extends Api {
         pack.setVersion(major + "." + minor + "." + revision);
     }
 
+    public void backupWiki() throws XWikiException {
+        pack.backupWiki(super.context);
+    }
+
 }

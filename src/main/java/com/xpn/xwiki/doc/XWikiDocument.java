@@ -1382,28 +1382,23 @@ public class XWikiDocument {
              return el.getText();
      }
 
-     public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException, XWikiException {
+        fromXML(xml, false);
+    }
+
+
+     public void fromXML(String xml, boolean withArchive) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException, XWikiException {
          SAXReader reader = new SAXReader();
          Document domdoc;
 
          try {
-             //StringInputStream in = new StringInputStream(xml);
              StringReader in = new StringReader(xml);
              domdoc = reader.read(in);
          } catch (DocumentException e) {
-             /*
-             try {
-                 String xml2 = new String(xml.getBytes(), "UTF-8");
-                 StringInputStream in = new StringInputStream(xml2);
-                 domdoc = reader.read(in); }
-             catch (Exception e2) {
-                 e.printStackTrace();
-                 throw e;
-             } */
              throw e;
          }
 
-         Element docel = domdoc.getRootElement();
+        Element docel = domdoc.getRootElement();
         setName(getElement(docel, "name"));
         setWeb(getElement(docel,"web"));
         setParent(getElement(docel,"parent"));
@@ -1419,6 +1414,12 @@ public class XWikiDocument {
           setTranslation(0);
         else
           setTranslation(Integer.parseInt(strans));
+
+        String archive = getElement(docel,"versions");
+        if (withArchive && archive != null && archive.length() > 0)
+        {
+            setArchive(archive);
+        }
 
 
         String sdate = getElement(docel,"date");

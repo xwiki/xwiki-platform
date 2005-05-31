@@ -198,7 +198,7 @@ public class ClassesTest extends TestCase {
         XWiki xwiki = new XWiki("./xwiki.cfg", context);
         context.setWiki(xwiki);
 
-        String hibPath = AllTests.class.getResource(StoreHibernateTest.HIB_LOCATION).getFile();
+        String hibPath = getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile();
         StoreHibernateTest.cleanUp(new XWikiHibernateStore(hibPath), context);
         xwiki.getUserClass(context);
         

@@ -58,7 +58,7 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
         if (store!=null)
          return store;
 
-        String hibPath = AllTests.class.getResource(HIB_LOCATION).getFile();
+        String hibPath = getClass().getResource(HIB_LOCATION).getFile();
         XWikiStoreInterface hibstore = new XWikiHibernateStore(hibPath);
         store = new XWikiCacheStore(hibstore, context);
         return store;

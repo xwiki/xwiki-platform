@@ -122,7 +122,7 @@ public class StoreHibernateTest extends StoreTest {
        if (store != null)
         return store;
 
-       String hibPath = AllTests.class.getResource(HIB_LOCATION).getFile();
+       String hibPath = getClass().getResource(HIB_LOCATION).getFile();
        store = new XWikiHibernateStore(hibPath);
        return store;
    }

@@ -1,22 +1,7 @@
-
-package com.xpn.xwiki.test;
-
-import java.sql.Connection;
-import java.sql.Statement;
-
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,9 +21,23 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
  * Time: 14:28:31
  */
 
+package com.xpn.xwiki.test;
+
+import java.sql.Connection;
+import java.sql.Statement;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+
 public class StoreHibernateTest extends StoreTest {
 
-    public static String hibpath = "hibernate-test.cfg.xml";
+    public static final String HIB_LOCATION = "/hibernate-test.cfg.xml";
     public XWikiStoreInterface store;
     public boolean cleanup = false;
 
@@ -120,10 +119,11 @@ public class StoreHibernateTest extends StoreTest {
     }
 
     public XWikiStoreInterface getStore() {
-       if (store!=null)
+       if (store != null)
         return store;
 
-       store = new XWikiHibernateStore(hibpath);
+       String hibPath = AllTests.class.getResource(HIB_LOCATION).getFile();
+       store = new XWikiHibernateStore(hibPath);
        return store;
    }
 

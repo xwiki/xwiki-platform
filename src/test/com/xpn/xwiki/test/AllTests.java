@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -26,25 +26,29 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class AllTests {
-    public static String hibpath = "hibernate-test.cfg.xml";
+    // TODO: There is also a hibpath variable in StoreHibernateTest. Should
+    // be refactored to use only one definition.
+    public static final String HIB_LOCATION = "/hibernate-test.cfg.xml";
 
+    // TODO: Use a TestSetup instead. Possibly make StoreHibernateStore (or
+    // part of it a TestSetup).
     private static void cleanUp() throws XWikiException {
         XWikiContext context = new XWikiContext();
         context.setDatabase("xwikitest");
-        //XWiki xwiki = new XWiki("./xwiki.cfg", context);
-        //context.setWiki(xwiki);
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibpath);
+        String hibPath = AllTests.class.getResource(HIB_LOCATION).getFile();
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(hibPath);
         StoreHibernateTest.cleanUp(hibstore, true, true, context);
     }
 
     public static Test suite () throws XWikiException {
-        TestSuite suite= new TestSuite("Test for com.xpn.xwiki");
         cleanUp();
 
+        TestSuite suite = new TestSuite("Tests for com.xpn.xwiki");
+
+        // TODO: What is this JUnit-BEGIN? Can it be removed?
         //$JUnit-BEGIN$
         suite.addTestSuite(XWikiTest.class);
         suite.addTestSuite(ClassesTest.class);
@@ -66,7 +70,6 @@ public class AllTests {
         suite.addTestSuite(UtilTest.class);
         suite.addTestSuite(PDFExportTest.class);
         suite.addTestSuite(LDAPTest.class);
-        // suite.addTestSuite(PerlTest.class);
         //$JUnit-END$
 
         return suite;

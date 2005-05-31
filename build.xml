@@ -185,7 +185,6 @@
                 dir="${basedir}/" />
         </copy>
 
-
         <copy todir="${build.dir}/web/WEB-INF/classes">
             <fileset dir="${build.dir}/web/WEB-INF">
                 <include name="hibernate*.cfg.xml" />
@@ -193,7 +192,6 @@
         </copy>
 
     </target>
-
 
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
         <javac srcdir="${java.main.src.dir}"
@@ -215,7 +213,9 @@
         	<src path="${test-cactus.src.dir}" />
         </javac>
         <filter filtersfile="${tests.filtersfile}"/>
-        <copy file="${basedir}/test/hibernate-test-template.cfg.xml" tofile="${basedir}/test/hibernate-test.cfg.xml" filtering="true" overwrite="true" />
+        <copy file="${basedir}/test/hibernate-test-template.cfg.xml" 
+            tofile="${tests.build.dir}/hibernate-test.cfg.xml" 
+            filtering="true" overwrite="true" />
     </target>
 
     <target name="test.client" depends="xwiki, tests">

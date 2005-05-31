@@ -1185,7 +1185,7 @@ public class XWikiDocument {
     }
 
 
-    public void addToZip(ZipOutputStream zos, XWikiContext context) throws IOException {
+    public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException {
         try  {
         String zipname = getWeb() + "/" + getName();
         String language = getLanguage();
@@ -1193,11 +1193,16 @@ public class XWikiDocument {
          zipname += "." + language;
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
-        zos.write(toFullXML(context).getBytes());
+        zos.write(toXML(true, false, true, withVersions, context).getBytes());
         zos.closeEntry();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    public void addToZip(ZipOutputStream zos, XWikiContext context) throws IOException {
+            addToZip(zos, true, context);
     }
 
 

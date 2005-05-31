@@ -97,6 +97,14 @@ public class ExportPluginApi  extends Api {
         pack.setVersion(major + "." + minor + "." + revision);
     }
 
+    public boolean isWithVersions() {
+        return pack.isWithVersions();
+    }
+
+    public void setWithVersions(boolean withVersions) {
+        pack.setWithVersions(withVersions);
+    }
+
     public void backupWiki() throws XWikiException {
         pack.backupWiki(super.context);
     }

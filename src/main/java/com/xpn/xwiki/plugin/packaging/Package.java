@@ -57,7 +57,7 @@ public class Package {
     private List    files = null;
     private boolean upgradePossible = false;
     private boolean backupPack = false;
-
+    private boolean withVersions = true;
 
     public static final int OK = 0;
     public static final int Right = 1;
@@ -148,6 +148,14 @@ public class Package {
         return true;
     }
 
+    public boolean isWithVersions() {
+        return withVersions;
+    }
+
+    public void setWithVersions(boolean withVersions) {
+        this.withVersions = withVersions;
+    }
+
     public Package()
     {
         files = new ArrayList();
@@ -212,7 +220,7 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             DocumentInfo docinfo = (DocumentInfo) files.get(i);
-            docinfo.getDoc().addToZip(zos, context);
+            docinfo.getDoc().addToZip(zos, withVersions, context);
         }
         addToZip(zos);
         zos.finish();
@@ -328,7 +336,7 @@ public class Package {
     private XWikiDocument readZipDoc(String XmlFile) throws IOException{
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
         try {
-            if (backupPack)
+            if (backupPack && withVersions)
                 doc.fromXML(XmlFile.toString(), true);
             else
                 doc.fromXML(XmlFile.toString());
@@ -457,7 +465,7 @@ public class Package {
         {
             List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);
             for(int j = 0; j < DocsName.size(); j++)
-                this.add(spaces.get(i) + "." + DocsName.get(j), context);
+                this.add(spaces.get(i) + "." + DocsName.get(j), DocumentInfo.ACTION_OVERWRITE,  context);
         }
         this.backupPack = true;
     }

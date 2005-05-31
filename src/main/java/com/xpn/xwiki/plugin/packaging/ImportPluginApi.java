@@ -114,4 +114,13 @@ public class ImportPluginApi   extends Api {
 
         pack.updateDoc(docName, iaction, context);
     }
+
+    public boolean isWithVersions() {
+        return pack.isWithVersions();
+    }
+
+    public void setWithVersions(boolean withVersions) {
+        pack.setWithVersions(withVersions);
+    }
+
 }

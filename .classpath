@@ -1,392 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/test">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src/test-cactus">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-dbcp-1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-dbcp-1.1-ld.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-fileupload-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-net-1.1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-pool-1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ecs-1.4.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-base-services-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-chart-service-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-chart-service-impl-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-commons-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-organization-service-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.container-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.chart.api-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.chart.impl-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.common.api-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.database.api-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.database.impl-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.organization.api-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.organization.impl-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.security.api-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exoplatform.services.security.impl-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-security-service-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/exo-services-container-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/groovy-all-1.0-jsr-01.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/InlineJavaServer.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/InlineJavaUser.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jcommon-0.9.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jfreechart-0.9.16.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jimi.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jta.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jtidy.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ldap.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/mx4j-jmx-1.1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/nanocontainer-1.0-beta-1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/org.apache.commons.jrcs.diff.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/org.apache.commons.jrcs.rcs.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/picocontainer-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/portlet.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/radeox.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/swarmcache.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/velocity-1.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/velocity-tools-1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xpertnet-xwiki-0.1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xpertnet-xwiki-tests.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/aspectjrt-1.2.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/cactus-1.7.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/cactus-ant-1.7.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jmock-1.0.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jmock-cglib-1.0.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/junit-3.8.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.7-bin.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/org.mortbay.jetty-5.1.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-httpclient-2.0.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/httpunit-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ant-1.6.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/avalon-framework-4.1.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/c3p0-0.8.4.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/cglib-2.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-beanutils-1.7.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-digester-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-lang-2.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/commons-logging-api-1.0.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/dom4j-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ehcache-1.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/fop-0.20.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/hibernate-3.0.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/hibernate-tools-2.1.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jgroups-2.2.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/odmg-3.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/oro-2.0.8.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/oscache-2.0.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/securityfilter-2.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/struts-1.2.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xalan-2.6.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xerces-2.4.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/xmlrpc-1.2.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/servlet-api-2.4.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/jdom-1.0.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/rome-0.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/nekohtml-0.9.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/soap-2.3.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/clover-1.3.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/asm-1.5.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/asm-util-1.5.3.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/antlr-2.7.5.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/batik-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/batik-util-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/batik-svg-dom-1.6.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
+	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/test-cactus"/>
+	<classpathentry kind="lib" path="lib/commons-fileupload-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net-1.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-pool-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/ecs-1.4.2.jar"/>
+	<classpathentry kind="lib" path="lib/exo-base-services-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-chart-service-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-chart-service-impl-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-commons-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-organization-service-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.container-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.chart.api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.chart.impl-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.common.api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.database.api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.database.impl-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.organization.api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.organization.impl-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.security.api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exoplatform.services.security.impl-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-security-service-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/exo-services-container-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.0-jsr-01.jar"/>
+	<classpathentry kind="lib" path="lib/InlineJavaServer.jar"/>
+	<classpathentry kind="lib" path="lib/InlineJavaUser.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-0.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-0.9.16.jar"/>
+	<classpathentry kind="lib" path="lib/jimi.jar"/>
+	<classpathentry kind="lib" path="lib/jta.jar"/>
+	<classpathentry kind="lib" path="lib/jtidy.jar"/>
+	<classpathentry kind="lib" path="lib/ldap.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="lib/mx4j-jmx-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/nanocontainer-1.0-beta-1.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.commons.jrcs.diff.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.commons.jrcs.rcs.jar"/>
+	<classpathentry kind="lib" path="lib/picocontainer-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/portlet.jar"/>
+	<classpathentry kind="lib" path="lib/radeox.jar"/>
+	<classpathentry kind="lib" path="lib/swarmcache.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/velocity-tools-1.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/aspectjrt-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/cactus-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/cactus-ant-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/jmock-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/jmock-cglib-1.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="lib/org.mortbay.jetty-5.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-httpclient-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/httpunit-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/ant-1.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/avalon-framework-4.1.5.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.8.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-beanutils-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-digester-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-api-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/fop-0.20.5.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-tools-2.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/jgroups-2.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/odmg-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/oro-2.0.8.jar"/>
+	<classpathentry kind="lib" path="lib/oscache-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/securityfilter-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/struts-1.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/xalan-2.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/xerces-2.4.0.jar"/>
+	<classpathentry kind="lib" path="lib/xml-apis-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/xmlrpc-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/jdom-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/rome-0.6.jar"/>
+	<classpathentry kind="lib" path="lib/nekohtml-0.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/soap-2.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/clover-1.3.6.jar"/>
+	<classpathentry kind="lib" path="lib/asm-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/asm-util-1.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-2.7.5.jar"/>
+	<classpathentry kind="lib" path="lib/batik-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/batik-util-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/batik-svg-dom-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-dbcp-1.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-3.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/alexa.jar"/>
+	<classpathentry kind="lib" path="lib/axis-1.2RC2.jar"/>
+	<classpathentry kind="lib" path="lib/batik-awt-util-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/batik-bridge-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/batik-gvt-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="lib/flickrapi-1.0a7.jar"/>
+	<classpathentry kind="lib" path="lib/flipper.jar"/>
+	<classpathentry kind="lib" path="lib/googleadwords.jar"/>
+	<classpathentry kind="lib" path="lib/googleapi.jar"/>
+	<classpathentry kind="lib" path="lib/hsqldb-1.7.3.jar"/>
+	<classpathentry kind="lib" path="lib/ical4j-0.9.12.jar"/>
+	<classpathentry kind="lib" path="lib/ipresolver.jar"/>
+	<classpathentry kind="lib" path="lib/jaxrpc-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/mail-1.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/terraservice.jar"/>
+	<classpathentry kind="lib" path="lib/wsdl4j-1.5.jar"/>
+	<classpathentry kind="lib" path="test"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

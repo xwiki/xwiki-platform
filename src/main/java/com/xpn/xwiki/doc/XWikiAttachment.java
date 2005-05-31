@@ -302,11 +302,12 @@ public class XWikiAttachment {
             XWikiAttachmentContent acontent = getAttachment_content();
             if (acontent!=null) {
              byte[] bcontent = getAttachment_content().getContent();
-             String content = Base64.encodeBase64(bcontent).toString();
+             String content = new String(Base64.encodeBase64(bcontent));
              el.addText(content);
             } else {
                 el.addText("");
             }
+            docel.add(el);
         }
 
         if (bWithVersions) {
@@ -318,6 +319,7 @@ public class XWikiAttachment {
                 } catch (XWikiException e) {
                     return null;
                 }
+                docel.add(el);
             }
         }
 

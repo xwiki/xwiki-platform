@@ -31,32 +31,33 @@
     <!-- The following line is used to read the version -->
     <property file="src/main/web/WEB-INF/xwiki.cfg" />
 
-
     <property name="app.name" value="xwiki" />
-    <property name="pkg"  value="com.xpn.xwiki" />
+    <property name="pkg" value="com.xpn.xwiki" />
 
     <property name="src.dir" value="${basedir}/src/" />
+
     <property name="main.src.dir" value="${src.dir}/main/" />
     <property name="java.main.src.dir" value="${main.src.dir}/java/" />
     <property name="resources.main.src.dir" value="${main.src.dir}/resources/" />
     <property name="web.main.src.dir" value="${main.src.dir}/web" />
+
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
 	
-    <property name="lib.dir"   value="${basedir}/lib" />
+    <property name="lib.dir" value="${basedir}/lib" />
 
-    <property name="build.dir"  value="${basedir}/build" />
-    <property name="tests.build.dir"  value="${build.dir}/test" />
+    <property name="build.dir" value="${basedir}/build" />
+    <property name="tests.build.dir" value="${build.dir}/test" />
 
     <property name="classes.dir" value="${build.dir}/web/WEB-INF/classes" />
-    <property name="release.dir"  value="${basedir}/release" />
+    <property name="release.dir" value="${basedir}/release" />
     <property name="dist.dir" value="${basedir}/dist" />
 
-    <property name="test.reports.dir" value="${basedir}/test/reports" />
-    <property name="test.clover.dir" value="${basedir}/test/clover" />
+    <property name="test.reports.dir" value="${build.dir}/test-reports" />
+    <property name="test.clover.dir" value="${build.dir}/test-clover" />
 
-    <property name="doc.dir"   value="${basedir}/doc" />
-    <property name="javadoc.dir"   value="${doc.dir}/api" />
+    <property name="doc.dir" value="${basedir}/doc" />
+    <property name="javadoc.dir" value="${doc.dir}/api" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
       includes="hibernate-3.0.3.jar,c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,odmg-3.0.jar,oscache-2.0.2.jar,jgroups-2.2.5.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
@@ -148,8 +149,6 @@
         <delete dir="${build.dir}" />
         <delete dir="${release.dir}" />
         <delete dir="${dist.dir}" />
-        <delete dir="${test.reports.dir}" />
-        <delete dir="${test.clover.dir}" />
     </target>
 
     <patternset id="non.java.sources">

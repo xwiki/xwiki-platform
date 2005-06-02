@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,11 +14,6 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * Created by
- * User: Ludovic Dubost
- * Date: 26 nov. 2003
- * Time: 13:53:42
  */
 package com.xpn.xwiki;
 
@@ -30,16 +25,21 @@ import java.util.Properties;
 
 public class XWikiConfig extends Properties {
 
+    public XWikiConfig() {
+        // Default constructor so that properties can be added after constructing the instance 
+        // by using XWikiConfig.put().
+    }
+    
     public XWikiConfig(String path) throws XWikiException {
        try {
            FileInputStream fis = new FileInputStream(path);
            loadConfig(fis, path);
        }
        catch (FileNotFoundException e) {
-               Object[] args = { path };
-               throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
-                       XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
-                       "Configuration file {0} not found", e, args);
+           Object[] args = { path };
+           throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
+               XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
+               "Configuration file {0} not found", e, args);
            }
     }
 
@@ -54,9 +54,8 @@ public class XWikiConfig extends Properties {
         catch (IOException e) {
             Object[] args = { path };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
-                    XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR,
-                    "Error reading configuration file", e, args);
+                XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR,
+                "Error reading configuration file", e, args);
         }
     }
 }
-

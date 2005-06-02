@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,70 +14,56 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- * * User: ludovic
- * Date: 8 mars 2004
- * Time: 09:19:35
  */
-
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import junit.framework.TestCase;
 import org.hibernate.HibernateException;
-import org.apache.velocity.app.Velocity;
 
 public class GroovyRenderTest extends TestCase {
 
-        private XWiki xwiki;
-        private XWikiContext context;
+    private XWiki xwiki;
+    private XWikiContext context;
 
-        public XWikiHibernateStore getHibStore() {
-            XWikiStoreInterface store = xwiki.getStore();
-            if (store instanceof XWikiCacheStoreInterface)
-                return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-            else
-                return (XWikiHibernateStore) store;
-        }
+    // TODO: Refactor this portion of code. It seems it is used in lots of places and it would 
+    // be good to have it in a common location (for example in a XWikiTestSetup class)
+    public void setUp() throws Exception {
 
-        public XWikiStoreInterface getStore() {
-            return xwiki.getStore();
-        }
+        XWikiConfig config = new XWikiConfig();
+        // TODO: Should be modified to use a memory store for testing or a mock store
+        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
+        config.put("xwiki.store.hibernate.path", getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile());
 
-        public void setUp() throws Exception {
-            context = new XWikiContext();
-            xwiki = new XWiki("./xwiki.cfg", context, null, false);
-            context.setWiki(xwiki);
-            StoreHibernateTest.cleanUp(getHibStore(), context);
-        }
+        context = new XWikiContext();
+        xwiki = new XWiki(config, context);
+        context.setWiki(xwiki);
+        StoreHibernateTest.cleanUp(xwiki.getHibernateStore(), context);
+    }
 
-        public void tearDown() throws HibernateException {
-            getHibStore().shutdownHibernate(context);
-            xwiki = null;
-            context = null;
-            System.gc();
-        }
+    public void tearDown() throws HibernateException {
+        xwiki.getHibernateStore().shutdownHibernate(context);
+        xwiki = null;
+        context = null;
+        System.gc();
+    }
 
-
-
-
-        public void testBasics() throws XWikiException {
-            XWikiRenderer wikibase = new XWikiGroovyRenderer();
-            xwiki.setRightService(new GroovyTestRightService());
-            RenderTest.renderTest(wikibase, "<% foo = \"Groovy\"\nprintln \"Hello $foo World!\" %>",
-                    "Hello Groovy World!", false, context);
-            RenderTest.renderTest(wikibase, "<% count = 0\nif ( count == 1)\n{ println \"A${count}A\" }\nelse\n { println \"B${count}B\" }\n %>",
-                    "B0B", false, context);
-        }
+    public void testBasics() throws XWikiException {
+        XWikiRenderer wikibase = new XWikiGroovyRenderer();
+        xwiki.setRightService(new GroovyTestRightService());
+        RenderTest.renderTest(wikibase, "<% foo = \"Groovy\"\nprintln \"Hello $foo World!\" %>",
+                "Hello Groovy World!", false, context);
+        RenderTest.renderTest(wikibase, "<% count = 0\nif ( count == 1)\n{ println \"A${count}A\" }\nelse\n { println \"B${count}B\" }\n %>",
+                "B0B", false, context);
+    }
 
     public void testWithFunction() throws XWikiException {
         XWikiRenderer wikibase = new XWikiGroovyRenderer();
@@ -86,10 +72,9 @@ public class GroovyRenderTest extends TestCase {
                 "3", false, context);
     }
 
-
     public void testWithInclude() throws Exception {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = getStore();
+        XWikiStoreInterface store = xwiki.getStore();
         xwiki.setRightService(new GroovyTestRightService());
 
         XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");
@@ -107,7 +92,7 @@ public class GroovyRenderTest extends TestCase {
 
     public void testWithFunctionInclude() throws Exception {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = getStore();
+        XWikiStoreInterface store = xwiki.getStore();
         xwiki.setRightService(new GroovyTestRightService());
 
         XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");

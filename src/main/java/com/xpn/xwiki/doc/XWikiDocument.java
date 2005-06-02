@@ -1578,28 +1578,7 @@ public class XWikiDocument {
     }
 
     public List getIncludedMacros(XWikiContext context) {
-        try {
-         String pattern = "#includeMacros\\(\"(.*?)\"\\)";
-         List list = context.getUtil().getMatches(getContent(), pattern, 1);
-         for (int i=0;i<list.size();i++) {
-             try {
-                 String name = (String)list.get(i);
-                 if (name.indexOf(".")==-1) {
-                     list.set(i, getWeb() + "." + name);
-                 }
-             } catch (Exception e) {
-                 // This should never happen
-                   e.printStackTrace();
-                   return null;
-               }
-         }
-
-         return list;
-        } catch (Exception e) {
-            // This should never happen
-            e.printStackTrace();
-            return null;
-        }
+        return context.getWiki().getIncludedMacros(getWeb(), getContent(), context);
     }
 
     public List getLinkedPages(XWikiContext context) {
@@ -1894,15 +1873,12 @@ public class XWikiDocument {
 
     public String getTranslatedContent(String language, XWikiContext context) throws XWikiException {
         XWikiDocument tdoc = getTranslatedDocument(language, context);
-        //return tdoc.getContent();
-
         String rev = (String)context.get("rev");
-        if (rev==null || rev.length() == 0)
+        if ((rev==null)||(rev.length()==0))
             return tdoc.getContent();
 
         XWikiDocument cdoc = context.getWiki().getDocument(tdoc, rev, context);
         return cdoc.getContent();
-
     }
 
     public XWikiDocument getTranslatedDocument(XWikiContext context) throws XWikiException {
@@ -2179,7 +2155,7 @@ public class XWikiDocument {
    }
 
    public void insertText(String text, String marker, XWikiContext context) throws XWikiException {
-      setContent(getContent().replaceFirst(marker, text + marker));
+      setContent(StringUtils.replaceOnce(getContent(), marker, text + marker));
       context.getWiki().saveDocument(this, context);
    }
 }

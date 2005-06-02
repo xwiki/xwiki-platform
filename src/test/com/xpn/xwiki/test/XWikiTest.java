@@ -44,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -72,6 +73,7 @@ public class XWikiTest extends TestCase {
          context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
          xwiki = new XWiki("./xwiki.cfg", context, null, false);
          context.setWiki(xwiki);
+         xwiki.setDatabase("xwikitest");
          StoreHibernateTest.cleanUp(getHibStore(), context);
          Velocity.init("velocity.properties");
      }
@@ -84,18 +86,18 @@ public class XWikiTest extends TestCase {
      }
 
     public void testDefaultSkin() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
         assertEquals("Skin should be default", "default", xwiki.getSkin(context));
     }
 
     public void testAlternSkin() throws XWikiException {
         Utils.setStringValue("XWiki.XWikiPreferences", "skin", "altern", context);
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
         assertEquals("Skin should be altern", "altern", xwiki.getSkin(context));
     }
 
     public void testDefaultSkinFile() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
         assertEquals("Skin File should be default",  "/xwiki/skins/default/style.css", xwiki.getSkinFile("style.css", context));
     }
 
@@ -267,5 +269,40 @@ public class XWikiTest extends TestCase {
         assertEquals("Attachment author incorrect", attachment1.getAuthor(), attachment2.getAuthor());
         assertEquals("Attachment content incorrect", new String(attachment1.getContent(context)), new String(attachment2.getContent(context)));
     }
+
+    public void testAccessSecureAPINoAccess() throws XWikiException {
+        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        Utils.content1 = "$context.context.database";
+        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI", context);
+        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI", context);
+        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, context);
+    }
+
+    public void testAccessSecureAPIAccess() throws XWikiException {
+        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        Utils.content1 = "$context.context.database";
+        Utils.author = "XWiki.LudovicDubost";
+        Utils.updateRight(xwiki, context, "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
+        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI2", context);
+        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI2", context);
+        RenderTest.renderTest(wikiengine, doc1, "xwikitest", false, context);
+    }
+
+    public void testAccessSecureAPIAccessWithInclude() throws XWikiException {
+        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        Utils.updateRight(xwiki, context, "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
+
+        Utils.content1 = "#includeForm(\"SecureAPI4\")";
+        Utils.author = "XWiki.LudovicDubost";
+        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI3", context);
+
+        Utils.content1 = "$context.context.database";
+        Utils.author = "XWiki.JohnDoe";
+        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI4", context);
+
+        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI3", context);
+        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, context);
+    }
+
 
 }

@@ -20,61 +20,46 @@
  * Date: 23 avr. 2005
  * Time: 00:57:33
  */
-package com.xpn.xwiki.plugin.graphviz;
+package com.xpn.xwiki.plugin.laszlo;
 
 import com.amazon.api.alexa.*;
 import com.amazon.api.alexa.holders.OperationRequestHolder;
 import com.amazon.api.alexa.holders.UrlInfoResultHolder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
+import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 import com.xpn.xwiki.api.Api;
 
 import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.io.*;
 
-public class GraphVizPluginApi extends Api {
-    private GraphVizPlugin plugin;
+public class LaszloPluginApi extends Api {
+    private LaszloPlugin plugin;
 
-    public GraphVizPluginApi(GraphVizPlugin plugin, XWikiContext context) {
+    public LaszloPluginApi(LaszloPlugin plugin, XWikiContext context) {
             super(context);
             setPlugin(plugin);
         }
 
-    public GraphVizPlugin getPlugin() {
+    public LaszloPlugin getPlugin() {
         return plugin;
     }
 
-    public void setPlugin(GraphVizPlugin plugin) {
+    public void setPlugin(LaszloPlugin plugin) {
         this.plugin = plugin;
     }
 
-    public byte[] getDotImage(String content, boolean dot) throws IOException {
-        return plugin.getDotImage(content, "gif", dot);
+    public String getFileName(String name, String laszlocode) {
+        return plugin.getFileName(name, laszlocode);
     }
 
-    public byte[] getDotImage(String content, String extension, boolean dot) throws IOException {
-        return plugin.getDotImage(content, extension, dot);
+    public String getLaszloURL(String name, String laszlocode) throws IOException {
+        return plugin.getLaszloURL(name, laszlocode);
     }
 
-    public String getDotImageURL(String content, boolean dot) throws IOException {
-        return plugin.getDotImageURL(content, dot, context);
-    }
-
-    public String writeDotImage(String content, boolean dot) throws IOException {
-        return plugin.writeDotImage(content, "gif", dot);
-    }
-
-    public String writeDotImage(String content, String extension, boolean dot) throws IOException {
-        return plugin.writeDotImage(content, extension, dot);
-    }
-
-    public void outputDotImage(String content, boolean dot) throws IOException {
-        plugin.outputDotImage(content, "gif", dot, context);
-    }
-
-    public void outputDotImage(String content, String extension, boolean dot) throws IOException {
-        plugin.outputDotImage(content, extension, dot, context);
+    public String getLaszloFlash(String name, String width, String height, String laszlocode) throws IOException {
+        return plugin.getLaszloFlash(name, width, height, laszlocode, context);
     }
 
     public void flushCache() {

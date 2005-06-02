@@ -41,6 +41,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
         private File tempDir;
         private String dotPath;
+        private String neatoPath;
 
     public GraphVizPlugin(String name, String className, XWikiContext context) {
         super(name, className, context);
@@ -83,31 +84,41 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                     mLogger.error("Cannot find graphiz dot program at " + dotPath);
             } catch (Exception e) {}
         }
+
+        neatoPath = context.getWiki().Param("xwiki.plugin.graphviz.neatopath", "neato");
+        if (!neatoPath.equals("neato")) {
+            try {
+                File dfile = new File(neatoPath);
+                if (!dfile.exists())
+                    mLogger.error("Cannot find graphiz neato program at " + neatoPath);
+            } catch (Exception e) {}
+        }
+
     }
 
-    public byte[] getDotImage(String dot) throws IOException {
-        return getDotImage(dot, "gif");
+    public byte[] getDotImage(String content, boolean dot) throws IOException {
+        return getDotImage(content, "gif", dot);
     }
 
-    public byte[] getDotImage(String dot, String extension) throws IOException {
-        int hashCode = Math.abs(dot.hashCode());
-        return getDotImage(hashCode, dot, extension);
+    public byte[] getDotImage(String content, String extension, boolean dot) throws IOException {
+        int hashCode = Math.abs(content.hashCode());
+        return getDotImage(hashCode, content, extension, dot);
     }
 
-    public byte[] getDotImage(int hashCode, String dot, String extension) throws IOException {
-         File dfile = getTempFile(hashCode, "dot");
+    public byte[] getDotImage(int hashCode, String content, String extension, boolean dot) throws IOException {
+         File dfile = getTempFile(hashCode, "dot", dot);
          if (!dfile.exists()) {
              FileWriter fwriter = new FileWriter(dfile);
-             fwriter.write(dot);
+             fwriter.write(content);
              fwriter.flush();
              fwriter.close();
          }
 
-        File ofile = getTempFile(hashCode, extension);
+        File ofile = getTempFile(hashCode, extension, dot);
         if (!ofile.exists()) {
             Runtime rt = Runtime.getRuntime();
             String[] command = new String[5];
-            command[0] = dotPath;
+            command[0] = dot ? dotPath : neatoPath;
             command[1] = "-T" + extension;
             command[2] = dfile.getAbsolutePath();
             command[3] = "-o";
@@ -155,22 +166,23 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     }
 
-    public String writeDotImage(String dot) throws IOException {
-        return writeDotImage(dot, "gif");
+    public String writeDotImage(String content, boolean dot) throws IOException {
+        return writeDotImage(content, "gif", dot);
     }
 
-    public String writeDotImage(String dot, String extension) throws IOException {
-        int hashCode = Math.abs(dot.hashCode());
-        getDotImage(hashCode, dot, extension);
-        return "" + hashCode + "." + extension;
+    public String writeDotImage(String content, String extension, boolean dot) throws IOException {
+        int hashCode = Math.abs(content.hashCode());
+        getDotImage(hashCode, content, extension, dot);
+        String name = dot ? "dot-" : "neato-";
+        return name + hashCode + "." + extension;
     }
 
-    public void outputDotImage(String dot, XWikiContext context) throws IOException {
-        outputDotImage(dot, "gif", context);
+    public void outputDotImage(String content, boolean dot, XWikiContext context) throws IOException {
+        outputDotImage(content, "gif", dot, context);
     }
 
-    public void outputDotImage(String dot, String extension, XWikiContext context) throws IOException {
-        byte[] dotbytes = getDotImage(dot, extension);
+    public void outputDotImage(String content, String extension, boolean dot, XWikiContext context) throws IOException {
+        byte[] dotbytes = getDotImage(content, extension, dot);
         XWikiResponse response = context.getResponse();
         context.setFinished(true);
         response.setContentLength(dotbytes.length);
@@ -196,12 +208,13 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return new File(tempDir, filename);
     }
 
-    public File getTempFile(int hashcode, String extension) {
-        return getTempFile("" + hashcode + "." + extension);
+    public File getTempFile(int hashcode, String extension, boolean dot) {
+        String name = dot ? "dot-" : "neato-";
+        return getTempFile(name + hashcode + "." + extension);
     }
 
-    public String getDotImageURL(String dot, XWikiContext context) throws IOException {
-        String filename = writeDotImage(dot, "gif");
+    public String getDotImageURL(String content, boolean dot, XWikiContext context) throws IOException {
+        String filename = writeDotImage(content, "gif", dot);
         return context.getDoc().getAttachmentURL(filename, "dot", context);
     }
 }

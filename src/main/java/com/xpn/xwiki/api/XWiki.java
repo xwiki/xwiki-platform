@@ -782,4 +782,14 @@ public class XWiki extends Api {
     public String sqlfilter(String text) {
         return Utils.SQLFilter(text);
     }
+
+    /**
+     * Returns the list of Macros documents in the specified content
+     * @param defaultweb Default Web to use for relative path names
+     * @param content Content to parse
+     * @return ArrayList of document names
+     */
+    public List getIncludedMacros(String defaultweb, String content) {
+        return xwiki.getIncludedMacros(defaultweb, content, context);
+    }
 }

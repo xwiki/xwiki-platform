@@ -85,7 +85,7 @@ public class VelocityRenderTest extends TestCase {
         }
 
         public void testRenderingEngine() throws XWikiException {
-            XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
+            XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
             RenderTest.renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
                     "Hello2", false, context);
         }
@@ -143,7 +143,7 @@ public class VelocityRenderTest extends TestCase {
         }
 
     public void testVelocityError() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki);
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
         RenderTest.renderTest(wikiengine, "#skype(hello)",
                 "hello", false, context);
     }

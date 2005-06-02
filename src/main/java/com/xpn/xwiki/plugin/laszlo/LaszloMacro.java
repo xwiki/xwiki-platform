@@ -20,7 +20,7 @@
  * Date: 24 août 2004
  * Time: 20:03:03
  */
-package com.xpn.xwiki.plugin.graphviz;
+package com.xpn.xwiki.plugin.laszlo;
 
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
@@ -34,10 +34,11 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 
-public class GraphVizMacro  extends BaseLocaleMacro {
+public class LaszloMacro  extends BaseLocaleMacro {
   public String getLocaleKey() {
-    return "macro.graphviz";
+    return "macro.laszlo";
   }
 
     public void execute(Writer writer, MacroParameter params)
@@ -49,30 +50,20 @@ public class GraphVizMacro  extends BaseLocaleMacro {
         XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
         XWiki xwiki = xcontext.getWiki();
 
-        GraphVizPlugin plugin = (GraphVizPlugin) xwiki.getPlugin("graphviz", xcontext);
+        LaszloPlugin plugin = (LaszloPlugin) xwiki.getPlugin("laszlo", xcontext);
         // If the plugin is not loaded
         if (plugin==null) {
             writer.write("Plugin not loaded");
             return;
         }
 
-        boolean dot = !("neato").equals(params.get("type"));
         StringBuffer str = new StringBuffer();
-        String img = params.get("text", 0);
+        String name = params.get("name", 0);
         String height = params.get("height", 1);
         String width = params.get("width", 2);
 
-        String dottext = params.getContent();
-        str.append("<img src=\"");
-        str.append(plugin.getDotImageURL(dottext, dot, xcontext));
-        str.append("\" ");
-        if ((!"none".equals(height))&&(height!=null))
-            str.append("height=\"" + height + "\" ");
-        if ((!"none".equals(width))&&(width!=null))
-            str.append("width=\"" + width + "\" ");
-        str.append("alt=\"");
-        str.append(img);
-        str.append("\" />");
+        String laszlocode = params.getContent();
+        str.append(plugin.getLaszloFlash(name, width, height, laszlocode, xcontext));
         writer.write(str.toString());
     }
 }

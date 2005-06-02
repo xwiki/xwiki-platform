@@ -656,14 +656,14 @@ public class Document extends Api {
            context.getWiki().saveDocument(doc, context);
    }
 
-    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException {
+    public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {
         if (hasAccessLevel("edit"))
-            return doc.addObjectFromRequest(context);
+            return new com.xpn.xwiki.api.Object(doc.addObjectFromRequest(context), context);
         else
             return null;
       }
 
-      public void insertText(String text, String marker, XWikiContext context) throws XWikiException {
+      public void insertText(String text, String marker) throws XWikiException {
           if (hasAccessLevel("edit"))
             doc.insertText(text, marker, context);  
       }

@@ -491,6 +491,37 @@ public class Utils {
         xwiki.saveDocument(doc, context);
     }
 
+    public static void setLargeStringValue(String docName, String propname, String propvalue, XWikiContext context) throws XWikiException {
+        XWiki xwiki = context.getWiki();
+        XWikiDocument doc = xwiki.getDocument(docName, context);
+        BaseClass bclass = doc.getxWikiClass();
+        if (bclass==null) {
+            bclass = new BaseClass();
+            bclass.setName(docName);
+        }
+        if (bclass.getField(propname)==null) {
+            TextAreaClass propclass = new TextAreaClass();
+            propclass.setName(propname);
+            propclass.setPrettyName(propname);
+            propclass.setSize(80);
+            propclass.setRows(20);
+            propclass.setObject(bclass);
+            bclass.addField(propname, propclass);
+            doc.setxWikiClass(bclass);
+        }
+
+        BaseObject bobject = doc.getxWikiObject();
+        if (bobject==null) {
+          bobject = new BaseObject();
+          doc.addObject(docName, bobject);
+        }
+        bobject.setName(docName);
+        bobject.setClassName(bclass.getName());
+        bobject.setLargeStringValue(propname, propvalue);
+        xwiki.saveDocument(doc, context);
+    }
+
+
     public static void setStringValue(String docName, String className, String propname, String propvalue, XWikiContext context) throws XWikiException {
         if (docName.equals(className)) {
             setStringValue(docName, propname, propvalue, context);
@@ -642,6 +673,16 @@ public class Utils {
         }
         doc.setContent("1 AdminGroup");
         xwiki.saveDocument(doc, context);
+    }
+
+    public static XWikiDocument createDoc(String docname, String content, XWikiStoreInterface store, XWikiContext context) throws XWikiException {
+        XWikiDocument doc1 = new XWikiDocument();
+        doc1.setFullName(docname, context);
+        doc1.setContent(content);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        store.saveXWikiDoc(doc1, context);
+        return doc1;
     }
 
 }

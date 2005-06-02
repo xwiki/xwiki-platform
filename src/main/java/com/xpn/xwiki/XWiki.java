@@ -68,6 +68,7 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.tools.VelocityFormatter;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.PortalContainer;
@@ -381,7 +382,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             setStore(basestore);
 
         // Prepare the Rendering Engine
-        setRenderingEngine(new XWikiRenderingEngine(this));
+        setRenderingEngine(new XWikiRenderingEngine(this, context));
 
         // Prepare the Plugin Engine
         preparePlugins(context);
@@ -2872,6 +2873,45 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
        
         List docs = this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.web", spaceName}}, context);
         return docs;
+    }
+
+    public List getIncludedMacros(String defaultweb, String content, XWikiContext context) {
+         try {
+          String pattern = "#includeMacros\\(\"(.*?)\"\\)";
+          List list = context.getUtil().getMatches(content, pattern, 1);
+          for (int i=0;i<list.size();i++) {
+              try {
+                  String name = (String)list.get(i);
+                  if (name.indexOf(".")==-1) {
+                      list.set(i, defaultweb + "." + name);
+                  }
+              } catch (Exception e) {
+                  // This should never happen
+                    e.printStackTrace();
+                    return null;
+                }
+          }
+
+          return list;
+         } catch (Exception e) {
+             // This should never happen
+             e.printStackTrace();
+             return null;
+         }
+     }
+
+    public String getFlash(String url, String width, String height, XWikiContext context) {
+        VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));
+        try {
+        VelocityContext vcontext = (VelocityContext) vorigcontext.clone();
+        vcontext.put("flashurl", url);
+        vcontext.put("width", width);
+        vcontext.put("height", height);
+        context.put("vcontext", vcontext);
+        return parseTemplate("flash.vm", context);
+        } finally {
+            context.put("vcontext", vorigcontext);
+        }
     }
 }
 

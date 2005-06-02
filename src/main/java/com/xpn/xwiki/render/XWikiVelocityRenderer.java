@@ -70,7 +70,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
                 try {
                     // We need to do this in case there are any macros in the content
-                    List macrolist = contentdoc.getIncludedMacros(context);
+                    List macrolist = context.getWiki().getIncludedMacros(contentdoc.getWeb(), content, context);
                     if (macrolist!=null) {
                         com.xpn.xwiki.XWiki xwiki = context.getWiki();
                         for (int i=0;i<macrolist.size();i++) {

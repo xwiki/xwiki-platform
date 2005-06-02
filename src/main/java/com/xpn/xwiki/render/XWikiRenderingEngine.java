@@ -34,7 +34,8 @@ public class XWikiRenderingEngine {
 
     private Vector renderers = new Vector();
 
-    public XWikiRenderingEngine(XWiki xwiki) throws XWikiException {
+    public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
+        // addRenderer(new XWikiMacrosMappingRenderer(xwiki, context));
         // addRenderer(new XWikiJSPRenderer());
         addRenderer(new XWikiVelocityRenderer());
         addRenderer(new XWikiGroovyRenderer());
@@ -100,10 +101,32 @@ public class XWikiRenderingEngine {
         context.getWiki().getPluginManager().beginRendering(context);
 
         String content = text;
+
+        // Which is the current idoc and sdoc
+        XWikiDocument idoc = (XWikiDocument) context.get("idoc");
+        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+        // We put the including and security doc in the context
+        // It will be needed to verify programming rights
+        context.put("idoc", includingdoc);
+        context.put("sdoc", contentdoc);
+
         try {
+
             for (int i=0;i<renderers.size();i++)
                 content = ((XWikiRenderer)renderers.elementAt(i)).render(content, contentdoc, includingdoc, context);
         } finally {
+            // Remove including doc or set the previous one
+            if (idoc==null)
+             context.remove("idoc");
+            else
+             context.put("idoc", idoc);
+
+            // Remove security doc or set the previous one
+            if (sdoc==null)
+             context.remove("sdoc");
+            else
+             context.put("sdoc", sdoc);
+
             // Let's call the endRendering loop
             context.getWiki().getPluginManager().endRendering(context);
         }

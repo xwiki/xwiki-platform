@@ -414,7 +414,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                     return false;
 
                 try {
-                    allow = checkRight(name, xwikimasterdoc , "programming", true, true, true, context);
+                    allow = checkRight(name, xwikimasterdoc , "programming", user, true, true, context);
                     if (allow) {
                         logAllow(name, resourceKey, accessLevel, "programming level");
                         return true;
@@ -435,7 +435,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 // Verify XWiki register right
         if (accessLevel.equals("register")) {
             try {
-                allow = checkRight(name, xwikimasterdoc , "register", true, true, true, context);
+                allow = checkRight(name, xwikimasterdoc , "register", user, true, true, context);
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "register level");
                     return true;
@@ -467,7 +467,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
             // Verify XWiki super user
             try {
-                allow = checkRight(name, xwikidoc , "admin", true, true, true, context);
+                allow = checkRight(name, xwikidoc , "admin", user, true, true, context);
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "admin level");
                     return true;
@@ -478,7 +478,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             String web = Util.getWeb(resourceKey);
             XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
             try {
-                allow = checkRight(name, webdoc , "admin", true, true, true, context);
+                allow = checkRight(name, webdoc , "admin", user, true, true, context);
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "web admin level");
                     return true;
@@ -489,7 +489,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             resourceKey = Util.getName(resourceKey, context);
             XWikiDocument doc = context.getWiki().getDocument(resourceKey, context);
             try {
-                deny = checkRight(name, doc, accessLevel, true, false, false, context);
+                deny = checkRight(name, doc, accessLevel, user, false, false, context);
                 deny_found = true;
                 if (deny) {
                     logDeny(name, resourceKey, accessLevel, "document level");
@@ -498,7 +498,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             } catch (XWikiRightNotFoundException e) {}
 
             try {
-                allow = checkRight(name, doc , accessLevel, true, true, false, context);
+                allow = checkRight(name, doc , accessLevel, user, true, false, context);
                 allow_found = true;
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "document level");
@@ -510,7 +510,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 // Check if this document is denied/allowed
 // through the web WebPreferences Global Rights
             try {
-                deny =  checkRight(name, webdoc, accessLevel, true, false, true, context);
+                deny =  checkRight(name, webdoc, accessLevel, user, false, true, context);
                 deny_found = true;
                 if (deny) {
                     logDeny(name, resourceKey, accessLevel, "web level");
@@ -522,7 +522,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             // then we cannot check the web rights anymore
             if (!allow_found) {
             try {
-                allow = checkRight(name, webdoc , accessLevel, true, true, true, context);
+                allow = checkRight(name, webdoc , accessLevel, user, true, true, context);
                 allow_found = true;
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "web level");
@@ -533,7 +533,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 // Check if this document is denied/allowed
 // through the XWiki.XWikiPreferences Global Rights
             try {
-                deny = checkRight(name, xwikidoc , accessLevel, true, false, true, context);
+                deny = checkRight(name, xwikidoc , accessLevel, user, false, true, context);
                 deny_found = true;
                 if (deny) {
                     logDeny(name, resourceKey, accessLevel, "xwiki level");
@@ -545,7 +545,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             // then we cannot check the web rights anymore
             if (!allow_found) {
             try {
-                allow = checkRight(name, xwikidoc , accessLevel, true, true, true, context);
+                allow = checkRight(name, xwikidoc , accessLevel, user, true, true, context);
                 allow_found = true;
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "xwiki level");
@@ -577,7 +577,10 @@ public class XWikiRightServiceImpl implements XWikiRightService {
     }
 
     public boolean hasProgrammingRights(XWikiContext context) {
-        return hasProgrammingRights(context.getDoc(), context);
+        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+        if (sdoc==null)
+         sdoc = context.getDoc();
+        return hasProgrammingRights(sdoc, context);
     }
 
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context) {

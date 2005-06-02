@@ -219,11 +219,6 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 
-#macro(testmacro)
- bla bli
-#end
-
-
 #macro (exportPackage)
 #set($export = $request.get("export"))
 #if ($export == "1")

@@ -1,24 +1,7 @@
-
-
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,12 +14,21 @@ import org.hibernate.HibernateException;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 19 déc. 2003
- * Time: 17:31:37
  */
+package com.xpn.xwiki.test;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import junit.framework.TestCase;
+import org.hibernate.HibernateException;
 
 public class ClassesTest extends TestCase {
 
@@ -58,7 +50,6 @@ public class ClassesTest extends TestCase {
         property = (NumberProperty)pclass.fromString("10.01");
         assertEquals("Float number not supported", new Float("10.01"), property.getValue());
     }
-
 
     public void testString() {
         StringClass pclass = new StringClass();
@@ -114,19 +105,18 @@ public class ClassesTest extends TestCase {
     }
 
     public void testRelationalStaticList() {
-            StaticListClass pclass = new StaticListClass();
-            pclass.setRelationalStorage(true);
-            pclass.setMultiSelect(true);
+        StaticListClass pclass = new StaticListClass();
+        pclass.setRelationalStorage(true);
+        pclass.setMultiSelect(true);
 
-            ListProperty property;
-            property = (ListProperty)pclass.fromString("1");
-            assertEquals("StaticList failed on single value", property.toText(), "1");
-            assertEquals("StaticList failed on single value", property.toFormString(), "1");
-            property = (ListProperty)pclass.fromString("1|2");
-            assertEquals("StaticList failed on multiple value", property.toText(), "1 2");
-            assertEquals("StaticList failed on multiple value", property.toFormString(), "1|2");
-        }
-
+        ListProperty property;
+        property = (ListProperty)pclass.fromString("1");
+        assertEquals("StaticList failed on single value", property.toText(), "1");
+        assertEquals("StaticList failed on single value", property.toFormString(), "1");
+        property = (ListProperty)pclass.fromString("1|2");
+        assertEquals("StaticList failed on multiple value", property.toText(), "1 2");
+        assertEquals("StaticList failed on multiple value", property.toFormString(), "1|2");
+    }
 
     public void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected) {
         testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
@@ -195,11 +185,16 @@ public class ClassesTest extends TestCase {
 
     public void testDBListDisplayers() throws XWikiException, HibernateException {
         XWikiContext context = new XWikiContext();
-        XWiki xwiki = new XWiki("./xwiki.cfg", context);
+        
+        XWikiConfig config = new XWikiConfig();
+        // TODO: Should be modified to use a memory store for testing or a mock store
+        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
+        config.put("xwiki.store.hibernate.path", getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile());
+        
+        XWiki xwiki = new XWiki(config, context);
         context.setWiki(xwiki);
+        StoreHibernateTest.cleanUp(xwiki.getHibernateStore(), context);
 
-        String hibPath = getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile();
-        StoreHibernateTest.cleanUp(new XWikiHibernateStore(hibPath), context);
         xwiki.getUserClass(context);
         
         try {

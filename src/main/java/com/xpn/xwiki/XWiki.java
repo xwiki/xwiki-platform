@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,36 +14,7 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * Created by
- * User: Ludovic Dubost
- * Date: 26 nov. 2003
- * Time: 13:52:39
  */
-
-/**
- * ===================================================================
- *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
- *
- * Created by
- * User: Ludovic Dubost
- * Date: 26 nov. 2003
- * Time: 13:52:39
- */
-
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -325,14 +296,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 + servername.substring(1);
     }
 
+    public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException {
+        this(config, context, null, false);
+    }
 
+    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
+        initXWiki(config, context, engine_context, noupdate);
+    }    
+    
+    /**
+     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext)} instead
+     */
     public XWiki(String xwikicfgpath, XWikiContext context) throws XWikiException {
         this(xwikicfgpath, context, null, false);
     }
 
+    /**
+     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext, XWikiEngineContext, boolean)} instead
+     */
     public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
         try {
-            initXWiki(new FileInputStream(xwikicfgpath), context, engine_context, noupdate);
+            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
         } catch (FileNotFoundException e) {
             Object[] args = { xwikicfgpath };
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
@@ -341,11 +325,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext, XWikiEngineContext, boolean)} instead
+     */
     public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException {
-        initXWiki(is, context, engine_context, true);
+        initXWiki(new XWikiConfig(is), context, engine_context, true);
     }
 
-    public void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
+    public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException {
         setEngineContext(engine_context);
         context.setWiki(this);
 
@@ -354,15 +341,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         // Prepare the store
         XWikiStoreInterface basestore;
-        setConfig(new XWikiConfig(xwikicfgis));
+        setConfig(config);
         String storeclass = Param("xwiki.store.class","com.xpn.xwiki.store.XWikiRCSFileStore");
         try {
-            Class[] classes = new Class[2];
-            classes[0] = this.getClass();
-            classes[1] = context.getClass();
-            Object[] args = new Object[2] ;
-            args[0] = this;
-            args[1] = context;
+            Class[] classes = new Class[] {this.getClass(), context.getClass()};
+            Object[] args = new Object[] {this, context};
             basestore = (XWikiStoreInterface)Class.forName(storeclass).getConstructor(classes).newInstance(args);
         }
         catch (InvocationTargetException e)

@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -14,11 +14,6 @@
  * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 14 juin 2004
- * Time: 17:09:14
  */
 package com.xpn.xwiki;
 
@@ -54,7 +49,7 @@ public interface XWikiInterface {
 
     List getVirtualWikiList();
 
-    void initXWiki(InputStream xwikicfgis, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException;
+    void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException;
 
     String getVersion();
 

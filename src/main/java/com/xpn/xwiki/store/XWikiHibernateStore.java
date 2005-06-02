@@ -1819,6 +1819,16 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
                 sql.append(",");
                 sql.append(selectColumns);
             }
+
+            int orderPos = wheresql.toLowerCase().indexOf("order by");
+            if (orderPos >= 0)
+            {
+                orderPos += "order by".length();
+                String orderStatement = wheresql.substring(orderPos + 1);
+                orderStatement = orderStatement.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
+                sql.append(", ").append(orderStatement);
+            }
+
             sql.append(" from XWikiDocument as doc");
             if (wheresql==null)
                 wheresql = "";

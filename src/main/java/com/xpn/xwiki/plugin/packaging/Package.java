@@ -28,9 +28,11 @@ import com.xpn.xwiki.XWiki;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
@@ -167,8 +169,8 @@ public class Package {
 //            return false;
         if (!context.getWiki().checkAccess("edit", doc, context))
             return false;
-        if (spaceName == null && (doc.getWeb().compareTo("XWiki") != 0))
-            spaceName = doc.getWeb();
+//        if (spaceName == null && (doc.getWeb().compareTo("XWiki") != 0))
+//            spaceName = doc.getWeb();
         for(int i = 0; i < files.size(); i++)
         {
             if (((DocumentInfo)files.get(i)).getFullName().compareTo(doc.getFullName()) == 0)
@@ -181,7 +183,7 @@ public class Package {
             }
         }
         DocumentInfo docinfo = new DocumentInfo(doc);
-        docinfo.setDefaultAction(defaultAction);
+        docinfo.setAction(defaultAction);
         files.add(docinfo);
         return true;
     }
@@ -228,36 +230,28 @@ public class Package {
         return "";
     }
 
-    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException {
+    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException, DocumentException {
         ByteArrayInputStream    bais = new ByteArrayInputStream(file);
         ZipInputStream          zis = new ZipInputStream(bais);
         ZipEntry                entry;
         Document                description = null;
         ArrayList               docs = new ArrayList();
 
+        description = ReadZipInfoFile(zis);
+        bais = new ByteArrayInputStream(file);
+        zis = new ZipInputStream(bais);
         while ((entry = zis.getNextEntry()) != null)
         {
             if(entry.getName().compareTo(DefaultPackageFileName) == 0)
-            {
-                try {
-                    description = ReadZipPackage(zis);
-                } catch (DocumentException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    files.clear();
-                    return "Can't read package file";
-                }
-            }
+                continue;
             else
             {
-                docs.add(readZipFile(zis));
+                XWikiDocument doc = readZipDoc(readZipFile(zis));
+
+                this.add(doc, context);
             }
         }
 
-        for (int i = 0; i < docs.size(); i++)
-        {
-            XWikiDocument doc = readZipDoc((String) docs.get(i));
-            this.add(doc, context);
-        }
 
         if (description == null)
                 files.clear();
@@ -288,7 +282,7 @@ public class Package {
         {
             if (((DocumentInfo)files.get(i)).getFullName().compareTo(docName) == 0)
             {
-                ((DocumentInfo)files.get(i)).setDefaultAction(defaultAction);
+                ((DocumentInfo)files.get(i)).setAction(defaultAction);
                 return;
             }
         }
@@ -344,6 +338,21 @@ public class Package {
             return null;
         }
         return doc;
+    }
+
+    private Document ReadZipInfoFile(ZipInputStream zis) throws IOException, DocumentException {
+        ZipEntry    entry;
+        Document    description;
+
+        while ((entry = zis.getNextEntry()) != null)
+        {
+            if(entry.getName().compareTo(DefaultPackageFileName) == 0)
+            {
+                description = ReadZipPackage(zis);
+                return description;
+            }
+        }
+        return null;
     }
 
     private Document ReadZipPackage(ZipInputStream zis) throws IOException, DocumentException{
@@ -411,7 +420,7 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             Element elfile = new DOMElement("file");
-            elfile.addAttribute("defaultAction", String.valueOf(((DocumentInfo)(files.get(i))).getDefaultAction()));
+            elfile.addAttribute("defaultAction", String.valueOf(((DocumentInfo)(files.get(i))).getAction()));
             elfile.addText(((DocumentInfo)(files.get(i))).getFullName());
             elfiles.add(elfile);
         }
@@ -461,6 +470,8 @@ public class Package {
     public void backupWiki(XWikiContext context) throws XWikiException {
         XWiki wiki = context.getWiki();
         List spaces = wiki.getSpaces(context);
+        name = "Backup";
+        description = "on " + (new Date().toString()) + " by " + context.getUser();
         for(int i = 0; i < spaces.size(); i++)
         {
             List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);

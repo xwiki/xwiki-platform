@@ -8,7 +8,6 @@ public class DocumentInfo
 {
     private XWikiDocument       doc;
     private int                 installable = INSTALL_IMPOSSIBLE;
-    private int                 DefaultAction = ACTION_NOT_DEFINED;
     private int                 action = ACTION_NOT_DEFINED;
     private int                 fileType;
 
@@ -140,14 +139,6 @@ public class DocumentInfo
         if (status.compareTo("skip") == 0)
             return ACTION_SKIP;
         return ACTION_NOT_DEFINED;
-    }
-
-    public int getDefaultAction() {
-        return DefaultAction;
-    }
-
-    public void setDefaultAction(int defaultAction) {
-        DefaultAction = defaultAction;
     }
 
     public int getAction() {

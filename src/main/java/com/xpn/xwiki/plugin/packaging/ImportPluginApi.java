@@ -6,6 +6,8 @@ import com.xpn.xwiki.XWikiException;
 import java.io.IOException;
 import java.util.List;
 
+import org.dom4j.DocumentException;
+
 /**
  * ===================================================================
  * <p/>
@@ -63,7 +65,7 @@ public class ImportPluginApi   extends Api {
         return pack.TestInstall(super.context);
     }
 
-    public void importPackage(byte[] PackageFile) throws IOException, XWikiException {
+    public void importPackage(byte[] PackageFile) throws IOException, XWikiException, DocumentException {
         pack.Import(PackageFile, super.context);
     }
 

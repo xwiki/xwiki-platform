@@ -20,24 +20,23 @@ import com.xpn.xwiki.atom.XWikiHelper;
 
 
 /**
- * @author Luis
+ * @author Luis Arias <luis.arias@xwiki.com>
  *
  */
 public class LifeblogServices {
 
-  private LifeblogContext lifeblogContext;
+  private String userName;
   private static final long NONCE_TIMEOUT = 1200000L;
   private XWikiHelper xwikiHelper;
 
   public LifeblogServices(XWikiContext context) {
 	xwikiHelper = new XWikiHelper(context);
-	lifeblogContext = new LifeblogContext(xwikiHelper);
-}
-
-public boolean isAuthenticated() throws XWikiException, IOException {
-    return isAuthenticated(lifeblogContext.getWSSEHeader());
   }
-  
+
+  public boolean isAuthenticated() throws XWikiException, IOException {
+    return isAuthenticated(xwikiHelper.getWSSEHeader());
+  }
+	  
   public boolean isAuthenticated(String header) throws XWikiException, IOException {
     if (header != null) {
       // Interpret WSSE Header and Authenticate User
@@ -45,8 +44,7 @@ public boolean isAuthenticated() throws XWikiException, IOException {
       
       if (nonceIsNotTooOld(wsseHeader.parseCreated())
           && !nonceAlreadyUsedByUser(wsseHeader.getNonce())) {
-        String userName = "XWiki." + wsseHeader.getUserName();
-        lifeblogContext.setUserName(userName);
+        userName = "XWiki." + wsseHeader.getUserName();
         
         String authenticationToken = xwikiHelper.getAtomAuthenticationToken(userName);
 
@@ -61,7 +59,7 @@ public boolean isAuthenticated() throws XWikiException, IOException {
   }
 
   public void listUserBlogs() throws IOException, XWikiException {
-    List userBlogs = xwikiHelper.listUserBlogs(lifeblogContext.getUserName());
+    List userBlogs = xwikiHelper.listUserBlogs(userName);
     HttpServletResponse response = xwikiHelper.getResponse();
     response.setContentType("application/x.atom+xml");
     PrintWriter writer = new PrintWriter(response.getOutputStream());
@@ -113,5 +111,4 @@ public boolean isAuthenticated() throws XWikiException, IOException {
   private boolean nonceIsNotTooOld(Calendar createdDate) {
     return Calendar.getInstance().getTimeInMillis() - createdDate.getTimeInMillis() <= NONCE_TIMEOUT;
   }
-
 }

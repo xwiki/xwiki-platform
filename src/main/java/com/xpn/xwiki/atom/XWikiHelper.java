@@ -162,4 +162,7 @@ public class XWikiHelper {
     return xwikiContext.getResponse();
   }
 
+  public String getWSSEHeader() {
+	return getRequest().getHeader("X-WSSE");
+  }
 }

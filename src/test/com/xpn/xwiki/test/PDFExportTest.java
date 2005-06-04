@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -14,57 +14,17 @@
  * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 19 août 2004
- * Time: 12:49:56
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import org.hibernate.HibernateException;
-import junit.framework.TestCase;
 
 import java.io.ByteArrayOutputStream;
 
-public class PDFExportTest extends TestCase {
-
-    private XWiki xwiki;
-    private XWikiContext context;
+public class PDFExportTest extends HibernateTestCase {
 
     public static boolean inTest = false;
-
-    public XWikiHibernateStore getHibStore() {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
-    }
-
-    public void setUp() throws HibernateException, XWikiException {
-        context = new XWikiContext();
-        context.setDatabase("xwikitest");
-        xwiki = new XWiki("./xwiki.cfg", context, null, false);
-        xwiki.setDatabase("xwikitest");
-        context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(getHibStore(), context);
-        xwiki.flushCache();
-    }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
-    }
 
     public String getHeader() {
        return "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n" +

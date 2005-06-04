@@ -17,95 +17,65 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
 
-public class GroovyRenderTest extends TestCase {
-
-    private XWiki xwiki;
-    private XWikiContext context;
-
-    // TODO: Refactor this portion of code. It seems it is used in lots of places and it would 
-    // be good to have it in a common location (for example in a XWikiTestSetup class)
-    public void setUp() throws Exception {
-
-        XWikiConfig config = new XWikiConfig();
-        // TODO: Should be modified to use a memory store for testing or a mock store
-        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        config.put("xwiki.store.hibernate.path", getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile());
-
-        context = new XWikiContext();
-        xwiki = new XWiki(config, context);
-        context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(xwiki.getHibernateStore(), context);
-    }
-
-    public void tearDown() throws HibernateException {
-        xwiki.getHibernateStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
-    }
+public class GroovyRenderTest extends HibernateTestCase {
 
     public void testBasics() throws XWikiException {
         XWikiRenderer wikibase = new XWikiGroovyRenderer();
-        xwiki.setRightService(new GroovyTestRightService());
+        getXWiki().setRightService(new GroovyTestRightService());
         RenderTest.renderTest(wikibase, "<% foo = \"Groovy\"\nprintln \"Hello $foo World!\" %>",
-                "Hello Groovy World!", false, context);
+                "Hello Groovy World!", false, getXWikiContext());
         RenderTest.renderTest(wikibase, "<% count = 0\nif ( count == 1)\n{ println \"A${count}A\" }\nelse\n { println \"B${count}B\" }\n %>",
-                "B0B", false, context);
+                "B0B", false, getXWikiContext());
     }
 
     public void testWithFunction() throws XWikiException {
         XWikiRenderer wikibase = new XWikiGroovyRenderer();
-        xwiki.setRightService(new GroovyTestRightService());
+        getXWiki().setRightService(new GroovyTestRightService());
         RenderTest.renderTest(wikibase, "<%  def add(int a, int b) { return a+b }\n println add(1,2)\n %>",
-                "3", false, context);
+                "3", false, getXWikiContext());
     }
 
     public void testWithInclude() throws Exception {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = xwiki.getStore();
-        xwiki.setRightService(new GroovyTestRightService());
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
+        XWikiStoreInterface store = getXWiki().getStore();
+        getXWiki().setRightService(new GroovyTestRightService());
 
         XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");
         doc1.setContent("<%  testvar = \"${doc.name}\" %>");
         doc1.setAuthor("FirstAuthor");
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1, context);
+        store.saveXWikiDoc(doc1, getXWikiContext());
 
         XWikiDocument doc2 = new XWikiDocument("Other", "IncludeTest");
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")<% println testvar %>");
-        store.saveXWikiDoc(doc2, context);
-        RenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, context);
+        store.saveXWikiDoc(doc2, getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, getXWikiContext());
     }
 
     public void testWithFunctionInclude() throws Exception {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = xwiki.getStore();
-        xwiki.setRightService(new GroovyTestRightService());
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
+        XWikiStoreInterface store = getXWiki().getStore();
+        getXWiki().setRightService(new GroovyTestRightService());
 
         XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");
         doc1.setContent("<%  def add(int a, int b) { return a+b } %>");
         doc1.setAuthor("FirstAuthor");
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1, context);
+        store.saveXWikiDoc(doc1, getXWikiContext());
 
         XWikiDocument doc2 = new XWikiDocument("Other", "IncludeTest");
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")<% println add(1,2) %>");
-        store.saveXWikiDoc(doc2, context);
-        RenderTest.renderTest(wikiengine, doc2, "3", false, context);
+        store.saveXWikiDoc(doc2, getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc2, "3", false, getXWikiContext());
     }
 
  }

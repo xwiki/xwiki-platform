@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,13 +14,7 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * User: ludovic
- * Date: 8 mars 2004
- * Time: 09:23:00
  */
-
-
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,9 +24,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
 import org.hibernate.HibernateException;
 
-
-
-public class RadeoxRenderTest  extends RenderTest {
+public class RadeoxRenderTest extends RenderTest {
 
     public XWikiRenderer getXWikiRenderer() {
         return new XWikiRadeoxRenderer();
@@ -43,14 +35,14 @@ public class RadeoxRenderTest  extends RenderTest {
 
         // Test formatting
         renderTest(wikibase, "Hello 1\nThis is a text with *strong* text\nHello 2",
-                "<strong class=\"strong\">", false, context);
+                "<strong class=\"strong\">", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n*strong*\nHello 2",
-                "<strong class=\"strong\">strong</strong>", false, context);
+                "<strong class=\"strong\">strong</strong>", false, getXWikiContext());
 
         renderTest(wikibase, "Hello 1\nThis is a text with __bold__ text\nHello 2",
-                "<b class=\"bold\">", false, context);
+                "<b class=\"bold\">", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n__bold__\nHello 2",
-                "<b class=\"bold\">bold</b>", false, context);
+                "<b class=\"bold\">bold</b>", false, getXWikiContext());
 
     }
 
@@ -58,41 +50,41 @@ public class RadeoxRenderTest  extends RenderTest {
         XWikiRenderer wikibase = getXWikiRenderer();
         // Test <hr>
         renderTest(wikibase, "Hello 1\n----\nHello 2",
-                "Hello 1\n<hr class=\"line\"/>\nHello 2", true, context);
+                "Hello 1\n<hr class=\"line\"/>\nHello 2", true, getXWikiContext());
         // Test heading
         renderTest(wikibase, "Hello 1\n1 Title\nHello 2",
-                "<h3 class=\"heading-1\">", false, context);
+                "<h3 class=\"heading-1\">", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n1.1 Title\nHello 2",
-                "<h3 class=\"heading-1-1\">", false, context);
+                "<h3 class=\"heading-1-1\">", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n1.1 Title\nHello 2",
-            "<h3 class=\"heading-1-1\"><a id=\"Title\" name=\"Title\">Title</a></h3>", false, context);
+            "<h3 class=\"heading-1-1\"><a id=\"Title\" name=\"Title\">Title</a></h3>", false, getXWikiContext());
     }
 
     public void testWikiBasePreRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         // Test formatting
         renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "1 Title {pre}\n*strong*\n{/pre}",
-        "<h3 class=\"heading-1\"><a id=\"Title+%25_0_%25\" name=\"Title+%25_0_%25\">Title \n*strong*\n</a></h3>", false, context);
+        "<h3 class=\"heading-1\"><a id=\"Title+%25_0_%25\" name=\"Title+%25_0_%25\">Title \n*strong*\n</a></h3>", false, getXWikiContext());
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
-        "<li>Item *strong*</li>", false, context);
+        "<li>Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
-        "This is a text with *one* and *two* items", false, context);
+        "This is a text with *one* and *two* items", false, getXWikiContext());
         renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
-        "This is a text with *strong* text", false, context);
+        "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
-        "<li>Item *strong*</li>", false, context);
+        "<li>Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
-        "This is a text with *one* and *two* items", false, context);
+        "This is a text with *one* and *two* items", false, getXWikiContext());
     }
 
     public void testWikiBaseTabListRenderer() throws XWikiException {
@@ -102,58 +94,57 @@ public class RadeoxRenderTest  extends RenderTest {
     public void testWikiBaseSpaceListRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         renderTest(wikibase, "* List1",
-                "<ul class=\"star\">\n<li>List1</li>\n</ul>", false, context);
+                "<ul class=\"star\">\n<li>List1</li>\n</ul>", false, getXWikiContext());
         renderTest(wikibase, "* List1\n* List2",
-                "<ul class=\"star\">\n<li>List1</li>\n<li>List2</li>\n</ul>", false, context);
+                "<ul class=\"star\">\n<li>List1</li>\n<li>List2</li>\n</ul>", false, getXWikiContext());
     }
 
     public void testWikiBaseLinkRenderer() throws XWikiException, HibernateException {
-        StoreHibernateTest.cleanUp(getHibStore(), context);
-        Utils.createDoc(getHibStore(), "Main", "WebHome", context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Main", "WebHome", getXWikiContext());
         XWikiRenderer wikibase = getXWikiRenderer();
         XWikiDocument doc = new XWikiDocument("Main","WebHome");
-        context.put("doc", doc);
+        getXWikiContext().put("doc", doc);
 
         renderTest(wikibase, "Test link: [Web Home]",
-                "view/Main/WebHome", false, context);
+                "view/Main/WebHome", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home]",
-                "Web Home</a>", false, context);
+                "Web Home</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home]",
-                "view/Main/WebHome", false, context);
+                "view/Main/WebHome", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home12]",
-                "Web+Home12", false, context);
+                "Web+Home12", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home12]",
-                "edit/Main/Web+Home12?parent=", false, context);
+                "edit/Main/Web+Home12?parent=", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
-                "Other Text", false, context);
+                "Other Text", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
-                "view/Main/WebHome", false, context);
+                "view/Main/WebHome", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome12]",
-                "Other Text", false, context);
+                "Other Text", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome12]",
-                "edit/Main/WebHome12?parent=", false, context);
+                "edit/Main/WebHome12?parent=", false, getXWikiContext());
         renderTest(wikibase, "Test link: http://www.ludovic.org/",
-                "<a href=\"http://www.ludovic.org/\">", false, context);
+                "<a href=\"http://www.ludovic.org/\">", false, getXWikiContext());
         renderTest(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
-                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: {link:WebHome| http://www.ludovic.org/ }",
-                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+                "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, context);
+                     "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [ludovic>http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, context);
+                     "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [ludovic web site>http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
+                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [ludovic web site> http://www.ludovic.org/ ]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
+                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [ludovic>mailto:ludovic@xwiki.org]",
-                     "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, context);
+                     "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, getXWikiContext());
         
         // test internal links
         renderTest(wikibase, "Test link: [#anchorname]",
-            "<a href=\"#anchorname\"></a>", false, context);
+            "<a href=\"#anchorname\"></a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [internal link>#anchorname]",
-            "<a href=\"#anchorname\">internal link</a>", false, context);
+            "<a href=\"#anchorname\">internal link</a>", false, getXWikiContext());
         }
 
 
@@ -165,82 +156,78 @@ public class RadeoxRenderTest  extends RenderTest {
        }
 
        public void testWikiLinksInTables() throws XWikiException, HibernateException {
-           StoreHibernateTest.cleanUp(getHibStore(), context);
-           Utils.createDoc(getHibStore(), "Main", "WebHome", context);
+           Utils.createDoc(getXWiki().getHibernateStore(), "Main", "WebHome", getXWikiContext());
            XWikiRenderer wikibase = getXWikiRenderer();
            XWikiDocument doc = new XWikiDocument("Main","WebHome");
-           context.put("doc", doc);
+           getXWikiContext().put("doc", doc);
 
            renderTestInTable(wikibase, "Test link: [Web Home]",
-                   "view/Main/WebHome", false, context);
+                   "view/Main/WebHome", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home]",
-                   "Web Home</a>", false, context);
+                   "Web Home</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home]",
-                   "view/Main/WebHome", false, context);
+                   "view/Main/WebHome", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home12]",
-                   "Web Home12", false, context);
+                   "Web Home12", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home12]",
-                   "edit/Main/Web+Home12?parent=", false, context);
+                   "edit/Main/Web+Home12?parent=", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
-                   "Other Text", false, context);
+                   "Other Text", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
-                   "view/Main/WebHome", false, context);
+                   "view/Main/WebHome", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
-                   "Other Text", false, context);
+                   "Other Text", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
-                   "edit/Main/WebHome12?parent=", false, context);
+                   "edit/Main/WebHome12?parent=", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: http://www.ludovic.org/",
-                   "<a href=\"http://www.ludovic.org/\">", false, context);
+                   "<a href=\"http://www.ludovic.org/\">", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: {link:WebHome|http://www.ludovic.org/}",
-                   "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+                   "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: {link:WebHome| http://www.ludovic.org/ }",
-                   "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, context);
+                   "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, context);
+                        "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic>http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, context);
+                        "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic web site>http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
+                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic web site> http://www.ludovic.org/ ]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, context);
+                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic>mailto:ludovic@xwiki.org]",
-                        "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, context);
+                        "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, getXWikiContext());
        }
 
        public void testHTMLCodeRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         renderTest(wikibase, "{code}\n<html>\n{code}",
-                "&#60;html&#62;", false, context);
+                "&#60;html&#62;", false, getXWikiContext());
        }
 
        public void testRSSRenderer() throws XWikiException {
         XWikiRenderer wikibase = getXWikiRenderer();
         renderTest(wikibase, "{rss:feed=http://www.ludovic.org/blog/index.rdf}",
-                "LudoBlog", false, context);
+                "LudoBlog", false, getXWikiContext());
        }
 
       public void testWikiBaseVirtualLinkRenderer() throws XWikiException, HibernateException {
-        StoreHibernateTest.cleanUp(getHibStore(), true, true, context);
-        Utils.createDoc(getHibStore(), "XWiki", "XWikiServerXwikitest2", context);
-        Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "XWiki", "XWikiServerXwikitest2", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", getXWikiContext());
 
-        context.setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(getHibStore(), false, true, context);
-        Utils.createDoc(getHibStore(), "Main", "WebHome", context);
-        context.setDatabase("xwikitest");
-
+        getXWikiContext().setDatabase("xwikitest2");
+        // TODO: Split into several tests if you need a new clean up.
+        StoreHibernateTest.cleanUp(getXWiki().getHibernateStore(), false, true, getXWikiContext());
+        Utils.createDoc(getXWiki().getHibernateStore(), "Main", "WebHome", getXWikiContext());
+        getXWikiContext().setDatabase("xwikitest");
 
         XWikiRenderer wikibase = getXWikiRenderer();
         XWikiDocument doc = new XWikiDocument("Main","WebHome");
-        context.put("doc", doc);
+        getXWikiContext().put("doc", doc);
 
         String res = renderTest(wikibase, "Test link: [xwikitest2:Main.WebHome]",
-                "127.0.0.1", false, context);
+                "127.0.0.1", false, getXWikiContext());
         assertTrue("Cannot find view link", res.indexOf("view/Main/WebHome")!=-1 );
         res = renderTest(wikibase, "Test link: [xwikitest2:Main.WebHome12]",
-                  "127.0.0.1", false, context);
+                  "127.0.0.1", false, getXWikiContext());
         assertTrue("Cannot find edit link", res.indexOf("edit/Main/WebHome")!=-1 );
       }
-
-
 }

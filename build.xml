@@ -232,8 +232,11 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}">
-                <fileset dir="${test.src.dir}">
+                <!-- TODO: Why not rather include only files matching *Test.java? -->
+            	<!-- TODO: Why are we excluding some tests like StoreTest? This is normal -->
+            	<fileset dir="${test.src.dir}">
                     <exclude name="**/AllTests.java"/>
+                    <exclude name="**/HibernateTestCase.java"/>
                     <exclude name="**/MyFormAuthentication.java"/>
                     <exclude name="**/RenderTest.java"/>
                     <exclude name="**/StoreObjectTest.java"/>

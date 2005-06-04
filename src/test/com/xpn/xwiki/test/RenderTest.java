@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,66 +14,29 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * Created by
- * User: Ludovic Dubost
- * Date: 27 nov. 2003
- * Time: 17:20:33
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
-import junit.framework.TestCase;
 import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
 
 import java.net.URL;
 
-public abstract class RenderTest extends TestCase {
-
-    public XWiki xwiki;
-    public XWikiContext context;
+public abstract class RenderTest extends HibernateTestCase {
 
     public abstract XWikiRenderer getXWikiRenderer();
 
-    public XWikiHibernateStore getHibStore() {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
-    }
-
-    public XWikiStoreInterface getStore() {
-        return xwiki.getStore();
-    }
-
     public void setUp() throws Exception {
-        context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context, null, false);
-        xwiki.setDatabase("xwikitest");
-        context.setWiki(xwiki);
-        context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
+        super.setUp();
+        getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
         Velocity.init("velocity.properties");
     }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
-    }
-
-
 
     public static String renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
 
@@ -134,12 +97,12 @@ public abstract class RenderTest extends TestCase {
         XWikiRenderer wikibase = getXWikiRenderer();
         // Test <hr>
         renderTest(wikibase, "Hello 1\n---\nHello 2",
-                "Hello 1\n<hr />\nHello 2", true, context);
+                "Hello 1\n<hr />\nHello 2", true, getXWikiContext());
         // Test heading
         renderTest(wikibase, "Hello 1\n---+ Title\nHello 2",
-                "<h1 id=\"Title\" >", false, context);
+                "<h1 id=\"Title\" >", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n---++ Title\nHello 2",
-                "<h2 id=\"Title\" >", false, context);
+                "<h2 id=\"Title\" >", false, getXWikiContext());
     }
 
     public void testWikiBaseFormattingRenderer() throws XWikiException {
@@ -147,31 +110,31 @@ public abstract class RenderTest extends TestCase {
 
         // Test formatting
         renderTest(wikibase, "Hello 1\nThis is a text with *strong* text\nHello 2",
-                "<strong>", false, context);
+                "<strong>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n*strong*\nHello 2",
-                "<strong>strong</strong>", false, context);
+                "<strong>strong</strong>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with _em_ text\nHello 2",
-                "<em>", false, context);
+                "<em>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n_em_\nHello 2",
-                "<em>em</em>", false, context);
+                "<em>em</em>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with __strong__ text\nHello 2",
-                "<strong><em>", false, context);
+                "<strong><em>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n__strong em__\nHello 2",
-                "<strong><em>strong em</em></strong>", false, context);
+                "<strong><em>strong em</em></strong>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with =fixed= text\nHello 2",
-                "<code>", false, context);
+                "<code>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n=fixed=\nHello 2",
-                "<code>fixed</code>", false, context);
+                "<code>fixed</code>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with ==boldfixed== text\nHello 2",
-                "<code><b>", false, context);
+                "<code><b>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n==bold fixed==\nHello 2",
-                "<code><b>bold fixed</b></code>", false, context);
+                "<code><b>bold fixed</b></code>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with ==bold fixed with one space== text\nHello 2",
-                "<code><b>bold fixed with one space</b></code>", false, context);
+                "<code><b>bold fixed with one space</b></code>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with ==bold  fixed   with    multiple     spaces== text\nHello 2",
-                "<code><b>bold&nbsp; fixed&nbsp; &nbsp;with&nbsp; &nbsp; multiple&nbsp; &nbsp; &nbsp;spaces</b></code>", false, context);
+                "<code><b>bold&nbsp; fixed&nbsp; &nbsp;with&nbsp; &nbsp; multiple&nbsp; &nbsp; &nbsp;spaces</b></code>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\nThis is a text with ==Hello if (5 == 6) then let's finish== text\nHello 2",
-                "<code><b>Hello if (5 == 6) then let's finish</b></code>", false, context);
+                "<code><b>Hello if (5 == 6) then let's finish</b></code>", false, getXWikiContext());
     }
 
     public void testWikiBasePreRenderer() throws XWikiException {
@@ -179,74 +142,72 @@ public abstract class RenderTest extends TestCase {
 
         // Test formatting
         renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "---+ Title {pre}\n*strong*\n{/pre}",
-                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
+                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, getXWikiContext());
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
-                 "<li> Item *strong*</li>", false, context);
+                 "<li> Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
-                "This is a text with *one* and *two* items", false, context);
+                "This is a text with *one* and *two* items", false, getXWikiContext());
         renderTest(wikibase, "{pre}This is a text with *strong* text{/pre}",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "{pre}\nThis is a text with *strong* text\n{/pre}",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
-                "This is a text with *strong* text", false, context);
+                "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "---+ Title {pre}\n*strong*\n{/pre}",
-                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, context);
+                 "<h1 id=\"Title_0_\" >Title \n*strong*\n</h1>", false, getXWikiContext());
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
-                 "<li> Item *strong*</li>", false, context);
+                 "<li> Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
-                "This is a text with *one* and *two* items", false, context);
+                "This is a text with *one* and *two* items", false, getXWikiContext());
 
     }
 
     public void testWikiBaseTabListRenderer() throws XWikiException {
          XWikiRenderer wikibase = getXWikiRenderer();
          renderTest(wikibase, "\t* List1",
-                "<ul><li> List1</li>\n</ul>\n", true, context);
+                "<ul><li> List1</li>\n</ul>\n", true, getXWikiContext());
          renderTest(wikibase, "\t* List1\n\t* List2",
-               "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, context);
+               "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, getXWikiContext());
         renderTest(wikibase, "\t* List1\n\t\t* List2",
-              "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, context);
+              "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, getXWikiContext());
 
     }
 
     public void testWikiBaseSpaceListRenderer() throws XWikiException {
          XWikiRenderer wikibase = getXWikiRenderer();
          renderTest(wikibase, "   * List1",
-                "<ul><li> List1</li>\n</ul>", true, context);
+                "<ul><li> List1</li>\n</ul>", true, getXWikiContext());
          renderTest(wikibase, "   * List1\n   * List2",
-               "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, context);
+               "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, getXWikiContext());
         renderTest(wikibase, "   * List1\n      * List2",
-              "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, context);
+              "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, getXWikiContext());
 
     }
 
     public void testWikiBaseLinkRenderer() throws XWikiException, HibernateException {
          XWikiRenderer wikibase = getXWikiRenderer();
          XWikiDocument doc = new XWikiDocument("Main","WebHome");
-         context.put("doc", doc);
+         getXWikiContext().put("doc", doc);
 
          renderTest(wikibase, "Test link: UnknownPage",
-               ">?</a>", false, context);
+               ">?</a>", false, getXWikiContext());
          renderTest(wikibase, "Test link: WebHome",
-                "Main/WebHome", false, context);
+                "Main/WebHome", false, getXWikiContext());
          renderTest(wikibase, "Test link: Main.WebHome",
-                "Main/WebHome", false, context);
+                "Main/WebHome", false, getXWikiContext());
 
          String sclass = this.getClass().getName();
          if (sclass.indexOf("WikiWikiBaseRenderTest")==-1) {
             renderTest(wikibase, "Test link: [[Web Home]]",
-               "WebHome</a>", false, context);
+               "WebHome</a>", false, getXWikiContext());
             renderTest(wikibase, "Test link: [[http://link/][WebHome]]",
-               "<a href=\"http://link\">WebHome</a>", false, context);
+               "<a href=\"http://link\">WebHome</a>", false, getXWikiContext());
          }
     }
-
-
 }

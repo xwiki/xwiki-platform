@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,12 +14,7 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * User: ludovic
- * Date: 6 mars 2004
- * Time: 12:01:47
  */
-
 package com.xpn.xwiki.test;
 
 import java.net.URL;
@@ -29,13 +24,8 @@ import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
-import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
@@ -44,72 +34,40 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
-
-public class XWikiTest extends TestCase {
-
-    private XWiki xwiki;
-     private XWikiContext context;
-
-     public XWikiHibernateStore getHibStore() {
-         XWikiStoreInterface store = xwiki.getStore();
-         if (store instanceof XWikiCacheStoreInterface)
-             return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-         else
-             return (XWikiHibernateStore) store;
-     }
-
-     public XWikiStoreInterface getStore() {
-         return xwiki.getStore();
-     }
+public class XWikiTest extends HibernateTestCase {
 
      public void setUp() throws Exception {
-         context = new XWikiContext();
-         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
-         xwiki = new XWiki("./xwiki.cfg", context, null, false);
-         context.setWiki(xwiki);
-         xwiki.setDatabase("xwikitest");
-         StoreHibernateTest.cleanUp(getHibStore(), context);
-         Velocity.init("velocity.properties");
-     }
-
-     public void tearDown() throws HibernateException {
-         getHibStore().shutdownHibernate(context);
-         xwiki = null;
-         context = null;
-         System.gc();
+         super.setUp();
+         getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
      }
 
     public void testDefaultSkin() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
-        assertEquals("Skin should be default", "default", xwiki.getSkin(context));
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        assertEquals("Skin should be default", "default", getXWiki().getSkin(getXWikiContext()));
     }
 
     public void testAlternSkin() throws XWikiException {
-        Utils.setStringValue("XWiki.XWikiPreferences", "skin", "altern", context);
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
-        assertEquals("Skin should be altern", "altern", xwiki.getSkin(context));
+        Utils.setStringValue("XWiki.XWikiPreferences", "skin", "altern", getXWikiContext());
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        assertEquals("Skin should be altern", "altern", getXWiki().getSkin(getXWikiContext()));
     }
 
     public void testDefaultSkinFile() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
-        assertEquals("Skin File should be default",  "/xwiki/skins/default/style.css", xwiki.getSkinFile("style.css", context));
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        assertEquals("Skin File should be default",  "/xwiki/skins/default/style.css", getXWiki().getSkinFile("style.css", getXWikiContext()));
     }
 
     public void testPassword() throws XWikiException, HibernateException {
         HashMap map = new HashMap();
         map.put("password", "toto");
-        xwiki.createUser("LudovicDubost", map, "", "", "view, edit", context);
-        XWikiDocument doc = xwiki.getDocument("XWiki.LudovicDubost", context);
-        String xml = doc.getXMLContent(context);
+        getXWiki().createUser("LudovicDubost", map, "", "", "view, edit", getXWikiContext());
+        XWikiDocument doc = getXWiki().getDocument("XWiki.LudovicDubost", getXWikiContext());
+        String xml = doc.getXMLContent(getXWikiContext());
         assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
         assertTrue("XML should contain password", xml.indexOf("toto")!=-1);
-        Document ddoc = new Document(doc, context);
+        Document ddoc = new Document(doc, getXWikiContext());
         xml = ddoc.getXMLContent();
         assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
         assertTrue("XML should not contain password", xml.indexOf("toto")==-1);
@@ -120,42 +78,42 @@ public class XWikiTest extends TestCase {
         Calendar cal = Calendar.getInstance();
         cal.set(2004,1,4,22,33);
         date = cal.getTime();
-        assertEquals("Format date failed", "2004/02/04", xwiki.formatDate(date,"yyyy/MM/dd", context) );
-        assertEquals("Format date failed", "2004/02/04 22:33", xwiki.formatDate(date, null, context));
-        assertEquals("Format date failed", "2004/02/04 22:33", xwiki.formatDate(date, "abc abcd efg", context));
+        assertEquals("Format date failed", "2004/02/04", getXWiki().formatDate(date,"yyyy/MM/dd", getXWikiContext()) );
+        assertEquals("Format date failed", "2004/02/04 22:33", getXWiki().formatDate(date, null, getXWikiContext()));
+        assertEquals("Format date failed", "2004/02/04 22:33", getXWiki().formatDate(date, "abc abcd efg", getXWikiContext()));
     }
 
     public void testDocName() throws XWikiException {
-        assertEquals("getDocName failed", "LudovicDubost", xwiki.getDocName("xwiki:XWiki.LudovicDubost"));
-        assertEquals("getDocName failed", "LudovicDubost", xwiki.getDocName("XWiki.LudovicDubost"));
-        assertEquals("getDocName failed", "LudovicDubost", xwiki.getDocName("LudovicDubost"));
-        assertEquals("getDocName failed", "LudovicDubost", xwiki.getDocName("Main.LudovicDubost"));
+        assertEquals("getDocName failed", "LudovicDubost", getXWiki().getDocName("xwiki:XWiki.LudovicDubost"));
+        assertEquals("getDocName failed", "LudovicDubost", getXWiki().getDocName("XWiki.LudovicDubost"));
+        assertEquals("getDocName failed", "LudovicDubost", getXWiki().getDocName("LudovicDubost"));
+        assertEquals("getDocName failed", "LudovicDubost", getXWiki().getDocName("Main.LudovicDubost"));
     }
 
     public void testGetUserName() throws XWikiException, HibernateException {
-        assertEquals("getUserName failed", "LudovicDubost", xwiki.getUserName("XWiki.LudovicDubost", context));
-        assertEquals("getUserName failed", "LudovicDubost", xwiki.getLocalUserName("XWiki.LudovicDubost", context));
-        assertEquals("getUserName failed", "LudovicDubost", xwiki.getLocalUserName("xwiki:XWiki.LudovicDubost", context));
+        assertEquals("getUserName failed", "LudovicDubost", getXWiki().getUserName("XWiki.LudovicDubost", getXWikiContext()));
+        assertEquals("getUserName failed", "LudovicDubost", getXWiki().getLocalUserName("XWiki.LudovicDubost", getXWikiContext()));
+        assertEquals("getUserName failed", "LudovicDubost", getXWiki().getLocalUserName("xwiki:XWiki.LudovicDubost", getXWikiContext()));
         HashMap map = new HashMap();
         map.put("first_name", "Ludovic");
         map.put("last_name", "Dubost");
-        xwiki.createUser("LudovicDubost", map, "", "", "view, edit", context);
-        String result = xwiki.getUserName("XWiki.LudovicDubost", context);
+        getXWiki().createUser("LudovicDubost", map, "", "", "view, edit", getXWikiContext());
+        String result = getXWiki().getUserName("XWiki.LudovicDubost", getXWikiContext());
         assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result );
-        result = xwiki.getUserName("xwikitest:XWiki.LudovicDubost", context);
+        result = getXWiki().getUserName("xwikitest:XWiki.LudovicDubost", getXWikiContext());
         assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.LudovicDubost", context);
+        result = getXWiki().getLocalUserName("XWiki.LudovicDubost", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
-        result = xwiki.getLocalUserName("xwikitest:XWiki.LudovicDubost", context);
+        result = getXWiki().getLocalUserName("xwikitest:XWiki.LudovicDubost", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.LudovicDubost", "$first_name", context);
+        result = getXWiki().getLocalUserName("XWiki.LudovicDubost", "$first_name", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.LudovicDubost", "$first_name", false, context);
+        result = getXWiki().getLocalUserName("XWiki.LudovicDubost", "$first_name", false, getXWikiContext());
         assertEquals("getLocalUserName failed", "Ludovic", result);
     }
 
     public void testDocAttachURL() throws XWikiException {
-        String attachURL = xwiki.getAttachmentURL("XWiki.LudovicDubost", "fichier avec blancs.gif", context);
+        String attachURL = getXWiki().getAttachmentURL("XWiki.LudovicDubost", "fichier avec blancs.gif", getXWikiContext());
         assertTrue("White spaces should be %20", (attachURL.indexOf("+")!=-1));
     }
 
@@ -163,27 +121,27 @@ public class XWikiTest extends TestCase {
         HashMap map = new HashMap();
         map.put("first_name", "Ludovic");
         map.put("last_name", "Dubost");
-        xwiki.createUser("LudovicDubost", map, "", "", "view, edit", context);
-        XWikiDocument doc = xwiki.getDocument("XWiki.LudovicDubost", context);
-        assertNull("No lock", doc.getLock(context));
-        doc.setLock("AnyUser", context);
-        XWikiLock thefirstlock = doc.getLock(context);
+        getXWiki().createUser("LudovicDubost", map, "", "", "view, edit", getXWikiContext());
+        XWikiDocument doc = getXWiki().getDocument("XWiki.LudovicDubost", getXWikiContext());
+        assertNull("No lock", doc.getLock(getXWikiContext()));
+        doc.setLock("AnyUser", getXWikiContext());
+        XWikiLock thefirstlock = doc.getLock(getXWikiContext());
         assertEquals("AnyUser is locking", thefirstlock.getUserName(), "AnyUser");
-        doc.removeLock(context);
-        assertNull("No lock", doc.getLock(context));
+        doc.removeLock(getXWikiContext());
+        assertNull("No lock", doc.getLock(getXWikiContext()));
     }
 
     public void testLockTimeout() throws XWikiException {
         HashMap map = new HashMap();
         map.put("first_name", "Ludovic");
         map.put("last_name", "Dubost");
-        xwiki.createUser("LudovicDubost", map, "", "", "view, edit", context);
-        XWikiDocument doc = xwiki.getDocument("XWiki.LudovicDubost", context);
-        assertNull("No lock", doc.getLock(context));
-        doc.setLock("AnyUser", context);
-        XWikiLock thefirstlock = doc.getLock(context);
+        getXWiki().createUser("LudovicDubost", map, "", "", "view, edit", getXWikiContext());
+        XWikiDocument doc = getXWiki().getDocument("XWiki.LudovicDubost", getXWikiContext());
+        assertNull("No lock", doc.getLock(getXWikiContext()));
+        doc.setLock("AnyUser", getXWikiContext());
+        XWikiLock thefirstlock = doc.getLock(getXWikiContext());
         assertEquals("AnyUser is locking", thefirstlock.getUserName(), "AnyUser");
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "lock_Timeout", "1", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "lock_Timeout", "1", getXWikiContext());
 
         try
         {
@@ -191,19 +149,19 @@ public class XWikiTest extends TestCase {
         }
         catch(Exception e) {};
 
-        assertNull("No lock", doc.getLock(context));
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "lock_Timeout", "3600", context);
-        assertNull("Lock really removed", doc.getLock(context));
+        assertNull("No lock", doc.getLock(getXWikiContext()));
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "lock_Timeout", "3600", getXWikiContext());
+        assertNull("Lock really removed", doc.getLock(getXWikiContext()));
 
     }
 
     public void testCopyDocument() throws XWikiException {
-        Utils.createDoc(getHibStore(), "Test", "CopyDocument", context);
-        xwiki.copyDocument("Test.CopyDocument", "Test.CopyDocument2", context);
-        xwiki.flushCache();
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocument", getXWikiContext());
+        getXWiki().copyDocument("Test.CopyDocument", "Test.CopyDocument2", getXWikiContext());
+        getXWiki().flushCache();
 
-        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocument", context);
-        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocument2", context);
+        XWikiDocument doc1 = getXWiki().getDocument("Test.CopyDocument", getXWikiContext());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.CopyDocument2", getXWikiContext());
         assertEquals("Copied doc name is not correct", "Test.CopyDocument2", doc2.getFullName());
         assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
         // Compare documents except the name and date
@@ -215,12 +173,12 @@ public class XWikiTest extends TestCase {
         Utils.prepareObject(doc, "Test.CopyDocumentWithObject");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithObject", bobject, bclass, context);
-        xwiki.copyDocument("Test.CopyDocumentWithObject", "Test.CopyDocumentWithObject2", context);
-        xwiki.flushCache();
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithObject", bobject, bclass, getXWikiContext());
+        getXWiki().copyDocument("Test.CopyDocumentWithObject", "Test.CopyDocumentWithObject2", getXWikiContext());
+        getXWiki().flushCache();
 
-        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithObject", context);
-        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithObject2", context);
+        XWikiDocument doc1 = getXWiki().getDocument("Test.CopyDocumentWithObject", getXWikiContext());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.CopyDocumentWithObject2", getXWikiContext());
         assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithObject2", doc2.getFullName());
         assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
         // Compare documents except the name and date
@@ -232,12 +190,12 @@ public class XWikiTest extends TestCase {
         Utils.prepareAdvancedObject(doc, "Test.CopyDocumentWithAdvObject");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithAdvObject", bobject, bclass, context);
-        xwiki.copyDocument("Test.CopyDocumentWithAdvObject", "Test.CopyDocumentWithAdvObject2", context);
-        xwiki.flushCache();
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithAdvObject", bobject, bclass, getXWikiContext());
+        getXWiki().copyDocument("Test.CopyDocumentWithAdvObject", "Test.CopyDocumentWithAdvObject2", getXWikiContext());
+        getXWiki().flushCache();
 
-        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithAdvObject", context);
-        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithAdvObject2", context);
+        XWikiDocument doc1 = getXWiki().getDocument("Test.CopyDocumentWithAdvObject", getXWikiContext());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.CopyDocumentWithAdvObject2", getXWikiContext());
         assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithAdvObject2", doc2.getFullName());
         assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
         // Compare documents except the name and date
@@ -245,19 +203,19 @@ public class XWikiTest extends TestCase {
     }
 
     public void testCopyDocumentWithAttachment() throws XWikiException, IOException {
-        Utils.createDoc(getHibStore(), "Test", "CopyDocumentWithAttachment", context);
-        XWikiDocument doc1 = xwiki.getDocument("Test.CopyDocumentWithAttachment", context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithAttachment", getXWikiContext());
+        XWikiDocument doc1 = getXWiki().getDocument("Test.CopyDocumentWithAttachment", getXWikiContext());
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
-        doc1.saveAttachmentContent(attachment1, context);
+        doc1.saveAttachmentContent(attachment1, getXWikiContext());
         doc1.getAttachmentList().add(attachment1);
-        getHibStore().saveXWikiDoc(doc1, context);
+        getXWiki().getHibernateStore().saveXWikiDoc(doc1, getXWikiContext());
 
-        xwiki.copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", context);
-        xwiki.flushCache();
+        getXWiki().copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", getXWikiContext());
+        getXWiki().flushCache();
 
-        XWikiDocument doc2 = xwiki.getDocument("Test.CopyDocumentWithAttachment2", context);
+        XWikiDocument doc2 = getXWiki().getDocument("Test.CopyDocumentWithAttachment2", getXWikiContext());
         assertEquals("Copied doc name is not correct", "Test.CopyDocumentWithAttachment2", doc2.getFullName());
         assertEquals("Copied doc content is not correct", doc1.getContent(), doc2.getContent());
         // Compare documents except the name and date
@@ -267,41 +225,41 @@ public class XWikiTest extends TestCase {
         assertEquals("Attachment filename incorrect", attachment1.getFilename(), attachment2.getFilename());
         assertEquals("Attachment file size", attachment1.getFilesize(), attachment2.getFilesize());
         assertEquals("Attachment author incorrect", attachment1.getAuthor(), attachment2.getAuthor());
-        assertEquals("Attachment content incorrect", new String(attachment1.getContent(context)), new String(attachment2.getContent(context)));
+        assertEquals("Attachment content incorrect", new String(attachment1.getContent(getXWikiContext())), new String(attachment2.getContent(getXWikiContext())));
     }
 
     public void testAccessSecureAPINoAccess() throws XWikiException {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         Utils.content1 = "$context.context.database";
-        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI", context);
-        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI", context);
-        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI", getXWikiContext());
+        XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI", getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
     public void testAccessSecureAPIAccess() throws XWikiException {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         Utils.content1 = "$context.context.database";
         Utils.author = "XWiki.LudovicDubost";
-        Utils.updateRight(xwiki, context, "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
-        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI2", context);
-        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI2", context);
-        RenderTest.renderTest(wikiengine, doc1, "xwikitest", false, context);
+        Utils.updateRight(getXWiki(), getXWikiContext(), "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI2", getXWikiContext());
+        XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI2", getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc1, "xwikitest", false, getXWikiContext());
     }
 
     public void testAccessSecureAPIAccessWithInclude() throws XWikiException {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        Utils.updateRight(xwiki, context, "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
+        Utils.updateRight(getXWiki(), getXWikiContext(), "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
 
         Utils.content1 = "#includeForm(\"SecureAPI4\")";
         Utils.author = "XWiki.LudovicDubost";
-        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI3", context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI3", getXWikiContext());
 
         Utils.content1 = "$context.context.database";
         Utils.author = "XWiki.JohnDoe";
-        Utils.createDoc(xwiki.getHibernateStore(), "Test", "SecureAPI4", context);
+        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI4", getXWikiContext());
 
-        XWikiDocument doc1 = xwiki.getDocument("Test.SecureAPI3", context);
-        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, context);
+        XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI3", getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
 

@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,97 +14,54 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- * * User: ludovic
- * Date: 8 mars 2004
- * Time: 09:19:35
  */
-
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
 import org.hibernate.HibernateException;
-import org.apache.velocity.app.Velocity;
 
-public class VelocityRenderTest extends TestCase {
-
-        private XWiki xwiki;
-        private XWikiContext context;
-
-        public XWikiHibernateStore getHibStore() {
-            XWikiStoreInterface store = xwiki.getStore();
-            if (store instanceof XWikiCacheStoreInterface)
-                return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-            else
-                return (XWikiHibernateStore) store;
-        }
-
-        public XWikiStoreInterface getStore() {
-            return xwiki.getStore();
-        }
-
-        public void setUp() throws Exception {
-            context = new XWikiContext();
-            xwiki = new XWiki("./xwiki.cfg", context, null, false);
-            context.setWiki(xwiki);
-            StoreHibernateTest.cleanUp(getHibStore(), context);
-            Velocity.init("velocity.properties");
-        }
-
-        public void tearDown() throws HibernateException {
-            getHibStore().shutdownHibernate(context);
-            xwiki = null;
-            context = null;
-            System.gc();
-        }
-
-
-
+public class VelocityRenderTest extends HibernateTestCase {
 
         public void testVelocityRenderer() throws XWikiException {
             XWikiRenderer wikibase = new XWikiVelocityRenderer();
 
             RenderTest.renderTest(wikibase, "#set( $foo = \"Velocity\" )\nHello $foo World!",
-                    "Hello Velocity World!", true, context);
+                    "Hello Velocity World!", true, getXWikiContext());
             RenderTest.renderTest(wikibase, "Test: #include( \"view.pm\" )",
-                    "Test: #include", false, context);
+                    "Test: #include", false, getXWikiContext());
             RenderTest.renderTest(wikibase, "Test: #INCLUDE( \"view.pm\" )",
-                    "Test: #INCLUDE", false, context);
+                    "Test: #INCLUDE", false, getXWikiContext());
 
             RenderTest.renderTest(wikibase, "#set( $count = 0 )\n#if ( $count == 1)\nHello1\n#else\nHello2\n#end\n",
-                    "Hello2", true, context);
+                    "Hello2", true, getXWikiContext());
         }
 
         public void testRenderingEngine() throws XWikiException {
-            XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
+            XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
             RenderTest.renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
-                    "Hello2", false, context);
+                    "Hello2", false, getXWikiContext());
         }
 
 
         public void testInclude(String text, String result) throws XWikiException {
-            XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-            XWikiStoreInterface store = getStore();
+            XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
+            XWikiStoreInterface store = getXWiki().getStore();
 
             XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");
             doc1.setContent("This is the topic name: $doc.name");
             doc1.setAuthor("FirstAuthor");
             doc1.setParent(Utils.parent);
-            store.saveXWikiDoc(doc1, context);
+            store.saveXWikiDoc(doc1, getXWikiContext());
 
             XWikiDocument doc2 = new XWikiDocument("Other", "IncludeTest");
             doc2.setAuthor("SecondAuthor");
             doc2.setContent(text);
-            RenderTest.renderTest(wikiengine, doc2, result, false, context);
+            RenderTest.renderTest(wikiengine, doc2, result, false, getXWikiContext());
         }
 
         public void testIncludeTopic() throws XWikiException {
@@ -126,13 +83,13 @@ public class VelocityRenderTest extends TestCase {
         }
 
         public void testIncludeFromOtherDatabase() throws XWikiException, HibernateException {
-          context.setDatabase("xwikitest2");
-          StoreHibernateTest.cleanUp(getHibStore(), true, true, context);
+          getXWikiContext().setDatabase("xwikitest2");
+          StoreHibernateTest.cleanUp(getXWiki().getHibernateStore(), true, true, getXWikiContext());
           String content = Utils.content1;
           Utils.content1 = "XWiki Users";
-          Utils.createDoc(getHibStore(),"XWiki", "XWikiUsers", context);
+          Utils.createDoc(getXWiki().getHibernateStore(),"XWiki", "XWikiUsers", getXWikiContext());
           Utils.content1 = content;
-          context.setDatabase("xwikitest");
+          getXWikiContext().setDatabase("xwikitest");
 
           testInclude( "#includeTopic(\"xwikitest2:XWiki.XWikiUsers\")", "XWiki Users");
         }
@@ -143,26 +100,26 @@ public class VelocityRenderTest extends TestCase {
         }
 
     public void testVelocityError() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(xwiki, context);
+        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
         RenderTest.renderTest(wikiengine, "#skype(hello)",
-                "hello", false, context);
+                "hello", false, getXWikiContext());
     }
 
     public void testIncludeMacro() throws Exception {
-        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
-        XWikiStoreInterface store = getStore();
+        XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
+        XWikiStoreInterface store = getXWiki().getHibernateStore();
 
         XWikiDocument doc1 = new XWikiDocument("Test", "WebHome");
         doc1.setContent("#macro(hello)\ncoucou\n#end");
         doc1.setAuthor("FirstAuthor");
         doc1.setParent(Utils.parent);
-        store.saveXWikiDoc(doc1, context);
+        store.saveXWikiDoc(doc1, getXWikiContext());
 
         XWikiDocument doc2 = new XWikiDocument("Other", "IncludeTest");
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")\n#hello()");
-        store.saveXWikiDoc(doc2, context);
-        RenderTest.renderTest(wikiengine, doc2, "coucou", false, context);
+        store.saveXWikiDoc(doc2, getXWikiContext());
+        RenderTest.renderTest(wikiengine, doc2, "coucou", false, getXWikiContext());
     }
 
  }

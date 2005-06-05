@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -33,92 +32,66 @@ import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class StoreObjectHibernateTest extends StoreObjectTest {
 
-    public XWikiHibernateStore store;
-    public String hibpath = "hibernate-test.cfg.xml";
-
-    public void setUp() throws HibernateException, XWikiException {
-        context.setDatabase("xwikitest");
-        StoreHibernateTest.cleanUp(getHibStore(), context);
-    }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        store = null;
-        System.gc();
-    }
-    
-    public XWikiHibernateStore getHibStore() {
-        return (XWikiHibernateStore) getStore();
-    }
-
-    public XWikiStoreInterface getStore() {
-       if (store!=null)
-        return store;
-       store = new XWikiHibernateStore(hibpath);
-       return store;
-   }
-
     public void testStringBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testString(store);
-        store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", context);
-        store.endTransaction(context, true);
+        store.beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", getXWikiContext());
+        store.endTransaction(getXWikiContext(), true);
         testString(store);
     }
 
     public void testStringBadDatabase2() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testString(store);
-        store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikistrings", context);
-        store.endTransaction(context, true);
+        store.beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(store, "delete from xwikistrings", getXWikiContext());
+        store.endTransaction(getXWikiContext(), true);
         testString(store);
     }
 
     public void testNumberBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testNumber(store);
-        store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", context);
-        store.endTransaction(context, true);
+        store.beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(store, "delete from xwikiproperties", getXWikiContext());
+        store.endTransaction(getXWikiContext(), true);
         testNumber(store);
     }
 
     public void testNumberBadDatabase2() throws XWikiException, HibernateException{
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testNumber(store);
-        store.beginTransaction(context);
-        StoreHibernateTest.runSQL(store, "delete from xwikiintegers", context);
-        StoreHibernateTest.runSQL(store, "delete from xwikilongs", context);
-        store.endTransaction(context, true);
+        store.beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(store, "delete from xwikiintegers", getXWikiContext());
+        StoreHibernateTest.runSQL(store, "delete from xwikilongs", getXWikiContext());
+        store.endTransaction(getXWikiContext(), true);
         testNumber(store);
     }
 
     public void testNumber(XWikiHibernateStore store) throws XWikiException {
         IntegerProperty prop = Utils.prepareIntegerProperty();
-        store.saveXWikiProperty(prop, context, true);
+        store.saveXWikiProperty(prop, getXWikiContext(), true);
         IntegerProperty prop2 = new IntegerProperty();
         prop2.setName(prop.getName());
         prop2.setPrettyName(prop.getPrettyName());
         prop2.setObject(prop.getObject());
-        store.loadXWikiProperty(prop2, context, true);
+        store.loadXWikiProperty(prop2, getXWikiContext(), true);
         assertEquals("IntegerProperty is different", prop, prop2);
 
     }
 
 
     public void testNumberEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testNumber(store);
     }
 
     public void testNumberUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testNumber(store);
         testNumber(store);
     }
@@ -126,78 +99,78 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public void testString(XWikiHibernateStore store) throws XWikiException {
         StringProperty prop = Utils.prepareStringProperty();
-        store.saveXWikiProperty(prop, context, true);
+        store.saveXWikiProperty(prop, getXWikiContext(), true);
         StringProperty prop2 = new StringProperty();
         prop2.setName(prop.getName());
         prop2.setPrettyName(prop.getPrettyName());
         prop2.setObject(prop.getObject());
-        store.loadXWikiProperty(prop2, context, true);
+        store.loadXWikiProperty(prop2, getXWikiContext(), true);
         assertEquals("StringProperty is different", prop, prop2);
 
     }
 
 
     public void testStringEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testString(store);
     }
 
     public void testStringUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testString(store);
         testString(store);
     }
 
     public void testStringList(XWikiHibernateStore store) throws XWikiException {
         StringListProperty prop = Utils.prepareStringListProperty();
-        store.saveXWikiProperty(prop, context, true);
+        store.saveXWikiProperty(prop, getXWikiContext(), true);
         StringListProperty prop2 = new StringListProperty();
         prop2.setName(prop.getName());
         prop2.setPrettyName(prop.getPrettyName());
         prop2.setObject(prop.getObject());
-        store.loadXWikiProperty(prop2, context, true);
+        store.loadXWikiProperty(prop2, getXWikiContext(), true);
         assertEquals("StringListProperty is different", prop, prop2);
 
     }
 
 
     public void testStringListEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testStringList(store);
     }
 
     public void testStringListUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testStringList(store);
         testStringList(store);
     }
 
     public void testDBStringList(XWikiHibernateStore store) throws XWikiException {
         DBStringListProperty prop = Utils.prepareDBStringListProperty();
-        store.saveXWikiProperty(prop, context, true);
+        store.saveXWikiProperty(prop, getXWikiContext(), true);
         DBStringListProperty prop2 = new DBStringListProperty();
         prop2.setName(prop.getName());
         prop2.setPrettyName(prop.getPrettyName());
         prop2.setObject(prop.getObject());
-        store.loadXWikiProperty(prop2, context, true);
+        store.loadXWikiProperty(prop2, getXWikiContext(), true);
         assertEquals("DBStringListProperty is different", prop, prop2);
     }
 
 
     public void testDBStringListEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testDBStringList(store);
     }
 
     public void testDBStringListUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         testDBStringList(store);
         testDBStringList(store);
     }
 
 
     public void testWriteObject(XWikiHibernateStore store, BaseObject object) throws  XWikiException {
-        store.saveXWikiObject(object, context,true);
+        store.saveXWikiObject(object, getXWikiContext(),true);
     }
 
     public void testReadObject(XWikiHibernateStore store, BaseObject object) throws  XWikiException {
@@ -207,7 +180,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         object2.setName(object.getName());
 
         // Read object2
-        store.loadXWikiObject(object2, context, true);
+        store.loadXWikiObject(object2, getXWikiContext(), true);
 
         // Verify object2
         Utils.assertProperty(object2, object, "first_name");
@@ -217,7 +190,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testWriteObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -226,7 +199,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testReadWriteObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -236,7 +209,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testWriteAdvancedObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -245,7 +218,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testReadWriteAdvancedObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -256,7 +229,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
 
     public void testWriteClass(XWikiHibernateStore store, BaseClass bclass) throws  XWikiException {
-        store.saveXWikiClass(bclass, context, true);
+        store.saveXWikiClass(bclass, getXWikiContext(), true);
     }
 
     public void testReadClass(XWikiHibernateStore store, BaseClass bclass) throws  XWikiException {
@@ -265,7 +238,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
         bclass2.setName(bclass.getName());
 
         // Read object2
-        store.loadXWikiClass(bclass2, context, true);
+        store.loadXWikiClass(bclass2, getXWikiContext(), true);
 
         // Verify object2
         Utils.assertProperty(bclass2, bclass, "first_name");
@@ -275,7 +248,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testWriteClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -284,7 +257,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testReadWriteClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -294,7 +267,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
      public void testWriteAdvancedClass()  throws  XWikiException {
-         XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+         XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
          XWikiDocument doc = new XWikiDocument();
          Utils.prepareAdvancedObject(doc);
          BaseClass bclass = doc.getxWikiClass();
@@ -303,7 +276,7 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testReadWriteAdvancedClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -313,40 +286,40 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
     }
 
     public void testSearchClass() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore)getStore();
-        List list = store.getClassList(context);
+        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        List list = store.getClassList(getXWikiContext());
         assertTrue("No result", (list.size()==0) );
         testWriteClass();
-        list = store.getClassList(context);
+        list = store.getClassList(getXWikiContext());
         assertTrue("No result", (list.size()>0) );
     }
 
     public void testSearchCount() throws XWikiException {
-        XWiki xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-        XWikiHibernateStore store = xwiki.getHibernateStore();
-        Utils.createDoc(store, "XWiki", "XWikiServerXwikitest", context);
-        Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", context);
+//        XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
+//        getXWikiContext().setWiki(xwiki);
+//        XWikiHibernateStore store = xwiki.getHibernateStore();
+        Utils.createDoc(getXWiki().getStore(), "XWiki", "XWikiServerXwikitest", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", getXWikiContext());
 
-        List list = store.search("select count(*) from XWikiDocument doc, BaseObject as obj where obj.name="
-                                    + xwiki.getFullNameSQL() + " and obj.className='XWiki.XWikiServerClass' and obj.name<>'XWiki.XWikiServerTemplate' group by obj.className", 0 , 0, context);
+        List list = getXWiki().getStore().search("select count(*) from XWikiDocument doc, BaseObject as obj where obj.name="
+                                    + getXWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiServerClass' and obj.name<>'XWiki.XWikiServerTemplate' group by obj.className", 0 , 0, getXWikiContext());
         Integer result = (Integer) list.get(0);
         assertEquals("Search for object property failed", 1, result.intValue());
     }
 
 
     public void testObjectSavePerf() throws XWikiException {
-         XWiki xwiki = new XWiki("./xwiki.cfg", context);
-         context.setWiki(xwiki);
-         XWikiHibernateStore store = xwiki.getHibernateStore();
+//         XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
+//         getXWikiContext().setWiki(xwiki);
+//         XWikiHibernateStore store = xwiki.getHibernateStore();
 
         // Start monitoring timer
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         if (monitor!=null)
           monitor.startRequest("", "test", null);
 
         Date starttime = new Date();
-        Utils.addManyMembers(xwiki, context, "XWiki.LudovicDubost", "XWiki.XWikiAllGroup", 40);
+        Utils.addManyMembers(getXWiki(), getXWikiContext(), "XWiki.LudovicDubost", "XWiki.XWikiAllGroup", 40);
         Date endtime = new Date();
         long delay = endtime.getTime() - starttime.getTime();
 
@@ -357,19 +330,19 @@ public class StoreObjectHibernateTest extends StoreObjectTest {
 
     public void testObjectReadPerf() throws XWikiException {
         int nb = 100;
-        XWiki xwiki = new XWiki("./xwiki.cfg", context);
-         context.setWiki(xwiki);
-         XWikiHibernateStore store = xwiki.getHibernateStore();
-         Utils.addManyMembers(xwiki, context, "XWiki.LudovicDubost", "XWiki.XWikiAllGroup", nb);
-         xwiki.flushCache();
+//        XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
+//         getXWikiContext().setWiki(xwiki);
+//         XWikiHibernateStore store = xwiki.getHibernateStore();
+         Utils.addManyMembers(getXWiki(), getXWikiContext(), "XWiki.LudovicDubost", "XWiki.XWikiAllGroup", nb);
+         getXWiki().flushCache();
 
         // Start monitoring timer
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         if (monitor!=null)
           monitor.startRequest("", "test", null);
 
         Date starttime = new Date();
-        XWikiDocument doc = xwiki.getDocument("XWiki.XWikiAllGroup", context);
+        XWikiDocument doc = getXWiki().getDocument("XWiki.XWikiAllGroup", getXWikiContext());
         Date endtime = new Date();
         long delay = endtime.getTime() - starttime.getTime();
 

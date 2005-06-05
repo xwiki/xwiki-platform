@@ -1,32 +1,36 @@
+/**
+ * ===================================================================
+ *
+ * Copyright (c) 2005 Ludovic Dubost, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details, published at
+ * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
+ * root folder of this distribution.
+ */
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.novell.ldap.*;
 
 import java.security.Principal;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.net.URL;
-import java.net.MalformedURLException;
-
-import org.hibernate.HibernateException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Alex
- * Date: 18 avr. 2005
- * Time: 16:02:41
  * Test for LDAP authentication
  * ***********************************************************************
  * This test need a TEST local LDAP server
@@ -49,29 +53,32 @@ import org.hibernate.HibernateException;
  *
  * Test works with out of the box ldap database.
  */
-public class LDAPTest  extends TestCase {
-    private XWiki xwiki;
-    private XWikiContext context;
+public class LDAPTest  extends HibernateTestCase {
 
     public static boolean inTest = false;
 
-    public XWikiHibernateStore getHibStore() {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
+    public void setUp() throws Exception {
+        super.setUp();
+        getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_server", "192.168.0.4", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_port", "389", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_base_DN", "dc=xwiki,dc=com", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=Manager,dc=xwiki,dc=com", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "secret", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_UID_attr", "uid", getXWikiContext());
+
     }
 
     public void prepareLDAP(boolean addUser, String userPassword)
     {
-        int ldapPort = context.getWiki().getXWikiPreferenceAsInt("ldap_port", LDAPConnection.DEFAULT_PORT, context);
+        int ldapPort = getXWikiContext().getWiki().getXWikiPreferenceAsInt("ldap_port", LDAPConnection.DEFAULT_PORT, getXWikiContext());
         int ldapVersion = LDAPConnection.LDAP_V3;
-        String ldapHost = context.getWiki().getXWikiPreference("ldap_server",context);
-        String loginDN = context.getWiki().getXWikiPreference("ldap_bind_DN",context);
-        String password = context.getWiki().getXWikiPreference("ldap_bind_pass",context);
+        String ldapHost = getXWikiContext().getWiki().getXWikiPreference("ldap_server", getXWikiContext());
+        String loginDN = getXWikiContext().getWiki().getXWikiPreference("ldap_bind_DN", getXWikiContext());
+        String password = getXWikiContext().getWiki().getXWikiPreference("ldap_bind_pass",getXWikiContext());
 
-        String containerName  =  context.getWiki().getXWikiPreference("ldap_base_DN",context);
+        String containerName  =  getXWikiContext().getWiki().getXWikiPreference("ldap_base_DN", getXWikiContext());
 
         try
         {
@@ -181,12 +188,12 @@ public class LDAPTest  extends TestCase {
     public void prepareData(boolean withLDAPDN, boolean withpassword) throws XWikiException {
         XWikiDocument doc = new XWikiDocument("XWiki","akartmann");
         try {
-            xwiki.getDocument(doc, null, context);
-            xwiki.deleteDocument(doc, context);
+            getXWiki().getDocument(doc, null, getXWikiContext());
+            getXWiki().deleteDocument(doc, getXWikiContext());
         } catch (XWikiException e) {
         }
 
-        BaseClass bclass = xwiki.getUserClass(context);
+        BaseClass bclass = getXWiki().getUserClass(getXWikiContext());
         BaseObject bobj = new BaseObject();
         bobj.setName("XWiki.akartmann");
         bobj.setClassName(bclass.getName());
@@ -198,47 +205,22 @@ public class LDAPTest  extends TestCase {
             bobj.setStringValue("password", "toto");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ Alexis KARTMANN HomePage");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
         doc = new XWikiDocument("XWiki","AdminGroup");
-        bclass = xwiki.getGroupClass(context);
+        bclass = getXWiki().getGroupClass(getXWikiContext());
         bobj = new BaseObject();
         bobj.setName("XWiki.AdminGroup");
         bobj.setClassName(bclass.getName());
         bobj.setStringValue("member", "XWiki.akartmann");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ AdminGroup");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
         doc = new XWikiDocument("Test","TestDoc");
         doc.setContent("---+ TestDoc");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
-    }
-    public void setUp() throws HibernateException, XWikiException, MalformedURLException {
-        context = new XWikiContext();
-        context.setDatabase("xwikitest");
-        xwiki = new XWiki("./xwiki.cfg", context);
-        xwiki.setDatabase("xwikitest");
-        context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(getHibStore(), context);
-        xwiki.flushCache();
-        context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
-
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_server", "192.168.0.4", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_port", "389", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_base_DN", "dc=xwiki,dc=com", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=Manager,dc=xwiki,dc=com", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "secret", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_UID_attr", "uid", context);
-
-    }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
     }
 
     public void testCheckLogonWithBind() throws ClassNotFoundException, IllegalAccessException, InstantiationException, XWikiException {
@@ -247,7 +229,7 @@ public class LDAPTest  extends TestCase {
         prepareData(false, false);
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
@@ -257,11 +239,11 @@ public class LDAPTest  extends TestCase {
         prepareLDAP(true, "alexis");
         prepareData(true, false);
 
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "", getXWikiContext());
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
@@ -271,11 +253,11 @@ public class LDAPTest  extends TestCase {
         prepareLDAP(true, "alexis");
         prepareData(false, false);
 
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn={0},cn=Manager,dc=xwiki,dc=com", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "{1}", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn={0},cn=Manager,dc=xwiki,dc=com", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "{1}", getXWikiContext());
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
@@ -285,11 +267,11 @@ public class LDAPTest  extends TestCase {
         prepareLDAP(true, "alexis");
         prepareData(true, false);
 
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=nothere", context);
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "bad", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_DN", "cn=nothere", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_bind_pass", "bad", getXWikiContext());
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
@@ -300,7 +282,7 @@ public class LDAPTest  extends TestCase {
         prepareData(false, true);
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "toto", context);
+        Principal principal = service.authenticate("akartmann", "toto", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
     }
@@ -311,7 +293,7 @@ public class LDAPTest  extends TestCase {
         prepareData(true, true);
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "toto", context);
+        Principal principal = service.authenticate("akartmann", "toto", getXWikiContext());
         assertNull("Authenticate failed", principal);
     }
 
@@ -321,7 +303,7 @@ public class LDAPTest  extends TestCase {
         prepareData(true, true);
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "toto", context);
+        Principal principal = service.authenticate("akartmann", "toto", getXWikiContext());
         assertNull("Authenticate failed", principal);
     }
 
@@ -331,28 +313,28 @@ public class LDAPTest  extends TestCase {
         prepareData(false, false);
 
         // Full check : bind, search, password
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "2", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "2", getXWikiContext());
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
 
         // Integrated check : bind, search
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "1", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "1", getXWikiContext());
         prepareLDAP(true, "notme");
 
         service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        principal = service.authenticate("akartmann", "alexis", context);
+        principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
 
         // Trivial check : bind
-        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "0", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_check_level", "0", getXWikiContext());
         prepareLDAP(false, null);
 
         service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        principal = service.authenticate("akartmann", "alexis", context);
+        principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
 
@@ -361,37 +343,37 @@ public class LDAPTest  extends TestCase {
     public void testTransfertUserFromLDAP() throws ClassNotFoundException, XWikiException, IllegalAccessException, InstantiationException {
         XWikiDocument doc = new XWikiDocument("XWiki","akartmann");
         try {
-            xwiki.getDocument(doc, null, context);
-            xwiki.deleteDocument(doc, context);
+            getXWiki().getDocument(doc, null, getXWikiContext());
+            getXWiki().deleteDocument(doc, getXWikiContext());
         } catch (XWikiException e) {
         }
         prepareLDAP(true, "alexis");
-        assertEquals("getUserName failed", "akartmann", xwiki.getUserName("XWiki.akartmann", context));
-        assertEquals("getUserName failed", "akartmann", xwiki.getLocalUserName("XWiki.akartmann", context));
-        assertEquals("getUserName failed", "akartmann", xwiki.getLocalUserName("xwiki:XWiki.akartmann", context));
+        assertEquals("getUserName failed", "akartmann", getXWiki().getUserName("XWiki.akartmann", getXWikiContext()));
+        assertEquals("getUserName failed", "akartmann", getXWiki().getLocalUserName("XWiki.akartmann", getXWikiContext()));
+        assertEquals("getUserName failed", "akartmann", getXWiki().getLocalUserName("xwiki:XWiki.akartmann", getXWikiContext()));
 
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "ldap_fields_mapping",
-                "name=cn,last_name=sn,first_name=givenName,fullname=displayName,mail=mail,ldap_dn=dn", context);
+                "name=cn,last_name=sn,first_name=givenName,fullname=displayName,mail=mail,ldap_dn=dn", getXWikiContext());
 
         XWikiAuthService service =  (XWikiAuthService) Class.forName("com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl").newInstance();
-        Principal principal = service.authenticate("akartmann", "alexis", context);
+        Principal principal = service.authenticate("akartmann", "alexis", getXWikiContext());
         assertNotNull("Authenticate failed", principal);
         assertEquals("Name is not equal", "XWiki.akartmann", principal.getName());
-        String result = xwiki.getUserName("XWiki.akartmann", context);
+        String result = getXWiki().getUserName("XWiki.akartmann", getXWikiContext());
         assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result );
-        result = xwiki.getUserName("xwikitest:XWiki.akartmann", context);
+        result = getXWiki().getUserName("xwikitest:XWiki.akartmann", getXWikiContext());
         assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.akartmann", context);
+        result = getXWiki().getLocalUserName("XWiki.akartmann", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
-        result = xwiki.getLocalUserName("xwikitest:XWiki.akartmann", context);
+        result = getXWiki().getLocalUserName("xwikitest:XWiki.akartmann", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis KARTMANN</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.akartmann", "$last_name", context);
+        result = getXWiki().getLocalUserName("XWiki.akartmann", "$last_name", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">KARTMANN</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.akartmann", "$last_name", false, context);
+        result = getXWiki().getLocalUserName("XWiki.akartmann", "$last_name", false, getXWikiContext());
         assertEquals("getLocalUserName failed", "KARTMANN", result);
-        result = xwiki.getLocalUserName("XWiki.akartmann", "$first_name", context);
+        result = getXWiki().getLocalUserName("XWiki.akartmann", "$first_name", getXWikiContext());
         assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/akartmann\">Alexis</a></span>", result);
-        result = xwiki.getLocalUserName("XWiki.akartmann", "$first_name", false, context);
+        result = getXWiki().getLocalUserName("XWiki.akartmann", "$first_name", false, getXWikiContext());
         assertEquals("getLocalUserName failed", "Alexis", result);
     }
 }

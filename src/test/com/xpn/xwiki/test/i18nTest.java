@@ -27,11 +27,6 @@ import com.xpn.xwiki.i18n.i18n;
 
 public class i18nTest extends HibernateTestCase {
 
-     protected void setUp() throws Exception {
-         super.setUp();
-         Velocity.init("velocity.properties");
-     }
-
      public void testTranslation() throws XWikiException {
          Utils.createDoc(getXWiki().getHibernateStore(), "Test", "TranslationTest", getXWikiContext());
          XWikiDocument doc = getXWiki().getDocument("Test.TranslationTest", getXWikiContext());

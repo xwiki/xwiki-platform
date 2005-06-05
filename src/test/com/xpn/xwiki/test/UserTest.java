@@ -1,22 +1,7 @@
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,48 +14,21 @@ import org.hibernate.HibernateException;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 26 janv. 2004
- * Time: 00:59:44
  */
+package com.xpn.xwiki.test;
 
-public class UserTest extends TestCase {
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
-    private XWiki xwiki;
-    private XWikiContext context;
+public class UserTest extends HibernateTestCase {
 
     public static boolean inTest = false;
 
-    public XWikiHibernateStore getHibStore() {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
-    }
-
-    public void setUp() throws HibernateException, XWikiException {
-        context = new XWikiContext();
-        context.setDatabase("xwikitest");
-        xwiki = new XWiki("./xwiki.cfg", context, null, false);
-        xwiki.setDatabase("xwikitest");
-        context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(getHibStore(), context);
-        xwiki.flushCache();
-    }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
-    }
-
     public void prepareData() throws XWikiException {
         XWikiDocument doc = new XWikiDocument("XWiki","LudovicDubost");
-        BaseClass bclass = xwiki.getUserClass(context);
+        BaseClass bclass = getXWiki().getUserClass(getXWikiContext());
         BaseObject bobj = new BaseObject();
         bobj.setName("XWiki.LudovicDubost");
         bobj.setClassName(bclass.getName());
@@ -79,26 +37,26 @@ public class UserTest extends TestCase {
         bobj.setStringValue("password", "toto");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ Ludovic Dubost HomePage");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
         doc = new XWikiDocument("XWiki","AdminGroup");
-        bclass = xwiki.getGroupClass(context);
+        bclass = getXWiki().getGroupClass(getXWikiContext());
         bobj = new BaseObject();
         bobj.setName("XWiki.AdminGroup");
         bobj.setClassName(bclass.getName());
         bobj.setStringValue("member", "XWiki.LudovicDubost");
         doc.setObject(bclass.getName(), 0, bobj);
         doc.setContent("---+ AdminGroup");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
         doc = new XWikiDocument("Test","TestDoc");
         doc.setContent("---+ TestDoc");
-        xwiki.saveDocument(doc, context);
+        getXWiki().saveDocument(doc, getXWikiContext());
 
     }
 
     public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
-        Utils.updateRight(xwiki, context, fullname, user, group, level, allow, global);
+        Utils.updateRight(getXWiki(), getXWikiContext(), fullname, user, group, level, allow, global);
     }
 
     /*
@@ -135,7 +93,7 @@ public class UserTest extends TestCase {
         assertFalse("Authentication should fail", user.authenticate("titi"));
         assertTrue("Authentication should pass", user.authenticate("toto"));
         user.setPassword("titi");
-        user.setFullName("John Doe", context);
+        user.setFullName("John Doe", getXWikiContext());
         user.store();
         assertTrue("Authentication should fail", user.authenticate("titi"));
         assertFalse("Authentication should pass", user.authenticate("toto"));
@@ -205,116 +163,116 @@ public class UserTest extends TestCase {
     public void testUserAccessRead()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
-        xwiki.flushCache();
+        getXWiki().flushCache();
         inTest = true;
         assertTrue("View Access should be allowed",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.Ludovic","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("Edit Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
     }
 
       public void testUserAccessReadWithAdmin()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
-        xwiki.flushCache();
+        getXWiki().flushCache();
         inTest = true;
 
         // Give Admin right to LudovicDubost
         updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
 
         assertTrue("View Access should be allowed",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("View Access should be allowed even though doc is protected",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                   getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
           updateRight(docname, "XWiki.Ludovic","","view", true, false);
-          xwiki.flushCache();
+          getXWiki().flushCache();
           assertTrue("View Access should be allowed even though doc is protected",
-                      xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                     getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("Edit Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                   getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("View Access should be allowed even though doc is protected",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                   getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
     }
 
     public void testUserAccessReadWithWebGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive Web Global right to LudovicDubost
       updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                      xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testUserAccessReadWithWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
 
       // Give negative Web Global right to LudovicDubost
       updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
 
@@ -322,65 +280,65 @@ public class UserTest extends TestCase {
    public void testUserAccessReadWithXWikiGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
        assertFalse("View Access should refused because there is a more restrictive right",
-                      xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                   getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                 getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testUserAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give negative XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
   public void testUserAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
@@ -388,29 +346,29 @@ public class UserTest extends TestCase {
       updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testUserAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
 
       // Give negative XWiki Global right to LudovicDubost
@@ -419,146 +377,146 @@ public class UserTest extends TestCase {
       updateRight("Test.WebPreferences", "XWiki.LudovicDubost","","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
         assertFalse("View Access should refused because there is a more restrictive right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
         assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.LudovicDubost","","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
 
     public void testGroupAccessRead()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
-        xwiki.flushCache();
+        getXWiki().flushCache();
         inTest = true;
         assertTrue("View Access should be allowed",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
 
         updateRight(docname, "", "XWiki.AdminGroup","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                     xwiki.getRightService().hasAccessLevel("view", "XWiki.JohnDoe", docname, context));
+                     getXWiki().getRightService().hasAccessLevel("view", "XWiki.JohnDoe", docname, getXWikiContext()));
 
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
 
         updateRight(docname, "XWiki.Ludovic","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("Edit Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
     }
 
       public void testGroupAccessReadWithAdmin()  throws XWikiException {
         String docname = "Test.TestDoc";
         prepareData();
-        xwiki.flushCache();
+        getXWiki().flushCache();
         inTest = true;
 
         // Give Admin right to LudovicDubost
         updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","admin", true, true);
 
         assertTrue("View Access should be allowed",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("View Access should be allowed even though doc is protected",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
           updateRight(docname, "XWiki.Ludovic","","view", true, false);
-          xwiki.flushCache();
+          getXWiki().flushCache();
           assertTrue("View Access should be allowed even though doc is protected",
-                      xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                      getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("Edit Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
         updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-        xwiki.flushCache();
+        getXWiki().flushCache();
         assertTrue("View Access should be allowed even though doc is protected",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
     }
 
     public void testGroupAccessReadWithWebGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive Web Global right to LudovicDubost
       updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
         assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testGroupAccessReadWithWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
 
       // Give negative Web Global right to LudovicDubost
       updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
 
@@ -566,65 +524,65 @@ public class UserTest extends TestCase {
    public void testGroupAccessReadWithXWikiGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                   xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                   getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testGroupAccessReadWithXWikiNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give negative XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
   public void testGroupAccessReadWithXWikiPositiveAndWebNegativeGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
       // Give positive XWiki Global right to LudovicDubost
       updateRight("XWiki.XWikiPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
@@ -632,29 +590,29 @@ public class UserTest extends TestCase {
       updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", false, true);
 
       assertFalse("View Access should be refused because of global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
     public void testGroupAccessReadWithXWikiNegativeAndWebPositiveGlobalRight()  throws XWikiException {
       String docname = "Test.TestDoc";
       prepareData();
-      xwiki.flushCache();
+      getXWiki().flushCache();
       inTest = true;
 
       // Give negative XWiki Global right to LudovicDubost
@@ -663,25 +621,25 @@ public class UserTest extends TestCase {
       updateRight("Test.WebPreferences", "", "XWiki.AdminGroup","view,edit", true, true);
 
       assertTrue("View Access should be allowed",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.JohnDoe","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
         assertFalse("View Access should refused because there is a more restrictive right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "XWiki.Ludovic","","view", true, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
         assertFalse("View Access should refused because there is a more restrictive right",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view,edit", true,false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertTrue("View Access should be granted",
-                    xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                    getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
       assertTrue("Edit Access should be granted",
-                  xwiki.getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
       updateRight(docname, "", "XWiki.AdminGroup","view", false, false);
-      xwiki.flushCache();
+      getXWiki().flushCache();
       assertFalse("View Access should be refused even though LudovicDubost has global right",
-                  xwiki.getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, context));
+                  getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", docname, getXWikiContext()));
   }
 
 }

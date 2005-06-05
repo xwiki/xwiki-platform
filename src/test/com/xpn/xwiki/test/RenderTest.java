@@ -35,7 +35,6 @@ public abstract class RenderTest extends HibernateTestCase {
     public void setUp() throws Exception {
         super.setUp();
         getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
-        Velocity.init("velocity.properties");
     }
 
     public static String renderTest(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {

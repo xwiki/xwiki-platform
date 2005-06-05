@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003,2004 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -14,15 +14,9 @@
  * GNU Lesser General Public License for more details, published at 
  * http://www.gnu.org/copyleft/lesser.html or in lesser.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 3 déc. 2004
- * Time: 17:04:44
  */
 package com.xpn.xwiki.test;
 
-import junit.framework.TestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.monitor.api.MonitorData;
@@ -34,14 +28,10 @@ import java.net.MalformedURLException;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.velocity.app.Velocity;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
-import org.hibernate.HibernateException;
 
-public class MonitorTest extends TestCase  {
+public class MonitorTest extends HibernateTestCase  {
 
-    private XWiki xwiki;
-    private XWikiContext context;
     private String surl = "http://127.0.0.1:9080/xwiki/bin/view/Main/WebHome";
     private String page = "xwiki:Main.WebHome1";
     private String action = "view";
@@ -53,21 +43,13 @@ public class MonitorTest extends TestCase  {
 
 
     public void setUp() throws Exception {
-         context = new XWikiContext();
-         xwiki = new XWiki("./xwiki.cfg", context);
-         xwiki.getPluginManager().addPlugin("monitor","com.xpn.xwiki.monitor.api.MonitorPlugin", context);
-         context.setWiki(xwiki);
-         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
+        super.setUp();
+        getXWiki().getPluginManager().addPlugin("monitor","com.xpn.xwiki.monitor.api.MonitorPlugin", getXWikiContext());
+        getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
 
-         context2 = new XWikiContext();
-         context2.setWiki(xwiki);
-         context2.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
-         Velocity.init("velocity.properties");
-     }
-
-    public void tearDown() throws HibernateException {
-         xwiki = null;
-         context = null;
+        context2 = new XWikiContext();
+        context2.setWiki(getXWiki());
+        context2.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
      }
 
     public void testMonitorData() throws MalformedURLException {
@@ -133,12 +115,12 @@ public class MonitorTest extends TestCase  {
     }
 
     public void testGetPlugin() {
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         assertNotNull("Monitor Plugin is null", monitor);
     }
 
     public void testGetMonitorData() throws MalformedURLException {
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         assertNotNull("Monitor Plugin is null",  monitor);
         long duration = 1100;
         // Test
@@ -170,9 +152,9 @@ public class MonitorTest extends TestCase  {
 
     public void testGetMonitorDataWithThread(MonitorPlugin monitor, int test, long duration1, long duration2) throws MalformedURLException {
         assertNotNull("Monitor Plugin is null",  monitor);
-        MonitorTestThread monitorthread1 = new MonitorTestThread(xwiki, context, page, action, new URL(surl), duration1, test);
+        MonitorTestThread monitorthread1 = new MonitorTestThread(getXWiki(), getXWikiContext(), page, action, new URL(surl), duration1, test);
         Thread t1 = new Thread(monitorthread1);
-        MonitorTestThread monitorthread2 = new MonitorTestThread(xwiki, context2, page2, action, new URL(surl2), duration2, test);
+        MonitorTestThread monitorthread2 = new MonitorTestThread(getXWiki(), context2, page2, action, new URL(surl2), duration2, test);
         Thread t2 = new Thread(monitorthread2);
         t1.start();
         t2.start();
@@ -198,7 +180,7 @@ public class MonitorTest extends TestCase  {
     }
 
     public void testGetMonitorDataWithThread1() throws MalformedURLException {
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         testGetMonitorDataWithThread(monitor, 1, 1100, 110);
         CircularFifoBuffer list = monitor.getLastTimerData();
         assertEquals("Timer Data list is incorrect", 2, list.size());
@@ -213,7 +195,7 @@ public class MonitorTest extends TestCase  {
     }
 
     public void testGetMonitorDataWithThread2() throws MalformedURLException {
-        MonitorPlugin monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         testGetMonitorDataWithThread(monitor, 2, 1100, 110);
         CircularFifoBuffer list = monitor.getLastTimerData();
         assertEquals("Timer Data list is incorrect", 2, list.size());

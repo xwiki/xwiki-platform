@@ -1,20 +1,7 @@
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
-
-import java.util.List;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,47 +14,21 @@ import java.util.List;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 4 janv. 2004
- * Time: 10:19:35
  */
+package com.xpn.xwiki.test;
 
-public class SearchTest extends TestCase {
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.hibernate.HibernateException;
 
-    public XWikiHibernateStore store;
-    public String hibpath = "hibernate-test.cfg.xml";
-    public XWikiContext context = new XWikiContext();
+import java.util.List;
 
-    public XWikiHibernateStore getHibStore() {
-        return (XWikiHibernateStore) getStore();
-    }
-
-    public XWikiStoreInterface getStore() {
-       if (store!=null)
-        return store;
-
-       store = new XWikiHibernateStore(hibpath);
-       return store;
-   }
-
-
-    public void setUp() throws HibernateException, XWikiException {
-        context.setDatabase("xwikitest");
-        XWikiHibernateStore hibstore = getHibStore();
-        StoreHibernateTest.cleanUp(hibstore, context);
-    }
-
-    public void tearDown() throws HibernateException {
-        XWikiHibernateStore hibstore = getHibStore();
-        hibstore.shutdownHibernate(context);
-        hibstore = null;
-        System.gc();
-    }
+public class SearchTest extends HibernateTestCase {
 
     public void testsearchDocumentsNames(XWikiStoreInterface hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
-        List lresult = hibstore.searchDocumentsNames(wheresql, context);
+        List lresult = hibstore.searchDocumentsNames(wheresql, getXWikiContext());
         String[] result = {};
         result = (String[]) lresult.toArray(result);
         assertEquals("Number of results of search " + wheresql + " is different", result.length, expected.length);
@@ -78,7 +39,7 @@ public class SearchTest extends TestCase {
     }
 
     public void testsearch(XWikiStoreInterface hibstore, String sql, String[] expected) throws XWikiException {
-        List lresult = hibstore.search(sql, 0, 0, context);
+        List lresult = hibstore.search(sql, 0, 0, getXWikiContext());
         String[] result = {};
         result = (String[]) lresult.toArray(result);
         assertEquals("Number of results of search " + sql + " is different", result.length, expected.length);
@@ -89,7 +50,7 @@ public class SearchTest extends TestCase {
     }
 
     public void testsearch(XWikiStoreInterface hibstore, String sql, Object[][] whereParams, String[] expected) throws XWikiException {
-        List lresult = hibstore.search(sql, 0, 0, whereParams , context);
+        List lresult = hibstore.search(sql, 0, 0, whereParams , getXWikiContext());
         String[] result = {};
         result = (String[]) lresult.toArray(result);
         assertEquals("Number of results of search " + sql + " is different", result.length, expected.length);
@@ -100,7 +61,7 @@ public class SearchTest extends TestCase {
     }
 
     public void testsearchDocumentsNamesWithOrder(XWikiStoreInterface hibstore, String wheresql, String[] expected) throws HibernateException, XWikiException {
-        List lresult = hibstore.searchDocumentsNames(wheresql + " order by doc.date desc", 0, 0, "doc.date", context);
+        List lresult = hibstore.searchDocumentsNames(wheresql + " order by doc.date desc", 0, 0, "doc.date", getXWikiContext());
         String[] result = {};
         result = (String[]) lresult.toArray(result);
         assertEquals("Number of results of search " + wheresql + " is different", result.length, expected.length);
@@ -111,20 +72,20 @@ public class SearchTest extends TestCase {
     }
 
     public void testSearch() throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = getHibStore();
+        XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
         testsearchDocumentsNames(hibstore, "", new String[] {} );
         testsearchDocumentsNames(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {} );
         XWikiDocument doc1 = new XWikiDocument("Main", "WebHome");
         doc1.setContent("no content");
         doc1.setAuthor("Ludovic Dubost");
         doc1.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc1, context);
+        hibstore.saveXWikiDoc(doc1, getXWikiContext());
         testsearchDocumentsNames(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         XWikiDocument doc2 = new XWikiDocument("Main", "WebHome2");
         doc2.setContent("no content");
         doc2.setAuthor("Ludovic Dubost");
         doc2.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc2, context);
+        hibstore.saveXWikiDoc(doc2, getXWikiContext());
         testsearchDocumentsNames(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         testsearchDocumentsNames(hibstore, "doc.web='Main'", new String[] {"Main.WebHome", "Main.WebHome2"});
 
@@ -135,7 +96,7 @@ public class SearchTest extends TestCase {
         doc2.setContent("no content");
         doc2.setAuthor("Ludovic Dubost");
         doc2.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc3, context);
+        hibstore.saveXWikiDoc(doc3, getXWikiContext());
 
         testsearch(hibstore, "select distinct doc.web from XWikiDocument doc", new String[] {"Main", "Other"});
         testsearch(hibstore, "select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.web", "Main"}},  new String[] {"WebHome", "WebHome2"});
@@ -153,20 +114,20 @@ public class SearchTest extends TestCase {
     }
 
     public void testSearchWithOrder() throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = getHibStore();
+        XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
         testsearchDocumentsNames(hibstore, "", new String[] {} );
         testsearchDocumentsNames(hibstore, "doc.web='Main' and doc.name='WebHome' order by doc.date desc", new String[] {} );
         XWikiDocument doc1 = new XWikiDocument("Main", "WebHome");
         doc1.setContent("no content");
         doc1.setAuthor("Ludovic Dubost");
         doc1.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc1, context);
+        hibstore.saveXWikiDoc(doc1, getXWikiContext());
         testsearchDocumentsNamesWithOrder(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         XWikiDocument doc2 = new XWikiDocument("Main", "WebHome2");
         doc2.setContent("no content");
         doc2.setAuthor("Ludovic Dubost");
         doc2.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc2, context);
+        hibstore.saveXWikiDoc(doc2, getXWikiContext());
         testsearchDocumentsNamesWithOrder(hibstore, "doc.web='Main' and doc.name='WebHome'", new String[] {"Main.WebHome"});
         testsearchDocumentsNamesWithOrder(hibstore, "doc.web='Main'", new String[] {"Main.WebHome", "Main.WebHome2"});
     }

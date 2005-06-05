@@ -17,6 +17,8 @@
  */
 package com.xpn.xwiki.test;
 
+import org.apache.velocity.app.Velocity;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -48,6 +50,8 @@ public class HibernateTestCase extends TestCase
         
         StoreHibernateTest.cleanUp(this.xwiki.getHibernateStore(), this.context);
         this.xwiki.flushCache();
+
+        Velocity.init("velocity.properties");
     }
 
     protected void tearDown()

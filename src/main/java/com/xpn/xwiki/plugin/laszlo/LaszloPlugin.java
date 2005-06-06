@@ -23,6 +23,8 @@
 package com.xpn.xwiki.plugin.laszlo;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -82,12 +84,14 @@ public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         flushCache();
     }
 
-    public String writeLaszloFile(String name, String laszlocode) throws IOException {
+    public String writeLaszloFile(String name, String laszlocode) throws IOException, XWikiException {
          File laszloDir = new File(laszloPath);
          if (!laszloDir.exists())
            laszloDir.mkdirs();
 
         String filename = getFileName(name, laszlocode);
+
+        laszlocode = Util.secureLaszloCode(laszlocode);
 
         File dfile = new File(laszloDir, filename);
          if (!dfile.exists()) {
@@ -108,12 +112,12 @@ public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         return filename;
     }
 
-    public String getLaszloURL(String name, String laszlocode) throws IOException {
+    public String getLaszloURL(String name, String laszlocode) throws IOException, XWikiException {
         String filename = writeLaszloFile(name, laszlocode);
         return laszloBaseURL + filename + "?lzt=swf";
     }
 
-    public String getLaszloFlash(String name, String width, String height, String laszlocode, XWikiContext context) throws IOException {
+    public String getLaszloFlash(String name, String width, String height, String laszlocode, XWikiContext context) throws IOException, XWikiException {
         String url = getLaszloURL(name, laszlocode);
         return context.getWiki().getFlash(url, width, height, context);
     }

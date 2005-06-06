@@ -4,6 +4,7 @@ com.xpn.xwiki.render.macro.AttachMacro
 com.xpn.xwiki.render.macro.FormMacro
 com.xpn.xwiki.render.macro.FieldMacro
 com.xpn.xwiki.plugin.graphviz.GraphVizMacro
+com.xpn.xwiki.plugin.laszlo.LaszloMacro
 org.radeox.macro.ApiDocMacro
 org.radeox.macro.ApiMacro
 org.radeox.macro.XrefMacro

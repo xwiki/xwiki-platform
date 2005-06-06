@@ -32,10 +32,14 @@ import org.apache.oro.text.PatternCache;
 import org.apache.oro.text.PatternCacheLRU;
 import org.apache.oro.text.perl.Perl5Util;
 import org.apache.oro.text.regex.*;
+import org.dom4j.io.SAXReader;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
 
 import javax.servlet.http.Cookie;
 import java.io.*;
 import java.util.*;
+import java.net.URLDecoder;
 
 
 public class Util {
@@ -248,6 +252,23 @@ public class Util {
                 + title + "</a><div id=\"xwikierror" + id + "\" style=\"display: none;\"><pre>\n"
                 + text + "</pre></div>";
     }
+
+    public static String secureLaszloCode(String laszlocode) throws XWikiException {
+        SAXReader reader = new SAXReader();
+              Document domdoc;
+
+              try {
+                  StringReader in = new StringReader(laszlocode);
+                  domdoc = reader.read(in);
+              } catch (DocumentException e) {
+                  throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_XML, "Invalid Laszlo XML", e);
+              }
+
+        String code = domdoc.asXML();
+        if (code.indexOf("..")!=-1)
+            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_DOTDOT, "Invalid content in Laszlo XML");
+
+        return laszlocode;
+    }
+
 }
-
-

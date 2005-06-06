@@ -60,6 +60,8 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_EXPORT = 12;
     public static final int MODULE_XWIKI_DIFF = 13;
 
+    public static final int MODULE_PLUGIN_LASZLO = 21;
+
     // Error list
     public static final int ERROR_XWIKI_UNKNOWN = 0;
     public static final int ERROR_XWIKI_NOT_IMPLEMENTED = 1;
@@ -159,6 +161,8 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK = 13006;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_LOCK = 13007;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK = 13008;
+    public static final int ERROR_LASZLO_INVALID_XML = 21001;
+    public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
 
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {

@@ -34,6 +34,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 
 public class LaszloMacro  extends BaseLocaleMacro {
@@ -63,7 +64,11 @@ public class LaszloMacro  extends BaseLocaleMacro {
         String width = params.get("width", 2);
 
         String laszlocode = params.getContent();
-        str.append(plugin.getLaszloFlash(name, width, height, laszlocode, xcontext));
+        try {
+         str.append(plugin.getLaszloFlash(name, width, height, laszlocode, xcontext));
+        } catch (XWikiException e) {
+            str.append("Laszlo Error");
+        }
         writer.write(str.toString());
     }
 }

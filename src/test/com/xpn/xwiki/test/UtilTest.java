@@ -208,4 +208,20 @@ public class UtilTest extends TestCase {
       assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.2");
       assertNull(result.get("j"));
     }
+
+    public void testSecureLaszloCode() throws XWikiException {
+      String result = Util.secureLaszloCode("<image src=\"../../../toto.gif\">");
+      assertTrue("Code is not secure", (result.indexOf("..")==-1));
+        result = Util.secureLaszloCode("<image src=../../../toto.gif >");
+              assertTrue("Code is not secure", (result.indexOf("..")==-1));
+        result = Util.secureLaszloCode("<image src=\"/../../../toto.gif\">");
+              assertTrue("Code is not secure", (result.indexOf("\"/")==-1));
+        result = Util.secureLaszloCode("<image src=\"../../../toto.gif\">");
+              assertTrue("Code is not secure", (result.indexOf("..")==-1));
+        result = Util.secureLaszloCode("<image src=\"..../../../toto.gif\">");
+              assertTrue("Code is not secure", (result.indexOf("toto.gif")!=-1));
+        result = Util.secureLaszloCode("<image anything=\"../../../toto.gif\">");
+              assertTrue("Code is not secure", (result.indexOf("\"/")==-1));
+    }
+
 }

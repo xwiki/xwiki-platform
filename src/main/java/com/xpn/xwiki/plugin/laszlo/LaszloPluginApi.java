@@ -26,6 +26,7 @@ import com.amazon.api.alexa.*;
 import com.amazon.api.alexa.holders.OperationRequestHolder;
 import com.amazon.api.alexa.holders.UrlInfoResultHolder;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 import com.xpn.xwiki.api.Api;
@@ -54,11 +55,11 @@ public class LaszloPluginApi extends Api {
         return plugin.getFileName(name, laszlocode);
     }
 
-    public String getLaszloURL(String name, String laszlocode) throws IOException {
+    public String getLaszloURL(String name, String laszlocode) throws IOException, XWikiException {
         return plugin.getLaszloURL(name, laszlocode);
     }
 
-    public String getLaszloFlash(String name, String width, String height, String laszlocode) throws IOException {
+    public String getLaszloFlash(String name, String width, String height, String laszlocode) throws IOException, XWikiException {
         return plugin.getLaszloFlash(name, width, height, laszlocode, context);
     }
 

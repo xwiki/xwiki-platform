@@ -19,13 +19,12 @@ public class DocumentInfo
     public final static int     ACTION_SKIP = 1;
     public final static int     ACTION_MERGE = 2;
 
-
     public final static int     INSTALL_IMPOSSIBLE = 0;
     public final static int     INSTALL_ALREADY_EXIST = 1;
     public final static int     INSTALL_OK = 2;
     public final static int     INSTALL_ERROR = 4;
 
-    DocumentInfo(XWikiDocument doc)
+    public DocumentInfo(XWikiDocument doc)
     {
         this.doc = doc;
     }

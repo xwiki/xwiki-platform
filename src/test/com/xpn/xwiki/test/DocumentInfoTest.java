@@ -1,50 +1,40 @@
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.apache.velocity.VelocityContext;
-
-
 /**
  * ===================================================================
- * <p/>
- * Copyright (c) 2005 Jérémi Joslin, All rights reserved.
- * <p/>
+ *
+ * Copyright (c) 2005 Jérémi Joslin, XpertNet, All rights reserved.
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * <p/>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- * <p/>
- * User: jeremi
- * Date: May 13, 2005
- * Time: 2:30:12 PM
  */
-public class DocumentInfoTest   extends HibernateTestCase{
+
+package com.xpn.xwiki.test;
+
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.XWikiException;
+import org.apache.velocity.VelocityContext;
+
+
+public class DocumentInfoTest extends HibernateTestCase {
 
     public void prepareData() throws XWikiException {
         XWikiDocument doc = new XWikiDocument("Test", "first");
-//        XWikiDocument doc2 = new XWikiDocument("Test", "second");
-//        XWikiDocument doc3 = new XWikiDocument("Test", "third");
 
         doc.setContent("blop, first test page");
         getXWiki().saveDocument(doc, getXWikiContext());
         getXWikiContext().put("vcontext", new VelocityContext());
     }
 
-    public void testActionTo()
-    {
+    public void testActionTo() {
         assertEquals(DocumentInfo.actionToString(DocumentInfo.ACTION_MERGE), "merge");
         assertEquals(DocumentInfo.actionToString(DocumentInfo.ACTION_OVERWRITE), "overwrite");
         assertEquals(DocumentInfo.actionToString(DocumentInfo.ACTION_SKIP), "skip");
@@ -57,8 +47,7 @@ public class DocumentInfoTest   extends HibernateTestCase{
 
     }
 
-    public void testInstallStatusToString()
-    {
+    public void testInstallStatusToString() {
         assertEquals(DocumentInfo.installStatusToString(DocumentInfo.INSTALL_IMPOSSIBLE), "Impossible");
         assertEquals(DocumentInfo.installStatusToString(DocumentInfo.INSTALL_OK), "Ok");
         assertEquals(DocumentInfo.installStatusToString(DocumentInfo.INSTALL_ERROR), "Error");
@@ -67,14 +56,11 @@ public class DocumentInfoTest   extends HibernateTestCase{
 
 
     public void testTestInstall() throws XWikiException {
-
         prepareData();
 
         XWikiDocument doc = new XWikiDocument("Test", "first");
         doc.setContent("overwrite");
         DocumentInfo docInfo = new DocumentInfo(doc);
-
-//        getXWiki().getRightService().hasAccessLevel("view", "XWiki.LudovicDubost", doc.getFullName(), getXWikiContext());
 
         assertEquals("install must overwrite", docInfo.testInstall(getXWikiContext()), DocumentInfo.INSTALL_ALREADY_EXIST);
 
@@ -98,10 +84,9 @@ public class DocumentInfoTest   extends HibernateTestCase{
     }
 
     public void testSecurity() throws XWikiException {
-        updateRight("Test.first", "XWiki.LudovicDubost","","edit", false, false);
-        //getXWiki().flushCache();
-        getXWikiContext().put("vcontext", new VelocityContext());
+        updateRight("Test.first", "XWiki.LudovicDubost", "", "edit", false, false);
 
+        getXWikiContext().put("vcontext", new VelocityContext());
 
         String userSave = getXWikiContext().getUser();
 

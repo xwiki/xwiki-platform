@@ -17,6 +17,8 @@
  */
 package com.xpn.xwiki.test;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -27,9 +29,16 @@ import org.dom4j.DocumentException;
 
 import java.text.ParseException;
 
-public class StoreObjectTest extends HibernateTestCase {
+import junit.framework.TestCase;
 
-    public String rcspath = "./rcs";
+public abstract class AbstractStoreObjectTest extends TestCase {
+
+    protected abstract XWikiContext getXWikiContext();
+
+    private XWiki getXWiki()
+    {
+        return getXWikiContext().getWiki();
+    }
 
     public void writeObjectInDoc(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
         XWikiDocument doc = new XWikiDocument("Test","TestObject");

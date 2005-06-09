@@ -125,7 +125,7 @@
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
         <classpath>
-        	  <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
+            <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
             <pathelement location="${lib.dir}/cactus-1.7.jar"/>
             <pathelement location="${lib.dir}/cactus-ant-1.7.jar"/>
             <pathelement location="${lib.dir}/commons-httpclient-2.0.2.jar"/>
@@ -244,15 +244,11 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}">
-                <!-- TODO: Why not rather include only files matching *Test.java? -->
             	<fileset dir="${java.test.src.dir}">
-            		<exclude name="**/AllTests.java"/>
-                    <exclude name="**/HibernateTestCase.java"/>
-                    <exclude name="**/MyFormAuthentication.java"/>
-                    <exclude name="**/RenderTest.java"/>
-                    <exclude name="**/Utils.java"/>
+            		<include name="**/*Test.java"/>
+                    <exclude name="**/Abstract*.java"/>
+                    <!-- TODO: Why do we exclude this test? -->
                     <exclude name="**/StoreRCSFileTest.java"/>
-                    <exclude name="**/GroovyTestRightService.java" />
                 </fileset>
             </batchtest>
         </junit>

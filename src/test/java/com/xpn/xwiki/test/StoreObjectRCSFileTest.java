@@ -1,15 +1,7 @@
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.store.XWikiRCSFileStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-
-import java.io.File;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,15 +14,21 @@ import java.io.File;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 28 janv. 2004
- * Time: 18:22:59
  */
+package com.xpn.xwiki.test;
 
-public class StoreObjectRCSFileTest extends StoreObjectTest {
-    public void cleanUp() {
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+
+import java.io.File;
+
+public class StoreObjectRCSFileTest extends AbstractStoreObjectTest {
+
+    private XWiki xwiki;
+    private XWikiContext context;
+
+    private void cleanUp() {
         File file = new File(Utils.rcspath + "/" + Utils.web + "/" + Utils.name + ".txt");
         file.delete();
         file = new File(Utils.rcspath + "/" + Utils.web + "/" + Utils.name + ".txt,v");
@@ -41,15 +39,28 @@ public class StoreObjectRCSFileTest extends StoreObjectTest {
         file.delete();
     }
 
-    public void setUp() {
+    protected void setUp() throws Exception {
+
         cleanUp();
+
+        XWikiConfig config = new XWikiConfig();
+        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiRCSFileStore");
+        config.put("xwiki.store.rcs.path", Utils.rcspath);
+        config.put("xwiki.store.rcs.attachmentpath", Utils.rcsattachmentpath);
+        
+        this.context = new XWikiContext();
+        this.xwiki = new XWiki(config, this.context);
+        this.context.setWiki(this.xwiki);
     }
 
-    public XWikiStoreInterface getStore() {
-        XWikiStoreInterface store = new XWikiRCSFileStore(Utils.rcspath, Utils.rcsattachmentpath);
-        return store;
+    protected void tearDown() {
+        this.xwiki = null;
+        this.context = null;
+        System.gc();
     }
-
-
-
+    
+    protected XWikiContext getXWikiContext()
+    {
+        return this.context;
+    }
 }

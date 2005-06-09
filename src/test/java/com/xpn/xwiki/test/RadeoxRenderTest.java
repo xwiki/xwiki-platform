@@ -24,7 +24,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
 import org.hibernate.HibernateException;
 
-public class RadeoxRenderTest extends RenderTest {
+public class RadeoxRenderTest extends AbstractRenderTest {
 
     public XWikiRenderer getXWikiRenderer() {
         return new XWikiRadeoxRenderer();
@@ -150,7 +150,7 @@ public class RadeoxRenderTest extends RenderTest {
 
        public String renderTestInTable(XWikiRenderer renderer, String source, String result, boolean fullmatch, XWikiContext context) throws XWikiException {
            String source2 = "{table}\na | b\ntext|" + source + "\n{table}\n";
-           String res = RenderTest.renderTest(renderer, source2, result, fullmatch, context);
+           String res = AbstractRenderTest.renderTest(renderer, source2, result, fullmatch, context);
            assertTrue("Result should contain a table", res.indexOf("<table")!=-1);
            return res;
        }

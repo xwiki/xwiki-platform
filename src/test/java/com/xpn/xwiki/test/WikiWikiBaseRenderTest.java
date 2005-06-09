@@ -25,7 +25,7 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiWikiBaseRenderer;
 
-public class WikiWikiBaseRenderTest extends RenderTest {
+public class WikiWikiBaseRenderTest extends AbstractRenderTest {
 
     public XWikiRenderer getXWikiRenderer() {
         return new XWikiWikiBaseRenderer();

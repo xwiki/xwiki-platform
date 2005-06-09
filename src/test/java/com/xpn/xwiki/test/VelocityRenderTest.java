@@ -30,20 +30,20 @@ public class VelocityRenderTest extends HibernateTestCase {
         public void testVelocityRenderer() throws XWikiException {
             XWikiRenderer wikibase = new XWikiVelocityRenderer();
 
-            RenderTest.renderTest(wikibase, "#set( $foo = \"Velocity\" )\nHello $foo World!",
+            AbstractRenderTest.renderTest(wikibase, "#set( $foo = \"Velocity\" )\nHello $foo World!",
                     "Hello Velocity World!", true, getXWikiContext());
-            RenderTest.renderTest(wikibase, "Test: #include( \"view.pm\" )",
+            AbstractRenderTest.renderTest(wikibase, "Test: #include( \"view.pm\" )",
                     "Test: #include", false, getXWikiContext());
-            RenderTest.renderTest(wikibase, "Test: #INCLUDE( \"view.pm\" )",
+            AbstractRenderTest.renderTest(wikibase, "Test: #INCLUDE( \"view.pm\" )",
                     "Test: #INCLUDE", false, getXWikiContext());
 
-            RenderTest.renderTest(wikibase, "#set( $count = 0 )\n#if ( $count == 1)\nHello1\n#else\nHello2\n#end\n",
+            AbstractRenderTest.renderTest(wikibase, "#set( $count = 0 )\n#if ( $count == 1)\nHello1\n#else\nHello2\n#end\n",
                     "Hello2", true, getXWikiContext());
         }
 
         public void testRenderingEngine() throws XWikiException {
             XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
-            RenderTest.renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
+            AbstractRenderTest.renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
                     "Hello2", false, getXWikiContext());
         }
 
@@ -61,7 +61,7 @@ public class VelocityRenderTest extends HibernateTestCase {
             XWikiDocument doc2 = new XWikiDocument("Other", "IncludeTest");
             doc2.setAuthor("SecondAuthor");
             doc2.setContent(text);
-            RenderTest.renderTest(wikiengine, doc2, result, false, getXWikiContext());
+            AbstractRenderTest.renderTest(wikiengine, doc2, result, false, getXWikiContext());
         }
 
         public void testIncludeTopic() throws XWikiException {
@@ -101,7 +101,7 @@ public class VelocityRenderTest extends HibernateTestCase {
 
     public void testVelocityError() throws XWikiException {
         XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
-        RenderTest.renderTest(wikiengine, "#skype(hello)",
+        AbstractRenderTest.renderTest(wikiengine, "#skype(hello)",
                 "hello", false, getXWikiContext());
     }
 
@@ -119,7 +119,7 @@ public class VelocityRenderTest extends HibernateTestCase {
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")\n#hello()");
         store.saveXWikiDoc(doc2, getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc2, "coucou", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc2, "coucou", false, getXWikiContext());
     }
 
  }

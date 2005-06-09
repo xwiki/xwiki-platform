@@ -27,7 +27,7 @@ import org.hibernate.HibernateException;
 
 import java.net.URL;
 
-public abstract class RenderTest extends HibernateTestCase {
+public abstract class AbstractRenderTest extends HibernateTestCase {
 
     public abstract XWikiRenderer getXWikiRenderer();
 

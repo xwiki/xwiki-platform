@@ -29,16 +29,16 @@ public class GroovyRenderTest extends HibernateTestCase {
     public void testBasics() throws XWikiException {
         XWikiRenderer wikibase = new XWikiGroovyRenderer();
         getXWiki().setRightService(new GroovyTestRightService());
-        RenderTest.renderTest(wikibase, "<% foo = \"Groovy\"\nprintln \"Hello $foo World!\" %>",
+        AbstractRenderTest.renderTest(wikibase, "<% foo = \"Groovy\"\nprintln \"Hello $foo World!\" %>",
                 "Hello Groovy World!", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "<% count = 0\nif ( count == 1)\n{ println \"A${count}A\" }\nelse\n { println \"B${count}B\" }\n %>",
+        AbstractRenderTest.renderTest(wikibase, "<% count = 0\nif ( count == 1)\n{ println \"A${count}A\" }\nelse\n { println \"B${count}B\" }\n %>",
                 "B0B", false, getXWikiContext());
     }
 
     public void testWithFunction() throws XWikiException {
         XWikiRenderer wikibase = new XWikiGroovyRenderer();
         getXWiki().setRightService(new GroovyTestRightService());
-        RenderTest.renderTest(wikibase, "<%  def add(int a, int b) { return a+b }\n println add(1,2)\n %>",
+        AbstractRenderTest.renderTest(wikibase, "<%  def add(int a, int b) { return a+b }\n println add(1,2)\n %>",
                 "3", false, getXWikiContext());
     }
 
@@ -57,7 +57,7 @@ public class GroovyRenderTest extends HibernateTestCase {
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")<% println testvar %>");
         store.saveXWikiDoc(doc2, getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, getXWikiContext());
     }
 
     public void testWithFunctionInclude() throws Exception {
@@ -75,7 +75,7 @@ public class GroovyRenderTest extends HibernateTestCase {
         doc2.setAuthor("SecondAuthor");
         doc2.setContent("#includeMacros(\"Test.WebHome\")<% println add(1,2) %>");
         store.saveXWikiDoc(doc2, getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc2, "3", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc2, "3", false, getXWikiContext());
     }
 
  }

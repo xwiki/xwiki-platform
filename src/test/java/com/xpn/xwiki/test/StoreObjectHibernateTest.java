@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
@@ -33,8 +35,31 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
-public class StoreObjectHibernateTest extends HibernateTestCase {
+public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
 
+    private HibernateTestCase hibernateTestCase;
+    
+    protected void setUp() throws Exception
+    {
+        this.hibernateTestCase = new HibernateTestCase();
+        this.hibernateTestCase.setUp();
+    }
+    
+    protected void tearDown()
+    {
+        this.hibernateTestCase.tearDown();
+    }
+
+    protected XWikiContext getXWikiContext()
+    {
+        return this.hibernateTestCase.getXWikiContext();
+    }
+    
+    private XWiki getXWiki()
+    {
+        return getXWikiContext().getWiki();
+    }
+    
     public void testStringBadDatabase1() throws XWikiException, HibernateException {
         XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
@@ -285,9 +310,6 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testSearchCount() throws XWikiException {
-//        XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
-//        getXWikiContext().setWiki(xwiki);
-//        XWikiHibernateStore store = xwiki.getHibernateStore();
         Utils.createDoc(getXWiki().getStore(), "XWiki", "XWikiServerXwikitest", getXWikiContext());
         Utils.setStringValue("XWiki.XWikiServerXwikitest", "XWiki.XWikiServerClass", "server", "127.0.0.1", getXWikiContext());
 
@@ -299,10 +321,6 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
 
 
     public void testObjectSavePerf() throws XWikiException {
-//         XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
-//         getXWikiContext().setWiki(xwiki);
-//         XWikiHibernateStore store = xwiki.getHibernateStore();
-
         // Start monitoring timer
         MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
         if (monitor!=null)
@@ -320,9 +338,6 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
 
     public void testObjectReadPerf() throws XWikiException {
         int nb = 100;
-//        XWiki xwiki = new XWiki("./xwiki.cfg", getXWikiContext());
-//         getXWikiContext().setWiki(xwiki);
-//         XWikiHibernateStore store = xwiki.getHibernateStore();
          Utils.addManyMembers(getXWiki(), getXWikiContext(), "XWiki.LudovicDubost", "XWiki.XWikiAllGroup", nb);
          getXWiki().flushCache();
 

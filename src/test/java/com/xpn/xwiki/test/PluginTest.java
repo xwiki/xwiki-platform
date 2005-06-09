@@ -36,37 +36,37 @@ public class PluginTest extends HibernateTestCase {
 
     public void testSmilies() throws XWikiException {
         XWikiRenderingEngine wikibase = getXWiki().getRenderingEngine();
-        RenderTest.renderTest(wikibase, "Hello 1\n :)\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n :)\nHello 2",
                 "smile", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "Hello 1\n :-)\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n :-)\nHello 2",
                 "smile", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "Hello 1\n :) :)\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n :) :)\nHello 2",
                 "smile smile", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "Hello 1\n :) 8-)\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n :) 8-)\nHello 2",
                 "smile cool", false, getXWikiContext());
     }
 
     public void testBugzilla() throws XWikiException {
         XWikiRenderingEngine wikibase = getXWiki().getRenderingEngine();
-        RenderTest.renderTest(wikibase, "hello bug 234 end",
+        AbstractRenderTest.renderTest(wikibase, "hello bug 234 end",
                 "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "hello Bug 234 end",
+        AbstractRenderTest.renderTest(wikibase, "hello Bug 234 end",
                 "http://bugzilla.xpertnet.biz/show_bug.cgi?id=234", false, getXWikiContext());
     }
 
     public void testPatternsTag() throws XWikiException {
         XWikiRenderingEngine wikibase = getXWiki().getRenderingEngine();
-        RenderTest.renderTest(wikibase, "Hello 1\n%PATTERNS%\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n%PATTERNS%\nHello 2",
                 "smile", false, getXWikiContext());
     }
 
     public void testTablePlugin() throws XWikiException {
         XWikiRenderingEngine wikibase = getXWiki().getRenderingEngine();
-        RenderTest.renderTest(wikibase, "Hello 1\n| a | b |c |\n| d | e | f |\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n| a | b |c |\n| d | e | f |\nHello 2",
                 "<table", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "Hello 1\n| a | b | c |\n| d | e | f |\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n| a | b | c |\n| d | e | f |\nHello 2",
                 "DDDDDD", false, getXWikiContext());
-        RenderTest.renderTest(wikibase, "Hello 1\n%TABLE{ headerbg=\"#EEEEEE\" }%\n| a | b | c |\n| d | e | f |\nHello 2",
+        AbstractRenderTest.renderTest(wikibase, "Hello 1\n%TABLE{ headerbg=\"#EEEEEE\" }%\n| a | b | c |\n| d | e | f |\nHello 2",
                 "EEEEEE", false, getXWikiContext());
     }
 

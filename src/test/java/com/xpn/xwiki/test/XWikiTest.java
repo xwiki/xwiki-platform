@@ -233,7 +233,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.content1 = "$context.context.database";
         Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI", getXWikiContext());
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI", getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
     public void testAccessSecureAPIAccess() throws XWikiException {
@@ -243,7 +243,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.updateRight(getXWiki(), getXWikiContext(), "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
         Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI2", getXWikiContext());
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI2", getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc1, "xwikitest", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc1, "xwikitest", false, getXWikiContext());
     }
 
     public void testAccessSecureAPIAccessWithInclude() throws XWikiException {
@@ -259,7 +259,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI4", getXWikiContext());
 
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI3", getXWikiContext());
-        RenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
 

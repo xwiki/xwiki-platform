@@ -36,7 +36,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 public class StoreObjectHibernateTest extends HibernateTestCase {
 
     public void testStringBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
         store.beginTransaction(getXWikiContext());
         StoreHibernateTest.runSQL(store, "delete from xwikiproperties", getXWikiContext());
@@ -45,7 +45,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testStringBadDatabase2() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
         store.beginTransaction(getXWikiContext());
         StoreHibernateTest.runSQL(store, "delete from xwikistrings", getXWikiContext());
@@ -54,7 +54,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testNumberBadDatabase1() throws XWikiException, HibernateException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         number(store);
         store.beginTransaction(getXWikiContext());
         StoreHibernateTest.runSQL(store, "delete from xwikiproperties", getXWikiContext());
@@ -63,7 +63,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testNumberBadDatabase2() throws XWikiException, HibernateException{
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         number(store);
         store.beginTransaction(getXWikiContext());
         StoreHibernateTest.runSQL(store, "delete from xwikiintegers", getXWikiContext());
@@ -84,12 +84,12 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testNumberEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         number(store);
     }
 
     public void testNumberUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         number(store);
         number(store);
     }
@@ -106,12 +106,12 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testStringEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
     }
 
     public void testStringUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
         string(store);
     }
@@ -128,12 +128,12 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testStringListEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         stringList(store);
     }
 
     public void testStringListUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         stringList(store);
         stringList(store);
     }
@@ -150,12 +150,12 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testDBStringListEmptyDatabase() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         dBStringList(store);
     }
 
     public void testDBStringListUpdate() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         dBStringList(store);
         dBStringList(store);
     }
@@ -181,7 +181,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testWriteObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -190,7 +190,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testReadWriteObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -200,7 +200,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testWriteAdvancedObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -209,7 +209,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testReadWriteAdvancedObject()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -238,7 +238,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testWriteClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -247,7 +247,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testReadWriteClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -257,7 +257,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
      public void testWriteAdvancedClass()  throws  XWikiException {
-         XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+         XWikiHibernateStore store = getXWiki().getHibernateStore();
          XWikiDocument doc = new XWikiDocument();
          Utils.prepareAdvancedObject(doc);
          BaseClass bclass = doc.getxWikiClass();
@@ -266,7 +266,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testReadWriteAdvancedClass()  throws  XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
@@ -276,7 +276,7 @@ public class StoreObjectHibernateTest extends HibernateTestCase {
     }
 
     public void testSearchClass() throws XWikiException {
-        XWikiHibernateStore store = (XWikiHibernateStore) getXWiki().getStore();
+        XWikiHibernateStore store = getXWiki().getHibernateStore();
         List list = store.getClassList(getXWikiContext());
         assertTrue("No result", (list.size()==0) );
         testWriteClass();

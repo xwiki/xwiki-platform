@@ -23,7 +23,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
-import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
 
 import java.net.URL;
@@ -164,7 +163,6 @@ public abstract class RenderTest extends HibernateTestCase {
                  "<li> Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",
                 "This is a text with *one* and *two* items", false, getXWikiContext());
-
     }
 
     public void testWikiBaseTabListRenderer() throws XWikiException {
@@ -179,14 +177,13 @@ public abstract class RenderTest extends HibernateTestCase {
     }
 
     public void testWikiBaseSpaceListRenderer() throws XWikiException {
-         XWikiRenderer wikibase = getXWikiRenderer();
-         renderTest(wikibase, "   * List1",
-                "<ul><li> List1</li>\n</ul>", true, getXWikiContext());
-         renderTest(wikibase, "   * List1\n   * List2",
-               "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, getXWikiContext());
+        XWikiRenderer wikibase = getXWikiRenderer();
+        renderTest(wikibase, "   * List1",
+            "<ul><li> List1</li>\n</ul>", true, getXWikiContext());
+        renderTest(wikibase, "   * List1\n   * List2",
+            "<ul><li> List1</li>\n<li> List2</li>\n</ul>\n", true, getXWikiContext());
         renderTest(wikibase, "   * List1\n      * List2",
-              "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, getXWikiContext());
-
+            "<ul><li> List1</li>\n<ul><li> List2</li>\n</ul></ul>\n", true, getXWikiContext());
     }
 
     public void testWikiBaseLinkRenderer() throws XWikiException, HibernateException {

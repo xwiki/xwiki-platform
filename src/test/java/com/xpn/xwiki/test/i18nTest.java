@@ -19,8 +19,6 @@ package com.xpn.xwiki.test;
 
 import java.util.List;
 
-import org.apache.velocity.app.Velocity;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.i18n.i18n;

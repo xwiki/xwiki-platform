@@ -211,7 +211,7 @@
     </target>
 
     <target name="tests" depends="junit-check,prepare,xwiki">
-        <copy todir="${tests.build.dir}">
+    	<copy todir="${tests.build.dir}">
             <fileset dir="${resources.test.src.dir}"/>
         </copy>
         <javac destdir="${tests.build.dir}"
@@ -245,14 +245,11 @@
 
             <batchtest todir="${test.reports.dir}">
                 <!-- TODO: Why not rather include only files matching *Test.java? -->
-            	<!-- TODO: Why are we excluding some tests like StoreTest? This is normal -->
             	<fileset dir="${java.test.src.dir}">
-                    <exclude name="**/AllTests.java"/>
+            		<exclude name="**/AllTests.java"/>
                     <exclude name="**/HibernateTestCase.java"/>
                     <exclude name="**/MyFormAuthentication.java"/>
                     <exclude name="**/RenderTest.java"/>
-                    <exclude name="**/StoreObjectTest.java"/>
-                    <exclude name="**/StoreTest.java"/>
                     <exclude name="**/Utils.java"/>
                     <exclude name="**/StoreRCSFileTest.java"/>
                     <exclude name="**/GroovyTestRightService.java" />

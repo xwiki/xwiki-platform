@@ -17,18 +17,13 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
+
 import junit.framework.TestCase;
-import org.hibernate.HibernateException;
 
 public class ClassesTest extends TestCase {
 
@@ -118,30 +113,6 @@ public class ClassesTest extends TestCase {
         assertEquals("StaticList failed on multiple value", property.toFormString(), "1|2");
     }
 
-    public void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected) {
-        testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
-    }
-
-    public void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected, XWikiContext context) {
-      if (context==null)
-         context = new XWikiContext();
-      StringBuffer result = new StringBuffer();
-      PropertyClass pclass = (PropertyClass)bclass.get(cname);
-      pclass.displayView(result,cname, "", obj, context);
-      assertEquals("Class " + cname + " view displayer not correct:\n" +
-                    "Expected: " + viewexpected + "\nResult: " + result,
-                    viewexpected.toLowerCase(), result.toString().toLowerCase());
-
-      result = new StringBuffer();
-      pclass.displayEdit(result,cname, "", obj, context);
-      assertTrue("Class " + cname + " edit displayer not correct" +
-                 "\nExpected: " + editexpected + "\nResult: " + result,
-                 result.toString().toLowerCase().indexOf(editexpected.toLowerCase())!=-1);
-
-      pclass.displayHidden(result,cname, "", obj, context);
-      pclass.displaySearch(result,cname, "", obj, context);
-    }
-
     public void testBasicDisplayers() throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
@@ -174,46 +145,33 @@ public class ClassesTest extends TestCase {
         testDisplayer("category3", obj, bclass, "1 2", "multiple");
     }
 
-
-    public XWikiHibernateStore getHibStore(XWiki xwiki) {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
-    }
-
-    public void testDBListDisplayers() throws XWikiException, HibernateException {
-        XWikiContext context = new XWikiContext();
-        
-        XWikiConfig config = new XWikiConfig();
-        // TODO: Should be modified to use a memory store for testing or a mock store
-        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        config.put("xwiki.store.hibernate.path", getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile());
-        
-        XWiki xwiki = new XWiki(config, context);
-        context.setWiki(xwiki);
-        StoreHibernateTest.cleanUp(xwiki.getHibernateStore(), context);
-
-        xwiki.getUserClass(context);
-        
-        try {
-            XWikiDocument doc = new XWikiDocument();
-            Utils.prepareAdvancedObject(doc);
-            BaseObject obj = doc.getObject(doc.getxWikiClass().getName(), 0);
-
-            testDisplayer("dblist", obj, doc.getxWikiClass(),
-                          "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", context);
-        } finally {
-            xwiki = null;
-            System.gc();
-        }
-    }
-
     public void testObject() throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseObject obj = doc.getObject(doc.getxWikiClass().getName(), 0);
     }
 
+    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected) {
+        testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
+    }
+
+    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected, XWikiContext context) {
+        if (context==null)
+            context = new XWikiContext();
+        StringBuffer result = new StringBuffer();
+        PropertyClass pclass = (PropertyClass)bclass.get(cname);
+        pclass.displayView(result,cname, "", obj, context);
+        assertEquals("Class " + cname + " view displayer not correct:\n" +
+            "Expected: " + viewexpected + "\nResult: " + result,
+            viewexpected.toLowerCase(), result.toString().toLowerCase());
+
+        result = new StringBuffer();
+        pclass.displayEdit(result,cname, "", obj, context);
+        assertTrue("Class " + cname + " edit displayer not correct" +
+            "\nExpected: " + editexpected + "\nResult: " + result,
+            result.toString().toLowerCase().indexOf(editexpected.toLowerCase())!=-1);
+
+        pclass.displayHidden(result,cname, "", obj, context);
+        pclass.displaySearch(result,cname, "", obj, context);
+    }
 }

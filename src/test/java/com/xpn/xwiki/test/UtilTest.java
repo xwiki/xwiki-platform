@@ -1,7 +1,7 @@
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -14,27 +14,15 @@
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
- *
- * Created by
- * User: Ludovic Dubost
- * Date: 24 nov. 2003
- * Time: 18:19:44
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
 import org.apache.oro.text.regex.MalformedPatternException;
 
 import java.io.IOException;
@@ -44,33 +32,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-
-public class UtilTest extends TestCase {
-
-    private XWiki xwiki;
-    private XWikiContext context;
-
-    public XWikiHibernateStore getHibStore() {
-        XWikiStoreInterface store = xwiki.getStore();
-        if (store instanceof XWikiCacheStoreInterface)
-            return (XWikiHibernateStore)((XWikiCacheStoreInterface)store).getStore();
-        else
-            return (XWikiHibernateStore) store;
-    }
-
-    public void setUp() throws XWikiException {
-        context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context);
-        context.setWiki(xwiki);
-        context.setDatabase("xwikitest");
-    }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        xwiki = null;
-        context = null;
-        System.gc();
-    }
+public class UtilTest extends HibernateClassesTest {
 
     public void testTopicInfo() throws IOException {
         String topicinfo;
@@ -103,19 +65,19 @@ public class UtilTest extends TestCase {
 
     public void testgetDocumentFromPath() throws XWikiException {
         String path = "/view/Main/WebHome";
-        XWikiDocument doc = xwiki.getDocumentFromPath(path, context);
+        XWikiDocument doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/taratata.doc";
-        doc = xwiki.getDocumentFromPath(path, context);
+        doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/blabla/tfdfdf.doc";
-        doc = xwiki.getDocumentFromPath(path, context);
+        doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
         assertEquals("Doc web is not correct", "Main", doc.getWeb());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
         path = "/view/Test/Titi/taratata.doc";
-       doc = xwiki.getDocumentFromPath(path, context);
+       doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
        assertEquals("Doc web is not correct", "Test", doc.getWeb());
        assertEquals("Doc name is not correct", "Titi", doc.getName());
 
@@ -123,15 +85,15 @@ public class UtilTest extends TestCase {
 
     public void testGetMatches() throws MalformedPatternException {
       String pattern = "#include(Topic|Form)\\(\"(.*?)\"\\)";
-      List list = context.getUtil().getMatches("", pattern, 2);
+      List list = getXWikiContext().getUtil().getMatches("", pattern, 2);
       assertEquals("List should have not items", 0, list.size());
-      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi", pattern, 2);
+      list = getXWikiContext().getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi", pattern, 2);
       assertEquals("List should have one items", 1, list.size());
       assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
-      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"Main.Toto\")Hi", pattern, 2);
+      list = getXWikiContext().getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"Main.Toto\")Hi", pattern, 2);
       assertEquals("List should have one items", 1, list.size());
       assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
-      list = context.getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"XWiki.Tata\")Hi", pattern, 2);
+      list = getXWikiContext().getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"XWiki.Tata\")Hi", pattern, 2);
       assertEquals("List should have two items", 2, list.size());
       assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
       assertEquals("List item 2 should be XWiki.Tata", "XWiki.Tata", list.get(1));
@@ -145,26 +107,24 @@ public class UtilTest extends TestCase {
     }
 
     public void testServletURLFactory() throws MalformedURLException {
-        XWikiContext context = new XWikiContext();
         URL url = new URL("http://www.xwiki.org/xwiki/bin/view/Main/WebHome");
         XWikiURLFactory factory = new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/");
-        context.setURL(url);
-        context.setURLFactory(factory);
+        getXWikiContext().setURL(url);
+        getXWikiContext().setURLFactory(factory);
 
         assertEquals("URL is incorrect",
                      new URL("http://www.xwiki.org/xwiki/bin/view/Main/Toto"),
-                     factory.createURL("Main", "Toto", context));
+                     factory.createURL("Main", "Toto", getXWikiContext()));
         assertEquals("URL is incorrect",
                      new URL("http://www.xwiki.org/xwiki/bin/view/XWiki/Toto"),
-                     factory.createURL("XWiki", "Toto", context));
+                     factory.createURL("XWiki", "Toto", getXWikiContext()));
         assertEquals("URL is incorrect",
                      new URL("http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto"),
-                     factory.createURL("XWiki", "Toto", "edit", context));
+                     factory.createURL("XWiki", "Toto", "edit", getXWikiContext()));
         assertEquals("URL is incorrect",
                      new URL("http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto?raw=1"),
-                     factory.createURL("XWiki", "Toto", "edit", "raw=1", null, context));
+                     factory.createURL("XWiki", "Toto", "edit", "raw=1", null, getXWikiContext()));
     }
-
     
     public static void testTOCGeneration() {
       String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i\n1.1.1.1.1.1 j";

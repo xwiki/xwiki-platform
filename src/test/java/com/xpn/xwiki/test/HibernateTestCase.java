@@ -17,28 +17,35 @@
  */
 package com.xpn.xwiki.test;
 
+import java.sql.Connection;
+import java.sql.Statement;
+
 import org.apache.velocity.app.Velocity;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import junit.framework.TestCase;
 
-public class HibernateTestCase extends TestCase
-{
+public class HibernateTestCase extends TestCase {
+    public static final String HIB_LOCATION = "/hibernate-test.cfg.xml";
+
     private XWiki xwiki;
     private XWikiConfig config;
     private XWikiContext context;
 
-    protected void setUp() throws Exception
-    {
+    protected void setUp() throws Exception {
         this.config = new XWikiConfig();
 
         // TODO: Should probably be modified to use a memory store for testing or a mock store
         // TODO: StoreHibernateTest should be refactored with this class in mind 
         this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        this.config.put("xwiki.store.hibernate.path", getClass().getResource(StoreHibernateTest.HIB_LOCATION).getFile());
+        this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
 
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");
@@ -48,14 +55,13 @@ public class HibernateTestCase extends TestCase
 
         this.context.setWiki(this.xwiki);
         
-        StoreHibernateTest.cleanUp(this.xwiki.getHibernateStore(), this.context);
+        cleanUp(this.xwiki.getHibernateStore(), this.context);
         this.xwiki.flushCache();
 
-        Velocity.init("velocity.properties");
+        Velocity.init(getClass().getResource("/velocity.properties").getFile());
     }
 
-    protected void tearDown()
-    {
+    protected void tearDown() {
         this.xwiki.getHibernateStore().shutdownHibernate(this.context);
         this.xwiki = null;
         this.context = null;
@@ -63,18 +69,78 @@ public class HibernateTestCase extends TestCase
         System.gc();
     }
     
-    public XWikiContext getXWikiContext()
-    {
+    public XWikiContext getXWikiContext() {
         return this.context;
     }
     
-    public XWikiConfig getXWikiConfig()
-    {
+    public XWikiConfig getXWikiConfig() {
         return this.config;
     }
     
-    public XWiki getXWiki()
-    {
+    public XWiki getXWiki() {
         return this.xwiki;
+    }
+
+    // Helper test methçds below
+    
+    public static void runSQL(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
+        try {
+            Session session = hibstore.getSession(context);
+            Connection connection = session.connection();
+            Statement st = connection.createStatement();
+            st.execute(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void cleanUp(XWikiHibernateStore hibstore, XWikiContext context) throws HibernateException, XWikiException {
+        cleanUp(hibstore, false, false, context);
+    }
+
+    public static void cleanUp(XWikiHibernateStore hibstore, boolean bFullCleanup, boolean bSchemaUpdate, XWikiContext context) throws HibernateException, XWikiException {
+        hibstore.checkHibernate(context);
+        hibstore.beginTransaction(context);
+        String database = context.getDatabase();
+        if (database==null)
+            context.setDatabase("xwikitest");
+        if (bFullCleanup) {
+            try {
+                runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
+            } catch (Exception e) {}
+            runSQL(hibstore, "create database " + context.getDatabase(), context);
+        } else {
+            runSQL(hibstore, "delete from xwikibooleanclasses", context);
+            runSQL(hibstore, "delete from xwikinumberclasses", context);
+            runSQL(hibstore, "delete from xwikislistclasses", context);
+            runSQL(hibstore, "delete from xwikidateclasses", context);
+            runSQL(hibstore, "delete from xwikistringclasses", context);
+            runSQL(hibstore, "delete from xwikidblistclasses", context);
+            runSQL(hibstore, "delete from xwikiclassesprop", context);
+            runSQL(hibstore, "delete from xwikiclasses", context);
+            runSQL(hibstore, "delete from xwikidates", context);
+            runSQL(hibstore, "delete from xwikidoubles", context);
+            runSQL(hibstore, "delete from xwikifloats", context);
+            runSQL(hibstore, "delete from xwikilongs", context);
+            runSQL(hibstore, "delete from xwikiintegers", context);
+            runSQL(hibstore, "delete from xwikilargestrings", context);
+            runSQL(hibstore, "delete from xwikilistitems", context);
+            runSQL(hibstore, "delete from xwikilists", context);
+            runSQL(hibstore, "delete from xwikistrings", context);
+            runSQL(hibstore, "delete from xwikiproperties", context);
+            runSQL(hibstore, "delete from xwikiobjects", context);
+            runSQL(hibstore, "delete from xwikiattachment_content", context);
+            runSQL(hibstore, "delete from xwikiattachment_archive", context);
+            runSQL(hibstore, "delete from xwikiattachment", context);
+            runSQL(hibstore, "delete from xwikidoc", context);
+            runSQL(hibstore, "delete from xwikilock", context);
+            runSQL(hibstore, "delete from xwikistatsdoc", context);
+            runSQL(hibstore, "delete from xwikistatsreferer", context);
+            runSQL(hibstore, "delete from xwikistatsvisit", context);
+        }
+        hibstore.endTransaction(context, true);
+
+        if (bFullCleanup&&bSchemaUpdate)
+            hibstore.updateSchema(context);
     }
 }

@@ -1,20 +1,7 @@
-
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,49 +14,32 @@ import org.hibernate.HibernateException;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 19 janv. 2004
- * Time: 14:25:48
  */
+package com.xpn.xwiki.test;
 
-public class StoreHibernateCacheTest extends StoreHibernateTest {
-    public XWiki xwiki;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiCacheStore;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.hibernate.HibernateException;
 
-    public void setUp() throws HibernateException, XWikiException {
-        context.setDatabase("xwikitest");
-        xwiki = new XWiki("./xwiki.cfg", context, null, false);
-        context.setWiki(xwiki);
-        cleanUp(getHibStore(), context);
+public class StoreHibernateCacheTest extends HibernateTestCase {
+
+    private XWikiStoreInterface store;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+
+        this.store = new XWikiCacheStore(getXWiki().getStore(), getXWikiContext());
     }
-
-    public void tearDown() throws HibernateException {
-        getHibStore().shutdownHibernate(context);
-        System.gc();
-    }
-
-    public XWikiHibernateStore getHibStore() {
-        XWikiCacheStoreInterface cacheStore = (XWikiCacheStoreInterface) getStore();
-        return (XWikiHibernateStore) cacheStore.getStore();
-    }
-
-    public XWikiStoreInterface getStore() {
-        if (store!=null)
-         return store;
-
-        String hibPath = getClass().getResource(HIB_LOCATION).getFile();
-        XWikiStoreInterface hibstore = new XWikiHibernateStore(hibPath);
-        store = new XWikiCacheStore(hibstore, context);
-        return store;
-    }
-
+    
     public void testCachedReadWrite() throws XWikiException {
         Utils.setStandardData();
-        XWikiStoreInterface store = getStore();
-        testStandardReadWrite(store, Utils.web, Utils.name);
+        StoreTest.standardReadWrite(store, Utils.web, Utils.name, getXWikiContext());
         XWikiDocument doc3 = new XWikiDocument(Utils.web, Utils.name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, context);
+        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
         String content3b = doc3.getContent();
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);
@@ -78,40 +48,39 @@ public class StoreHibernateCacheTest extends StoreHibernateTest {
     }
 
     public void testVirtualCachedReadWrite() throws XWikiException, HibernateException {
-        XWikiStoreInterface store = getStore();
 
-        context.setDatabase("xwikitest2");
-        cleanUp(getHibStore(), context);
+        getXWikiContext().setDatabase("xwikitest2");
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
 
-        context.setDatabase("xwikitest");
+        getXWikiContext().setDatabase("xwikitest");
         Utils.setStandardData();
-        testStandardWrite(store, Utils.web, Utils.name);
-        testStandardRead(store, Utils.web, Utils.name);
-        context.setDatabase("xwikitest2");
+        StoreTest.standardWrite(store, Utils.web, Utils.name, getXWikiContext());
+        StoreTest.standardRead(store, Utils.web, Utils.name, getXWikiContext());
+        getXWikiContext().setDatabase("xwikitest2");
         Utils.setMediumData();
-        testStandardWrite(store, Utils.web, Utils.name);
-        testStandardRead(store, Utils.web, Utils.name);
+        StoreTest.standardWrite(store, Utils.web, Utils.name, getXWikiContext());
+        StoreTest.standardRead(store, Utils.web, Utils.name, getXWikiContext());
     }
 
     public void testVirtualCachedReadWrite2() throws XWikiException, HibernateException {
-        XWikiStoreInterface store = getStore();
-        context.setDatabase("xwikitest2");
-        cleanUp(getHibStore(), context);
 
-        context.setDatabase("xwikitest");
+        getXWikiContext().setDatabase("xwikitest2");
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+
+        getXWikiContext().setDatabase("xwikitest");
         Utils.setStandardData();
-        testStandardWrite(store, Utils.web, Utils.name);
-        context.setDatabase("xwikitest2");
+        StoreTest.standardWrite(store, Utils.web, Utils.name, getXWikiContext());
+        getXWikiContext().setDatabase("xwikitest2");
         Utils.setMediumData();
-        testStandardWrite(store, Utils.web, Utils.name);
+        StoreTest.standardWrite(store, Utils.web, Utils.name, getXWikiContext());
 
         ((XWikiCacheStoreInterface)store).flushCache();
         Utils.setStandardData();
-        context.setDatabase("xwikitest");
-        testStandardRead(store, Utils.web, Utils.name);
+        getXWikiContext().setDatabase("xwikitest");
+        StoreTest.standardRead(store, Utils.web, Utils.name, getXWikiContext());
         Utils.setMediumData();
-        context.setDatabase("xwikitest2");
-        testStandardRead(store, Utils.web, Utils.name);
+        getXWikiContext().setDatabase("xwikitest2");
+        StoreTest.standardRead(store, Utils.web, Utils.name, getXWikiContext());
     }
 
 }

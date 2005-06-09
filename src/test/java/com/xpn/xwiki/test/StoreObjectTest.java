@@ -27,11 +27,11 @@ import org.dom4j.DocumentException;
 
 import java.text.ParseException;
 
-public abstract class StoreObjectTest extends HibernateTestCase {
+public class StoreObjectTest extends HibernateTestCase {
 
     public String rcspath = "./rcs";
 
-    public void testWriteObjectInDoc(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
+    public void writeObjectInDoc(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
         XWikiDocument doc = new XWikiDocument("Test","TestObject");
         object.setName("Test.TestObject");
         doc.setObject("Test.TestObject", 0, object);
@@ -39,11 +39,11 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         store.saveXWikiDoc(doc, getXWikiContext());
     }
 
-    public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
-        testReadObjectInDoc(store, object, false);
+    public void readObjectInDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+        readObjectInDoc(store, object, false);
     }
 
-    public void testReadObjectInDoc(XWikiStoreInterface store, BaseObject object, boolean advanced) throws  XWikiException {
+    public void readObjectInDoc(XWikiStoreInterface store, BaseObject object, boolean advanced) throws  XWikiException {
         // Prepare object2 for reading
         XWikiDocument doc = new XWikiDocument("Test","TestObject");
 
@@ -68,11 +68,9 @@ public abstract class StoreObjectTest extends HibernateTestCase {
             assertNull("category3 Field should not exist", object2.safeget("category3"));
             assertNull("dblist Field should not exist", object2.safeget("dblist"));
         }
-
-
     }
 
-    public void testDeleteObjectAndDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
+    public void deleteObjectAndDoc(XWikiStoreInterface store, BaseObject object) throws  XWikiException {
         // Prepare object2 for reading
         XWikiDocument doc = new XWikiDocument("Test","TestObject");
 
@@ -87,13 +85,13 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         assertTrue("Document should not exist", doc2.isNew());
     }
 
-    public void testWriteObjectInDoc()  throws  XWikiException {
+    public void testWriteObjectInDoc() throws  XWikiException {
         XWikiStoreInterface store = getXWiki().getStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
+        writeObjectInDoc(store, object, bclass);
     }
 
     public void testReadWriteObjectInDoc()  throws  XWikiException {
@@ -102,8 +100,8 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
-        testReadObjectInDoc(store, object);
+        writeObjectInDoc(store, object, bclass);
+        readObjectInDoc(store, object);
     }
 
     public void testDeleteObjectAndDoc()  throws  XWikiException {
@@ -112,16 +110,16 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
-        testDeleteObjectAndDoc(store, object);
+        writeObjectInDoc(store, object, bclass);
+        deleteObjectAndDoc(store, object);
         // To test that delete did it's work properly
         // we use a smaller object
         doc = new XWikiDocument();
         Utils.prepareObject(doc);
         bclass = doc.getxWikiClass();
         object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
-        testReadObjectInDoc(store, object);
+        writeObjectInDoc(store, object, bclass);
+        readObjectInDoc(store, object);
     }
 
     public void testWriteAdvancedObjectInDoc()  throws  XWikiException {
@@ -130,7 +128,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
+        writeObjectInDoc(store, object, bclass);
     }
 
     public void testReadWriteAdvancedObjectInDoc()  throws  XWikiException {
@@ -139,20 +137,18 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteObjectInDoc(store, object, bclass);
-        testReadObjectInDoc(store, object, true);
+        writeObjectInDoc(store, object, bclass);
+        readObjectInDoc(store, object, true);
     }
 
-
-
-    public void testWriteClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
+    public void writeClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
         XWikiDocument doc = new XWikiDocument("Test","TestClass");
         bclass.setName("Test.TestClass");
         doc.setxWikiClass(bclass);
         store.saveXWikiDoc(doc, getXWikiContext());
     }
 
-    public void testReadClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
+    public void readClassInDoc(XWikiStoreInterface store, BaseClass bclass) throws  XWikiException {
         // Prepare object2 for reading
         XWikiDocument doc = new XWikiDocument("Test","TestClass");
 
@@ -171,7 +167,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteClassInDoc(store, bclass);
+        writeClassInDoc(store, bclass);
     }
 
     public void testReadWriteClassInDoc()  throws  XWikiException {
@@ -180,8 +176,8 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteClassInDoc(store, bclass);
-        testReadClassInDoc(store, bclass);
+        writeClassInDoc(store, bclass);
+        readClassInDoc(store, bclass);
     }
 
     public void testWriteAdvancedClassInDoc()  throws  XWikiException {
@@ -190,7 +186,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteClassInDoc(store, bclass);
+        writeClassInDoc(store, bclass);
     }
 
     public void testReadWriteAdvancedClassInDoc()  throws  XWikiException {
@@ -199,12 +195,11 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
-        testWriteClassInDoc(store, bclass);
-        testReadClassInDoc(store, bclass);
+        writeClassInDoc(store, bclass);
+        readClassInDoc(store, bclass);
     }
 
-
-    public void testVersionedObject(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
+    public void versionedObject(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
        Utils.createDoc(store, "Test", "TestVersion", object, bclass, null, getXWikiContext());
        XWikiDocument doc1 = new XWikiDocument("Test", "TestVersion");
        doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
@@ -230,7 +225,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
          Utils.prepareObject(doc, "Test.TestVersion");
          BaseClass bclass = doc.getxWikiClass();
          BaseObject bobject = doc.getObject(bclass.getName(), 0);
-         testVersionedObject(store, bobject, bclass);
+         versionedObject(store, bobject, bclass);
      }
 
     public void testVersionedAdvancedObject() throws XWikiException {
@@ -239,10 +234,10 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc, "Test.TestVersion");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        testVersionedObject(store, bobject, bclass);
+        versionedObject(store, bobject, bclass);
      }
 
-    public void testXML(XWikiStoreInterface store, BaseObject bobject, BaseClass bclass) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
+    public void xml(XWikiStoreInterface store, BaseObject bobject, BaseClass bclass) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
          XWikiDocument doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bclass, null, getXWikiContext());
          String xml0 = doc0.toXML(getXWikiContext());
          XWikiDocument doc1 = new XWikiDocument("Test", "TestVersion");
@@ -262,7 +257,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareObject(doc, "Test.TestVersion");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        testXML(store, bobject, bclass);
+        xml(store, bobject, bclass);
     }
 
     public void testAdvancedXML() throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
@@ -271,7 +266,7 @@ public abstract class StoreObjectTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc, "Test.TestVersion");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        testXML(store, bobject, bclass);
+        xml(store, bobject, bclass);
     }
 
 }

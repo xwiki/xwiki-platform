@@ -1,16 +1,7 @@
-
-package com.xpn.xwiki.test;
-
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiRCSFileStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-
-import java.io.File;
-
 /**
  * ===================================================================
  *
- * Copyright (c) 2003 Ludovic Dubost, All rights reserved.
+ * Copyright (c) 2003-2005 Ludovic Dubost, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,14 +14,18 @@ import java.io.File;
  * GNU General Public License for more details, published at
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
-
- * Created by
- * User: Ludovic Dubost
- * Date: 19 janv. 2004
- * Time: 14:30:43
  */
+package com.xpn.xwiki.test;
 
-public class StoreRCSFileTest extends StoreTest {
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiRCSFileStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+
+import java.io.File;
+
+import junit.framework.TestCase;
+
+public class StoreRCSFileTest extends TestCase {
 
     public void cleanUp() {
         File file = new File(Utils.rcspath + "/" + Utils.web + "/" + Utils.name + ".txt");

@@ -42,6 +42,7 @@
     <property name="web.main.src.dir" value="${main.src.dir}/web" />
 
     <property name="test.src.dir" value="${src.dir}/test" />
+    <property name="java.test.src.dir" value="${test.src.dir}/java" />
     <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
 	
     <property name="lib.dir" value="${basedir}/lib" />
@@ -209,7 +210,7 @@
             debug="on" optimize="on" deprecation="on" source="1.4"
             sourcepath="" 
             encoding="ISO-8859-1" >
-        	<src path="${test.src.dir}" />
+        	<src path="${java.test.src.dir}" />
         	<src path="${test-cactus.src.dir}" />
         </javac>
         <filter filtersfile="${tests.filtersfile}"/>
@@ -234,7 +235,7 @@
             <batchtest todir="${test.reports.dir}">
                 <!-- TODO: Why not rather include only files matching *Test.java? -->
             	<!-- TODO: Why are we excluding some tests like StoreTest? This is normal -->
-            	<fileset dir="${test.src.dir}">
+            	<fileset dir="${java.test.src.dir}">
                     <exclude name="**/AllTests.java"/>
                     <exclude name="**/HibernateTestCase.java"/>
                     <exclude name="**/MyFormAuthentication.java"/>

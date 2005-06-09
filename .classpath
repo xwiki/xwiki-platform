@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/cactus"/>
 	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry kind="src" path="src/test-cactus"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-net-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-pool-1.1.jar"/>

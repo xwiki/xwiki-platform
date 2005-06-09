@@ -43,7 +43,7 @@
 
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="java.test.src.dir" value="${test.src.dir}/java" />
-    <property name="test-cactus.src.dir" value="${src.dir}/test-cactus" />
+    <property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
 	
     <property name="lib.dir" value="${basedir}/lib" />
 
@@ -211,7 +211,7 @@
             sourcepath="" 
             encoding="ISO-8859-1" >
         	<src path="${java.test.src.dir}" />
-        	<src path="${test-cactus.src.dir}" />
+        	<src path="${cactus.test.src.dir}" />
         </javac>
         <filter filtersfile="${tests.filtersfile}"/>
         <copy file="${basedir}/test/hibernate-test-template.cfg.xml" 
@@ -281,7 +281,7 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}" >
-                <fileset dir="${test-cactus.src.dir}">
+                <fileset dir="${cactus.test.src.dir}">
                     <include name="**/ServletAuthTest.java"/>
                     <exclude name="**/AllTests.java"/>
                     <exclude name="**/AllServletTests.java"/>

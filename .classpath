@@ -112,6 +112,6 @@
 	<classpathentry kind="lib" path="lib/saaj-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/terraservice.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j-1.5.jar"/>
-	<classpathentry kind="lib" path="test"/>
+	<classpathentry kind="lib" path="src/test/resources"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

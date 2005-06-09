@@ -25,8 +25,6 @@
     <property file="${user.home}/build.properties" />
     <!-- Allow user defaults for this project -->
     <property file="build.properties" />
-    
-    <property name="tests.filtersfile" value="${basedir}/test/hsqldb_filters.properties" />
 
     <!-- The following line is used to read the version -->
     <property file="src/main/web/WEB-INF/xwiki.cfg" />
@@ -43,7 +41,8 @@
 
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="java.test.src.dir" value="${test.src.dir}/java" />
-    <property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
+    <property name="resources.test.src.dir" value="${test.src.dir}/resources/" />
+	<property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
 	
     <property name="lib.dir" value="${basedir}/lib" />
 
@@ -59,6 +58,13 @@
 
     <property name="doc.dir" value="${basedir}/doc" />
     <property name="javadoc.dir" value="${doc.dir}/api" />
+
+	<!-- TODO: Change location of files that are used by the build and not by the tests.
+	     There are 2 that I can see: 
+	     - hsqldb_filters.properties
+	     - hibernate config file that is generated
+	     They should go in a different directory -->
+    <property name="tests.filtersfile" value="${resources.test.src.dir}/hsqldb_filters.properties" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
       includes="hibernate-3.0.3.jar,c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,odmg-3.0.jar,oscache-2.0.2.jar,jgroups-2.2.5.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
@@ -205,6 +211,9 @@
     </target>
 
     <target name="tests" depends="junit-check,prepare,xwiki">
+        <copy todir="${tests.build.dir}">
+            <fileset dir="${resources.test.src.dir}"/>
+        </copy>
         <javac destdir="${tests.build.dir}"
             classpath="${libs};${libs.tests};${tests.build.dir};${classes.dir}"
             debug="on" optimize="on" deprecation="on" source="1.4"
@@ -214,7 +223,7 @@
         	<src path="${cactus.test.src.dir}" />
         </javac>
         <filter filtersfile="${tests.filtersfile}"/>
-        <copy file="${basedir}/test/hibernate-test-template.cfg.xml" 
+        <copy file="${resources.test.src.dir}/hibernate-test-template.cfg.xml" 
             tofile="${tests.build.dir}/hibernate-test.cfg.xml" 
             filtering="true" overwrite="true" />
     </target>
@@ -222,7 +231,9 @@
     <target name="test.client" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
 
-        <junit printsummary="yes" dir="${basedir}/test" haltonfailure="no" fork="on" >
+    	<!-- TODO: Remove the dir attibute which should not be needed if all tests get
+    	     their resources from the classpath -->
+        <junit printsummary="yes" dir="${tests.build.dir}" haltonfailure="no" fork="on" >
 
             <classpath>
                 <pathelement path="${tests.build.dir}" />
@@ -256,10 +267,10 @@
       <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
         <classes dir="${tests.build.dir}"/>
           <lib refid="libs.tests.fileset" />
-        <zipfileset dir="test" prefix="WEB-INF/classes/test">
+        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/classes/test">
           <include name="hibernate-integration.cfg.xml"/>
         </zipfileset>
-        <zipfileset dir="test" prefix="WEB-INF/test">
+        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/test">
           <include name="xwiki-integration.cfg"/>
         </zipfileset>
       </cactifywar>
@@ -269,7 +280,7 @@
     <target name="test.server" depends="tests, test.server.prepare">
 
         <mkdir dir="${test.reports.dir}" />
-        <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${basedir}/test"
+        <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${tests.build.dir}"
             haltonfailure="no" fork="on" >
 
             <classpath>
@@ -291,17 +302,17 @@
             </batchtest>
 
             <containerset>
-              <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${basedir}/test/server.xml"
+              <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
                   port="9080" todir="${test.reports.dir}"/>                
-              <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${basedir}/test/server.xml"
+              <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
                   port="9080" todir="${test.reports.dir}"/>
             </containerset>
         </cactus> 
         <delete file="${cactus.warfile}" />
     </target>
 
-    <target name="test"  depends="test.client, test.server" />
-    <target name="test.clover"  depends="clover-check, test.client, test.server" />
+    <target name="test" depends="test.client, test.server" />
+    <target name="test.clover" depends="clover-check, test.client, test.server" />
 
     <target name="clover.report" depends=""  if="clover.available">
         <mkdir dir="${doc.dir}/clover" />
@@ -382,7 +393,6 @@
             <tarfileset dir="${lib.dir}" prefix="lib" />
             <tarfileset dir="${doc.dir}" prefix="doc" />
             <tarfileset dir="${src.dir}" prefix="src" />
-            <tarfileset dir="${basedir}/test" prefix="test" excludes="reports/*" />
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
             <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
         </tar>
@@ -391,4 +401,3 @@
     <target name="all"  depends="release, test, doc, src.dist" />
 
 </project>
-

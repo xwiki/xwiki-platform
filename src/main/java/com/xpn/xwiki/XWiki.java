@@ -47,6 +47,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
@@ -75,6 +76,8 @@ import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.PortalContainer;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -820,6 +823,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
 
         return null;
+    }
+
+
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
+     * templates; works by creating a RequestDispatcher, buffering the output,
+     * then returning it as a string.
+     *
+     * @author LBlaze
+     */
+    public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext) {
+
+        HttpServletRequest servletRequest = xwikiContext.getRequest();
+        HttpServletResponse servletResponse = xwikiContext.getResponse();
+
+        try
+        {
+            return IncludeServletAsString.invokeServletAndReturnAsString(
+                    url,
+                    servletRequest,
+                    servletResponse);
+        }
+        catch(Exception e)
+        {
+            log.warn("Exception including url: "+url, e);
+            return "Exception including \""+url+"\", see logs for details.";
+        }
+
     }
 
 

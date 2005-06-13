@@ -254,6 +254,17 @@ public class XWiki extends Api {
             return xwiki.parseTemplate(template, context);
         }
 
+    /**
+     * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
+     * templates; works by creating a RequestDispatcher, buffering the output,
+     * then returning it as a string.
+     *
+     * @author LBlaze
+     */
+    public String invokeServletAndReturnAsString(String url) {
+        return xwiki.invokeServletAndReturnAsString(url, context);
+    }
+
     public String getSkinFile(String filename) {
         return xwiki.getSkinFile(filename, context);
     }

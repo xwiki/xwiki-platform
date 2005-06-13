@@ -52,10 +52,13 @@ $mconn.exception.getStackTraceAsString()
 </ul>
 #end
 
-<h2>Current Pool</h2>
 
 #set($provider = $xwiki.store.store.sessionFactory.connectionProvider)
 #set($pool = $xwiki.getPrivateField($provider,"connectionPool"))
+
+#if ($pool)
+<h2>Current Pool</h2>
+
 
 <h3>Before gc</h3>
 <ul>
@@ -99,4 +102,5 @@ $xwiki.gc()
 <li />Warnings: $!conn.warnings
 #end
 </ul>
+#end
 #end

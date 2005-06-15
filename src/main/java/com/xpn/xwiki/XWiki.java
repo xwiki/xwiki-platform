@@ -158,6 +158,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public synchronized void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException {
+        updateDatabase(appname, false, context);
+    }
+    public synchronized void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException, XWikiException {
         String database = context.getDatabase()
                 ;
         try {
@@ -167,7 +170,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 wikilist.add(appname);
                 XWikiHibernateStore store = getHibernateStore();
                 if (store != null)
-                    store.updateSchema(context, true);
+                    store.updateSchema(context, force);
             }
 
             // Make sure these classes exists
@@ -249,7 +252,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             context.setOriginalDatabase(appname);
             try {
                 // Let's make sure the virtaul wikis are upgraded to the latest database version
-                xwiki.updateDatabase(appname, context);
+                xwiki.updateDatabase(appname, false, context);
             } catch (HibernateException e) {
                 // Just to report it
                 e.printStackTrace();
@@ -2253,7 +2256,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             try {
-                updateDatabase(wikiName, context);
+                updateDatabase(wikiName, true, context);
             } catch (Exception e) {
                 log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database shema update threw exception", e);
                 return -6;

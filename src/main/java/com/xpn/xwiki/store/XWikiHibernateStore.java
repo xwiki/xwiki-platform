@@ -167,9 +167,17 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
         // No updating of schema if we have a config parameter saying so
         try {
-        if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
-         return;
+            if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
+                if (log.isErrorEnabled())
+                    log.error("Schema update deactivated for wiki " + context.getDatabase());
+                return;
+            }
+
+            if (log.isErrorEnabled())
+                log.error("Schema update for wiki " + context.getDatabase());
+
         } catch (Exception e) {}
+
 
         Session session;
         Connection connection;
@@ -215,7 +223,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 if (monitor!=null)
                     monitor.endTimer("sqlupgrade");
             }
-                
+
             // Make sure we have no null valued in integer fields
             stmt.executeUpdate("update xwikidoc set xwd_translation=0 where xwd_translation is null");
             stmt.executeUpdate("update xwikidoc set xwd_language='' where xwd_language is null");

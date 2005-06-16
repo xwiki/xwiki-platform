@@ -288,6 +288,7 @@
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.7.3.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/oscache/docs/api" />

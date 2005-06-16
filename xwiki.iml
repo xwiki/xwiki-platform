@@ -57,14 +57,14 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/classes" />
     </containerElement>
+    <containerElement type="library" level="project" name="Ant">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
     <containerElement type="library" level="module">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/classes" />
       <url>file://$MODULE_DIR$/build/xwikibase_test</url>
-    </containerElement>
-    <containerElement type="library" level="project" name="Ant">
-      <attribute name="method" value="1" />
-      <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="Dom4J">
       <attribute name="method" value="1" />
@@ -134,7 +134,7 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/web.xml" version="2.3" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web.xml" version="2.3" />
     <webroots>
       <root url="file://$MODULE_DIR$/src/main/web" relative="/" />
     </webroots>

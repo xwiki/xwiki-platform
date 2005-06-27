@@ -1,3 +1,4 @@
+#set($isReadOnly = $xwiki.isReadOnly())
 #set($hasedit = $xwiki.hasAccessLevel("edit"))
 #set($hasadmin = $xwiki.hasAdminRights())
 <div class="xwiki${xwikimode}a" id="xwikinav_header">
@@ -5,6 +6,11 @@
 <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
 $!xwiki.parseContent($!xwiki.getWebPreference("menu"))
 </div>
+#if($isReadOnly)
+<div id="xwikireadonly">
+$msg.get("readonly")
+</div>
+#end
 <div id="xwikieditmenu">
 #if($hasedit)
 #set($editparams="")
@@ -28,7 +34,7 @@ $!xwiki.parseContent($!xwiki.getWebPreference("menu"))
 $msg.get("editpage")</a>
 <span class="xwikisep"> | </span>
 #end
-#if($xwiki.hasAccessLevel("comments"))
+#if($xwiki.hasAccessLevel("comment"))
 <a href="$doc.getURL("view", "xpage=comments")" class="img">
 <img src="$xwiki.getSkinFile("addComment.gif")" alt="$msg.get("addcomment")" />
 $msg.get("addcomment") ($doc.getComments().size())</a>
@@ -85,7 +91,7 @@ $msg.get("history")</a>
 #end
 #xwikiitem($doc.getURL("edit", "xpage=editrights") "editrights")
 #end
-#if($hasadmin)
+#if($hasadmin && !$isReadOnly)
 <div class="xwikimenutitle">$msg.get("admin")</div>
 #xwikiitem($xwiki.getURL("${doc.web}.WebHome", "view") "space")
 #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit", "xpage=editprefs") "webprefs")

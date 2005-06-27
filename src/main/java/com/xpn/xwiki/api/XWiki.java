@@ -803,4 +803,17 @@ public class XWiki extends Api {
     public List getIncludedMacros(String defaultweb, String content) {
         return xwiki.getIncludedMacros(defaultweb, content, context);
     }
+
+
+    /**
+     * returns true if xwiki.readonly is set in the configuration file
+     *
+     * @return the value of xwiki.isReadOnly()
+     *
+     * @see #com.xpn.xwiki.XWiki
+     *
+     */
+    public boolean isReadOnly () {
+        return xwiki.isReadOnly();
+    }
 }

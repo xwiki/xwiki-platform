@@ -2,8 +2,15 @@
 #template("httpheader.vm")
 #template("header.vm")
 #template("baseheader.vm")
+#set ($isReadOnly = $xwiki.isReadOnly())
 <div id="xwikicontent">
+#if ($isReadOnly)
+<div id="xwikireadonly">
+$msg.get("readonly")
+</div>
+#else
 $msg.get("notallowed")
+#end
 </div>
 #template("basefooter.vm")
 #template("footer.vm")

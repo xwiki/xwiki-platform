@@ -384,6 +384,19 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         String database = context.getDatabase();
         XWikiDocument xwikimasterdoc;
 
+        boolean isReadOnly = context.getWiki().isReadOnly();
+
+        if (isReadOnly) {
+
+            if ("edit".equals(accessLevel) ||
+                    "delete".equals (accessLevel) ||
+                    "comment".equals(accessLevel ) ||
+                    "register".equals(accessLevel)) {
+                logDeny (name,resourceKey,accessLevel,"server in read-only mode");
+                return false;
+           }
+        }
+
         if (name.equals("XWiki.XWikiGuest")||name.endsWith(":XWiki.XWikiGuest")) {
             if (needsAuth(accessLevel, context))
                 return false;

@@ -2999,5 +2999,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             context.put("vcontext", vorigcontext);
         }
     }
+
+    /**
+     * returns the value of xwiki.readonly in the server configuration
+     *
+     * @return true if xwiki.readonly is "yes", "true" or "1"
+     */
+    public boolean isReadOnly () {
+        return ("yes".equalsIgnoreCase(Param("xwiki.readonly")) || "1".equals(Param("xwiki.readonly")) ||
+                "true".equalsIgnoreCase(Param("xwiki.readonly")));
+    }
 }
 

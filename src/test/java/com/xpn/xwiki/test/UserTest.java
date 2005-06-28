@@ -653,9 +653,7 @@ public class UserTest extends HibernateTestCase {
                     getXWiki().getRightService().hasAccessLevel("comment", "XWiki.LudovicDubost", docname, getXWikiContext()));
         assertTrue("Delete Access should be granted",
                     getXWiki().getRightService().hasAccessLevel("delete", "XWiki.LudovicDubost", docname, getXWikiContext()));
-        assertTrue("Register Access should be granted",
-                    getXWiki().getRightService().hasAccessLevel("register", "XWiki.LudovicDubost", docname, getXWikiContext()));
-         getXWiki().flushCache();
+        getXWiki().flushCache();
         // set read-only mode
         getXWiki().getConfig().setProperty("xwiki.readonly","yes");
         assertFalse("Edit Access should be denied",

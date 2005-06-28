@@ -1,4 +1,10 @@
-#set($isReadOnly = $xwiki.isReadOnly())
+#if($xwiki.exists("XWiki.MaintenanceInfo"))
+#set($maintenanceinfo = "XWiki.MaintenanceInfo")
+#else
+#if($xwiki.exists("xwiki:XWiki.MaintenanceInfo"))
+#set($maintenanceinfo = "xwiki:XWiki.MaintenanceInfo")
+#end
+#end
 #set($hasedit = $xwiki.hasAccessLevel("edit"))
 #set($hasadmin = $xwiki.hasAdminRights())
 <div class="xwiki${xwikimode}a" id="xwikinav_header">
@@ -6,11 +12,6 @@
 <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
 $!xwiki.parseContent($!xwiki.getWebPreference("menu"))
 </div>
-#if($isReadOnly)
-<div id="xwikireadonly">
-$msg.get("readonly")
-</div>
-#end
 <div id="xwikieditmenu">
 #if($hasedit)
 #set($editparams="")
@@ -105,6 +106,11 @@ $msg.get("history")</a>
 #xwikiitem($xwiki.getURL("Doc.XWikiSyntax", "view") "xwikisyntax")
 </div>
 </div>
+</div>
+<div id="xwikimessage">
+#if($maintenanceinfo)
+$xwiki.includeForm("$maintenanceinfo",false)
+#end
 </div>
 <div id="xwikilanguagemenu">
 #template("languages.vm")

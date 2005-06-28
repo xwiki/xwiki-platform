@@ -246,6 +246,10 @@
     background-color: white;
 }
 
+#xwikireadonly {
+    color: red;
+}
+
 #xwikilanguagemenu {
     float: right;
     right: 0px;
@@ -549,4 +553,14 @@
 
 .xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
  background-color: #9c6;
+}
+
+#xwikimessage {
+  float: left;
+  clear: left;
+  width: 100%;
+  margin: auto;
+  padding: auto;
+  margin-top: 5px;
+  margin-left: 20px;
 }

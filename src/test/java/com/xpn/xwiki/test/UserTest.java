@@ -665,6 +665,7 @@ public class UserTest extends HibernateTestCase {
         assertFalse("Register Access should be denied",
                     getXWiki().getRightService().hasAccessLevel("register", "XWiki.LudovicDubost", docname, getXWikiContext()));
 
+        getXWiki().getConfig().setProperty("xwiki.readonly","no");
      }
 
 }

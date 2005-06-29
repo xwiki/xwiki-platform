@@ -149,7 +149,9 @@ public abstract class ServletTest extends ServletTestCase {
     }
 
     public void launchTest() throws Throwable {
-      launchTest(true);
+
+      // by default we don't check the number of active connections
+      launchTest(false);
     }
 
     public void launchTest(boolean checkActive) throws Throwable {

@@ -19,7 +19,7 @@
 <property name="connection.url">@connection.url@</property>
 <property name="connection.username">@connection.username@</property>
 <property name="connection.password">@connection.password@</property>
-<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+<property name="connection.driver_class">@connection.driver_class@</property>
 <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
 <property name="connection.pool_size">50</property>
 <property name="statement_cache.size">50</property>

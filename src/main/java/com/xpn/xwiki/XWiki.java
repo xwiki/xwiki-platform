@@ -119,6 +119,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private static Map virtualWikiMap = new HashMap();
     private static Map threadMap = new HashMap();
 
+    private boolean isReadOnly = false;
+
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = "/WEB-INF/xwiki.cfg";
         String xwikiname = "xwiki";
@@ -409,6 +411,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             getGlobalRightsClass(context);
             getStatsService(context);
         }
+
+        String ro = Param ("xwiki.readonly", "no");
+
+        isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
+
     }
 
     private void preparePlugins(XWikiContext context) {
@@ -3001,13 +3008,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * returns the value of xwiki.readonly in the server configuration
+     * accessor for the isReadOnly instance var.
      *
-     * @return true if xwiki.readonly is "yes", "true" or "1"
+     * @see #isReadOnly
+     *
      */
     public boolean isReadOnly () {
-        return ("yes".equalsIgnoreCase(Param("xwiki.readonly")) || "1".equals(Param("xwiki.readonly")) ||
-                "true".equalsIgnoreCase(Param("xwiki.readonly")));
+        return isReadOnly;
+    }
+
+    public void setReadOnly (boolean readOnly) {
+        isReadOnly = readOnly;
+
     }
 }
 

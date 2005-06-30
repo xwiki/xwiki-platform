@@ -7,6 +7,7 @@
 #end
 #set($hasedit = $xwiki.hasAccessLevel("edit"))
 #set($hasadmin = $xwiki.hasAdminRights())
+#set($isReadOnly = $xwiki.isReadOnly())
 <div class="xwiki${xwikimode}a" id="xwikinav_header">
 <div id="xwikiwebusermenu">
 <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
@@ -66,7 +67,7 @@ $msg.get("history")</a>
 #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
 #if($hasedit)
 <div class="xwikimenutitle">$msg.get("edit")</div>
-#if ($xwiki.isMultiLingual()==true)
+#if ($xwiki.isMultiLingual()==true && !$isReadOnly)
 #if ($tdoc.realLanguage!="")
 #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}") "editcontent")
 #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}&xpage=htmlarea") "edithtmlcontent")
@@ -83,14 +84,20 @@ $msg.get("history")</a>
 <a href="$doc.getURL("edit", "language=es")">Es</a>
 </span><span class="xwikisep"> | </span>
 #else
+#if (!$isReadOnly)
 #xwikiitem($doc.getURL("edit") "editcontent")
 #end
+#end
+#if (!$isReadOnly))
 #xwikiitem($doc.getURL("inline") "editinline")
 #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
-#if($hasadmin||($context.user.equals($doc.creator)))
+#end
+#if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)
 #xwikiitem($doc.getURL("delete") "delete")
 #end
+#if (!$isReadOnly)
 #xwikiitem($doc.getURL("edit", "xpage=editrights") "editrights")
+#end
 #end
 #if($hasadmin && !$isReadOnly)
 <div class="xwikimenutitle">$msg.get("admin")</div>

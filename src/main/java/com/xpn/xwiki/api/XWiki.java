@@ -816,4 +816,10 @@ public class XWiki extends Api {
     public boolean isReadOnly () {
         return xwiki.isReadOnly();
     }
+
+    public void setReadOnly (boolean ro) {
+        if (hasAdminRights()) {
+            xwiki.setReadOnly(ro);
+        }
+    }
 }

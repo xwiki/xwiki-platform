@@ -645,6 +645,7 @@ public class UserTest extends HibernateTestCase {
     public void testUserAccessReadInReadOnlyMode()  throws XWikiException {
          String docname = "Test.TestDoc";
          prepareData();
+         updateRight(docname, "XWiki.LudovicDubost","","view,edit,comment,delete", true,false);
          getXWiki().flushCache();
          inTest = true;
         assertTrue("Edit Access should be granted",
@@ -653,19 +654,20 @@ public class UserTest extends HibernateTestCase {
                     getXWiki().getRightService().hasAccessLevel("comment", "XWiki.LudovicDubost", docname, getXWikiContext()));
         assertTrue("Delete Access should be granted",
                     getXWiki().getRightService().hasAccessLevel("delete", "XWiki.LudovicDubost", docname, getXWikiContext()));
+
         getXWiki().flushCache();
         // set read-only mode
-        getXWiki().getConfig().setProperty("xwiki.readonly","yes");
+        boolean ro = getXWiki().isReadOnly();
+        getXWiki().setReadOnly(true);
         assertFalse("Edit Access should be denied",
                     getXWiki().getRightService().hasAccessLevel("edit", "XWiki.LudovicDubost", docname, getXWikiContext()));
         assertFalse("Comment Access should be denied",
                     getXWiki().getRightService().hasAccessLevel("comment", "XWiki.LudovicDubost", docname, getXWikiContext()));
         assertFalse("Delete Access should be denied",
                     getXWiki().getRightService().hasAccessLevel("delete", "XWiki.LudovicDubost", docname, getXWikiContext()));
-        assertFalse("Register Access should be denied",
-                    getXWiki().getRightService().hasAccessLevel("register", "XWiki.LudovicDubost", docname, getXWikiContext()));
 
-        getXWiki().getConfig().setProperty("xwiki.readonly","no");
+        
+        getXWiki().setReadOnly(ro);
      }
 
 }

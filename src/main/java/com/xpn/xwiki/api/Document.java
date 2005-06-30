@@ -48,8 +48,8 @@ public class Document extends Api {
     private XWikiDocument doc;
 
     public Document(XWikiDocument doc, XWikiContext context) {
-       super(context);
-       this.doc = doc;
+        super(context);
+        this.doc = doc;
     }
 
     public XWikiDocument getDocument() {
@@ -216,7 +216,7 @@ public class Document extends Api {
 
     public void createNewObject(String classname) throws XWikiException {
         if (checkProgrammingRights())
-         doc.createNewObject(classname, context);
+            doc.createNewObject(classname, context);
     }
 
     public boolean isFromCache() {
@@ -235,7 +235,7 @@ public class Document extends Api {
             String name = (String) it.next();
             Vector objects = (Vector)map.get(name);
             if (objects!=null)
-             resultmap.put(name, getObjects(objects));
+                resultmap.put(name, getObjects(objects));
         }
         return resultmap;
     }
@@ -243,11 +243,11 @@ public class Document extends Api {
     protected Vector getObjects(Vector objects) {
         Vector result = new Vector();
         if (objects==null)
-         return result;
+            return result;
         for (int i=0;i<objects.size();i++) {
             BaseObject bobj = (BaseObject) objects.get(i);
             if (bobj!=null) {
-              result.add(new Object(bobj, context));
+                result.add(new Object(bobj, context));
             }
         }
         return result;
@@ -259,60 +259,80 @@ public class Document extends Api {
     }
 
     public Object getFirstObject(String fieldname) {
-        BaseObject obj = doc.getFirstObject(fieldname);
-        if (obj==null)
-         return null;
-        else
-         return new Object(obj, context);
+        try {
+            BaseObject obj = doc.getFirstObject(fieldname);
+            if (obj==null)
+                return null;
+            else
+                return new Object(obj, context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Object getObject(String classname, String key, String value, boolean failover) {
-        BaseObject obj = doc.getObject(classname, key, value, failover);
-        if (obj==null)
-         return null;
-        else
-         return new Object(obj, context);
+        try {
+            BaseObject obj = doc.getObject(classname, key, value, failover);
+            if (obj==null)
+                return null;
+            else
+                return new Object(obj, context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Object getObject(String classname, String key, String value) {
-        BaseObject obj = doc.getObject(classname, key, value);
-        if (obj==null)
-         return null;
-        else
-         return new Object(obj, context);
+        try {
+            BaseObject obj = doc.getObject(classname, key, value);
+            if (obj==null)
+                return null;
+            else
+                return new Object(obj, context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Object getObject(String classname) {
-        BaseObject obj = doc.getObject(classname);
-        if (obj==null)
-         return null;
-        else
-         return new Object(obj, context);
+        try {
+            BaseObject obj = doc.getObject(classname);
+            if (obj==null)
+                return null;
+            else
+                return new Object(obj, context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public Object getObject(String classname, int nb) {
-        BaseObject obj = doc.getObject(classname, nb);
-        if (obj==null)
-         return null;
-        else
-         return new Object(obj, context);
+        try {
+            BaseObject obj = doc.getObject(classname, nb);
+            if (obj==null)
+                return null;
+            else
+                return new Object(obj, context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String getXMLContent() throws XWikiException {
         String xml = doc.getXMLContent(context);
         return context.getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml);
     }
-
+    
     public String toXML() {
-         if (checkProgrammingRights())
-          return doc.toXML(context);
-         else
-          return "";
+        if (checkProgrammingRights())
+            return doc.toXML(context);
+        else
+            return "";
     }
 
     public org.dom4j.Document toXMLDocument() {
         if (checkProgrammingRights())
-          return doc.toXMLDocument(context);
+            return doc.toXMLDocument(context);
         else return null;
     }
 
@@ -343,7 +363,7 @@ public class Document extends Api {
 
     public Vector getComments(boolean asc) {
         if (asc)
-         return getObjects("XWiki.XWikiComments");
+            return getObjects("XWiki.XWikiComments");
         else {
             Vector list = getObjects("XWiki.XWikiComments");
             if (list==null)
@@ -358,14 +378,14 @@ public class Document extends Api {
 
 
     public String display(String fieldname, Object obj) {
-       if (obj==null)
-         return "";
-       return doc.display(fieldname, obj.getBaseObject(), context);
+        if (obj==null)
+            return "";
+        return doc.display(fieldname, obj.getBaseObject(), context);
     }
 
     public String display(String fieldname, String mode, Object obj) {
         if (obj==null)
-         return "";
+            return "";
         return doc.display(fieldname, mode, obj.getBaseObject(), context);
     }
 
@@ -387,32 +407,32 @@ public class Document extends Api {
 
     public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
         if ((pclass==null)||(object==null))
-         return "";
+            return "";
         return doc.displayRendered(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayView(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
         if ((pclass==null)||(object==null))
-         return "";
-         return doc.displayView(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
+            return "";
+        return doc.displayView(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayEdit(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
         if ((pclass==null)||(object==null))
-         return "";
-         return doc.displayEdit(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
+            return "";
+        return doc.displayEdit(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displayHidden(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
         if ((pclass==null)||(object==null))
-         return "";
-         return doc.displayHidden(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
+            return "";
+        return doc.displayHidden(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public String displaySearch(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
         if ((pclass==null)||(object==null))
-         return "";
-         return doc.displaySearch(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
+            return "";
+        return doc.displaySearch(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public List getIncludedPages() {
@@ -430,9 +450,9 @@ public class Document extends Api {
     public Attachment getAttachment(String filename) {
         XWikiAttachment attach = doc.getAttachment(filename);
         if (attach==null)
-         return null;
+            return null;
         else
-         return new Attachment(this, attach, context);
+            return new Attachment(this, attach, context);
     }
 
     public List getContentDiff(Document origdoc, Document newdoc) throws XWikiException, DifferentiationFailedException {
@@ -566,15 +586,15 @@ public class Document extends Api {
     }
 
     public DocumentStats getCurrentMonthPageStats(String action) {
-       return context.getWiki().getStatsService(context).getDocMonthStats(doc.getFullName(), "view", new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getFullName(), "view", new Date(), context);
     }
 
     public DocumentStats getCurrentMonthWebStats(String action) {
-       return context.getWiki().getStatsService(context).getDocMonthStats(doc.getWeb(), "view", new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getWeb(), "view", new Date(), context);
     }
 
     public List getCurrentMonthRefStats() throws XWikiException {
-       return context.getWiki().getStatsService(context).getRefMonthStats(doc.getFullName(), new Date(), context);
+        return context.getWiki().getStatsService(context).getRefMonthStats(doc.getFullName(), new Date(), context);
     }
 
     public boolean checkAccess(String right) {
@@ -586,19 +606,19 @@ public class Document extends Api {
     }
 
     public boolean hasAccessLevel(String level) {
-       try {
-           return context.getWiki().getRightService().hasAccessLevel(level, context.getUser(), doc.getFullName(), context);
-       } catch (Exception e) {
-           return false;
-       }
+        try {
+            return context.getWiki().getRightService().hasAccessLevel(level, context.getUser(), doc.getFullName(), context);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean hasAccessLevel(String level, String user) {
-       try {
-           return context.getWiki().getRightService().hasAccessLevel(level, user, doc.getFullName(), context);
-       } catch (Exception e) {
-           return false;
-       }
+        try {
+            return context.getWiki().getRightService().hasAccessLevel(level, user, doc.getFullName(), context);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean getLocked() {
@@ -608,7 +628,7 @@ public class Document extends Api {
                 return true;
             else
                 return false;
-            } catch(Exception e) {
+        } catch(Exception e) {
             return false;
         }
     }
@@ -637,7 +657,7 @@ public class Document extends Api {
     public String getTextArea() {
         return com.xpn.xwiki.XWiki.getTextArea(doc.getContent(), context);
     }
-    
+
 
     /**
      * Returns data needed for a generation of Table of Content for this document.
@@ -652,19 +672,19 @@ public class Document extends Api {
     }
 
     public void saveDocument() throws XWikiException {
-       if (hasAccessLevel("edit"))
-           context.getWiki().saveDocument(doc, context);
-   }
+        if (hasAccessLevel("edit"))
+            context.getWiki().saveDocument(doc, context);
+    }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {
         if (hasAccessLevel("edit"))
             return new com.xpn.xwiki.api.Object(doc.addObjectFromRequest(context), context);
         else
             return null;
-      }
+    }
 
-      public void insertText(String text, String marker) throws XWikiException {
-          if (hasAccessLevel("edit"))
-            doc.insertText(text, marker, context);  
-      }
+    public void insertText(String text, String marker) throws XWikiException {
+        if (hasAccessLevel("edit"))
+            doc.insertText(text, marker, context);
+    }
 }

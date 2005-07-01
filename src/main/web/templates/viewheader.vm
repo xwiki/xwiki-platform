@@ -114,11 +114,6 @@ $msg.get("history")</a>
 </div>
 </div>
 </div>
-<div id="xwikimessage">
-#if($maintenanceinfo)
-$xwiki.includeForm("$maintenanceinfo",false)
-#end
-</div>
 <div id="xwikilanguagemenu">
 #template("languages.vm")
 </div>

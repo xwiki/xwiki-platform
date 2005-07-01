@@ -50,7 +50,6 @@ Version $xwiki.version
   </div>
 </div>
 <div id="xwikiad">
-#template("ad.vm")
 </div>
 </div>
 #end

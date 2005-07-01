@@ -122,9 +122,9 @@ $xwiki.includeForm("$maintenanceinfo",false)
 <div id="xwikilanguagemenu">
 #template("languages.vm")
 </div>
-<div id="xwikimessage">
 #if($maintenanceinfo)
+<div id="xwikimessage">
 $xwiki.includeForm("$maintenanceinfo",false)
-#end
 </div>
+#end
 </div>

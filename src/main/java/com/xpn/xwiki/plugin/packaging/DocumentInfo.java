@@ -22,6 +22,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+
 public class DocumentInfo
 {
     private XWikiDocument       doc;
@@ -56,7 +57,7 @@ public class DocumentInfo
         return doc.isNew();
     }
 
-    public void setDefaultSpace(String Space)
+    public void changeSpace(String Space)
     {
         if (doc.getWeb().compareTo("XWiki") != 0)
             return;
@@ -102,25 +103,6 @@ public class DocumentInfo
         }
         installable = INSTALL_OK;
         return installable;
-    }
-
-    public int install(XWikiContext context)
-    {
-        int status = testInstall(context);
-        if (status == INSTALL_IMPOSSIBLE)
-            return INSTALL_IMPOSSIBLE;
-        if (status == INSTALL_OK || ((status == INSTALL_ALREADY_EXIST) && (this.action == ACTION_OVERWRITE)))
-        {
-            try {
-                doc.setAuthor(context.getUser());
-                context.getWiki().saveDocument(doc, context);
-            } catch (XWikiException e) {
-                e.printStackTrace();
-                return INSTALL_ERROR;
-            }
-        }
-
-        return INSTALL_OK;
     }
 
     public static String installStatusToString(int status)

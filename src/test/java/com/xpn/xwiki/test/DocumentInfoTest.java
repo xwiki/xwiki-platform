@@ -55,29 +55,6 @@ public class DocumentInfoTest extends HibernateTestCase {
     }
 
 
-    public void testTestInstall() throws XWikiException {
-        prepareData();
-
-        XWikiDocument doc = new XWikiDocument("Test", "first");
-        doc.setContent("overwrite");
-        DocumentInfo docInfo = new DocumentInfo(doc);
-
-        assertEquals("install must overwrite", docInfo.testInstall(getXWikiContext()), DocumentInfo.INSTALL_ALREADY_EXIST);
-
-        docInfo.setAction(DocumentInfo.ACTION_SKIP);
-        assertEquals("install must return Ok", docInfo.install(getXWikiContext()), DocumentInfo.INSTALL_OK);
-
-        assertEquals("document must be new (not saved)", doc.isNew(), true);
-
-        docInfo.setAction(DocumentInfo.ACTION_OVERWRITE);
-        assertEquals("install must return Ok", docInfo.install(getXWikiContext()), DocumentInfo.INSTALL_OK);
-
-        assertEquals("document must not be new (saved)", doc.isNew(), false);
-
-        XWikiDocument doctest = getXWikiContext().getWiki().getDocument(doc.getFullName(), getXWikiContext());
-
-        assertEquals("document content must be equals", doc.getContent(), doctest.getContent());
-    }
 
     public void updateRight(String fullname, String user, String group, String level, boolean allow, boolean global) throws XWikiException {
         Utils.updateRight(getXWiki(), getXWikiContext(), fullname, user, group, level, allow, global);
@@ -97,8 +74,6 @@ public class DocumentInfoTest extends HibernateTestCase {
         DocumentInfo docInfo = new DocumentInfo(doc);
 
         assertEquals("testinstall must say impossible", docInfo.testInstall(getXWikiContext()), DocumentInfo.INSTALL_IMPOSSIBLE);
-
-        assertEquals("install must say impossible", docInfo.install(getXWikiContext()), DocumentInfo.INSTALL_IMPOSSIBLE);
 
         XWikiDocument doctest = getXWikiContext().getWiki().getDocument(doc.getFullName(), getXWikiContext());
         assertTrue("document content must be not equals", doc.getContent().compareTo(doctest.getContent()) != 0);

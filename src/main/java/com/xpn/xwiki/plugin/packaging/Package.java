@@ -33,10 +33,7 @@ import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.io.StringReader;
+import java.io.*;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -55,15 +52,14 @@ public class Package {
     private String  version = "1.0.0";
     private String  licence = "GPL";
     private String  authorName = "XWiki";
-    private String  spaceName = null;
     private List    files = null;
-    private boolean upgradePossible = false;
     private boolean backupPack = false;
     private boolean withVersions = true;
 
     public static final int OK = 0;
     public static final int Right = 1;
     public static final String DefaultPackageFileName = "package.xml";
+    public static final String DefaultPluginName = "package";
 
     public String getName() {
         return name;
@@ -113,41 +109,8 @@ public class Package {
         this.backupPack = backupPack;
     }
 
-    public String getSpaceName() {
-        return spaceName;
-    }
-
-    public boolean setSpaceName(String spaceName) {
-        if (spaceName.compareTo("XWiki") != 0)
-            return false;
-        this.spaceName = spaceName;
-        for (int i = 0; i < files.size(); i++)
-            ((DocumentInfo)files.get(i)).setDefaultSpace(spaceName);
-        return true;
-    }
-
     public List getFiles() {
         return files;
-    }
-
-    public boolean getUpgradePossible() {
-        return upgradePossible;
-    }
-
-    public void setUpgradePossible(boolean upgradePossible) {
-        this.upgradePossible = upgradePossible;
-    }
-
-
-    public boolean isInstalled() {
-        if (files.size() == 0)
-            return (false);
-        for (int i = 0; i < files.size(); i++)
-        {
-            if (((DocumentInfo)files.get(i)).isNew())
-                return false ;
-        }
-        return true;
     }
 
     public boolean isWithVersions() {
@@ -161,16 +124,11 @@ public class Package {
     public Package()
     {
         files = new ArrayList();
-
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException {
-//        if ((doc.getWeb().compareTo("XWiki") != 0) && (spaceName != null) && (doc.getWeb().compareTo(spaceName) != 0))
-//            return false;
         if (!context.getWiki().checkAccess("edit", doc, context))
             return false;
-//        if (spaceName == null && (doc.getWeb().compareTo("XWiki") != 0))
-//            spaceName = doc.getWeb();
         for(int i = 0; i < files.size(); i++)
         {
             if (((DocumentInfo)files.get(i)).getFullName().compareTo(doc.getFullName()) == 0)
@@ -200,8 +158,6 @@ public class Package {
 
     public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
-        if (doc.isNew())
-            return (false);
         add(doc, DefaultAction, context);
         return true;
     }
@@ -211,52 +167,53 @@ public class Package {
         return add(docFullName, DocumentInfo.ACTION_NOT_DEFINED, context);
     }
 
-    public String Export(XWikiContext context) throws IOException, XWikiException {
+    public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException {
         if (files.size() == 0)
         {
             return "No Selected file";
         }
 
-        ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
-        context.setFinished(true);
+        ZipOutputStream zos = new ZipOutputStream(os);
         for (int i = 0; i < files.size(); i++)
         {
             DocumentInfo docinfo = (DocumentInfo) files.get(i);
             docinfo.getDoc().addToZip(zos, withVersions, context);
         }
-        addToZip(zos);
+        addInfosToZip(zos);
         zos.finish();
         zos.flush();
         return "";
     }
 
-    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException, DocumentException {
+    public String Import(byte file[], XWikiContext context) throws IOException, XWikiException {
         ByteArrayInputStream    bais = new ByteArrayInputStream(file);
         ZipInputStream          zis = new ZipInputStream(bais);
         ZipEntry                entry;
         Document                description = null;
         ArrayList               docs = new ArrayList();
 
-        description = ReadZipInfoFile(zis);
-        bais = new ByteArrayInputStream(file);
-        zis = new ZipInputStream(bais);
-        while ((entry = zis.getNextEntry()) != null)
-        {
-            if(entry.getName().compareTo(DefaultPackageFileName) == 0)
-                continue;
-            else
-            {
-                XWikiDocument doc = readZipDoc(readZipFile(zis));
+        try {
+            description = ReadZipInfoFile(zis);
+            bais = new ByteArrayInputStream(file);
+            zis = new ZipInputStream(bais);
+            while ((entry = zis.getNextEntry()) != null) {
+                if (entry.getName().compareTo(DefaultPackageFileName) == 0)
+                    continue;
+                else {
+                    XWikiDocument doc = readZipDoc(readZipFile(zis));
 
-                this.add(doc, context);
+                    this.add(doc, context);
+                }
             }
-        }
 
 
-        if (description == null)
+            if (description == null)
                 files.clear();
             else
                 updateFileInfos(description);
+        } catch (DocumentException e) {
+            throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
+        }
         return "";
     }
 
@@ -288,7 +245,7 @@ public class Package {
         }
     }
 
-    public int TestInstall(XWikiContext context)
+    public int testInstall(XWikiContext context)
     {
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         if (files.size() == 0)
@@ -304,14 +261,35 @@ public class Package {
         return result;
     }
 
-    public int install(XWikiContext context)
-    {
-        if (TestInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE)
+    public int install(XWikiContext context) throws XWikiException {
+        if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE)
             return DocumentInfo.INSTALL_IMPOSSIBLE;
 
         for (int i = 0; i < files.size(); i++)
         {
-            int res = ((DocumentInfo)files.get(i)).install(context);
+            installDocument(((DocumentInfo)files.get(i)),context);
+        }
+        return DocumentInfo.INSTALL_OK;
+    }
+
+    private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
+        int status = doc.testInstall(context);
+        if (status == DocumentInfo.INSTALL_IMPOSSIBLE)
+            return DocumentInfo.INSTALL_IMPOSSIBLE;
+        if (status == DocumentInfo.INSTALL_OK || ((status == DocumentInfo.INSTALL_ALREADY_EXIST) && (doc.getAction() == DocumentInfo.ACTION_OVERWRITE)))
+        {
+            if (status == DocumentInfo.INSTALL_ALREADY_EXIST)
+            {
+                XWikiDocument deleteddoc = context.getWiki().getDocument(doc.getFullName(), context);
+                context.getWiki().deleteDocument(deleteddoc, context);        
+            }
+            try {
+                doc.getDoc().setAuthor(context.getUser());
+                context.getWiki().saveDocument(doc.getDoc(), context);
+            } catch (XWikiException e) {
+                e.printStackTrace();
+                return DocumentInfo.INSTALL_ERROR;
+            }
         }
         return DocumentInfo.INSTALL_OK;
     }
@@ -327,7 +305,7 @@ public class Package {
         return XmlFile.toString();
     }
 
-    private XWikiDocument readZipDoc(String XmlFile) throws IOException{
+    private XWikiDocument readZipDoc(String XmlFile){
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
         try {
             if (backupPack && withVersions)
@@ -380,12 +358,11 @@ public class Package {
         }
     }
 
-    public Document toXmlDocument()
+    private Document toXmlDocument()
     {
         Document doc = new DOMDocument();
         Element docel = new DOMElement("package");
         doc.setRootElement(docel);
-
         Element elInfos = new DOMElement("infos");
         docel.add(elInfos);
 
@@ -427,7 +404,7 @@ public class Package {
         return doc;
     }
 
-    public void addToZip(ZipOutputStream zos) throws IOException {
+    private void addInfosToZip(ZipOutputStream zos) {
         try  {
         String zipname = DefaultPackageFileName;
         ZipEntry zipentry = new ZipEntry(zipname);
@@ -447,7 +424,7 @@ public class Package {
              return el.getText();
      }
 
-    protected Document fromXml(String xml) throws DocumentException {
+     protected Document fromXml(String xml) throws DocumentException {
         SAXReader reader = new SAXReader();
         Document domdoc;
 
@@ -467,7 +444,7 @@ public class Package {
     }
 
 
-    public void backupWiki(XWikiContext context) throws XWikiException {
+    public void addAllWikiDocuments(XWikiContext context) throws XWikiException {
         XWiki wiki = context.getWiki();
         List spaces = wiki.getSpaces(context);
         name = "Backup";
@@ -482,16 +459,6 @@ public class Package {
     }
 
 
-    public static Package OpenInformations(String PackageName)
-    {
-        return null;
-    }
-
-    public static List getPackageList()
-    {
-
-        return null;
-    }
 
 
 }

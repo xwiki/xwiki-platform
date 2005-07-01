@@ -24,9 +24,8 @@ package com.xpn.xwiki.plugin.feed;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.calendar.CalendarPluginApi;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
@@ -64,15 +63,13 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return -1;
             return (-entry1.getPublishedDate().compareTo(entry2.getPublishedDate()));
         }
-  }
+    }
 
 
-
-
-        public FeedPlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
+    public FeedPlugin(String name, String className, XWikiContext context) {
+        super(name, className, context);
+        init(context);
+    }
 
     public String getName() {
         return "feed";
@@ -101,10 +98,22 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             feeds = sfeeds.split("\\|");
         List entries = new ArrayList();
         SyndFeed outputFeed = new SyndFeedImpl();
-        outputFeed.setTitle("XWiki Feeds");
-        outputFeed.setAuthor("XWiki Team");
+        if (context.getDoc() != null)
+        {
+            outputFeed.setTitle(context.getDoc().getFullName());
+            try {
+                outputFeed.setUri(context.getWiki().getURL(context.getDoc().getFullName(), "view", context));
+            } catch (XWikiException e) {
+                e.printStackTrace();
+            }
+            outputFeed.setAuthor(context.getDoc().getAuthor());
+        }
+        else
+        {
+            outputFeed.setTitle("XWiki Feeds");
+            outputFeed.setAuthor("XWiki Team");
+        }
         outputFeed.setEntries(entries);
-
         for (int i = 0; i < feeds.length; i++)
         {
             SyndFeed feed = getFeed(feeds[i], context);

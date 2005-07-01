@@ -82,7 +82,7 @@ public class ServletVirtualTest extends ServletTest {
 
         // Setup database xwikitest2
         context.setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(hibstore, context);
+        StoreHibernateTest.cleanUp(hibstore, true, true, context);
         Utils.createDoc(hibstore, "Main", "VirtualViewOkTest2", context);
 
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualViewOkTest2", "");

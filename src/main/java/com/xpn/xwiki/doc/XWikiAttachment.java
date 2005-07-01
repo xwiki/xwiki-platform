@@ -126,10 +126,11 @@ public class XWikiAttachment {
     }
 
     public void setFilename(String filename) {
+        filename = filename.replace('+',' ');
         if (!filename.equals(this.filename)) {
                 setMetaDataDirty(true);
+                this.filename = filename;
             }
-        this.filename = filename;
     }
 
     public String getAuthor() {

@@ -88,7 +88,7 @@ $msg.get("history")</a>
 #xwikiitem($doc.getURL("edit") "editcontent")
 #end
 #end
-#if (!$isReadOnly))
+#if (!$isReadOnly)
 #xwikiitem($doc.getURL("inline") "editinline")
 #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
 #end

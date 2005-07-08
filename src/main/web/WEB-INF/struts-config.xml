@@ -220,6 +220,12 @@
           scope="request">
       </action>
 
+      <action path="/svg/"
+          type="com.xpn.xwiki.web.ViewEditAction"
+          name="svg"
+          scope="request">
+      </action>
+
       <action path="/delattachment/"
           type="com.xpn.xwiki.web.ViewEditAction"
           name="delattachment"

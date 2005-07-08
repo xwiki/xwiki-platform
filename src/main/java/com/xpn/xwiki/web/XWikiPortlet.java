@@ -271,6 +271,9 @@ public class XWikiPortlet extends GenericPortlet {
             else if (action.equals("dot")) {
                 renderResult = xwikiservice.renderDot(context);
             }
+            else if (action.equals("svg")) {
+                renderResult = xwikiservice.renderSVG(context);
+            }
             else if (action.equals("attach")) {
                 renderResult = xwikiservice.renderAttach(context);
             }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/web"/>
 	<classpathentry kind="src" path="src/test/cactus"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.0.jar"/>
@@ -89,16 +90,10 @@
 	<classpathentry kind="lib" path="lib/asm-1.5.3.jar"/>
 	<classpathentry kind="lib" path="lib/asm-util-1.5.3.jar"/>
 	<classpathentry kind="lib" path="lib/antlr-2.7.5.jar"/>
-	<classpathentry kind="lib" path="lib/batik-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/batik-util-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/batik-svg-dom-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/commons-dbcp-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate-3.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/alexa.jar"/>
 	<classpathentry kind="lib" path="lib/axis-1.2RC2.jar"/>
-	<classpathentry kind="lib" path="lib/batik-awt-util-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/batik-bridge-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/batik-gvt-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/commons-discovery-0.2.jar"/>
 	<classpathentry kind="lib" path="lib/flickrapi-1.0a7.jar"/>
 	<classpathentry kind="lib" path="lib/flipper.jar"/>
@@ -113,5 +108,6 @@
 	<classpathentry kind="lib" path="lib/terraservice.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j-1.5.jar"/>
 	<classpathentry kind="lib" path="src/test/resources"/>
+	<classpathentry kind="lib" path="lib/batik-all-1.6.jar"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

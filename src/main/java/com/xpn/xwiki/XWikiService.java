@@ -22,6 +22,22 @@
  */
 package com.xpn.xwiki;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.atom.lifeblog.LifeblogServices;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -32,24 +48,21 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
-import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.net.URLCodec;
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
-import org.apache.ecs.html.P;
-
-import java.io.*;
-import java.text.ParseException;
-import java.util.*;
+import com.xpn.xwiki.plugin.svg.SVGPlugin;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.ObjectRemoveForm;
+import com.xpn.xwiki.web.PrepareEditForm;
+import com.xpn.xwiki.web.PropAddForm;
+import com.xpn.xwiki.web.RollbackForm;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiForm;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
 
 public class XWikiService {
 
@@ -705,6 +718,21 @@ public class XWikiService {
         String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
         try {
            ((GraphVizPlugin)context.getWiki().getPlugin("graphviz",context)).outputDotImageFromFile(filename, context);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                    "Exception while sending response", e);
+        }
+        return null;
+    }
+
+    public String renderSVG(XWikiContext context) throws XWikiException {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
+        String path = request.getRequestURI();
+        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
+        try {
+           ((SVGPlugin)context.getWiki().getPlugin("svg",context)).outputSVGImageFromFile(filename, context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,

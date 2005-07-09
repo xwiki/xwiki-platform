@@ -192,7 +192,16 @@ public class XWikiService {
         doc.saveAttachmentContent(attachment, context);
 
         // forward to attach page
-        sendRedirect(response, doc.getURL("attach", true, context));
+        // I don't like it.. But this is the way
+        // to get form elements..
+        byte[] redirectdata = Utils.getContent(filelist, "xredirect");
+        String redirect = null;
+        if (redirectdata!=null) {
+            redirect = new String(redirectdata);
+        }
+        if ((redirect == null)||(redirect.equals("")))
+           redirect = context.getDoc().getURL("attach", true, context);
+        sendRedirect(response, redirect);
         return false;
     }
 

@@ -353,7 +353,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Prepare the store
         XWikiStoreInterface basestore;
         setConfig(config);
-        String storeclass = Param("xwiki.store.class", "com.xpn.xwiki.store.XWikiRCSFileStore");
+        String storeclass = Param("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
         try {
             Class[] classes = new Class[]{this.getClass(), context.getClass()};
             Object[] args = new Object[]{this, context};

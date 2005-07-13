@@ -60,7 +60,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
     }
     int occurence = 0;
     for (Iterator iter = processedHeadings.iterator(); iter.hasNext();) if (iter.next().equals(text)) occurence++;
-    id = TOCGenerator.makeHeadingID(text, occurence);
+    id = TOCGenerator.makeHeadingID(text, occurence, xcontext);
     processedHeadings.add(text);
     
     //  add numbering if the flag is set

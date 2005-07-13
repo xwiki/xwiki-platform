@@ -668,7 +668,7 @@ public class Document extends Api {
      *          value is another map with two keys: text, level and numbering 
      */
     public Map getTOC(int init, int max, boolean numbered) {
-        return TOCGenerator.generateTOC(getContent(), init, max, numbered);
+        return TOCGenerator.generateTOC(getContent(), init, max, numbered, context);
     }
 
     public void saveDocument() throws XWikiException {

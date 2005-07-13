@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -138,6 +139,9 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     }
 
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
+        // allow using spaces in links to anchors
+        if (anchor != null) anchor = anchor.replace(' ','+');
+        
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor); 
         } else {
@@ -212,6 +216,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("<span class=\"wikilink\"><a href=\"#");
         buffer.append(anchor);
         buffer.append("\">");
+        if (view.length() == 0) view = Utils.decode(anchor, context);
         buffer.append(view);
         buffer.append("</a></span>");
     }

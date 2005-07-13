@@ -126,11 +126,11 @@ public class UtilTest extends HibernateClassesTest {
                      factory.createURL("XWiki", "Toto", "edit", "raw=1", null, getXWikiContext()));
     }
     
-    public static void testTOCGeneration() {
+    public void testTOCGeneration() {
       String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i\n1.1.1.1.1.1 j";
 
       // test init level 1
-      Map result = TOCGenerator.generateTOC(content, 1, 6, true);
+      Map result = TOCGenerator.generateTOC(content, 1, 6, true, getXWikiContext());
       assertEquals (((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.1");
       assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
       assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
@@ -143,7 +143,7 @@ public class UtilTest extends HibernateClassesTest {
       assertEquals ((((Map) result.get("j")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3.1.1.1.1");
       
       // test init level 2
-      result = TOCGenerator.generateTOC(content, 2, 6, true);
+      result = TOCGenerator.generateTOC(content, 2, 6, true, getXWikiContext());
       assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1");
       assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
       assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
@@ -156,7 +156,7 @@ public class UtilTest extends HibernateClassesTest {
       assertEquals ((((Map) result.get("j")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5.1.1.1.1");
       
       // test max level 3
-      result = TOCGenerator.generateTOC(content, 1, 3, true);
+      result = TOCGenerator.generateTOC(content, 1, 3, true, getXWikiContext());
       assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1.1");
       assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
       assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");

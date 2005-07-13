@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.OrderedMap;
 import org.apache.commons.collections.map.ListOrderedMap;
 
-import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.XWikiContext;
 
 
 public class TOCGenerator {
@@ -18,7 +19,7 @@ public class TOCGenerator {
   public static final String TOC_DATA_TEXT = "text";
   
   
-  public static Map generateTOC(String content, int init, int max, boolean numbered) {
+  public static Map generateTOC(String content, int init, int max, boolean numbered, XWikiContext context) {
     OrderedMap tocData = ListOrderedMap.decorate(new HashMap());
     List processedHeadings = new ArrayList();
     int previousNumbers[] = { 0, 0, 0, 0, 0, 0, 0 };
@@ -32,7 +33,7 @@ public class TOCGenerator {
       int occurence = 0;
       for (Iterator iter = processedHeadings.iterator(); iter.hasNext();) if (iter.next().equals(text)) occurence++;
 
-      String id = makeHeadingID (text, occurence);
+      String id = makeHeadingID (text, occurence, context);
       
       Map tocEntry = new HashMap();
       tocEntry.put(TOC_DATA_LEVEL, new Integer(level));
@@ -87,10 +88,10 @@ public class TOCGenerator {
     return tocData;
   }
 
-  public static String makeHeadingID (String text, int occurence) {
+  public static String makeHeadingID (String text, int occurence, XWikiContext context) {
     // Encode to convert unsafe chars
-    text = XWiki.getURLEncoded(text);
-    
+    text = Utils.encode(text.trim(), context);
+        
     if (occurence > 0) {
       return text + "-" + occurence;
     } else {

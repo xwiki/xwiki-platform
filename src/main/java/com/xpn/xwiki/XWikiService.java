@@ -900,9 +900,13 @@ public class XWikiService {
     }
 
     public String renderView(XWikiContext context) throws XWikiException {
-        XWikiRequest request = context.getRequest();
-        String rev = request.getParameter("rev");
+        handleRevision(context);
+        
+        return "view";
+    }
 
+    private void handleRevision(XWikiContext context) throws XWikiException {
+        String rev = context.getRequest().getParameter("rev");
         if (rev!=null) {
             context.put("rev", rev);
             XWikiDocument doc = (XWikiDocument) context.get("doc");
@@ -917,13 +921,14 @@ public class XWikiService {
             vcontext.put("cdoc", vcontext.get("doc"));
             vcontext.put("tdoc", new Document(rtdoc, context));
         }
-        return "view";
     }
 
     public String renderPDF(XWikiContext context) throws XWikiException {
         context.setURLFactory(new PdfURLFactory(context));
         PdfExportImpl pdfexport = new PdfExportImpl();
         XWikiDocument doc = context.getDoc();
+        handleRevision(context);
+            
         try {
          context.getResponse().setContentType("application/pdf");
          context.getResponse().addHeader("Content-disposition", "attachment; filename=" + doc.getWeb() + "_" + doc.getName() + ".pdf");

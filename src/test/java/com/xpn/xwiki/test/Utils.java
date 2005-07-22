@@ -181,21 +181,25 @@ public class Utils {
 
 
     public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name, XWikiContext context) throws XWikiException {
-        return createDoc(store,web, name, null, null, null, context);
+        return createDoc(store,web, name, content1, null, null, null, context);
+    }
+
+    public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name, String content, XWikiContext context) throws XWikiException {
+        return createDoc(store,web, name, content, null, null, null, context);
     }
 
     public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name,
                                  BaseObject bobject, BaseClass bclass, XWikiContext context) throws XWikiException {
-        return createDoc(store,web, name, bobject, bclass, null, context);
+        return createDoc(store,web, name, content1, bobject, bclass, null, context);
 
     }
 
     public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name,
-                                 BaseObject bobject, BaseClass bclass,
+                                 String content, BaseObject bobject, BaseClass bclass,
                                  Map bobjects, XWikiContext context) throws XWikiException {
         XWikiDocument doc1 = new XWikiDocument(web, name);
         String fullname = doc1.getFullName();
-        doc1.setContent(content1);
+        doc1.setContent(content);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.web + "." + Utils.name);
         doc1.setDefaultLanguage(Utils.defaultLanguage);
@@ -215,6 +219,12 @@ public class Utils {
         store.saveXWikiDoc(doc1, context);
         return doc1;
     }
+
+    public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name,
+                                     BaseObject bobject, BaseClass bclass,
+                                     Map bobjects, XWikiContext context) throws XWikiException {
+              return createDoc(store, web, name, content1, bobject, bclass, bobjects, context);
+        }
 
     public static void prepareObject(XWikiDocument doc) throws XWikiException {
         prepareObject(doc, "Test.TestObject");

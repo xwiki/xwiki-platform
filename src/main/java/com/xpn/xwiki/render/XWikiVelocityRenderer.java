@@ -41,18 +41,22 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.XWikiVelocityRenderer.class);
-
     public XWikiVelocityRenderer() {
+
         try {
             Velocity.init();
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+            e.printStackTrace();
         }
     }
 
@@ -233,6 +237,81 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         return false;
     }
 
+    private void generateFunction(StringBuffer result, String param, String data, XWikiVirtualMacro macro) {
+        Map namedparams = new HashMap();
+        List unnamedparams = new ArrayList();
+        if ((param!=null)&&(!param.trim().equals(""))) {
+            String[] params = StringUtils.split(param, "|");
+            for (int i=0;i<params.length;i++) {
+              String[] rparam = StringUtils.split(params[i], "=");
+              if (rparam.length==1)
+                  unnamedparams.add(params[i]);
+              else
+                  namedparams.put(rparam[0], rparam[1]);
+            }
+        }
+
+        result.append("#");
+        result.append(macro.getFunctionName());
+        result.append("(");
+
+        List macroparam = macro.getParams();
+        int j = 0;
+        for (int i=0;i<macroparam.size();i++) {
+            String name = (String) macroparam.get(i);
+            String value = (String) namedparams.get(name);
+            if (value==null) {
+                try {
+                    value = (String) unnamedparams.get(j);
+                    j++;
+                } catch (Exception e) {
+                    value = "";
+                }
+            }
+            if (i>0)
+             result.append(" ");
+            result.append("\"");
+            result.append(value.replaceAll("\"","\\\\\""));
+            result.append("\"");
+        }
+
+        if (data!=null) {
+            result.append(" ");
+            result.append("\"");
+            result.append(data.replaceAll("\"","\\\\\""));
+            result.append("\"");
+        }
+        result.append(")");
+    }
+
+    private void addVelocityMacros(StringBuffer result, XWikiContext context) {
+        Object macroAdded = context.get("velocityMacrosAdded");
+        if (macroAdded==null) {
+          context.put("velocityMacrosAdded", "1");
+          String inclDocName = context.getWiki().getXWikiPreference("macros_velocity", context);
+            try {
+                XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
+                result.append(doc.getContent());
+            } catch (XWikiException e) {
+                if (log.isErrorEnabled())
+                log.error("Impossible to load velocity macros doc " + inclDocName);
+            }
+        }
+    }
+
+    public String convertSingleLine(String macroname, String param, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        StringBuffer result = new StringBuffer();
+        addVelocityMacros(result, context);
+        generateFunction(result, param, null, macro);
+        return result.toString();
+    }
+
+    public String convertMultiLine(String macroname, String param, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        StringBuffer result = new StringBuffer();
+        addVelocityMacros(result, context);
+        generateFunction(result, param, data, macro);
+        return result.toString();
+    }
 
 }
 

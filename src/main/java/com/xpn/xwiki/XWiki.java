@@ -70,7 +70,6 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.tools.VelocityFormatter;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.PortalContainer;
@@ -390,8 +389,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } else
             setStore(basestore);
 
-        // Prepare the Rendering Engine
-        setRenderingEngine(new XWikiRenderingEngine(this, context));
+        resetRenderingEngine(context);
 
         // Prepare the Plugin Engine
         preparePlugins(context);
@@ -416,6 +414,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
 
+    }
+
+    public void resetRenderingEngine(XWikiContext context) throws XWikiException {
+        // Prepare the Rendering Engine
+        setRenderingEngine(new XWikiRenderingEngine(this, context));
     }
 
     private void preparePlugins(XWikiContext context) {
@@ -1405,8 +1408,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
 
 
-        needsUpdate |= bclass.addTextField("ad_clientid", "Advertisement Client ID", 60);
-
+        needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
+        needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
+        needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
+        needsUpdate |= bclass.addTextField("macros_wiki2", "Macros for new Wiki Parser", 60);
+        needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
@@ -2950,6 +2956,58 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // print the status and response
             return get.getResponseBodyAsString();
+        } finally {
+            // release any connection resources used by the method
+            get.releaseConnection();
+        }
+    }
+
+    public byte[] getURLContentAsBytes(String surl) throws IOException {
+        HttpClient client = new HttpClient();
+
+        // create a GET method that reads a file over HTTPS, we're assuming
+        // that this file requires basic authentication using the realm above.
+        GetMethod get = new GetMethod(surl);
+
+        try {
+            // execute the GET
+            int status = client.executeMethod(get);
+
+            // print the status and response
+            return get.getResponseBody();
+        } finally {
+            // release any connection resources used by the method
+            get.releaseConnection();
+        }
+    }
+
+    public byte[] getURLContentAsBytes(String surl, String username, String password) throws IOException {
+        HttpClient client = new HttpClient();
+
+        // pass our credentials to HttpClient, they will only be used for
+        // authenticating to servers with realm "realm", to authenticate agains
+        // an arbitrary realm change this to null.
+        client.getState().setCredentials(null,
+                null,
+                new UsernamePasswordCredentials(username, password));
+
+        // create a GET method that reads a file over HTTPS, we're assuming
+        // that this file requires basic authentication using the realm above.
+        GetMethod get = new GetMethod(surl);
+
+        try {
+            // Tell the GET method to automatically handle authentication. The
+            // method will use any appropriate credentials to handle basic
+            // authentication requests.  Setting this value to false will cause
+            // any request for authentication to return with a status of 401.
+            // It will then be up to the client to handle the authentication.
+            get.setDoAuthentication(true);
+
+            // execute the GET
+            int status = client.executeMethod(get);
+
+            // print the status and response
+            return get.getResponseBody();
         } finally {
             // release any connection resources used by the method
             get.releaseConnection();

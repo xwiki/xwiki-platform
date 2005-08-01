@@ -25,56 +25,54 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
 
 public class XWikiRenderingEngine {
 
-    private Vector renderers = new Vector();
+    private List renderers = new ArrayList();
+    private HashMap renderermap = new HashMap();
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
-        // addRenderer(new XWikiMacrosMappingRenderer(xwiki, context));
+        if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
+            addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
         // addRenderer(new XWikiJSPRenderer());
-        addRenderer(new XWikiVelocityRenderer());
-        addRenderer(new XWikiGroovyRenderer());
-        addRenderer(new XWikiPluginRenderer());
-        /*
-        if (xwiki.Param("xwiki.perl.active", "1").equals("1")) {
-            boolean hasPerl = true;
-            String pluginspath = xwiki.ParamAsRealPathVerified("xwiki.perl.pluginspath");
-            if (pluginspath!=null) {
-
-                String classespath = xwiki.ParamAsRealPathVerified("xwiki.perl.classespath");
-                if (classespath==null)
-                    classespath = "../classes";
-
-                addRenderer(new XWikiPerlPluginRenderer(xwiki.Param("xwiki.perl.perlpath"),
-                        pluginspath, classespath,
-                        xwiki.Param("xwiki.perl.javaserverport", "7890"), 0));
-            }
-        }
-        */
+        if (xwiki.Param("xwiki.render.velocity", "1").equals("1"))
+            addRenderer("velocity", new XWikiVelocityRenderer());
+        if (xwiki.Param("xwiki.render.groovy", "1").equals("1"))
+            addRenderer("groovy", new XWikiGroovyRenderer());
+        if (xwiki.Param("xwiki.render.plugin", "1").equals("1"))
+            addRenderer("plugin", new XWikiPluginRenderer());
 
         // The first should not removePre
         // The last one should removePre
-        renderers.add(new XWikiRadeoxRenderer(false));
+        if (xwiki.Param("xwiki.render.wiki", "1").equals("1"))
+            addRenderer("wiki", new XWikiRadeoxRenderer(false));
+
+        // if (xwiki.Param("xwiki.render.wiki2", "1").equals("1"))
+        // addRenderer("wiki2", new XWikiWikiParser2Renderer(false));
 
         if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
-           renderers.add(new XWikiWikiBaseRenderer(true, true));
+            addRenderer("xwiki", new XWikiWikiBaseRenderer(true, true));
         } else {
-           renderers.add(new XWikiWikiBaseRenderer(false, true));
+            addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
         }
     }
 
-    public void addRenderer(XWikiRenderer renderer) {
+    public void addRenderer(String name, XWikiRenderer renderer) {
         renderers.add(renderer);
+        renderermap.put(name, renderer);
     }
 
     public XWikiRenderer getRenderer(String name) {
         for (int i=0;i<renderers.size();i++) {
-            XWikiRenderer renderer = (XWikiRenderer) renderers.elementAt(i);
+            XWikiRenderer renderer = (XWikiRenderer) renderers.get(i);
             if (renderer.getClass().getName().equals(name))
                 return renderer;
         }
@@ -94,6 +92,12 @@ public class XWikiRenderingEngine {
     }
 
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
+        try {
+            // Start monitoring timer
+            if (monitor!=null)
+             monitor.startTimer("rendering");
+
         XWikiDocument doc = context.getDoc();
         XWikiDocument cdoc = context.getDoc();
 
@@ -113,7 +117,7 @@ public class XWikiRenderingEngine {
         try {
 
             for (int i=0;i<renderers.size();i++)
-                content = ((XWikiRenderer)renderers.elementAt(i)).render(content, contentdoc, includingdoc, context);
+                content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
         } finally {
             // Remove including doc or set the previous one
             if (idoc==null)
@@ -132,11 +136,34 @@ public class XWikiRenderingEngine {
         }
 
         return content;
+        }
+        finally {
+               if (monitor!=null)
+                   monitor.endTimer("rendering");
+        }
     }
 
     public void flushCache() {
         for (int i=0;i<renderers.size();i++)
-           ((XWikiRenderer)renderers.elementAt(i)).flushCache();
+           ((XWikiRenderer)renderers.get(i)).flushCache();
+    }
+
+    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        String language = macro.getLanguage();
+        XWikiRenderer renderer = (XWikiRenderer) renderermap.get(language);
+        if (renderer==null)
+            return allcontent;
+        else
+            return renderer.convertMultiLine(macroname, params, data, allcontent, macro, context);
+    }
+
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        String language = macro.getLanguage();
+        XWikiRenderer renderer = (XWikiRenderer) renderermap.get(language);
+        if (renderer==null)
+            return allcontent;
+        else
+            return renderer.convertSingleLine(macroname, params, allcontent, macro, context);
     }
 
 }

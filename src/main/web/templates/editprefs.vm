@@ -27,12 +27,13 @@ document.forms.objectadd.submit();
 </script>
 #else
 #set($class = $obj.xWikiClass)
-#set($sections = ["params", "skin", "presentation", "editing", "registration"])
+#set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
 #set($sectionitemsmap = $xwiki.hashMap)
 #set($sectionitemsmap.params = ["multilingual", "language" , "default_language", "authenticate_view", "authenticate_edit"  ])
 #set($sectionitemsmap.skin = ["skin", "baseskin", "stylesheet", "stylesheets"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
+#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_wiki2", "macros_mapping"])
 #set($sectionitemsmap.registration = [ "use_email_verification", "admin_email", "smtp_server", "validation_email_content",  "confirmation_email_content"])
 #macro(showsection $section $sectionitemsmap)
 <h3>$msg.get($section)</h3>

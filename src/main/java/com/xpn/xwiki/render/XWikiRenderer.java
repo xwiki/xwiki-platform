@@ -28,4 +28,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface XWikiRenderer {
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context);
     public void flushCache();
+    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context);
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context);
 }

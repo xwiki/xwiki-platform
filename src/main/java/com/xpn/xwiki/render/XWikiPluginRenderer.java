@@ -36,4 +36,12 @@ public class XWikiPluginRenderer implements XWikiRenderer {
     public void flushCache() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
+
+    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        return allcontent;
+    }
+
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        return allcontent;
+    }    
 }

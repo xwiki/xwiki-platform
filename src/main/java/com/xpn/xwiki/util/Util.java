@@ -24,6 +24,7 @@ package com.xpn.xwiki.util;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.lang.ArrayUtils;
@@ -269,6 +270,17 @@ public class Util {
             throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_DOTDOT, "Invalid content in Laszlo XML");
 
         return laszlocode;
+    }
+
+    public static MonitorPlugin getMonitorPlugin(XWikiContext context) {
+        try {
+        if ((context==null)||(context.getWiki()==null))
+            return null;
+
+        return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

@@ -350,7 +350,16 @@ public class XWiki extends Api {
     }
 
     public void flushCache() {
-        xwiki.flushCache();
+        if (hasProgrammingRights())
+         xwiki.flushCache();
+    }
+
+    public void resetRenderingEngine() {
+        if (hasProgrammingRights())
+            try {
+                xwiki.resetRenderingEngine(context);
+            } catch (XWikiException e) {
+            }
     }
 
     public int createUser() throws XWikiException {
@@ -782,6 +791,36 @@ public class XWiki extends Api {
             return xwiki.getURLContent(surl);
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    /**
+     * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication as Bytes
+     * @param surl url to retrieve
+     * @param username username for the basic authentication
+     * @param password password for the basic authentication
+     * @return Content of the specified URL
+     * @throws IOException
+     */
+    public byte[] getURLContentAsBytes(String surl, String username, String password) throws IOException {
+        try {
+            return xwiki.getURLContentAsBytes(surl, username, password);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the content of an HTTP/HTTPS URL as Bytes
+     * @param surl url to retrieve
+     * @return Content of the specified URL
+     * @throws IOException
+     */
+    public byte[] getURLContentAsBytes(String surl) throws IOException {
+        try {
+            return xwiki.getURLContentAsBytes(surl);
+        } catch (Exception e) {
+            return null;
         }
     }
 

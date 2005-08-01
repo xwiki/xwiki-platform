@@ -307,5 +307,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         this.renderWiki = renderWiki;
     }
 
+    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        return allcontent;
+    }
 
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+        return allcontent;
+    }
 }

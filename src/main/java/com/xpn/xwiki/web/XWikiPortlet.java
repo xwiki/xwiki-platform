@@ -25,7 +25,6 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiService;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.log4j.MDC;
 import org.apache.velocity.VelocityContext;
@@ -132,7 +131,10 @@ public class XWikiPortlet extends GenericPortlet {
 				if (prepareAction(action, request, response, engine_context, context)==false)
 					return;
 
-				XWikiService xwikiservice = new XWikiService();
+//				XWikiService xwikiservice = new XWikiService();
+				
+				
+				
 				XWikiForm form = null;
 
 				if (action.equals("save"))
@@ -154,46 +156,46 @@ public class XWikiPortlet extends GenericPortlet {
 				}
 
 				if (action.equals("save")) {
-					xwikiservice.actionSave(context);
+					(new SaveAction()).action(context);
 				}
                 else if (action.equals("rollback")) {
-                    xwikiservice.actionRollback(context);
+					(new RollbackAction()).action(context);
                 }
                 else if (action.equals("cancel")) {
-                    xwikiservice.actionCancel(context);
+                    (new CancelAction()).action(context);
                 }
 				else if (action.equals("delete")) {
-					xwikiservice.actionDelete(context);
+                    (new DeleteAction()).action(context);
 				}
 				else if (action.equals("propupdate")) {
-					xwikiservice.actionPropupdate(context);
+                    (new PropUpdateAction()).action(context);
 				}
 				else if (action.equals("propadd")) {
-					xwikiservice.actionPropadd(context);
+                    (new PropAddAction()).action(context);
 				}
 				else if (action.equals("objectadd")) {
-					xwikiservice.actionObjectadd(context);
+                    (new ObjectAddAction()).action(context);
 				}
 				else if (action.equals("commentadd")) {
-					xwikiservice.actionCommentadd(context);
+                    (new CommentAddAction()).action(context);
 				}
 				else if (action.equals("objectremove")) {
-					xwikiservice.actionObjectremove(context);
+                    (new ObjectRemoveAction()).action(context);
 				}
 				else if (action.equals("upload")) {
-					xwikiservice.actionUpload(context);
+                    (new UploadAction()).action(context);
 				}
 				else if (action.equals("delattachment")) {
-					xwikiservice.actionDelattachment(context);
+                    (new DeleteAttachmentAction()).action(context);
 				}
 				else if (action.equals("skin")) {
-					xwikiservice.actionSkin(context);
+                    (new SkinAction()).action(context);
 				}
 				else if (action.equals("logout")) {
-					xwikiservice.actionLogout(context);
+                    (new LogoutAction()).action(context);
 				}
 				else if (action.equals("register")) {
-					xwikiservice.actionRegister(context);
+                    (new RegisterAction()).action(context);
 				}
 			} catch (Throwable e) {
 				handleException(request, response, e, context);
@@ -234,7 +236,6 @@ public class XWikiPortlet extends GenericPortlet {
             if (prepareAction(action, request, response, engine_context, context)==false)
                 return;
 
-            XWikiService xwikiservice = new XWikiService();
             XWikiForm form = null;
 
             if (action.equals("edit")
@@ -251,40 +252,40 @@ public class XWikiPortlet extends GenericPortlet {
             String renderResult = null;
             // Determine what to do
             if (action.equals("view")) {
-                renderResult = xwikiservice.renderView(context);
+                renderResult = (new ViewAction()).render(context);
             }
             else if ( action.equals("inline")) {
-                renderResult = xwikiservice.renderInline(context);
+                renderResult = (new InlineAction()).render(context);
             }
             else if ( action.equals("edit") ) {
-                renderResult = xwikiservice.renderEdit(context);
+                renderResult = (new EditAction()).render(context);
             }
             else if ( action.equals("preview")) {
-                renderResult = xwikiservice.renderPreview(context);
+                renderResult = (new PreviewAction()).render(context);
             }
             else if (action.equals("delete")) {
-                renderResult = xwikiservice.renderDelete(context);
+                renderResult = (new DeleteAction()).render(context);
             }
             else if (action.equals("download")) {
-                renderResult = xwikiservice.renderDownload(context);
+                renderResult = (new DownloadAction()).render(context);
             }
             else if (action.equals("dot")) {
-                renderResult = xwikiservice.renderDot(context);
+                renderResult = (new DotAction()).render(context);
             }
             else if (action.equals("svg")) {
-                renderResult = xwikiservice.renderSVG(context);
+                renderResult = (new SVGAction()).render(context);
             }
             else if (action.equals("attach")) {
-                renderResult = xwikiservice.renderAttach(context);
+                renderResult = (new AttachAction()).render(context);
             }
             else if (action.equals("login")) {
-                renderResult = xwikiservice.renderLogin(context);
+                renderResult = (new LoginAction()).render(context);
             }
             else if (action.equals("loginerror")) {
-                renderResult = xwikiservice.renderLoginerror(context);
+                renderResult = (new LoginErrorAction()).render(context);
             }
-            else if (action.equals("loginerror")) {
-                renderResult = xwikiservice.renderRegister(context);
+            else if (action.equals("register")) {
+                renderResult = (new RegisterAction()).render(context);
             }
             else if ( action.equals("portletConfig") ) {
 				renderResult = "portletConfig";

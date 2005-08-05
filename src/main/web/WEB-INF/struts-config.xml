@@ -79,66 +79,66 @@
 
     <!-- XWiki Struts Application with Velocity --> 
     <action path="/xmlrpc/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.XMLRPCAction"
             name="xmlrpc"
             scope="request">
     </action>
     <action path="/view/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.ViewAction"
             name="view"
             scope="request">
         <forward name="view" path="/templates/view.vm"/>
         <forward name="plain" path="/templates/plain.vm"/>
     </action>
     <action path="/pdf/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.PDFAction"
             name="pdf"
             scope="request">
     </action>
     <action path="/edit/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.EditAction"
             name="edit"
             scope="request">
         <forward name="edit" path="/templates/edit.vm"/>
     </action>
 
     <action path="/inline/"
-                  type="com.xpn.xwiki.web.ViewEditAction"
+                  type="com.xpn.xwiki.web.InlineAction"
                   name="inline"
                   scope="request">
          <forward name="inline" path="/templates/inline.vm"/>
     </action>
 
     <action path="/preview/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.PreviewAction"
             name="preview"
             scope="request">
         <forward name="preview" path="/templates/preview.vm"/>
     </action>
 
     <action path="/save/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.SaveAction"
             name="save"
             scope="request">
         <forward name="save" path="/templates/save.vm"/>
     </action>
 
       <action path="/rollback/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.RollbackAction"
           name="rollback"
           scope="request">
           <forward name="edit" path="/templates/rollback.vm"/>
       </action>
 
     <action path="/cancel/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.CancelAction"
             name="cancel"
             scope="request">
         <forward name="cancel" path="/templates/cancel.vm"/>
     </action>
 
     <action path="/delete/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.DeleteAction"
             name="delete"
             scope="request">
         <forward name="delete" path="/templates/delete.vm"/>
@@ -146,126 +146,126 @@
     </action>
 
     <action path="/register/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.RegisterAction"
             name="register"
             scope="request">
         <forward name="register" path="/templates/register.vm"/>
     </action>
 
     <action path="/propupdate/"
-              type="com.xpn.xwiki.web.ViewEditAction"
+              type="com.xpn.xwiki.web.PropUpdateAction"
               name="propupdate"
               scope="request">
           <forward name="propupdate" path="/templates/edit.vm"/>
     </action>
 
     <action path="/propadd/"
-                type="com.xpn.xwiki.web.ViewEditAction"
+                type="com.xpn.xwiki.web.PropAddAction"
                 name="propadd"
                 scope="request">
             <forward name="propadd" path="/templates/edit.vm"/>
     </action>
 
       <action path="/propdelete/"
-                  type="com.xpn.xwiki.web.ViewEditAction"
+                  type="com.xpn.xwiki.web.PropDeleteAction"
                   name="propdelete"
                   scope="request">
               <forward name="propdelete" path="/templates/edit.vm"/>
       </action>
 
       <action path="/objectadd/"
-                  type="com.xpn.xwiki.web.ViewEditAction"
+                  type="com.xpn.xwiki.web.ObjectAddAction"
                   name="objectadd"
                   scope="request">
               <forward name="objectadd" path="/templates/edit.vm"/>
       </action>
 
       <action path="/commentadd/"
-                        type="com.xpn.xwiki.web.ViewEditAction"
+                        type="com.xpn.xwiki.web.CommentAddAction"
                         name="commentadd"
                         scope="request">
                     <forward name="commentadd" path="/templates/edit.vm"/>
       </action>
 
       <action path="/objectremove/"
-                  type="com.xpn.xwiki.web.ViewEditAction"
+                  type="com.xpn.xwiki.web.ObjectRemoveAction"
                   name="objectremove"
                   scope="request">
               <forward name="objectremove" path="/templates/edit.vm"/>
       </action>
 
       <action path="/attach/"
-                        type="com.xpn.xwiki.web.ViewEditAction"
+                        type="com.xpn.xwiki.web.AttachAction"
                         name="attach"
                         scope="request">
                <forward name="attach" path="/templates/attach.vm"/>
       </action>
 
       <action path="/upload/"
-                        type="com.xpn.xwiki.web.ViewEditAction"
+                        type="com.xpn.xwiki.web.UploadAction"
                         name="upload"
                         scope="request">
                <forward name="upload" path="/templates/attach.vm"/>
       </action>
 
       <action path="/download/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.DownloadAction"
           name="download"
           scope="request">
       </action>
 
       <action path="/dot/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.DotAction"
           name="dot"
           scope="request">
       </action>
 
       <action path="/svg/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.SVGAction"
           name="svg"
           scope="request">
       </action>
 
       <action path="/delattachment/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.DeleteAttachmentAction"
           name="delattachment"
           scope="request">
       </action>
 
       <action path="/skin/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.SkinAction"
           name="skin"
           scope="request">
       </action>
 
       <action path="/login/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.LoginAction"
           name="login"
           scope="request">
       </action>
 
       <action path="/loginerror/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.LoginErrorAction"
           name="loginerror"
           scope="request">
       </action>
 
       <action path="/logout/"
-          type="com.xpn.xwiki.web.ViewEditAction"
+          type="com.xpn.xwiki.web.LogoutAction"
           name="logout"
           scope="request">
          <forward name="logout" path="/templates/logout.vm"/>
       </action>
 
       <action path="/status/"
-              type="com.xpn.xwiki.web.ViewEditAction"
+              type="com.xpn.xwiki.web.StatusAction"
               name="status"
               scope="request">
           <forward name="status" path="/templates/status.vm"/>
       </action>
 
     <action path="/lifeblog/"
-            type="com.xpn.xwiki.web.ViewEditAction"
+            type="com.xpn.xwiki.web.LifeBlogAction"
             name="lifeblog"
             scope="request">
     </action>

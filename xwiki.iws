@@ -418,6 +418,19 @@
         <option name="myCondition" value="" />
         <option name="myLogMessage" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java" line="24">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_VM" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="myCondition" value="" />
+        <option name="myLogMessage" value="" />
+      </breakpoint>
     </line_breakpoints>
     <exception_breakpoints>
       <breakpoint_any>
@@ -683,75 +696,26 @@
     <option name="HIDE_WARNINGS" value="false" />
   </component>
   <component name="FileEditorManager" split-orientation="horizontal" split-proportion="0.5">
-    <first-group selected-file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/XWikiTest.java">
-      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateStore.java" pinned="false">
+    <first-group selected-file="file://$PROJECT_DIR$/build.xml">
+      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/render/XWikiInlineHtmlFormatter.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="196" column="127" selection-start="6964" selection-end="6964" vertical-scroll-proportion="0.18416207">
+          <state line="18" column="13" selection-start="615" selection-end="615" vertical-scroll-proportion="0.3327674">
             <folding>
               <element signature="imports" expanded="true" />
             </folding>
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/render/XWikiWikiParser2Renderer.java" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="2693" column="18" selection-start="104756" selection-end="104756" vertical-scroll-proportion="0.1436464">
+          <state line="63" column="16" selection-start="2581" selection-end="2581" vertical-scroll-proportion="0.43293718">
             <folding />
           </state>
         </provider>
       </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/BaseClass.java" pinned="false">
+      <entry file="file://$PROJECT_DIR$/build.xml" pinned="false">
         <provider selected="true" editor-type-id="text-editor">
-          <state line="114" column="0" selection-start="4083" selection-end="4083" vertical-scroll-proportion="0.042357273">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/PropertyClass.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="295" column="0" selection-start="9410" selection-end="9410" vertical-scroll-proportion="0.6629834">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/NumberClass.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="72" column="0" selection-start="2145" selection-end="2145" vertical-scroll-proportion="0.13627993">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateCustomMappingTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="336" column="0" selection-start="17404" selection-end="17404" vertical-scroll-proportion="0.71823204">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateTestCase.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="152" column="23" selection-start="5395" selection-end="5395" vertical-scroll-proportion="0.21915285">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="60" column="13" selection-start="2165" selection-end="2165" vertical-scroll-proportion="0.12707183">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/XWikiTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="56" column="16" selection-start="2239" selection-end="2239" vertical-scroll-proportion="0.12707183">
-            <folding />
-          </state>
-        </provider>
-      </entry>
-      <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ServletTest.java" pinned="false">
-        <provider selected="true" editor-type-id="text-editor">
-          <state line="64" column="16" selection-start="2107" selection-end="2107" vertical-scroll-proportion="0.1436464">
+          <state line="79" column="17" selection-start="3875" selection-end="3875" vertical-scroll-proportion="0.30390492">
             <folding />
           </state>
         </provider>
@@ -848,9 +812,13 @@
   <component name="PackagesPane">
     <expanded_node url="" module="xwikibase" type="module" />
   </component>
-  <component name="ProjectPane" />
+  <component name="ProjectPane">
+    <expanded_node url="file://$PROJECT_DIR$" module="xwikibase" type="directory" />
+    <expanded_node url="" module="xwikibase" type="module" />
+    <expanded_node url="" module="xwiki" type="module" />
+  </component>
   <component name="ProjectView">
-    <navigator currentView="PackagesPane" splitterProportion="0.43551797">
+    <navigator currentView="ProjectPane" splitterProportion="0.43551797">
       <flattenPackages PackagesPane="false" ProjectPane="false" />
       <showMembers ProjectPane="true" J2EEPane="true" />
       <showModules />
@@ -897,8 +865,8 @@
     <property name="last_opened_file_path" value="C:\dev\java\webservices\alexa\com\amazon\api\alexa" />
     <property name="cvs_file_history_flatOrder5" value="5" />
     <property name="cvs_file_history_flatWidth5" value="92" />
-    <property name="cvs_file_history_treeWidth3" value="141" />
     <property name="cvs_file_history_treeOrder2" value="2" />
+    <property name="cvs_file_history_treeWidth3" value="141" />
     <property name="cvs_file_history_treeWidth5" value="141" />
     <property name="cvs_file_history_flatOrder6" value="6" />
     <property name="cvs_file_history_flatWidth0" value="140" />
@@ -986,6 +954,23 @@
       <option name="VM_OPTS" value="" />
       <option name="LOCAL_PORT" value="80" />
     </configuration>
+    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="false" />
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3384" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+    </configuration>
     <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
@@ -1035,23 +1020,6 @@
           <option name="PROGRAM_PARAMETERS" value="" />
         </SHUTDOWN>
       </ConfigurationWrapper>
-    </configuration>
-    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="false" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3384" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
     </configuration>
     <configuration selected="false" default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
@@ -1691,12 +1659,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1015" height="774" extended-state="7" />
-    <editor active="false" />
+    <frame x="-4" y="-4" width="1015" height="774" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.309375" order="6" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.2596054" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.25856698" order="0" x="-87" y="100" width="469" height="491" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.42414862" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22168285" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.43343654" order="9" />
@@ -1732,7 +1700,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ACTIVE_VCS_NAME" value="" />
-    <option name="STATE" value="0" />
+    <option name="STATE" value="2" />
   </component>
   <component name="VssConfiguration">
     <CheckoutOptions>
@@ -1803,34 +1771,6 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiStoreInterface.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="36" selection-start="4678" selection-end="4678" vertical-scroll-proportion="2.7607656">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiDefaultStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="16" selection-start="1636" selection-end="1636" vertical-scroll-proportion="1.0223215">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/resources/xwiki.hbm.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="300" column="53" selection-start="10707" selection-end="10707" vertical-scroll-proportion="1.7116104">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/StringClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="0" selection-start="1948" selection-end="2110" vertical-scroll-proportion="1.988764">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiCacheStore.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="78" column="0" selection-start="2688" selection-end="2688" vertical-scroll-proportion="0.46153846">
@@ -1838,74 +1778,106 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/NumberClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="0" selection-start="2145" selection-end="2145" vertical-scroll-proportion="0.13627993">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/PropertyClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="295" column="0" selection-start="9410" selection-end="9410" vertical-scroll-proportion="0.6629834">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/BaseClass.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="114" column="0" selection-start="4083" selection-end="4083" vertical-scroll-proportion="0.042357273">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateCustomMappingTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="336" column="0" selection-start="17404" selection-end="17404" vertical-scroll-proportion="0.71823204">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ServletTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="16" selection-start="2107" selection-end="2107" vertical-scroll-proportion="0.1436464">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="60" column="13" selection-start="2165" selection-end="2165" vertical-scroll-proportion="0.12707183">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="152" column="23" selection-start="5395" selection-end="5395" vertical-scroll-proportion="0.21915285">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2693" column="18" selection-start="104756" selection-end="104756" vertical-scroll-proportion="0.1436464">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="196" column="127" selection-start="6964" selection-end="6964" vertical-scroll-proportion="0.18416207">
+        <state line="196" column="127" selection-start="6964" selection-end="6964" vertical-scroll-proportion="0.18494272">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2693" column="18" selection-start="104756" selection-end="104756" vertical-scroll-proportion="0.14402619">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/BaseClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="114" column="0" selection-start="4083" selection-end="4083" vertical-scroll-proportion="0.04255319">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/PropertyClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="295" column="0" selection-start="9410" selection-end="9410" vertical-scroll-proportion="0.6904762">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/classes/NumberClass.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="72" column="0" selection-start="2145" selection-end="2145" vertical-scroll-proportion="0.1377551">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateCustomMappingTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="336" column="0" selection-start="17404" selection-end="17404" vertical-scroll-proportion="0.7397959">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateTestCase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="152" column="23" selection-start="5395" selection-end="5395" vertical-scroll-proportion="0.22831859">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="13" selection-start="2165" selection-end="2165" vertical-scroll-proportion="0.12743363">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/XWikiTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="16" selection-start="2239" selection-end="2239" vertical-scroll-proportion="0.12707183">
+        <state line="56" column="16" selection-start="2239" selection-end="2239" vertical-scroll-proportion="0.13259669">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ServletTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="16" selection-start="2211" selection-end="2211" vertical-scroll-proportion="0.1510129">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2179" column="12" selection-start="75803" selection-end="75803" vertical-scroll-proportion="1.6125828">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/render/XWikiInlineHtmlFormatter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="13" selection-start="615" selection-end="615" vertical-scroll-proportion="0.3327674">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="17" selection-start="3875" selection-end="3875" vertical-scroll-proportion="0.30390492">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/render/XWikiWikiParser2Renderer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="16" selection-start="2581" selection-end="2581" vertical-scroll-proportion="0.43293718">
           <folding />
         </state>
       </provider>

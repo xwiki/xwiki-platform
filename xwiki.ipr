@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4" relativePaths="false">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
@@ -247,17 +247,8 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.1.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/commons-fileupload-1.0/docs/apidocs" />
-        <root url="file://C:/dev/java/commons-net-1.1.0/docs/apidocs" />
-        <root url="file://C:/dev/java/commons-httpclient-2.0.1/docs/apidocs" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/commons-fileupload-1.0/src/java" />
-        <root url="file://C:/dev/java/commons-dbcp-1.1/src/java" />
-        <root url="file://C:/dev/java/jrcs-full-0.1.7/src/java" />
-        <root url="file://C:/dev/java/commons-logging-1.0.3-src/src/java" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Unit Tests">
       <CLASSES>
@@ -269,10 +260,7 @@
         <root url="jar://$PROJECT_DIR$/lib/httpunit-1.6.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/share" />
-        <root url="file://C:/dev/java/jakarta-cactus-src-1.6dev20040418/framework/src/java/j2ee13" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="Hibernate">
       <CLASSES>
@@ -288,7 +276,6 @@
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.7.3.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate/hibernate-3.0/doc/api" />
@@ -297,75 +284,43 @@
         <root url="file://C:/dev/java/hibernate/hibernate-3.0/src" />
       </SOURCES>
     </library>
-    <library name="Perl">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/InlineJavaServer.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/InlineJavaUser.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/perl/Inline-Java-0.44/Java/sources" />
-      </SOURCES>
-    </library>
     <library name="Velocity">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/velocity-tools-1.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/velocity-1.4.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/velocity-1.4/docs/api" />
-        <root url="file://C:/dev/java/velocity-tools-1.1/docs/javadoc" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/velocity-1.4/src/java" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Struts">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/struts-1.2.4.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/share" />
-        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/upload/org" />
-        <root url="file://C:/dev/java/jakarta-struts-1.1-src/src/validator/org" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="Ant">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/ant-1.6.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/antlr-2.7.5.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/tools/apache-ant-1.6.0/docs/manual/api" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/apache-ant-1.6.0/src/main" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="SecurityFilter">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/securityfilter-2.0.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/securityfilter-2.0-src/build/documentation/api" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/securityfilter-2.0-src/src/share" />
-        <root url="file://C:/dev/java/securityfilter-2.0-src/src/catalina" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Radeox">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/radeox.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/asm-util-1.5.3.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/radeox/docs/api" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/radeox/src" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Portlets">
       <CLASSES>
@@ -376,8 +331,6 @@
     </library>
     <library name="ExoPlatform">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.0-rc1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/picocontainer-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.impl-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.impl-1.0.jar!/" />
@@ -389,22 +342,18 @@
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.container-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.impl-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.api-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.0-rc1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/java/exoplatform/exo-services-container/src/java" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="XMLRPC">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/xmlrpc-1.2.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/xmlrpc/xmlrpc-1.2-b1/docs/apidocs" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/xmlrpc/xmlrpc-1.2-b1/src/java" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Groovy">
       <CLASSES>
@@ -423,23 +372,6 @@
         <root url="jar://$PROJECT_DIR$/lib/fop-0.20.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xerces-2.4.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/batik-all-1.6.jar!/" />
-      </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/fop/fop-0.20.5/docs" />
-        <root url="file://C:/dev/java/jtidy/jtidy-r8-SNAPSHOT/docs/apidocs" />
-        <root url="file://C:/dev/java/xalan/xalan-j_2_6_0/docs/apidocs" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/fop/fop-0.20.5/src" />
-        <root url="file://C:/dev/java/jtidy/jtidy-r8-SNAPSHOT/src/main" />
-        <root url="file://C:/dev/java/xerces/xerces-2_6_2/src" />
-        <root url="file://C:/dev/java/xerces/xerces-2_6_2/src/dom3/org" />
-        <root url="file://C:/dev/java/xalan/xalan-j_2_6_0/src" />
-      </SOURCES>
-    </library>
-    <library name="YourKit">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/yjp.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -503,13 +435,6 @@
         <root url="file://C:/dev/java/webservices/alexa/com" />
         <root url="file://C:/dev/java/webservices/google/com" />
       </SOURCES>
-    </library>
-    <library name="javacc">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/src/wikiparser/com.cogniumsystems.repository/javacc/jars/javacc.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
     </library>
   </component>
   <component name="uidesigner-configuration">

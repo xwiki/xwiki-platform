@@ -39,7 +39,6 @@ import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.ObjectAddForm;
-import com.cogniumsystems.wiki.dom.IWikiNode;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;

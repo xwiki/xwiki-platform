@@ -1857,7 +1857,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 bundle = ResourceBundle.getBundle("ApplicationResources");
             XWikiMessageTool msg = new XWikiMessageTool(bundle);
             context.put("msg", msg);
-            ((VelocityContext) context.get("vcontext")).put("msg", msg);
+            VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
+            if (vcontext!=null)
+                vcontext.put("msg", msg);
         }
     }
 
@@ -2686,15 +2688,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getFullNameSQL() {
-        /*if (fullNameSQL==null) {
+        return getFullNameSQL(true);
+    }
+
+    public String getFullNameSQL(boolean newFullName) {
+        if (newFullName)
+            return "doc.fullName";
+
+        if (fullNameSQL==null) {
             if (isMySQL())
                 fullNameSQL = "CONCAT(doc.web,'.',doc.name)";
             else
                 fullNameSQL = "doc.web||'.'||doc.name";
         }
         return fullNameSQL;
-        */
-        return "doc.fullName";
     }
 
     public String getDocName(String docname) {

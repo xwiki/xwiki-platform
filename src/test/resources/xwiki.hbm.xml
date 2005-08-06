@@ -295,6 +295,9 @@
         <property name="name" type="string">
             <column name="XWO_NAME" not-null="true" length="255"/>
         </property>
+        <property name="customMapping" type="string">
+            <column name="XWO_CUSTOM_MAPPING" length="60000"/>
+        </property>
     </class>
 
 

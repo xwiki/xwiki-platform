@@ -19,6 +19,12 @@ package com.xpn.xwiki.test;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
@@ -91,6 +97,47 @@ public class HibernateTestCase extends TestCase {
             st.execute(sql);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static List runSQLwithReturn(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
+        try {
+            Session session = hibstore.getSession(context);
+            Connection connection = session.connection();
+            Statement st = connection.createStatement();
+            st.execute(sql);
+            ResultSet rs = st.getResultSet();
+            ResultSetMetaData mdata = rs.getMetaData();
+            int colcount = mdata.getColumnCount();
+            List list = new ArrayList();
+            while (rs.next()) {
+                Map item = new HashMap();
+                for (int i=1;i<=colcount;i++) {
+                    String colname = mdata.getColumnName(i);
+                    item.put(colname, rs.getObject(i));
+                }
+                list.add(item);
+            }
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static Object runSQLuniqueResult(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
+        try {
+            Session session = hibstore.getSession(context);
+            Connection connection = session.connection();
+            Statement st = connection.createStatement();
+            st.execute(sql);
+            ResultSet rs = st.getResultSet();
+            rs.next();
+            return rs.getObject(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

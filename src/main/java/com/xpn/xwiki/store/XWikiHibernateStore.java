@@ -26,6 +26,7 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.doc.*;
@@ -34,6 +35,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.impl.SessionImpl;
@@ -43,13 +45,12 @@ import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.HibernateException;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.apache.commons.lang.ArrayUtils;
+import org.hibernate.*;
+import org.hibernate.proxy.MapProxy;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,9 +58,9 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.lang.reflect.Field;
 
 
 public class XWikiHibernateStore extends XWikiDefaultStore {
@@ -73,6 +74,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     private String hibpath;
     private URL hiburl;
+    private Map validTypesMap = new HashMap();
 
     public XWikiHibernateStore(XWiki xwiki, XWikiContext context) {
         String path = xwiki.Param("xwiki.store.hibernate.path");
@@ -84,12 +86,27 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             } catch (MalformedURLException e) {
             }
         }
+        initValidColumTypes();
     }
 
     public XWikiHibernateStore(String hibpath) {
         setPath(hibpath);
     }
 
+
+    private void initValidColumTypes() {
+        String[] string_types = { "string" , "text" , "clob" };
+        String[] number_types = { "integer" , "long" , "float", "double", "big_decimal", "big_integer", "yes_no", "true_false" };
+        String[] date_types = { "date" , "time" , "timestamp" };
+        String[] boolean_types = { "boolean" , "yes_no" , "true_false" };
+        validTypesMap = new HashMap();
+        validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass" , string_types);
+        validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass" , string_types);
+        validTypesMap.put("com.xpn.xwiki.objects.classes.PasswordClass" , string_types);
+        validTypesMap.put("com.xpn.xwiki.objects.classes.NumberClass" , number_types);
+        validTypesMap.put("com.xpn.xwiki.objects.classes.DateClass" , date_types);
+        validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass" , boolean_types);
+    }
 
     public String getPath() {
         return hibpath;
@@ -158,13 +175,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void updateSchema(XWikiContext context) throws HibernateException {
-            updateSchema(context, false);
-
+        updateSchema(context, false);
     }
+
 
     // Let's synchronize this, to only update one schema at a time
     public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException {
-
         // No updating of schema if we have a config parameter saying so
         try {
             if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
@@ -178,6 +194,26 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
         } catch (Exception e) {}
 
+        String fullName = ((context!=null)&&(context.getWiki()!=null)) ? context.getWiki().getFullNameSQL(true) : "xwd_fullname";
+        String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
+        String[] addSQL = {
+            // Make sure we have no null valued in integer fields
+            "update xwikidoc set xwd_translation=0 where xwd_translation is null",
+            "update xwikidoc set xwd_language='' where xwd_language is null",
+            "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
+            "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
+
+        String[] sql = new String[schemaSQL.length+addSQL.length];
+        for (int i=0;i<schemaSQL.length;i++)
+            sql[i] = schemaSQL[i];
+        for (int i=0;i<addSQL.length;i++)
+            sql[i + schemaSQL.length] = addSQL[i];
+
+        updateSchema(sql, context);
+    }
+
+    public String[] getSchemaUpdateScript(Configuration config, XWikiContext context) throws HibernateException {
+        String[] schemaSQL = null;
 
         Session session;
         Connection connection;
@@ -187,60 +223,20 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         boolean bTransaction = true;
 
         try {
-            try {
-                bTransaction = beginTransaction(context);
-                session = getSession(context);
-                connection = session.connection();
-                setDatabase(session, context);
+            bTransaction = beginTransaction(context);
+            session = getSession(context);
+            connection = session.connection();
+            setDatabase(session, context);
 
-                meta = new DatabaseMetadata(connection, dialect);
-                stmt = connection.createStatement();
-            }
-            catch (SQLException sqle) {
-                if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + sqle.getMessage());
-                throw sqle;
-            }
+            meta = new DatabaseMetadata(connection, dialect);
+            stmt = connection.createStatement();
 
-            String[] createSQL = configuration.generateSchemaUpdateScript(dialect, meta);
-            MonitorPlugin monitor  = getMonitorPlugin(context);
-            // Start monitoring timer
-            if (monitor!=null)
-                monitor.startTimer("sqlupgrade");
-            try {
-                for (int j = 0; j < createSQL.length; j++) {
-                    final String sql = createSQL[j];
-                    if ( log.isDebugEnabled() ) log.debug("Update Schema sql: " + sql);
-                    stmt.executeUpdate(sql);
-                }
-                connection.commit();
-            }
-            catch (SQLException e) {
-                connection.rollback();
-                if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
-            }
-            finally {
-                // End monitoring timer
-                if (monitor!=null)
-                    monitor.endTimer("sqlupgrade");
-            }
-
-            // Make sure we have no null valued in integer fields
-            stmt.executeUpdate("update xwikidoc set xwd_translation=0 where xwd_translation is null");
-            stmt.executeUpdate("update xwikidoc set xwd_language='' where xwd_language is null");
-            stmt.executeUpdate("update xwikidoc set xwd_default_language='' where xwd_default_language is null");
-            String fullNameSQL;
-            if (context.getWiki().isMySQL())
-                fullNameSQL = "CONCAT(xwd_web,'.',xwd_name)";
-            else
-                fullNameSQL = "xwd_web||'.'||xwd_name";
-            stmt.executeUpdate("update xwikidoc set xwd_fullname=" + fullNameSQL + " where xwd_fullname is null");
-            connection.commit();
+            schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
         }
         catch (Exception e) {
             if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
         }
         finally {
-
             try {
                 if (stmt!=null) stmt.close();
                 if (bTransaction)
@@ -249,8 +245,63 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             catch (Exception e) {
             }
         }
+        return schemaSQL;
     }
 
+    public void updateSchema(String[] createSQL, XWikiContext context) {
+        // Updating the schema for custom mappings
+        Session session;
+        Connection connection;
+        Statement stmt=null;
+        boolean bTransaction = true;
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
+
+        try {
+            bTransaction = beginTransaction(context);
+            session = getSession(context);
+            connection = session.connection();
+            setDatabase(session, context);
+            stmt = connection.createStatement();
+
+            // Start monitoring timer
+            if (monitor!=null)
+                monitor.startTimer("sqlupgrade");
+            for (int j = 0; j < createSQL.length; j++) {
+                final String sql = createSQL[j];
+                if ( log.isDebugEnabled() ) log.debug("Update Schema sql: " + sql);
+                stmt.executeUpdate(sql);
+            }
+            connection.commit();
+        }
+        catch (Exception e) {
+            if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
+        }
+        finally {
+            try {
+                if (stmt!=null) stmt.close();
+                if (bTransaction)
+                    endTransaction(context, true);
+            }
+            catch (Exception e) {
+            }
+
+            // End monitoring timer
+            if (monitor!=null)
+                monitor.endTimer("sqlupgrade");
+        }
+    }
+
+
+    public void updateSchema(BaseClass bclass, XWikiContext context) throws XWikiException {
+        Configuration config = makeMapping(bclass.getName(), bclass.getCustomMapping());
+        if (isValidCustomMapping(bclass.getName(), config, bclass)==false) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING,
+                    "Cannot update schema for class " + bclass.getName() + " because of an invalid mapping");
+        }
+
+        String[] sql = getSchemaUpdateScript(config, context);
+        updateSchema(sql, context);
+    }
 
     public void checkHibernate(XWikiContext context) throws HibernateException {
 
@@ -287,6 +338,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     public boolean beginTransaction(XWikiContext context)
             throws HibernateException, XWikiException {
+            return beginTransaction(null, context);
+    }
+    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context)
+            throws HibernateException, XWikiException {
 
         Transaction transaction = getTransaction(context);
         Session session = getSession(context);
@@ -304,7 +359,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
         if (session==null) {
             if ( log.isDebugEnabled() ) log.debug("Trying to get session from pool");
-            session = (SessionImpl)getSessionFactory().openSession();
+            if (sfactory==null)
+             session = (SessionImpl)getSessionFactory().openSession();
+            else
+             session = sfactory.openSession();
+
             if ( log.isDebugEnabled() ) log.debug("Taken session from pool " + session);
 
             // Keep some statistics about session and connections
@@ -419,9 +478,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
     }
 
-public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
 
             doc.setStore(this);
@@ -429,7 +488,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
 
             bTransaction = bTransaction && beginTransaction(context);
             Session session = getSession(context);
@@ -437,7 +496,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
             String sql = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName";
             if (monitor!=null)
-              monitor.setTimerDesc("hibernate", sql);
+                monitor.setTimerDesc("hibernate", sql);
             Query query = session.createQuery(sql);
             query.setString("fullName", fullName);
             Iterator it = query.list().iterator();
@@ -453,7 +512,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         } finally {
             // End monitoring timer
             if (monitor!=null)
-             monitor.endTimer("hibernate");
+                monitor.endTimer("hibernate");
 
             try {
                 if (bTransaction)
@@ -463,16 +522,18 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
     }
 
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException {
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
             doc.setStore(this);
 
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+                bTransaction = beginTransaction(sfactory, context);
             }
             Session session = getSession(context);
 
@@ -561,14 +622,16 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         //To change body of implemented methods use Options | File Templates.
         BufferedReader fr = null;
         boolean bTransaction = true;
-        MonitorPlugin monitor = getMonitorPlugin(context);
+        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
             doc.setStore(this);
             checkHibernate(context);
-            bTransaction = bTransaction && beginTransaction(context);
+
+            SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+            bTransaction = bTransaction && beginTransaction(sfactory, context);
             Session session = getSession(context);
 
             try {
@@ -658,24 +721,13 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         return doc;
     }
 
-    private MonitorPlugin getMonitorPlugin(XWikiContext context) {
-        try {
-        if ((context==null)||(context.getWiki()==null))
-            return null;
-
-        return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument(basedoc.getWeb(), basedoc.getName());
-        MonitorPlugin monitor = getMonitorPlugin(context);
+        MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
             doc.setStore(this);
             Archive archive = basedoc.getRCSArchive();
             doc.setRCSArchive(archive);
@@ -730,13 +782,14 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
+            bTransaction = bTransaction && beginTransaction(sfactory, context);
             Session session = getSession(context);
 
             if (doc.getStore()==null) {
@@ -843,7 +896,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             Query query;
             if (stats)
                 query = session.createQuery("select obj.id from " +
-                            object.getClass().getName() + " as obj where obj.id = :id");
+                        object.getClass().getName() + " as obj where obj.id = :id");
             else
                 query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             query.setInteger("id", object.getId());
@@ -852,11 +905,23 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             else
                 session.update(object);
 
+            BaseClass bclass = object.getxWikiClass(context);
+            List handledProps = new ArrayList();
+            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
+                // save object using the custom mapping
+                Map objmap = object.getMap();
+                handledProps = bclass.getCustomMappingPropertyList(context);
+                Session dynamicSession = session.getSession(EntityMode.MAP);
+                dynamicSession.save((String) bclass.getName(), objmap);
+            }
+
             if (!object.getClassName().equals("internal")) {
                 // Remove all existing properties
                 if (object.getFieldsToRemove().size()>0) {
                     for (int i=0;i<object.getFieldsToRemove().size();i++) {
-                        session.delete(object.getFieldsToRemove().get(i));
+                        BaseProperty prop = (BaseProperty) object.getFieldsToRemove().get(i);
+                        if (!handledProps.contains(prop.getName()))
+                         session.delete(prop);
                     }
                     object.setFieldsToRemove(new ArrayList());
                 }
@@ -870,7 +935,8 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
                         throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
                                 "Field {0} in object {1} has an invalid name", null, args);
                     }
-                    saveXWikiProperty(prop, context, false);
+                    if (!handledProps.contains(prop.getName()))
+                     saveXWikiProperty(prop, context, false);
                 }
             }
 
@@ -910,17 +976,29 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
 
             if (!alreadyLoaded) {
-             try {
-                session.load(object, new Integer(object.getId()));
-             }
-             catch (ObjectNotFoundException e) {
-                // There is no object data saved
-                object = null;
-                return;
-             }
+                try {
+                    session.load(object, new Integer(object.getId()));
+                }
+                catch (ObjectNotFoundException e) {
+                    // There is no object data saved
+                    object = null;
+                    return;
+                }
             }
 
             String className = object.getClassName();
+
+            // Let's check if the class has a custom mapping
+            BaseClass bclass = object.getxWikiClass(context);
+            List handledProps = new ArrayList();
+            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
+                handledProps = bclass.getCustomMappingPropertyList(context);
+                Session dynamicSession = session.getSession(EntityMode.MAP);
+                Object map = dynamicSession.load((String) bclass.getName(),new Integer(object.getId()));
+                bclass.fromValueMap((Map)map, object);
+            }
+
+
             if (!className.equals("internal")) {
                 HashMap map = new HashMap();
                 Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id");
@@ -967,12 +1045,26 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             }
             Session session = getSession(context);
 
+            // Let's check if the class has a custom mapping
+            BaseClass bclass = object.getxWikiClass(context);
+            List handledProps = new ArrayList();
+            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
+                handledProps = bclass.getCustomMappingPropertyList(context);
+                Session dynamicSession = session.getSession(EntityMode.MAP);
+                Object map = dynamicSession.get((String) bclass.getName(),new Integer(object.getId()));
+                dynamicSession.delete(map);
+                if (evict)
+                    dynamicSession.evict(map);
+            }
+
             if (!object.getClassName().equals("internal")) {
                 for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
                     BaseProperty property = (BaseProperty)it.next();
-                    session.delete(property);
-                    if (evict)
-                        session.evict(property);
+                    if (!handledProps.contains(property.getName())) {
+                        session.delete(property);
+                        if (evict)
+                            session.evict(property);
+                    }
                 }
             }
             session.delete(object);
@@ -1688,17 +1780,17 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         }
     }
 
-     public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
-               boolean bTransaction = true;
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
+        boolean bTransaction = true;
 
         if (sql==null)
             return null;
 
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate");
+                monitor.startTimer("hibernate");
             checkHibernate(context);
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
@@ -1737,7 +1829,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             if (monitor!=null)
                 monitor.endTimer("hibernate");
         }
-     }
+    }
 
     private String generateWhereStatement(String sql, Object[][] whereParams) {
         StringBuffer str =  new StringBuffer();
@@ -1781,11 +1873,11 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
         if (query==null)
             return null;
 
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate", query.getQueryString());
+                monitor.startTimer("hibernate", query.getQueryString());
             checkHibernate(context);
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
@@ -1820,7 +1912,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
     public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
             if (!selectColumns.trim().equals("")) {
@@ -1854,7 +1946,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate", ssql);
+                monitor.startTimer("hibernate", ssql);
 
             checkHibernate(context);
             bTransaction = beginTransaction(context);
@@ -1894,7 +1986,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
     public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
-        MonitorPlugin monitor  = getMonitorPlugin(context);
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             StringBuffer sql;
             if (distinctbyname)
@@ -1917,7 +2009,7 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
 
             // Start monitoring timer
             if (monitor!=null)
-             monitor.startTimer("hibernate", ssql);
+                monitor.startTimer("hibernate", ssql);
 
             checkHibernate(context);
             bTransaction = beginTransaction(context);
@@ -2051,6 +2143,182 @@ public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiExcep
             this.url = url;
         }
 
+    }
+
+
+    public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) {
+        try {
+            Configuration hibconfig = makeMapping(bclass.getName(), custommapping1);
+            return isValidCustomMapping(bclass.getName(), hibconfig, bclass);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public SessionFactory injectCustomMappingsInSessionFactory(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        boolean result = injectCustomMappings(doc, context);
+        if (result==false)
+         return null;
+
+        Configuration config = getConfiguration();
+        SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
+        Settings settings = sfactory.getSettings();
+        ConnectionProvider provider = ((SessionFactoryImpl)getSessionFactory()).getSettings().getConnectionProvider();
+        Field field = null;
+        try {
+            field = settings.getClass().getDeclaredField("connectionProvider");
+            field.setAccessible(true);
+            field.set(settings, provider);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED, "Mapping injection failed", e);
+        }
+        return sfactory;
+    }
+
+    public void injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
+        boolean result = injectCustomMapping(bclass, context);
+        if (result==false)
+         return;
+
+        Configuration config = getConfiguration();
+        injectInSessionFactory(config);
+    }
+
+    public void injectInSessionFactory(Configuration config) throws XWikiException {
+        SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
+        Settings settings = sfactory.getSettings();
+        ConnectionProvider provider = ((SessionFactoryImpl)getSessionFactory()).getSettings().getConnectionProvider();
+        Field field = null;
+        try {
+            field = settings.getClass().getDeclaredField("connectionProvider");
+            field.setAccessible(true);
+            field.set(settings, provider);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED, "Mapping injection failed", e);
+        }
+        setSessionFactory(sfactory);
+    }
+
+    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+        List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null", context);
+        boolean result = false;
+
+        for (int i=0;i<list.size();i++) {
+          XWikiDocument doc = (XWikiDocument)list.get(i);
+          result |= injectCustomMapping(doc.getxWikiClass(), context);
+        }
+
+        if (result==false)
+         return;
+        Configuration config = getConfiguration();
+        injectInSessionFactory(config);
+    }
+
+    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        boolean result = false;
+        Iterator it = doc.getxWikiObjects().values().iterator();
+        while (it.hasNext()) {
+            Vector objects = (Vector) it.next();
+            for (int i=0;i<objects.size();i++) {
+                BaseObject obj = (BaseObject)objects.get(i);
+                if (obj!=null) {
+                    result |=  injectCustomMapping(obj.getxWikiClass(context), context);
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException {
+        String custommapping = doc1class.getCustomMapping();
+        if ((custommapping==null)||(custommapping.equals("")))
+         return false;
+
+        Configuration config = getConfiguration();
+
+        // don't add a mapping that's already there
+        if (config.getClassMapping(doc1class.getName())!=null)
+         return false;
+
+        Configuration mapconfig = makeMapping(doc1class.getName(), custommapping);
+        if (!isValidCustomMapping(doc1class.getName(), mapconfig, doc1class))
+          throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
+
+        config.addXML(makeMapping(doc1class.getName() , "xwikicustom_" + doc1class.getName().replace('.','_'), custommapping));
+        config.buildMappings();
+        return true;
+    }
+
+    private boolean isValidCustomMapping(String className, Configuration hibconfig, BaseClass bclass) {
+        PersistentClass mapping = hibconfig.getClassMapping(className);
+        if (mapping==null)
+            return true;
+
+        Iterator it = mapping.getPropertyIterator();
+        while (it.hasNext()) {
+            Property hibprop = (Property) it.next();
+            String propname = hibprop.getName();
+            PropertyClass propclass = (PropertyClass) bclass.getField(propname);
+            if (propclass==null) {
+                log.warn("Mapping contains invalid field name " + propname);
+                return false;
+            }
+
+            boolean result = isValidColumnType(hibprop.getValue().getType().getName(), propclass.getClassName());
+            if (result==false) {
+                log.warn("Mapping contains invalid type in field " + propname);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public List getCustomMappingPropertyList(BaseClass bclass) {
+        List list = new ArrayList();
+        Configuration hibconfig = makeMapping(bclass.getName(), bclass.getCustomMapping());
+        PersistentClass mapping = hibconfig.getClassMapping(bclass.getName());
+        if (mapping==null)
+            return null;
+
+        Iterator it = mapping.getPropertyIterator();
+        while (it.hasNext()) {
+            Property hibprop = (Property) it.next();
+            String propname = hibprop.getName();
+            list.add(propname);
+        }
+        return list;
+    }
+
+    private Configuration makeMapping(String className, String custommapping1) {
+        Configuration hibconfig = new Configuration();
+        {
+            hibconfig.addXML(makeMapping(className , "xwikicustom_" + className.replace('.','_'), custommapping1));
+        }
+        hibconfig.buildMappings();
+        return hibconfig;
+    }
+
+    private String makeMapping(String entityName, String tableName, String custommapping1) {
+        String custommapping = "<?xml version=\"1.0\"?>\n" +
+                "<!DOCTYPE hibernate-mapping PUBLIC\n" +
+                "\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n" +
+                "\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n" +
+                "<hibernate-mapping>" +
+                "<class entity-name=\"" + entityName + "\" table=\"" + tableName+ "\">\n" +
+                "<id name=\"id\" type=\"integer\" />\n" +
+                custommapping1 +
+                "</class>\n" +
+                "</hibernate-mapping>";
+        return custommapping;
+    }
+
+    private boolean isValidColumnType(String name, String className) {
+        String[] validtypes = (String[]) validTypesMap.get(className);
+        if (validtypes==null)
+            return true;
+        else
+            return ArrayUtils.contains(validtypes, name);
     }
 }
 

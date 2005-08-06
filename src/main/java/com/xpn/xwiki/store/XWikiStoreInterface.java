@@ -25,10 +25,12 @@ package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import org.apache.commons.jrcs.rcs.Version;
+import org.hibernate.cfg.Configuration;
 
 import java.util.List;
 
@@ -59,7 +61,10 @@ public interface XWikiStoreInterface {
     public void cleanUp(XWikiContext context);
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
-
-    List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
-
+    public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
+    public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;
+    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    public List getCustomMappingPropertyList(BaseClass bclass);
+    public void injectCustomMappings(XWikiContext context) throws XWikiException;
 }

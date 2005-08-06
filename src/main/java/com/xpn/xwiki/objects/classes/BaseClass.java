@@ -26,16 +26,26 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.lob.ReaderInputStream;
+import org.hibernate.engine.Mapping;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.io.StringReader;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {
+    private static final Log log = LogFactory.getLog(BaseClass.class);
+    private String customMapping;
 
     // This insures natural ordering between properties
     public void addField(String name, PropertyInterface element) {
@@ -84,6 +94,25 @@ public class BaseClass extends BaseCollection implements ClassInterface {
                 } else {
                     objprop = property.fromString(formvalues.toString());
                 }
+                if (objprop!=null) {
+                    objprop.setObject(object);
+                    object.safeput(name, objprop);
+                }
+            }
+        }
+        return object;
+    }
+
+    public BaseCollection fromValueMap(Map map, BaseCollection object) {
+        object.setClassName(getName());
+        Iterator classit = getFieldList().iterator();
+        while (classit.hasNext()) {
+            PropertyClass property = (PropertyClass) classit.next();
+            String name = property.getName();
+            Object formvalue = map.get(name);
+            if (formvalue!=null) {
+                BaseProperty objprop;
+                objprop = property.fromValue(formvalue);
                 if (objprop!=null) {
                     objprop.setObject(object);
                     object.safeput(name, objprop);
@@ -242,4 +271,30 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
+    public void setCustomMapping(String customMapping) {
+        this.customMapping = customMapping;
+    }
+
+    public String getCustomMapping() {
+        return customMapping;
+    }
+
+    public boolean isCustomMappingValid(XWikiContext context) throws XWikiException {
+        return isCustomMappingValid(getCustomMapping(), context);
+    }
+
+    public boolean isCustomMappingValid(String custommapping1, XWikiContext context) throws XWikiException {
+        if ((custommapping1!=null)&&(custommapping1.trim().length()>0))
+          return context.getWiki().getStore().isCustomMappingValid(this, custommapping1, context);
+        else
+          return true;
+    }
+
+    public List getCustomMappingPropertyList(XWikiContext context) {
+        String custommapping1 = getCustomMapping();
+        if ((custommapping1!=null)&&(custommapping1.trim().length()>0))
+          return context.getWiki().getStore().getCustomMappingPropertyList(this);
+        else
+          return new ArrayList();
+    }
 }

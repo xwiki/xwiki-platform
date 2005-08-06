@@ -26,8 +26,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.input;
+import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Column;
+
+import java.util.Iterator;
 
 public class StringClass extends PropertyClass {
 
@@ -53,12 +58,16 @@ public class StringClass extends PropertyClass {
     }
 
     public BaseProperty fromString(String value) {
-        StringProperty property = new StringProperty();
-        property.setName(getName());
+        BaseProperty property = newProperty();
         property.setValue(value);
         return property;
     }
 
+    public BaseProperty newProperty() {
+        BaseProperty property = new StringProperty();
+        property.setName(getName());
+        return property;
+    }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         input input = new input();

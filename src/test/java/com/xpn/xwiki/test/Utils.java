@@ -33,14 +33,7 @@ import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.DBListClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
@@ -226,12 +219,14 @@ public class Utils {
               return createDoc(store, web, name, content1, bobject, bclass, bobjects, context);
         }
 
-    public static void prepareObject(XWikiDocument doc) throws XWikiException {
-        prepareObject(doc, "Test.TestObject");
+    public static BaseObject prepareObject(XWikiDocument doc) throws XWikiException {
+        return prepareObject(doc, "Test.TestObject");
     }
 
-    public static void prepareObject(XWikiDocument doc, String name) throws XWikiException {
-        BaseClass wclass = new BaseClass();
+    public static BaseClass prepareClass(XWikiDocument doc, String name) throws XWikiException {
+        BaseClass wclass = doc.getxWikiClass();
+        if (wclass==null)
+          wclass =  new BaseClass();
         wclass.setName(name);
         doc.setxWikiClass(wclass);
 
@@ -268,35 +263,36 @@ public class Utils {
         wclass.put("age", age_class);
         wclass.put("password", passwd_class);
         wclass.put("comment", comment_class);
+        return wclass;
+    }
 
+    public static BaseObject prepareObject(XWikiDocument doc, String name) throws XWikiException {
+        BaseClass wclass = prepareClass(doc, name);
         BaseObject object = new BaseObject();
         doc.setObject(wclass.getName(), 0, object);
 
         object.setClassName(wclass.getName());
         object.setName(name);
-        object.put("first_name", first_name_class.fromString("Ludovic"));
-        object.put("last_name", last_name_class.fromString("Von Dubost"));
-        object.put("age", age_class.fromString("33"));
-        object.put("password", passwd_class.fromString("sesame"));
-        object.put("comment",comment_class.fromString("Hello1\nHello2\nHello3\n"));
+        object.put("first_name", ((PropertyClass)wclass.get("first_name")).fromString("Ludovic"));
+        object.put("last_name", ((PropertyClass)wclass.get("last_name")).fromString("Von Dubost"));
+        object.put("age", ((PropertyClass)wclass.get("age")).fromString("33"));
+        object.put("password", ((PropertyClass)wclass.get("password")).fromString("sesame"));
+        object.put("comment",((PropertyClass)wclass.get("comment")).fromString("Hello1\nHello2\nHello3\n"));
+        return object;
     }
 
-    public static void prepareAdvancedObject(XWikiDocument doc) throws XWikiException {
-        prepareAdvancedObject(doc, "Test.TestObject");
+    public static BaseObject prepareAdvancedObject(XWikiDocument doc) throws XWikiException {
+        return prepareAdvancedObject(doc, "Test.TestObject");
     }
 
-    public static void prepareAdvancedObject(XWikiDocument doc, String name) throws XWikiException {
-        prepareObject(doc, name);
+    public static BaseClass prepareAdvancedClass(XWikiDocument doc, String name) throws XWikiException {
         BaseClass wclass = doc.getxWikiClass();
-        BaseObject object = doc.getObject(wclass.getName(), 0);
-
         BooleanClass boolean_class = new BooleanClass();
         boolean_class.setName("driver");
         boolean_class.setPrettyName("Driver License ?");
         boolean_class.setDisplayType("truefalse");
         boolean_class.setObject(wclass);
         wclass.put("driver", boolean_class);
-        object.put("driver", boolean_class.fromString("1"));
 
         StaticListClass slist_class = new StaticListClass();
         slist_class.setName("category");
@@ -304,7 +300,6 @@ public class Utils {
         slist_class.setValues("1|2|3");
         slist_class.setObject(wclass);
         wclass.put("category", slist_class);
-        object.put("category", slist_class.fromString("1"));
 
 
         StaticListClass slist_class2 = new StaticListClass();
@@ -314,7 +309,6 @@ public class Utils {
         slist_class2.setValues("1|2|3");
         slist_class2.setObject(wclass);
         wclass.put("category2", slist_class2);
-        object.put("category2", slist_class2.fromString("1|2"));
 
         StaticListClass slist_class3 = new StaticListClass();
         slist_class3.setName("category3");
@@ -324,7 +318,6 @@ public class Utils {
         slist_class3.setRelationalStorage(true);
         slist_class3.setMultiSelect(true);
         wclass.put("category3", slist_class3);
-        object.put("category3", slist_class3.fromString("1|2"));
 
         DBListClass dblist_class = new DBListClass();
         dblist_class.setName("dblist");
@@ -332,7 +325,19 @@ public class Utils {
         dblist_class.setSql("select distinct doc.name from XWikiDocument as doc");
         dblist_class.setObject(wclass);
         wclass.put("dblist", dblist_class);
-        object.put("dblist", dblist_class.fromString("XWikiUsers"));
+        return wclass;
+    }
+
+    public static BaseObject prepareAdvancedObject(XWikiDocument doc, String name) throws XWikiException {
+        BaseObject object = prepareObject(doc, name);
+        BaseClass wclass = prepareAdvancedClass(doc, name);
+
+        object.put("driver", ((PropertyClass)wclass.get("driver")).fromString("1"));
+        object.put("category", ((PropertyClass)wclass.get("category")).fromString("1"));
+        object.put("category2", ((PropertyClass)wclass.get("category2")).fromString("1|2"));
+        object.put("category3", ((PropertyClass)wclass.get("category3")).fromString("1|2"));
+        object.put("dblist", ((PropertyClass)wclass.get("dblist")).fromString("XWikiUsers"));
+        return object;
     }
 
 

@@ -134,7 +134,7 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web.xml" version="2.3" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web-test.xml" version="2.3" />
     <webroots>
       <root url="file://$MODULE_DIR$/src/main/web" relative="/" />
     </webroots>

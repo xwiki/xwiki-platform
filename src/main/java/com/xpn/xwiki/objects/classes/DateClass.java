@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
+import org.hibernate.mapping.Property;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,8 +74,7 @@ public class DateClass  extends PropertyClass {
     }
 
     public BaseProperty fromString(String value) {
-        DateProperty property = new DateProperty();
-        property.setName(getName());
+        BaseProperty property = newProperty();
 
         if ((value==null)||(value.equals(""))) {
             property.setValue(new Date());
@@ -90,6 +90,12 @@ public class DateClass  extends PropertyClass {
         return property;
     }
 
+    public BaseProperty newProperty() {
+        BaseProperty property = new DateProperty();
+        property.setName(getName());
+        return property;
+    }
+
     public String toFormString(BaseProperty property) {
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         return sdf.format(property.getValue());
@@ -97,8 +103,7 @@ public class DateClass  extends PropertyClass {
 
     public BaseProperty newPropertyfromXML(Element ppcel) {
         String value = ppcel.getText();
-        DateProperty property = new DateProperty();
-        property.setName(getName());
+        BaseProperty property = newProperty();
 
         if ((value==null)||(value.equals(""))) {
             property.setValue(new Date());
@@ -137,5 +142,4 @@ public class DateClass  extends PropertyClass {
         input.setSize(getSize());
         buffer.append(input.toString());
     }
-
 }

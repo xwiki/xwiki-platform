@@ -25,6 +25,7 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -32,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import org.apache.commons.jrcs.rcs.Version;
+import org.hibernate.cfg.Configuration;
 
 import java.util.List;
 
@@ -166,6 +168,18 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.searchDocumentsNames(wheresql, nb, start, selectColumns, context);
     }
 
+    public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException {
+        return store.isCustomMappingValid(bclass, custommapping1, context);
+    }
+
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException {
+        return store.injectCustomMapping(doc1class, context);
+    }
+
+    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        return store.injectCustomMappings(doc, context);
+    }
+
     public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException {
         return store.searchDocuments(wheresql, distinctbyname, context);
     }
@@ -261,5 +275,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public void setPageExistCache(XWikiCache pageExistCache) {
         this.pageExistCache = pageExistCache;
+    }
+
+    public List getCustomMappingPropertyList(BaseClass bclass) {
+        return store.getCustomMappingPropertyList(bclass);
+    }
+
+    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+        store.injectCustomMappings(context);
     }
 }

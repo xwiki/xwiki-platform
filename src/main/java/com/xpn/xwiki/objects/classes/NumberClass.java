@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.input;
+import org.hibernate.mapping.Property;
 
 public class NumberClass  extends PropertyClass {
 
@@ -56,31 +57,41 @@ public class NumberClass  extends PropertyClass {
         setStringValue("numberType", ntype);
     }
 
+    public BaseProperty newProperty() {
+        String ntype = getNumberType();
+        BaseProperty property;
+        if (ntype.equals("integer")) {
+            property = new IntegerProperty();
+        } else if (ntype.equals("float")) {
+            property = new FloatProperty();
+        } else if (ntype.equals("double")) {
+            property = new DoubleProperty();
+        } else {
+            property = new LongProperty();
+        }
+        property.setName(getName());
+        return property;
+    }
+
 
     public BaseProperty fromString(String value) {
-        NumberProperty property;
+        BaseProperty property = newProperty();
         String ntype = getNumberType();
         Number nvalue = null;
         if (ntype.equals("integer")) {
-            property = new IntegerProperty();
             if ((value!=null)&&(!value.equals("")))
                 nvalue = new Integer(value);
         } else if (ntype.equals("float")) {
-            property = new FloatProperty();
             if ((value!=null)&&(!value.equals("")))
                 nvalue = new Float(value);
         } else if (ntype.equals("double")) {
-            property = new DoubleProperty();
             if ((value!=null)&&(!value.equals("")))
                 nvalue = new Double(value);
         } else {
-            property = new LongProperty();
             if ((value!=null)&&(!value.equals("")))
                 nvalue = new Long(value);
         }
-        property.setName(getName());
         property.setValue(nvalue);
-        // property.setPropertyClass(this);
         return property;
     }
 
@@ -95,5 +106,4 @@ public class NumberClass  extends PropertyClass {
         input.setSize(getSize());
         buffer.append(input.toString());
     }
-
 }

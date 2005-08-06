@@ -24,15 +24,14 @@ package com.xpn.xwiki.objects;
 
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
 

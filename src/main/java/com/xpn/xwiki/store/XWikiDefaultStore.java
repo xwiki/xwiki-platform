@@ -25,8 +25,11 @@ package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public abstract class XWikiDefaultStore implements XWikiStoreInterface {
 
@@ -49,4 +52,20 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
         return searchDocuments(wheresql, true, nb, start, context);
     }
+
+    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException {
+        return false;
+    }
+
+    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext xWikiContext) throws XWikiException {
+        return false;
+    }
+
+    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+    }
+
+    public List getCustomMappingPropertyList(BaseClass bclass) {
+        return new ArrayList();
+    }
+
 }

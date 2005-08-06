@@ -41,10 +41,10 @@ import java.io.StringWriter;
 import java.util.*;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
-    private String className;
-    private Map fields = ListOrderedMap.decorate(new HashMap());
-    private List fieldsToRemove = new ArrayList();
-    private int number;
+    protected String className;
+    protected Map fields = ListOrderedMap.decorate(new HashMap());
+    protected List fieldsToRemove = new ArrayList();
+    protected int number;
 
     public int getId() {
         return hashCode();
@@ -76,7 +76,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setClassName(String name) {
         className = name;
     }
-
 
     public void checkField(String name) throws XWikiException {
         /*  // Let's stop checking.. This is a pain
@@ -407,5 +406,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return toXMLString();
     }
 
-
+    public Map getMap() throws XWikiException {
+        Map map = new HashMap();
+        for (Iterator it = fields.keySet().iterator();it.hasNext();) {
+            String name = (String) it.next();
+            BaseProperty property = (BaseProperty) get(name);
+            map.put(name, property.getValue());
+        }
+        map.put("id", new Integer(getId()));
+        return map;
+    }
 }

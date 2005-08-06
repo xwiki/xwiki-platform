@@ -32,6 +32,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Column;
 
 import java.util.Iterator;
 import java.util.List;
@@ -282,5 +284,19 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseProperty fromStringArray(String[] strings) {
         return fromString(strings[0]);
+    }
+
+    public boolean isValidColumnTypes(Property hibprop) {
+        return true;
+    }
+
+    public BaseProperty fromValue(Object value) {
+        BaseProperty property= newProperty();
+        property.setValue(value);
+        return property;
+    }
+
+    public BaseProperty newProperty() {
+        return new BaseProperty();
     }
 }

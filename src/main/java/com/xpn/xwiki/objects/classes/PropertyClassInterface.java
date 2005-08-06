@@ -31,8 +31,11 @@ import com.xpn.xwiki.objects.ObjectInterface;
 public interface PropertyClassInterface extends ObjectInterface {
     public String toString(BaseProperty property);
     public BaseProperty fromString(String value);
+    public BaseProperty fromValue(Object value);
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
     public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
+
+    BaseProperty newProperty();
 }

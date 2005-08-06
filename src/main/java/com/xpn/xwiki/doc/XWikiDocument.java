@@ -39,6 +39,7 @@ import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.ObjectAddForm;
+import com.cogniumsystems.wiki.dom.IWikiNode;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
@@ -110,6 +111,8 @@ public class XWikiDocument {
     // Caching
     private boolean fromCache = false;
     private ArrayList objectsToRemove = new ArrayList();
+
+    private Object wikiNode;
 
     private XWikiStoreInterface store;
 
@@ -212,6 +215,7 @@ public class XWikiDocument {
     public void setContent(String content) {
         if (!content.equals(this.content)) {
             setContentDirty(true);
+            setWikiNode(null);
         }
         this.content = content;
     }
@@ -2164,4 +2168,13 @@ public class XWikiDocument {
         setContent(StringUtils.replaceOnce(getContent(), marker, text + marker));
         context.getWiki().saveDocument(this, context);
     }
+
+    public Object getWikiNode() {
+        return wikiNode;
+    }
+
+    public void setWikiNode(Object WikiNode) {
+        this.wikiNode = wikiNode;
+    }
+
 }

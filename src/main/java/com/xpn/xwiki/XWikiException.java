@@ -161,6 +161,8 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK = 13006;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_LOCK = 13007;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK = 13008;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING = 13009;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED = 13010;
     public static final int ERROR_LASZLO_INVALID_XML = 21001;
     public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
 

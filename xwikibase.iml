@@ -10,6 +10,22 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/cactus" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.app.docformatter/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.app.docformatter/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.common/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.common/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.dem/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.dem/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.dom/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.dom/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.format/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.format/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.parser/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.parser/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.test/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.test/test" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.transform/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/wikiparser/com.cogniumsystems.wiki.transform/test" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/release" />
@@ -38,6 +54,7 @@
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
+    <orderEntry type="library" name="javacc" level="project" />
     <orderEntryProperties />
   </component>
 </module>

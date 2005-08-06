@@ -26,8 +26,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.textarea;
+import org.hibernate.mapping.Property;
 
 public class TextAreaClass extends StringClass {
 
@@ -41,6 +43,12 @@ public class TextAreaClass extends StringClass {
         this(null);
     }
 
+    public BaseProperty newProperty() {
+        BaseProperty property = new LargeStringProperty();
+        property.setName(getName());
+        return property;
+    }
+
     public int getRows() {
         return getIntValue("rows");
     }
@@ -49,12 +57,6 @@ public class TextAreaClass extends StringClass {
         setIntValue("rows", rows);
     }
 
-  public BaseProperty fromString(String value) {
-        LargeStringProperty property = new LargeStringProperty();
-        property.setName(getName());
-        property.setValue(value);
-        return property;
-    }
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         textarea textarea = new textarea();
         BaseProperty prop = (BaseProperty) object.safeget(name);

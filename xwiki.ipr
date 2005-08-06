@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project version="4" relativePaths="false">
   <component name="AntConfiguration">
     <defaultAnt bundledAnt="true" />
@@ -379,8 +379,8 @@
     </library>
     <library name="ExoPlatform">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/jcommon-0.9.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/jfreechart-0.9.16.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.0-rc1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/picocontainer-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.impl-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.impl-1.0.jar!/" />

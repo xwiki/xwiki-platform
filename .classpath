@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/Servleti18nTest.java|com/xpn/xwiki/test/ServletVirtualTest.java" kind="src" path="src/main/java"/>
-	<classpathentry kind="src" path="src/main/web"/>
-	<classpathentry kind="src" path="src/test/cactus"/>
-	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry excluding="**/.svn|**/.svn/**|com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/ServletVirtualTest.java|com/xpn/xwiki/test/Servleti18nTest.java" kind="src" path="src/main/java"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/main/web"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/cactus"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/java"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-net-1.1.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-pool-1.1.jar"/>
@@ -28,8 +28,8 @@
 	<classpathentry kind="lib" path="lib/groovy-all-1.0-jsr-01.jar"/>
 	<classpathentry kind="lib" path="lib/InlineJavaServer.jar"/>
 	<classpathentry kind="lib" path="lib/InlineJavaUser.jar"/>
-	<classpathentry kind="lib" path="lib/jcommon-0.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/jfreechart-0.9.16.jar"/>
+	<classpathentry kind="lib" path="lib/jcommon-1.0.0-rc1.jar"/>
+	<classpathentry kind="lib" path="lib/jfreechart-1.0.0-rc1.jar"/>
 	<classpathentry kind="lib" path="lib/jimi.jar"/>
 	<classpathentry kind="lib" path="lib/jta.jar"/>
 	<classpathentry kind="lib" path="lib/jtidy.jar"/>

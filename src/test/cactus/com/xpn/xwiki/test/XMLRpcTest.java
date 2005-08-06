@@ -29,12 +29,16 @@ import java.util.Map;
 import java.util.Collection;
 import java.util.HashMap;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import junit.framework.TestCase;
@@ -56,7 +60,10 @@ public class XMLRpcTest  extends TestCase
 
     public void setUp() throws Exception {
         super.setUp();
-        xwiki = new XWiki("./xwiki.cfg", context);
+    	String configpath = "./xwiki.cfg";
+    	XWikiConfig config = new XWikiConfig(new FileInputStream(configpath));
+        xwiki = new XWiki(config, context);
+
         context.setWiki(xwiki);
 
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());

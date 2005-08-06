@@ -1,5 +1,6 @@
 package com.xpn.xwiki.test;
 
+import java.io.FileInputStream;
 import java.net.URL;
 
 import org.apache.cactus.ServletTestCase;
@@ -7,6 +8,7 @@ import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -34,7 +36,10 @@ public abstract class XWikiIntegrationTest extends ServletTestCase {
   public void setUp() throws Exception {
       context = new XWikiContext();
       context.setDatabase("xwikitest");
-      xwiki = new XWiki("./test/xwiki-integration.cfg", context);
+      String configpath = "./test/xwiki-integration.cfg";
+	  XWikiConfig config = new XWikiConfig(new FileInputStream(configpath));
+      xwiki = new XWiki(config, context);
+
       xwiki.setDatabase("xwikitest");
       
       context.setWiki(xwiki);

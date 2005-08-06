@@ -23,6 +23,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -37,6 +38,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -63,7 +66,17 @@ public abstract class ServletTest extends ServletTestCase {
     };
 
     public void clientSetUp(XWikiStoreInterface store) throws XWikiException {
-        xwiki = new XWiki("./xwiki.cfg", context);
+    	String configpath = "./xwiki.cfg";
+    	XWikiConfig config;
+    	try {
+    		config = new XWikiConfig(new FileInputStream(configpath));
+    	} catch (FileNotFoundException e) {
+            Object[] args = { configpath };
+    		throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
+    	               XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
+    	               "Configuration file {0} not found", e, args);
+    	}
+        xwiki = new XWiki(config, context);
         context.setWiki(xwiki);
     }
 

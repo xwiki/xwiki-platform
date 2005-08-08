@@ -156,7 +156,7 @@ public class XWikiTest extends HibernateTestCase {
     }
 
     public void testCopyDocument() throws XWikiException {
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocument", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "CopyDocument", getXWikiContext());
         getXWiki().copyDocument("Test.CopyDocument", "Test.CopyDocument2", getXWikiContext());
         getXWiki().flushCache();
 
@@ -173,7 +173,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.prepareObject(doc, "Test.CopyDocumentWithObject");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithObject", bobject, bclass, getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "CopyDocumentWithObject", bobject, bclass, getXWikiContext());
         getXWiki().copyDocument("Test.CopyDocumentWithObject", "Test.CopyDocumentWithObject2", getXWikiContext());
         getXWiki().flushCache();
 
@@ -190,7 +190,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.prepareAdvancedObject(doc, "Test.CopyDocumentWithAdvObject");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithAdvObject", bobject, bclass, getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "CopyDocumentWithAdvObject", bobject, bclass, getXWikiContext());
         getXWiki().copyDocument("Test.CopyDocumentWithAdvObject", "Test.CopyDocumentWithAdvObject2", getXWikiContext());
         getXWiki().flushCache();
 
@@ -203,14 +203,14 @@ public class XWikiTest extends HibernateTestCase {
     }
 
     public void testCopyDocumentWithAttachment() throws XWikiException, IOException {
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "CopyDocumentWithAttachment", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "CopyDocumentWithAttachment", getXWikiContext());
         XWikiDocument doc1 = getXWiki().getDocument("Test.CopyDocumentWithAttachment", getXWikiContext());
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
         doc1.saveAttachmentContent(attachment1, getXWikiContext());
         doc1.getAttachmentList().add(attachment1);
-        getXWiki().getHibernateStore().saveXWikiDoc(doc1, getXWikiContext());
+        getXWiki().getStore().saveXWikiDoc(doc1, getXWikiContext());
 
         getXWiki().copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", getXWikiContext());
         getXWiki().flushCache();
@@ -231,7 +231,7 @@ public class XWikiTest extends HibernateTestCase {
     public void testAccessSecureAPINoAccess() throws XWikiException {
         XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         Utils.content1 = "$context.context.database";
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "SecureAPI", getXWikiContext());
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI", getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
@@ -241,7 +241,7 @@ public class XWikiTest extends HibernateTestCase {
         Utils.content1 = "$context.context.database";
         Utils.author = "XWiki.LudovicDubost";
         Utils.updateRight(getXWiki(), getXWikiContext(), "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI2", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "SecureAPI2", getXWikiContext());
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI2", getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc1, "xwikitest", false, getXWikiContext());
     }
@@ -250,13 +250,13 @@ public class XWikiTest extends HibernateTestCase {
         XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         Utils.updateRight(getXWiki(), getXWikiContext(), "XWiki.XWikiPreferences", "XWiki.LudovicDubost","","admin", true, true);
 
-        Utils.content1 = "#includeForm(\"SecureAPI4\")";
+        Utils.content1 = "$xwiki.includeForm(\"SecureAPI4\")";
         Utils.author = "XWiki.LudovicDubost";
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI3", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "SecureAPI3", getXWikiContext());
 
         Utils.content1 = "$context.context.database";
         Utils.author = "XWiki.JohnDoe";
-        Utils.createDoc(getXWiki().getHibernateStore(), "Test", "SecureAPI4", getXWikiContext());
+        Utils.createDoc(getXWiki().getStore(), "Test", "SecureAPI4", getXWikiContext());
 
         XWikiDocument doc1 = getXWiki().getDocument("Test.SecureAPI3", getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());

@@ -201,7 +201,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             "update xwikidoc set xwd_translation=0 where xwd_translation is null",
             "update xwikidoc set xwd_language='' where xwd_language is null",
             "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
-            "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
+            "update xwikidoc as doc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
 
         String[] sql = new String[schemaSQL.length+addSQL.length];
         for (int i=0;i<schemaSQL.length;i++)
@@ -677,7 +677,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     continue;
 
                 if (!className.equals("")) {
-                    loadXWikiCollection(object, context, false, true);
+                    loadXWikiCollection(object, doc, context, false, true);
                     doc.setObject(className, object.getNumber(), object);
                 }
             }
@@ -959,14 +959,18 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void loadXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
-        loadXWikiCollection(object, context, bTransaction, false);
+        loadXWikiCollection(object, null,context, bTransaction, false);
     }
 
     public void loadXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction) throws XWikiException {
-        loadXWikiCollection(object, context, bTransaction, false);
+        loadXWikiCollection(object, null, context, bTransaction, false);
     }
 
     public void loadXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction, boolean alreadyLoaded) throws XWikiException {
+        loadXWikiCollection(object, null, context, bTransaction, alreadyLoaded);
+    }
+
+    public void loadXWikiCollection(BaseCollection object, XWikiDocument doc, XWikiContext context, boolean bTransaction, boolean alreadyLoaded) throws XWikiException {
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -987,9 +991,16 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             String className = object.getClassName();
+            BaseClass bclass;
+            if (!className.equals(object.getName())) {
+                // Let's check if the class has a custom mapping
+                bclass = object.getxWikiClass(context);
+            } else {
+                // We need to get it from the document otherwise
+                // we will go in an endless loop
+                bclass = doc.getxWikiClass();
+            }
 
-            // Let's check if the class has a custom mapping
-            BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
             if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
@@ -997,7 +1008,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 Object map = dynamicSession.load((String) bclass.getName(),new Integer(object.getId()));
                 bclass.fromValueMap((Map)map, object);
             }
-
 
             if (!className.equals("internal")) {
                 HashMap map = new HashMap();

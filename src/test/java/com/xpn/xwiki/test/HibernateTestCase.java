@@ -113,7 +113,7 @@ public class HibernateTestCase extends TestCase {
             while (rs.next()) {
                 Map item = new HashMap();
                 for (int i=1;i<=colcount;i++) {
-                    String colname = mdata.getColumnName(i);
+                    String colname = mdata.getColumnName(i).toLowerCase();
                     item.put(colname, rs.getObject(i));
                 }
                 list.add(item);

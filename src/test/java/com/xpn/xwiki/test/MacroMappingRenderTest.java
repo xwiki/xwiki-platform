@@ -60,6 +60,7 @@ public class MacroMappingRenderTest extends TestCase {
         context.setDatabase("xwikitest");
         context.setWiki(xwiki);
         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
+        xwiki.getConfig().setProperty("xwiki.render.macromapping", "1");
         Velocity.init("velocity.properties");
     }
 

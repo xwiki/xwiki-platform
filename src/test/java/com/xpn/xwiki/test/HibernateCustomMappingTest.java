@@ -202,7 +202,7 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         try {
             getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
             Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_test_hcmclass", getXWikiContext());
-            assertEquals("Table does not exist", new Integer(0), result);
+            assertEquals("Table does not exist", 0, ((Number)result).intValue());
             List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_test_hcmclass", getXWikiContext());
             assertNotNull("Table items incorrect does not exist", list);
         } finally {
@@ -256,16 +256,16 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         try {
             getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
             Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_test_hcmclass", getXWikiContext());
-            assertEquals("Table does not exist", new Integer(1), result);
+            assertEquals("Table does not exist", 1, ((Number)result).intValue());
             List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_test_hcmclass", getXWikiContext());
             assertNotNull("Table items incorrect does not exist", list);
             assertEquals("Result size incorrect", 1, list.size());
             Map item = (Map)list.get(0);
-            assertEquals("First Name incorrect", "Ludovic", item.get("XWO_FIRST_NAME"));
-            assertEquals("Last Name incorrect", "Von Dubost", item.get("XWO_LAST_NAME"));
-            assertEquals("Age incorrect", new Integer(33), item.get("XWO_AGE"));
-            assertEquals("Password incorrect", "sesame", item.get("XWO_PASSWORD"));
-            assertEquals("Comment incorrect", "Hello1\nHello2\nHello3\n", item.get("XWO_COMMENT"));
+            assertEquals("First Name incorrect", "Ludovic", item.get("xwo_first_name"));
+            assertEquals("Last Name incorrect", "Von Dubost", item.get("xwo_last_name"));
+            assertEquals("Age incorrect", new Integer(33), item.get("xwo_age"));
+            assertEquals("Password incorrect", "sesame", item.get("xwo_password"));
+            assertEquals("Comment incorrect", "Hello1\nHello2\nHello3\n", item.get("xwo_comment"));
         } finally {
             getXWiki().getHibernateStore().endTransaction(getXWikiContext(), false);
         }

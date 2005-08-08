@@ -194,14 +194,14 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
         } catch (Exception e) {}
 
-        String fullName = ((context!=null)&&(context.getWiki()!=null)) ? context.getWiki().getFullNameSQL(true) : "xwd_fullname";
+        String fullName = ((context!=null)&&(context.getWiki()!=null)&&(context.getWiki().isMySQL())) ?  "concat('xwd_web','.','xwd_name)" : "xwd_fullname";
         String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
         String[] addSQL = {
             // Make sure we have no null valued in integer fields
             "update xwikidoc set xwd_translation=0 where xwd_translation is null",
             "update xwikidoc set xwd_language='' where xwd_language is null",
             "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
-            "update xwikidoc as doc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
+            "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
 
         String[] sql = new String[schemaSQL.length+addSQL.length];
         for (int i=0;i<schemaSQL.length;i++)
@@ -991,14 +991,15 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             String className = object.getClassName();
-            BaseClass bclass;
+            BaseClass bclass = null;
             if (!className.equals(object.getName())) {
                 // Let's check if the class has a custom mapping
                 bclass = object.getxWikiClass(context);
             } else {
                 // We need to get it from the document otherwise
                 // we will go in an endless loop
-                bclass = doc.getxWikiClass();
+                if (doc!=null)
+                 bclass = doc.getxWikiClass();
             }
 
             List handledProps = new ArrayList();

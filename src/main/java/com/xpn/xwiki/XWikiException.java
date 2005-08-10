@@ -122,6 +122,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST = 7001;
     public static final int ERROR_XWIKI_CLASSES_FIELD_INVALID = 7002;
     public static final int ERROR_XWIKI_CLASSES_DIFF = 7003;
+    public static final int ERROR_XWIKI_CLASS_CUSTOMCLASSINVOCATIONERROR = 7004;
 
     public static final int ERROR_XWIKI_USER_INIT = 8001;
     public static final int ERROR_XWIKI_USER_CREATE = 8002;

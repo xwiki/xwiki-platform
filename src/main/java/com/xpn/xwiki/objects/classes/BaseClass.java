@@ -29,6 +29,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.cfg.Configuration;
@@ -41,11 +42,13 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {
     private static final Log log = LogFactory.getLog(BaseClass.class);
     private String customMapping;
+    private String customClass;
 
     // This insures natural ordering between properties
     public void addField(String name, PropertyInterface element) {
@@ -296,5 +299,35 @@ public class BaseClass extends BaseCollection implements ClassInterface {
           return context.getWiki().getStore().getCustomMappingPropertyList(this);
         else
           return new ArrayList();
+    }
+
+    public void setCustomClass(String customClass) {
+        this.customClass = customClass;
+    }
+
+    public String getCustomClass() {
+        return customClass;
+    }
+
+    public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException {
+        String customClass = getCustomClass();
+        try {
+            if ((customClass==null)||(customClass.equals("")))
+             return new BaseObject();
+            else
+             return (BaseObject) Class.forName(getCustomClass()).newInstance();
+        } catch (Exception e) {
+            Object[] args = {customClass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                    XWikiException.ERROR_XWIKI_CLASS_CUSTOMCLASSINVOCATIONERROR,
+                    "Cannot instanciate custom class {0}", e, args);
+        }
+    }
+
+    public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException { {
+        BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
+        BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        return object;
+    }
     }
 }

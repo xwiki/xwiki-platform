@@ -298,6 +298,9 @@
         <property name="customMapping" type="string">
             <column name="XWO_CUSTOM_MAPPING" length="60000"/>
         </property>
+        <property name="customClass" type="string">
+            <column name="XWO_CUSTOM_CLASS" length="255"/>
+        </property>
     </class>
 
 

@@ -552,7 +552,7 @@ public class XWikiDocument {
     }
 
     public int createNewObject(String classname, XWikiContext context) throws XWikiException {
-        BaseObject object = new BaseObject();
+        BaseObject object = BaseClass.newCustomClassInstance(classname, context);
         object.setName(getFullName());
         object.setClassName(classname);
         Vector objects = getObjects(classname);

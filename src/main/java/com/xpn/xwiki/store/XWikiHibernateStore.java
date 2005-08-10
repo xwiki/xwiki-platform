@@ -677,6 +677,14 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     continue;
 
                 if (!className.equals("")) {
+                    BaseObject newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
+                    if (newobject!=null) {
+                        newobject.setId(object.getId());
+                        newobject.setClassName(object.getClassName());
+                        newobject.setName(object.getName());
+                        newobject.setNumber(object.getNumber());
+                        object = newobject;
+                    }
                     loadXWikiCollection(object, doc, context, false, true);
                     doc.setObject(className, object.getNumber(), object);
                 }
@@ -691,7 +699,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     Object[] result = (Object[])it2.next();
                     Integer number = (Integer)result[0];
                     String member = (String)result[1];
-                    BaseObject obj = new BaseObject();
+                    BaseObject obj = BaseClass.newCustomClassInstance("XWiki.XWikiGroups", context);
                     obj.setName(doc.getFullName());
                     obj.setClassName("XWiki.XWikiGroups");
                     obj.setNumber(number.intValue());
@@ -970,7 +978,8 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         loadXWikiCollection(object, null, context, bTransaction, alreadyLoaded);
     }
 
-    public void loadXWikiCollection(BaseCollection object, XWikiDocument doc, XWikiContext context, boolean bTransaction, boolean alreadyLoaded) throws XWikiException {
+    public void loadXWikiCollection(BaseCollection object1, XWikiDocument doc, XWikiContext context, boolean bTransaction, boolean alreadyLoaded) throws XWikiException {
+        BaseCollection object = object1;
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -978,10 +987,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
             Session session = getSession(context);
 
-
             if (!alreadyLoaded) {
                 try {
-                    session.load(object, new Integer(object.getId()));
+                    session.load(object, new Integer(object1.getId()));
                 }
                 catch (ObjectNotFoundException e) {
                     // There is no object data saved

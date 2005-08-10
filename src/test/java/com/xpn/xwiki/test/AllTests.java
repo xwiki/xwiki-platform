@@ -72,6 +72,7 @@ public class AllTests {
         suite.addTestSuite(LDAPTest.class);
         suite.addTestSuite(MacroMappingRenderTest.class);
         suite.addTestSuite(HibernateCustomMappingTest.class);
+        suite.addTestSuite(HibernateCustomClassTest.class);
         //$JUnit-END$
 
         return suite;

@@ -677,7 +677,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     continue;
 
                 if (!className.equals("")) {
-                    BaseObject newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
+                    BaseObject newobject;
+                    if (className.equals(doc.getFullName()))
+                     newobject = bclass.newCustomClassInstance(context);
+                    else
+                     newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
                     if (newobject!=null) {
                         newobject.setId(object.getId());
                         newobject.setClassName(object.getClassName());

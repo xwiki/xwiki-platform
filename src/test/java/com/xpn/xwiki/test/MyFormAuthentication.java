@@ -257,21 +257,10 @@ public class MyFormAuthentication extends AbstractAuthentication
                 if (name.equalsIgnoreCase(theTarget))
                 {
                     String host = theConnection.getURL().getHost();
-                      // Let's force it to localhost as it seems to fail on Linux
-                    host = "localhost";
-
-                    /*
-                      String[] hosts = {
-                           "127.0.0.1",
-                           "localhost",
-                           "localhost.localdomain"
-                      };
-                      for (int h = 0; h < hosts.length; h++) {
-
-                      }
-                      */
-                      return new Cookie(host,
-                         name, value);
+                    System.out.println("Found cookie: name=" + name + " value=" + value + " for host " + host);
+                    Cookie cookie = new Cookie(host, name, value);
+                    cookie.setPath("/");
+                    return cookie;
                 }
             }
             key = theConnection.getHeaderFieldKey(++i);
@@ -300,15 +289,18 @@ public class MyFormAuthentication extends AbstractAuthentication
                 int equalsChar = nameValue.indexOf("=");
                 String name = nameValue.substring(0, equalsChar);
                 String value = nameValue.substring(equalsChar + 1);
-                // String host = theConnection.getURL().getHost();
-                // Let's force it to localhost as it seems to fail on Linux
+                String host = theConnection.getURL().getHost();
+                System.out.println("Found cookie: name=" + name + " value=" + value + " for host " + host);
+                Cookie cookie = new Cookie(host, name, value);
+                cookie.setPath("/");
+                cookies.add(cookie);
+
+                // Let's also force it to localhost as it seems to fail on Linux
                 String [] hosts = { "localhost", "127.0.0.1", "localhost.localdomain" };
                 for (int h = 0; h < hosts.length; h ++) {
-                    String host = hosts[h];
-                    Cookie cookie = new Cookie(host, name, value);
+                    cookie = new Cookie(hosts[h], name, value);
                     cookie.setPath("/");
                     cookies.add(cookie);
-
                 }
             }
             key = theConnection.getHeaderFieldKey(++i);
@@ -437,6 +429,12 @@ public class MyFormAuthentication extends AbstractAuthentication
             WebRequest request = getSecurityRequest();
             ((WebRequestImpl) request).setConfiguration(theConfiguration);
             request.addCookie(this.jsessionCookie);
+            String [] hosts = { "localhost", "127.0.0.1", "localhost.localdomain" };
+            for (int h = 0; h < hosts.length; h ++) {
+                Cookie cookie = new Cookie(hosts[h], this.jsessionCookie.getName(), this.jsessionCookie.getValue());
+                cookie.setPath(this.jsessionCookie.getPath());
+                request.addCookie(cookie);
+            }
             request.addParameter("j_username", getName(),
                 WebRequest.POST_METHOD);
             request.addParameter("j_password", getPassword(),

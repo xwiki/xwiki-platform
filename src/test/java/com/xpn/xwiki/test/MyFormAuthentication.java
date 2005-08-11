@@ -276,6 +276,9 @@ public class MyFormAuthentication extends AbstractAuthentication
         String key = theConnection.getHeaderFieldKey(i);
         while (key != null)
         {
+            String headerstr = theConnection.getHeaderField(i);
+            System.out.println("Examining header: name=" + key + " value=" + headerstr);
+
             if (key.equalsIgnoreCase("set-cookie"))
             {
                 // Cookie is in the form:

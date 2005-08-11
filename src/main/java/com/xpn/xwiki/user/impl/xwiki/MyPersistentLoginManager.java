@@ -24,6 +24,8 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.crypto.Cipher;
 import javax.servlet.ServletException;
@@ -38,6 +40,7 @@ import java.util.List;
 import com.xpn.xwiki.XWikiContext;
 
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
+    private static final Log log = LogFactory.getLog(MyPersistentLoginManager.class);
     protected String cookiePath = "/";
     protected String[] cookieDomains = null;
 
@@ -88,21 +91,21 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
        if (cookieDomain!=null)
         usernameCookie.setDomain(cookieDomain);
 
-       response.addCookie(usernameCookie);
-       Cookie passwdCookie = new Cookie(COOKIE_PASSWORD, password);
+        addCookie(response, usernameCookie);
+        Cookie passwdCookie = new Cookie(COOKIE_PASSWORD, password);
        passwdCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
        passwdCookie.setPath(cookiePath);
         if (cookieDomain!=null)
          passwdCookie.setDomain(cookieDomain);
 
-       response.addCookie(passwdCookie);
-       Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, "true");
+        addCookie(response, passwdCookie);
+        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, "true");
        rememberCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
        rememberCookie.setPath(cookiePath);
        if (cookieDomain!=null)
          rememberCookie.setDomain(cookieDomain);
-       response.addCookie(rememberCookie);
-       if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
+        addCookie(response, rememberCookie);
+        if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
           String validationHash = getValidationHash(username, password, request.getRemoteAddr());
           if (validationHash != null) {
              Cookie validationCookie = new Cookie(COOKIE_VALIDATION, validationHash);
@@ -110,7 +113,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
              validationCookie.setPath(cookiePath);
              if (cookieDomain!=null)
                validationCookie.setDomain(cookieDomain);
-             response.addCookie(validationCookie);
+              addCookie(response, validationCookie);
           } else {
              System.out.println("WARNING!!! WARNING!!!");
              System.out.println("PROTECTION=ALL or PROTECTION=VALIDATION was specified");
@@ -119,6 +122,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
           }
        }
        return;
+    }
+
+    private void addCookie(HttpServletResponse response, Cookie cookie) {
+        if (log.isDebugEnabled())
+         log.debug("Adding cookie: " + cookie.getDomain() + " " + cookie.getPath() + " " + cookie.getName() + " " + cookie.getValue());
+        response.addCookie(cookie);
     }
 
     private String getCookieDomain(HttpServletRequest request) {
@@ -265,7 +274,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
          String cookieDomain = getCookieDomain(request);
          if (cookieDomain!=null)
           cookie.setDomain(cookieDomain);
-         response.addCookie(cookie);
+          addCookie(response, cookie);
       }
    }
 

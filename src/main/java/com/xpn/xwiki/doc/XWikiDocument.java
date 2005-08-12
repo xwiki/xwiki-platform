@@ -25,6 +25,7 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.packaging.PackageException;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -63,9 +64,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -250,7 +249,7 @@ public class XWikiDocument {
     }
 
     public void setFullName(String name) {
-        // Should not be used
+        setFullName(name, null);
     }
 
     public String getFormat() {
@@ -1187,7 +1186,6 @@ public class XWikiDocument {
         return toXML(true, false, true, true, context);
     }
 
-
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException {
         try  {
             String zipname = getWeb() + "/" + getName();
@@ -1202,7 +1200,6 @@ public class XWikiDocument {
             e.printStackTrace();
         }
     }
-
 
     public void addToZip(ZipOutputStream zos, XWikiContext context) throws IOException {
         addToZip(zos, true, context);
@@ -1805,7 +1802,7 @@ public class XWikiDocument {
     }
 
 
-    public void setFullName(String fullname, XWikiContext context) throws XWikiException {
+    public void setFullName(String fullname, XWikiContext context) {
         if (fullname==null)
             return;
 
@@ -1832,17 +1829,6 @@ public class XWikiDocument {
 
         if (name.equals(""))
             name = "WebHome";
-
-        /*
-        // Now anything is allowed..
-        Util util = context.getUtil();
-        if ((!util.isAlphaNumeric(name))||(!util.isAlphaNumeric(web))) {
-        Object[] args = { fullname };
-        throw new XWikiException( XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_INVALID_CHARS,
-        "Document name {0} contains invalid characters", null, args);
-        }
-        */
-
     }
 
     public String getLanguage() {
@@ -2172,8 +2158,7 @@ public class XWikiDocument {
         return wikiNode;
     }
 
-    public void setWikiNode(Object WikiNode) {
+    public void setWikiNode(Object wikiNode) {
         this.wikiNode = wikiNode;
     }
-
 }

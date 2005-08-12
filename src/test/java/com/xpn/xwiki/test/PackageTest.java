@@ -26,6 +26,7 @@ import org.apache.velocity.VelocityContext;
 
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.List;
 
 
@@ -48,6 +49,27 @@ public class PackageTest extends HibernateTestCase {
 
         doc = new XWikiDocument("Test", "third");
         doc.setContent("blop, third test page");
+        getXWiki().saveDocument(doc, getXWikiContext());
+
+        getXWikiContext().put("vcontext", new VelocityContext());
+    }
+
+    public void changeData() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument("Test", "first");
+        doc.setContent("blop, first changed test page");
+        getXWiki().saveDocument(doc, getXWikiContext());
+
+        doc = new XWikiDocument("Test", "second");
+        doc.setContent("blop, second changed test page");
+        getXWiki().saveDocument(doc, getXWikiContext());
+
+        doc = new XWikiDocument("Test", "third");
+        doc = getXWiki().getDocument("Test.third", getXWikiContext());
+        doc.setContent("blop, third delete test page");
+        getXWiki().deleteDocument(doc, getXWikiContext());
+
+        doc = new XWikiDocument("Test", "fourth");
+        doc.setContent("blop, fourth added test page");
         getXWiki().saveDocument(doc, getXWikiContext());
 
         getXWikiContext().put("vcontext", new VelocityContext());
@@ -156,6 +178,179 @@ public class PackageTest extends HibernateTestCase {
 
     }
 
+    public void testExportWikiToDir() throws IOException, XWikiException {
+        Package myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(3, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.third", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+        File dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
+        File file1 = new File("./backuptest/Test/first");
+        assertTrue("File 1 does not exist", file1.exists());
+        File file2 = new File("./backuptest/Test/first");
+        assertTrue("File 2 does not exist", file2.exists());
+        File file3 = new File("./backuptest/Test/first");
+        assertTrue("File 3 does not exist", file3.exists());
+    }
 
+    public void testExportWikiToDirOverExisting() throws IOException, XWikiException {
+        Package myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(3, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.third", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+        File dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
+        File file1 = new File("./backuptest/Test/first");
+        assertTrue("File 1 does not exist", file1.exists());
+        File file2 = new File("./backuptest/Test/first");
+        assertTrue("File 2 does not exist", file2.exists());
+        File file3 = new File("./backuptest/Test/first");
+        assertTrue("File 3 does not exist", file3.exists());
+
+        changeData();
+        myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(3, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.fourth", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+        dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
+        file1 = new File("./backuptest/Test/first");
+        assertTrue("File 1 does not exist", file1.exists());
+        assertTrue("File 1 has not changed", Utils.getData(file1).indexOf("changed")!=-1);
+        file2 = new File("./backuptest/Test/first");
+        assertTrue("File 2 does not exist", file2.exists());
+        assertTrue("File 2 has not changed", Utils.getData(file1).indexOf("changed")!=-1);
+        file3 = new File("./backuptest/Test/first");
+        assertTrue("File 3 should still exist", file3.exists());
+        File file4 = new File("./backuptest/Test/first");
+        assertTrue("File 4 does not exist", file4.exists());
+    }
+
+    public void testImportWikiFromDir() throws IOException, XWikiException {
+        testExportWikiToDir();
+        Package myPackage = new Package();
+        File dir = new File("./backuptest");
+        myPackage.readFromDir(dir, getXWikiContext());
+        assertEquals(3, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.third", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+    }
+
+    public void testImportWikiFromDirOverExisting() throws IOException, XWikiException {
+        testExportWikiToDirOverExisting();
+        Package myPackage = new Package();
+        File dir = new File("./backuptest");
+        myPackage.readFromDir(dir, getXWikiContext());
+        assertEquals(3, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.fourth", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+    }
+
+    public void testInstallWikiFromDirOnEmptyWiki() throws IOException, XWikiException {
+        // Export
+        testExportWikiToDir();
+
+        // Empty the wiki
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        getXWiki().flushCache();
+
+        // Install from package
+        Package myPackage = new Package();
+        File dir = new File("./backuptest");
+        myPackage.readFromDir(dir, getXWikiContext());
+        myPackage.install(getXWikiContext());
+
+        // Compare
+        // Compare
+        getXWiki().flushCache();
+        XWikiDocument doc1 = getXWiki().getDocument("Test.first", getXWikiContext());
+        assertTrue("Document should exist", !doc1.isNew());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.second", getXWikiContext());
+        assertTrue("Document should exist", !doc2.isNew());
+        XWikiDocument doc3 = getXWiki().getDocument("Test.third", getXWikiContext());
+        assertTrue("Document should exist", !doc3.isNew());
+    }
+
+    public void testInstallWikiFromDirOverExisting() throws IOException, XWikiException {
+        // Export
+        testExportWikiToDirOverExisting();
+
+        // Empty the wiki
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        getXWiki().flushCache();
+
+        // Reinitialize
+        prepareData();
+
+        // Install
+        Package myPackage = new Package();
+        File dir = new File("./backuptest");
+        myPackage.readFromDir(dir, getXWikiContext());
+        myPackage.install(getXWikiContext());
+
+        // Compare
+        getXWiki().flushCache();
+        XWikiDocument doc1 = getXWiki().getDocument("Test.first", getXWikiContext());
+        assertTrue("Document should exist", !doc1.isNew());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.second", getXWikiContext());
+        assertTrue("Document should exist", !doc2.isNew());
+        XWikiDocument doc3 = getXWiki().getDocument("Test.third", getXWikiContext());
+        assertTrue("Document should exist", !doc3.isNew());
+        XWikiDocument doc4 = getXWiki().getDocument("Test.fourth", getXWikiContext());
+        assertTrue("Document should exist", !doc4.isNew());
+    }
+
+    public void testInstallWikiFromDirOverExistingWithOverride() throws IOException, XWikiException {
+        // Export
+        testExportWikiToDirOverExisting();
+
+        // Empty the wiki
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        getXWiki().flushCache();
+
+        // Reinitialize
+        prepareData();
+
+        // Install
+        Package myPackage = new Package();
+        File dir = new File("./backuptest");
+        myPackage.readFromDir(dir, getXWikiContext());
+        myPackage.deleteAllWikiDocuments(getXWikiContext());
+        myPackage.install(getXWikiContext());
+
+        // Compare
+        // Compare
+        getXWiki().flushCache();
+        XWikiDocument doc1 = getXWiki().getDocument("Test.first", getXWikiContext());
+        assertTrue("Document should exist", !doc1.isNew());
+        XWikiDocument doc2 = getXWiki().getDocument("Test.second", getXWikiContext());
+        assertTrue("Document should exist", !doc2.isNew());
+        XWikiDocument doc3 = getXWiki().getDocument("Test.third", getXWikiContext());
+        assertTrue("Document should not exist", doc3.isNew());
+        XWikiDocument doc4 = getXWiki().getDocument("Test.fourth", getXWikiContext());
+        assertTrue("Document should exist", !doc4.isNew());
+    }
 
 }

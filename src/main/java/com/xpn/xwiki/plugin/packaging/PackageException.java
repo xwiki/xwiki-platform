@@ -20,8 +20,10 @@ import com.xpn.xwiki.plugin.PluginException;
  * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
  * root folder of this distribution.
  */
-public class PackageException extends PluginException{
+public class PackageException extends PluginException {
     static String plugName = "Package";
+    public static final int ERROR_PACKAGE_UNKNOWN = 1;
+    public static final int ERROR_PACKAGE_NODESCRIPTION = 2;
 
     public PackageException(int code, String message, Throwable e, Object[] args)
     {

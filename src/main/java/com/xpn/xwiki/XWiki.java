@@ -3086,5 +3086,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         isReadOnly = readOnly;
 
     }
+
+    public void deleteAllDocuments(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        // Delete all documents
+        List list = doc.getTranslationList(context);
+        for (int i=0;i<list.size();i++) {
+            String lang = (String) list.get(i);
+            XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
+            deleteDocument(tdoc, context);
+        }
+        deleteDocument(doc, context);
+    }
 }
 

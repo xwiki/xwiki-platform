@@ -700,4 +700,18 @@ public class Utils {
         return doc1;
     }
 
+    public static void rmdirs(File dir) {
+        File[] filelist = dir.listFiles();
+        if (filelist!=null) {
+            for (int i=0;i<filelist.length;i++) {
+                File file = filelist[i];
+                if (file.isDirectory())
+                    rmdirs(file);
+                else
+                    filelist[i].delete();
+            }
+        }
+        dir.delete();
+    }
+
 }

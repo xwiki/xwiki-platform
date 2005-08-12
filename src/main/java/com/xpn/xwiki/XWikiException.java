@@ -67,12 +67,14 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_NOT_IMPLEMENTED = 1;
     public static final int ERROR_XWIKI_DOES_NOT_EXIST = 2;
     public static final int ERROR_XWIKI_INIT_FAILED = 3;
+    public static final int ERROR_XWIKI_MKDIR = 4;
 
     // Config
     public static final int ERROR_XWIKI_CONFIG_FILENOTFOUND = 1001;
     public static final int ERROR_XWIKI_CONFIG_FORMATERROR = 1002;
 
     // Doc
+    public static final int ERROR_XWIKI_DOC_EXPORT = 2001;
 
     // Store
     public static final int ERROR_XWIKI_STORE_CLASSINVOCATIONERROR = 3001;

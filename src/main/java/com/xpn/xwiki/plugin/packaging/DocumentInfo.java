@@ -78,6 +78,11 @@ public class DocumentInfo
         return (doc.getFullName());
     }
 
+    public String getLanguage()
+    {
+        return (doc.getLanguage());
+    }
+
     public int isInstallable()
     {
         return installable;

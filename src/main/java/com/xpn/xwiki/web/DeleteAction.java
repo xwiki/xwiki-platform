@@ -18,14 +18,7 @@ public class DeleteAction extends XWikiAction {
         if ((confirm!=null)&&(confirm.equals("1"))) {
             String language = xwiki.getLanguagePreference(context);
             if ((language==null)||(language.equals(""))||language.equals(doc.getDefaultLanguage())) {
-                // Delete all documents
-                List list = doc.getTranslationList(context);
-                for (int i=0;i<list.size();i++) {
-                    String lang = (String) list.get(i);
-                    XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
-                    xwiki.deleteDocument(tdoc, context);
-                }
-                xwiki.deleteDocument(doc, context);
+                xwiki.deleteAllDocuments(doc, context);
             } else {
                 // Only delete the translation
                 XWikiDocument tdoc = doc.getTranslatedDocument(language, context);

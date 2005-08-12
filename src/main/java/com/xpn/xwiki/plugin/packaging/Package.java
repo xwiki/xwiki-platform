@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.io.*;
 
 import org.dom4j.Document;
@@ -131,12 +130,13 @@ public class Package {
             return false;
         for(int i = 0; i < files.size(); i++)
         {
-            if (((DocumentInfo)files.get(i)).getFullName().compareTo(doc.getFullName()) == 0)
+            DocumentInfo di = (DocumentInfo)files.get(i);
+            if (di.getFullName().equals(doc.getFullName())&&(di.getLanguage().equals(doc.getLanguage())))
             {
                 if (defaultAction != DocumentInfo.ACTION_NOT_DEFINED)
-                    ((DocumentInfo)files.get(i)).setAction(defaultAction);
+                    di.setAction(defaultAction);
                 if (!doc.isNew())
-                    ((DocumentInfo)files.get(i)).setDoc(doc);
+                    di.setDoc(doc);
                 return true;
             }
         }
@@ -159,12 +159,31 @@ public class Package {
     public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException {
         XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
         add(doc, DefaultAction, context);
+        List languages = doc.getTranslationList(context);
+        for (int i=0;i<languages.size();i++) {
+            String language = (String) languages.get(i);
+            if (!((language==null)||(language.equals(""))||(language.equals(doc.getDefaultLanguage()))))
+                add(doc.getTranslatedDocument(language, context), DefaultAction, context);
+        }
+        return true;
+    }
+
+    public boolean add(String docFullName, String language, int DefaultAction, XWikiContext context) throws XWikiException {
+        XWikiDocument doc = context.getWiki().getDocument(docFullName, context);
+        if ((language==null)||(language.equals("")))
+         add(doc, DefaultAction, context);
+        else
+         add(doc.getTranslatedDocument(language, context), DefaultAction, context);
         return true;
     }
 
 
     public boolean add(String docFullName, XWikiContext context) throws XWikiException {
         return add(docFullName, DocumentInfo.ACTION_NOT_DEFINED, context);
+    }
+
+    public boolean add(String docFullName, String language, XWikiContext context) throws XWikiException {
+        return add(docFullName, language, DocumentInfo.ACTION_NOT_DEFINED, context);
     }
 
     public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException {
@@ -177,13 +196,32 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             DocumentInfo docinfo = (DocumentInfo) files.get(i);
-            docinfo.getDoc().addToZip(zos, withVersions, context);
+            addToZip(docinfo.getDoc(), zos, withVersions, context);
         }
         addInfosToZip(zos);
         zos.finish();
         zos.flush();
         return "";
     }
+
+    public String exportToDir(File dir, XWikiContext context) throws IOException, XWikiException {
+        if (!dir.exists()) {
+           if (!dir.mkdirs()) {
+               Object[] args = new Object[1];
+               args[0] = dir.toString();
+               throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_MKDIR, "Error creating directory {0}", null, args);
+           }
+        }
+
+        for (int i = 0; i < files.size(); i++)
+        {
+            DocumentInfo docinfo = (DocumentInfo) files.get(i);
+            addToDir(docinfo.getDoc(), dir, withVersions, context);
+        }
+        addInfosToDir(dir);
+        return "";
+    }
+
 
     public String Import(byte file[], XWikiContext context) throws IOException, XWikiException {
         ByteArrayInputStream    bais = new ByteArrayInputStream(file);
@@ -200,7 +238,7 @@ public class Package {
                 if (entry.getName().compareTo(DefaultPackageFileName) == 0)
                     continue;
                 else {
-                    XWikiDocument doc = readZipDoc(readZipFile(zis));
+                    XWikiDocument doc = readFromXML(readFromInputStream(zis));
 
                     this.add(doc, context);
                 }
@@ -225,21 +263,26 @@ public class Package {
         List ListFile =  infosFiles.elements("file");
         for (int i = 0; i < ListFile.size(); i++)
         {
-            String defaultAction = ((Element)ListFile.get(i)).attributeValue("defaultAction");
-            String docName = ((Element)ListFile.get(i)).getStringValue();
-            setDocumentDefaultAction(docName, Integer.parseInt(defaultAction));
+            Element el = (Element)ListFile.get(i);
+            String defaultAction = el.attributeValue("defaultAction");
+            String language = el.attributeValue("language");
+            if (language==null)
+             language = "";
+            String docName = el.getStringValue();
+            setDocumentDefaultAction(docName, language, Integer.parseInt(defaultAction));
         }
     }
 
-    private void setDocumentDefaultAction(String docName, int defaultAction)
+    private void setDocumentDefaultAction(String docName, String language, int defaultAction)
     {
         if (files == null)
             return;
         for(int i = 0; i < files.size(); i++)
         {
-            if (((DocumentInfo)files.get(i)).getFullName().compareTo(docName) == 0)
+            DocumentInfo di = (DocumentInfo)files.get(i);
+            if (di.getFullName().equals(docName) && di.equals(language))
             {
-                ((DocumentInfo)files.get(i)).setAction(defaultAction);
+                di.setAction(defaultAction);
                 return;
             }
         }
@@ -276,7 +319,7 @@ public class Package {
         int status = doc.testInstall(context);
         if (status == DocumentInfo.INSTALL_IMPOSSIBLE)
             return DocumentInfo.INSTALL_IMPOSSIBLE;
-        if (status == DocumentInfo.INSTALL_OK || ((status == DocumentInfo.INSTALL_ALREADY_EXIST) && (doc.getAction() == DocumentInfo.ACTION_OVERWRITE)))
+        if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST && doc.getAction() == DocumentInfo.ACTION_OVERWRITE)
         {
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST)
             {
@@ -295,17 +338,17 @@ public class Package {
     }
 
 
-    private String readZipFile(ZipInputStream zis) throws IOException{
+    private String readFromInputStream(InputStream is) throws IOException {
         byte[] data = new byte[4096];
-        StringBuffer XmlFile = new StringBuffer();
+        StringBuffer buffer = new StringBuffer();
         int Cnt;
-        while ((Cnt = zis.read(data, 0, 4096)) != -1) {
-          XmlFile.append(new String(data, 0, Cnt)) ;
+        while ((Cnt = is.read(data, 0, 4096)) != -1) {
+          buffer.append(new String(data, 0, Cnt)) ;
         }
-        return XmlFile.toString();
+        return buffer.toString();
     }
 
-    private XWikiDocument readZipDoc(String XmlFile){
+    private XWikiDocument readFromXML(String XmlFile){
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
         try {
             if (backupPack && withVersions)
@@ -326,18 +369,18 @@ public class Package {
         {
             if(entry.getName().compareTo(DefaultPackageFileName) == 0)
             {
-                description = ReadZipPackage(zis);
+                description = readPackage(zis);
                 return description;
             }
         }
         return null;
     }
 
-    private Document ReadZipPackage(ZipInputStream zis) throws IOException, DocumentException{
+    private Document readPackage(InputStream is) throws IOException, DocumentException{
         byte[] data = new byte[4096];
         StringBuffer XmlFile = new StringBuffer();
         int Cnt;
-        while ((Cnt = zis.read(data, 0, 4096)) != -1) {
+        while ((Cnt = is.read(data, 0, 4096)) != -1) {
           XmlFile.append(new String(data, 0, Cnt)) ;
         }
         return fromXml(XmlFile.toString());
@@ -397,7 +440,9 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             Element elfile = new DOMElement("file");
-            elfile.addAttribute("defaultAction", String.valueOf(((DocumentInfo)(files.get(i))).getAction()));
+            DocumentInfo di = (DocumentInfo) files.get(i);
+            elfile.addAttribute("defaultAction", String.valueOf(di.getAction()));
+            elfile.addAttribute("language", String.valueOf(di.getLanguage()));
             elfile.addText(((DocumentInfo)(files.get(i))).getFullName());
             elfiles.add(elfile);
         }
@@ -411,6 +456,62 @@ public class Package {
         zos.putNextEntry(zipentry);
         zos.write(toXml().getBytes());
         zos.closeEntry();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException {
+        try  {
+            String zipname = doc.getWeb() + "/" + doc.getName();
+            String language = doc.getLanguage();
+            if ((language!=null)&&(!language.equals("")))
+                zipname += "." + language;
+            ZipEntry zipentry = new ZipEntry(zipname);
+            zos.putNextEntry(zipentry);
+            zos.write(doc.toXML(true, false, true, withVersions, context).getBytes());
+            zos.closeEntry();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException {
+        try  {
+            File spacedir = new File(dir, doc.getWeb());
+            if (!spacedir.exists()) {
+                if (!spacedir.mkdirs()) {
+                    Object[] args = new Object[1];
+                    args[0] = dir.toString();
+                    throw new XWikiException(XWikiException.MODULE_XWIKI ,XWikiException.ERROR_XWIKI_MKDIR, "Error creating directory {0}", null, args);
+                }
+            }
+            String filename = doc.getName();
+            String language = doc.getLanguage();
+            if ((language!=null)&&(!language.equals("")))
+                filename += "." + language;
+            File file = new File(spacedir, filename);
+            String xml = doc.toXML(true, false, true, withVersions, context);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(xml.getBytes());
+            fos.flush();
+            fos.close();
+        } catch (Exception e) {
+            Object[] args = new Object[1];
+            args[0] = doc.getFullName();
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,XWikiException.ERROR_XWIKI_DOC_EXPORT, "Error creating file {0}", e, args);
+        }
+    }
+
+
+    private void addInfosToDir(File dir) {
+        try  {
+        String filename = DefaultPackageFileName;
+        File file = new File(dir, filename);
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.write(toXml().getBytes());
+        fos.flush();
+        fos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -452,14 +553,62 @@ public class Package {
         for(int i = 0; i < spaces.size(); i++)
         {
             List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);
-            for(int j = 0; j < DocsName.size(); j++)
+            for(int j = 0; j < DocsName.size(); j++) {
                 this.add(spaces.get(i) + "." + DocsName.get(j), DocumentInfo.ACTION_OVERWRITE,  context);
+            }
         }
         this.backupPack = true;
     }
 
+    public void deleteAllWikiDocuments(XWikiContext context) throws XWikiException {
+        XWiki wiki = context.getWiki();
+        List spaces = wiki.getSpaces(context);
+        for(int i = 0; i < spaces.size(); i++)
+        {
+            List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);
+            for(int j = 0; j < DocsName.size(); j++) {
+                String docName = spaces.get(i) + "." + DocsName.get(j);
+                XWikiDocument doc = wiki.getDocument(docName, context);
+                wiki.deleteAllDocuments(doc, context);
+            }
+        }
+    }
 
 
+    public String readFromDir(File dir, XWikiContext context) throws IOException, XWikiException {
+        Document description = null;
+        try {
+            File infofile = new File(dir, DefaultPackageFileName);
+            description = readPackage(new FileInputStream(infofile));
+            if (description==null) {
+                throw new PackageException(PackageException.ERROR_PACKAGE_NODESCRIPTION, "Cannot read package description file");
+            }
 
+            Element docFiles = description.getRootElement();
+            Element infosFiles = docFiles.element("files");
+
+            List ListFile =  infosFiles.elements("file");
+            for (int i = 0; i < ListFile.size(); i++)
+            {
+                Element el = (Element)ListFile.get(i);
+                String defaultAction = el.attributeValue("defaultAction");
+                String language = el.attributeValue("language");
+                if (language==null)
+                 language = "";
+                String docName = el.getStringValue();
+                XWikiDocument doc = new XWikiDocument();
+                doc.setFullName(docName, context);
+                doc.setLanguage(language);
+                File space = new File(dir, doc.getWeb());
+                File docfile = new File(space, doc.getName() + "." + doc.getLanguage());
+                doc = readFromXML(readFromInputStream(new FileInputStream(docfile)));
+                files.add(new DocumentInfo(doc));
+                setDocumentDefaultAction(docName, language, Integer.parseInt(defaultAction));
+            }
+        } catch (DocumentException e) {
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
+        }
+        return "";
+    }
 }
 

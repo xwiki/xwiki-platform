@@ -173,10 +173,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 String newname = noaccents(name);
                 XWikiDocument newdoc = new XWikiDocument();
                 if (newname.indexOf(".")!=-1) {
-                    try {
                         newdoc.setFullName(newname, context);
-                    } catch (XWikiException e) {
-                    }
                 } else {
                     newdoc.setWeb(context.getDoc().getWeb());
                     newdoc.setName(newname);
@@ -185,10 +182,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 // If the document does not exist, then we use the normal name as is
                 if (!context.getWiki().exists(newdoc.getFullName(), context)) {
                     if (name.indexOf(".")!=-1) {
-                        try {
                             newdoc.setFullName(name, context);
-                        } catch (XWikiException e) {
-                        }
                     } else {
                         newdoc.setWeb(context.getDoc().getWeb());
                         newdoc.setName(name);
@@ -245,10 +239,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             String newname = name;
             XWikiDocument newdoc = new XWikiDocument();
             if (newname.indexOf(".")!=-1) {
-                try {
                     newdoc.setFullName(newname, context);
-                } catch (XWikiException e) {
-                }
             } else {
                 newdoc.setWeb(context.getDoc().getWeb());
                 newdoc.setName(newname);

@@ -226,6 +226,8 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         String foundDN = null;
 
         try {
+            if (log.isDebugEnabled())
+                 log.debug("LDAP Password check for user " + username);
 
             int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
@@ -246,6 +248,9 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
 
             lc.connect( ldapHost, ldapPort );
+
+            if (log.isDebugEnabled())
+                 log.debug("LDAP Connect successfull to host " + ldapHost + " and port " + ldapPort );
 
             // authenticate to the server
             result = Bind(bindDN, bindPassword, lc, ldapVersion);
@@ -297,11 +302,11 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                 else
                     notinLDAP = true;
 
-                if (log.isDebugEnabled()) {
+                if (log.isInfoEnabled()) {
                     if (result)
-                     log.debug("(debug) Password check for user " + username + " successfull");
+                     log.info("LDAP Password check for user " + username + " successfull");
                     else
-                     log.debug("(debug) Password check for user " + username + " failed");
+                     log.info("LDAP Password check for user " + username + " failed");
                 }
             }
         }
@@ -312,9 +317,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                                         LDAPException.NO_SUCH_ATTRIBUTE ) {
                 notinLDAP = true;
             }
+
+            if (log.isInfoEnabled())
+                 log.info("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
         }
         catch (Throwable e) {
-            e.printStackTrace();
+            notinLDAP = true;
+            if (log.isErrorEnabled())
+                 log.error("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
         }
         finally
         {
@@ -326,6 +336,9 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         }
         if (notinLDAP)
         {
+            if (log.isDebugEnabled())
+                 log.debug("LDAP Password check reverting to XWiki");
+
             // Use XWiki password if user not in LDAP
             result = checkPassword(username, password, context);
             foundDN = null;
@@ -424,14 +437,26 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
     private boolean Bind(String bindDN, String bindPassword, LDAPConnection lc, int ldapVersion) throws UnsupportedEncodingException {
         boolean bound = false;
+        if (log.isDebugEnabled())
+             log.debug("LDAP Bind starting");            
+
         if (bindDN != null && bindDN.length() > 0 && bindPassword != null)
         {
             try
             {
                 lc.bind( ldapVersion, bindDN, bindPassword.getBytes("UTF8") );
                 bound = true;
+
+                if (log.isDebugEnabled())
+                     log.debug("LDAP Bind successfull");
             }
-            catch(LDAPException e) { };
+            catch(LDAPException e) {
+                if (log.isErrorEnabled())
+                     log.error("LDAP Bind failed with Exception " + e.getMessage());
+            };
+        } else {
+            if (log.isDebugEnabled())
+                 log.debug("LDAP Bind does not have binding info");
         }
         return bound;
     }

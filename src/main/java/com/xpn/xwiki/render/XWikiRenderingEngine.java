@@ -71,12 +71,14 @@ public class XWikiRenderingEngine {
     }
 
     public XWikiRenderer getRenderer(String name) {
-        for (int i=0;i<renderers.size();i++) {
-            XWikiRenderer renderer = (XWikiRenderer) renderers.get(i);
-            if (renderer.getClass().getName().equals(name))
-                return renderer;
-        }
-        return null;
+    	return (XWikiRenderer)renderermap.get(name);
+// prior version    	
+//        for (int i=0;i<renderers.size();i++) {
+//            XWikiRenderer renderer = (XWikiRenderer) renderers.get(i);
+//            if (renderer.getClass().getName().equals(name))
+//                return renderer;
+//        }
+//        return null;
     }
 
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {

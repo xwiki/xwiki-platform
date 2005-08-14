@@ -63,6 +63,16 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
     }
 
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
+        String superadmin = "superadmin";
+        if (username.equals(superadmin)) {
+            String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
+            if ((superadminpassword!=null)&&(superadminpassword.equals(password))) {
+                return new SimplePrincipal("XWiki.superadmin");
+            } else {
+                return null;
+            }
+        }
+
         try {
             if (getSecurityService().authenticate(username, password))
                 return new SimplePrincipal(username);

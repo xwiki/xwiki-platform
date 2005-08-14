@@ -75,6 +75,8 @@ public class XWikiException extends Exception {
 
     // Doc
     public static final int ERROR_XWIKI_DOC_EXPORT = 2001;
+    public static final int ERROR_DOC_XML_PARSING = 2002;
+    public static final int ERROR_DOC_RCS_PARSING = 2003;
 
     // Store
     public static final int ERROR_XWIKI_STORE_CLASSINVOCATIONERROR = 3001;
@@ -124,7 +126,9 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST = 7001;
     public static final int ERROR_XWIKI_CLASSES_FIELD_INVALID = 7002;
     public static final int ERROR_XWIKI_CLASSES_DIFF = 7003;
-    public static final int ERROR_XWIKI_CLASS_CUSTOMCLASSINVOCATIONERROR = 7004;
+    public static final int ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR = 7004;
+    public static final int ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION = 7005;
+
 
     public static final int ERROR_XWIKI_USER_INIT = 8001;
     public static final int ERROR_XWIKI_USER_CREATE = 8002;
@@ -168,7 +172,6 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED = 13010;
     public static final int ERROR_LASZLO_INVALID_XML = 21001;
     public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
-
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {
         setModule(module);

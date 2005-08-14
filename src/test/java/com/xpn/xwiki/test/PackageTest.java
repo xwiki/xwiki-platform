@@ -21,6 +21,7 @@ package com.xpn.xwiki.test;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiException;
 import org.apache.velocity.VelocityContext;
 
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
+import java.util.Date;
 
 
 public class PackageTest extends HibernateTestCase {
@@ -54,6 +56,13 @@ public class PackageTest extends HibernateTestCase {
         getXWikiContext().put("vcontext", new VelocityContext());
     }
 
+    public void languageData() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument("Test", "first");
+        doc.setLanguage("fr");
+        doc.setContent("blop, in french");
+        getXWiki().saveDocument(doc, getXWikiContext());
+    }
+
     public void changeData() throws XWikiException {
         XWikiDocument doc = new XWikiDocument("Test", "first");
         doc.setContent("blop, first changed test page");
@@ -73,6 +82,16 @@ public class PackageTest extends HibernateTestCase {
         getXWiki().saveDocument(doc, getXWikiContext());
 
         getXWikiContext().put("vcontext", new VelocityContext());
+    }
+
+    public void attachmentData() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument("Test", "withattach");
+        doc.setContent("blop, test page with attach");
+        getXWiki().saveDocument(doc, getXWikiContext());
+        XWikiAttachment attach = new XWikiAttachment(doc, "test.txt");
+        attach.setContent("attachcontent".getBytes());
+        doc.getAttachmentList().add(attach);
+        doc.saveAttachmentContent(attach, getXWikiContext());
     }
 
     public void testExportWiki() throws IOException, XWikiException {
@@ -171,6 +190,17 @@ public class PackageTest extends HibernateTestCase {
         assertTrue("Document not found: " + fileName, false);
     }
 
+    public void testDocName(String fileName, String language, List files)
+    {
+        for (int i = 0; i < files.size(); i++)
+        {
+            DocumentInfo doc = (DocumentInfo) files.get(i);
+            if ((doc.getFullName().equals(fileName))
+                &&(doc.getLanguage().equals(language)))
+               return;
+        }
+        assertTrue("Document not found " + fileName + " for language " + language, false);
+    }
 
 
     public void testPackageAPI()
@@ -244,6 +274,23 @@ public class PackageTest extends HibernateTestCase {
         assertTrue("File 4 does not exist", file4.exists());
     }
 
+    public void testExportWikiToDirWithAttachment() throws IOException, XWikiException {
+        attachmentData();
+        Package myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(4, myPackage.getFiles().size());
+        File dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
+        File file4 = new File("./backuptest/Test/withattach");
+        assertTrue("File 4 does not exist", file4.exists());
+        String content = Utils.getData(file4);
+        assertTrue("File 4 does not contain an attachment", content.indexOf("<attachment>")!=-1);
+        assertTrue("File 4 does not contain an attachment content", content.indexOf("<content></content>")==-1);
+    }
+
     public void testImportWikiFromDir() throws IOException, XWikiException {
         testExportWikiToDir();
         Package myPackage = new Package();
@@ -268,13 +315,54 @@ public class PackageTest extends HibernateTestCase {
         assertEquals(myPackage.isBackupPack(), true);
     }
 
-    public void testInstallWikiFromDirOnEmptyWiki() throws IOException, XWikiException {
-        // Export
-        testExportWikiToDir();
+    public void testInstallWikiFromDirWithAttachment() throws IOException, XWikiException {
+        attachmentData();
+        Package myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(4, myPackage.getFiles().size());
+        File dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
 
         // Empty the wiki
         cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
         getXWiki().flushCache();
+
+        myPackage = new Package();
+        myPackage.readFromDir(dir, getXWikiContext());
+        myPackage.install(getXWikiContext());
+        assertEquals(4, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.third", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
+        XWikiDocument doc = getXWiki().getDocument("Test.withattach", getXWikiContext());
+        XWikiAttachment attach = doc.getAttachment("test.txt");
+        String content = new String(attach.getContent(getXWikiContext()));
+        assertEquals("Attachment does not contain text", "attachcontent", content);
+    }
+
+    public void testInstallWikiFromDirOnEmptyWiki() throws IOException, XWikiException {
+        // Export
+        testExportWikiToDir();
+
+        // Get Dates
+        XWikiDocument doc = getXWiki().getDocument("Test.first", getXWikiContext());
+        Date date1 = doc.getDate();
+        String sdate1 = getXWiki().formatDate(date1, "yyyyMMddHHmmss", getXWikiContext());
+        Date cdate1 = doc.getCreationDate();
+        String scdate1 = getXWiki().formatDate(cdate1, "yyyyMMddHHmmss", getXWikiContext());
+
+        // Empty the wiki
+        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        getXWiki().flushCache();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
 
         // Install from package
         Package myPackage = new Package();
@@ -283,10 +371,13 @@ public class PackageTest extends HibernateTestCase {
         myPackage.install(getXWikiContext());
 
         // Compare
-        // Compare
         getXWiki().flushCache();
         XWikiDocument doc1 = getXWiki().getDocument("Test.first", getXWikiContext());
         assertTrue("Document should exist", !doc1.isNew());
+        String sdate = getXWiki().formatDate(doc1.getDate(), "yyyyMMddHHmmss", getXWikiContext());
+        String scdate = getXWiki().formatDate(doc1.getCreationDate(), "yyyyMMddHHmmss", getXWikiContext());
+        assertEquals("Update date should be equals", sdate1, sdate);
+        assertEquals("Creation date should be equals", scdate1, scdate);
         XWikiDocument doc2 = getXWiki().getDocument("Test.second", getXWikiContext());
         assertTrue("Document should exist", !doc2.isNew());
         XWikiDocument doc3 = getXWiki().getDocument("Test.third", getXWikiContext());
@@ -351,6 +442,27 @@ public class PackageTest extends HibernateTestCase {
         assertTrue("Document should not exist", doc3.isNew());
         XWikiDocument doc4 = getXWiki().getDocument("Test.fourth", getXWikiContext());
         assertTrue("Document should exist", !doc4.isNew());
+    }
+
+    public void testImportWikiFromDirWithLanguage() throws IOException, XWikiException {
+        languageData();
+        Package myPackage = new Package();
+        myPackage.setWithVersions(false);
+        myPackage.addAllWikiDocuments(getXWikiContext());
+        assertEquals(4, myPackage.getFiles().size());
+        File dir = new File("./backuptest");
+        // Remove recursively
+        Utils.rmdirs(dir);
+        myPackage.exportToDir(dir, getXWikiContext());
+
+        myPackage = new Package();
+        myPackage.readFromDir(dir, getXWikiContext());
+        assertEquals(4, myPackage.getFiles().size());
+        testDocName("Test.first", myPackage.getFiles());
+        testDocName("Test.second", myPackage.getFiles());
+        testDocName("Test.third", myPackage.getFiles());
+        testDocName("Test.first", "fr", myPackage.getFiles());
+        assertEquals(myPackage.isBackupPack(), true);
     }
 
 }

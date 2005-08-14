@@ -96,8 +96,14 @@ public class DocumentInfo
         try {
             if (!context.getWiki().checkAccess("edit", this.doc, context))
                 return installable;
-            XWikiDocument docExist = context.getWiki().getDocument(doc.getFullName(), context);
-            if (!docExist.isNew())
+            XWikiDocument doc1 = context.getWiki().getDocument(doc.getFullName(), context);
+            boolean isNew = doc1.isNew();
+            if (!isNew) {
+               if ((doc.getLanguage()!=null)&&(!doc.getLanguage().equals("")))
+                 isNew = !doc1.getTranslationList(context).contains(doc.getLanguage());
+            }
+
+            if (!isNew)
             {
                 installable = INSTALL_ALREADY_EXIST;
                  return installable;

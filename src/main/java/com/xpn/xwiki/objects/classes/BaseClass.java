@@ -152,18 +152,22 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return cel;
     }
 
-    public void fromXML(Element cel) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        setName(cel.element("name").getText());
-        List list = cel.elements();
-        for (int i=1;i<list.size();i++) {
-            Element pcel = (Element) list.get(i);
-            String name = pcel.getName();
-            String classType = pcel.element("classType").getText();
-            PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
-            property.setName(name);
-            property.setObject(this);
-            property.fromXML(pcel);
-            safeput(name, property);
+    public void fromXML(Element cel) throws XWikiException {
+        try {
+            setName(cel.element("name").getText());
+            List list = cel.elements();
+            for (int i=1;i<list.size();i++) {
+                Element pcel = (Element) list.get(i);
+                String name = pcel.getName();
+                String classType = pcel.element("classType").getText();
+                PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
+                property.setName(name);
+                property.setObject(this);
+                property.fromXML(pcel);
+                safeput(name, property);
+            }
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION, "Error instanciating property class", e, null);
         }
     }
 
@@ -319,7 +323,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         } catch (Exception e) {
             Object[] args = {customClass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                    XWikiException.ERROR_XWIKI_CLASS_CUSTOMCLASSINVOCATIONERROR,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR,
                     "Cannot instanciate custom class {0}", e, args);
         }
     }

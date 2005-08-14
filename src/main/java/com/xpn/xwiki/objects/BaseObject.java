@@ -150,7 +150,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return oel;
     }
 
-    public void fromXML(Element oel) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public void fromXML(Element oel) throws XWikiException {
         Element cel = oel.element("class");
         BaseClass bclass = new BaseClass();
         if (cel!=null) {

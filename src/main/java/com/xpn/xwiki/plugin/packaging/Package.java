@@ -42,10 +42,14 @@ import org.dom4j.io.XMLWriter;
 import org.dom4j.io.SAXReader;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 
 public class Package {
+    private static final Log log = LogFactory.getLog(Package.class);
+
     private String  name = "My package";
     private String  description = "";
     private String  version = "1.0.0";
@@ -280,7 +284,7 @@ public class Package {
         for(int i = 0; i < files.size(); i++)
         {
             DocumentInfo di = (DocumentInfo)files.get(i);
-            if (di.getFullName().equals(docName) && di.equals(language))
+            if (di.getFullName().equals(docName) && di.getLanguage().equals(language))
             {
                 di.setAction(defaultAction);
                 return;
@@ -327,8 +331,15 @@ public class Package {
                 context.getWiki().deleteDocument(deleteddoc, context);        
             }
             try {
-                doc.getDoc().setAuthor(context.getUser());
+                if (!backupPack)
+                 doc.getDoc().setAuthor(context.getUser());
+
+                // We don't want date and version to change
+                // So we need to cancel the dirty status
+                doc.getDoc().setContentDirty(false);
+                doc.getDoc().setMetaDataDirty(false);
                 context.getWiki().saveDocument(doc.getDoc(), context);
+                doc.getDoc().saveAllAttachments(context);
             } catch (XWikiException e) {
                 e.printStackTrace();
                 return DocumentInfo.INSTALL_ERROR;
@@ -577,6 +588,8 @@ public class Package {
 
     public String readFromDir(File dir, XWikiContext context) throws IOException, XWikiException {
         Document description = null;
+        setBackupPack(true);
+        int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
             description = readPackage(new FileInputStream(infofile));
@@ -588,6 +601,8 @@ public class Package {
             Element infosFiles = docFiles.element("files");
 
             List ListFile =  infosFiles.elements("file");
+            if (log.isInfoEnabled())
+             log.info("Package declares " + ListFile.size() + " documents");
             for (int i = 0; i < ListFile.size(); i++)
             {
                 Element el = (Element)ListFile.get(i);
@@ -599,15 +614,26 @@ public class Package {
                 XWikiDocument doc = new XWikiDocument();
                 doc.setFullName(docName, context);
                 doc.setLanguage(language);
+
+                if (log.isDebugEnabled())
+                 log.debug("Package adding document " + docName + " with language " + language);
+
                 File space = new File(dir, doc.getWeb());
-                File docfile = new File(space, doc.getName() + "." + doc.getLanguage());
+                String filename = doc.getName();
+                if ((doc.getLanguage()!=null)&&(!doc.getLanguage().equals("")))
+                 filename += "." + doc.getLanguage();
+                File docfile = new File(space, filename);
                 doc = readFromXML(readFromInputStream(new FileInputStream(docfile)));
-                files.add(new DocumentInfo(doc));
-                setDocumentDefaultAction(docName, language, Integer.parseInt(defaultAction));
+                DocumentInfo di = new DocumentInfo(doc);
+                di.setAction(Integer.parseInt(defaultAction));
+                files.add(di);
+                count++;
             }
         } catch (DocumentException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Error when reading the XML");
         }
+        if (log.isInfoEnabled())
+         log.info("Package read " + count + " documents");
         return "";
     }
 }

@@ -72,7 +72,7 @@ import java.util.zip.ZipOutputStream;
 
 
 public class XWikiDocument {
-    private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
+    private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
     private String parent;
     private String web;
@@ -1177,12 +1177,12 @@ public class XWikiDocument {
         return toXML(doc, context);
     }
 
-    public String toXML(XWikiContext context) {
+    public String toXML(XWikiContext context) throws XWikiException {
         Document doc = toXMLDocument(context);
         return toXML(doc, context);
     }
 
-    public String toFullXML(XWikiContext context) {
+    public String toFullXML(XWikiContext context) throws XWikiException {
         return toXML(true, false, true, true, context);
     }
 
@@ -1209,20 +1209,20 @@ public class XWikiDocument {
     public String toXML(boolean bWithObjects, boolean bWithRendering,
                         boolean bWithAttachmentContent,
                         boolean bWithVersions,
-                        XWikiContext context) {
+                        XWikiContext context) throws XWikiException {
         Document doc = toXMLDocument(bWithObjects, bWithRendering,
                 bWithAttachmentContent, bWithVersions ,context);
         return toXML(doc, context);
     }
 
-    public Document toXMLDocument(XWikiContext context) {
+    public Document toXMLDocument(XWikiContext context) throws XWikiException {
         return toXMLDocument(true, false, false, false, context);
     }
 
     public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering,
                                   boolean bWithAttachmentContent,
                                   boolean bWithVersions,
-                                  XWikiContext context) {
+                                  XWikiContext context) throws XWikiException {
         Document doc = new DOMDocument();
         Element docel = new DOMElement("xwikidoc");
         doc.setRootElement(docel);
@@ -1272,7 +1272,7 @@ public class XWikiDocument {
         List alist = getAttachmentList();
         for (int ai=0;ai<alist.size();ai++) {
             XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
-            docel.add(attach.toXML(bWithAttachmentContent, bWithVersions));
+            docel.add(attach.toXML(bWithAttachmentContent, bWithVersions, context));
         }
 
         if (bWithObjects) {
@@ -1387,12 +1387,12 @@ public class XWikiDocument {
             return el.getText();
     }
 
-    public void fromXML(String xml) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException, XWikiException {
+    public void fromXML(String xml)throws XWikiException {
         fromXML(xml, false);
     }
 
 
-    public void fromXML(String xml, boolean withArchive) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException, XWikiException {
+    public void fromXML(String xml, boolean withArchive) throws XWikiException {
         SAXReader reader = new SAXReader();
         Document domdoc;
 
@@ -1400,7 +1400,7 @@ public class XWikiDocument {
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw e;
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
         }
 
         Element docel = domdoc.getRootElement();
@@ -1455,7 +1455,6 @@ public class XWikiDocument {
             setxWikiClass(bclass);
         }
 
-        //
         List objels = docel.elements("object");
         for (int i=0;i<objels.size();i++) {
             Element objel = (Element) objels.get(i);
@@ -1471,6 +1470,12 @@ public class XWikiDocument {
 
     public List getAttachmentList() {
         return attachmentList;
+    }
+
+    public void saveAllAttachments(XWikiContext context) throws XWikiException {
+        for (int i=0;i<attachmentList.size();i++) {
+            saveAttachmentContent((XWikiAttachment) attachmentList.get(i), context);
+        }
     }
 
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {

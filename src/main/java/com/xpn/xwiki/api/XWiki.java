@@ -590,6 +590,11 @@ public class XWiki extends Api {
         return new HashMap();
     }
 
+    public List sort(List list) {
+            Collections.sort(list);
+            return list;
+    }
+
     public void outputImage(BufferedImage image) throws IOException {
         JPEGImageEncoder encoder;
         OutputStream ostream = context.getResponse().getOutputStream();

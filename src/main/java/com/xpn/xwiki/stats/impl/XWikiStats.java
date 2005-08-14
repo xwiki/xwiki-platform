@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.XWikiException;
 
 import java.util.*;
 
@@ -134,7 +135,7 @@ public class XWikiStats extends BaseCollection {
         return oel;
     }
 
-    public void fromXML(Element oel) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public void fromXML(Element oel) throws XWikiException {
         Element cel = oel.element("class");
         BaseClass bclass = new BaseClass();
         if (cel!=null) {

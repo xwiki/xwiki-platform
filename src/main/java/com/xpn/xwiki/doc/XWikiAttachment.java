@@ -267,11 +267,11 @@ public class XWikiAttachment {
     }
     */
 
-    public Element toXML() {
-        return toXML(false, false);
+    public Element toXML(XWikiContext context) throws XWikiException {
+        return toXML(false, false, context);
     }
 
-    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions) {
+    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context) throws XWikiException {
         Element docel = new DOMElement("attachment");
         Element el = new DOMElement("filename");
         el.addText(getFilename());
@@ -300,6 +300,8 @@ public class XWikiAttachment {
 
         if (bWithAttachmentContent) {
             el = new DOMElement("content");
+            // We need to make sure content is loaded
+            loadContent(context);
             XWikiAttachmentContent acontent = getAttachment_content();
             if (acontent!=null) {
              byte[] bcontent = getAttachment_content().getContent();
@@ -312,6 +314,8 @@ public class XWikiAttachment {
         }
 
         if (bWithVersions) {
+            // We need to make sure content is loaded
+            loadArchive(context);
             XWikiAttachmentArchive aarchive = getAttachment_archive();
             if (aarchive!=null) {
                 el = new DOMElement("versions");
@@ -323,11 +327,10 @@ public class XWikiAttachment {
                 docel.add(el);
             }
         }
-
         return docel;
     }
 
-    public void fromXML(Element docel) throws DocumentException, java.text.ParseException, IllegalAccessException, InstantiationException, ClassNotFoundException {
+    public void fromXML(Element docel) throws XWikiException {
         setFilename(docel.element("filename").getText());
         setFilesize(Integer.parseInt(docel.element("filesize").getText()));
         setAuthor(docel.element("author").getText());
@@ -337,6 +340,19 @@ public class XWikiAttachment {
         String sdate = docel.element("date").getText();
         Date date = new Date(Long.parseLong(sdate));
         setDate(date);
+
+        Element contentel = docel.element("content");
+        if (contentel!=null) {
+            String base64content = contentel.getText();
+            byte[] content = Base64.decodeBase64(base64content.getBytes());
+            setContent(content);
+        }
+        Element archiveel = docel.element("versions");
+        if (archiveel!=null) {
+            String archive = archiveel.getText();
+            setArchive(archive);
+        }
+
     }
 
     public XWikiAttachmentContent getAttachment_content() {
@@ -378,6 +394,15 @@ public class XWikiAttachment {
         attachment_archive.setRCSArchive(archive);
     }
 
+    public void setArchive(String data) throws XWikiException {
+        if (attachment_archive==null) {
+            attachment_archive = new XWikiAttachmentArchive();
+            attachment_archive.setAttachment(this);
+        }
+        attachment_archive.setArchive(data.getBytes());
+    }
+
+
     public Version[] getVersions() {
         Node[] nodes = getArchive().changeLog();
         Version[] versions = new Version[nodes.length];
@@ -407,6 +432,16 @@ public class XWikiAttachment {
             attachment_content.setAttachment(this);
         }
         attachment_content.setContent(data);
+    }
+
+    public void loadContent(XWikiContext context) throws XWikiException {
+        if (attachment_content==null)
+            getDoc().getStore().loadAttachmentContent(this, context, true);
+    }
+
+    public void loadArchive(XWikiContext context) throws XWikiException {
+        if (attachment_archive==null)
+            getDoc().getStore().loadAttachmentArchive(this, context, true);
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException {

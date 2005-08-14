@@ -308,7 +308,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
         }
     }
 
-    public String getFullContent(XWikiDocument doc, XWikiContext context) {
+    public String getFullContent(XWikiDocument doc, XWikiContext context) throws XWikiException {
         return doc.toXML(context);
     }
 

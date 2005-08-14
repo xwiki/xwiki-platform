@@ -323,14 +323,14 @@ public class Document extends Api {
         return context.getUtil().substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml);
     }
     
-    public String toXML() {
+    public String toXML() throws XWikiException {
         if (checkProgrammingRights())
             return doc.toXML(context);
         else
             return "";
     }
 
-    public org.dom4j.Document toXMLDocument() {
+    public org.dom4j.Document toXMLDocument() throws XWikiException {
         if (checkProgrammingRights())
             return doc.toXMLDocument(context);
         else return null;

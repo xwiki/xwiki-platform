@@ -96,7 +96,7 @@
      	includes="picocontainer-1.0.jar,exoplatform.container-1.0.jar,exoplatform.services.chart.api-1.0.jar,exoplatform.services.chart.impl-1.0.jar,exoplatform.services.common.api-1.0.jar,exoplatform.services.organization.api-1.0.jar,exoplatform.services.organization.impl-1.0.jar,exoplatform.services.security.api-1.0.jar,exoplatform.services.security.impl-1.0.jar,exoplatform.services.database.api-1.0.jar,exoplatform.services.database.impl-1.0.jar" />
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
-        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.6.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar,hsqldb-1.7.3.jar" />
+        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar,hsqldb-1.7.3.jar" />
 
     <pathconvert pathsep=";" property="libs.main" refid="libs.main.fileset" />
     <pathconvert pathsep=";" property="libs.exo" refid="libs.exo.fileset" />

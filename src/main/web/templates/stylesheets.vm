@@ -1,10 +1,11 @@
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  />
+<link href="$xwiki.getSkinFile("charting.css")" rel="stylesheet" type="text/css"/>
 #set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
 #set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
 #if ($defaultstyle!="")
 <link href="$xwiki.getSkinFile($defaultstyle)" rel="stylesheet" type="text/css" title="default" />
 #else
-<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" title="default" />
+<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" />
 #end
 #if($request.getHeader("user-agent").indexOf("MSIE")!=-1)
 <link href="$xwiki.getSkinFile("ie.css")" rel="stylesheet" type="text/css" title="default" />

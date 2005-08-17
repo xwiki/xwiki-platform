@@ -24,7 +24,7 @@ package com.xpn.xwiki.objects;
 
 
 
-public abstract class BaseElement extends Object {
+public abstract class BaseElement implements ElementInterface {
     private String name;
     private String prettyName;
 
@@ -62,10 +62,7 @@ public abstract class BaseElement extends Object {
         } else if (!element.getPrettyName().equals(getPrettyName()))
             return false;
 
-        if (element.getClass()==null) {
-            if (getClass()!=null)
-                return false;
-        } else if (!(element.getClass().equals(this.getClass())))
+		if (!(element.getClass().equals(this.getClass())))
             return false;
 
         return true;

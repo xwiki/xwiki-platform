@@ -4,16 +4,6 @@
           "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN"
           "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
 
-<!--
-     This is a blank Struts configuration file based on the example application,
-     with commented examples of some items.
-
-     NOTE: If you have a generator tool to create the corresponding Java classes
-     for you, you could include the details in the "form-bean" declarations.  
-     Otherwise, you would only define the "form-bean" element itself, with the 
-     corresponding "name" and "type" attributes, as shown here.
--->
-
 
 <struts-config>
 
@@ -267,6 +257,12 @@
     <action path="/lifeblog/"
             type="com.xpn.xwiki.web.LifeBlogAction"
             name="lifeblog"
+            scope="request">
+    </action>
+
+    <action path="/charting/"
+            type="com.google.code.xwiki.charts.ChartingAction"
+            name="charting"
             scope="request">
     </action>
 

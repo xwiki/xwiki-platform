@@ -35,6 +35,8 @@ import java.io.StringWriter;
 
 import com.xpn.xwiki.web.Utils;
 
+// TODO: shouldn't this be abstract? toFormString and toText
+// will never work unless getValue is overriden
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
     private BaseCollection object;
     private int id;

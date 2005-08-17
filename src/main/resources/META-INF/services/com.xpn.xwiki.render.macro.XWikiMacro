@@ -22,3 +22,4 @@ org.radeox.macro.RfcMacro
 org.radeox.macro.TableMacro
 org.radeox.macro.InterWikiMacro
 org.radeox.macro.XrefMacro
+com.google.code.xwiki.charts.ChartingMacro

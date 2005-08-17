@@ -104,6 +104,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     public void put(String name, PropertyInterface property) throws XWikiException {
+		// TODO: order?
         checkField(name);
         safeput(name, property);
     }

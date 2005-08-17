@@ -794,7 +794,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             // If we still could not find the template in the skin or in the base skin
-            // let's try in the base skin (as long as the default base skin is not the same as the skin or the base skin
+            // let's try in the default base skin (as long as the default base skin is not the same as the skin or the base skin
             String defaultbaseskin = getDefaultBaseSkin(context);
             if ((!baseskin.equals(defaultbaseskin)) && (!skin.equals(defaultbaseskin))) {
                 result = parseTemplate(template, defaultbaseskin, context);

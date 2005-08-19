@@ -64,4 +64,9 @@ public class Object extends Collection {
         }
     }
 
+    public boolean equals(java.lang.Object arg0) {
+    	if (!(arg0 instanceof Object)) return false;
+    	Object o = (Object) arg0;
+    	return o.context.equals(context) && element.equals(o.element);    	
+    }
 }

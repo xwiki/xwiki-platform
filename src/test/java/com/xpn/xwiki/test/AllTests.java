@@ -27,6 +27,7 @@ import junit.framework.TestSuite;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.test.plugin.query.QueryPluginTest;
 
 public class AllTests {
     // TODO: There is also a hibpath variable in StoreHibernateTest. Should
@@ -74,6 +75,7 @@ public class AllTests {
         suite.addTestSuite(HibernateCustomMappingTest.class);
         suite.addTestSuite(HibernateCustomClassTest.class);
         suite.addTestSuite(PackageTest.class);
+        suite.addTestSuite(QueryPluginTest.class);
         //$JUnit-END$
 
         return suite;

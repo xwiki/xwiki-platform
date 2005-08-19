@@ -22,26 +22,28 @@
 
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.util.TOCGenerator;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.stats.api.DocStats;
-import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.MetaDataDiff;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
-import org.apache.commons.jrcs.diff.Delta;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Version;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.util.TOCGenerator;
+import com.xpn.xwiki.util.Util;
 
 
 public class Document extends Api {
@@ -686,5 +688,11 @@ public class Document extends Api {
     public void insertText(String text, String marker) throws XWikiException {
         if (hasAccessLevel("edit"))
             doc.insertText(text, marker, context);
+    }
+    
+    public boolean equals(java.lang.Object arg0) {
+    	if (!(arg0 instanceof Document)) return false;
+    	Document d = (Document) arg0;
+    	return d.context.equals(context) && doc.equals(d.doc);
     }
 }

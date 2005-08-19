@@ -1934,7 +1934,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException {
-        boolean bTransaction = true;
+        boolean bTransaction = false;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
@@ -1942,6 +1942,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 sql.append(",");
                 sql.append(selectColumns);
             }
+
+            if (wheresql==null)
+                wheresql = "";
 
             int orderPos = wheresql.toLowerCase().indexOf("order by");
             if (orderPos >= 0)
@@ -1953,8 +1956,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             sql.append(" from XWikiDocument as doc");
-            if (wheresql==null)
-                wheresql = "";
 
             wheresql.trim();
             if (!wheresql.equals("")) {
@@ -1986,8 +1987,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 String name = (String) result[0] + "." + (String)result[1];
                 list.add(name);
             }
-            if (bTransaction)
-                endTransaction(context, false);
             return list;
         }
         catch (Exception e) {

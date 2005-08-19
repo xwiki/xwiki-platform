@@ -56,8 +56,17 @@ public class QueryPluginTest extends HibernateTestCase {
 		for (int i=0; i<exps.length; i++) {
 			final Object obj = lst.get(i);
 			final Object exp = exps[i];
-			if (exp==obj) continue; // XXX: bugs with proxy objects?
-			assertEquals("Objects #"+i+" not equals", obj, exp);
+			if (obj instanceof Object[]) {
+				Object[] obj0 = (Object[]) obj,
+						exp0 = (Object[]) exp;
+				assertEquals(obj0.length, exp0.length);
+				for (int j=0; i<obj0.length; i++) {
+					assertEquals(obj0[j], exp0[j]);
+				}
+			} else {
+				if (exp==obj) continue; // XXX: bugs with proxy objects?
+				assertEquals("Objects #"+i+" not equals", obj, exp);
+			}
 		}
 	}
 	public void testsearch(String sxq, Object[] exps) throws XWikiException, InvalidQueryException {
@@ -293,6 +302,9 @@ public class QueryPluginTest extends HibernateTestCase {
         testsearch("//Test/TestObject/obj/*/TestClass",		new Object[]{object1});
         checkequals(qf.getObjects("Test.TestObject","*.TestClass",null,null).list(), new Object[]{object1});
         
+        testsearch("//Test/TestObject/obj/Test/TestClass/(@name,@className)",			new Object[]{new Object[]{"Test.TestObject", "Test.TestClass"}});
+        checkequals(qf.getObjects("Test.TestObject","Test.TestClass","@name,@className",null).list(), new Object[]{new Object[]{"Test.TestObject", "Test.TestClass"}});
+        
         doc = (XWikiDocument) hb.getSession(getXWikiContext()).load(XWikiDocument.class, new Long(doc1.getId())); 
         testsearch("//*/*/obj/*/*/@doc:self",						new Object[]{doc});
 		checkequals(qf.getObjects("*/*","*/*","@doc:self",null).list(), new Object[]{doc});
@@ -356,6 +368,8 @@ public class QueryPluginTest extends HibernateTestCase {
         checkequals(qf.getObjects("Test.TestObject","Test.TestClass","@f:first_name", "@f:password,@f:age").list(), new Object[]{"Artem", "Ivan"});
         testsearch("//*/*/obj/Test/TestClass/@f:first_name order by @f:password descending, @f:age descending",	new Object[]{"Ivan", "Artem"});
         checkequals(qf.getObjects("Test.TestObject","Test.TestClass","@f:first_name", "-@f:password,-@f:age").list(), new Object[]{"Ivan", "Artem"});
+        testsearch("//*/*/obj/Test/TestClass/(@f:first_name,@f:age) order by @f:password descending, @f:age descending",	new Object[]{new Object[]{"Ivan", new Long(21)}, new Object[]{"Artem", new Long(20)}});
+        checkequals(qf.getObjects("Test.TestObject","Test.TestClass","@f:first_name,@f:age", "-@f:password,-@f:age").list(), new Object[]{new Object[]{"Ivan", new Long(21)}, new Object[]{"Artem", new Long(20)}});
         
         testsearch("//*/*/obj/Test/TestClass[@f:first_name='Artem']/@doc:name",			new Object[]{"TestObject"});
 		checkequals(qf.getObjects("*/*","Test.TestClass[@f:first_name='Artem']","@doc:name",null).list(), new Object[]{"TestObject"});

@@ -39,7 +39,7 @@ public interface IQueryFactory {
 	
 	/** create query for docs 
 	 * @param docname - full document name (web/name | web.name). name may consist xpath []-selection. if any (name|web) - *
-	 * @param prop - return property, start with @, if null - return document
+	 * @param prop - return properties, separated by comma, property start with @, if null - return document
 	 * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/- before. if null - not sort 
 	 * @throws InvalidQueryException 
 	 * */
@@ -60,7 +60,7 @@ public interface IQueryFactory {
 	
 	/** create query for objects
 	 * @param oclass - full name of object class (web/name | web.name).  if any(name|web) - *
-	 * @param prop. for flex-attributes use f:flexname 
+	 * @param prop. for flex-attributes use @f:flexname 
 	 * @see getDocs
 	 * @throws InvalidQueryException
 	 */

@@ -151,8 +151,27 @@ public class QueryFactory extends Api implements IQueryFactory {
 	}
 	protected String getPropertyXPath(String prop) {
 		if ("".equals(n2e(prop))) return "";
-		if (prop.charAt(0)!='@') prop = "@"+prop;
-		return "/"+prop;
+		prop = prop.trim();
+		if (prop.charAt(0)=='(') return "/"+prop;
+		
+		final StringBuffer sb = new StringBuffer();
+		final String[] props = StringUtils.split(prop, " ,");
+		sb.append("/");
+		if (props.length>1)
+			sb.append("(");
+		String comma = "";
+		for (int i=0; i<props.length; i++) {
+			final String p = props[i];
+			sb.append(comma);
+			if (p.charAt(0)!='@')
+				sb.append("@");
+			sb.append(p);
+			comma = ",";
+		}
+		if (props.length>1)
+			sb.append(")");
+		
+		return sb.toString();
 	}
 	private final String n2e(String s) {
 		return s==null?"":s;

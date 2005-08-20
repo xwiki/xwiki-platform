@@ -33,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.plugin.query.QueryFactory;
@@ -172,7 +173,7 @@ public class QueryPluginTest extends HibernateTestCase {
         checkequals(qf.getDocs("*/*", "", "-@creationDate").setMaxResults(2).list(), new Object[]{doc5,doc4});
         
         checkequals(qf.getDocs("*.*[@author='Artem Melentev']", "@author", "").setDistinct(true).list(), new Object[]{"Artem Melentev"});
-        checkequals(qf.getDocs("*.*[@author='Artem Melentev']", "@author", "").setDistinct(false).list(), new Object[]{"Artem Melentev", "Artem Melentev"});
+        checkequals(qf.getDocs("*.*[@author='Artem Melentev']", "@author", "").setDistinct(false).list(), new Object[]{"Artem Melentev", "Artem Melentev"});        
 	}
 	
 	// XXX: Attachments don`t store it`s document!!!
@@ -378,6 +379,62 @@ public class QueryPluginTest extends HibernateTestCase {
 		testsearch("//*/*/obj/Test/TestClass[@f:first_name!='Artem' and @f:first_name!='Ivan']/@doc:web",	new Object[]{});
 		checkequals(qf.getObjects("*/*","Test.TestClass[@f:first_name!='Artem' and @f:first_name!='Ivan']","@doc:fullName",null).list(), new Object[]{});
 		
+		testsearch("//*/*/obj/Test/TestClass[@f:first_name!='Artem' and @f:first_name!='Ivan']/@f:first_name",	new Object[]{});
+		
         hb.endTransaction(getXWikiContext(), false);
+	}
+	
+	public void test_jcr_contain() throws HibernateException, XWikiException, InvalidQueryException {
+		XWikiHibernateStore hb = getXWiki().getHibernateStore();
+		XWikiDocument doc = new XWikiDocument("Test", "Contains");
+		BaseClass bclass = Utils.prepareClass(doc, "Test.Contains");
+		bclass = Utils.prepareAdvancedClass(doc, "Test.Contains");
+		ListClass propclass = (ListClass) bclass.get("dblist");
+		propclass.setMultiSelect(true);
+		propclass.setRelationalStorage(true);
+        BaseObject obj1, obj = obj1 = Utils.prepareObject(doc, "Test.Contains");
+        obj.put("driver", ((PropertyClass)bclass.get("driver")).fromString("1"));
+        obj.put("category", ((PropertyClass)bclass.get("category")).fromString("1"));
+        obj.put("category2", ((PropertyClass)bclass.get("category2")).fromString("1|2"));
+        obj.put("category3", ((PropertyClass)bclass.get("category3")).fromString("1|2"));
+        obj.put("dblist", ((PropertyClass)bclass.get("dblist")).fromString("XWikiUsers|test2"));
+        doc.addObject("Test.Contains", obj1);
+		hb.saveXWikiDoc(doc, getXWikiContext());
+		
+		getXWiki().flushCache();
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:category2, '1')]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:category2, '2')]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:category,  '2')]/@f:first_name", new Object[]{});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:dblist,    'XWikiUsers')]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:dblist,    'XWikiUsers1')]/@f:first_name", new Object[]{});
+		testsearch("/*/*/obj/Test/Contains[not(jcr:contains(@f:dblist,'XWikiUsers'))]/(@f:first_name)", new Object[]{});
+		testsearch("/*/*/obj/Test/Contains[not(jcr:contains(@f:dblist,'XWikiUsers1'))]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:dblist,    'test2')]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:dblist,'test2') and jcr:contains(@f:dblist,'XWikiUsers')]/@f:first_name", new Object[]{"Ludovic"});
+		testsearch("/*/*/obj/Test/Contains[jcr:contains(@f:dblist,'test2') and jcr:contains(@f:dblist,'XWikiUsers1')]/@f:first_name", new Object[]{});
+		testsearch("/*/*/obj/Test/Contains[not(jcr:contains(@f:dblist,'test2'))and not(jcr:contains(@f:dblist,'XWikiUsers'))]/@f:first_name", new Object[]{});
+	}
+	
+	public void testReturnListS() throws XWikiException, InvalidQueryException {
+		XWikiHibernateStore hb = getXWiki().getHibernateStore();
+		XWikiDocument doc = new XWikiDocument("Test", "Contains");
+		BaseClass bclass = Utils.prepareClass(doc, "Test.Contains");
+		bclass = Utils.prepareAdvancedClass(doc, "Test.Contains");
+		ListClass propclass = (ListClass) bclass.get("dblist");
+		propclass.setMultiSelect(true);
+		propclass.setRelationalStorage(true);
+        BaseObject obj1, obj = obj1 = Utils.prepareObject(doc, "Test.Contains");
+        obj.put("driver", ((PropertyClass)bclass.get("driver")).fromString("1"));
+        obj.put("category", ((PropertyClass)bclass.get("category")).fromString("1"));
+        obj.put("category2", ((PropertyClass)bclass.get("category2")).fromString("1|2"));
+        obj.put("category3", ((PropertyClass)bclass.get("category3")).fromString("1|2"));
+        obj.put("dblist", ((PropertyClass)bclass.get("dblist")).fromString("XWikiUsers|test2"));
+        doc.addObject("Test.Contains", obj1);
+		hb.saveXWikiDoc(doc, getXWikiContext());
+		getXWiki().flushCache();
+		testsearch("/*/*/obj/Test/Contains/@f:category",	new Object[]{"1"});
+		testsearch("/*/*/obj/Test/Contains/@f:category2",	new Object[]{"1|2"});
+		// Hibernate(even 3.1) could not return lists..(NullPointer in parser) maybe needed special select query. question is posted
+		//testsearch("/*/*/obj/Test/Contains/@f:dblist",		new Object[]{Arrays.asList(new Object[]{"XWikiUsers", "test2"})});
 	}
 }

@@ -56,8 +56,10 @@ import org.hibernate.Session;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 
@@ -190,9 +192,10 @@ public class HibernateQuery extends DefaultQuery {
 			}
 			final String obj = (String) data;
 			QueryNode[] operands = node.getOperands();
-			if (operands.length > 0) {
-	            _userwhere.append(" NOT ");
+			if (operands.length > 0) {				
+	            _userwhere.append(" NOT (");
 	            traverse(operands[0], obj);
+	            _userwhere.append(")");
 	        }
 			return obj;
 		}
@@ -210,14 +213,23 @@ public class HibernateQuery extends DefaultQuery {
 			//return obj;
 		}
 
-		public Object visit(NodeTypeQueryNode node, Object data) {		
-			return visit((ExactQueryNode)node, data);
+		public Object visit(NodeTypeQueryNode node, Object data) {
+			throw new TranslateException("Not implemented");			
 		}
 
-		public Object visit(TextsearchQueryNode node, Object data) {
-			// TODO Where to search??
-			throw new TranslateException("Not implemented: " + node.dump());
-			//return sb;
+		public Object visit(TextsearchQueryNode node, Object data) { // jcr:contain
+			if (data==null)
+				throw new TranslateException("No object for relation");			
+			if (node.getPropertyName()==null)
+				throw new TranslateException("Full search is not implemented");
+			final String obj = (String) data;
+			final String hqlprop = getProp(node.getPropertyName(), obj);
+			int type = getPropType(node.getPropertyName(), obj);
+			if (type==TYPE_DEFAULT)
+				_userwhere.append(hqlprop).append(" LIKE ").append("'%").append(node.getQuery()).append("%'");
+			else if (type==TYPE_LIST)
+				_userwhere.append("'").append(node.getQuery()).append("'").append(" in elements(").append(hqlprop).append(")");
+			return obj;
 		}
 		
 		private String _getLocationNodeName(QueryNode p) {
@@ -384,6 +396,7 @@ public class HibernateQuery extends DefaultQuery {
 			return n;
 		}
 		Set _fromclass = new HashSet();
+		//Map _objpropClass = new HashMap();
 		private String _addnewfrom(String sf) {
 			final String scl = (String) _mapObjClass.get(sf);
 			return _addnewfrom(sf, scl);			
@@ -397,6 +410,12 @@ public class HibernateQuery extends DefaultQuery {
 			_fromclass.add(scl);
 			return r;
 		}
+		/*private String _addjoin(String what, String name) {
+			Integer n = getNextObjNumb(name);
+			final String r = name+n;
+			_from.append(" join ").append(what).append(" ").append(r);
+			return r;
+		}*/
 				
 		private final String n2e(String s) {
 			return s==null?"":s;
@@ -416,14 +435,18 @@ public class HibernateQuery extends DefaultQuery {
 				super(string, e);
 			}
 		}
-		/** obj - BaseClass.name */
-		Map _objClassName	= new HashMap();		
-		/** "obj:flex-prop" - string property for hql */ 
-		Map _props			= new HashMap();
+		/** Map obj - BaseClass.name */
+		Map _objClassName	= new HashMap();
+		///** "obj:flex-prop" - string property for hql */ 
+		//Map _props			= new HashMap();
 		/** set of used PropertyClass */
 		Set _propclass		= new HashSet();
 		public String getProp(QName qname, String obj) {
 			final String prop = qname.getLocalName();
+			ObjProperty oprop = (ObjProperty) _propertyes.get(obj+"|"+prop);
+			if (oprop!=null)
+				return oprop.hqlname;
+			
 			if (XWikiNamespaceResolver.NS_DOC_URI.equals(qname.getNamespaceURI())) {
 				_addfrom("doc");				
 				return "doc"+ (prop.equals("self")?"":"."+prop);
@@ -434,9 +457,7 @@ public class HibernateQuery extends DefaultQuery {
 			}
 			if (!XWikiNamespaceResolver.NS_FLEX_URI.equals(qname.getNamespaceURI()))
 				return obj+"."+prop;
-			String result = (String) _props.get(obj+":"+prop);
-			if (!"".equals(n2e(result)))
-				return result;
+						
 			final String classname = (String) _objClassName.get(obj);
 			if (classname==null)
 				throw new TranslateException("ClassName for "+obj+" not found");
@@ -455,8 +476,11 @@ public class HibernateQuery extends DefaultQuery {
 			if (pc==null)
 				throw new TranslateException("Couldn`t find property "+prop+" of class "+classname);
 			_propclass.add(pc.getClass());
-			String propclassname = pc.newProperty().getClass().getName();
-			result = _addnewfrom(prop, propclassname);
+			final Class propclass = pc.newProperty().getClass();
+			String propclassname = propclass.getName();
+			
+			String result = _addnewfrom(prop, propclassname);
+			
 			_where.appendSeparator().append("obj.id=").append(result).append(".id.id")
 				.appendSeparator().append(result).append(".name='").append(prop).append("'");
 			
@@ -464,8 +488,43 @@ public class HibernateQuery extends DefaultQuery {
 			if (val==null)
 				val = "value";
 			result += "." + val;
+			//if (propclass.equals(DBStringListProperty.class))
+			//	result = _addjoin(result, prop+"_"+val);			
 			
-			return result;			
+			oprop = new ObjProperty(obj, prop, result, pc.getClass(), propclass);
+			_propertyes.put(obj+"|"+prop, oprop);
+			
+			return result;
+		}
+		static final int TYPE_DEFAULT = -1;
+		static final int TYPE_LIST = TYPE_DEFAULT-1;
+		protected int getPropType(QName prop, String obj) {
+			getProp(prop, obj);
+			ObjProperty oprop = getObjProperty(prop.getLocalName(), obj);
+			if (oprop==null)
+				return TYPE_DEFAULT;
+			if (oprop.propertyclass.equals(DBStringListProperty.class))
+				return TYPE_LIST;
+			return TYPE_DEFAULT;
+		}
+		protected ObjProperty getObjProperty(String prop, String obj) {
+			return (ObjProperty) _propertyes.get(obj+"|"+prop);
+		}
+		/**	 obj:prop - ObjProperty */
+		Map _propertyes = new HashMap(); 
+		class ObjProperty {			
+			String	object,
+					propname,
+					hqlname;
+			Class	basepropclass,
+					propertyclass;
+			public ObjProperty(String obj, String prop, String hqlname, Class bpclass, Class propclass) {
+				this.object = obj;
+				this.propname = prop;
+				this.hqlname = hqlname;
+				this.basepropclass = bpclass;
+				this.propertyclass = propclass;
+			}
 		}
 	}
 	

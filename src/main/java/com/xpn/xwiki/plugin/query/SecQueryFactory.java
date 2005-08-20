@@ -23,20 +23,28 @@ package com.xpn.xwiki.plugin.query;
 import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.cache.api.XWikiCache;
 
-public class SecQueryFactory extends QueryFactory {	
+public class SecQueryFactory extends QueryFactory {
+	private static final Log log = LogFactory.getLog(SecQueryFactory.class);
 	public SecQueryFactory(XWikiContext context, XWikiCache cache) {
 		super(context, cache);
 	}	
 	public IQuery xpath(String q) throws InvalidQueryException {
+		if (log.isDebugEnabled())
+			log.debug("create xpath query: "+q);
 		if (isHibernate())
 			return new SecHibernateQuery( parse(q, Query.XPATH), this);
 		return null;
 	}
 	
 	public IQuery ql(String q) throws InvalidQueryException {
+		if (log.isDebugEnabled())
+			log.debug("create JCRSQL query: "+q);
 		if (isHibernate())
 			return new SecHibernateQuery( parse(q, Query.SQL), this);
 		return null;

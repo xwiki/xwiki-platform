@@ -99,8 +99,8 @@ public class QueryPluginApiTest extends HibernateTestCase {
         testsearch("//Test/Test0/obj/Test/Test0",					new Object[]{secobj1});
         testsearch("//Test/Test0/obj/Test/Test0/@name",				new Object[]{"Test.Test0"});        
         testsearch("//Test/Test0/obj/Test/Test0/@f:first_name",		new Object[]{"Artem"});
-        testsearch("//Test/Test0/obj/Test/Test0/(@name,@f:first_name)",		new Object[]{new Object[]{"Test.Test0","Artem"}});
-        
+        testsearch("//Test/Test0/obj/Test/Test0/(@name,@f:first_name)",		new Object[]{new Object[]{"Test.Test0","Artem"}});        
+                
         try {
         	testsearch("//Test/Test0/obj/Test/Test0/@f:password",	new Object[]{});
         	assertTrue(false);

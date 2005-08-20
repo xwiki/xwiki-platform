@@ -193,7 +193,7 @@ $xwiki.getUserName("xwiki:${username}")
   #set ($numbered = $boolean.valueOf($numbered))
   #set ($context.context.tocNumbered = $numbered)
  #end
- #set ($tocData = ${doc.getTOC($init, $max, $numbered)})
+ #set ($tocData = ${tdoc.getTOC($init, $max, $numbered)})
  #set ($context.context.tocData = $tocData)
  #set ($lastLevel = $init - 1)
  #set ($depth = 0)

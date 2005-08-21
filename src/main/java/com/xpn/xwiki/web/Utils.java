@@ -61,7 +61,9 @@ public class Utils {
             response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
         }
 
-        if ("view".equals(context.getAction())) {
+        String action = context.getAction();
+        if ((!"download".equals(action))
+            &&(!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
                 if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 1, context)!=0) {
@@ -80,9 +82,17 @@ public class Utils {
                 } else if (expires!=0) {
                     response.setDateHeader("Expires", (new Date()).getTime() + 30*24*3600*1000L);
                 }
-
             }
         }
+
+        if (("download".equals(action))
+            ||("skin".equals(action))) {
+            // Set a nocache to make sure these files are not cached by proxies
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context)!=0) {
+                response.setHeader("Cache-Control","no-cache");
+            }
+        }
+
 
         String content = context.getWiki().parseTemplate(template + ".vm", context);
         content = content.trim();

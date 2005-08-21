@@ -25,7 +25,6 @@ package com.xpn.xwiki.web;
 
 
 public class PrepareEditForm extends XWikiForm {
-    private String formTemplate;
     private String template;
     private String parent;
     private String defaultLanguage;
@@ -34,20 +33,11 @@ public class PrepareEditForm extends XWikiForm {
 
     public void readRequest() {
         XWikiRequest request = getRequest();
-        setFormTemplate(request.getParameter("formtemplate"));
         setTemplate(request.getParameter("template"));
         setParent(request.getParameter("parent"));
         setCreator(request.getParameter("creator"));
         setDefaultLanguage(request.getParameter("defaultLanguage"));
         setLockForce("1".equals(request.getParameter("lockforce")));
-    }
-
-    public String getFormTemplate() {
-        return formTemplate;
-    }
-
-    public void setFormTemplate(String formTemplate) {
-        this.formTemplate = formTemplate;
     }
 
     public String getTemplate() {

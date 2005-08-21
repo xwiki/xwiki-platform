@@ -20,7 +20,6 @@
     <orderEntry type="library" name="Hibernate" level="project" />
     <orderEntry type="library" name="Jakarta Commons" level="project" />
     <orderEntry type="library" name="Struts" level="project" />
-    <orderEntry type="library" name="Perl" level="project" />
     <orderEntry type="library" name="Unit Tests" level="project" />
     <orderEntry type="library" name="Velocity" level="project" />
     <orderEntry type="library" name="Ant" level="project" />
@@ -38,6 +37,7 @@
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
+    <orderEntry type="library" name="JackRabbit" level="project" />
     <orderEntryProperties />
   </component>
 </module>

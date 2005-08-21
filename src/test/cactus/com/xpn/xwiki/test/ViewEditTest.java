@@ -86,7 +86,7 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewOkTest");
     }
@@ -112,7 +112,7 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRawOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRawOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewRawOkTest");
         webRequest.addParameter("raw","1");
@@ -139,7 +139,7 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRawOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRawOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewRawOkTest");
         webRequest.addParameter("xpage","code");
@@ -166,7 +166,7 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewXMLOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewXMLOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewXMLOkTest");
         webRequest.addParameter("xpage","xml");
@@ -179,6 +179,9 @@ public class ViewEditTest extends ServletTest {
             assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
             assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
             assertTrue("Could not find xml tags in content: " + result, result.indexOf("<content")!=-1);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
 
             XWikiDocument doc1 = (XWikiDocument) xwiki.getDocument("Main.ViewXMLOkTest", context);
             XWikiDocument doc2 = new XWikiDocument();
@@ -198,10 +201,10 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "ViewGetDocumentContent", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewGetDocumentContent", context);
         String content = Utils.content1;
         Utils.content1 = "test\n$xwiki.getDocument(\"Main.ViewGetDocumentContent\").getContent()\ntest\n";
-        Utils.createDoc(hibstore, "Main", "ViewGetDocument", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewGetDocument", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewGetDocument");
     }
@@ -224,10 +227,10 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        // Utils.createDoc(hibstore, "Main", "ViewDocumentTestLinkTest", context);
+        // Utils.createDoc(xwiki.getStore(), "Main", "ViewDocumentTestLinkTest", context);
         String content = Utils.content1;
         Utils.content1 = "[Main.ViewDocumentLink]";
-        Utils.createDoc(hibstore, "Main", "ViewDocumentLink", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewDocumentLink", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewDocumentLink");
     }
@@ -254,7 +257,7 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.PreviewOkTest");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "PreviewOkTest", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PreviewOkTest", bobject, bclass, context);
         setUrl(webRequest, "preview", "PreviewOkTest");
     }
 
@@ -282,7 +285,7 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.EditOkTest");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "EditOkTest", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditOkTest", bobject, bclass, context);
         setUrl(webRequest, "edit", "EditOkTest");
     }
 
@@ -308,7 +311,7 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.EditObjectOkTest");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "EditObjectOkTest", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditObjectOkTest", bobject, bclass, context);
         setUrl(webRequest, "edit", "EditObjectOkTest");
         webRequest.addParameter("xpage", "editobject");
     }
@@ -337,7 +340,7 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.EditClassOkTest");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "EditClassOkTest", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditClassOkTest", bobject, bclass, context);
         setUrl(webRequest, "edit", "EditClassOkTest");
         webRequest.addParameter("xpage", "editclass");
     }
@@ -371,7 +374,7 @@ public class ViewEditTest extends ServletTest {
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         String content = Utils.content1;
         Utils.content1 = "Template content";
-        Utils.createDoc(hibstore, "Main", "EditOkTestTemplate", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditOkTestTemplate", bobject, bclass, context);
         Utils.content1 = content;
         setUrl(webRequest, "edit", "EditOkWithTestTemplate");
         webRequest.addParameter("template", "Main.EditOkTestTemplate");
@@ -406,14 +409,14 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
 
         // Document already exist.. This will make template system fail
-        Utils.createDoc(hibstore, "Main", "EditOkTestWithTemplate", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditOkTestWithTemplate", context);
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc, "Main.EditOkTestTemplate");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         String content = Utils.content1;
         Utils.content1 = "Template content";
-        Utils.createDoc(hibstore, "Main", "EditOkTestTemplate", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditOkTestTemplate", bobject, bclass, context);
         Utils.content1 = content;
         setUrl(webRequest, "edit", "EditOkTestWithTemplate");
         webRequest.addParameter("template", "Main.EditOkTestTemplate");
@@ -444,7 +447,7 @@ public class ViewEditTest extends ServletTest {
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         String content = Utils.content1;
         Utils.content1 = "Template content";
-        Utils.createDoc(hibstore, "Main", "SaveOkTestTemplate", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "SaveOkTestTemplate", bobject, bclass, context);
         Utils.content1 = content;
         setUrl(webRequest, "save", "SaveOkWithTestTemplate");
         webRequest.addParameter("template", "Main.SaveOkTestTemplate");
@@ -458,9 +461,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "SaveOkWithTestTemplate");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveOkWithTestTemplate", context);
             String content2 = doc2.getContent();
             assertEquals("Content is not identical", "Template content",content2);
             assertEquals("Parent is not identical", "XWiki.TestParentComesFromTemplate", doc2.getParent());
@@ -475,12 +479,11 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRevOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRevOkTest", context);
         Utils.content1 = content;
-        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRevOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRevOkTest", context);
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRevOkTest", "");
         webRequest.addParameter("rev", "1.2");
     }
@@ -507,13 +510,12 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRevOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRevOkTest", context);
         Utils.content1 = content;
-        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRevOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-        hibstore.saveXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRevOkTest", context);
+        xwiki.saveDocument(doc2, context);
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRevOkTest", "");
         webRequest.addParameter("rev", "1.2");
     }
@@ -546,15 +548,14 @@ public class ViewEditTest extends ServletTest {
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         String content = Utils.content1;
         Utils.content1 = "Hello First name is $doc.first_name";
-        Utils.createDoc(hibstore, "Main", "ViewRevWithObjOkTest", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRevWithObjOkTest", bobject, bclass, context);
         Utils.content1 = content;
 
-        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRevWithObjOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-        hibstore.saveXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRevWithObjOkTest", context);
+        xwiki.saveDocument(doc2, context);
         doc2.setStringValue("Main.ViewRevWithObjOkTest", "first_name", "John");
         doc2.setContent("Hello First name now is $doc.last_name");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRevWithObjOkTest", "");
         webRequest.addParameter("rev", "1.2");
     }
@@ -583,34 +584,30 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.RollbackRevWithObjOkTest");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        String content = Utils.content1;
-        Utils.content1 = "Hello First name is $doc.first_name";
-        Utils.createDoc(hibstore, "Main", "RollbackRevWithObjOkTest", bobject, bclass, context);
-        Utils.content1 = content;
+        Utils.createDoc(xwiki.getStore(), "Main", "RollbackRevWithObjOkTest", bobject, bclass, context);
 
-        XWikiDocument doc2 = new XWikiDocument("Main", "RollbackRevWithObjOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-        hibstore.saveXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.RollbackRevWithObjOkTest", context);
+        doc2.setContent("Hello First name is $doc.first_name");
+        xwiki.saveDocument(doc2, context);
         doc2.setStringValue("Main.RollbackRevWithObjOkTest", "first_name", "John");
         doc2.setContent("Hello First name now is $doc.last_name");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "rollback", "RollbackRevWithObjOkTest", "");
         webRequest.addParameter("rev", "1.2");
     }
 
     public void endRollbackRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
-            String result = webResponse.getText();
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "RollbackRevWithObjOkTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            XWikiDocument doc2 = xwiki.getDocument("Main.RollbackRevWithObjOkTest", context);
             String content2 = doc2.getContent();
             String name = doc2.getStringValue("Main.RollbackRevWithObjOkTest", "first_name");
 
+            assertEquals("Version is incorrect", "1.4", doc2.getVersion());
             assertEquals("Content has not been rolled back", "Hello First name is $doc.first_name", content2);
             assertEquals("First name had not been rolledback", "Ludovic", name);
-            assertEquals("Version is incorrect", "1.4", doc2.getVersion());
         } finally {
             clientTearDown();
         }
@@ -626,13 +623,12 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRawRevOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRawRevOkTest", context);
         Utils.content1 = content;
-        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRawRevOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-        hibstore.saveXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRawRevOkTest", context);
+        xwiki.saveDocument(doc2, context);
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRawRevOkTest", "");
         webRequest.addParameter("rev","1.2");
         webRequest.addParameter("raw","1");
@@ -660,13 +656,12 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Hello $doc.name\n----\n";
-        Utils.createDoc(hibstore, "Main", "ViewRawRevOkTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRawRevOkTest", context);
         Utils.content1 = content;
-        XWikiDocument doc2 = new XWikiDocument("Main", "ViewRawRevOkTest");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-        hibstore.saveXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRawRevOkTest", context);
+        xwiki.saveDocument(doc2, context);
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
-        hibstore.saveXWikiDoc(doc2, context);
+        xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRawRevOkTest", "");
         webRequest.addParameter("rev","1.2");
         webRequest.addParameter("xpage","code");
@@ -716,9 +711,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "SaveTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
             assertEquals("Content is not indentical", "Hello1Hello2Hello3",content2);
             assertEquals("Parent is not identical", "Main.WebHome", doc2.getParent());
@@ -736,7 +732,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "DeleteTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "DeleteTest", context);
         setUrl(webRequest, "delete", "DeleteTest");
         webRequest.addParameter("confirm","1");
     }
@@ -747,10 +743,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Delete returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "DeleteTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
 
+            XWikiDocument doc2 = xwiki.getDocument("Main.DeleteTest", context);
             assertTrue("Document should not exist", doc2.isNew());
         } finally {
             clientTearDown();
@@ -766,7 +762,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "DeleteTest2", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "DeleteTest2", context);
         setUrl(webRequest, "delete", "DeleteTest2");
     }
 
@@ -776,10 +772,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("DeleteWithoutConfirm returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "DeleteTest2");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
 
+            XWikiDocument doc2 = xwiki.getDocument("Main.DeleteTest2", context);
             assertFalse("Document should exist", doc2.isNew());
         } finally {
             clientTearDown();
@@ -795,7 +791,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "PropAddTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropAddTest", context);
         setUrl(webRequest, "propadd", "PropAddTest");
         webRequest.addParameter("propname", name);
         webRequest.addParameter("proptype", cclass.getName());
@@ -806,9 +802,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Adding Property " + cclass.getName() + " returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropAddTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropAddTest", context);
             BaseClass bclass = doc2.getxWikiClass();
             assertNotNull("Class does not exist for " + cclass.getName(), bclass);
             assertNotNull("Property of type " + cclass.getName() + " has not been added", bclass.safeget(name));
@@ -866,8 +864,8 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.PropAddObjectClass");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "PropAddObjectClass", bobject, bclass, context);
-        Utils.createDoc(hibstore, "Main", "PropAddObject", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropAddObjectClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropAddObject", context);
         setUrl(webRequest, "objectadd", "PropAddObject");
         webRequest.addParameter("classname", "Main.PropAddObjectClass");
     }
@@ -877,10 +875,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropAddObject");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-            Map bobjects = doc2.getxWikiObjects();
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropAddObject", context);
             BaseObject bobject = null;
             try { bobject = (BaseObject) doc2.getObject("Main.PropAddObjectClass", 0); }
             catch (Exception e) {}
@@ -910,13 +909,13 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("PropAddSecondObjectClass");
-        Utils.createDoc(hibstore, "Main", "PropAddSecondObjectClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropAddSecondObjectClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropAddSecondObject");
         bobjlist.add(bobject);
         bobjects.put("Main.PropAddSecondObjectClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropAddSecondObject", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropAddSecondObject", null, null, bobjects, context);
         setUrl(webRequest, "objectadd", "PropAddSecondObject");
         webRequest.addParameter("classname", "Main.PropAddSecondObjectClass");
     }
@@ -926,9 +925,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropAddSecondObject");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropAddSecondObject", context);
             BaseObject bobject = null;
             try {
                 bobject = (BaseObject) doc2.getObject("Main.PropAddSecondObjectClass", 0); }
@@ -963,17 +964,16 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("PropRemoveObjectClass");
-        Utils.createDoc(hibstore, "Main", "PropRemoveObjectClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropRemoveObjectClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropRemoveObject");
         bobjlist.add(bobject);
         bobjects.put("Main.PropRemoveObjectClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropRemoveObject", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropRemoveObject", null, null, bobjects, context);
         if (hibstore instanceof XWikiCacheStoreInterface)
             ((XWikiCacheStoreInterface) hibstore).flushCache();
-        XWikiDocument doc2 = new XWikiDocument("Main", "PropRemoveObject");
-        doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+        XWikiDocument doc2 = xwiki.getDocument("Main.PropRemoveObject", context);
         BaseObject bobject2 = null;
         try {
             bobject2 = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0); }
@@ -990,9 +990,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Remove Object returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropRemoveObject");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropRemoveObject", context);
             BaseObject bobject = null;
             try {
                 bobject = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0); }
@@ -1017,13 +1019,13 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("Main.PropUpdateObjectClass");
-        Utils.createDoc(hibstore, "Main", "PropUpdateObjectClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateObjectClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropUpdateObject");
         bobjlist.add(bobject);
         bobjects.put("Main.PropUpdateObjectClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropUpdateObject", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateObject", null, null, bobjects, context);
 
         setUrl(webRequest, "save", "PropUpdateObject");
         webRequest.addParameter("content", "toto");
@@ -1038,9 +1040,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropUpdateObject");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateObject", context);
             BaseObject bobject = null;
             try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateObjectClass", 0); }
             catch (Exception e) {}
@@ -1078,13 +1082,13 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("Main.PropUpdateClassPropClass");
-        Utils.createDoc(hibstore, "Main", "PropUpdateClassPropClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateClassPropClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropUpdateClassProp");
         bobjlist.add(bobject);
         bobjects.put("Main.PropUpdateClassPropClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropUpdateClassProp", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateClassProp", null, null, bobjects, context);
         setUrl(webRequest, "propupdate", "PropUpdateClassPropClass");
         webRequest.addParameter("age_name", "age");
         webRequest.addParameter("age_size", "20");
@@ -1096,9 +1100,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Updated Class returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc = new XWikiDocument("Main", "PropUpdateClassPropClass");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc = xwiki.getDocument("Main.PropUpdateClassPropClass", context);
             BaseClass bclass = doc.getxWikiClass();
             NumberClass ageclass = (NumberClass) bclass.safeget("age");
             assertNotNull("Updated Class wikiClass should have age property", ageclass);
@@ -1107,9 +1113,7 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Updated Class wikiClass should have name property", bclass.safeget("first_name"));
 
 
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropUpdateClassProp");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-            Map bobjects = doc2.getxWikiObjects();
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateClassProp", context);
             BaseObject bobject = null;
             try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateClassPropClass", 0); }
             catch (Exception e) {}
@@ -1151,13 +1155,13 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("Main.PropRenameClassPropClass");
-        Utils.createDoc(hibstore, "Main", "PropRenameClassPropClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropRenameClassPropClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropRenameClassProp");
         bobjlist.add(bobject);
         bobjects.put("Main.PropRenameClassPropClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropRenameClassProp", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropRenameClassProp", null, null, bobjects, context);
         setUrl(webRequest, "propupdate", "PropRenameClassPropClass");
         webRequest.addParameter("age_name", "age2");
         webRequest.addParameter("age_size", "40");
@@ -1169,9 +1173,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Rename Class returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc = new XWikiDocument("Main", "PropRenameClassPropClass");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc = xwiki.getDocument("Main.PropRenameClassPropClass", context);
             BaseClass bclass = doc.getxWikiClass();
             NumberClass ageclass2 = (NumberClass) bclass.safeget("age2");
             assertNotNull("Rename Class wikiClass should have age2 property", ageclass2);
@@ -1213,8 +1219,7 @@ public class ViewEditTest extends ServletTest {
             String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
             assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
 
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropRenameClassProp");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropRenameClassProp", context);
             bobject = null;
             try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
             catch (Exception e) {}
@@ -1263,13 +1268,13 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         bclass.setName("PropUpdateAdvObjectClass");
-        Utils.createDoc(hibstore, "Main", "PropUpdateAdvObjectClass", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateAdvObjectClass", bobject, bclass, context);
         Map bobjects = new HashMap();
         Vector bobjlist = new Vector();
         bobject.setName("Main.PropUpdateAdvObject");
         bobjlist.add(bobject);
         bobjects.put("Main.PropUpdateAdvObjectClass", bobjlist);
-        Utils.createDoc(hibstore, "Main", "PropUpdateAdvObject", null, null, bobjects, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "PropUpdateAdvObject", null, null, bobjects, context);
         setUrl(webRequest, "save", "PropUpdateAdvObject");
         webRequest.addParameter("content", "toto");
         webRequest.addParameter("parent", "");
@@ -1288,10 +1293,11 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             // Verify return
             assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception")==-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "PropUpdateAdvObject");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
-            Map bobjects = doc2.getxWikiObjects();
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateAdvObject", context);
             BaseObject bobject = null;
             try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateAdvObjectClass", 0); }
             catch (Exception e) {}
@@ -1368,10 +1374,11 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
             File fattach = new File(Utils.filename);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "AttachTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            XWikiDocument doc2 = xwiki.getDocument("Main.AttachTest", context);
             List list = doc2.getAttachmentList();
             assertEquals("Document has no attachement", 1, list.size());
             XWikiAttachment attachment = (XWikiAttachment) list.get(0);
@@ -1396,13 +1403,13 @@ public class ViewEditTest extends ServletTest {
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
         doc1.saveAttachmentContent(attachment1, context);
         doc1.getAttachmentList().add(attachment1);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
 
         setUrl(webRequest, "upload", "AttachTest");
         webRequest.setContentType("multipart/form-data");
@@ -1416,10 +1423,11 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
             File fattach = new File(Utils.filename);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "AttachTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            XWikiDocument doc2 = xwiki.getDocument("Main.AttachTest", context);
             List list = doc2.getAttachmentList();
             assertEquals("Document has no attachement", 1, list.size());
             XWikiAttachment attachment = (XWikiAttachment) list.get(0);
@@ -1444,13 +1452,13 @@ public class ViewEditTest extends ServletTest {
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         String attachcontent1 = "blablabla";
         attachment1.setContent(attachcontent1.getBytes());
         doc1.saveAttachmentContent(attachment1, context);
         doc1.getAttachmentList().add(attachment1);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
         setUrl(webRequest, "download", "AttachDownloadTest/" + Utils.filename);
     }
 
@@ -1461,9 +1469,10 @@ public class ViewEditTest extends ServletTest {
             assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception")==-1);
             assertTrue("Attach Delete should contain attachment text: " + result, result.indexOf("blablabla")!=-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "AttachDownloadTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.AttachDownloadTest", context);
             List list = doc2.getAttachmentList();
             assertEquals("Document should have an attachement", 1, list.size());
         } finally {
@@ -1486,13 +1495,13 @@ public class ViewEditTest extends ServletTest {
         doc1.setContent(Utils.content1);
         doc1.setAuthor(Utils.author);
         doc1.setParent(Utils.parent);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
         doc1.saveAttachmentContent(attachment1, context);
         doc1.getAttachmentList().add(attachment1);
-        hibstore.saveXWikiDoc(doc1, context);
+        xwiki.saveDocument(doc1, context);
         setUrl(webRequest, "delattachment", "AttachDeleteTest/" + Utils.filename);
     }
 
@@ -1502,9 +1511,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "AttachDeleteTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.AttachDeleteTest", context);
             List list = doc2.getAttachmentList();
             assertEquals("Document should have no attachement", 0, list.size());
         } finally {
@@ -1540,9 +1550,9 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Included Page";
-        Utils.createDoc(hibstore, "Main", "IncludeTest2", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeTest2", context);
         Utils.content1 = "#includeTopic(\"Main.IncludeTest2\")\n";
-        Utils.createDoc(hibstore, "Main", "IncludeTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "IncludeTest");
     }
@@ -1566,9 +1576,9 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "Included Page";
-        Utils.createDoc(hibstore, "Main", "IncludeTest2", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeTest2", context);
         Utils.content1 = "#includeTopic(\"IncludeTest2\")\n#includeForm(\"Main.IncludeTest3\")";
-        Utils.createDoc(hibstore, "Main", "IncludeTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "edit", "IncludeTest");
     }
@@ -1588,7 +1598,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        Utils.createDoc(hibstore, "Main", "DefaultSkinTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "DefaultSkinTest", context);
         setUrl(webRequest, "view", "DefaultSkinTest");
     }
 
@@ -1615,13 +1625,12 @@ public class ViewEditTest extends ServletTest {
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
         Utils.setStringValue("XWiki.XWikiPreferences", "skin", "altern", context);
-        Utils.createDoc(hibstore, "Main", "AlternSkinTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "AlternSkinTest", context);
         setUrl(webRequest, "view", "AlternSkinTest");
     }
 
     public void endAlternSkin(WebResponse webResponse) throws HibernateException {
         try {
-            String result = webResponse.getText();
             // TODO: add and altern skin to reactivate this test
             //assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/altern/style.css\"")!=-1);
         } finally {
@@ -1638,7 +1647,7 @@ public class ViewEditTest extends ServletTest {
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
         Utils.setStringValue("XWiki.XWikiPreferences", "skin", "Main.TestSkin", context);
-        Utils.createDoc(hibstore, "Main", "WikiPageSkinTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "WikiPageSkinTest", context);
         setUrl(webRequest, "view", "WikiPageSkinTest");
     }
 
@@ -1660,8 +1669,8 @@ public class ViewEditTest extends ServletTest {
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
         Utils.setStringValue("XWiki.XWikiPreferences", "skin", "Main.TestSkin", context);
-        Utils.createDoc(hibstore, "Main", "WikiPageSkinTest", context);
-        Utils.createDoc(hibstore, "Main", "TestSkin", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "WikiPageSkinTest", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "TestSkin", context);
         Utils.setStringValue("Main.TestSkin", "XWiki.XWikiSkins", "style.css", "// no style", context);
         setUrl(webRequest, "view", "WikiPageSkinTest");
     }
@@ -1685,9 +1694,9 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         String content = Utils.content1;
         Utils.content1 = "#macro(hello)\ncoucou#end";
-        Utils.createDoc(hibstore, "Main", "IncludeMacros2", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeMacros2", context);
         Utils.content1 = "#includeMacros(\"Main.IncludeMacros2\")\n#hello()";
-        Utils.createDoc(hibstore, "Main", "IncludeMacros", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "IncludeMacros", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "IncludeMacros");
     }
@@ -1713,7 +1722,7 @@ public class ViewEditTest extends ServletTest {
         Utils.prepareObject(doc, "Main.EditLock");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        Utils.createDoc(hibstore, "Main", "EditLock", bobject, bclass, context);
+        Utils.createDoc(xwiki.getStore(), "Main", "EditLock", bobject, bclass, context);
         setUrl(webRequest, "edit", "EditLock");
         webRequest.addParameter("xpage", "editclass");
 }
@@ -1727,9 +1736,11 @@ public class ViewEditTest extends ServletTest {
             assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
             assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
             assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc = new XWikiDocument("Main", "EditLock");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc = xwiki.getDocument("Main.EditLock", context);
             XWikiLock thefirstlock = doc.getLock(context);
             assertNotNull("Lock exist", thefirstlock);
             assertEquals("Lock user", "XWiki.XWikiGuest", thefirstlock.getUserName());
@@ -1760,8 +1771,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        XWikiDocument doc = new XWikiDocument("Main", "SaveTest");
-        doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+        XWikiDocument doc = xwiki.getDocument("Main.SaveTest", context);
         doc.setLock("XWiki.XWikiGuest", context);
         XWikiLock thefirstlock = doc.getLock(context);
         assertNotNull("Lock exist", thefirstlock);
@@ -1776,9 +1786,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "SaveTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
             assertEquals("Content is not indentical", "Hello1Hello2Hello3",content2);
             assertEquals("Parent is not identical", "Main.WebHome", doc2.getParent());
@@ -1806,8 +1817,7 @@ public class ViewEditTest extends ServletTest {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        XWikiDocument doc = new XWikiDocument("Main", "SaveTest");
-        doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+        XWikiDocument doc = xwiki.getDocument("Main.SaveTest", context);
         doc.setLock("XWiki.XWikiGuest", context);
         XWikiLock thefirstlock = doc.getLock(context);
         assertNotNull("Lock exist", thefirstlock);
@@ -1822,9 +1832,10 @@ public class ViewEditTest extends ServletTest {
             // Verify return
             assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
 
-            XWikiStoreInterface hibstore = new XWikiHibernateStore(getHibpath());
-            XWikiDocument doc2 = new XWikiDocument("Main", "SaveTest");
-            doc2 = (XWikiDocument) hibstore.loadXWikiDoc(doc2, context);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
             assertEquals("Content is not indentical", "\n",content2);
             assertEquals("Parent is not identical", "", doc2.getParent());

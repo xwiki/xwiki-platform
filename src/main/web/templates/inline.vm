@@ -9,14 +9,14 @@ $message
 <form id="edit" method="post" action="$doc.getURL("preview")">
 <p>
 <input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="template" value="$!tdoc.template" />
-<input type="hidden" name="language" value="$!tdoc.language" />
+<input type="hidden" name="template" value="$!doc.template" />
+<input type="hidden" name="language" value="$!doc.language" />
 #set($force = $!request.get("force"))
-#if (($tdoc.getLocked()==true)&&(!$force))
+#if (($doc.getLocked()==true)&&(!$force))
 <p>
 $msg.get("doclockedby"): $xwiki.getLocalUserName($doc.getLockingUser()).
 <br />
-<a href="$doc.getURL("inline", "template=$!tdoc.template&xredirect=$!xredirect&language=$!tdoc.language&force=1")">$msg.get("forcelock")
+<a href="$doc.getURL("inline", "template=$!doc.template&xredirect=$!xredirect&language=$!doc.language&force=1")">$msg.get("forcelock")
 </p>
 #else
 #foreach($class in $doc.xWikiClasses)

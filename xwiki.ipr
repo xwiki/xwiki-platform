@@ -436,6 +436,17 @@
         <root url="file://C:/dev/java/webservices/google/com" />
       </SOURCES>
     </library>
+    <library name="JackRabbit">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-1.0-SNAPSHOT.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-api-1.0-SNAPSHOT.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-commons-1.0-SNAPSHOT.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-core-1.0-SNAPSHOT.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcr-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
   </component>
   <component name="uidesigner-configuration">
     <option name="INSTRUMENT_CLASSES" value="true" />

@@ -121,6 +121,10 @@ public class Document extends Api {
         return doc.getLanguage();
     }
 
+    public String getTemplate() {
+        return doc.getTemplate();
+    }
+
     public String getRealLanguage() throws XWikiException {
         return doc.getRealLanguage(context);
     }

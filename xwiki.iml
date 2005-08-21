@@ -11,7 +11,6 @@
     <orderEntry type="library" name="Ant" level="project" />
     <orderEntry type="library" name="Hibernate" level="project" />
     <orderEntry type="library" name="Struts" level="project" />
-    <orderEntry type="library" name="Perl" level="project" />
     <orderEntry type="library" name="Velocity" level="project" />
     <orderEntry type="library" name="Unit Tests" level="project" />
     <orderEntry type="library" name="Jakarta Commons" level="project" />
@@ -40,6 +39,7 @@
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
+    <orderEntry type="library" name="JackRabbit" level="project" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
@@ -83,6 +83,10 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="Hibernate">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="JackRabbit">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>

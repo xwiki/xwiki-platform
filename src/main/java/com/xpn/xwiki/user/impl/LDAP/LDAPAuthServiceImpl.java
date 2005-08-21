@@ -1,32 +1,20 @@
 package com.xpn.xwiki.user.impl.LDAP;
 
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.*;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.novell.ldap.*;
-import com.novell.ldap.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.xhtml.fieldset;
-import org.securityfilter.authenticator.Authenticator;
-import org.securityfilter.config.SecurityConfig;
-import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
-import java.text.Format;
 import java.text.MessageFormat;
 
 /**
@@ -255,8 +243,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             // authenticate to the server
             result = Bind(bindDN, bindPassword, lc, ldapVersion);
 
+            if (log.isDebugEnabled())
+                 log.debug("LDAP Bind returned");
+
             if (result && checkLevel > 0)
             {
+                if (log.isDebugEnabled())
+                     log.debug("LDAP searching user");
+
                 LDAPSearchResults searchResults =
                     lc.search(  baseDN,
                                 LDAPConnection.SCOPE_SUB ,
@@ -267,18 +261,29 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
                 if (searchResults.hasMore())
                 {
-                    LDAPEntry nextEntry = searchResults.next();
+                    if (log.isDebugEnabled())
+                         log.debug("LDAP searching found user");
 
+                    LDAPEntry nextEntry = searchResults.next();
                     foundDN = nextEntry.getDN();
+
+                    if (log.isDebugEnabled())
+                         log.debug("LDAP searching found DN: " + foundDN);
 
                     if (checkLevel > 1)
                     {
+                        if (log.isDebugEnabled())
+                             log.debug("LDAP comparing password");
+
                         LDAPAttribute attr = new LDAPAttribute(
                                                         "userPassword", password );
                         result = lc.compare( foundDN, attr );
                     }
                     if (result)
                     {
+                        if (log.isDebugEnabled())
+                             log.debug("LDAP adding user attributes");
+
                         LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
                         Iterator allAttributes = attributeSet.iterator();
 
@@ -291,6 +296,9 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
                             if( allValues != null) {
                                 while(allValues.hasMoreElements()) {
+                                    if (log.isDebugEnabled())
+                                         log.debug("LDAP adding user attribute " + attributeName);
+
                                     String Value = (String) allValues.nextElement();
                                     attributes.put(attributeName, Value);
                                 }
@@ -299,8 +307,11 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                         attributes.put("dn", foundDN);
                     }
                 }
-                else
+                else {
+                    if (log.isDebugEnabled())
+                       log.debug("LDAP search user failed");
                     notinLDAP = true;
+                }
 
                 if (log.isInfoEnabled()) {
                     if (result)
@@ -311,15 +322,15 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             }
         }
         catch( LDAPException e ) {
+            if (log.isInfoEnabled())
+                log.info("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
+
             if ( e.getResultCode() == LDAPException.NO_SUCH_OBJECT ) {
                 notinLDAP = true;
             } else if ( e.getResultCode() ==
                                         LDAPException.NO_SUCH_ATTRIBUTE ) {
                 notinLDAP = true;
             }
-
-            if (log.isInfoEnabled())
-                 log.info("LDAP Password check for user " + username + " failed with exception " + e.getMessage());
         }
         catch (Throwable e) {
             notinLDAP = true;
@@ -328,12 +339,16 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         }
         finally
         {
+            if (log.isDebugEnabled())
+                 log.debug("LDAP check in finally block");
+
             try {
                 lc.disconnect();
             } catch (LDAPException e) {
                 e.printStackTrace();
             }
         }
+
         if (notinLDAP)
         {
             if (log.isDebugEnabled())

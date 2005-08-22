@@ -29,41 +29,36 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
+import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.api.Api;
 
 import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.io.*;
 
-public class LaszloPluginApi extends Api {
-    private LaszloPlugin plugin;
+public class LaszloPluginApi extends PluginApi {
 
     public LaszloPluginApi(LaszloPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
+            super(plugin, context);
         }
 
-    public LaszloPlugin getPlugin() {
-        return plugin;
-    }
-
-    public void setPlugin(LaszloPlugin plugin) {
-        this.plugin = plugin;
+    public LaszloPlugin getLaszloPlugin() {
+        return (LaszloPlugin) getPlugin();
     }
 
     public String getFileName(String name, String laszlocode) {
-        return plugin.getFileName(name, laszlocode);
+        return getLaszloPlugin().getFileName(name, laszlocode);
     }
 
     public String getLaszloURL(String name, String laszlocode) throws IOException, XWikiException {
-        return plugin.getLaszloURL(name, laszlocode);
+        return getLaszloPlugin().getLaszloURL(name, laszlocode);
     }
 
     public String getLaszloFlash(String name, String width, String height, String laszlocode) throws IOException, XWikiException {
-        return plugin.getLaszloFlash(name, width, height, laszlocode, context);
+        return getLaszloPlugin().getLaszloFlash(name, width, height, laszlocode, context);
     }
 
     public void flushCache() {
-        plugin.flushCache();
+        getLaszloPlugin().flushCache();
     }
 }

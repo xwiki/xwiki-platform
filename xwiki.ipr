@@ -247,7 +247,9 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.1.jar!/" />
       </CLASSES>
-      <JAVADOC />
+      <JAVADOC>
+        <root url="file://C:/dev/java/apache/commons-fileupload-1.0/docs/apidocs" />
+      </JAVADOC>
       <SOURCES />
     </library>
     <library name="Unit Tests">

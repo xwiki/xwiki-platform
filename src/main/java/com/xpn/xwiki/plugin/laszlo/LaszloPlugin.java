@@ -40,10 +40,10 @@ import org.apache.commons.lang.RandomStringUtils;
 import java.io.*;
 
 public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.laszlo.LaszloPlugin.class);
+    private static Log mLogger =
+            LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.laszlo.LaszloPlugin.class);
 
-        private String laszloBaseURL;
+    private String laszloBaseURL;
     private String laszloPath;
 
     public LaszloPlugin(String name, String className, XWikiContext context) {
@@ -58,15 +58,15 @@ public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
         return new LaszloPluginApi((LaszloPlugin) plugin, context);
     }
-
+    
     public void flushCache() {
         try {
             File[] filelist = (new File(laszloPath)).listFiles();
-              for (int i=0;i<filelist.length;i++) {
+            for (int i=0;i<filelist.length;i++) {
                 try {
                     filelist[i].delete();
                 } catch (Exception e) {}
-              }
+            }
         } catch (Exception e) {}
     }
 
@@ -75,38 +75,38 @@ public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
         laszloBaseURL = context.getWiki().Param("xwiki.plugin.laszlo.baseurl", "/openlaszlo/xwiki/");
         if (!laszloBaseURL.endsWith("/"))
-         laszloBaseURL = laszloBaseURL + "/";
+            laszloBaseURL = laszloBaseURL + "/";
 
         laszloPath = context.getWiki().Param("xwiki.plugin.laszlo.path", "./webapps/openlaszlo/xwiki/");
         if (!laszloPath.endsWith("/"))
-         laszloPath = laszloPath + "/";
+            laszloPath = laszloPath + "/";
 
         flushCache();
     }
 
     public String writeLaszloFile(String name, String laszlocode) throws IOException, XWikiException {
-         File laszloDir = new File(laszloPath);
-         if (!laszloDir.exists())
-           laszloDir.mkdirs();
+        File laszloDir = new File(laszloPath);
+        if (!laszloDir.exists())
+            laszloDir.mkdirs();
 
         String filename = getFileName(name, laszlocode);
 
         laszlocode = Util.secureLaszloCode(laszlocode);
 
         File dfile = new File(laszloDir, filename);
-         if (!dfile.exists()) {
-             FileWriter fwriter = new FileWriter(dfile);
-             fwriter.write(laszlocode);
-             fwriter.flush();
-             fwriter.close();
-         }
+        if (!dfile.exists()) {
+            FileWriter fwriter = new FileWriter(dfile);
+            fwriter.write(laszlocode);
+            fwriter.flush();
+            fwriter.close();
+        }
 
-         return filename;
+        return filename;
     }
 
     public String getFileName(String name, String laszlocode) {
         if ((name==null)||name.trim().equals(""))
-         name = "laszlo";
+            name = "laszlo";
 
         String filename = name + "-" + Math.abs(laszlocode.hashCode()) + ".lzx";
         return filename;

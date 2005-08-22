@@ -78,9 +78,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     public XWikiHibernateStore(XWiki xwiki, XWikiContext context) {
         String path = xwiki.Param("xwiki.store.hibernate.path");
-        if (context.getEngineContext()==null)
-            setPath(path);
-        else {
+        if (new File(path).exists() || context.getEngineContext() == null){
+            setPath (path);
+        } else {
             try {
                 setHibUrl(context.getEngineContext().getResource(path));
             } catch (MalformedURLException e) {

@@ -77,6 +77,9 @@ import org.exoplatform.container.PortalContainer;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -120,16 +123,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     private boolean isReadOnly = false;
 
+    public static final String CFG_ENV_NAME = "XWikiConfig";
+
+    /* i don't like using static variables like, but this avoid making a JNDI lookup with
+       each request ...
+    */
+    private static String configPath = null;
+    private static String getConfigPath () throws NamingException {
+        if (configPath == null) {
+            Context envContext = (Context) new InitialContext().lookup("java:comp/env");
+            configPath = (String) envContext.lookup(CFG_ENV_NAME);
+
+        }
+        return configPath;
+   }
+
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
-        String xwikicfg = "/WEB-INF/xwiki.cfg";
+        String xwikicfg = null;
         String xwikiname = "xwiki";
         XWiki xwiki = null;
         XWikiEngineContext econtext = context.getEngineContext();
 
         try {
+            xwikicfg = getConfigPath();
             xwiki = (XWiki) econtext.getAttribute(xwikiname);
             if (xwiki == null) {
-                InputStream xwikicfgis = econtext.getResourceAsStream(xwikicfg);
+                InputStream xwikicfgis = null;
+
+                // first try to load the file pointed by the given path
+                // if it does not exist, look for it relative to the classpath
+                File f = new File (xwikicfg);
+                if (f.exists()) {
+                    xwikicfgis = new FileInputStream(f);
+                } else {
+                    xwikicfgis = econtext.getResourceAsStream(xwikicfg);
+                }
                 xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                 econtext.setAttribute(xwikiname, xwiki);
             }

@@ -1,0 +1,13 @@
+XWIKIHOME=$HOME/dev/java/xwiki
+XWIKILIB=$XWIKIHOME/lib
+TOOLSLIB=./lib
+
+TOOLSPATH="$TOOLSLIB/commons-cli-1.0.jar"
+
+XWIKIPATH="$XWIKILIB/groovy-all-1.0-jsr-01.jar:$XWIKILIB/ant-1.6.2.jar:$XWIKILIB/antlr-2.7.5.jar:$XWIKILIB/alexa.jar:$XWIKILIB/asm-1.5.3.jar:$XWIKILIB/asm-util-1.5.3.jar:$XWIKILIB/aspectjrt-1.2.1.jar:$XWIKILIB/avalon-framework-4.1.5.jar:$XWIKILIB/axis-1.2RC2.jar:$XWIKILIB/batik-all-1.6.jar:$XWIKILIB/c3p0-0.8.4.5.jar:$XWIKILIB/cactus-1.7.jar:$XWIKILIB/cactus-ant-1.7.jar:$XWIKILIB/cglib-2.1.jar:$XWIKILIB/clover-1.3.6.jar:$XWIKILIB/commons-beanutils-1.7.0.jar:$XWIKILIB/commons-codec-1.3.jar:$XWIKILIB/commons-collections-3.1.jar:$XWIKILIB/commons-dbcp-1.2.1.jar:$XWIKILIB/commons-digester-1.6.jar:$XWIKILIB/commons-discovery-0.2.jar:$XWIKILIB/commons-fileupload-1.0.jar:$XWIKILIB/commons-httpclient-2.0.2.jar:$XWIKILIB/commons-lang-2.1.jar:$XWIKILIB/commons-logging-1.0.4.jar:$XWIKILIB/commons-logging-api-1.0.4.jar:$XWIKILIB/commons-net-1.1.0.jar:$XWIKILIB/commons-pool-1.1.jar:$XWIKILIB/dom4j-1.6.jar:$XWIKILIB/ecs-1.4.2.jar:$XWIKILIB/ehcache-1.1.jar:$XWIKILIB/fop-0.20.5.jar:$XWIKILIB/googleadwords.jar:$XWIKILIB/googleapi.jar:$XWIKILIB/hibernate-3.0.3.jar:$XWIKILIB/hibernate-tools-2.1.3.jar:$XWIKILIB/hsqldb-1.7.3.jar:$XWIKILIB/httpunit-1.6.jar:$XWIKILIB/ical4j-0.9.12.jar:$XWIKILIB/jaxrpc-1.1.jar:$XWIKILIB/jcommon-1.0.0-rc1.jar:$XWIKILIB/jdom-1.0.jar:$XWIKILIB/jfreechart-1.0.0-rc1.jar:$XWIKILIB/jgroups-2.2.5.jar:$XWIKILIB/jimi.jar:$XWIKILIB/jmock-1.0.1.jar:$XWIKILIB/jmock-cglib-1.0.1.jar:$XWIKILIB/jta.jar:$XWIKILIB/jtidy.jar:$XWIKILIB/junit-3.8.1.jar:$XWIKILIB/ldap.jar:$XWIKILIB/log4j-1.2.8.jar:$XWIKILIB/mail-1.3.2.jar:$XWIKILIB/mx4j-jmx-1.1.1.jar:$XWIKILIB/mysql-connector-java-3.1.7-bin.jar:$XWIKILIB/nanocontainer-1.0-beta-1.jar:$XWIKILIB/nekohtml-0.9.1.jar:$XWIKILIB/odmg-3.0.jar:$XWIKILIB/org.apache.commons.jrcs.diff.jar:$XWIKILIB/org.apache.commons.jrcs.rcs.jar:$XWIKILIB/org.mortbay.jetty-5.1.3.jar:$XWIKILIB/oro-2.0.8.jar:$XWIKILIB/oscache-2.0.2.jar:$XWIKILIB/picocontainer-1.0.jar:$XWIKILIB/portlet.jar:$XWIKILIB/radeox.jar:$XWIKILIB/rome-0.6.jar:$XWIKILIB/saaj-1.2.jar:$XWIKILIB/securityfilter-2.0.jar:$XWIKILIB/servlet-api-2.4.jar:$XWIKILIB/soap-2.3.1.jar:$XWIKILIB/struts-1.2.4.jar:$XWIKILIB/swarmcache.jar:$XWIKILIB/terraservice.jar:$XWIKILIB/velocity-1.4.jar:$XWIKILIB/velocity-tools-1.1.jar:$XWIKILIB/wsdl4j-1.5.jar:$XWIKILIB/xalan-2.6.0.jar:$XWIKILIB/xerces-2.4.0.jar:$XWIKILIB/xml-apis-2.0.2.jar:$XWIKILIB/xmlrpc-1.2.jar:$XWIKIHOME/build/web/WEB-INF/classes"
+
+
+CP=$TOOLSPATH:$XWIKIPATH
+export CP
+CLASSPATH=`cygpath --path --windows "$CP"`
+export CLASSPATH

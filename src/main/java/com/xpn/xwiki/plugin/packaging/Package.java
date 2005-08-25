@@ -294,23 +294,33 @@ public class Package {
 
     public int testInstall(XWikiContext context)
     {
-        int result = DocumentInfo.INSTALL_IMPOSSIBLE;
-        if (files.size() == 0)
-            return result;
+        if (log.isErrorEnabled())
+            log.error("Package test install");
 
-        result = ((DocumentInfo)files.get(0)).testInstall(context);
-        for (int i = 1; i < files.size(); i++)
-        {
-            int res = ((DocumentInfo)files.get(i)).testInstall(context);
-            if (res < result)
-                result = res;
+        int result = DocumentInfo.INSTALL_IMPOSSIBLE;
+        try {
+            if (files.size() == 0)
+                return result;
+
+            result = ((DocumentInfo)files.get(0)).testInstall(context);
+            for (int i = 1; i < files.size(); i++)
+            {
+                DocumentInfo docInfo = ((DocumentInfo)files.get(i));
+                int res = docInfo.testInstall(context);
+                if (res < result)
+                    result = res;
+            }
+            return result;
+        } finally {
+            if (log.isErrorEnabled())
+                log.error("Package test install result " + result);
         }
-        return result;
     }
 
     public int install(XWikiContext context) throws XWikiException {
-        if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE)
+        if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             return DocumentInfo.INSTALL_IMPOSSIBLE;
+        }
 
         for (int i = 0; i < files.size(); i++)
         {
@@ -320,9 +330,13 @@ public class Package {
     }
 
     private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
+        if (log.isDebugEnabled())
+         log.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
+
         int status = doc.testInstall(context);
-        if (status == DocumentInfo.INSTALL_IMPOSSIBLE)
+        if (status == DocumentInfo.INSTALL_IMPOSSIBLE) {
             return DocumentInfo.INSTALL_IMPOSSIBLE;
+        }
         if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST && doc.getAction() == DocumentInfo.ACTION_OVERWRITE)
         {
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST)
@@ -359,16 +373,12 @@ public class Package {
         return buffer.toString();
     }
 
-    private XWikiDocument readFromXML(String XmlFile){
+    private XWikiDocument readFromXML(String XmlFile) throws XWikiException {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
-        try {
-            if (backupPack && withVersions)
-                doc.fromXML(XmlFile.toString(), true);
-            else
-                doc.fromXML(XmlFile.toString());
-        } catch (Exception e) {
-            return null;
-        }
+        if (backupPack && withVersions)
+            doc.fromXML(XmlFile.toString(), true);
+        else
+            doc.fromXML(XmlFile.toString());
         return doc;
     }
 
@@ -624,6 +634,10 @@ public class Package {
                  filename += "." + doc.getLanguage();
                 File docfile = new File(space, filename);
                 doc = readFromXML(readFromInputStream(new FileInputStream(docfile)));
+                if (doc==null) {
+                    if (log.isErrorEnabled())
+                     log.info("Package readFrom XML read null doc for " + docName + " language " + language);
+                }
                 DocumentInfo di = new DocumentInfo(doc);
                 di.setAction(Integer.parseInt(defaultAction));
                 files.add(di);

@@ -140,16 +140,19 @@ public abstract class ListClass extends PropertyClass {
         List elist = ppcel.elements("value");
         BaseProperty lprop = (BaseProperty)newProperty();
 
-        List llist;
 
-        if ((isRelationalStorage())&&(isMultiSelect()))
-            llist = ((DBStringListProperty)lprop).getList();
-        else
-            llist = ((ListProperty)lprop).getList();
-
-        for (int i=0;i<elist.size();i++) {
-            Element el = (Element) elist.get(i);
-            llist.add(el.getText());
+        if (isMultiSelect()) {
+            List llist = ((ListProperty)lprop).getList();
+            for (int i=0;i<elist.size();i++) {
+                Element el = (Element) elist.get(i);
+                llist.add(el.getText());
+            }
+        }
+        else {
+            for (int i=0;i<elist.size();i++) {
+                Element el = (Element) elist.get(i);
+                ((StringProperty)lprop).setValue(el.getText());
+            }
         }
         return lprop;
     }

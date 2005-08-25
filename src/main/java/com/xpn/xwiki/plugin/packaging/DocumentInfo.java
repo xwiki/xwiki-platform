@@ -21,10 +21,14 @@ package com.xpn.xwiki.plugin.packaging;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public class DocumentInfo
 {
+    private static final Log log = LogFactory.getLog(DocumentInfo.class);
+
     private XWikiDocument       doc;
     private int                 installable = INSTALL_IMPOSSIBLE;
     private int                 action = ACTION_NOT_DEFINED;
@@ -90,30 +94,39 @@ public class DocumentInfo
 
     public int testInstall(XWikiContext context)
     {
-        installable = INSTALL_IMPOSSIBLE;
-        if (this.doc == null)
-            return installable;
-        try {
-            if (!context.getWiki().checkAccess("edit", this.doc, context))
-                return installable;
-            XWikiDocument doc1 = context.getWiki().getDocument(doc.getFullName(), context);
-            boolean isNew = doc1.isNew();
-            if (!isNew) {
-               if ((doc.getLanguage()!=null)&&(!doc.getLanguage().equals("")))
-                 isNew = !doc1.getTranslationList(context).contains(doc.getLanguage());
-            }
+        if (log.isDebugEnabled())
+         log.debug("Package test install document " + ((doc==null) ? "" : getFullName()) + " " + ((doc==null)? "":getLanguage()));
 
-            if (!isNew)
-            {
-                installable = INSTALL_ALREADY_EXIST;
-                 return installable;
+        installable = INSTALL_IMPOSSIBLE;
+
+        try {
+            if (this.doc == null)
+                return installable;
+            try {
+                if (!context.getWiki().checkAccess("edit", this.doc, context))
+                    return installable;
+                XWikiDocument doc1 = context.getWiki().getDocument(doc.getFullName(), context);
+                boolean isNew = doc1.isNew();
+                if (!isNew) {
+                    if ((doc.getLanguage()!=null)&&(!doc.getLanguage().equals("")))
+                        isNew = !doc1.getTranslationList(context).contains(doc.getLanguage());
+                }
+
+                if (!isNew)
+                {
+                    installable = INSTALL_ALREADY_EXIST;
+                    return installable;
+                }
+            } catch (XWikiException e) {
+                installable = INSTALL_IMPOSSIBLE;
+                return installable;
             }
-        } catch (XWikiException e) {
-             installable = INSTALL_IMPOSSIBLE;
-             return installable;
+            installable = INSTALL_OK;
+            return installable;
+        } finally {
+            if (log.isDebugEnabled())
+                log.debug("Package test install document " + ((doc==null) ? "" : getFullName()) + " " + ((doc==null)? "":getLanguage()) + " result " + installable);
         }
-        installable = INSTALL_OK;
-        return installable;
     }
 
     public static String installStatusToString(int status)

@@ -109,5 +109,10 @@
 	<classpathentry kind="lib" path="src/test/resources"/>
 	<classpathentry kind="lib" path="lib/batik-all-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/commons-lang-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/jackrabbit-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jackrabbit-api-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jackrabbit-commons-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jackrabbit-core-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

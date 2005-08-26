@@ -49,8 +49,16 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
         return searchDocuments(wheresql, distinctbylanguage, 0, 0, context);
     }
 
+    public List searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, XWikiContext context) throws XWikiException {
+        return searchDocuments(wheresql, distinctbylanguage, customMapping, 0, 0, context);
+    }
+
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
         return searchDocuments(wheresql, true, nb, start, context);
+    }
+
+    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
+          return searchDocuments(wheresql, distinctbyname, false, nb, start, context);
     }
 
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException {

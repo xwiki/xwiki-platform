@@ -45,7 +45,9 @@ public interface XWikiStoreInterface {
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException;
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException;
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;

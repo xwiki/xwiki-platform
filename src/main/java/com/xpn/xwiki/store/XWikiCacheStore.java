@@ -183,8 +183,16 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.searchDocuments(wheresql, distinctbyname, context);
     }
 
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException {
+        return store.searchDocuments(wheresql, distinctbyname, customMapping, context);
+    }
+
     public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
         return store.searchDocuments(wheresql, distinctbyname, nb, start, context);
+    }
+
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+        return store.searchDocuments(wheresql, distinctbyname, customMapping, nb, start, context);
     }
 
     public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {

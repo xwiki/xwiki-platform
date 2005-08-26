@@ -927,17 +927,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             // Verify if the property already exists
             Query query;
-            if (stats)
-                query = session.createQuery("select obj.id from " +
-                        object.getClass().getName() + " as obj where obj.id = :id");
-            else
-                query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
-            query.setInteger("id", object.getId());
-            if (query.uniqueResult()==null)
-                session.save(object);
-            else
-                session.update(object);
-
+            session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject",(Object)object);
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
             if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
@@ -945,7 +935,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 Map objmap = object.getMap();
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
-                dynamicSession.save((String) bclass.getName(), objmap);
+                dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
             }
 
             if (!object.getClassName().equals("internal")) {
@@ -1560,7 +1550,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+
+                SessionFactory sfactory = injectCustomMappingsInSessionFactory(attachment.getDoc(), context);
+                bTransaction = beginTransaction(sfactory, context);
             }
             Session session = getSession(context);
 
@@ -2027,7 +2019,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
@@ -2055,8 +2047,13 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 monitor.startTimer("hibernate", ssql);
 
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            if (bTransaction) {
+                // Inject everything until we know what's needed
+                SessionFactory sfactory = customMapping ? injectCustomMappingsInSessionFactory(context) : getSessionFactory();
+                bTransaction = beginTransaction(sfactory, context);
+            }
             Session session = getSession(context);
+
             Query query = session.createQuery(ssql);
             if (start!=0)
                 query.setFirstResult(start);
@@ -2218,16 +2215,16 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         return sfactory;
     }
 
-    public void injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
+    public SessionFactory injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
         boolean result = injectCustomMapping(bclass, context);
         if (result==false)
-         return;
+         return getSessionFactory();
 
         Configuration config = getConfiguration();
-        injectInSessionFactory(config);
+        return injectInSessionFactory(config);
     }
 
-    public void injectInSessionFactory(Configuration config) throws XWikiException {
+    public SessionFactory injectInSessionFactory(Configuration config) throws XWikiException {
         SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
         Settings settings = sfactory.getSettings();
         ConnectionProvider provider = ((SessionFactoryImpl)getSessionFactory()).getSettings().getConnectionProvider();
@@ -2239,10 +2236,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_MAPPING_INJECTION_FAILED, "Mapping injection failed", e);
         }
-        setSessionFactory(sfactory);
+        return sfactory;
     }
 
-    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+    public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext context) throws XWikiException {
         List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null", context);
         boolean result = false;
 
@@ -2252,9 +2249,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
 
         if (result==false)
-         return;
+         return getSessionFactory();
+
         Configuration config = getConfiguration();
-        injectInSessionFactory(config);
+        return injectInSessionFactory(config);
     }
 
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -2281,7 +2279,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
         // don't add a mapping that's already there
         if (config.getClassMapping(doc1class.getName())!=null)
-         return false;
+         return true;
 
         Configuration mapconfig = makeMapping(doc1class.getName(), custommapping);
         if (!isValidCustomMapping(doc1class.getName(), mapconfig, doc1class))
@@ -2349,7 +2347,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 "\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n" +
                 "<hibernate-mapping>" +
                 "<class entity-name=\"" + entityName + "\" table=\"" + tableName+ "\">\n" +
-                "<id name=\"id\" type=\"integer\" />\n" +
+                " <id name=\"id\" type=\"integer\" unsaved-value=\"any\">\n" +
+                "   <column name=\"XWO_ID\" not-null=\"true\" />\n" +
+                "   <generator class=\"assigned\" />\n" +
+                " </id>\n" +
                 custommapping1 +
                 "</class>\n" +
                 "</hibernate-mapping>";

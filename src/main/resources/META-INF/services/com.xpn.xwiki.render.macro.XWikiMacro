@@ -6,6 +6,7 @@ com.xpn.xwiki.render.macro.FieldMacro
 com.xpn.xwiki.plugin.laszlo.LaszloMacro
 com.xpn.xwiki.plugin.graphviz.GraphVizMacro
 com.xpn.xwiki.plugin.svg.SVGMacro
+com.xpn.xwiki.plugin.charts.ChartingMacro
 org.radeox.macro.ApiDocMacro
 org.radeox.macro.ApiMacro
 org.radeox.macro.XrefMacro
@@ -22,4 +23,3 @@ org.radeox.macro.RfcMacro
 org.radeox.macro.TableMacro
 org.radeox.macro.InterWikiMacro
 org.radeox.macro.XrefMacro
-com.google.code.xwiki.charts.ChartingMacro

@@ -259,10 +259,16 @@
             name="lifeblog"
             scope="request">
     </action>
-
+    
     <action path="/charting/"
-            type="com.google.code.xwiki.charts.ChartingAction"
-            name="charting"
+			type="com.xpn.xwiki.plugin.charts.ChartingAction"
+			name="charting"
+			scope="request">
+	</action>
+
+    <action path="/gettables/"
+            type="com.xpn.xwiki.plugin.charts.GetTablesAction"
+            name="gettables"
             scope="request">
     </action>
 

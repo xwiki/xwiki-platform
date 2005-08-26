@@ -22,12 +22,8 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.objects.classes.DateClass;
-
-import java.util.Date;
-import java.util.Locale;
 import java.text.SimpleDateFormat;
-import java.text.DateFormat;
+import java.util.Date;
 
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;

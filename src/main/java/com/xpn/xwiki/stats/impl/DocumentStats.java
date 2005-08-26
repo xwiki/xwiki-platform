@@ -22,10 +22,7 @@
  */
 package com.xpn.xwiki.stats.impl;
 
-import com.xpn.xwiki.objects.BaseObject;
-
 import java.util.Date;
-import java.util.Calendar;
 
 public class DocumentStats extends XWikiStats {
 

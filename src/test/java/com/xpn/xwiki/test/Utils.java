@@ -33,7 +33,15 @@ import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**

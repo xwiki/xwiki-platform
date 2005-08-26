@@ -22,14 +22,19 @@
  */
 package com.xpn.xwiki.plugin.alexa;
 
-import com.amazon.api.alexa.*;
+import java.rmi.RemoteException;
+
+import javax.xml.rpc.ServiceException;
+
+import com.amazon.api.alexa.AWSAlexa;
+import com.amazon.api.alexa.AWSAlexaLocator;
+import com.amazon.api.alexa.AWSAlexaPortType;
+import com.amazon.api.alexa.UrlInfoRequest;
+import com.amazon.api.alexa.UrlInfoResult;
 import com.amazon.api.alexa.holders.OperationRequestHolder;
 import com.amazon.api.alexa.holders.UrlInfoResultHolder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
-
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
 
 public class AlexaPluginApi extends Api {
     private AlexaPlugin plugin;

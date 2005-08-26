@@ -22,23 +22,24 @@
 
 package com.xpn.xwiki.test;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.apache.cactus.client.authentication.Authentication;
+import org.apache.cactus.client.authentication.BasicAuthentication;
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.smtp.SimpleSmtpServer;
 import com.xpn.xwiki.test.smtp.SmtpMessage;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import org.hibernate.HibernateException;
-import org.apache.cactus.WebRequest;
-import org.apache.cactus.WebResponse;
-import org.apache.cactus.client.authentication.Authentication;
-import org.apache.cactus.client.authentication.BasicAuthentication;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Date;
 
 
 public class ServletAuthTest extends ServletTest {

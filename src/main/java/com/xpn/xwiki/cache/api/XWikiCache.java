@@ -22,7 +22,6 @@
  */
 package com.xpn.xwiki.cache.api;
 
-import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface XWikiCache {
     void setCapacity(int capacity);

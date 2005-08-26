@@ -22,15 +22,14 @@
  */
 package com.xpn.xwiki.stats.api;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Collection;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
+import com.xpn.xwiki.stats.impl.DocumentStats;
 
 public interface XWikiStatsService extends XWikiActionNotificationInterface {
     public void init(XWikiContext context);

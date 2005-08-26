@@ -17,22 +17,22 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.io.File;
-import java.io.IOException;
 
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 

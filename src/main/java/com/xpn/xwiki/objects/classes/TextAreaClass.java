@@ -22,14 +22,13 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.apache.ecs.xhtml.textarea;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.xhtml.textarea;
-import org.hibernate.mapping.Property;
 
 public class TextAreaClass extends StringClass {
 

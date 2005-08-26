@@ -50,8 +50,8 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiStatsServiceImpl implements XWikiStatsService {
 

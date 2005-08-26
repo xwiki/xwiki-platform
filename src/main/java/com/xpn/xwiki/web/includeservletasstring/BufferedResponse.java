@@ -22,8 +22,8 @@
 package com.xpn.xwiki.web.includeservletasstring;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;

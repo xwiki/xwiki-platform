@@ -22,8 +22,8 @@
  */
 package com.xpn.xwiki.notify;
 
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 public class XWikiActionRule implements XWikiNotificationRule {
     private XWikiActionNotificationInterface target;

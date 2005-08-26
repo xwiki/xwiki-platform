@@ -17,13 +17,14 @@
  */
 package com.xpn.xwiki.test;
 
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
 
 public class VelocityRenderTest extends HibernateTestCase {
 

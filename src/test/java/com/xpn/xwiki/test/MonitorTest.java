@@ -17,18 +17,19 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.monitor.api.MonitorData;
-import com.xpn.xwiki.monitor.api.MonitorTimer;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.monitor.api.MonitorData;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.monitor.api.MonitorTimer;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class MonitorTest extends HibernateTestCase  {
 

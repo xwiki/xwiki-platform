@@ -23,7 +23,6 @@
 package com.xpn.xwiki.notify;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface XWikiDocChangeNotificationInterface {

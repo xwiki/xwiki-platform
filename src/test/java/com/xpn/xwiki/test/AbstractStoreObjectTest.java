@@ -17,6 +17,12 @@
  */
 package com.xpn.xwiki.test;
 
+import java.text.ParseException;
+
+import junit.framework.TestCase;
+
+import org.dom4j.DocumentException;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -25,11 +31,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.dom4j.DocumentException;
-
-import java.text.ParseException;
-
-import junit.framework.TestCase;
 
 public abstract class AbstractStoreObjectTest extends TestCase {
 

@@ -22,20 +22,20 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import org.hibernate.ObjectNotFoundException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.hibernate.ObjectNotFoundException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class XWikiAttachment {
     private XWikiDocument doc;

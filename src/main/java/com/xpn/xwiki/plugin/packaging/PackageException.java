@@ -1,6 +1,5 @@
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PluginException;
 
 /**

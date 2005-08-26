@@ -54,6 +54,7 @@ public class ChartParams {
 	public static final String PLOT_ZOOM = "plot_zoom";
 	
 	public static final String LEGEND_BACKGROUND_COLOR = "legend_background_color";
+	public static final String LEGEND_ITEM_FONT = "legend_item_font";
 	
 	public ChartParams() {
 		this(null);
@@ -87,6 +88,7 @@ public class ChartParams {
 		addParam(new StrokeChartParam(PLOT_OUTLINE_STROKE));
 		addParam(new DoubleChartParam(PLOT_ZOOM));
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
+		addParam(new FontChartParam(LEGEND_ITEM_FONT));
 	}
 
 	public void addParam(ChartParam param) {

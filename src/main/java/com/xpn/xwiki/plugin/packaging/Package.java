@@ -21,29 +21,37 @@
  */
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-
-import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipInputStream;
+import java.util.List;
 import java.util.zip.ZipEntry;
-import java.io.*;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.DocumentException;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.io.SAXReader;
-import org.dom4j.dom.DOMDocument;
-import org.dom4j.dom.DOMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.dom.DOMElement;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 
 

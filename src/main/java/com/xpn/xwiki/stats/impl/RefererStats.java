@@ -22,7 +22,7 @@
  */
 package com.xpn.xwiki.stats.impl;
 
-import java.util.*;
+import java.util.Date;
 
 public class RefererStats extends XWikiStats {
 

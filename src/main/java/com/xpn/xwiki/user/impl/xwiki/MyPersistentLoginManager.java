@@ -22,22 +22,20 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
-import org.securityfilter.filter.SecurityRequestWrapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
-import com.xpn.xwiki.XWikiContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
+import org.securityfilter.filter.SecurityRequestWrapper;
 
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
     private static final Log log = LogFactory.getLog(MyPersistentLoginManager.class);
@@ -206,7 +204,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
        try {
           Cipher c1 = Cipher.getInstance(cipherParameters);
           if (secretKey != null) {
-             c1.init(c1.ENCRYPT_MODE, secretKey);
+             c1.init(Cipher.ENCRYPT_MODE, secretKey);
              byte clearTextBytes[];
              clearTextBytes = clearText.getBytes();
              byte encryptedText[] = c1.doFinal(clearTextBytes);

@@ -22,24 +22,25 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.commons.jrcs.rcs.Version;
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.Utils;
-import org.apache.commons.jrcs.rcs.Version;
-import org.apache.velocity.VelocityContext;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Vector;
 
 public class ConfluenceRpcHandler extends BaseRpcHandler {
 

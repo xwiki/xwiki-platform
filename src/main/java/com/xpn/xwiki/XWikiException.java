@@ -22,17 +22,18 @@
  */
 package com.xpn.xwiki;
 
-import org.hibernate.JDBCException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.exception.MethodInvocationException;
-
-import javax.servlet.ServletException;
-import javax.xml.transform.TransformerException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+
+import javax.servlet.ServletException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.hibernate.JDBCException;
 
 public class XWikiException extends Exception {
 

@@ -22,9 +22,9 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.web.XWikiServletContext;
-
 import javax.servlet.ServletContext;
+
+import com.xpn.xwiki.web.XWikiServletContext;
 
 public class XWikiXMLRPCContext extends XWikiServletContext {
     public XWikiXMLRPCContext(ServletContext scontext) {

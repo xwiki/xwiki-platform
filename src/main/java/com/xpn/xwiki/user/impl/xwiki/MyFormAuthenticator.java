@@ -22,18 +22,20 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import java.io.IOException;
+import java.security.Principal;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
-import java.io.IOException;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator {
     private static final Log log = LogFactory.getLog(MyFormAuthenticator.class);

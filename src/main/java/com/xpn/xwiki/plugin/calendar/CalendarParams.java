@@ -22,7 +22,11 @@
  */
 package com.xpn.xwiki.plugin.calendar;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class CalendarParams {
     private Map map = new HashMap();

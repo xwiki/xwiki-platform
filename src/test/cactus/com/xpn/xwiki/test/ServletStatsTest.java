@@ -22,19 +22,20 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.stats.impl.RefererStats;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
 
 public class ServletStatsTest extends ServletTest {
 

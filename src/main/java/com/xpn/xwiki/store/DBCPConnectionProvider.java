@@ -50,9 +50,9 @@ import org.apache.commons.dbcp.BasicDataSourceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
+import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.connection.ConnectionProviderFactory;
-import org.hibernate.cfg.Environment;
 
 /**
  * <p>A connection provider that uses an Apache commons DBCP connection pool.</p>

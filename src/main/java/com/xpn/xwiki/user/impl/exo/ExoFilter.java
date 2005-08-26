@@ -22,9 +22,6 @@
  */
 package com.xpn.xwiki.user.impl.exo;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
-
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -33,6 +30,9 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.container.RootContainer;
 
 
 public class ExoFilter implements Filter {

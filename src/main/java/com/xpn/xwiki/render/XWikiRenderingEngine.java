@@ -22,17 +22,17 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashMap;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiRenderingEngine {
 

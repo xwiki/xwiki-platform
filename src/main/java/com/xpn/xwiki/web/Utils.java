@@ -22,27 +22,28 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.log4j.MDC;
+
+import com.novell.ldap.util.Base64;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCURLFactory;
-import com.novell.ldap.util.Base64;
-import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.log4j.MDC;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.net.URLDecoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Utils {
 

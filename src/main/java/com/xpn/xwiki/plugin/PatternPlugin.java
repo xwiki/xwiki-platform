@@ -22,6 +22,11 @@
  */
 package com.xpn.xwiki.plugin;
 
+import java.util.Vector;
+
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.tools.ant.util.StringUtils;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -32,10 +37,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.util.Util;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.tools.ant.util.StringUtils;
-
-import java.util.Vector;
 
 public class PatternPlugin extends XWikiDefaultPlugin implements XWikiDocChangeNotificationInterface {
     Vector patterns = new Vector();

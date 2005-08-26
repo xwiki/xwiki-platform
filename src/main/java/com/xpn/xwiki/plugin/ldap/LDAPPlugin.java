@@ -22,16 +22,23 @@
  */
 package com.xpn.xwiki.plugin.ldap;
 
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import com.novell.ldap.*;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-import java.util.Iterator;
-import java.util.HashMap;
+
+import com.novell.ldap.LDAPAttribute;
+import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPSearchResults;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =

@@ -24,7 +24,6 @@ package com.xpn.xwiki.render.macro.rss;
 
 import java.io.Writer;
 import java.net.MalformedURLException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;

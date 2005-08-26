@@ -13,9 +13,9 @@ import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.util.TOCGenerator;
-import com.xpn.xwiki.XWikiContext;
 
 
 /**

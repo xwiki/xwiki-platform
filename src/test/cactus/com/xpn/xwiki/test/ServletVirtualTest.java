@@ -21,21 +21,22 @@
 
 package com.xpn.xwiki.test;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
-import org.apache.cactus.WebRequest;
-import org.apache.cactus.WebResponse;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 public class ServletVirtualTest extends ServletTest {

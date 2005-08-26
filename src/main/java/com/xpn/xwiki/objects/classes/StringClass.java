@@ -22,17 +22,13 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.apache.ecs.xhtml.input;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.xhtml.input;
-import org.hibernate.mapping.Property;
-import org.hibernate.mapping.Column;
-
-import java.util.Iterator;
 
 public class StringClass extends PropertyClass {
 

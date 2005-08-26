@@ -22,16 +22,16 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
 
 import com.xpn.xwiki.web.Utils;
 

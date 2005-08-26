@@ -22,8 +22,6 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
-import java.lang.*;
-
 public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
 
         public PackagePlugin(String name, String className, XWikiContext context) {

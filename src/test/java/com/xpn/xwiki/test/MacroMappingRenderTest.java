@@ -21,20 +21,23 @@
 
 package com.xpn.xwiki.test;
 
+import java.net.URL;
+
+import junit.framework.TestCase;
+
+import org.apache.velocity.app.Velocity;
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import junit.framework.TestCase;
-import org.hibernate.HibernateException;
-import org.apache.velocity.app.Velocity;
-
-import java.net.URL;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class MacroMappingRenderTest extends TestCase {
 
@@ -55,7 +58,8 @@ public class MacroMappingRenderTest extends TestCase {
 
     public void setUp() throws Exception {
         context = new XWikiContext();
-        xwiki = new XWiki("./xwiki.cfg", context, null, false);
+        XWikiConfig config = new XWikiConfig("./xwiki.cfg");
+        xwiki = new XWiki(config, context, null, false);
         xwiki.setDatabase("xwikitest");
         context.setDatabase("xwikitest");
         context.setWiki(xwiki);

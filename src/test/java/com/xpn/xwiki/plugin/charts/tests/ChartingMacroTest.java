@@ -6,6 +6,10 @@ import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+import junit.textui.TestRunner;
+
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
@@ -26,10 +30,6 @@ import com.xpn.xwiki.plugin.charts.mocks.MockServletContext;
 import com.xpn.xwiki.plugin.charts.mocks.MockStore;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.web.XWikiServletContext;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
-import junit.textui.TestRunner;
 
 public class ChartingMacroTest extends TestCase {
 

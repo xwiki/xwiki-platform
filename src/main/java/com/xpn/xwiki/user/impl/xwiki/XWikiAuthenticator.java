@@ -22,15 +22,15 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import org.securityfilter.authenticator.Authenticator;
-import org.securityfilter.filter.SecurityRequestWrapper;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.xpn.xwiki.XWikiContext;
+import org.securityfilter.authenticator.Authenticator;
+import org.securityfilter.filter.SecurityRequestWrapper;
 
-import java.io.IOException;
+import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiAuthenticator extends Authenticator {
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception;

@@ -59,7 +59,6 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 

@@ -22,12 +22,11 @@
  */
 package com.xpn.xwiki.plugin.feed;
 
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
-import com.xpn.xwiki.XWikiContext;
-import com.sun.syndication.feed.synd.SyndFeed;
-
 import java.io.IOException;
+
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 
 public class FeedPluginApi extends Api {
         private FeedPlugin plugin;

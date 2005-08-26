@@ -2,16 +2,21 @@
 
 package com.xpn.xwiki.test;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
-import junit.framework.TestCase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ===================================================================

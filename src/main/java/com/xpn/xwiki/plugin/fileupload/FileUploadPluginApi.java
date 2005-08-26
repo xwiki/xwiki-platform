@@ -22,38 +22,11 @@
  */
 package com.xpn.xwiki.plugin.fileupload;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
-import com.xpn.xwiki.plugin.calendar.CalendarParams;
-import com.xpn.xwiki.plugin.calendar.CalendarData;
-import com.xpn.xwiki.plugin.calendar.CalendarEvent;
-import com.xpn.xwiki.plugin.laszlo.LaszloPlugin;
 import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Document;
-import net.fortuna.ical4j.data.ParserException;
-import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.PropertyList;
-import net.fortuna.ical4j.model.Property;
-import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.parameter.Value;
-import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.property.*;
-
-import java.io.IOException;
-import java.io.File;
-import java.io.InputStream;
-import java.util.*;
-import java.text.SimpleDateFormat;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.DefaultFileItem;
 
 public class FileUploadPluginApi extends PluginApi {
 

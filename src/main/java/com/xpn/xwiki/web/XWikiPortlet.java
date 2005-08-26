@@ -22,17 +22,27 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.GenericPortlet;
+import javax.portlet.PortletException;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.WindowState;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.MDC;
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import org.apache.log4j.MDC;
-import org.apache.velocity.VelocityContext;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import javax.portlet.*;
-import java.io.IOException;
 
 public class XWikiPortlet extends GenericPortlet {
     protected final Log logger = LogFactory.getLog( getClass() );

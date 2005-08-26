@@ -23,16 +23,16 @@
 
 package com.xpn.xwiki.store;
 
+import java.util.List;
+
+import org.apache.commons.jrcs.rcs.Version;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import org.apache.commons.jrcs.rcs.Version;
-import org.hibernate.cfg.Configuration;
-
-import java.util.List;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;

@@ -18,18 +18,19 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.plugin.packaging.Package;
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.XWikiException;
-import org.apache.velocity.VelocityContext;
-
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+
+import org.apache.velocity.VelocityContext;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
+import com.xpn.xwiki.plugin.packaging.Package;
 
 
 public class PackageTest extends HibernateTestCase {

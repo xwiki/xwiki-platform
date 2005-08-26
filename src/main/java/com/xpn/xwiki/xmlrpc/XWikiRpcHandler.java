@@ -22,15 +22,15 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
-
-import java.util.List;
-import java.util.Vector;
 
 public class XWikiRpcHandler extends BaseRpcHandler {
 

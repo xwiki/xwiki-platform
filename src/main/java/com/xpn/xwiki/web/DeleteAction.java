@@ -1,7 +1,5 @@
 package com.xpn.xwiki.web;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

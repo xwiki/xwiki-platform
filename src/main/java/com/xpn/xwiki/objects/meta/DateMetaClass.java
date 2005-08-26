@@ -23,9 +23,8 @@
 package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
 public class DateMetaClass extends PropertyMetaClass {

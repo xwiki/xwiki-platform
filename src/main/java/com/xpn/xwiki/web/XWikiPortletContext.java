@@ -22,10 +22,11 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.portlet.PortletContext;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import javax.portlet.PortletContext;
 
 public class XWikiPortletContext implements XWikiEngineContext {
     private PortletContext pcontext;

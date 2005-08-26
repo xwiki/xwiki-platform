@@ -22,23 +22,31 @@
  */
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.util.Util;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
+
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
 
-import java.io.*;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
     private File rcspath;

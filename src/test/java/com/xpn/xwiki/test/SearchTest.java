@@ -17,14 +17,15 @@
  */
 package com.xpn.xwiki.test;
 
+import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
-import org.apache.commons.lang.ArrayUtils;
-
-import java.util.List;
 
 public class SearchTest extends HibernateTestCase {
 

@@ -22,12 +22,10 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
+
+import com.xpn.xwiki.XWikiContext;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     protected URL serverURL;

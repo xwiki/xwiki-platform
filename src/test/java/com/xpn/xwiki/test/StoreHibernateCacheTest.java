@@ -17,12 +17,13 @@
  */
 package com.xpn.xwiki.test;
 
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
 
 public class StoreHibernateCacheTest extends HibernateTestCase {
 

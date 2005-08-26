@@ -22,12 +22,12 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.Date;
+import java.util.Hashtable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.util.Date;
-import java.util.Hashtable;
 
 public class Attachment {
     private String id;

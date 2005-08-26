@@ -22,9 +22,8 @@
  */
 package com.xpn.xwiki.render.macro;
 
-import org.radeox.macro.code.DefaultRegexCodeFormatter;
-import org.radeox.macro.code.SourceCodeFormatter;
 import org.radeox.filter.context.FilterContext;
+import org.radeox.macro.code.SourceCodeFormatter;
 
 public class WikiCodeFilter implements SourceCodeFormatter {
 

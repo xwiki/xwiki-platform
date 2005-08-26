@@ -22,12 +22,13 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.web.XWikiServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+
+import com.xpn.xwiki.web.XWikiServletResponse;
 
 public class XWikiXMLRPCResponse extends XWikiServletResponse {
 

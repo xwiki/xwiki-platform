@@ -22,6 +22,8 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.io.UnsupportedEncodingException;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -30,8 +32,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
-
-import java.io.UnsupportedEncodingException;
 
 public class BaseRpcHandler extends Object {
 

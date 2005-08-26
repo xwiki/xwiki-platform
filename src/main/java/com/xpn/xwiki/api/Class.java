@@ -22,11 +22,11 @@
 
 package com.xpn.xwiki.api;
 
+import java.util.Iterator;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import java.util.Iterator;
 
 public class Class extends Collection {
 

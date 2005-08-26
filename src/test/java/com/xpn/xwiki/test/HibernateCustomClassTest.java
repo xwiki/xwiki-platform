@@ -1,13 +1,13 @@
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.net.URL;
 import java.sql.SQLException;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Created by IntelliJ IDEA.

@@ -22,15 +22,26 @@
  */
 package com.xpn.xwiki.plugin.google;
 
-import com.google.api.adwords.v2.*;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import org.apache.axis.client.Stub;
-
-import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.xml.rpc.ServiceException;
+
+import org.apache.axis.client.Stub;
+
+import com.google.api.adwords.v2.Campaign;
+import com.google.api.adwords.v2.CampaignService;
+import com.google.api.adwords.v2.CampaignServiceService;
+import com.google.api.adwords.v2.CampaignServiceServiceLocator;
+import com.google.api.adwords.v2.KeywordEstimate;
+import com.google.api.adwords.v2.KeywordRequest;
+import com.google.api.adwords.v2.StatsRecord;
+import com.google.api.adwords.v2.TrafficEstimatorInterface;
+import com.google.api.adwords.v2.TrafficEstimatorService;
+import com.google.api.adwords.v2.TrafficEstimatorServiceLocator;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 
 public class AdWordsPluginApi extends Api {
     private AdWordsPlugin plugin;

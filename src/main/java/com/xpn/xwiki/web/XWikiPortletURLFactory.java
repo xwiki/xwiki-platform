@@ -22,13 +22,15 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
+import java.net.URL;
+import java.util.Map;
+
+import javax.portlet.PortletURL;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.portlet.PortletURL;
-import java.net.URL;
-import java.util.Map;
+import com.xpn.xwiki.XWikiContext;
 
 public class XWikiPortletURLFactory extends XWikiServletURLFactory {
 

@@ -22,22 +22,19 @@
  */
 package com.xpn.xwiki.plugin.laszlo;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.graphviz.GraphVizPluginApi;
-import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
-import com.xpn.xwiki.plugin.alexa.AlexaPluginApi;
-import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.RandomStringUtils;
-
-import java.io.*;
+import com.xpn.xwiki.util.Util;
 
 public class LaszloPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
     private static Log mLogger =

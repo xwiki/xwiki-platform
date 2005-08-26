@@ -17,12 +17,13 @@
  */
 package com.xpn.xwiki.test;
 
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
-import org.hibernate.HibernateException;
 
 public class RadeoxRenderTest extends AbstractRenderTest {
 

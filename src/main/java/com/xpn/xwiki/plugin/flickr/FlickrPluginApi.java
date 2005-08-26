@@ -22,11 +22,11 @@
  */
 package com.xpn.xwiki.plugin.flickr;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
+import com.aetrion.flickr.Authentication;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.Authentication;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 
 public class FlickrPluginApi extends Api {
     private FlickrPlugin plugin;

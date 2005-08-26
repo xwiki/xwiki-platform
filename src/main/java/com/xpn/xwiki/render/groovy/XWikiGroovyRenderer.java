@@ -22,27 +22,28 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiVirtualMacro;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.Document;
 import groovy.text.Template;
 
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRenderer;
+import com.xpn.xwiki.render.XWikiVirtualMacro;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiGroovyRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);

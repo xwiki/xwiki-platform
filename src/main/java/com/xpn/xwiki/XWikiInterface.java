@@ -17,6 +17,18 @@
  */
 package com.xpn.xwiki;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.velocity.VelocityContext;
+import org.hibernate.HibernateException;
+import org.securityfilter.filter.URLPatternMatcher;
+
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
@@ -32,17 +44,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.hibernate.HibernateException;
-import org.apache.velocity.VelocityContext;
-import org.securityfilter.filter.URLPatternMatcher;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 public interface XWikiInterface {
     void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException;

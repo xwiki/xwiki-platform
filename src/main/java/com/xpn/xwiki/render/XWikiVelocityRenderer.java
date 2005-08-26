@@ -22,32 +22,41 @@
  */
 package com.xpn.xwiki.render;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.Velocity;
+import org.apache.velocity.app.tools.VelocityFormatter;
+import org.apache.velocity.context.InternalContextAdapterImpl;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.apache.velocity.exception.ParseErrorException;
+import org.apache.velocity.exception.ResourceNotFoundException;
+import org.apache.velocity.runtime.RuntimeSingleton;
+import org.apache.velocity.runtime.parser.ParseException;
+import org.apache.velocity.runtime.parser.node.SimpleNode;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.context.InternalContextAdapterImpl;
-import org.apache.velocity.runtime.RuntimeSingleton;
-import org.apache.velocity.runtime.parser.node.SimpleNode;
-import org.apache.velocity.runtime.parser.ParseException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.app.tools.VelocityFormatter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.XWikiVelocityRenderer.class);

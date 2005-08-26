@@ -22,13 +22,14 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import java.io.ByteArrayInputStream;
+import java.util.Date;
+
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 
-import java.io.ByteArrayInputStream;
-import java.util.Date;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class XWikiAttachmentArchive {
 

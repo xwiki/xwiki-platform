@@ -1,17 +1,10 @@
 package com.xpn.xwiki.web;
 
-import java.io.File;
-import java.util.List;
-
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileUploadException;
-
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 public class UploadAction extends XWikiAction {
     

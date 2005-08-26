@@ -22,9 +22,9 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.util.Hashtable;
+
+import com.xpn.xwiki.doc.XWikiDocument;
 
 public class SearchResult {
    private String title;

@@ -18,11 +18,12 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 
 public class DocumentInfo

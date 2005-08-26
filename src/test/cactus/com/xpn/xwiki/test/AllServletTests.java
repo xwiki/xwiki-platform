@@ -22,11 +22,12 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class AllServletTests {
         public static String hibpath = "hibernate-test.cfg.xml";

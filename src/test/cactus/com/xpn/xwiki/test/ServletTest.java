@@ -22,6 +22,21 @@
 
 package com.xpn.xwiki.test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Enumeration;
+import java.util.Vector;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpSession;
+
+import org.apache.cactus.ServletTestCase;
+import org.apache.cactus.WebRequest;
+import org.apache.struts.action.ActionServlet;
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -29,19 +44,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
-import org.apache.cactus.ServletTestCase;
-import org.apache.cactus.WebRequest;
-import org.apache.struts.action.ActionServlet;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Enumeration;
-import java.util.Vector;
 
 
 public abstract class ServletTest extends ServletTestCase {

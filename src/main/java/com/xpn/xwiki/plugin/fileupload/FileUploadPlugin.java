@@ -23,27 +23,26 @@
  */
 package com.xpn.xwiki.plugin.fileupload;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.DefaultFileItem;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-
-import java.util.List;
-import java.util.ArrayList;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
     private static Log mLogger =

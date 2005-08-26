@@ -22,27 +22,27 @@
 
 package com.xpn.xwiki.api;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.jrcs.diff.Chunk;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
-import com.xpn.xwiki.plugin.calendar.CalendarPlugin;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.BaseObject;
-import org.apache.commons.jrcs.diff.Chunk;
-import org.apache.velocity.VelocityContext;
-
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import java.net.MalformedURLException;
+import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.web.Utils;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -161,7 +161,7 @@ public class XWiki extends Api {
      * @return  encoded result
      */
      public String getFormEncoded(String content) {
-        return xwiki.getFormEncoded(content);
+        return com.xpn.xwiki.XWiki.getFormEncoded(content);
      }
 
     /**
@@ -171,7 +171,7 @@ public class XWiki extends Api {
      */
 
     public String getURLEncoded(String content) {
-       return xwiki.getURLEncoded(content);
+       return com.xpn.xwiki.XWiki.getURLEncoded(content);
     }
 
     /**
@@ -180,7 +180,7 @@ public class XWiki extends Api {
      * @return  encoded result
      */
      public String getXMLEncoded(String content) {
-        return xwiki.getXMLEncoded(content);
+        return com.xpn.xwiki.XWiki.getXMLEncoded(content);
      }
 
     /**
@@ -189,7 +189,7 @@ public class XWiki extends Api {
      * @return the textarea text content
      */
      public String getTextArea(String content) {
-        return xwiki.getTextArea(content, context);
+        return com.xpn.xwiki.XWiki.getTextArea(content, context);
      }
 
     /**

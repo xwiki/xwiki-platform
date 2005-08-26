@@ -22,28 +22,25 @@
  */
 package com.xpn.xwiki.test;
 
-import org.apache.xmlrpc.XmlRpcClient;
-
-import java.util.Vector;
-import java.util.Map;
-import java.util.Collection;
-import java.util.HashMap;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import junit.framework.TestCase;
+
+import org.apache.xmlrpc.XmlRpcClient;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import junit.framework.TestCase;
-
-import javax.servlet.ServletContext;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class XMLRpcTest  extends TestCase
     {

@@ -1,30 +1,6 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.NumberProperty;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.DateClass;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.hibernate.HibernateException;
-import org.apache.cactus.WebRequest;
-import org.apache.cactus.WebResponse;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.struts.action.ActionServlet;
-import org.dom4j.DocumentException;
-
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -34,6 +10,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
+import javax.servlet.ServletException;
+
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.struts.action.ActionServlet;
+import org.dom4j.DocumentException;
+import org.hibernate.HibernateException;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DateClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * ===================================================================

@@ -17,10 +17,10 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.ByteArrayOutputStream;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-
-import java.io.ByteArrayOutputStream;
 
 public class PDFExportTest extends HibernateTestCase {
 

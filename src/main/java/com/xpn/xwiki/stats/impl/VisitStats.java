@@ -22,8 +22,6 @@
  */
 package com.xpn.xwiki.stats.impl;
 
-import com.xpn.xwiki.objects.classes.BaseClass;
-
 import java.util.Date;
 
 public class VisitStats extends XWikiStats {

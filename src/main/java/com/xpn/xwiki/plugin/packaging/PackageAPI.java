@@ -18,14 +18,14 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.api.Api;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
+import com.xpn.xwiki.api.Api;
 
 public class PackageAPI   extends Api {
     Package plugin;

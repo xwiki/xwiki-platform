@@ -18,27 +18,17 @@
 package com.xpn.xwiki.test;
 
 import java.net.URL;
-import java.util.*;
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.cfg.Configuration;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class HibernateCustomMappingTest extends HibernateTestCase {

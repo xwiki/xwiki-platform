@@ -1,14 +1,14 @@
 package com.xpn.xwiki.plugin.charts.tests;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import com.xpn.xwiki.plugin.charts.exceptions.ColumnIndexOutOfBoundsException;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.NoHeaderColumnException;
 import com.xpn.xwiki.plugin.charts.exceptions.NoHeaderRowException;
 import com.xpn.xwiki.plugin.charts.exceptions.RowIndexOutOfBoundsException;
 import com.xpn.xwiki.plugin.charts.source.DefaultDataSource;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class DefaultDataSourceTest extends TestCase {
 	public DefaultDataSourceTest(String arg0) {

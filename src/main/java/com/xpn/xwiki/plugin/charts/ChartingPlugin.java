@@ -167,6 +167,10 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 	        	legend.setBackgroundPaint(params.getColor(ChartParams.LEGEND_BACKGROUND_COLOR));
 	        }
 	        
+	        if (params.get(ChartParams.LEGEND_ITEM_FONT) != null) {
+	        	legend.setItemFont(params.getFont(ChartParams.LEGEND_ITEM_FONT));
+	        }
+	        	        
 	        // anti-alias
 	        if (params.get(ChartParams.ANTI_ALIAS) != null) {
 	        	jfchart.setAntiAlias(params.getBoolean(ChartParams.ANTI_ALIAS).booleanValue());

@@ -17,16 +17,17 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.jrcs.rcs.Version;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.apache.commons.jrcs.rcs.Version;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 public class StoreTest extends HibernateTestCase {
 

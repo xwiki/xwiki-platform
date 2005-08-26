@@ -22,13 +22,14 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
 import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 public class WikiNameSubstitution extends WikiSubstitution {
     public static final int TYPE_ONE = 1;

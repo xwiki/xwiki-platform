@@ -17,20 +17,21 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.TOCGenerator;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactory;
-import org.apache.oro.text.regex.MalformedPatternException;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.oro.text.regex.MalformedPatternException;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.TOCGenerator;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class UtilTest extends HibernateClassesTest {
 

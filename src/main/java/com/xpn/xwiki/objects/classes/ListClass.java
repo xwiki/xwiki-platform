@@ -22,18 +22,24 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.StringListProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public abstract class ListClass extends PropertyClass {
 

@@ -22,19 +22,20 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import java.io.IOException;
+import java.security.Principal;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.securityfilter.authenticator.BasicAuthenticator;
-import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.SecurityFilter;
+import org.securityfilter.filter.SecurityRequestWrapper;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
-import java.io.IOException;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public class MyBasicAuthenticator extends BasicAuthenticator  implements XWikiAuthenticator {
 

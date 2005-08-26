@@ -22,18 +22,23 @@
  */
 package com.xpn.xwiki.plugin.graphviz;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.alexa.AlexaPluginApi;
-import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.RandomStringUtils;
-
-import java.io.*;
+import com.xpn.xwiki.web.XWikiResponse;
 
 public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =

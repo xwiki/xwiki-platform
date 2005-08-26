@@ -23,11 +23,19 @@
 package com.xpn.xwiki.objects;
 
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -35,10 +43,11 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable {
     protected String className;

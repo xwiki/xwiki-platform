@@ -1,21 +1,29 @@
 package com.xpn.xwiki.user.impl.LDAP;
 
-import com.xpn.xwiki.user.impl.xwiki.*;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.novell.ldap.*;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.text.MessageFormat;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import org.securityfilter.realm.SimplePrincipal;
 
-import java.security.Principal;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.text.MessageFormat;
+import com.novell.ldap.LDAPAttribute;
+import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPSearchResults;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 
 /**
  * Created by IntelliJ IDEA.

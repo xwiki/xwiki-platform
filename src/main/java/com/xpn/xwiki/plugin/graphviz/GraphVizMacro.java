@@ -22,18 +22,17 @@
  */
 package com.xpn.xwiki.plugin.graphviz;
 
+import java.io.IOException;
+import java.io.Writer;
+
+import org.radeox.api.engine.RenderEngine;
+import org.radeox.api.engine.context.RenderContext;
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
-import org.radeox.api.engine.context.RenderContext;
-import org.radeox.api.engine.RenderEngine;
 
-import java.io.Writer;
-import java.io.IOException;
-
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 
 public class GraphVizMacro  extends BaseLocaleMacro {
   public String getLocaleKey() {

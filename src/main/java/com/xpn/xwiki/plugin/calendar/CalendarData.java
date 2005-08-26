@@ -22,6 +22,12 @@
  */
 package com.xpn.xwiki.plugin.calendar;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Vector;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -29,8 +35,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.StringProperty;
-
-import java.util.*;
 
 public class CalendarData {
     private List cdata = new ArrayList();

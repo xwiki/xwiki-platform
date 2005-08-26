@@ -22,18 +22,18 @@
  */
 package com.xpn.xwiki.user.impl.exo;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
-import java.util.Collection;
-
-import org.exoplatform.services.organization.OrganizationService;
-import org.exoplatform.services.organization.Group;
 import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.OrganizationService;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiGroupService;
 
 public class ExoGroupServiceImpl implements XWikiGroupService {
     private OrganizationService organizationService;

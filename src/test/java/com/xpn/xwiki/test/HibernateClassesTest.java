@@ -17,10 +17,11 @@
  */
 package com.xpn.xwiki.test;
 
+import org.hibernate.HibernateException;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.*;
-import org.hibernate.HibernateException;
+import com.xpn.xwiki.objects.BaseObject;
 
 public class HibernateClassesTest extends HibernateTestCase {
 

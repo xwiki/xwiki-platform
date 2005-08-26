@@ -24,14 +24,12 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.xmlrpc.*;
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -40,13 +38,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
-import org.apache.xmlrpc.XmlRpcServer;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 /**
  * <p>A simple action that handles the display and editing of an

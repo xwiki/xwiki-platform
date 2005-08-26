@@ -18,13 +18,15 @@
 package com.xpn.xwiki.test;
 
 import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.Map;
+import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+
+import junit.framework.TestCase;
 
 import org.apache.velocity.app.Velocity;
 import org.hibernate.HibernateException;
@@ -35,8 +37,6 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-
-import junit.framework.TestCase;
 
 public class HibernateTestCase extends TestCase {
     public static final String HIB_LOCATION = "/hibernate-test.cfg.xml";

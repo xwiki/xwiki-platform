@@ -24,8 +24,9 @@ package com.xpn.xwiki.test;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import com.xpn.xwiki.XWikiException;
+
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.plugin.query.QueryPluginTest;
 

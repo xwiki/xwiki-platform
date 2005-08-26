@@ -22,18 +22,22 @@
  */
 package com.xpn.xwiki.stats.impl;
 
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.XWikiException;
-
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class XWikiStats extends BaseCollection {
     public static int PERIOD_MONTH = 0;

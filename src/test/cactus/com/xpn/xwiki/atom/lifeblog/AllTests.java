@@ -1,9 +1,9 @@
 package com.xpn.xwiki.atom.lifeblog;
 
-import org.apache.cactus.extension.jetty.JettyTestSetup;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import org.apache.cactus.extension.jetty.JettyTestSetup;
 
 public class AllTests {
 

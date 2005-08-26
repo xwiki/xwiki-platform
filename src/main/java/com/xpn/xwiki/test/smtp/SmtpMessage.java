@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.test.smtp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Container for a complete SMTP message - headers and message body.

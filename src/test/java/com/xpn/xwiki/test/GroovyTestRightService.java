@@ -22,10 +22,10 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class GroovyTestRightService implements XWikiRightService {
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException {

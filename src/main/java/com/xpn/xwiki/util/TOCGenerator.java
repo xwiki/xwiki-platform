@@ -1,16 +1,18 @@
 package com.xpn.xwiki.util;
 
-import java.util.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.OrderedMap;
 import org.apache.commons.collections.map.ListOrderedMap;
 
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 
 public class TOCGenerator {

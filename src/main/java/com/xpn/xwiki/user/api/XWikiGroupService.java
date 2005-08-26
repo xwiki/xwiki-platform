@@ -22,11 +22,11 @@
  */
 package com.xpn.xwiki.user.api;
 
+import java.util.Collection;
+
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-
-import java.util.Collection;
 
 public interface XWikiGroupService {
     public void init(XWiki xwiki);

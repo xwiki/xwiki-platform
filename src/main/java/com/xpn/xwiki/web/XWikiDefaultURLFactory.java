@@ -22,9 +22,9 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-
 import java.net.URL;
+
+import com.xpn.xwiki.XWikiContext;
 
 public abstract class XWikiDefaultURLFactory implements XWikiURLFactory {
     public URL createURL(String web, String name, XWikiContext context) {

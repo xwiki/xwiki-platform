@@ -22,25 +22,29 @@
  */
 package com.xpn.xwiki.plugin.feed;
 
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheCache;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.net.URL;
-import java.io.IOException;
-import java.util.*;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =

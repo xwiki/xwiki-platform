@@ -4,6 +4,9 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import org.jfree.ui.RectangleInsets;
 
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
@@ -12,9 +15,6 @@ import com.xpn.xwiki.plugin.charts.params.ColorChartParam;
 import com.xpn.xwiki.plugin.charts.params.FontChartParam;
 import com.xpn.xwiki.plugin.charts.params.RectangleInsetsChartParam;
 import com.xpn.xwiki.plugin.charts.params.StrokeChartParam;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class ChartParamsTest extends TestCase {
 

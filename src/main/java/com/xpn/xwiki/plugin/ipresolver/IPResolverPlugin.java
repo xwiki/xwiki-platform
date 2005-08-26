@@ -22,12 +22,13 @@
  */
 package com.xpn.xwiki.plugin.ipresolver;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class IPResolverPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =

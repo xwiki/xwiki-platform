@@ -22,22 +22,24 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
-
-import java.util.*;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
     private XWikiCache groupCache;

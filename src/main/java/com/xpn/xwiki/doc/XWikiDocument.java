@@ -22,24 +22,24 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.packaging.PackageException;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.EditForm;
-import com.xpn.xwiki.web.PrepareEditForm;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.ObjectAddForm;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
@@ -47,9 +47,9 @@ import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.jrcs.util.ToString;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
@@ -63,12 +63,22 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.URL;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.PrepareEditForm;
+import com.xpn.xwiki.web.Utils;
 
 
 public class XWikiDocument {
@@ -828,7 +838,7 @@ public class XWikiDocument {
             PropertyClass pclass = (PropertyClass) it.next();
             vcontext.put(pclass.getName(), pclass.getPrettyName());
         }
-        result.append(renderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
+        result.append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
         if (linebreak)
             result.append("\n");
 
@@ -841,7 +851,7 @@ public class XWikiDocument {
                     String name = (String) it.next();
                     vcontext.put(name, display(name, object, context));
                 }
-                result.append(renderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
+                result.append(XWikiVelocityRenderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
                 if (linebreak)
                     result.append("\n");
             }

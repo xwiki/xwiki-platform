@@ -22,16 +22,17 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.HashMap;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 public class XWikiMacrosMappingRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);

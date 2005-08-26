@@ -22,16 +22,14 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import com.xpn.xwiki.web.XWikiServletURLFactory;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.net.URL;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class PdfURLFactory extends XWikiServletURLFactory {
 

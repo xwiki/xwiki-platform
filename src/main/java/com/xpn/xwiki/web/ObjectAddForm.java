@@ -22,9 +22,9 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 public class ObjectAddForm extends XWikiForm {

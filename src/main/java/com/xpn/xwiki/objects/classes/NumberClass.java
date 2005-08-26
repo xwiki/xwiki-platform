@@ -23,11 +23,16 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.ecs.xhtml.input;
-import org.hibernate.mapping.Property;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DoubleProperty;
+import com.xpn.xwiki.objects.FloatProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.LongProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class NumberClass  extends PropertyClass {
 

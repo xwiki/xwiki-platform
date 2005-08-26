@@ -17,18 +17,23 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.novell.ldap.*;
-
-import java.security.Principal;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.net.URL;
+import java.security.Principal;
+import java.util.ArrayList;
+
+import com.novell.ldap.LDAPAttribute;
+import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPSearchResults;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Test for LDAP authentication

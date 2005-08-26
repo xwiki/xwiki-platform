@@ -3,8 +3,7 @@
  */
 package com.xpn.xwiki.atom.lifeblog;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * @author Luis

@@ -1,5 +1,8 @@
 package com.xpn.xwiki.web;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -7,9 +10,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-
-import java.util.Iterator;
-import java.util.Map;
 
 public class ObjectAddAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {

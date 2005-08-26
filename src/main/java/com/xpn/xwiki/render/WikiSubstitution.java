@@ -22,8 +22,14 @@
  */
 package com.xpn.xwiki.render;
 
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternMatcher;
+import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.oro.text.regex.Perl5Substitution;
+
 import com.xpn.xwiki.util.Util;
-import org.apache.oro.text.regex.*;
 
 public class WikiSubstitution extends Perl5Substitution {
 
@@ -42,16 +48,16 @@ public class WikiSubstitution extends Perl5Substitution {
     }
 
     public WikiSubstitution(Util util, String[] patternparam) {
-       this.setPattern(util.getPatterns().getPattern(makePattern(patternparam)));
+       this.setPattern(Util.getPatterns().getPattern(makePattern(patternparam)));
        setSubstitution("$&");
     }
 
     public void setPattern(String patternparam) {
-        setPattern(util.getPatterns().getPattern(makePattern(patternparam)));
+        setPattern(Util.getPatterns().getPattern(makePattern(patternparam)));
     }
 
     public void setPattern(String patternparam, int options) {
-        setPattern(util.getPatterns().getPattern(makePattern(patternparam), options));
+        setPattern(Util.getPatterns().getPattern(makePattern(patternparam), options));
     }
 
     public String makePattern(String patternparam) {

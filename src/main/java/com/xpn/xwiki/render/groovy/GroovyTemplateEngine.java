@@ -22,13 +22,19 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import groovy.text.*;
+import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
-import groovy.lang.Binding;
 import groovy.lang.Writable;
+import groovy.text.Template;
+import groovy.text.TemplateEngine;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Map;
 
 import org.codehaus.groovy.control.CompilationFailedException;

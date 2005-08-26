@@ -1,9 +1,7 @@
 package com.xpn.xwiki.plugin;
 
-import com.xpn.xwiki.plugin.laszlo.LaszloPlugin;
-import com.xpn.xwiki.plugin.laszlo.LaszloPluginApi;
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 
 /**
  * Created by IntelliJ IDEA.

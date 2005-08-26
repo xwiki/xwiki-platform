@@ -22,14 +22,15 @@
 
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Version;
 
-import java.util.Date;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class Attachment extends Api {
     private Document doc;

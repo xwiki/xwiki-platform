@@ -22,27 +22,23 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.lob.ReaderInputStream;
-import org.hibernate.engine.Mapping;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.*;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {

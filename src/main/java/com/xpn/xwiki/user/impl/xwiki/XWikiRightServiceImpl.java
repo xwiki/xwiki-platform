@@ -22,6 +22,18 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -31,12 +43,6 @@ import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.*;
 
 public class XWikiRightServiceImpl implements XWikiRightService {
     private static final Log log = LogFactory.getLog(XWikiRightServiceImpl.class);

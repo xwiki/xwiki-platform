@@ -22,13 +22,13 @@
  */
 package com.xpn.xwiki.cache.impl;
 
+import java.util.Date;
+
+import com.opensymphony.oscache.base.Cache;
+import com.opensymphony.oscache.base.EntryRefreshPolicy;
+import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.opensymphony.oscache.base.Cache;
-import com.opensymphony.oscache.base.NeedsRefreshException;
-import com.opensymphony.oscache.base.EntryRefreshPolicy;
-
-import java.util.Date;
 
 public class OSCacheCache implements XWikiCache {
     private Cache cache;

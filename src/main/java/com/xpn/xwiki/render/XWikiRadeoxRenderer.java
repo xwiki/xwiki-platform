@@ -21,15 +21,16 @@
 
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
+import java.util.Locale;
+
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
 import org.radeox.engine.context.BaseRenderContext;
 
-import java.util.Locale;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 
 public class XWikiRadeoxRenderer  implements XWikiRenderer {

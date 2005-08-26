@@ -22,16 +22,10 @@
  */
 package com.xpn.xwiki.plugin.graphviz;
 
-import com.amazon.api.alexa.*;
-import com.amazon.api.alexa.holders.OperationRequestHolder;
-import com.amazon.api.alexa.holders.UrlInfoResultHolder;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
-import com.xpn.xwiki.api.Api;
+import java.io.IOException;
 
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
-import java.io.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 
 public class GraphVizPluginApi extends Api {
     private GraphVizPlugin plugin;

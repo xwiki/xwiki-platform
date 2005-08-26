@@ -23,18 +23,19 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.xhtml.input;
-import org.dom4j.Element;
-import org.hibernate.mapping.Property;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import org.apache.ecs.xhtml.input;
+import org.dom4j.Element;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class DateClass  extends PropertyClass {
 

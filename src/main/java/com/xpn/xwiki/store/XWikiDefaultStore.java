@@ -23,13 +23,13 @@
 
 package com.xpn.xwiki.store;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import java.util.List;
-import java.util.ArrayList;
 
 public abstract class XWikiDefaultStore implements XWikiStoreInterface {
 

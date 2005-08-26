@@ -17,13 +17,13 @@
  */
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiRCSFileStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-
 import java.io.File;
 
 import junit.framework.TestCase;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.XWikiRCSFileStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class StoreRCSFileTest extends TestCase {
 

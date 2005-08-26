@@ -22,9 +22,8 @@
  */
 package com.xpn.xwiki.cache.impl;
 
-import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.XWikiCache;
-import com.opensymphony.oscache.base.Cache;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
 
 public class OSCacheService implements XWikiCacheService {
     public XWikiCache newCache() {

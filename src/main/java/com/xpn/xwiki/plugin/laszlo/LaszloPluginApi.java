@@ -22,19 +22,11 @@
  */
 package com.xpn.xwiki.plugin.laszlo;
 
-import com.amazon.api.alexa.*;
-import com.amazon.api.alexa.holders.OperationRequestHolder;
-import com.amazon.api.alexa.holders.UrlInfoResultHolder;
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.alexa.AlexaPlugin;
-import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
 import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.api.Api;
-
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
-import java.io.*;
 
 public class LaszloPluginApi extends PluginApi {
 

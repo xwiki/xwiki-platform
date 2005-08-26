@@ -18,10 +18,11 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiException;
 import org.apache.velocity.VelocityContext;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 
 
 public class DocumentInfoTest extends HibernateTestCase {

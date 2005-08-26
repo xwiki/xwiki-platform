@@ -17,13 +17,25 @@
  */
 package com.xpn.xwiki.test;
 
+import junit.framework.TestCase;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.*;
-
-import junit.framework.TestCase;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.NumberProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 public class ClassesTest extends TestCase {
 

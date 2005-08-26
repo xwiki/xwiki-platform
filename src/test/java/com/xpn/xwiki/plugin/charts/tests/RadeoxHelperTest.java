@@ -1,5 +1,8 @@
 package com.xpn.xwiki.plugin.charts.tests;
 
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 import org.radeox.macro.table.Table;
 
 import com.xpn.xwiki.XWiki;
@@ -7,9 +10,6 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.charts.RadeoxHelper;
-
-import junit.framework.Assert;
-import junit.framework.TestCase;
 
 public class RadeoxHelperTest extends TestCase {
 

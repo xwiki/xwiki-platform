@@ -22,16 +22,17 @@
  */
 package com.xpn.xwiki.user.impl.exo;
 
+import java.security.Principal;
+
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.exception.ExoServiceException;
+import org.exoplatform.services.security.SecurityService;
+import org.securityfilter.realm.SimplePrincipal;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
-import org.securityfilter.realm.SimplePrincipal;
-import org.exoplatform.services.security.SecurityService;
-import org.exoplatform.services.exception.ExoServiceException;
-import org.exoplatform.container.PortalContainer;
-
-import java.security.Principal;
 
 public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
     private SecurityService securityService;

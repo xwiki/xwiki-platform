@@ -22,29 +22,36 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import com.xpn.xwiki.pdf.api.PdfExport;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
 
-import org.w3c.tidy.Tidy;
-import org.w3c.tidy.Configuration;
-import org.w3c.dom.Document;
-import org.apache.fop.apps.Driver;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.avalon.framework.logger.ConsoleLogger;
 import org.apache.avalon.framework.logger.Logger;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.fop.apps.Driver;
+import org.w3c.dom.Document;
+import org.w3c.tidy.Configuration;
+import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import java.io.*;
-import java.util.Properties;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.pdf.api.PdfExport;
+import com.xpn.xwiki.util.Util;
 
 public class PdfExportImpl implements PdfExport {
     private Tidy tidy;

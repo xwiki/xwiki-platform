@@ -17,11 +17,11 @@
  */
 package com.xpn.xwiki.test;
 
+import java.io.File;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-
-import java.io.File;
 
 public class StoreObjectRCSFileTest extends AbstractStoreObjectTest {
 

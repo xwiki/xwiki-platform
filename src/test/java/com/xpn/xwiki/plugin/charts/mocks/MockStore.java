@@ -117,12 +117,20 @@ public class MockStore implements XWikiStoreInterface {
 		return null;
 	}
 
-	public List searchDocuments(String wheresql, boolean distinctbyname,
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException {
+        return null;
+    }
+
+    public List searchDocuments(String wheresql, boolean distinctbyname,
 			int nb, int start, XWikiContext context) throws XWikiException {
 		return null;
 	}
 
-	public List searchDocuments(String wheresql, XWikiContext context)
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+        return null;
+    }
+
+    public List searchDocuments(String wheresql, XWikiContext context)
 			throws XWikiException {
 		return null;
 	}

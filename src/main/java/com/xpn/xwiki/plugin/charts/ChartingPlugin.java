@@ -170,7 +170,32 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 	        if (params.get(ChartParams.LEGEND_ITEM_FONT) != null) {
 	        	legend.setItemFont(params.getFont(ChartParams.LEGEND_ITEM_FONT));
 	        }
-	        	        
+	        
+	        if (params.get(ChartParams.LEGEND_ITEM_LABEL_PADDING) != null) {
+	        	legend.setItemLabelPadding(params.getRectangleInsets(
+	        			ChartParams.LEGEND_ITEM_LABEL_PADDING));
+	        }
+	        
+	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_ANCHOR) != null) {
+	        	legend.setLegendItemGraphicAnchor(params.getRectangleAnchor(
+	        			ChartParams.LEGEND_ITEM_GRAPHIC_ANCHOR));
+	        }
+	        
+	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_EDGE) != null) {
+	        	legend.setLegendItemGraphicEdge(params.getRectangleEdge(
+	        			ChartParams.LEGEND_ITEM_GRAPHIC_EDGE));
+	        }
+	        
+	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_LOCATION) != null) {
+	        	legend.setLegendItemGraphicAnchor(params.getRectangleAnchor(
+	        			ChartParams.LEGEND_ITEM_GRAPHIC_LOCATION));
+	        }
+	        
+	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_PADDING) != null) {
+	        	legend.setLegendItemGraphicPadding(params.getRectangleInsets(
+	        			ChartParams.LEGEND_ITEM_GRAPHIC_PADDING));
+	        }
+
 	        // anti-alias
 	        if (params.get(ChartParams.ANTI_ALIAS) != null) {
 	        	jfchart.setAntiAlias(params.getBoolean(ChartParams.ANTI_ALIAS).booleanValue());

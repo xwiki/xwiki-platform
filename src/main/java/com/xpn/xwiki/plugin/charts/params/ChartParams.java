@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jfree.ui.HorizontalAlignment;
+import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.VerticalAlignment;
@@ -55,6 +56,11 @@ public class ChartParams {
 	
 	public static final String LEGEND_BACKGROUND_COLOR = "legend_background_color";
 	public static final String LEGEND_ITEM_FONT = "legend_item_font";
+	public static final String LEGEND_ITEM_LABEL_PADDING = "legend_item_label_padding";
+	public static final String LEGEND_ITEM_GRAPHIC_ANCHOR = "legend_item_graphic_anchor";
+	public static final String LEGEND_ITEM_GRAPHIC_EDGE = "legend_item_graphic_edge";
+	public static final String LEGEND_ITEM_GRAPHIC_LOCATION = "legend_item_graphic_location";
+	public static final String LEGEND_ITEM_GRAPHIC_PADDING = "legend_item_graphic_padding";
 	
 	public ChartParams() {
 		this(null);
@@ -89,6 +95,11 @@ public class ChartParams {
 		addParam(new DoubleChartParam(PLOT_ZOOM));
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
+		addParam(new RectangleInsetsChartParam(LEGEND_ITEM_LABEL_PADDING));
+		addParam(new RectangleAnchorChartParam(LEGEND_ITEM_GRAPHIC_ANCHOR));
+		addParam(new RectangleEdgeChartParam(LEGEND_ITEM_GRAPHIC_EDGE));
+		addParam(new RectangleAnchorChartParam(LEGEND_ITEM_GRAPHIC_LOCATION));
+		addParam(new RectangleInsetsChartParam(LEGEND_ITEM_GRAPHIC_PADDING));
 	}
 
 	public void addParam(ChartParam param) {
@@ -222,6 +233,15 @@ public class ChartParams {
 		ChartParam param = (ChartParam)paramMap.get(name);
 		if (param != null && param.getType() == RectangleInsets.class) {
 			return (RectangleInsets)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public RectangleAnchor getRectangleAnchor(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == RectangleAnchor.class) {
+			return (RectangleAnchor)get(name);
 		} else {
 			return null;
 		}

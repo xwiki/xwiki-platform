@@ -16,8 +16,6 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.Plot;
-import org.jfree.chart.title.LegendTitle;
-import org.jfree.chart.title.TextTitle;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
@@ -82,146 +80,18 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 			} catch (Throwable e) {
 				throw new GenerateException(e);
 			}
-
-	        plot.setDataAreaRatio(params.getInteger(ChartParams.HEIGHT).intValue()/
-	        						params.getInteger(ChartParams.WIDTH).intValue());
-	        // plot
-	        if (params.get(ChartParams.PLOT_BACKGROUND_COLOR) != null) {
-	        	plot.setBackgroundPaint(params.getColor(ChartParams.PLOT_BACKGROUND_COLOR));
-	        }
-	        
-	        if (params.get(ChartParams.PLOT_BACKGROUND_ALPHA) != null) {
-	        	plot.setBackgroundAlpha(params.getFloat(
-	        			ChartParams.PLOT_BACKGROUND_ALPHA).floatValue());	        	
-	        }
-
-	        if (params.get(ChartParams.PLOT_FOREGROUND_ALPHA) != null) {
-	        	plot.setForegroundAlpha(params.getFloat(
-	        			ChartParams.PLOT_FOREGROUND_ALPHA).floatValue());	        	
-	        }
-	        
-	        if (params.get(ChartParams.PLOT_INSERTS) != null) {
-	        	plot.setInsets(params.getRectangleInsets(ChartParams.PLOT_INSERTS));	        	
-	        }
-	        
-        	if (params.get(ChartParams.PLOT_OUTLINE_COLOR) != null) {
-        		plot.setOutlinePaint(params.getColor(ChartParams.PLOT_OUTLINE_COLOR));
-        	}
-        	
-        	if (params.get(ChartParams.PLOT_OUTLINE_STROKE) != null) {
-        		plot.setOutlineStroke(params.getStroke(ChartParams.PLOT_OUTLINE_STROKE));
-        	}
-        	
-        	if (params.get(ChartParams.PLOT_ZOOM) != null) {
-        		plot.zoom(params.getDouble(ChartParams.PLOT_ZOOM).doubleValue());
-        	}
-
+			
+			ChartCustomizer.customizePlot(plot, params);
+			
 	        JFreeChart jfchart = new JFreeChart(plot);
 	        
-	        // title
-	        if (params.get(ChartParams.TITLE) != null) {
-	        	TextTitle title = new TextTitle(params.getString(ChartParams.TITLE));
-	        	jfchart.setTitle(title);
-	        	
-		        if (params.get(ChartParams.TITLE_FONT) != null) {
-		        	title.setFont(params.getFont(ChartParams.TITLE_FONT));
-		        } else {
-		        	title.setFont(JFreeChart.DEFAULT_TITLE_FONT);
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_POSITION) != null) {
-		        	title.setPosition(params.getRectangleEdge(ChartParams.TITLE_POSITION));
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_HORIZONTAL_ALIGNMENT) != null) {
-		        	title.setHorizontalAlignment(params.getHorizontalAlignment(
-		        			ChartParams.TITLE_HORIZONTAL_ALIGNMENT));
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_VERTICAL_ALIGNMENT) != null) {
-		        	title.setVerticalAlignment(params.getVerticalAlignment(
-		        			ChartParams.TITLE_VERTICAL_ALIGNMENT));
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_COLOR) != null) {
-		        	title.setPaint(params.getColor(ChartParams.TITLE_COLOR));
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_BACKGROUND_COLOR) != null) {
-		        	title.setBackgroundPaint(params.getColor(ChartParams.TITLE_BACKGROUND_COLOR));
-		        }
-
-		        if (params.get(ChartParams.TITLE_PADDING) != null) {
-		        	title.setPadding(params.getRectangleInsets(ChartParams.TITLE_PADDING));
-		        }
-		        
-		        if (params.get(ChartParams.TITLE_URL) != null) {
-		        	title.setURLText(params.getString(ChartParams.TITLE_URL));
-		        }
-	        }
-	        
-	        // legend
-	        LegendTitle legend = jfchart.getLegend();
-	        
-	        if (params.get(ChartParams.LEGEND_BACKGROUND_COLOR) != null) {
-	        	legend.setBackgroundPaint(params.getColor(ChartParams.LEGEND_BACKGROUND_COLOR));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_FONT) != null) {
-	        	legend.setItemFont(params.getFont(ChartParams.LEGEND_ITEM_FONT));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_LABEL_PADDING) != null) {
-	        	legend.setItemLabelPadding(params.getRectangleInsets(
-	        			ChartParams.LEGEND_ITEM_LABEL_PADDING));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_ANCHOR) != null) {
-	        	legend.setLegendItemGraphicAnchor(params.getRectangleAnchor(
-	        			ChartParams.LEGEND_ITEM_GRAPHIC_ANCHOR));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_EDGE) != null) {
-	        	legend.setLegendItemGraphicEdge(params.getRectangleEdge(
-	        			ChartParams.LEGEND_ITEM_GRAPHIC_EDGE));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_LOCATION) != null) {
-	        	legend.setLegendItemGraphicAnchor(params.getRectangleAnchor(
-	        			ChartParams.LEGEND_ITEM_GRAPHIC_LOCATION));
-	        }
-	        
-	        if (params.get(ChartParams.LEGEND_ITEM_GRAPHIC_PADDING) != null) {
-	        	legend.setLegendItemGraphicPadding(params.getRectangleInsets(
-	        			ChartParams.LEGEND_ITEM_GRAPHIC_PADDING));
-	        }
-
-	        // anti-alias
-	        if (params.get(ChartParams.ANTI_ALIAS) != null) {
-	        	jfchart.setAntiAlias(params.getBoolean(ChartParams.ANTI_ALIAS).booleanValue());
-	        }
-	        // background color
-	        if (params.get(ChartParams.BACKGROUND_COLOR) != null) {
-	        	jfchart.setBackgroundPaint(params.getColor(ChartParams.BACKGROUND_COLOR));
-	        }
-
-	        // border
-	        if (params.get(ChartParams.BORDER_VISIBLE) != null && 
-	        		params.getBoolean(ChartParams.BORDER_VISIBLE).booleanValue()) {
-	        	jfchart.setBorderVisible(true);
-	        	if (params.get(ChartParams.BORDER_COLOR) != null) {
-	        		jfchart.setBorderPaint(params.getColor(ChartParams.BORDER_COLOR));
-	        	}
-	        	if (params.get(ChartParams.BORDER_STROKE) != null) {
-	        		jfchart.setBorderStroke(params.getStroke(ChartParams.BORDER_STROKE));
-	        	}
-	        }
+	        ChartCustomizer.customizeChart(jfchart, params);
 
 			return generatePngChart(jfchart, params, context);
 		} catch (IOException ioe) {
 			throw new GenerateException(ioe);
 		} catch (DataSourceException dse) {
-			throw new GenerateException(dse);		
+			throw new GenerateException(dse);
 		}
 	}
 	
@@ -307,6 +177,6 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
     private File getTempFile(String filename) {
         return new File(tempDir, filename);
     }
-
+    
     private File tempDir;
 }

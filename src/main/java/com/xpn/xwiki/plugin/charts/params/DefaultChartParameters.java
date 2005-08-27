@@ -12,8 +12,6 @@ public class DefaultChartParameters extends ChartParams {
 			set(ChartParams.HEIGHT, "300");
 			set(ChartParams.SERIES, "columns");
 			set(ChartParams.RENDERER, "default");
-			set(ChartParams.DOMAIN_AXIS_LABEL, "");
-			set(ChartParams.RANGE_AXIS_LABEL, "");
 			set(ChartParams.BORDER_VISIBLE, "false");
 			set(ChartParams.ANTI_ALIAS, "true");
 		} catch (ParamException e) {

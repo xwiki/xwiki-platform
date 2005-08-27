@@ -8,6 +8,7 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
@@ -26,12 +27,12 @@ public class CategoryPlotFactory implements PlotFactory {
 
 	public Plot create(DataSource dataSource, ChartParams params)
 			throws GenerateException, DataSourceException {
-		String domainAxisLabel = params.getString(ChartParams.DOMAIN_AXIS_LABEL);
-		String rangeAxisLabel = params.getString(ChartParams.RANGE_AXIS_LABEL);
 		String dataSeries = params.getString(ChartParams.SERIES);
 		
-		CategoryAxis domainAxis = new CategoryAxis(domainAxisLabel);
-		ValueAxis rangeAxis = new NumberAxis(rangeAxisLabel);
+		CategoryAxis domainAxis = new CategoryAxis();
+		ValueAxis rangeAxis = new NumberAxis();
+		ChartCustomizer.customizeCategoryAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
+		ChartCustomizer.customizeValueAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);    
 		
 		CategoryItemRenderer renderer = CategoryItemRendererFactory.getInstance().create(params);
 

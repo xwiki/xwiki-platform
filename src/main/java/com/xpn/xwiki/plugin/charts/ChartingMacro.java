@@ -72,7 +72,8 @@ public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWiki
 	        	throw exception("Error generating chart", ge);
 	        }
 
-	        String title = chartParams.getString(ChartParams.TITLE);
+	        String title = chartParams.getString(
+	        		ChartParams.TITLE_PREFIX+ChartParams.TITLE_SUFFIX);
 	        Integer height = chartParams.getInteger(ChartParams.HEIGHT);
 	        Integer width = chartParams.getInteger(ChartParams.WIDTH);
 	        

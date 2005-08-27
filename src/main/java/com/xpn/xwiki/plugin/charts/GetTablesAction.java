@@ -13,19 +13,19 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * This clas generates the tables for the new datasource wizard.
- * @author M
+ * @author Sergiu Dumitriu
  *
  */
 public class GetTablesAction extends XWikiAction{
     public String render(XWikiContext context) throws XWikiException {
         XWikiResponse response = context.getResponse();
         response.setContentType("text/xml");
+        response.setCharacterEncoding("ISO-8859-1");
         XWikiDocument doc = context.getDoc();
         try{
             PrintWriter writer = response.getWriter();
             RadeoxHelper rHelper = new RadeoxHelper(doc, context);
             Table[] tables = rHelper.getTables();
-
             writer.print("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
             writer.print("<html xmlns='http://www.w3.org/1999/xhtml'><head><title>Tables from the page " + doc.getFullName() + "</title></head><body><div id='dswEnvelope'>");
             for(int tidx = 0; tidx < tables.length; tidx++){
@@ -33,6 +33,7 @@ public class GetTablesAction extends XWikiAction{
                 int rowCount = getTableRowCount(t);
                 int colCount = getTableColumnCount(t);
                 writer.print("<table>");
+                writer.print("<caption>Table " + (tidx + 1) + "</caption>");
                 for(int cidx = 0; cidx <= colCount + 1; cidx++){
                     writer.print("<col id='T" + tidx + "C" + cidx + "'/>");
                 }

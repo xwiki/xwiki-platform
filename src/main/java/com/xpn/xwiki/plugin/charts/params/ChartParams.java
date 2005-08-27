@@ -19,7 +19,6 @@ public class ChartParams {
 	private Map valueMap = new HashMap(); // Map<String,Object>
 	private ChartParams parent;
 	
-	public static final String TITLE = "title";
 	public static final String TYPE = "type";
 	public static final String SOURCE = "source";
 	public static final String WIDTH = "width";
@@ -27,21 +26,22 @@ public class ChartParams {
 	public static final String SERIES = "series";
 	public static final String RENDERER = "renderer";
 	
-	public static final String DOMAIN_AXIS_LABEL = "domain_axis_label";
-	public static final String RANGE_AXIS_LABEL = "range_axis_label";
-	
 	public static final String BORDER_VISIBLE = "border_visible";
 	public static final String BORDER_COLOR = "border_color";
 	public static final String BORDER_STROKE = "border_stroke";
 	
-	public static final String TITLE_POSITION = "title_position";
-	public static final String TITLE_HORIZONTAL_ALIGNMENT = "title_horizontal_alignment";
-	public static final String TITLE_VERTICAL_ALIGNMENT = "title_vertical_alignment";
-	public static final String TITLE_COLOR = "title_color";
-	public static final String TITLE_BACKGROUND_COLOR = "title_background_color";
-	public static final String TITLE_FONT = "title_font";
-	public static final String TITLE_PADDING = "title_padding";
-	public static final String TITLE_URL = "title_url";
+	public static final String TITLE_PREFIX = "title";
+	public static final String SUBTITLE_PREFIX = "subtitle";
+	
+	public static final String TITLE_SUFFIX = "";
+	public static final String TITLE_POSITION_SUFFIX = "_position";
+	public static final String TITLE_HORIZONTAL_ALIGNMENT_SUFFIX = "_horizontal_alignment";
+	public static final String TITLE_VERTICAL_ALIGNMENT_SUFFIX = "_vertical_alignment";
+	public static final String TITLE_COLOR_SUFFIX = "_color";
+	public static final String TITLE_BACKGROUND_COLOR_SUFFIX = "_background_color";
+	public static final String TITLE_FONT_SUFFIX = "_font";
+	public static final String TITLE_PADDING_SUFFIX = "_padding";
+	public static final String TITLE_URL_SUFFIX = "_url";
 	
 	public static final String ANTI_ALIAS = "anti_alias";
 	public static final String BACKGROUND_COLOR = "background_color";
@@ -61,6 +61,31 @@ public class ChartParams {
 	public static final String LEGEND_ITEM_GRAPHIC_EDGE = "legend_item_graphic_edge";
 	public static final String LEGEND_ITEM_GRAPHIC_LOCATION = "legend_item_graphic_location";
 	public static final String LEGEND_ITEM_GRAPHIC_PADDING = "legend_item_graphic_padding";
+
+	public static final String AXIS_DOMAIN_PREFIX = "axis_domain_";
+	public static final String AXIS_RANGE_PREFIX = "axis_range_";
+	
+	public static final String AXIS_VISIBLE_SUFIX = "visible";
+	
+	public static final String AXIS_LABEL_SUFFIX = "label";
+	public static final String AXIS_LABEL_FONT_SUFFIX = "label_font";
+	public static final String AXIS_LABEL_COLOR_SUFFIX = "label_color";
+	public static final String AXIS_LABEL_INSERTS_SUFFIX = "label_inserts";
+	
+	public static final String AXIS_LINE_VISIBLE_SUFFIX = "line_visible";
+	public static final String AXIS_LINE_COLOR_SUFFIX = "line_color";
+	public static final String AXIS_LINE_STROKE_SUFFIX = "line_stroke";
+	
+	public static final String AXIS_TICK_LABEL_VISIBLE_SUFFIX = "tick_label_visible";
+	public static final String AXIS_TICK_LABEL_FONT_SUFFIX = "tick_label_font";
+	public static final String AXIS_TICK_LABEL_COLOR_SUFFIX = "tick_label_color";
+	public static final String AXIS_TICK_LABEL_INSERTS_SUFFIX = "tick_label_inserts";
+
+	public static final String AXIS_TICK_MARK_VISIBLE_SUFFIX = "tick_mark_visible";
+	public static final String AXIS_TICK_MARK_INSIDE_LENGTH_SUFFIX = "tick_mark_inside_length";
+	public static final String AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX = "tick_mark_outside_length";
+	public static final String AXIS_TICK_MARK_COLOR_SUFFIX = "tick_mark_color";
+	public static final String AXIS_TICK_MARK_STROKE_SUFFIX = "tick_mark_stroke";
 	
 	public ChartParams() {
 		this(null);
@@ -70,22 +95,20 @@ public class ChartParams {
 		this.parent = parent;
 		addParam(new StringChartParam(TYPE, false));
 		addParam(new StringChartParam(SOURCE, false));
-		addParam(new StringChartParam(TITLE));
 		addParam(new IntegerChartParam(WIDTH));
 		addParam(new IntegerChartParam(HEIGHT));
 		addParam(new StringChartParam(RENDERER));
+		
 		addParam(new BooleanChartParam(BORDER_VISIBLE));
 		addParam(new ColorChartParam(BORDER_COLOR));
-		addParam(new ColorChartParam(TITLE_BACKGROUND_COLOR));
 		addParam(new StrokeChartParam(BORDER_STROKE));
-		addParam(new RectangleEdgeChartParam(TITLE_POSITION));
-		addParam(new HorizontalAlignmentChartParam(TITLE_HORIZONTAL_ALIGNMENT));
-		addParam(new VerticalAlignmentChartParam(TITLE_VERTICAL_ALIGNMENT));	
-		addParam(new ColorChartParam(TITLE_COLOR));
-		addParam(new FontChartParam(TITLE_FONT));
-		addParam(new RectangleInsetsChartParam(TITLE_PADDING));
+
+		addTitleParams(TITLE_PREFIX);
+		addTitleParams(SUBTITLE_PREFIX);
+
 		addParam(new BooleanChartParam(ANTI_ALIAS));
 		addParam(new ColorChartParam(BACKGROUND_COLOR));
+		
 		addParam(new ColorChartParam(PLOT_BACKGROUND_COLOR));
 		addParam(new FloatChartParam(PLOT_BACKGROUND_ALPHA));
 		addParam(new FloatChartParam(PLOT_FOREGROUND_ALPHA));
@@ -93,6 +116,7 @@ public class ChartParams {
 		addParam(new ColorChartParam(PLOT_OUTLINE_COLOR));
 		addParam(new StrokeChartParam(PLOT_OUTLINE_STROKE));
 		addParam(new DoubleChartParam(PLOT_ZOOM));
+		
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
 		addParam(new RectangleInsetsChartParam(LEGEND_ITEM_LABEL_PADDING));
@@ -100,6 +124,46 @@ public class ChartParams {
 		addParam(new RectangleEdgeChartParam(LEGEND_ITEM_GRAPHIC_EDGE));
 		addParam(new RectangleAnchorChartParam(LEGEND_ITEM_GRAPHIC_LOCATION));
 		addParam(new RectangleInsetsChartParam(LEGEND_ITEM_GRAPHIC_PADDING));
+
+		addAxisParams(AXIS_DOMAIN_PREFIX);
+		addAxisParams(AXIS_RANGE_PREFIX);
+	}
+
+	// 16x2
+	private void addAxisParams(String prefix) {
+		addParam(new BooleanChartParam(prefix+AXIS_VISIBLE_SUFIX));
+		
+		addParam(new BooleanChartParam(prefix+AXIS_LINE_VISIBLE_SUFFIX));
+		addParam(new ColorChartParam(prefix+AXIS_LINE_COLOR_SUFFIX));
+		addParam(new StrokeChartParam(prefix+AXIS_LINE_STROKE_SUFFIX));
+		
+		addParam(new StringChartParam(prefix+AXIS_LABEL_SUFFIX));
+		addParam(new FontChartParam(prefix+AXIS_LABEL_FONT_SUFFIX));
+		addParam(new ColorChartParam(prefix+AXIS_LABEL_COLOR_SUFFIX));
+		addParam(new RectangleInsetsChartParam(prefix+AXIS_LABEL_INSERTS_SUFFIX));		
+
+		addParam(new BooleanChartParam(prefix+AXIS_TICK_LABEL_VISIBLE_SUFFIX));
+		addParam(new FontChartParam(prefix+AXIS_TICK_LABEL_FONT_SUFFIX));
+		addParam(new ColorChartParam(prefix+AXIS_TICK_LABEL_COLOR_SUFFIX));
+		addParam(new RectangleInsetsChartParam(prefix+AXIS_TICK_LABEL_INSERTS_SUFFIX));
+		
+		addParam(new BooleanChartParam(prefix+AXIS_TICK_MARK_VISIBLE_SUFFIX));
+		addParam(new FloatChartParam(prefix+AXIS_TICK_MARK_INSIDE_LENGTH_SUFFIX));
+		addParam(new FloatChartParam(prefix+AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX));
+		addParam(new ColorChartParam(prefix+AXIS_TICK_MARK_COLOR_SUFFIX));
+		addParam(new StrokeChartParam(prefix+AXIS_TICK_MARK_STROKE_SUFFIX));
+	}
+	
+	//8x2
+	private void addTitleParams(String prefix) {
+		addParam(new StringChartParam(prefix+TITLE_SUFFIX));
+		addParam(new ColorChartParam(prefix+TITLE_BACKGROUND_COLOR_SUFFIX));
+		addParam(new RectangleEdgeChartParam(prefix+TITLE_POSITION_SUFFIX));
+		addParam(new HorizontalAlignmentChartParam(prefix+TITLE_HORIZONTAL_ALIGNMENT_SUFFIX));
+		addParam(new VerticalAlignmentChartParam(prefix+TITLE_VERTICAL_ALIGNMENT_SUFFIX));	
+		addParam(new ColorChartParam(prefix+TITLE_COLOR_SUFFIX));
+		addParam(new FontChartParam(prefix+TITLE_FONT_SUFFIX));
+		addParam(new RectangleInsetsChartParam(prefix+TITLE_PADDING_SUFFIX));
 	}
 
 	public void addParam(ChartParam param) {

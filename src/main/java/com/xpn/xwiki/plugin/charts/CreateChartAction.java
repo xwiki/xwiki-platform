@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.params.DefaultChartParams;
@@ -27,8 +28,12 @@ public class CreateChartAction extends XWikiAction {
         	throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
         			XWikiException.ERROR_XWIKI_UNKNOWN, e.getMessage(), e);
         }
+        String chartRadeoxMacro = RadeoxHelper.buildMacro("chart", map);
+        XWikiDocument doc = context.getDoc();
+        doc.setContent(doc.getContent()+"\n\n"+chartRadeoxMacro);
+        context.getWiki().saveDocument(doc, context);
 		try {
-			response.getWriter().print(RadeoxHelper.buildMacro("chart", map));
+			response.sendRedirect(doc.getURL("view", true, context));
 		} catch(IOException ex) {
         	throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
         			XWikiException.ERROR_XWIKI_UNKNOWN, ex.getMessage(), ex);

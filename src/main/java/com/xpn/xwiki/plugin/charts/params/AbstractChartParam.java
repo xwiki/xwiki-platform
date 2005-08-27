@@ -57,8 +57,8 @@ public abstract class AbstractChartParam implements ChartParam {
 		if (value != null) {
 			return value;
 		} else {
-			throw new ParamException("Invalid value for parameter "+getName()+":when " + 
-					map.size() + " parameters are present one has to be " + name);
+			throw new ParamException("Invalid value for the parameter "+getName()+": When " + 
+					map.size() + " values are present one has to be " + name);
 		}
 	}
 
@@ -68,12 +68,11 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				return Integer.parseInt(value);
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid parameter value:" +
-						"non-int value for the "+name+" parameter");
+				throw new ParamException("Non-integer value for the parameter "+getName());
 			}
 		} else {
-			throw new ParamException("Invalid parameter value:when " + 
-					map.size() + " parameters are present one has to be " + name);
+			throw new ParamException("Invalid value for the parameter "+getName()+": When " + 
+					map.size() + " values are present one has to be " + name);
 		}
 	}
 	
@@ -83,12 +82,11 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				return Float.parseFloat(value);
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid parameter value:" +
-						"non-float value for the "+name+" parameter");
+				throw new ParamException("Non-float value for the parameter "+getName());
 			}
 		} else {
-			throw new ParamException("Invalid parameter value:when " + 
-					map.size() + " parameters are present one has to be " + name);
+			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
+					map.size() + " values are present one has to be " + name);
 		}
 	}
 	
@@ -98,12 +96,11 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				return Double.parseDouble(value);
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid parameter value:" +
-						"non-double value for the "+name+" parameter");
+				throw new ParamException("Non-double value for the parameter "+getName());
 			}
 		} else {
-			throw new ParamException("Invalid parameter value:when " + 
-					map.size() + " parameters are present one has to be " + name);
+			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
+					map.size() + " values are present one has to be " + name);
 		}
 	}
 
@@ -114,8 +111,8 @@ public abstract class AbstractChartParam implements ChartParam {
 		if (obj != null) {
 			return obj;
 		} else {
-			throw new ParamException("Invalid parameter value: accepted values for the "
-					+ name + " parameter are " + choices.keySet() + "; encountered:" + value);
+			throw new ParamException("Invalid value for the parameter "+getName()+
+					": accepted values are " + choices.keySet() + "; encountered:" + value);
 		}
 	}
 	
@@ -124,8 +121,8 @@ public abstract class AbstractChartParam implements ChartParam {
 		if (value != null) {
 			return parseList(value);
 		} else {
-			throw new ParamException("Invalid parameter value:when " + 
-					map.size() + " parameters are present one has to be " + name);
+			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
+					map.size() + " values are present one has to be " + name);
 		}
 	}
 	
@@ -138,7 +135,7 @@ public abstract class AbstractChartParam implements ChartParam {
 		for (int i = 0; i<args.length; i++) {
 			String[] split = args[i].split(MAP_ASSIGNMENT);
 			if (split.length != 2) {
-				throw new ParamException("Invalid parameter value:"
+				throw new ParamException("Invalid value for the parameter "+getName()+": "
 						+ "name" + MAP_ASSIGNMENT + "value \"" + 
 						MAP_SEPARATOR + "\"-separated list expected");
 			}
@@ -176,8 +173,8 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				result.add(new Float(value));
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid parameter value:" +
-						"non-float value for the " + name + " parameter");
+				throw new ParamException("Invalid value for the parameter "+getName()+": "+
+						"non-float value for " + name );
 			}			
 		}
 		return result;
@@ -191,8 +188,8 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				result[i] = Float.parseFloat(value);
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid parameter value:" +
-						"non-float value for the " + name + " parameter");
+				throw new ParamException("Invalid value for the parameter "+getName()+": "+
+						"non-float value for " + name);
 			}
 			i++;
 		}

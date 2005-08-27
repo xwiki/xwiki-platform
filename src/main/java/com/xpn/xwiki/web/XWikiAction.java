@@ -232,8 +232,9 @@ public abstract class XWikiAction extends Action
 
     protected void sendRedirect(XWikiResponse response, String page) throws XWikiException {
         try {
-            if (page!=null)
-             response.sendRedirect(page);
+            if (page!=null) {
+            	response.sendRedirect(page);
+            }
         } catch (IOException e) {
             Object[] args = { page };
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,

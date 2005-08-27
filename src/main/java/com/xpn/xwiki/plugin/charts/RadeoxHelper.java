@@ -119,6 +119,50 @@ public class RadeoxHelper {
 	    return table;
 	}
 	
+    public int getTableColumnCount(Table t){
+        int i = 0;
+        try{
+            while(true){
+                t.getXY(i, 0);
+                i++;
+            }
+        }
+        catch(Exception ex){
+            // Reached the table limit
+            i--;
+        }
+        if(i < 0){
+            return 0;
+        }
+        return i;
+    }
+    
+    public int getTableRowCount(Table t){
+        int i = 0;
+        try{
+            while(true){
+                t.getXY(0, i);
+                i++;
+            }
+        }
+        catch(Exception ex){
+            // Reached the table limit
+            i--;
+        }
+        if(i < 0){
+            return 0;
+        }
+        return i;
+    }
+    
+    public String getCell(Table table, int columnIndex, int rowIndex) {
+    	try{
+    		return table.getXY(columnIndex, rowIndex).toString().replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    	} catch(Exception ex){
+    		return null;
+    	}
+    }
+	
 	public static String buildMacro(String name, Map params) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("{"+name);
@@ -136,5 +180,9 @@ public class RadeoxHelper {
 		}
 		sb.append("}");
 		return sb.toString();
+	}
+	
+	public char getColumn(int columnIndex) {
+		return (char)((int)'A' + columnIndex);
 	}
 }

@@ -3,12 +3,15 @@ package com.xpn.xwiki.plugin.charts.tests;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.jfree.ui.RectangleInsets;
 
+import com.xpn.xwiki.plugin.charts.RadeoxHelper;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.params.ColorChartParam;
@@ -132,6 +135,15 @@ public class ChartParamsTest extends TestCase {
 		Assert.assertEquals(20, padding.getBottom(), 0.0001);
 		Assert.assertEquals(30, padding.getLeft(), 0.0001);
 		Assert.assertEquals(40, padding.getTop(), 0.0001);
+	}
+	
+	public void testToString() throws ParamException {
+		params.addParam(new RectangleInsetsChartParam("padding"));
+		params.set("padding", "right:10;bottom:20;left:30;top:40");
+		System.out.println(params.toString());
+		Map map = new LinkedHashMap();
+		map.put("type", "bar");
+		System.out.println(RadeoxHelper.buildMacro("chart", map));
 	}
 	
 	private ChartParams params = new ChartParams();

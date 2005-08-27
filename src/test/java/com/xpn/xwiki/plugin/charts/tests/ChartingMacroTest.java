@@ -24,10 +24,7 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.plugin.charts.ChartingMacro;
-import com.xpn.xwiki.plugin.charts.mocks.MockChartingPlugin;
-import com.xpn.xwiki.plugin.charts.mocks.MockSVGPlugin;
 import com.xpn.xwiki.plugin.charts.mocks.MockServletContext;
-import com.xpn.xwiki.plugin.charts.mocks.MockStore;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.web.XWikiServletContext;
 

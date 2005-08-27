@@ -11,7 +11,7 @@ function tdwWizard(){
     'this' does not point to the right object in private methods
   */
   var self = this;
-  
+
   /*
     The curent state of the selection process
     Possible values: none, cells, rows, columns
@@ -434,8 +434,10 @@ function tdwWizard(){
       var tbody = foreignContainer.childNodes.item(tidx).lastChild;
       for(var ridx = 0; ridx < tbody.childNodes.length; ridx++){
         var row = tbody.childNodes.item(ridx);
+        if(row.nodeType != row.ELEMENT_NODE) continue;
         for(var cidx = 0; cidx < row.childNodes.length; cidx++){
           var cell = row.childNodes.item(cidx);
+          if(cell.nodeType != cell.ELEMENT_NODE) continue;
           cell.className = 'tdwUnselectedTableCell';
           if(cell.addEventListener){
             cell.addEventListener('mousedown', onMouseDown, true);

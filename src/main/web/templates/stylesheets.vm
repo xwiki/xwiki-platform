@@ -1,5 +1,4 @@
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css"  />
-<link href="$xwiki.getSkinFile("charting.css")" rel="stylesheet" type="text/css"/>
 #set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
 #set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
 #if ($defaultstyle!="")

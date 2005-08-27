@@ -1,10 +1,24 @@
+#template("xwiki.vm")
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>New chart wizard</title>
+<meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
+$!xwiki.getWebPreference("meta") 
+<link href="$xwiki.getSkinFile("datasource.css")" rel="stylesheet" type="text/css"/>
+#template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
+</head>
+<body onload='window.wizard.initialize("$xwiki.getSkinFile("")");'>
+#template("header.vm");
 <div id="chartWizard">
   <table id="chwWizard" summary="Chart Wizard Content">
     <tbody>
       <tr>
         <td colspan="2" id="chwNavigation">
-#template("chartnavigationimages.html")
+#template("chartnavigationimages.vm")
       </td>
     </tr>
     <tr>
@@ -21,9 +35,9 @@
               <option value="Bar">Bar</option>
             </select>
             <select id="chwChartSubtypeInput" name="chwChartSubtypeInput">
-              <optgroup label="Bar subtype" style="display: none">
-                <option style="display: none">A</option>
-                <option style="display: none">F</option>
+              <optgroup label="Bar subtype">
+                <option>A</option>
+                <option>F</option>
               </optgroup>
               <optgroup label="subtype">
                 <option>C</option>
@@ -68,8 +82,5 @@
   </tbody>
   </table>
 </div>
-<script type="text/javascript">
-<!--
-window.wizard.initialize("$xwiki.getSkinFile("")");
-//-->
-</script>
+</body>
+</html>

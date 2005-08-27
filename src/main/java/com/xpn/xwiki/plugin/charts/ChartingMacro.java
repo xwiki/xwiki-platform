@@ -2,8 +2,6 @@ package com.xpn.xwiki.plugin.charts;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.LocaleMacro;
@@ -15,7 +13,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
-import com.xpn.xwiki.plugin.charts.params.DefaultChartParameters;
+import com.xpn.xwiki.plugin.charts.params.DefaultChartParams;
 import com.xpn.xwiki.render.macro.XWikiMacro;
 
 public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWikiMacro {
@@ -46,20 +44,8 @@ public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWiki
 
 	        ChartParams chartParams;
 	        try {
-	        	chartParams = new ChartParams(DefaultChartParameters.getInstance());
-		        // copy all the named parameters and their values to chartParams
-		        Map map = params.getParams();
-		        Iterator it = map.keySet().iterator();
-		        while (it.hasNext()) {
-		        	String paramName = (String)it.next();
-		            try {
-		    	        Integer.parseInt(paramName);
-		    	        // discard integers
-		            } catch (NumberFormatException nfe) {
-		    	        chartParams.set(paramName, (String)map.get(paramName));	            	
-		            }
-		        }
-		        
+	        	chartParams = new ChartParams(params.getParams(),
+	        		DefaultChartParams.getInstance(), true);
 		        chartParams.check();
 	        } catch (ParamException e) {
 	        	throw exception("Parameter Exception", e);

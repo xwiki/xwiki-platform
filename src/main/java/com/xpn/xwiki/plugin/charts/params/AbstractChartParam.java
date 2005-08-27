@@ -57,7 +57,7 @@ public abstract class AbstractChartParam implements ChartParam {
 		if (value != null) {
 			return value;
 		} else {
-			throw new ParamException("Invalid parameter value:when " + 
+			throw new ParamException("Invalid value for parameter "+getName()+":when " + 
 					map.size() + " parameters are present one has to be " + name);
 		}
 	}

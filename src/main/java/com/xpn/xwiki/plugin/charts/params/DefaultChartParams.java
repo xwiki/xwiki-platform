@@ -3,10 +3,10 @@ package com.xpn.xwiki.plugin.charts.params;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 
-public class DefaultChartParameters extends ChartParams {
-	public static DefaultChartParameters uniqueInstance;
+public class DefaultChartParams extends ChartParams {
+	public static DefaultChartParams uniqueInstance;
 	
-	private DefaultChartParameters() {
+	private DefaultChartParams() {
 		try {
 			set(ChartParams.WIDTH, "400");
 			set(ChartParams.HEIGHT, "300");
@@ -19,9 +19,9 @@ public class DefaultChartParameters extends ChartParams {
 		}
 	}
 	
-	public static synchronized DefaultChartParameters getInstance() {
+	public static synchronized DefaultChartParams getInstance() {
 		if (uniqueInstance == null) {
-			uniqueInstance = new DefaultChartParameters();
+			uniqueInstance = new DefaultChartParams();
 		}
 		return uniqueInstance; 
 	}

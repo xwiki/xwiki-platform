@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Stroke;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.jfree.ui.HorizontalAlignment;
@@ -88,7 +89,34 @@ public class ChartParams {
 	public static final String AXIS_TICK_MARK_STROKE_SUFFIX = "tick_mark_stroke";
 	
 	public ChartParams() {
-		this(null);
+		this((ChartParams)null);
+	}
+
+	public ChartParams(Map map) throws ParamException {
+		this(map, null, false);
+	}
+	
+	public ChartParams(Map map, ChartParams parent) throws ParamException {
+		this(map, parent, false);
+	}
+	
+	public ChartParams(Map map, ChartParams parent,
+			boolean discardNumbers) throws ParamException {
+		this(parent);
+		Iterator it = map.keySet().iterator();
+		while (it.hasNext()) {
+			String name = (String)it.next();
+			String value = (String)map.get(name);
+			if (discardNumbers) {
+	            try {
+	    	        Integer.parseInt(name);
+	            } catch (NumberFormatException nfe) {
+	    	        set(name, value);	            	
+	            }
+			} else {
+				set(name, value);				
+			}
+		}		
 	}
 	
 	public ChartParams(ChartParams parent) {
@@ -116,7 +144,7 @@ public class ChartParams {
 		addParam(new ColorChartParam(PLOT_OUTLINE_COLOR));
 		addParam(new StrokeChartParam(PLOT_OUTLINE_STROKE));
 		addParam(new DoubleChartParam(PLOT_ZOOM));
-		
+
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
 		addParam(new RectangleInsetsChartParam(LEGEND_ITEM_LABEL_PADDING));
@@ -128,7 +156,7 @@ public class ChartParams {
 		addAxisParams(AXIS_DOMAIN_PREFIX);
 		addAxisParams(AXIS_RANGE_PREFIX);
 	}
-
+	
 	// 16x2
 	private void addAxisParams(String prefix) {
 		addParam(new BooleanChartParam(prefix+AXIS_VISIBLE_SUFIX));
@@ -309,5 +337,17 @@ public class ChartParams {
 		} else {
 			return null;
 		}
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		Iterator it = valueMap.keySet().iterator();
+		while (it.hasNext()) {
+			String name = (String)it.next();
+			sb.append(name+"=");
+			sb.append(valueMap.get(name).toString());;
+			sb.append("\n");
+		}
+		return sb.toString();
 	}
 }

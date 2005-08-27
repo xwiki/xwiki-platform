@@ -1,6 +1,8 @@
 package com.xpn.xwiki.plugin.charts;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.radeox.macro.table.Table;
 import org.radeox.macro.table.TableBuilder;
@@ -115,5 +117,24 @@ public class RadeoxHelper {
 	    Table table = TableBuilder.build(content);
 	    table.calc();
 	    return table;
+	}
+	
+	public static String buildMacro(String name, Map params) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("{"+name);
+		if (!params.isEmpty()) {
+			sb.append(":");
+			Iterator it = params.keySet().iterator();
+			while (it.hasNext()) {
+				String paramName = (String)it.next();
+				String paramValue = (String)params.get(paramName);
+				sb.append(paramName+"="+paramValue);
+				if (it.hasNext()) {
+					sb.append("|");
+				}
+			}			
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 }

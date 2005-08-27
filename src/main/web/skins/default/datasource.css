@@ -1,0 +1,48 @@
+.dswTables table{
+  border: outset 2px;
+  border-spacing: 1px;
+  margin: 5px;
+  cursor: crosshair;
+}
+.dswTables th{
+  border: outset 2px;
+  border-color: #B6C5F2;
+  background: #B6C5F2;
+  color: #5368A6;
+}
+.dswTables td{
+  border: inset 1px;
+  cursor: crosshair;
+  empty-cells: show;
+}
+
+tbody.dswUnselectedTable{
+  background-color: none;
+}
+tbody.dswSelectedTable{
+  background-color: #F7F0D2; /*#B6C5F2;*/
+}
+
+tbody.dswSelectedTable th, tr.dswSelectedRow th, th.dswSelectedCell{
+/*  background-color: #5368A6;
+  color: #B6C5F2;*/
+  background-color: #C82;
+  color: #FFF;
+}
+
+tr.dswUnselectedRow, col.dswUnselectedColumn{
+  background-color: none;
+}
+
+col.dswSelectedColumn{
+  background: #F7F0D2; /*#B6C5F2;*/
+}
+
+tr.dswSelectedRow{
+/*  background: #B6C5F2;*/
+  background-color: #F7F0D2; /*#B6C5F2;#C82;*/
+}
+
+td.dswSelectedCell{
+  background: #F7F0D2; /*#B6C5F2;*/
+}

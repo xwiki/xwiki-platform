@@ -431,7 +431,12 @@ function tdwWizard(){
    */
   var prepareTables = function(foreignContainer){
     for(var tidx = 0; tidx < foreignContainer.childNodes.length; tidx++){
-      var tbody = foreignContainer.childNodes.item(tidx).lastChild;
+      var table = foreignContainer.childNodes.item(tidx);
+      if(table.nodeType != table.ELEMENT_NODE) continue;
+      for(k = table.childNodes.length - 1; k >= 0; k--){
+        if(table.childNodes.item(k).tagName == 'tbody') break;
+      }
+      var tbody = table.childNodes.item(k);
       for(var ridx = 0; ridx < tbody.childNodes.length; ridx++){
         var row = tbody.childNodes.item(ridx);
         if(row.nodeType != row.ELEMENT_NODE) continue;

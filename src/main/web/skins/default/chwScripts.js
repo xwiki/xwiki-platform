@@ -1,6 +1,6 @@
 /*
-Type       => Chart type
 Data       => Data sources
+Type       => Chart type
 Titles     => Chart title, Axes names
 Axes       => Displayed values on axes
 Grid       => Gridline options 
@@ -34,19 +34,7 @@ function chwWizard(){
     Colors : false,
     Insert : false
   }
-  var visiblePages = {
-    Data   : false,
-    Type   : false,
-    Titles : false,
-    Axes   : false,
-    Grid   : false,
-    Labels : false,
-    Legend : false,
-    Space  : false,
-    Colors : false,
-    Insert : false
-  }
-  var activatedPages = {
+  var activatedElements = {
     Pie    : {
              Data   : [],
              Type   : ["ChartType"],
@@ -61,6 +49,7 @@ function chwWizard(){
   }
   var backEnabled = false;
   var nextEnabled = true;
+  var finishEnabled =false;
 
   adjustPage = function(show, hide){
     var a = 0, b=0;
@@ -90,7 +79,7 @@ function chwWizard(){
   }
 
   getNextPageIndex = function(pageIndex){
-    while(!activatedPages[selectedChartType][pageOrder[++pageIndex]]){
+    while(!activatedElements[selectedChartType][pageOrder[++pageIndex]]){
       if(pageIndex == pageOrder.length - 1){
         return -1;
       }
@@ -98,7 +87,7 @@ function chwWizard(){
     return pageIndex;
   }
   getPrevPageIndex = function(pageIndex){
-    while(!activatedPages[selectedChartType][pageOrder[--pageIndex]]){
+    while(!activatedElements[selectedChartType][pageOrder[--pageIndex]]){
       if(pageIndex == 0){
         return -1;
       }
@@ -110,10 +99,9 @@ function chwWizard(){
     skinDirectory = theSkinDirectory;
     activePage = pageOrder[0];
     selectedChartType = document.getElementById("chwChartTypeInput").value;
-    for(var wizardPage in activatedPages[selectedChartType]){
-      visiblePages[wizardPage] = true;
+    for(var wizardPage in activatedElements[selectedChartType]){
       document.getElementById("chw" + wizardPage + "WizardButton").className = "chwNavigationImageDisabled";
-      adjustPage(activatedPages[selectedChartType][wizardPage], []);
+      adjustPage(activatedElements[selectedChartType][wizardPage], []);
     }
     document.getElementById("chw" + activePage + "WizardButton").className = "chwNavigationImage";
   }
@@ -195,23 +183,22 @@ function chwWizard(){
     dImage.setAttribute('alt', 'Chart Type: ' + newChartType);
     dImage.setAttribute('title', 'Chart Type: ' + newChartType);
     // Hide old pages
-    for(var wizardPage in activatedPages[selectedChartType]){
-      if(!activatedPages[newChartType][wizardPage]){
-        visiblePages[wizardPage] = false;
+    for(var wizardPage in activatedElements[selectedChartType]){
+      if(!activatedElements[newChartType][wizardPage]){
+//        visiblePages[wizardPage] = false;
         enabledPages[wizardPage] = false;
-        adjustPage([], activatedPages[selectedChartType][wizardPage]);
+        adjustPage([], activatedElements[selectedChartType][wizardPage]);
         document.getElementById("chw" + wizardPage + "WizardButton").className = "chwNavigationImageHidden";
       }
     }
     // Show new pages and adjust remaining pages
-    for(var wizardPage in activatedPages[newChartType]){
-      if(!activatedPages[selectedChartType][wizardPage]){
+    for(var wizardPage in activatedElements[newChartType]){
+      if(!activatedElements[selectedChartType][wizardPage]){
         // Previously hidden page, show it
-        visiblePages[wizardPage] = true;
-        adjustPage(activatedPages[newChartType][wizardPage], []);
+        adjustPage(activatedElements[newChartType][wizardPage], []);
       }
       else{
-        adjustPage(activatedPages[newChartType][wizardPage], activatedPages[selectedChartType][wizardPage]);
+        adjustPage(activatedElements[newChartType][wizardPage], activatedElements[selectedChartType][wizardPage]);
       }
       enabledPages[wizardPage] = false;
       document.getElementById("chw" + wizardPage + "WizardButton").className = "chwNavigationImageDisabled";
@@ -220,39 +207,51 @@ function chwWizard(){
     selectedChartType = newChartType;
     var currentPage = getPageIndex(activePage);
     for(var i = 0; i < currentPage; i++){
-      if(!activatedPages[selectedChartType][pageOrder[i]]) continue;
+      if(!activatedElements[selectedChartType][pageOrder[i]]) continue;
       document.getElementById("chw" + pageOrder[i] + "WizardButton").className = "chwNavigationImage";
       document.getElementById("chw" + pageOrder[i] + "WizardButton").src = skinDirectory + "chwTaskCompleted.png";
       enabledPages[pageOrder[i]] = true;
     }
     enabledPages[activePage] = true;
+    document.getElementById("chwFinishButton").className = "chwButtonDisabled";
+    finishEnabled = false;
     document.getElementById("chw" + activePage + "WizardButton").className = "chwNavigationImage";
     document.getElementById("chw" + activePage + "WizardButton").src = skinDirectory + "chwTaskCompleting.png";
   }
 
   this.showNextPage = function(){
-    if(!nextEnabled) return;
+    if(!nextEnabled) return false;
     var currentPage = getPageIndex(activePage);
     var nextPage = getNextPageIndex(currentPage);
     if(activePage == "Type"){
-      for(var page in activatedPages[selectedChartType]){
+      for(var page in activatedElements[selectedChartType]){
         enabledPages[page] = true;
         document.getElementById("chw" + page + "WizardButton").className = "chwNavigationImage";
         document.getElementById("chw" + page + "WizardButton").src = skinDirectory + "chwTaskCompleted.png";
       }
+      document.getElementById("chwFinishButton").className = "chwButton";
+      finishEnabled = true;
     }
     nextPage = pageOrder[nextPage];
     enabledPages[nextPage] = true;
     document.getElementById("chw" + nextPage + "WizardButton").className = "chwNavigationImage";
     this.showWizardPage(nextPage);
+    return false;
   }
 
   this.showPrevPage = function(){
-    if(!backEnabled) return;
+    if(!backEnabled) return false;
     var currentPage = getPageIndex(activePage);
     var prevPage = getPrevPageIndex(currentPage);
     prevPage = pageOrder[prevPage];
     this.showWizardPage(prevPage);
+    return false;
+  }
+
+  this.finish = function(){
+    if(!finishEnabled) return false;
+    document.getElementById('chwForm').submit();
+    return false;
   }
 }
 

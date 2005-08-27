@@ -14,7 +14,7 @@ $!xwiki.getWebPreference("meta")
 #set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
 #set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
 <body onload="window.wizard.init('$baseAddress');">
-<input type="text" id="tdwPage"></input>
+<input type="text" id="tdwPage" value="$doc.getFullName()"></input>
 <span onclick="window.wizard.getTablesFromPage(document.getElementById('tdwPage').value);">Get tables</span>
 <div id="tdwTables" class='tdwTables'></div>
 </body>

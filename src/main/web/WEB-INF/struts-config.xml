@@ -271,6 +271,12 @@
             name="gettables"
             scope="request">
     </action>
+    
+    <action path="/createchart/"
+            type="com.xpn.xwiki.plugin.charts.CreateChartAction"
+            name="createchart"
+            scope="request">
+    </action>
 
   </action-mappings>
 

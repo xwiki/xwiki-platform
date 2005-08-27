@@ -15,14 +15,8 @@ import com.xpn.xwiki.web.XWikiResponse;
  */
 public class GetTablesAction extends XWikiAction{
     public String render(XWikiContext context) throws XWikiException {
-        XWikiResponse response = context.getResponse();
-        response.setContentType("application/html+xml");
-        response.setCharacterEncoding("UTF-8"); //TODO: make this work!
-        
         VelocityContext vcontext = (VelocityContext)context.get("vcontext");
         vcontext.put("rhelper", new RadeoxHelper(context.getDoc(), context));
-        
-        XWikiDocument doc = context.getDoc();
         return "gettables";
     }
 }

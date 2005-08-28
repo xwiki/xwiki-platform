@@ -4,9 +4,7 @@ import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiAction;
-import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * This clas generates the tables for the new datasource wizard.

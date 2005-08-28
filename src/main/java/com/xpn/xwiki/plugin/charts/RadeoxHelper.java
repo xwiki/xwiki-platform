@@ -34,7 +34,9 @@ public class RadeoxHelper {
         // Remove the content that is inside "{pre}"
 		content = (new PreTagSubstitution(context.getUtil(), true)).substitute(content);
 
-		int index = 0, lastIndex = 0; boolean opened = false;
+		int index = Integer.MIN_VALUE;
+		int lastIndex = Integer.MIN_VALUE;
+		boolean opened = false;
 		while (index < content.length()) {
 			lastIndex = index;
 			index = content.indexOf(TABLE, index+TABLE.length());

@@ -26,24 +26,8 @@ public class LinePlotFactory  implements PlotFactory {
 	
 	public Plot create(DataSource dataSource, ChartParams params)
 			throws GenerateException, DataSourceException {
-		String dataSeries = params.getString(ChartParams.SERIES);
 		
-		boolean hasNumericHeader = false;
-		try { 
-			if (dataSeries.equals("rows") && dataSource.hasHeaderRow()) {
-				for (int column = 0; column<dataSource.getColumnCount(); column++) {
-					Double.parseDouble(dataSource.getHeaderRowValue(column));
-				}
-				hasNumericHeader = true;
-			} else if (dataSeries.equals("columns") && dataSource.hasHeaderColumn()) {
-				for (int row = 0; row<dataSource.getRowCount(); row++) {
-					Double.parseDouble(dataSource.getHeaderColumnValue(row));
-				}
-				hasNumericHeader = true;			
-			}
-		} catch (NumberFormatException e) { /* ignore */ }
-		
-		if (hasNumericHeader) {
+		if (hasNumericHeader(dataSource, params)) {
 			NumberAxis domainAxis = new NumberAxis();
 			ValueAxis rangeAxis = new NumberAxis();
 			ChartCustomizer.customizeValueAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
@@ -53,9 +37,32 @@ public class LinePlotFactory  implements PlotFactory {
 
 			XYDataset dataset = XYDatasetFactory.getInstance().create(dataSource, params);
 			
-			return new XYPlot(dataset, domainAxis, rangeAxis, renderer);
+			XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer);
+			
+			ChartCustomizer.customizeXYPlot(plot, params);
+			
+			return plot;
 		} else {
 			return CategoryPlotFactory.getInstance().create(dataSource, params);			
 		}
+	}
+	
+	private boolean hasNumericHeader(DataSource dataSource,
+			ChartParams params) throws DataSourceException {
+		String dataSeries = params.getString(ChartParams.SERIES);
+		try { 
+			if (dataSeries.equals("rows") && dataSource.hasHeaderRow()) {
+				for (int column = 0; column<dataSource.getColumnCount(); column++) {
+					Double.parseDouble(dataSource.getHeaderRowValue(column));
+				}
+				return true;
+			} else if (dataSeries.equals("columns") && dataSource.hasHeaderColumn()) {
+				for (int row = 0; row<dataSource.getRowCount(); row++) {
+					Double.parseDouble(dataSource.getHeaderColumnValue(row));
+				}
+				return true;			
+			}
+		} catch (NumberFormatException e) { /* ignore */ }
+		return false;
 	}
 }

@@ -8,6 +8,7 @@ public class AllTests extends TestSuite {
     public AllTests() {
         addTest(new TestSuite(ObjectsTest.class));
         addTest(new TestSuite(RadeoxHelperTest.class));
+        addTest(new TestSuite(RadeoxHelperBug.class));
         addTest(new TestSuite(DefaultDataSourceTest.class));
         addTest(new TestSuite(TableDataSourceTest.class));
         addTest(new TestSuite(DataSourceFactoryTest.class));

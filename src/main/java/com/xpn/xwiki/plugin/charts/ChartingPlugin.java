@@ -48,7 +48,6 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
         try {
             tempDir.mkdirs();
         } catch (Exception e) {};
-
     }
 
     public String getName() {

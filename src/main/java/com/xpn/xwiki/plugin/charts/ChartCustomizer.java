@@ -1,10 +1,13 @@
 package com.xpn.xwiki.plugin.charts;
 
+import java.awt.Color;
+
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.Axis;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 
@@ -47,7 +50,60 @@ public class ChartCustomizer {
     		plot.zoom(params.getDouble(ChartParams.PLOT_ZOOM).doubleValue());
     	}
     }
+    
+    public static void customizeXYPlot(XYPlot plot, ChartParams params) {
+    	if (params.get(ChartParams.PLOTXY_ORIENTATION) != null) {
+    		plot.setOrientation(params.getPlotOrientation(ChartParams.PLOTXY_ORIENTATION));
+    	}
+    	
+    	if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
+    		if (params.getBoolean(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
+        		plot.setDomainGridlinesVisible(true);
+        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR) != null) {
+        			plot.setDomainGridlinePaint(params.getColor(ChartParams.AXIS_DOMAIN_PREFIX
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR));
+        		}
+        		
+        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
+        			plot.setDomainGridlineStroke(params.getStroke(ChartParams.AXIS_DOMAIN_PREFIX
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE));
+        		}
+    		} else {
+    			plot.setDomainGridlinesVisible(false);
+    		}
+    	}
 
+    	if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
+    		if (params.getBoolean(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
+        		plot.setRangeGridlinesVisible(true);
+        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR) != null) {
+        			plot.setRangeGridlinePaint(params.getColor(ChartParams.AXIS_RANGE_PREFIX
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR));
+        		}
+        		
+        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
+        			plot.setRangeGridlineStroke(params.getStroke(ChartParams.AXIS_RANGE_PREFIX
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE));
+        		}
+    		} else {
+    			plot.setRangeGridlinesVisible(false);
+    		}
+    	}
+    	
+    	if (params.get(ChartParams.PLOTXY_QUADRANT_ORIGIN) != null) {
+    		plot.setQuadrantOrigin(params.getPoint2D(ChartParams.PLOTXY_QUADRANT_ORIGIN));
+    	}
+    	
+    	if (params.get(ChartParams.PLOTXY_QUADRANT_COLORS) != null) {
+    		Color[] colors = params.getColors(ChartParams.PLOTXY_QUADRANT_COLORS);
+    		for (int i = 0; i<4 && i<colors.length; i++) {
+    			if (colors[i] != null) {
+    				plot.setQuadrantPaint(i, colors[i]);
+    			}
+    		}
+    	}
+    }
+    
     public static void customizeAxis(Axis axis, ChartParams params, String prefix) {
     	
     	if (params.get(prefix+ChartParams.AXIS_VISIBLE_SUFIX) != null &&
@@ -145,7 +201,6 @@ public class ChartCustomizer {
     
     public static void customizeValueAxis(ValueAxis axis, ChartParams params, String prefix) {
     	customizeAxis(axis, params, prefix);
-    	
     }
     
     public static void customizeChart(JFreeChart jfchart, ChartParams params) {

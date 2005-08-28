@@ -17,7 +17,7 @@ public abstract class AbstractChartParam implements ChartParam {
 	public static final String LIST_SEPARATOR = ",";
 
 	public AbstractChartParam(String name) {
-		this(name, false);
+		this(name, true);
 	}
 
 	public AbstractChartParam(String name, boolean optional) {
@@ -160,7 +160,7 @@ public abstract class AbstractChartParam implements ChartParam {
 		}
 		List result = new ArrayList(args.length);
 		for (int i = 0; i<args.length; i++) {
-			result.add(args[i]);
+			result.add(args[i].trim());
 		}
 		return result;
 	}

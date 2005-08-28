@@ -3,10 +3,12 @@ package com.xpn.xwiki.plugin.charts.params;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Stroke;
+import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
@@ -55,6 +57,10 @@ public class ChartParams {
 	public static final String PLOT_OUTLINE_STROKE = "plot_outline_stroke";
 	public static final String PLOT_ZOOM = "plot_zoom";
 	
+	public static final String PLOTXY_ORIENTATION = "plot_orientation";
+	public static final String PLOTXY_QUADRANT_ORIGIN = "plot_quadrant_origin";
+	public static final String PLOTXY_QUADRANT_COLORS = "plot_quadrant_colors";
+	
 	public static final String LEGEND_BACKGROUND_COLOR = "legend_background_color";
 	public static final String LEGEND_ITEM_FONT = "legend_item_font";
 	public static final String LEGEND_ITEM_LABEL_PADDING = "legend_item_label_padding";
@@ -87,7 +93,11 @@ public class ChartParams {
 	public static final String AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX = "tick_mark_outside_length";
 	public static final String AXIS_TICK_MARK_COLOR_SUFFIX = "tick_mark_color";
 	public static final String AXIS_TICK_MARK_STROKE_SUFFIX = "tick_mark_stroke";
-	
+
+	public static final String PLOTXY_AXIS_GRIDLINE_VISIBLE = "gridline_visible";
+	public static final String PLOTXY_AXIS_GRIDLINE_COLOR = "gridline_color";
+	public static final String PLOTXY_AXIS_GRIDLINE_STROKE = "gridline_stroke";
+
 	public ChartParams() {
 		this((ChartParams)null);
 	}
@@ -144,6 +154,11 @@ public class ChartParams {
 		addParam(new ColorChartParam(PLOT_OUTLINE_COLOR));
 		addParam(new StrokeChartParam(PLOT_OUTLINE_STROKE));
 		addParam(new DoubleChartParam(PLOT_ZOOM));
+		addParam(new DoubleChartParam(PLOT_ZOOM));
+		
+		addParam(new PlotOrientationChartParam(PLOTXY_ORIENTATION));
+		addParam(new Point2DChartParam(PLOTXY_QUADRANT_ORIGIN));
+		addParam(new ColorsChartParam(PLOTXY_QUADRANT_COLORS));
 
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
@@ -180,6 +195,10 @@ public class ChartParams {
 		addParam(new FloatChartParam(prefix+AXIS_TICK_MARK_OUTSIDE_LENGTH_SUFFIX));
 		addParam(new ColorChartParam(prefix+AXIS_TICK_MARK_COLOR_SUFFIX));
 		addParam(new StrokeChartParam(prefix+AXIS_TICK_MARK_STROKE_SUFFIX));
+		
+		addParam(new BooleanChartParam(prefix+PLOTXY_AXIS_GRIDLINE_VISIBLE));
+		addParam(new ColorChartParam(prefix+PLOTXY_AXIS_GRIDLINE_COLOR));
+		addParam(new StrokeChartParam(prefix+PLOTXY_AXIS_GRIDLINE_STROKE));
 	}
 	
 	//8x2
@@ -334,6 +353,33 @@ public class ChartParams {
 		ChartParam param = (ChartParam)paramMap.get(name);
 		if (param != null && param.getType() == RectangleAnchor.class) {
 			return (RectangleAnchor)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public PlotOrientation getPlotOrientation(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == PlotOrientation.class) {
+			return (PlotOrientation)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public Point2D getPoint2D(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == Point2D.class) {
+			return (Point2D)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public Color[] getColors(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == Color[].class) {
+			return (Color[])get(name);
 		} else {
 			return null;
 		}

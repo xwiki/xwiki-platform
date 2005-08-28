@@ -3,6 +3,7 @@ package com.xpn.xwiki.plugin.charts.tests;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -137,14 +138,26 @@ public class ChartParamsTest extends TestCase {
 		Assert.assertEquals(40, padding.getTop(), 0.0001);
 	}
 	
-	public void testToString() throws ParamException {
-		params.addParam(new RectangleInsetsChartParam("padding"));
-		params.set("padding", "right:10;bottom:20;left:30;top:40");
-		System.out.println(params.toString());
-		Map map = new LinkedHashMap();
-		map.put("type", "bar");
-		System.out.println(RadeoxHelper.buildMacro("chart", map));
-	}
+//	public void testToString() throws ParamException {
+//		params.addParam(new RectangleInsetsChartParam("padding"));
+//		params.set("padding", "right:10;bottom:20;left:30;top:40");
+//		System.out.println(params.toString());
+//		Map map = new LinkedHashMap();
+//		map.put("type", "bar");
+//		System.out.println(RadeoxHelper.buildMacro("chart", map));
+//	}
+
+//	public void testFont() throws ParamException {
+//		GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+//		Font[] fonts = env.getAllFonts();
+//		for (int i = 0; i<fonts.length; i++) {
+//			System.out.println(fonts[i].getName());
+//		}
+//		String[] families = env.getAvailableFontFamilyNames();
+//		for (int i = 0; i<families.length; i++) {
+//			System.out.println(families[i]);
+//		}		
+//	}
 	
 	private ChartParams params = new ChartParams();
 }

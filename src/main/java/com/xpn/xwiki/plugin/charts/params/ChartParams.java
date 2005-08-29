@@ -2,10 +2,12 @@ package com.xpn.xwiki.plugin.charts.params;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.jfree.chart.plot.PlotOrientation;
@@ -29,6 +31,29 @@ public class ChartParams {
 	public static final String SERIES = "series";
 	public static final String RENDERER = "renderer";
 	
+	public static final String RENDERER_COLOR = "renderer_color";
+	public static final String RENDERER_STROKE = "renderer_stroke";
+	public static final String RENDERER_SHAPE = "renderer_shape";
+	public static final String RENDERER_FILL_COLOR = "renderer_fill_color";
+	public static final String RENDERER_OUTLINE_COLOR = "renderer_outline_color";
+	public static final String RENDERER_OUTLINE_STROKE = "renderer_outline_stroke";	
+	public static final String RENDERER_ITEM_LABEL_VISIBLE = "renderer_item_label_visible";
+	public static final String RENDERER_ITEM_LABEL_COLOR = "renderer_item_label_color";
+	public static final String RENDERER_ITEM_LABEL_FONT = "renderer_item_label_font";
+	
+	public static final String RENDERER_SERIES_VISIBLE = "series_visible";
+	public static final String RENDERER_SERIES_VISIBLE_IN_LEGEND = "series_visible_in_legend";
+
+	public static final String RENDERER_SERIES_COLORS = "series_colors";
+	public static final String RENDERER_SERIES_STROKES = "series_strokes";
+	public static final String RENDERER_SERIES_SHAPES = "series_shapes";
+	public static final String RENDERER_SERIES_FILL_COLORS = "series_fill_colors";
+	public static final String RENDERER_SERIES_OUTLINE_COLORS = "series_outline_colors";
+	public static final String RENDERER_SERIES_OUTLINE_STROKES = "series_outline_strokes";
+	public static final String RENDERER_SERIES_ITEM_LABEL_VISIBLES = "series_item_label_visibles";
+	public static final String RENDERER_SERIES_ITEM_LABEL_COLORS = "series_item_label_colors";
+	public static final String RENDERER_SERIES_ITEM_LABEL_FONTS = "series_item_label_fonts";
+
 	public static final String BORDER_VISIBLE = "border_visible";
 	public static final String BORDER_COLOR = "border_color";
 	public static final String BORDER_STROKE = "border_stroke";
@@ -121,10 +146,10 @@ public class ChartParams {
 	            try {
 	    	        Integer.parseInt(name);
 	            } catch (NumberFormatException nfe) {
-	    	        set(name, value);	            	
+	    	        set(name.trim(), value.trim());	            	
 	            }
 			} else {
-				set(name, value);				
+				set(name.trim(), value.trim());				
 			}
 		}		
 	}
@@ -136,6 +161,29 @@ public class ChartParams {
 		addParam(new IntegerChartParam(WIDTH));
 		addParam(new IntegerChartParam(HEIGHT));
 		addParam(new StringChartParam(RENDERER));
+		
+		addParam(new ColorChartParam(RENDERER_COLOR));
+		addParam(new StrokeChartParam(RENDERER_STROKE));
+		addParam(new ShapeChartParam(RENDERER_SHAPE));
+		addParam(new ColorChartParam(RENDERER_FILL_COLOR));
+		addParam(new ColorChartParam(RENDERER_OUTLINE_COLOR));
+		addParam(new StrokeChartParam(RENDERER_OUTLINE_STROKE));
+		addParam(new BooleanChartParam(RENDERER_ITEM_LABEL_VISIBLE));
+		addParam(new ColorChartParam(RENDERER_ITEM_LABEL_COLOR));
+		addParam(new FontChartParam(RENDERER_ITEM_LABEL_FONT));
+		addParam(new BooleanChartParam(RENDERER_SERIES_VISIBLE));
+		addParam(new BooleanChartParam(RENDERER_SERIES_VISIBLE_IN_LEGEND));
+
+		addParam(new ListChartParam(new ColorChartParam(RENDERER_SERIES_COLORS)));
+		addParam(new ListChartParam(new StrokeChartParam(RENDERER_SERIES_STROKES)));
+		addParam(new ListChartParam(new ShapeChartParam(RENDERER_SERIES_SHAPES)));
+		addParam(new ListChartParam(new ColorChartParam(RENDERER_SERIES_FILL_COLORS)));
+		addParam(new ListChartParam(new ColorChartParam(RENDERER_SERIES_OUTLINE_COLORS)));
+		addParam(new ListChartParam(new StrokeChartParam(RENDERER_SERIES_OUTLINE_STROKES)));
+		addParam(new ListChartParam(new BooleanChartParam(RENDERER_SERIES_ITEM_LABEL_VISIBLES)));
+		addParam(new ListChartParam(new ColorChartParam(RENDERER_SERIES_ITEM_LABEL_COLORS)));
+		addParam(new ListChartParam(new FontChartParam(RENDERER_SERIES_ITEM_LABEL_FONTS)));
+
 		
 		addParam(new BooleanChartParam(BORDER_VISIBLE));
 		addParam(new ColorChartParam(BORDER_COLOR));
@@ -158,7 +206,8 @@ public class ChartParams {
 		
 		addParam(new PlotOrientationChartParam(PLOTXY_ORIENTATION));
 		addParam(new Point2DChartParam(PLOTXY_QUADRANT_ORIGIN));
-		addParam(new ColorsChartParam(PLOTXY_QUADRANT_COLORS));
+//		addParam(new ColorsChartParam(PLOTXY_QUADRANT_COLORS));
+		addParam(new ListChartParam(new ColorChartParam(PLOTXY_QUADRANT_COLORS)));
 
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
@@ -227,7 +276,7 @@ public class ChartParams {
 	}
 	
 	public void check() throws ParamException {
-		// TODO:
+		// TODO: check if the mandatory parameters have a value
 	}
 	
 	public Object get(String name) {
@@ -376,14 +425,23 @@ public class ChartParams {
 		}
 	}
 	
-	public Color[] getColors(String name) {
+	public Shape getShape(String name) {
 		ChartParam param = (ChartParam)paramMap.get(name);
-		if (param != null && param.getType() == Color[].class) {
-			return (Color[])get(name);
+		if (param != null && param.getType() == Shape.class) {
+			return (Shape)get(name);
 		} else {
 			return null;
 		}
 	}
+	
+	public List getList(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == List.class) {
+			return (List)get(name);
+		} else {
+			return null;
+		}
+	}	
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();

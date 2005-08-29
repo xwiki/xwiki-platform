@@ -22,6 +22,7 @@ import org.jfree.chart.renderer.category.StatisticalBarRenderer;
 import org.jfree.chart.renderer.category.StatisticalLineAndShapeRenderer;
 import org.jfree.chart.renderer.category.WaterfallBarRenderer;
 
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 
@@ -37,58 +38,61 @@ public class CategoryItemRendererFactory {
 	}
 	
 	public CategoryItemRenderer create(ChartParams params) throws GenerateException {
-		String renderer = params.getString(ChartParams.RENDERER);
+		String rendererSelector = params.getString(ChartParams.RENDERER);
 		String type = params.getString(ChartParams.TYPE);
-		if (renderer.equals("default")) {
+		CategoryItemRenderer renderer;
+		if (rendererSelector.equals("default")) {
 			if (type.equals("bar")) {
-				return new BarRenderer();
+				renderer = new BarRenderer();
 			} else if (type.equals("line")) {
-				return new LineAndShapeRenderer();				
+				renderer = new LineAndShapeRenderer();				
 			} else {
-				return new DefaultCategoryItemRenderer();
+				renderer = new DefaultCategoryItemRenderer();
 			}
-		} else if (renderer.equals("bar")) {
-			return new BarRenderer();
-		} else if (renderer.equals("bar_3d")) {
-			return new BarRenderer3D();
-		} else if (renderer.equals("area")) {
-			return new AreaRenderer();					
-		} else if (renderer.equals("stacked_area")) {
-			return new StackedAreaRenderer();
-		} else if (renderer.equals("box_and_whisker")) {
-			return new BoxAndWhiskerRenderer();					
-		} else if (renderer.equals("category_step")) {
-			return new CategoryStepRenderer();					
-		} else if (renderer.equals("default_category")) {
-			return new DefaultCategoryItemRenderer();
-		} else if (renderer.equals("gantt")) {
-			return new GanttRenderer();					
-		} else if (renderer.equals("grouped_stacked_bar")) {
-			return new GroupedStackedBarRenderer();					
-		} else if (renderer.equals("interval_bar")) {
-			return new IntervalBarRenderer();					
-		} else if (renderer.equals("layered_bar")) {
-			return new LayeredBarRenderer();					
-		} else if (renderer.equals("level")) {
-			return new LevelRenderer();					
-		} else if (renderer.equals("line_and_shape")) {
-			return new LineAndShapeRenderer();
-		} else if (renderer.equals("line_3D")) {
-			return new LineRenderer3D();
-		} else if (renderer.equals("min_max")) {
-			return new MinMaxCategoryRenderer();					
-		} else if (renderer.equals("stacked_bar")) {
-			return new StackedBarRenderer();					
-		} else if (renderer.equals("stacked_bar_3D")) {
-			return new StackedBarRenderer3D();
-		} else if (renderer.equals("statistical_bar")) {
-			return new StatisticalBarRenderer();
-		} else if (renderer.equals("statistical_line_and_shape")) {
-			return new StatisticalLineAndShapeRenderer();
-		} else if (renderer.equals("waterfall_bar")) {
-			return new WaterfallBarRenderer();
+		} else if (rendererSelector.equals("bar")) {
+			renderer = new BarRenderer();
+		} else if (rendererSelector.equals("bar_3d")) {
+			renderer = new BarRenderer3D();
+		} else if (rendererSelector.equals("area")) {
+			renderer = new AreaRenderer();					
+		} else if (rendererSelector.equals("stacked_area")) {
+			renderer = new StackedAreaRenderer();
+		} else if (rendererSelector.equals("box_and_whisker")) {
+			renderer = new BoxAndWhiskerRenderer();					
+		} else if (rendererSelector.equals("category_step")) {
+			renderer = new CategoryStepRenderer();					
+		} else if (rendererSelector.equals("default_category")) {
+			renderer = new DefaultCategoryItemRenderer();
+		} else if (rendererSelector.equals("gantt")) {
+			renderer = new GanttRenderer();					
+		} else if (rendererSelector.equals("grouped_stacked_bar")) {
+			renderer = new GroupedStackedBarRenderer();					
+		} else if (rendererSelector.equals("interval_bar")) {
+			renderer = new IntervalBarRenderer();					
+		} else if (rendererSelector.equals("layered_bar")) {
+			renderer = new LayeredBarRenderer();					
+		} else if (rendererSelector.equals("level")) {
+			renderer = new LevelRenderer();					
+		} else if (rendererSelector.equals("line_and_shape")) {
+			renderer = new LineAndShapeRenderer();
+		} else if (rendererSelector.equals("line_3D")) {
+			renderer = new LineRenderer3D();
+		} else if (rendererSelector.equals("min_max")) {
+			renderer = new MinMaxCategoryRenderer();					
+		} else if (rendererSelector.equals("stacked_bar")) {
+			renderer = new StackedBarRenderer();					
+		} else if (rendererSelector.equals("stacked_bar_3D")) {
+			renderer = new StackedBarRenderer3D();
+		} else if (rendererSelector.equals("statistical_bar")) {
+			renderer = new StatisticalBarRenderer();
+		} else if (rendererSelector.equals("statistical_line_and_shape")) {
+			renderer = new StatisticalLineAndShapeRenderer();
+		} else if (rendererSelector.equals("waterfall_bar")) {
+			renderer = new WaterfallBarRenderer();
 		} else {
-			throw new GenerateException("Unknown renderer:"+renderer);
+			throw new GenerateException("Unknown renderer:"+rendererSelector);
 		}
+		ChartCustomizer.customizeCategoryItemRenderer(renderer, params);
+		return renderer;
 	}
 }

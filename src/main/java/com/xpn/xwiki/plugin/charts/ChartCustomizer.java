@@ -1,6 +1,10 @@
 package com.xpn.xwiki.plugin.charts;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.util.List;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.Axis;
@@ -8,12 +12,132 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.AbstractRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 
 public class ChartCustomizer {
+
+	public static void customizeRenderer(AbstractRenderer renderer, ChartParams params) {
+        if (params.get(ChartParams.RENDERER_COLOR) != null) {
+        	renderer.setPaint(params.getColor(ChartParams.RENDERER_COLOR));
+        }
+        if (params.get(ChartParams.RENDERER_STROKE) != null) {
+        	renderer.setStroke(params.getStroke(ChartParams.RENDERER_STROKE));
+        }
+        if (params.get(ChartParams.RENDERER_SHAPE) != null) {
+        	renderer.setShape(params.getShape(ChartParams.RENDERER_SHAPE));
+        }
+        if (params.get(ChartParams.RENDERER_FILL_COLOR) != null) {
+        	renderer.setFillPaint(params.getColor(ChartParams.RENDERER_FILL_COLOR));
+        }
+        if (params.get(ChartParams.RENDERER_OUTLINE_COLOR) != null) {
+        	renderer.setOutlinePaint(params.getColor(ChartParams.RENDERER_OUTLINE_COLOR));
+        }
+        if (params.get(ChartParams.RENDERER_OUTLINE_STROKE) != null) {
+        	renderer.setOutlineStroke(params.getStroke(ChartParams.RENDERER_OUTLINE_STROKE));
+        }
+    	if (params.get(ChartParams.RENDERER_ITEM_LABEL_VISIBLE) != null) {
+    		if (params.getBoolean(ChartParams.RENDERER_ITEM_LABEL_VISIBLE).booleanValue()) {
+    			renderer.setItemLabelsVisible(true);
+    	        if (params.get(ChartParams.RENDERER_ITEM_LABEL_COLOR) != null) {
+    	        	renderer.setItemLabelPaint(params.getColor(ChartParams.RENDERER_ITEM_LABEL_COLOR));
+    	        }
+    	        if (params.get(ChartParams.RENDERER_ITEM_LABEL_FONT) != null) {
+    	        	renderer.setItemLabelFont(params.getFont(ChartParams.RENDERER_ITEM_LABEL_FONT));
+    	        }
+    		} else {
+    			renderer.setItemLabelsVisible(false);
+    		}
+    	}
+    	if (params.get(ChartParams.RENDERER_SERIES_VISIBLE) != null) {
+    		renderer.setSeriesVisible(params.getBoolean(ChartParams.RENDERER_SERIES_VISIBLE));
+    	}
+    	if (params.get(ChartParams.RENDERER_SERIES_VISIBLE_IN_LEGEND) != null) {
+    		renderer.setSeriesVisibleInLegend(params.getBoolean(ChartParams.RENDERER_SERIES_VISIBLE_IN_LEGEND));
+    	}
+    	
+    	//series
+    	if (params.get(ChartParams.RENDERER_SERIES_COLORS) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_COLORS);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesPaint(i, (Color)list.get(i));
+    		}
+    		// TODO: how the fuck do we get rid of the default values -- we don't! :(
+//    		for (int i = list.size(); renderer.getSeriesPaint(i) != null; i++) {
+//    			renderer.setSeriesPaint(i, null);
+//    		}
+    	}
+    	
+    	if (params.get(ChartParams.RENDERER_SERIES_STROKES) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_STROKES);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesStroke(i, (Stroke)list.get(i));
+    		}
+    	}
+    	
+    	if (params.get(ChartParams.RENDERER_SERIES_SHAPES) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_SHAPES);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesShape(i, (Shape)list.get(i));
+    		}
+    	}
+
+    	if (params.get(ChartParams.RENDERER_SERIES_FILL_COLORS) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_FILL_COLORS);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesFillPaint(i, (Color)list.get(i));
+    		}
+    	}
+
+    	if (params.get(ChartParams.RENDERER_SERIES_OUTLINE_COLORS) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_OUTLINE_COLORS);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesOutlinePaint(i, (Color)list.get(i));
+    		}
+    	}
+    	
+    	if (params.get(ChartParams.RENDERER_SERIES_OUTLINE_STROKES) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_OUTLINE_STROKES);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesOutlineStroke(i, (Stroke)list.get(i));
+    		}
+    	}
+
+    	if (params.get(ChartParams.RENDERER_SERIES_ITEM_LABEL_VISIBLES) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_ITEM_LABEL_VISIBLES);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesItemLabelsVisible(i, (Boolean)list.get(i));
+    		}
+    	}
+    	
+    	if (params.get(ChartParams.RENDERER_SERIES_ITEM_LABEL_COLORS) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_ITEM_LABEL_COLORS);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesItemLabelPaint(i, (Color)list.get(i));
+    		}
+    	}
+    	
+    	if (params.get(ChartParams.RENDERER_SERIES_ITEM_LABEL_FONTS) != null) {
+    		List list = params.getList(ChartParams.RENDERER_SERIES_ITEM_LABEL_FONTS);
+    		for (int i = 0; i<list.size(); i++) {
+    			renderer.setSeriesItemLabelFont(i, (Font)list.get(i));
+    		}
+    	}
+	}
+	
+	public static void customizeXYItemRenderer(XYItemRenderer renderer, ChartParams params) {
+		customizeRenderer((AbstractRenderer)renderer, params);
+	}
+	
+	public static void customizeCategoryItemRenderer(CategoryItemRenderer renderer, ChartParams params) {
+		customizeRenderer((AbstractRenderer)renderer, params);
+	}
+	
     public static void customizePlot(Plot plot, ChartParams params) {
         if (params.get(ChartParams.HEIGHT) != null && params.get(ChartParams.WIDTH) != null) {
 	        plot.setDataAreaRatio(params.getInteger(ChartParams.HEIGHT).intValue()/
@@ -95,10 +219,10 @@ public class ChartCustomizer {
     	}
     	
     	if (params.get(ChartParams.PLOTXY_QUADRANT_COLORS) != null) {
-    		Color[] colors = params.getColors(ChartParams.PLOTXY_QUADRANT_COLORS);
-    		for (int i = 0; i<4 && i<colors.length; i++) {
-    			if (colors[i] != null) {
-    				plot.setQuadrantPaint(i, colors[i]);
+    		List colors = params.getList(ChartParams.PLOTXY_QUADRANT_COLORS);
+    		for (int i = 0; i<4 && i<colors.size(); i++) {
+    			if (colors.get(i) != null) {
+    				plot.setQuadrantPaint(i, (Color)colors.get(i));
     			}
     		}
     	}

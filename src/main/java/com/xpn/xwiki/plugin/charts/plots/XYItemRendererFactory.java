@@ -25,6 +25,7 @@ import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
 import org.jfree.chart.renderer.xy.XYStepRenderer;
 import org.jfree.chart.renderer.xy.YIntervalRenderer;
 
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 
@@ -41,55 +42,58 @@ public class XYItemRendererFactory {
 	}
 	
 	public XYItemRenderer create(ChartParams params) throws GenerateException {
-		String renderer = params.getString(ChartParams.RENDERER);
-		if (renderer.equals("default")) {
-			return new DefaultXYItemRenderer();
-		} else if (renderer.equals("candlestick")) {
-			return new CandlestickRenderer();
-		} else if (renderer.equals("clustered_bar")) {
-			return new ClusteredXYBarRenderer();
-		} else if (renderer.equals("cyclic")) {
-			return new CyclicXYItemRenderer();			
-		} else if (renderer.equals("high_low")) {
-			return new HighLowRenderer();
-		} else if (renderer.equals("signal")) {
-			return new SignalRenderer();					
-		} else if (renderer.equals("stacked_area")) {
-			return new StackedXYAreaRenderer();
-		} else if (renderer.equals("stacked_area2")) {
-			return new StackedXYAreaRenderer2();
-		} else if (renderer.equals("stacked_bar")) {
-			return new StackedXYBarRenderer();
-		} else if (renderer.equals("standard")) {
-			return new StandardXYItemRenderer();					
-		} else if (renderer.equals("wind")) {
-			return new WindItemRenderer();					
-		} else if (renderer.equals("area")) {
-			return new XYAreaRenderer();					
-		} else if (renderer.equals("area2")) {
-			return new XYAreaRenderer2();					
-		} else if (renderer.equals("bar")) {
-			return new XYBarRenderer();
-		} else if (renderer.equals("box_and_whisker")) {
-			return new XYBoxAndWhiskerRenderer();
-		} else if (renderer.equals("bubble")) {
-			return new XYBubbleRenderer();					
-		} else if (renderer.equals("difference")) {
-			return new XYDifferenceRenderer();					
-		} else if (renderer.equals("dot")) {
-			return new XYDotRenderer();
-		} else if (renderer.equals("line_3d")) {
-			return new XYLine3DRenderer();
-		} else if (renderer.equals("line_and_shape")) {
-			return new XYLineAndShapeRenderer();
-		} else if (renderer.equals("step_area")) {
-			return new XYStepAreaRenderer();
-		} else if (renderer.equals("step")) {
-			return new XYStepRenderer();
-		} else if (renderer.equals("y_interval")) {
-			return new YIntervalRenderer();
+		String rendererSelector = params.getString(ChartParams.RENDERER);
+		XYItemRenderer renderer;
+		if (rendererSelector.equals("default")) {
+			renderer = new DefaultXYItemRenderer();
+		} else if (rendererSelector.equals("candlestick")) {
+			renderer = new CandlestickRenderer();
+		} else if (rendererSelector.equals("clustered_bar")) {
+			renderer = new ClusteredXYBarRenderer();
+		} else if (rendererSelector.equals("cyclic")) {
+			renderer = new CyclicXYItemRenderer();			
+		} else if (rendererSelector.equals("high_low")) {
+			renderer = new HighLowRenderer();
+		} else if (rendererSelector.equals("signal")) {
+			renderer = new SignalRenderer();					
+		} else if (rendererSelector.equals("stacked_area")) {
+			renderer = new StackedXYAreaRenderer();
+		} else if (rendererSelector.equals("stacked_area2")) {
+			renderer = new StackedXYAreaRenderer2();
+		} else if (rendererSelector.equals("stacked_bar")) {
+			renderer = new StackedXYBarRenderer();
+		} else if (rendererSelector.equals("standard")) {
+			renderer = new StandardXYItemRenderer();					
+		} else if (rendererSelector.equals("wind")) {
+			renderer = new WindItemRenderer();					
+		} else if (rendererSelector.equals("area")) {
+			renderer = new XYAreaRenderer();					
+		} else if (rendererSelector.equals("area2")) {
+			renderer = new XYAreaRenderer2();					
+		} else if (rendererSelector.equals("bar")) {
+			renderer = new XYBarRenderer();
+		} else if (rendererSelector.equals("box_and_whisker")) {
+			renderer = new XYBoxAndWhiskerRenderer();
+		} else if (rendererSelector.equals("bubble")) {
+			renderer = new XYBubbleRenderer();					
+		} else if (rendererSelector.equals("difference")) {
+			renderer = new XYDifferenceRenderer();					
+		} else if (rendererSelector.equals("dot")) {
+			renderer = new XYDotRenderer();
+		} else if (rendererSelector.equals("line_3d")) {
+			renderer = new XYLine3DRenderer();
+		} else if (rendererSelector.equals("line_and_shape")) {
+			renderer = new XYLineAndShapeRenderer();
+		} else if (rendererSelector.equals("step_area")) {
+			renderer = new XYStepAreaRenderer();
+		} else if (rendererSelector.equals("step")) {
+			renderer = new XYStepRenderer();
+		} else if (rendererSelector.equals("y_interval")) {
+			renderer = new YIntervalRenderer();
 		} else {
-			throw new GenerateException("Unknown renderer:"+renderer);
+			throw new GenerateException("Unknown renderer:"+rendererSelector);
 		}
+		ChartCustomizer.customizeXYItemRenderer(renderer, params);
+		return renderer;
 	}
 }

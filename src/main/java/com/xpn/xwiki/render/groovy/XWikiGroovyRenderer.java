@@ -23,11 +23,13 @@
 package com.xpn.xwiki.render.groovy;
 
 import groovy.text.Template;
+import groovy.lang.Writable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.Writer;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -47,7 +49,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiGroovyRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);
-    private GroovyTemplateEngine engine = new GroovyTemplateEngine();
     private XWikiCache cache;
 
     public XWikiGroovyRenderer() {
@@ -65,20 +66,23 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             }
 
             Map gcontext = (Map) context.get("gcontext");
-            if (gcontext==null)
+            if (gcontext==null) {
                 gcontext = new HashMap();
-            gcontext.put("xwiki", new XWiki(context.getWiki(), context));
-            gcontext.put("request", context.getRequest());
-            gcontext.put("response", context.getResponse());
-            gcontext.put("context", new Context(context));
+                gcontext.put("xwiki", new XWiki(context.getWiki(), context));
+                gcontext.put("request", context.getRequest());
+                gcontext.put("response", context.getResponse());
+                gcontext.put("context", new Context(context));
 
-            // Put the Grrovy Context in the context
-            // so that includes can use it..
-            context.put("gcontext", gcontext);
+
+                // Put the Grrovy Context in the context
+                // so that includes can use it..
+                context.put("gcontext", gcontext);
+            }
             return gcontext;
         }
 
     public String evaluate(String content, String name, Map gcontext) {
+        GroovyTemplateEngine engine = new GroovyTemplateEngine();
         Template template = null;
         boolean refresh = false;
         try {
@@ -100,7 +104,9 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             } finally {
                 cache.cancelUpdate(content);
             }
-            return template.make(gcontext).toString();
+            Writable writable = template.make(gcontext);
+            String result = writable.toString();
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             Object[] args =  { name };
@@ -131,6 +137,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             String name = contextdoc.getFullName();
             gcontext = prepareContext(context);
             Document previousdoc = (Document) gcontext.get("doc");
+            Writer previouswriter  = (Writer) gcontext.get("out");
 
             try {
                 gcontext.put("doc", new Document(contextdoc, context));
@@ -138,6 +145,8 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             } finally {
                 if (previousdoc!=null)
                     gcontext.put("doc", previousdoc);
+                if (previouswriter!=null)
+                    gcontext.put("out", previouswriter);    
             }
 
         } finally {

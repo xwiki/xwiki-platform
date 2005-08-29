@@ -80,6 +80,16 @@
         </property>
     </class>
 
+    <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
+        <composite-id unsaved-value="any">
+            <key-property name="docId" column="XWL_DOC_ID" type="long" />
+            <key-property name="link" column="XWL_LINK" type="string"  length="255" />
+        </composite-id>
+        <property name="fullName" type="string">
+            <column name="XWL_FULLNAME" length="255"/>
+        </property>
+    </class>
+    
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
         <id name="id" type="long" unsaved-value="any">
             <column name="XWA_ID" not-null="true"/>

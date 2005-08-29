@@ -254,4 +254,14 @@ public class MockStore implements XWikiStoreInterface {
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException {
     	return false;
     }
+
+    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{
+        return null;
+    };
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException{
+        return null;
+    };
+    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException{};
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{};
+
 }

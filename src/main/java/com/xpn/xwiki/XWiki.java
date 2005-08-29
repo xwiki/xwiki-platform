@@ -154,8 +154,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private static String configPath = null;
     private static String getConfigPath () throws NamingException {
         if (configPath == null) {
-            Context envContext = (Context) new InitialContext().lookup("java:comp/env");
-            configPath = (String) envContext.lookup(CFG_ENV_NAME);
+            try {
+                Context envContext = (Context) new InitialContext().lookup("java:comp/env");
+                configPath = (String) envContext.lookup(CFG_ENV_NAME);
+            } catch (Exception e) {
+                // Allow a config path from WEB-INF
+                if (log.isInfoEnabled())
+                 log.info("xwiki.cfg taken from /WEB-INF/xwiki.cfg because the XWikiConfig variable is not set in the context");
+                configPath = "/WEB-INF/xwiki.cfg";
+            }
 
         }
         return configPath;

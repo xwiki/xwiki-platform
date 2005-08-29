@@ -51,12 +51,12 @@ public class ChartingMacroTest extends TestCase {
         xcontext.setEngineContext(xscontext);
 
 		XWikiConfig config = new XWikiConfig();
-		config.setProperty("xwiki.store.class", "com.xpn.xwiki.plugins.charts.mocks.MockStore");
+		config.setProperty("xwiki.store.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
 		XWiki wiki = new XWiki(config, xcontext);		
 		
 		XWikiPluginManager pluginManager = new XWikiPluginManager();
-		pluginManager.addPlugin("svg", "com.xpn.xwiki.plugins.charts.mocks.MockSVGPlugin", xcontext);
-		pluginManager.addPlugin("charting", "com.xpn.xwiki.plugins.charts.mocks.MockChartingPlugin", xcontext);
+		pluginManager.addPlugin("svg", "com.xpn.xwiki.plugin.charts.mocks.MockSVGPlugin", xcontext);
+		pluginManager.addPlugin("charting", "com.xpn.xwiki.plugin.charts.mocks.MockChartingPlugin", xcontext);
 		wiki.setPluginManager(pluginManager);
 		
 		Assert.assertSame(wiki, xcontext.getWiki());

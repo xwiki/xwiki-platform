@@ -57,7 +57,7 @@ public class ChartingPluginTest extends TestCase {
 		this.xclass = TestHelper.createTableDataSourceClass(xcontext);
 		xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1:D4", true, true);
 
-		plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugins.charts.ChartingPlugin", xcontext);
+		plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugin.charts.ChartingPlugin", xcontext);
 	}
 
 	protected void tearDown() throws Exception {

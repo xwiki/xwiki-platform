@@ -66,10 +66,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     }
 
     private URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException {
-    	final String host = context.getRequest().getHeader("x-forwarded-host"); // apache modproxy host
-    	if (host!=null && !host.equals("")) 
-    		return new URL("http://"+host);
-    	
+        if (context.getRequest()!=null){      // necessary to the tests
+            final String host = context.getRequest().getHeader("x-forwarded-host"); // apache modproxy host
+            if (host!=null && !host.equals(""))
+                return new URL("http://"+host);
+        }
         if (xwikidb==null)
             return serverURL;
 

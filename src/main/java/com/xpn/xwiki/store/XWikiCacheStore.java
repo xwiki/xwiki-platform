@@ -22,10 +22,6 @@
  */
 package com.xpn.xwiki.store;
 
-import java.util.List;
-
-import org.apache.commons.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
@@ -35,6 +31,10 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import org.apache.commons.jrcs.rcs.Version;
+
+import java.util.List;
+
 
 
 public class XWikiCacheStore implements XWikiCacheStoreInterface {
@@ -236,7 +236,23 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.deleteLock(lock, context, bTransaction);
     }
 
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
+        return store.loadLinks(docId, context, bTransaction);
+    }
+
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException {
+        return store.loadBacklinks(fullName, context, bTransaction);
+    }
+
+    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.saveLinks( links, context, bTransaction);
+    }
+
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.deleteLinks(docId, context, bTransaction);
+    }
+
+     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
         return store.search(sql, nb, start, context);
     }
 

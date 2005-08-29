@@ -23,16 +23,16 @@
 
 package com.xpn.xwiki.store;
 
-import java.util.List;
-
-import org.apache.commons.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import org.apache.commons.jrcs.rcs.Version;
+
+import java.util.List;
+
 
 public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
@@ -58,6 +58,10 @@ public interface XWikiStoreInterface {
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
     public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;
     public void cleanUp(XWikiContext context);

@@ -22,23 +22,6 @@
  */
 package com.xpn.xwiki.store;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Lines;
-import org.apache.commons.jrcs.rcs.Node;
-import org.apache.commons.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -47,6 +30,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.util.Util;
+import org.apache.commons.jrcs.rcs.Archive;
+import org.apache.commons.jrcs.rcs.Lines;
+import org.apache.commons.jrcs.rcs.Node;
+import org.apache.commons.jrcs.rcs.Version;
+
+import java.io.*;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.List;
 
 public class XWikiRCSFileStore extends XWikiDefaultStore {
     private File rcspath;
@@ -464,7 +456,26 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 "Not implemented");
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Not implemented");
+    }
+
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Not implemented");
+    }
+
+    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
+        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Not implemented");
+    }
+
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {        throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                "Not implemented");
+    }
+
+      public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             File file = getAttachmentPath(attachment, context);
             FileOutputStream os = new FileOutputStream(file);

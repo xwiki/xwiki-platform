@@ -927,7 +927,17 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             // Verify if the property already exists
             Query query;
-            session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject",(Object)object);
+            if (stats)
+                query = session.createQuery("select obj.id from " +
+                        object.getClass().getName() + " as obj where obj.id = :id");
+            else
+                query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
+            query.setInteger("id", object.getId());
+            if (query.uniqueResult()==null)
+                session.save((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+            else
+                session.update((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
             if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {

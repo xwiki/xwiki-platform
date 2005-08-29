@@ -23,36 +23,25 @@
 
 package com.xpn.xwiki.store;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.*;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.stats.impl.XWikiStats;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.EntityMode;
-import org.hibernate.HibernateException;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.connection.ConnectionProvider;
@@ -63,25 +52,15 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.stats.impl.XWikiStats;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiRequest;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.*;
 
 
 public class XWikiHibernateStore extends XWikiDefaultStore {
@@ -113,7 +92,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     public XWikiHibernateStore(String hibpath) {
         setPath(hibpath);
     }
-
 
     private void initValidColumTypes() {
         String[] string_types = { "string" , "text" , "clob" };
@@ -613,6 +591,8 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 }
             }
 
+           // doc.saveLinks(context);
+
             if (bTransaction) {
                 endTransaction(context, true);
             }
@@ -632,7 +612,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (monitor!=null)
                 monitor.endTimer("hibernate");
         }
-
     }
 
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -666,6 +645,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             // Loading the attachment list
             loadAttachmentList(doc, context, false);
+
+            // Loading the backlinks list
+          //  loadBacklinks(doc.getFullName(),context,true);
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
@@ -754,6 +736,18 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         return doc;
     }
 
+
+    private MonitorPlugin getMonitorPlugin(XWikiContext context) {
+        try {
+            if ((context==null)||(context.getWiki()==null))
+                return null;
+
+            return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument(basedoc.getWeb(), basedoc.getName());
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -837,6 +831,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
                 deleteXWikiAttachment(attachment, false, context, false);
             }
+
+            // deleting XWikiLinks
+         //   deleteLinks(doc.getId(),context,true);
 
             BaseClass bclass = doc.getxWikiClass();
             if ((bclass==null)&&(bclass.getName()!=null)) {
@@ -1696,7 +1693,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException {
-        try {
+        try {        
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -1741,6 +1738,143 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         catch (Exception e) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK,
                     "Exception while deleting lock", e);
+        } finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+    }
+
+    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
+        List links=new ArrayList();
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+
+            Query query = session.createQuery(" from XWikiLink as link where link.id.docId = :docId");
+            query.setLong("docId", docId);
+
+            links = query.list();
+
+            if (bTransaction)
+                endTransaction(context, false);
+        }
+        catch (Exception e) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_LINKS,
+                    "Exception while loading links", e);
+        }
+        finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+        return links;
+    }
+
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException {
+        List backlinks = new ArrayList();
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+
+            //the select clause is compulsory to reach the fullName i.e. the page pointed
+            Query query = session.createQuery("select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink");
+            query.setString("backlink", fullName);
+
+            backlinks = query.list();
+
+            if (bTransaction)
+                endTransaction(context, false);
+        }
+        catch (Exception e) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS,
+                    "Exception while loading backlinks", e);
+        }
+        finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+        return backlinks;
+    }
+
+    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+
+            // verifying there's a unique docId and fullName
+            long docId = ((XWikiLink)links.get(0)).getDocId();
+            String fullName = ((XWikiLink)links.get(0)).getFullName();
+            for (int i=0;i<links.size();i++){
+                if ( (docId != ((XWikiLink)links.get(i)).getDocId())
+                        || !(fullName.equals(((XWikiLink)links.get(i)).getFullName())) ){
+                    throw new Exception() ;
+                }
+            }
+
+            // need to delete existing links before saving the page's one
+            deleteLinks(docId,context, bTransaction);
+
+            // XWikiLink is the object declared in the Hibernate mapping
+            if (((XWikiLink)links.get(0)).getLink() != null){
+                for (int i=0;i<links.size();i++) {
+                    XWikiLink link = (XWikiLink)links.get(i);
+                    session.save(link);
+                }
+            }
+
+
+            if (bTransaction) {
+                endTransaction(context, true);
+            }
+        }
+        catch (Exception e) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LINKS,
+                    "Exception while saving links", e);
+        } finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+    }
+
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
+        try {
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            Session session = getSession(context);
+
+            Query query = session.createQuery(" from XWikiLink as link where link.id.docId = :docId");
+            query.setLong("docId", docId);
+
+            List links = query.list();
+            for (int i=0;i<links.size();i++) {
+                XWikiLink link = (XWikiLink) links.get(i);
+                session.delete(link);
+            }
+
+            if (bTransaction)
+                endTransaction(context, true);
+        }
+        catch (Exception e) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LINKS,
+                    "Exception while deleting links", e);
         } finally {
             try {
                 if (bTransaction)

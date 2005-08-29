@@ -57,10 +57,9 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 	public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {
 		try {
 			// Obtain the corresponding data source and wrap it into a data source object 
-			String source = params.getString(ChartParams.SOURCE);
-			DataSource dataSource = MainDataSourceFactory
-					.getInstance().create(source, context);
-
+			DataSource dataSource = MainDataSourceFactory.getInstance()
+					.create(params.getMap(ChartParams.SOURCE), context);
+			
 			String type = params.getString(ChartParams.TYPE);
 			
 			Plot plot;

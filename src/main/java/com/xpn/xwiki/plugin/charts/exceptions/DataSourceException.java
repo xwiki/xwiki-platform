@@ -1,6 +1,6 @@
 package com.xpn.xwiki.plugin.charts.exceptions;
 
-public class DataSourceException extends Exception {
+public class DataSourceException extends ChartingException {
 	public DataSourceException() {
 		super();
 	}
@@ -16,6 +16,6 @@ public class DataSourceException extends Exception {
 	public DataSourceException(Throwable arg0) {
 		super(arg0);
 	}
-
+	
 	private static final long serialVersionUID = -3378540511395442568L;
 }

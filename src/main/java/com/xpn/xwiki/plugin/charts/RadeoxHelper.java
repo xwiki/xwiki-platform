@@ -9,6 +9,8 @@ import org.radeox.macro.table.TableBuilder;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+import com.xpn.xwiki.plugin.charts.source.TableDataSource;
 import com.xpn.xwiki.render.PreTagSubstitution;
 import com.xpn.xwiki.render.XWikiRenderer;
 
@@ -121,40 +123,21 @@ public class RadeoxHelper {
 	    return table;
 	}
 	
-    public int getTableColumnCount(Table t){
-        int i = 0;
-        try{
-            while(true){
-                t.getXY(i, 0);
-                i++;
-            }
-        }
-        catch(Exception ex){
-            // Reached the table limit
-            i--;
-        }
-        if(i < 0){
-            return 0;
-        }
-        return i;
+    public int getTableColumnCount(Table t) {
+    	try {
+    		return TableDataSource.getTableColumnCount(t);
+    	} catch (DataSourceException e) {
+    		return 0;
+    	}
+
     }
     
     public int getTableRowCount(Table t){
-        int i = 0;
-        try{
-            while(true){
-                t.getXY(0, i);
-                i++;
-            }
-        }
-        catch(Exception ex){
-            // Reached the table limit
-            i--;
-        }
-        if(i < 0){
-            return 0;
-        }
-        return i;
+    	try {
+    		return TableDataSource.getTableRowCount(t);
+    	} catch (DataSourceException e) {
+    		return 0;
+    	}
     }
     
     public String getCell(Table table, int columnIndex, int rowIndex) {

@@ -1,6 +1,6 @@
 package com.xpn.xwiki.plugin.charts.exceptions;
 
-public class ParamException extends Exception {
+public class ParamException extends ChartingException {
 	public ParamException() {
 		super();
 	}

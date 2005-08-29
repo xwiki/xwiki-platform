@@ -2,6 +2,7 @@ package com.xpn.xwiki.plugin.charts.params;
 
 import java.awt.Color;
 import java.awt.Shape;
+import java.util.Map;
 
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
@@ -23,7 +24,7 @@ public class ColorChartParam extends AbstractChartParam {
 	}
 	
 	public void init() {
-		choice = new ChoiceChartParam(getName()) {
+		choice = new ChoiceChartParam(getName()) {			
 			protected void init() {
 				addChoice("black", new Color(0x000000));
 				addChoice("silver", new Color(0xC0C0C0));
@@ -40,7 +41,9 @@ public class ColorChartParam extends AbstractChartParam {
 				addChoice("navy", new Color(0x000080));
 				addChoice("blue", new Color(0x0000FF));
 				addChoice("teal", new Color(0x008080));
-				addChoice("aqua", new Color(0x00FFFF));		
+				addChoice("aqua", new Color(0x00FFFF));
+				addChoice("orange", new Color(0xFFA500));
+				addChoice("transparent", new Color(0, 0, 0, 0));
 			}
 			public Class getType() {
 				return Shape.class;
@@ -52,18 +55,27 @@ public class ColorChartParam extends AbstractChartParam {
 		try {
 			return choice.convert(value);
 		} catch (ParamException e) {
-			if (value.length() == 0 || value.charAt(0) != '#') {
-	        	throw new ParamException("Color parameter "+getName()+" must start with #");
+			if (value.length() == 0) {
+		       	throw new ParamException("Empty color parameter "+getName());
+			}
+			if (value.charAt(0) == '#') {
+		        value = value.substring(1);
+		        int intValue;
+		        try {
+		        	intValue = Integer.parseInt(value, 16);
+		        } catch (NumberFormatException nfe) {
+					throw new ParamException("Color parameter "+getName()+" is not a valid hexadecimal number");
+		        }
+		        return new Color(intValue);				
+	        } else {
+	        	Map map = parseMap(value, 4);
+	        	try {
+		        	return new Color(getIntParam(map, "red"), getIntParam(map, "green"),
+		        			getIntParam(map, "blue"), getIntParam(map, "alpha"));
+	        	} catch (IllegalArgumentException iae) {
+	        		throw new ParamException("Color component out of range (0-255)");
+	        	}
 	        }
-			
-	        value = value.substring(1);
-	        int intValue;
-	        try {
-	        	intValue = Integer.parseInt(value, 16);
-	        } catch (NumberFormatException nfe) {
-				throw new ParamException("Color parameter "+getName()+" is not a valid hexadecimal number");
-	        }
-	        return new Color(intValue);			
-		}		
+		}
 	}
 }

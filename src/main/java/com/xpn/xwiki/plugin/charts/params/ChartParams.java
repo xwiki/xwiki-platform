@@ -157,7 +157,7 @@ public class ChartParams {
 	public ChartParams(ChartParams parent) {
 		this.parent = parent;
 		addParam(new StringChartParam(TYPE, false));
-		addParam(new StringChartParam(SOURCE, false));
+		addParam(new MapChartParam(SOURCE, false));
 		addParam(new IntegerChartParam(WIDTH));
 		addParam(new IntegerChartParam(HEIGHT));
 		addParam(new StringChartParam(RENDERER));
@@ -441,7 +441,16 @@ public class ChartParams {
 		} else {
 			return null;
 		}
-	}	
+	}
+	
+	public Map getMap(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == Map.class) {
+			return (Map)get(name);
+		} else {
+			return null;
+		}
+	}
 	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();

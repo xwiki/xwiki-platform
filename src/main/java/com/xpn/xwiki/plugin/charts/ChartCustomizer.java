@@ -67,7 +67,7 @@ public class ChartCustomizer {
     		for (int i = 0; i<list.size(); i++) {
     			renderer.setSeriesPaint(i, (Color)list.get(i));
     		}
-    		// TODO: how the fuck do we get rid of the default values -- we don't! :(
+// TODO: how the fuck do we get rid of the default values -- we don't! :(
 //    		for (int i = list.size(); renderer.getSeriesPaint(i) != null; i++) {
 //    			renderer.setSeriesPaint(i, null);
 //    		}

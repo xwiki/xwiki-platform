@@ -204,7 +204,7 @@
       <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="java version &quot;1.4.2_04&quot;" />
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="false" project-jdk-name="java version &quot;1.4.2_04&quot;" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />
@@ -247,9 +247,7 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.1.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/apache/commons-fileupload-1.0/docs/apidocs" />
-      </JAVADOC>
+      <JAVADOC />
       <SOURCES />
     </library>
     <library name="Unit Tests">
@@ -278,6 +276,7 @@
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.7.3.jar!/" />
       </CLASSES>
       <JAVADOC>
         <root url="file://C:/dev/java/hibernate/hibernate-3.0/doc/api" />
@@ -438,13 +437,31 @@
         <root url="file://C:/dev/java/webservices/google/com" />
       </SOURCES>
     </library>
-    <library name="JackRabbit">
+    <library name="JCR">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/jackrabbit-1.0-SNAPSHOT.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jackrabbit-api-1.0-SNAPSHOT.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jackrabbit-commons-1.0-SNAPSHOT.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jackrabbit-core-1.0-SNAPSHOT.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jcr-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="Chart">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.0-rc1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="XML">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xml-apis-2.0.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xalan-2.6.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xerces-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

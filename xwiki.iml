@@ -39,7 +39,9 @@
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
-    <orderEntry type="library" name="JackRabbit" level="project" />
+    <orderEntry type="library" name="Chart" level="project" />
+    <orderEntry type="library" name="JCR" level="project" />
+    <orderEntry type="library" name="XML" level="project" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
@@ -66,6 +68,10 @@
       <attribute name="URI" value="/WEB-INF/classes" />
       <url>file://$MODULE_DIR$/build/xwikibase_test</url>
     </containerElement>
+    <containerElement type="library" level="project" name="Chart">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
     <containerElement type="library" level="project" name="Dom4J">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
@@ -86,11 +92,11 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <containerElement type="library" level="project" name="JackRabbit">
+    <containerElement type="library" level="project" name="Jakarta Commons">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <containerElement type="library" level="project" name="Jakarta Commons">
+    <containerElement type="library" level="project" name="JCR">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
@@ -131,6 +137,10 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="WebServices">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="XML">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>

@@ -2359,6 +2359,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         return sfactory;
     }
 
+    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+        SessionFactory sfactory = injectCustomMappingsInSessionFactory(context);
+        setSessionFactory(sfactory);
+    }
+
     public SessionFactory injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
         boolean result = injectCustomMapping(bclass, context);
         if (result==false)

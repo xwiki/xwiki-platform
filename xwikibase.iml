@@ -37,7 +37,9 @@
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
-    <orderEntry type="library" name="JackRabbit" level="project" />
+    <orderEntry type="library" name="XML" level="project" />
+    <orderEntry type="library" name="JCR" level="project" />
+    <orderEntry type="library" name="Chart" level="project" />
     <orderEntryProperties />
   </component>
 </module>

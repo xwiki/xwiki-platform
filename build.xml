@@ -266,11 +266,11 @@
       <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
         <classes dir="${tests.build.dir}"/>
           <lib refid="libs.tests.fileset" />
-        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/classes/test">
-          <include name="hibernate-integration.cfg.xml"/>
+        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/">
+          <include name="hibernate-test.cfg.xml"/>
         </zipfileset>
-        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/test">
-          <include name="xwiki-integration.cfg"/>
+        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/">
+          <include name="xwiki-test.cfg"/>
         </zipfileset>
       </cactifywar>
     

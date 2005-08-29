@@ -102,7 +102,7 @@ public class VelocityRenderTest extends HibernateTestCase {
 
     public void testVelocityError() throws XWikiException {
         XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
-        AbstractRenderTest.renderTest(wikiengine, "#skype(hello)",
+        AbstractRenderTest.renderTest(wikiengine, "#skype(\"hello\")",
                 "hello", false, getXWikiContext());
     }
 

@@ -54,8 +54,8 @@ public class ChartingPluginTest extends TestCase {
         this.doc = new XWikiDocument(url, "Page");
         xcontext.setDoc(doc);
 
-		this.xclass = TestHelper.createTableDataSourceClass(xcontext);
-		xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1:D4", true, true);
+		// this.xclass = TestHelper.createTableDataSourceClass(xcontext);
+		// xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1:D4", true, true);
 
 		plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugin.charts.ChartingPlugin", xcontext);
 	}

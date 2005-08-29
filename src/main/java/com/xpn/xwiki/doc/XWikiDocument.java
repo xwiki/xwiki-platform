@@ -22,24 +22,24 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.render.XWikiRenderer;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.PrepareEditForm;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
@@ -63,22 +63,14 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.EditForm;
-import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.web.PrepareEditForm;
-import com.xpn.xwiki.web.Utils;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 public class XWikiDocument {
@@ -1531,6 +1523,40 @@ public class XWikiDocument {
             if (database!=null)
                 context.setDatabase(database);
         }
+    }
+
+    public void saveLinks(XWikiContext context) throws XWikiException{
+        // necessary to blank links from doc
+        context.remove("links");
+
+        // call to RenderEngine and converting the list of links into a list of backlinks
+        XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
+
+ //       XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("com.xpn.xwiki.render.XWikiRadeoxRenderer");
+        renderer.render(getContent(), this, this, context);
+
+        List links = (List)context.get("links");
+        List backlinks = new ArrayList();
+        if (links != null){
+            for (int i=0; i<links.size();i++){
+                XWikiLink link = new XWikiLink();
+                link.setDocId(getId());
+                link.setLink((String)links.get(i));
+                link.setFullName(getFullName());
+                backlinks.add(link);
+            }
+        } else {
+            XWikiLink link = new XWikiLink();
+            link.setDocId(getId());
+            link.setLink("");
+            link.setFullName(getFullName());
+            backlinks.add(link);          
+        }
+        getStore().saveLinks(backlinks,context, true);
+    }
+
+    public List getBacklinks(XWikiContext context) throws XWikiException {
+        return getStore().loadBacklinks(getFullName(),context ,true);
     }
 
     public void renameProperties(String className, Map fieldsToRename) {

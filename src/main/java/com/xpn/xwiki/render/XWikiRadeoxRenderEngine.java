@@ -41,6 +41,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import java.util.List;
+import java.util.ArrayList;
 
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
     private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
@@ -189,6 +191,10 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     }
                 }
 
+
+                if ((db==null)||(database.equals(db)))
+                 addLinkToContext(newdoc.getFullName(), context);
+
                 URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
                         "view", querystring, anchor, context);
                 buffer.append(context.getURLFactory().getURL(url, context));
@@ -198,6 +204,22 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             } finally {
                 context.setDatabase(database);
             }
+        }
+    }
+
+    private void addLinkToContext(String docname, XWikiContext context) {
+        // Add to backlinks in context object
+        try {
+                List links = (List) context.get("links");
+                if (links==null) {
+                    links = new ArrayList();
+                    context.put("links", links);
+                }
+                if (!links.contains(docname))
+                    links.add(docname);
+        } catch (Exception e) {
+            if (log.isErrorEnabled())
+                log.error("Error adding link to context", e);
         }
     }
 
@@ -250,6 +272,9 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if (currentdoc!=null) {
                 querystring = "parent=" + currentdoc.getFullName();
             }
+
+            if ((db==null)||(database.equals(db)))
+             addLinkToContext(newdoc.getFullName(), context);
 
             URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
                     "edit", querystring, null, context);

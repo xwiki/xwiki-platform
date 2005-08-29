@@ -699,4 +699,8 @@ public class Document extends Api {
     	Document d = (Document) arg0;
     	return d.context.equals(context) && doc.equals(d.doc);
     }
+
+    public List getBacklinks (XWikiContext context) throws XWikiException {
+        return doc.getBacklinks(context);
+    }
 }

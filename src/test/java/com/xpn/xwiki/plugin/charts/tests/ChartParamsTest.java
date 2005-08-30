@@ -3,8 +3,6 @@ package com.xpn.xwiki.plugin.charts.tests;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -12,7 +10,6 @@ import junit.framework.TestCase;
 
 import org.jfree.ui.RectangleInsets;
 
-import com.xpn.xwiki.plugin.charts.RadeoxHelper;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.params.ColorChartParam;

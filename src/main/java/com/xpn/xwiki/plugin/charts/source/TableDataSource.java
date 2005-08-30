@@ -46,7 +46,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
     		throws DataSourceException {
 		init(defObject.getName(),
 			defObject.getIntValue(TABLE_NUMBER),
-			defObject.getStringValue(RANGE),
+			defObject.getStringValue(RANGE)==""?null:defObject.getStringValue(RANGE),
 			defObject.getIntValue(HAS_HEADER_ROW) == 1,
 			defObject.getIntValue(HAS_HEADER_COLUMN) == 1,
 			defObject.getStringValue(DECIMAL_SYMBOL)==""?null:
@@ -119,10 +119,10 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 	        RadeoxHelper rHelper = new RadeoxHelper(doc, context);
 	        Table table = rHelper.getTable(tableNumber);
 	        parseRange(range, hasHeaderRow, hasHeaderColumn, table);
-	        makeDataMatrix(table);
-	        makeHeaders(table);
 	        setDecimalSymbol(decimalSymbolSelector);
 	        this.ignoreAlpha = ignoreAlpha;
+	        makeDataMatrix(table);
+	        makeHeaders(table);
         } catch (NumberFormatException e) {
      	   throw new DataSourceException(e);
         } catch (XWikiException e) {

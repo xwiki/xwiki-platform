@@ -337,6 +337,39 @@ public class TableDataSourceTest extends TestCase {
 		Assert.assertFalse(source.hasHeaderRow());
 		Assert.assertFalse(source.hasHeaderColumn());
 	}
+	
+	public void testTableDataSourceCommaDecimalSeparator() throws DataSourceException, XWikiException {
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context,
+				0, "*", true, true, "comma", true);
+		DataSource source = new TableDataSource(xobject, context);
+
+		Assert.assertEquals(3, source.getColumnCount());
+		Assert.assertEquals(3, source.getRowCount());
+
+		Assert.assertEquals(10, source.getCell(0,0).longValue());
+		Assert.assertEquals(20, source.getCell(0,1).longValue());
+		Assert.assertEquals(30, source.getCell(0,2).longValue());
+		Assert.assertEquals(40, source.getCell(1,0).longValue());
+		Assert.assertEquals(50, source.getCell(1,1).longValue());
+		Assert.assertEquals(60, source.getCell(1,2).longValue());
+		Assert.assertEquals(70, source.getCell(2,0).longValue());
+		Assert.assertEquals(80, source.getCell(2,1).longValue());
+		Assert.assertEquals(90, source.getCell(2,2).longValue());
+
+		Assert.assertTrue(source.hasHeaderRow());
+		Assert.assertTrue(source.hasHeaderColumn());
+
+		Assert.assertEquals(3, source.getHeaderRow().length);
+		Assert.assertEquals(3, source.getHeaderColumn().length);
+
+		Assert.assertEquals("Column0", source.getHeaderRowValue(0));
+		Assert.assertEquals("Column1", source.getHeaderRowValue(1));
+		Assert.assertEquals("Column2", source.getHeaderRowValue(2));
+
+		Assert.assertEquals("Row0", source.getHeaderColumnValue(0));
+		Assert.assertEquals("Row1", source.getHeaderColumnValue(1));
+		Assert.assertEquals("Row2", source.getHeaderColumnValue(2));
+	}
 
 	public void testTableDataSourceOneCellWithHeaders() throws DataSourceException, XWikiException {
 		try {

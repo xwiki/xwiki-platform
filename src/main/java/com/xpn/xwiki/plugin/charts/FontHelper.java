@@ -4,8 +4,6 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.Plot;
 
 public class FontHelper {
   public FontHelper(){

@@ -85,7 +85,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 		String hhr = (String)params.get(HAS_HEADER_ROW);
 		boolean hasHeaderRow;
 		if (hhr != null) {
-			hasHeaderRow = Boolean.getBoolean(hhr);
+			hasHeaderRow = hhr.equalsIgnoreCase("true");
 		} else {
 			throw new DataSourceException("Missing argument "
 					+HAS_HEADER_ROW+" for parameter source");
@@ -94,7 +94,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 		String hhc = (String)params.get(HAS_HEADER_COLUMN);
 		boolean hasHeaderColumn;
 		if (hhc != null) {
-			hasHeaderColumn = Boolean.getBoolean(hhc);
+			hasHeaderColumn = hhc.equalsIgnoreCase("true");
 		} else {
 			throw new DataSourceException("Missing argument "
 					+HAS_HEADER_COLUMN+" for parameter source");
@@ -105,7 +105,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 		String ia = (String)params.get(IGNORE_ALPHA);
 		boolean ignoreAlpha = false;
 		if (ia != null) {
-			ignoreAlpha = Boolean.getBoolean(ia);
+			ignoreAlpha = ia.equalsIgnoreCase("true");
 		}
 				
 		init(doc, number, range, hasHeaderRow, hasHeaderColumn, decimal, ignoreAlpha, context);

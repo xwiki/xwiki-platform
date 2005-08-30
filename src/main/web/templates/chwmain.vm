@@ -24,21 +24,8 @@ $!xwiki.getWebPreference("meta")
     </tr>
     <tr>
       <td id="chwOptions">
-        <div id="chwDataWizard" class="chwInactivePage">
-          <p>Reuse an already defined source of data</p>
-          <input type="text" name="source" value="table:Main.WebHome:0"/>
-        </div>
-        <div id="chwTypeWizard" class="chwInactivePage">
-          <div id="chwChartTypeDiv" class="chwHidden">
-            <fieldset>
-              <label for="chwChartTypeInput" accesskey="t">Chart type:</label>
-              <select id="chwChartTypeInput" size="3" name="type" onchange="window.wizard.changeChartType(this.value);">
-                <option value="Pie">Pie</option>
-                <option selected="selected" value="Bar">Bar</option>
-              </select>
-            </fieldset>
-          </div>
-        </div>
+#template("chwdatapage.vm")
+#template("chwtypepage.vm")
 #template("chwtitlepage.vm")
 #template("chwaxispage.vm")
       </td>

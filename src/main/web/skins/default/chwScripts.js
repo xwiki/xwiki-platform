@@ -145,6 +145,7 @@ function chwColorChooser(property){
      Validate the color code entered by the user
    */
   this.validateCustomColor = function(){
+    var selectedFirst = this.element.selectedIndex;
     if(this.custom.value.match("^#[0-9a-fA-F]{3}$")){
       this.customOption.value = '#' + this.custom.value.charAt(1) + this.custom.value.charAt(1) +
           this.custom.value.charAt(2) + this.custom.value.charAt(2) +
@@ -166,6 +167,7 @@ function chwColorChooser(property){
       this.showCustomColor();
       return false;
     }
+    this.element.selectedIndex = selectedFirst;
   }
   this.showCustomColor();
 }

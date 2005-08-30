@@ -12,7 +12,7 @@ body{
 
 #chwWizard{
   width: 700px;
-	height: 500px;
+	height: 470px;
   border: #DDD 1px solid;
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -81,7 +81,7 @@ td{
 }
 #chwPreview{
   width: 300px;
-  height: 450px;
+  height: 420px;
   border: #DDD 1px solid;
   text-align: center;
 }
@@ -91,7 +91,7 @@ td{
 
 #chwOptions{
  width: 385px;
- height: 450px;
+ height: 420px;
  overflow: auto;
 }
 
@@ -115,10 +115,17 @@ legend.chwLargeLegend, legend.chwSmallLegend{
   padding: 2px 4px 2px 4px;
   cursor: pointer;
 }
+legend.chwLargeLegend{
+  border: #5368A6 1px solid;
+}
 
 legend.chwSmallLegend{
   font-size: 12px;
   font-weight: 600;
+}
+
+legend label{
+  margin-left: 0px;
 }
 
 input{
@@ -136,7 +143,7 @@ label{
 .chwActivePage, .chwInactivePage{
   overflow: auto;
   width: 400px;
-  height: 450px;
+  height: 420px;
   padding: 10px;
 }
 
@@ -313,4 +320,19 @@ td.chwLowered{
 
 td.chwFormLabelCell{
   vertical-align: middle;
+}
+
+table.chwTitlePositioningLayout{
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0px;  
+}
+
+td.chwTitlePositioningUnitLeft{
+  border-right: #BBB 1px solid;
+  width: 50%;
+}
+
+td.chwTitlePositioningUnitRight{
+  border-left: #BBB 1px solid;
 }

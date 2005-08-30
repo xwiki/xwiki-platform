@@ -1,0 +1,16 @@
+        <div id="chwDataWizard" class="chwInactivePage">
+          <fieldset class="chwLargeFieldset">
+            <legend id="chwDataOptionsLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('DataOptions');" title="$msg.get("chwdatasourcetitle")">$msg.get("chwdatasourcelegend") &lt;&lt;</legend>
+            <div id="chwDataOptionsDiv" class="chwVisible">
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataCreateLegend" name="create" checked="checked"/><label for="chwDataCreateLegend">$msg.get("chwdatacreatelegend")</label></legend>
+                <div id="chwDataCreateDiv">
+                </div>
+              </fieldset>
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataReuseLegend" name="create"/><label for="chwDataReuseLegend">$msg.get("chwdatareuselegend")</label></legend>
+                <input type="text" name="source" value="type:table;doc:Main.WebHome;table_number:3;range:A-B;has_header_row:true;has_header_column:false"/>
+              </fieldset>
+            </div>
+          </fieldset>
+        </div>

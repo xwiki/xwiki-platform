@@ -1,0 +1,11 @@
+        <div id="chwTypeWizard" class="chwInactivePage">
+          <div id="chwChartTypeDiv" class="chwHidden">
+            <fieldset>
+              <label for="chwChartTypeInput" accesskey="t">Chart type:</label>
+              <select id="chwChartTypeInput" size="3" name="type" onchange="window.wizard.changeChartType(this.value);">
+                <option value="Pie">Pie</option>
+                <option selected="selected" value="Bar">Bar</option>
+              </select>
+            </fieldset>
+          </div>
+        </div>

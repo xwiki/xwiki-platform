@@ -1,14 +1,20 @@
         <div id="chwTitlesWizard" class="chwInactivePage">
           <div id="chwChartTitleDiv" class="chwHidden">
             <fieldset class="chwLargeFieldset">
-              <legend class="chwLargeLegend" id="chwChartTitleOptionsLegend" title="$msg.get("chwtitleoptionslegend")" onclick="window.wizard.flipAdvanced('ChartTitleOptions');">$msg.get("chwcharttitle") &lt;&lt;</legend>
+              <legend class="chwLargeLegend" id="chwChartTitleOptionsLegend" title="$msg.get("chwtitleoptionstitle")" onclick="window.wizard.flipAdvanced('ChartTitleOptions');">$msg.get("chwcharttitlelegend") &lt;&lt;</legend>
               <div id="chwChartTitleOptionsDiv" class="chwVisible">
-                <label for="chwChartTitleInput">$msg.get("chwlabel")</label>
-                <input type="text" id="chwChartTitleInput" title="$msg.get("chwcharttitleinput")" name="title" onchange="window.wizard.checkTitle('ChartTitle');"/>
+                <label for="chwChartTitleInput">$msg.get("chwlabellabel")</label>
+                <input type="text" id="chwChartTitleInput" title="$msg.get("chwcharttitleinputtitle")" name="title" onchange="window.wizard.checkTitle('ChartTitle');"/>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartTitlePositionLegend" title="$msg.get("chwtitlepositionlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePosition');">$msg.get("chwpositioning") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartTitlePositionLegend" title="$msg.get("chwtitlepositiontitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePosition');">$msg.get("chwpositioninglegend") &gt;&gt;</legend>
                   <div id="chwChartTitlePositionDiv" class="chwHidden">
-                    <label for="chwChartTitlePositionInput">$msg.get("chwtitleplacement")</label>
+
+<table summary="chwtTitlePositioningLayout" class="chwTitlePositioningLayout">
+  <tbody>
+   <tr>
+     <td class="chwTitlePositioningUnitLeft">
+
+                    <label for="chwChartTitlePositionInput">$msg.get("chwtitleplacementlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
@@ -27,7 +33,10 @@
 </table>
 </div>
                     <input type="hidden" value="top" id="chwChartTitlePositionInput" name="title_position"/>
-                    <label for="chwChartTitleHorizontalAlignmentInput">$msg.get("chwalignment")</label>
+     </td>
+     <td class="chwTitlePositioningUnitRight">
+     
+                    <label for="chwChartTitleHorizontalAlignmentInput">$msg.get("chwalignmentlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
@@ -49,49 +58,54 @@
   </tbody>
 </table>
 </div>
+      </td>
+      </tr>
+      </tbody>
+      </table>
                     <input type="hidden" value="center" id="chwChartTitleAlignmentHorizontalInput" name="title_horizontal_alignment"/>
                     <input type="hidden" value="center" id="chwChartTitleAlignmentVerticalInput" name="title_vertical_alignment"/>
                   </div>
+         
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartTitleFontLegend" title="$msg.get("chwtitlefontlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitleFont'); return false;">$msg.get("chwfont") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartTitleFontLegend" title="$msg.get("chwtitlefonttitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitleFont'); return false;">$msg.get("chwfontlegend") &gt;&gt;</legend>
                   <div id="chwChartTitleFontDiv" class="chwHidden">
                    <table summary="Layout for chart title font">
                     <tbody>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartTitleFontFamilyInput">$msg.get("chwfontfamily")</label></td>
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontFamilyInput">$msg.get("chwfontfamilylabel")</label></td>
                       <td><select id="chwChartTitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
-#set($defaultfont = $fonthelper.getDefaultTitleFont())
-#foreach($font in $fonthelper.getAvailableFonts())
-#if($font == $defaultfont)
-                        <option value="$font" style="font-family: $font, sans-serif;" selected="selected">$font</option>
+#set($chwdefaultfont = $fonthelper.getDefaultTitleFont())
+#foreach($chwfont in $fonthelper.getAvailableFonts())
+#if($chwfont == $chwdefaultfont)
+                        <option value="$chwfont" style="font-family: $chwfont, sans-serif;" selected="selected">$chwfont</option>
 #else
-                        <option value="$font" style="font-family: $font, sans-serif;">$font</option>
+                        <option value="$chwfont" style="font-family: $chwfont, sans-serif;">$chwfont</option>
 #end
 #end
                       </select>
                       </td>
                     </tr>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartTitleFontStyleInput">$msg.get("chwfontstyle")</label></td>
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontStyleInput">$msg.get("chwfontstylelabel")</label></td>
                       <td><select id="chwChartTitleFontStyleInput" title="$msg.get("chwfontstyletitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
-#set($defaultstyle = $fonthelper.getDefaultTitleStyle())
-#if($defaultstyle == "plain")
+#set($chwdefaultstyle = $fonthelper.getDefaultTitleStyle())
+#if($chwdefaultstyle == "plain")
                         <option value="plain" selected="selected">$msg.get("chwplain")</option>
 #else
                         <option value="plain">$msg.get("chwplain")</option>
 #end
-#if($defaultstyle == "bold")
+#if($chwdefaultstyle == "bold")
                         <option value="bold" style="font-weight: bold;" selected="selected">$msg.get("chwbold")</option>
 #else
                         <option value="bold" style="font-weight: bold;">$msg.get("chwbold")</option>
 #end
-#if($defaultstyle == "italic")
+#if($chwdefaultstyle == "italic")
                         <option value="italic" style="font-style: italic;" selected="selected">$msg.get("chwitalic")</option>
 #else
                         <option value="italic" style="font-style: italic;">$msg.get("chwitalic")</option>
 #end
-#if($defaultstyle == "bold+italic")
+#if($chwdefaultstyle == "bold+italic")
                         <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">$msg.get("chwbolditalic")</option>
 #else
                         <option value="bold+italic" style="font-style: italic; font-weight: bold;">$msg.get("chwbolditalic")</option>
@@ -100,23 +114,23 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartTitleFontSizeInput">$msg.get("chwfontsize")</label></td>
-#set($defaultsize = $fonthelper.getDefaultTitleSize())
-                      <td><input type="text" id="chwChartTitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartTitleFont');"/>pt
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontSizeInput">$msg.get("chwfontsizelabel")</label></td>
+#set($chwdefaultsize = $fonthelper.getDefaultTitleSize())
+                      <td><input type="text" id="chwChartTitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$chwdefaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartTitleFont');"/>pt
                     </td>
                     </tr>
                     </tbody>
                     </table>
-                    <input id="chwChartTitleFontInput" type="hidden" name="title_font" style="width: 400px;" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                    <input id="chwChartTitleFontInput" type="hidden" name="title_font" style="width: 400px;" value="name:$chwdefaultfont;style:$chwdefaultstyle;size:$chwdefaultsize"/>
                   </div>
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartTitleColorLegend" title="$msg.get("chwtitlecolorlegend")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartTitleColor'); window.wizard.colorChoiceChanged('ChartTitleBackgroundColor'); window.wizard.flipAdvanced('ChartTitleColor'); return false;">$msg.get("chwcolor") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartTitleColorLegend" title="$msg.get("chwtitlecolortitle")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartTitleColor'); window.wizard.colorChoiceChanged('ChartTitleBackgroundColor'); window.wizard.flipAdvanced('ChartTitleColor'); return false;">$msg.get("chwcolorlegend") &gt;&gt;</legend>
                   <div id="chwChartTitleColorDiv" class="chwHidden">
                     <div>
-                      <label for="chwChartTitleColorInput">$msg.get("chwforecolor")</label><br/>
-                      <select id="chwChartTitleColorInput" title="$msg.get("chwtitleforecolor")" name="title_color" onchange="window.wizard.colorChoiceChanged('ChartTitleColor');">
-                        <option title="$msg.get("chwtrasparenttitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
+                      <label for="chwChartTitleColorInput">$msg.get("chwforecolorlabel")</label><br/>
+                      <select id="chwChartTitleColorInput" title="$msg.get("chwtitleforecolortitle")" name="title_color" onchange="window.wizard.colorChoiceChanged('ChartTitleColor');">
+                        <option title="$msg.get("chwtrasparentforetitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
                         <option title="#000000" class="chwBlack" value="black" selected="selected">$msg.get("chwblack")</option>
                         <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
                         <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
@@ -134,19 +148,19 @@
                         <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
                         <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
                         <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
-                        <option title="$msg.get("chwcustomcolor")" id="chwChartTitleColorCustomOption" value="#000000">$msg.get("chwcustom")</option>
+                        <option title="$msg.get("chwcustomcolortitle")" id="chwChartTitleColorCustomOption" value="#000000">$msg.get("chwcustomoption")</option>
                       </select>
                       <div id="chwChartTitleColorCustomGroup" class="chwCustomColorGroup">
-                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartTitleColorCustomInput" value="#000000" class="chwCustomColor"
+                        <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartTitleColorCustomInput" value="#000000" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartTitleColor');"
                              onblur="window.wizard.validateCustomColor('ChartTitleColor');"
                              onfocus="window.wizard.customColorValueFocus('ChartTitleColor')"/>
                       </div>
                     </div>
                     <div>
-                      <label for="chwChartTitleBackgroundColorInput">$msg.get("chwbackcolor")</label><br/>
-                      <select id="chwChartTitleBackgroundColorInput" title="$msg.get("chwtitlebackcolor")" name="title_background_color" onchange="window.wizard.colorChoiceChanged('ChartTitleBackgroundColor');">
-                        <option title="$msg.get("chwtrasparenttitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
+                      <label for="chwChartTitleBackgroundColorInput">$msg.get("chwbackcolorlabel")</label><br/>
+                      <select id="chwChartTitleBackgroundColorInput" title="$msg.get("chwtitlebackcolortitle")" name="title_background_color" onchange="window.wizard.colorChoiceChanged('ChartTitleBackgroundColor');">
+                        <option title="$msg.get("chwtrasparentbacktitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
                         <option title="#000000" class="chwBlack" value="black">$msg.get("chwblack")</option>
                         <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
                         <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
@@ -164,10 +178,10 @@
                         <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
                         <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
                         <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
-                        <option title="$msg.get("chwcustomcolor")" id="chwChartTitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustom")</option>
+                        <option title="$msg.get("chwcustomcolortitle")" id="chwChartTitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustomoption")</option>
                       </select>
                       <div id="chwChartTitleBackgroundColorCustomGroup" class="chwCustomColorGroup">
-                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartTitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
+                        <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartTitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartTitleBackgroundColor');"
                              onblur="window.wizard.validateCustomColor('ChartTitleBackgroundColor');"
                              onfocus="window.wizard.customColorValueFocus('ChartTitleBackgroundColor')"/>
@@ -176,7 +190,7 @@
                   </div>
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartTitlePaddingLegend" title="$msg.get("chwtitlepaddinglegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePadding'); return false;">$msg.get("chwpadding") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartTitlePaddingLegend" title="$msg.get("chwtitlepaddingtitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePadding'); return false;">$msg.get("chwpaddinglegend") &gt;&gt;</legend>
                   <div id="chwChartTitlePaddingDiv" class="chwHidden">
                     <div class="chwCentered">
                       <table class="chwMarginSelector">
@@ -204,14 +218,14 @@
 
           <div id="chwChartSubtitleDiv" class="chwHidden">
             <fieldset class="chwLargeFieldset">
-              <legend class="chwLargeLegend" id="chwChartSubtitleOptionsLegend" title="$msg.get("chwsubtitleoptionslegend")" onclick="window.wizard.flipAdvanced('ChartSubtitleOptions');">$msg.get("chwchartsubtitle") &gt;&gt;</legend>
+              <legend class="chwLargeLegend" id="chwChartSubtitleOptionsLegend" title="$msg.get("chwsubtitleoptionstitle")" onclick="window.wizard.flipAdvanced('ChartSubtitleOptions');">$msg.get("chwchartsubtitlelegend") &gt;&gt;</legend>
               <div id="chwChartSubtitleOptionsDiv" class="chwHidden">
-                <label for="chwChartSubtitleInput">$msg.get("chwlabel")</label>
-                <input type="text" id="chwChartSubtitleInput" title="$msg.get("chwchartsubtitleinput")" name="subtitle" onchange="window.wizard.checkSubtitle('ChartSubtitle');"/>
+                <label for="chwChartSubtitleInput">$msg.get("chwlabellabel")</label>
+                <input type="text" id="chwChartSubtitleInput" title="$msg.get("chwchartsubtitleinputtitle")" name="subtitle" onchange="window.wizard.checkSubtitle('ChartSubtitle');"/>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartSubtitlePositionLegend" title="$msg.get("chwsubtitlepositionlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePosition');">$msg.get("chwpositioning") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartSubtitlePositionLegend" title="$msg.get("chwsubtitlepositiontitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePosition');">$msg.get("chwpositioninglegend") &gt;&gt;</legend>
                   <div id="chwChartSubtitlePositionDiv" class="chwHidden">
-                    <label for="chwChartSubtitlePositionInput">$msg.get("chwsubtitleplacement")</label>
+                    <label for="chwChartSubtitlePositionInput">$msg.get("chwsubtitleplacementlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
@@ -230,7 +244,7 @@
 </table>
 </div>
                     <input type="hidden" value="top" id="chwChartSubtitlePositionInput" name="subtitle_position"/>
-                    <label for="chwChartSubtitleHorizontalAlignmentInput">$msg.get("chwalignment")</label>
+                    <label for="chwChartSubtitleHorizontalAlignmentInput">$msg.get("chwalignmentlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
@@ -257,44 +271,42 @@
                   </div>
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartSubtitleFontLegend" title="$msg.get("chwsubtitlefontlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitleFont'); return false;">$msg.get("chwfont") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartSubtitleFontLegend" title="$msg.get("chwsubtitlefonttitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitleFont'); return false;">$msg.get("chwfontlegend") &gt;&gt;</legend>
                   <div id="chwChartSubtitleFontDiv" class="chwHidden">
                    <table summary="Layout for chart subtitle font">
                     <tbody>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontFamilyInput">$msg.get("chwfontfamily")</label></td>
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontFamilyInput">$msg.get("chwfontfamilylabel")</label></td>
                       <td><select id="chwChartSubtitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartSubtitleFont');">
-#set($defaultfont = $fonthelper.getDefaultSubtitleFont())
-#foreach($font in $fonthelper.getAvailableFonts())
-#if($font == $defaultfont)
-                        <option value="$font" style="font-family: $font, sans-serif;" selected="selected">$font</option>
+#foreach($chwfont in $fonthelper.getAvailableFonts())
+#if($chwfont == $chwdefaultfont)
+                        <option value="$chwfont" style="font-family: $chwfont, sans-serif;" selected="selected">$chwfont</option>
 #else
-                        <option value="$font" style="font-family: $font, sans-serif;">$font</option>
+                        <option value="$chwfont" style="font-family: $chwfont, sans-serif;">$chwfont</option>
 #end
 #end
                       </select>
                       </td>
                     </tr>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontStyleInput">$msg.get("chwfontstyle")</label></td>
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontStyleInput">$msg.get("chwfontstylelabel")</label></td>
                       <td><select id="chwChartSubtitleFontStyleInput" title="$msg.get("chwfontstyletitle")" onchange="window.wizard.changeFont('ChartSubtitleFont');">
-#set($defaultstyle = $fonthelper.getDefaultSubtitleStyle())
-#if($defaultstyle == "plain")
+#if($chwdefaultstyle == "plain")
                         <option value="plain" selected="selected">$msg.get("chwplain")</option>
 #else
                         <option value="plain">$msg.get("chwplain")</option>
 #end
-#if($defaultstyle == "bold")
+#if($chwdefaultstyle == "bold")
                         <option value="bold" style="font-weight: bold;" selected="selected">$msg.get("chwbold")</option>
 #else
                         <option value="bold" style="font-weight: bold;">$msg.get("chwbold")</option>
 #end
-#if($defaultstyle == "italic")
+#if($chwdefaultstyle == "italic")
                         <option value="italic" style="font-style: italic;" selected="selected">$msg.get("chwitalic")</option>
 #else
                         <option value="italic" style="font-style: italic;">$msg.get("chwitalic")</option>
 #end
-#if($defaultstyle == "bold+italic")
+#if($chwdefaultstyle == "bold+italic")
                         <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">$msg.get("chwbolditalic")</option>
 #else
                         <option value="bold+italic" style="font-style: italic; font-weight: bold;">$msg.get("chwbolditalic")</option>
@@ -303,23 +315,22 @@
                       </td>
                     </tr>
                     <tr>
-                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontSizeInput">$msg.get("chwfontsize")</label></td>
-#set($defaultsize = $fonthelper.getDefaultSubtitleSize())
-                      <td><input type="text" id="chwChartSubtitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartSubtitleFont');"/>pt
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontSizeInput">$msg.get("chwfontsizelabel")</label></td>
+                      <td><input type="text" id="chwChartSubtitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$chwdefaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartSubtitleFont');"/>pt
                     </td>
                     </tr>
                     </tbody>
                     </table>
-                    <input id="chwChartSubtitleFontInput" type="hidden" name="subtitle_font" style="width: 400px;" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                    <input id="chwChartSubtitleFontInput" type="hidden" name="subtitle_font" style="width: 400px;" value="name:$chwdefaultfont;style:$chwdefaultstyle;size:$chwdefaultsize"/>
                   </div>
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartSubtitleColorLegend" title="$msg.get("chwsubtitlecolorlegend")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartSubtitleColor'); window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor'); window.wizard.flipAdvanced('ChartSubtitleColor'); return false;">$msg.get("chwcolor") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartSubtitleColorLegend" title="$msg.get("chwsubtitlecolortitle")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartSubtitleColor'); window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor'); window.wizard.flipAdvanced('ChartSubtitleColor'); return false;">$msg.get("chwcolorlegend") &gt;&gt;</legend>
                   <div id="chwChartSubtitleColorDiv" class="chwHidden">
                     <div>
-                      <label for="chwChartSubtitleColorInput">$msg.get("chwforecolor")</label><br/>
-                      <select id="chwChartSubtitleColorInput" title="$msg.get("chwsubtitleforecolor")" name="subtitle_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleColor');">
-                        <option title="$msg.get("chwtrasparentsubtitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
+                      <label for="chwChartSubtitleColorInput">$msg.get("chwforecolorlabel")</label><br/>
+                      <select id="chwChartSubtitleColorInput" title="$msg.get("chwsubtitleforecolortitle")" name="subtitle_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleColor');">
+                        <option title="$msg.get("chwtrasparentforetitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
                         <option title="#000000" class="chwBlack" value="black" selected="selected">$msg.get("chwblack")</option>
                         <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
                         <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
@@ -337,19 +348,19 @@
                         <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
                         <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
                         <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
-                        <option title="$msg.get("chwcustomcolor")" id="chwChartSubtitleColorCustomOption" value="#000000">$msg.get("chwcustom")</option>
+                        <option title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleColorCustomOption" value="#000000">$msg.get("chwcustomoption")</option>
                       </select>
                       <div id="chwChartSubtitleColorCustomGroup" class="chwCustomColorGroup">
-                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartSubtitleColorCustomInput" value="#000000" class="chwCustomColor"
+                        <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleColorCustomInput" value="#000000" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartSubtitleColor');"
                              onblur="window.wizard.validateCustomColor('ChartSubtitleColor');"
                              onfocus="window.wizard.customColorValueFocus('ChartSubtitleColor')"/>
                       </div>
                     </div>
                     <div>
-                      <label for="chwChartSubtitleBackgroundColorInput">$msg.get("chwbackcolor")</label><br/>
-                      <select id="chwChartSubtitleBackgroundColorInput" title="$msg.get("chwsubtitlebackcolor")" name="subtitle_background_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor');">
-                        <option title="$msg.get("chwtrasparentsubtitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
+                      <label for="chwChartSubtitleBackgroundColorInput">$msg.get("chwbackcolorlabel")</label><br/>
+                      <select id="chwChartSubtitleBackgroundColorInput" title="$msg.get("chwsubtitlebackcolortitle")" name="subtitle_background_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor');">
+                        <option title="$msg.get("chwtrasparentbacktitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
                         <option title="#000000" class="chwBlack" value="black">$msg.get("chwblack")</option>
                         <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
                         <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
@@ -367,10 +378,10 @@
                         <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
                         <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
                         <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
-                        <option title="$msg.get("chwcustomcolor")" id="chwChartSubtitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustom")</option>
+                        <option title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustomoption")</option>
                       </select>
                       <div id="chwChartSubtitleBackgroundColorCustomGroup" class="chwCustomColorGroup">
-                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartSubtitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
+                        <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartSubtitleBackgroundColor');"
                              onblur="window.wizard.validateCustomColor('ChartSubtitleBackgroundColor');"
                              onfocus="window.wizard.customColorValueFocus('ChartSubtitleBackgroundColor')"/>
@@ -379,7 +390,7 @@
                   </div>
                 </fieldset>
                 <fieldset class="chwSmallFieldset">
-                  <legend class="chwSmallLegend" id="chwChartSubtitlePaddingLegend" title="$msg.get("chwsubtitlepaddinglegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePadding'); return false;">$msg.get("chwpadding") &gt;&gt;</legend>
+                  <legend class="chwSmallLegend" id="chwChartSubtitlePaddingLegend" title="$msg.get("chwsubtitlepaddingtitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePadding'); return false;">$msg.get("chwpaddinglegend") &gt;&gt;</legend>
                   <div id="chwChartSubtitlePaddingDiv" class="chwHidden">
                     <div class="chwCentered">
                       <table class="chwMarginSelector">
@@ -404,3 +415,4 @@
               </div>
             </fieldset>
           </div>
+        </div>

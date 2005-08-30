@@ -1,13 +1,24 @@
+body{
+  overflow: auto;
+}
+#chwForm{
+  clear: both; /* I've noticed strange behavior in DeerPark Alpha 2 if I don't put this */
+  margin: auto;
+}
 #chartWizard{
+  margin: auto;
+  text-align: center;
 }
 
 #chwWizard{
-  width: 600px;
-	height: 300px;
-  border: #888 1px dashed;
+  width: 700px;
+	height: 500px;
+  border: #DDD 1px solid;
 	border-collapse: collapse;
 	border-spacing: 0;
-	margin-top: 5px;
+	margin: 5px;
+  margin: auto;
+  text-align: left;
 }
 
 .chwTitle{
@@ -17,8 +28,10 @@
 }
 
 #chwNavigation{
-  width: 600px;
   height: 20px;
+  margin: 0;
+  padding: 0;
+  border-style: hidden;
 }
 
 #chwNavigationButtons{
@@ -26,7 +39,7 @@
   background-color: #B6C5F2;
   border: black 1px solid;
   border-color: #FFF #FFF #5368A6 #FFF;
-  margin: 13px 7px 10px 7px;
+  margin: 0px 0px 0px 0px;
   padding-left: 4px;
 }
 
@@ -35,7 +48,7 @@
 }
 
 img.chwNavigationImage, img.chwNavigationImageDisabled, img.chwNavigationImageHidden{
-	margin: 3px 4px 2px 4px;
+	margin: 3px 4px 2px 3px;
 	height: 16px;
   vertical-align: middle;
 }
@@ -68,8 +81,8 @@ td{
 }
 #chwPreview{
   width: 300px;
-  height: 250px;
-  border: #888 1px dashed;
+  height: 450px;
+  border: #DDD 1px solid;
   text-align: center;
 }
 #chwPreviewImg{
@@ -77,19 +90,40 @@ td{
 }
 
 #chwOptions{
- width: 285px;
+ width: 385px;
+ height: 450px;
+ overflow: auto;
+}
+
+fieldset{
+  border: #BBB 1px solid;
+  margin: 8px;
+  padding: 6px;
+}
+
+legend{
+  color: #5368A6;
+  background-color: #B6C5F2;
+  background-color: #FFF;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 2px 4px 2px 4px;
+  cursor: pointer;
+}
+
+.chwExpander{
+  font-size: 12px;
+  font-weight: 600;
 }
 
 #chwButtons{
-  height: 30px;
-	margin: 0;
-	padding: 0;
+	padding: 8px 12px 8px 12px;
 }
 
 .chwActivePage, .chwInactivePage{
   overflow: auto;
-  width: 300px;
-  height: 250px;
+  width: 400px;
+  height: 450px;
   padding: 10px;
 }
 
@@ -101,6 +135,11 @@ td{
   display: none;
 }
 
+.chwCentered{
+  text-align: center;
+  margin: auto;
+}
+
 input, select{
   margin: 5px;
   margin-bottom: 10px;
@@ -108,4 +147,144 @@ input, select{
 }
 
 #chwPreview{
+}
+
+
+/*
+  Position selector table
+ */
+.chwPositionSelector{
+  margin: auto;
+}
+.chwPositionSelector td{
+ border: navy 2px outset;
+ cursor: pointer;
+}
+
+td.chwDisabledCell{
+  background-color: #DDD;
+  border: none;
+  cursor: default;
+}
+
+.chwNormalCell{
+  background-color: transparent;
+}
+.chwNormalCellHighlighted{
+  background-color: #b6c5f2;
+}
+.chwSelectedCell{
+ background-color: #5368a6;
+}
+.chwSelectedCellHighlighted{
+ background-color: #c82;
+}
+
+.chwNormalBlockDiv{
+  width: 16px;
+  height: 16px;
+}
+.chwLargeBlockDiv{
+  height: 16px;
+}
+
+/*
+  Color chooser style
+ */
+
+.chwTransparent {
+  color: black;
+}
+.chwBlack {
+  color: black;
+}
+.chwWhite {
+  color: black;
+}
+.chwSilver {
+  color: silver
+}
+.chwGray {
+  color: gray;
+}
+.chwMaroon {
+  color: maroon;
+}
+.chwRed {
+  color: red;
+}
+.chwPurple {
+  color: purple;
+}
+.chwFuchsia {
+  color: fuchsia;
+}
+.chwGreen {
+  color: green;
+}
+.chwLime {
+  color: lime;
+}
+.chwOlive {
+  color: olive;
+}
+.chwOrange {
+  color: orange;
+}
+.chwYellow {
+  color: yellow;
+}
+.chwNavy {
+  color: navy;
+}
+.chwBlue {
+  color: blue;
+}
+.chwTeal {
+  color: teal;
+}
+.chwAqua {
+  color: aqua;
+}
+
+.chwCustomColorGroup{
+  display: none;
+}
+
+.chwCustomColor{
+}
+
+/*
+  Margin selector
+ */
+.chwMarginSelector{
+  margin: auto;
+  border: #BBB 1px dashed;
+  border-spacing: 0px;
+  border-collapse: collapse;
+  vertical-align: middle;
+}
+.chwMarginSelector td{
+  vertical-align: middle;
+}
+.chwLargeInput{
+  text-align: center;
+  width: 100%;
+  margin: 0px;
+}
+.chwNormalInput{
+  text-align: center;
+  width: 32px;
+  margin: 0px;
+  vertical-align: text-top;
+}
+.chwMarginCenter{
+  font-size: 28px;
+  padding: 4px;
+  color: #BBB;
+  border: #BBB 1px dashed;
+}
+
+td.chwLowered{
+  vertical-align: text-bottom;
 }

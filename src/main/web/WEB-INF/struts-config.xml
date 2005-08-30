@@ -284,6 +284,12 @@
             scope="request">
     </action>
 
+    <action path="/chartwizard/"
+            type="com.xpn.xwiki.plugin.charts.ChartWizardAction"
+            name="chartwizard"
+            scope="request">
+    </action>
+
   </action-mappings>
 
   <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"

@@ -432,17 +432,17 @@ function tdwWizard(){
   var prepareTables = function(foreignContainer){
     for(var tidx = 0; tidx < foreignContainer.childNodes.length; tidx++){
       var table = foreignContainer.childNodes.item(tidx);
-      if(table.nodeType != table.ELEMENT_NODE) continue;
+      if(table.nodeType != 1) continue;
       for(k = table.childNodes.length - 1; k >= 0; k--){
-        if(table.childNodes.item(k).tagName == 'tbody') break;
+        if(table.childNodes.item(k).nodeType == 1) break;
       }
       var tbody = table.childNodes.item(k);
       for(var ridx = 0; ridx < tbody.childNodes.length; ridx++){
         var row = tbody.childNodes.item(ridx);
-        if(row.nodeType != row.ELEMENT_NODE) continue;
+        if(row.nodeType != 1) continue;
         for(var cidx = 0; cidx < row.childNodes.length; cidx++){
           var cell = row.childNodes.item(cidx);
-          if(cell.nodeType != cell.ELEMENT_NODE) continue;
+          if(cell.nodeType != 1) continue;
           cell.className = 'tdwUnselectedTableCell';
           if(cell.addEventListener){
             cell.addEventListener('mousedown', onMouseDown, true);

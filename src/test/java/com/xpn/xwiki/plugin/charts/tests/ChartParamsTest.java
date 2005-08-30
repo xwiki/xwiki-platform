@@ -159,5 +159,15 @@ public class ChartParamsTest extends TestCase {
 //		}		
 //	}
 	
+	public void testSource() throws ParamException {
+		ChartParams params = new ChartParams();
+		params.set("source", "type:object;doc:Main.WebHome;class:XWiki.TableDataSource;number:1");
+		Map map = params.getMap("source");
+		Assert.assertEquals("object", (String)map.get("type"));
+		Assert.assertEquals("Main.WebHome", (String)map.get("doc"));
+		Assert.assertEquals("XWiki.TableDataSource", (String)map.get("class"));
+		Assert.assertEquals("1", (String)map.get("number"));
+	}
+	
 	private ChartParams params = new ChartParams();
 }

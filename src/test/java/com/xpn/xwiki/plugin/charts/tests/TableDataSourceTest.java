@@ -34,21 +34,20 @@ public class TableDataSourceTest extends TestCase {
         this.doc = TestHelper.createDocument("Doc",
         		"{table}\n" +
         		"Empty | Column0 | Column1 | Column2 \n" +
-        		"Row0 | 1 | 2 | 3 \n" +
-        		"Row1 | 4 | 5 | 6 \n" +
-        		"Row2 | 7 | 8 | 9 \n" +
+        		"Row0 | 1.0 | 2.0 | 3.0 \n" +
+        		"Row1 | 4.0 | 5.0 | 6.0 \n" +
+        		"Row2 | 7.0 | 8.0 | 9.0 \n" +
         		"{table}", context
         );
 
-		//this.xclass = TestHelper.createTableDataSourceClass(context);
+        this.xclass = TestHelper.createTableDataSourceClass(context);
 	}
 
 	protected void tearDown() throws Exception {
 	}
 
-    /*
 	public void testTableDataSourceWholeWithHeaders() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A1:D4", true, true);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A1-D4", true, true);
 
 		DataSource source = new TableDataSource(xobject, context);
 
@@ -114,7 +113,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeNoHeaders() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2:D4", false, false);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2-D4", false, false);
 
 		DataSource source = new TableDataSource(xobject, context);
 
@@ -166,7 +165,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceSingleCellWithHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A1:B2", true, true);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A1-B2", true, true);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(1, source.getColumnCount());
@@ -185,7 +184,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceSingleCellNoHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2:B2", false, false);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2-B2", false, false);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(1, source.getColumnCount());
@@ -198,7 +197,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeRowsWithHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "1:3", true, true);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "1-3", true, true);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(2, source.getRowCount());
@@ -226,7 +225,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeRowsNoHeaderRow() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "3:4", false, true);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "3-4", false, true);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(3, source.getColumnCount());
@@ -249,7 +248,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeRowsNoHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "3:4", false, false);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "3-4", false, false);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(2, source.getRowCount());
@@ -269,7 +268,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeColumnsWithHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A:C", true, true);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "A-C", true, true);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(3, source.getRowCount());
@@ -297,7 +296,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeColumnsNoHeaderColumn() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "C:D", true, false);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "C-D", true, false);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(3, source.getRowCount());
@@ -320,7 +319,7 @@ public class TableDataSourceTest extends TestCase {
 	}
 
 	public void testTableDataSourceWholeColumnsNoHeader() throws DataSourceException, XWikiException {
-		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "C:D", false, false);
+		BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "C-D", false, false);
 		DataSource source = new TableDataSource(xobject, context);
 
 		Assert.assertEquals(4, source.getRowCount());
@@ -341,7 +340,7 @@ public class TableDataSourceTest extends TestCase {
 
 	public void testTableDataSourceOneCellWithHeaders() throws DataSourceException, XWikiException {
 		try {
-			BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2:B2", true, true);
+			BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2-B2", true, true);
 			new TableDataSource(xobject, context);
 			Assert.fail("Empty data source with headers");
 		} catch (EmptyDataSourceException e) {
@@ -351,14 +350,13 @@ public class TableDataSourceTest extends TestCase {
 
 	public void testTableDataSourceNoCell() throws DataSourceException, XWikiException {
 		try {
-			BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2:A1", true, true);
+			BaseObject xobject = TestHelper.defineTable(this.xclass, this.doc, this.context, 0, "B2-A1", true, true);
 			new TableDataSource(xobject, context);
 			Assert.fail("Bad range");
 		} catch (EmptyDataSourceException e) {
 			// TODO: BadRangeDataSourceException?
 		}
 	}
-	*/
     
     private BaseClass xclass;
 	private XWikiContext context;

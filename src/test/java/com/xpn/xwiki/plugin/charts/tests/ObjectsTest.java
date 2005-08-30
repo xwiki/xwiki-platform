@@ -32,7 +32,7 @@ public class ObjectsTest extends TestCase {
         this.xwiki = new XWiki(this.config, this.context);
         this.context.setWiki(this.xwiki);
         
-		//this.xclass = TestHelper.createTableDataSourceClass(context);
+		this.xclass = TestHelper.createTableDataSourceClass(context);
 		
 		this.doc = TestHelper.createDocument("Main.Doc", "{table}\ncontent\n{table}", context);
 	}
@@ -41,8 +41,8 @@ public class ObjectsTest extends TestCase {
 	}
 	
 	public void testObjectDocument() throws Exception {
-		//BaseObject xobject = TestHelper.defineTable(xclass, this.doc, this.context, 0, "A1:A1", false, false);
-		//Assert.assertEquals(this.doc.getFullName(), xobject.getName());
+		BaseObject xobject = TestHelper.defineTable(xclass, this.doc, this.context, 0, "A1-A1", false, false);
+		Assert.assertEquals(this.doc.getFullName(), xobject.getName());
 	}
 	
 	public void testListDocuments() throws Exception {
@@ -60,9 +60,9 @@ public class ObjectsTest extends TestCase {
 		Assert.assertTrue(list.contains(doc2));
 		Assert.assertTrue(list.contains(doc3));
 	}
-	    /*
+
 	public void testId() throws Exception {
-		BaseObject obj = TestHelper.defineTable(xclass, this.doc, this.context, 0, "A1:A1", false, false);
+		BaseObject obj = TestHelper.defineTable(xclass, this.doc, this.context, 0, "A1-A1", false, false);
 
 		List list = xwiki.getStore().search("from "+BaseObject.class.getName()
 				+ " as obj where obj.id='"+obj.getId()+"'", 0, 0, context);
@@ -81,7 +81,6 @@ public class ObjectsTest extends TestCase {
 		
 		Assert.assertEquals(obj, obj2);
 	}
-	    */
     
     private XWiki xwiki;
     private XWikiConfig config;

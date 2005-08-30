@@ -90,7 +90,7 @@ public class ChartingMacroTest extends TestCase {
 	public void testExecute() throws Exception {
 		params.getParams().put("title", "A title");
 		params.getParams().put("type", "pie");
-		params.getParams().put("source", "table2");
+		params.getParams().put("source", "type:table;doc:Page;table_number:0;range:A1-D4;has_header_row:true;has_header_column:true");
 		
 		StringWriter swriter = new StringWriter();
 		macro.execute(swriter, params);

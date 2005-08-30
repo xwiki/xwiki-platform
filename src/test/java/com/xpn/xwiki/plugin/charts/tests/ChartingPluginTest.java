@@ -54,8 +54,8 @@ public class ChartingPluginTest extends TestCase {
         this.doc = new XWikiDocument(url, "Page");
         xcontext.setDoc(doc);
 
-		// this.xclass = TestHelper.createTableDataSourceClass(xcontext);
-		// xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1:D4", true, true);
+		 this.xclass = TestHelper.createTableDataSourceClass(xcontext);
+		 xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1-D4", true, true);
 
 		plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugin.charts.ChartingPlugin", xcontext);
 	}
@@ -67,7 +67,8 @@ public class ChartingPluginTest extends TestCase {
 		ChartParams params = new ChartParams();
 		params.set("title", "a chart");
 		params.set("type", "pie");
-		params.set("source", "table:Page:0");
+		params.set("source", "type:table;doc:Page;table_number:0;range:A1-D4;has_header_row:true;has_header_column:true");
+		params.set("series", "rows");
 		params.set("width", "500");
 		params.set("height", "400");		
 		Chart chart = plugin.generateChart(params, xcontext);

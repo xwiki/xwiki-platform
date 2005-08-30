@@ -36,15 +36,15 @@ public abstract class XWikiIntegrationTest extends ServletTestCase {
   public void setUp() throws Exception {
       context = new XWikiContext();
       context.setDatabase("xwikitest");
-      String configpath = "./test/xwiki-integration.cfg";
+      String configpath = "./xwiki.cfg";
 	  XWikiConfig config = new XWikiConfig(new FileInputStream(configpath));
       xwiki = new XWiki(config, context);
 
       xwiki.setDatabase("xwikitest");
       
       context.setWiki(xwiki);
-      context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080/"), "xwiki/" , "bin/"));
-      Velocity.init("test/velocity.properties");
+      context.setURLFactory(new XWikiServletURLFactory(new URL("http://127.0.0.1:9080/"), "xwiki/" , "testbin/"));
+      Velocity.init("/velocity.properties");
 
       context.setRequest(new XWikiServletRequest(request));
       context.setResponse(new XWikiServletResponse(response));

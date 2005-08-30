@@ -9,7 +9,7 @@ public class AllTests {
 
   public static Test suite () {
     
-    System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+    System.setProperty("cactus.contextURL", "http://127.0.0.1:9080/xwiki");
     
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom");
     //$JUnit-BEGIN$

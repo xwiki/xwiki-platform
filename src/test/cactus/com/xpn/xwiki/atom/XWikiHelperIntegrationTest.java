@@ -22,7 +22,7 @@ public class XWikiHelperIntegrationTest extends XWikiIntegrationTest {
 
     if (!inContainer) {
       // Will use Jetty
-      System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+      System.setProperty("cactus.contextURL", "http://127.0.0.1:9080/xwiki");
     }
       
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.XWikiHelperIntegrationTest");
@@ -82,9 +82,9 @@ public class XWikiHelperIntegrationTest extends XWikiIntegrationTest {
     assertEquals(userBlogs.size(), 1);
     
     UserBlog userBlog = new UserBlog();
-    userBlog.setPostHref("http://localhost:8080/xwiki/bin/lifeblog/Blog/WebHome");
-    userBlog.setFeedHref("http://localhost:8080/xwiki/bin/view/Blog/WebHome?xpage=rdf");
-    userBlog.setAlternateHref("http://localhost:8080/xwiki/bin/view/Blog/WebHome");
+    userBlog.setPostHref("http://127.0.0.1:9080/xwiki/testbin/lifeblog/Blog/WebHome");
+    userBlog.setFeedHref("http://127.0.0.1:9080/testbin/view/Blog/WebHome?xpage=rdf");
+    userBlog.setAlternateHref("http://127.0.0.1:9080/testbin/view/Blog/WebHome");
     
     assertEquals(userBlog, (UserBlog)userBlogs.get(0));
   }

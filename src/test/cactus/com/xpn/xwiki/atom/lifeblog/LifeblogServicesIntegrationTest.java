@@ -19,9 +19,9 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
   private static final String TEST_ATOM_USER_BLOG_LIST = 
     "<?xml version=\"1.0\"?>\r\n"
     + "<feed xmlns=\"http://purl.org/atom/ns#\">\r\n"
-    + "<link type=\"application/atom+xml\" rel=\"service.post\" href=\"http://localhost:8080/xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
-    + "<link type=\"application/atom+xml\" rel=\"service.feed\" href=\"http://localhost:8080/xwiki/bin/view/Blog/WebHome?xpage=rdf\" title=\"Blog.WebHome\"/>\r\n"
-    + "<link type=\"application/atom+xml\" rel=\"service.alternate\" href=\"http://localhost:8080/xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.post\" href=\"http://127.0.0.1:9080//xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.feed\" href=\"http://127.0.0.1:9080//xwiki/bin/view/Blog/WebHome?xpage=rdf\" title=\"Blog.WebHome\"/>\r\n"
+    + "<link type=\"application/atom+xml\" rel=\"service.alternate\" href=\"http://127.0.0.1:9080//xwiki/bin/lifeblog/Blog/WebHome\" title=\"Blog.WebHome\"/>\r\n"
     + "</feed>";
   
   public static Test suite () {
@@ -29,7 +29,7 @@ public class LifeblogServicesIntegrationTest extends XWikiIntegrationTest {
 
     if (!inContainer) {
       // Will use Jetty
-      System.setProperty("cactus.contextURL", "http://localhost:8080/xwiki");
+      System.setProperty("cactus.contextURL", "http://127.0.0.1:9080//xwiki");
     }
     
     TestSuite suite= new TestSuite("Test for com.xpn.xwiki.atom.lifeblog.LifeblogServicesIntegrationTest");

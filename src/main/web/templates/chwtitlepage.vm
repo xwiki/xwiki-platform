@@ -1,50 +1,50 @@
         <div id="chwTitlesWizard" class="chwInactivePage">
           <div id="chwChartTitleDiv" class="chwHidden">
-            <fieldset>
-              <legend id="chwChartTitleOptionsLegend" title="Click to show or hide the properties of the chart title" onclick="window.wizard.flipAdvanced('ChartTitleOptions');">Chart title &lt;&lt;</legend>
+            <fieldset class="chwLargeFieldset">
+              <legend class="chwLargeLegend" id="chwChartTitleOptionsLegend" title="$msg.get("chwtitleoptionslegend")" onclick="window.wizard.flipAdvanced('ChartTitleOptions');">$msg.get("chwcharttitle") &lt;&lt;</legend>
               <div id="chwChartTitleOptionsDiv" class="chwVisible">
-                <label for="chwChartTitleInput">Label:</label>
-                <input type="text" id="chwChartTitleInput" name="title" onchange="window.wizard.checkTitle('ChartTitle');"/>
-                <fieldset>
-                  <legend id="chwChartTitlePositionLegend" title="Click to show or hide the positioning properties of the chart title" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePosition');">Positioning &gt;&gt;</legend>
+                <label for="chwChartTitleInput">$msg.get("chwlabel")</label>
+                <input type="text" id="chwChartTitleInput" title="$msg.get("chwcharttitleinput")" name="title" onchange="window.wizard.checkTitle('ChartTitle');"/>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartTitlePositionLegend" title="$msg.get("chwtitlepositionlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePosition');">$msg.get("chwpositioning") &gt;&gt;</legend>
                   <div id="chwChartTitlePositionDiv" class="chwHidden">
-                    <label for="chwChartTitlePositionInput">Title placement:</label>
+                    <label for="chwChartTitlePositionInput">$msg.get("chwtitleplacement")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
     <tr>
-      <td colspan="3" id="chwChartTitlePositionTop" class="chwSelectedCell" title="Top" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Top');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Top');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Top');" onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
+      <td colspan="3" id="chwChartTitlePositionTop" class="chwSelectedCell" title="$msg.get("chwtop")" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Top');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Top');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Top');" onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartTitlePositionLeft" class="chwNormalCell" title="Left" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitlePositionLeft" class="chwNormalCell" title="$msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
       <td class="chwDisabledCell"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitlePositionRight" class="chwNormalCell" title="Right" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Right');"  onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitlePositionRight" class="chwNormalCell" title="$msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Right');"  onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartTitlePositionBottom" colspan="3" class="chwNormalCell" title="Bottom" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Bottom');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Bottom');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Bottom');"  onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
+      <td id="chwChartTitlePositionBottom" colspan="3" class="chwNormalCell" title="$msg.get("chwbottom")" onmouseover="window.wizard.selectorMouseOver('ChartTitlePosition', this, 'Bottom');" onmouseout="window.wizard.selectorMouseOut('ChartTitlePosition', this, 'Bottom');" onmousedown="window.wizard.selectorMouseDown('ChartTitlePosition', event, 'Bottom');"  onmouseup="window.wizard.selectorMouseUp('ChartTitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
     </tr>
   </tbody>
 </table>
 </div>
                     <input type="hidden" value="top" id="chwChartTitlePositionInput" name="title_position"/>
-                    <label for="chwChartTitleHorizontalAlignmentInput">Text alignment:</label>
+                    <label for="chwChartTitleHorizontalAlignmentInput">$msg.get("chwalignment")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
     <tr>
-      <td id="chwChartTitleAlignmentTop_Left" class="chwNormalCell" title="Top Left" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentTop_Center" class="chwNormalCell" title="Top Center" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentTop_Right" class="chwNormalCell" title="Top Right" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentTop_Left" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentTop_Center" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentTop_Right" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Top_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Top_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Top_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartTitleAlignmentCenter_Left" class="chwNormalCell" title="Center Left" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentCenter_Center" class="chwSelectedCell" title="Center" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentCenter_Right" class="chwNormalCell" title="Center Right" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentCenter_Left" class="chwNormalCell" title="$msg.get("chwcenter") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentCenter_Center" class="chwSelectedCell" title="$msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentCenter_Right" class="chwNormalCell" title="$msg.get("chwcenter") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Center_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Center_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Center_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartTitleAlignmentBottom_Left" class="chwNormalCell" title="Bottom Left" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentBottom_Center" class="chwNormalCell" title="Bottom Center" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartTitleAlignmentBottom_Right" class="chwNormalCell" title="Bottom Right" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentBottom_Left" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Left');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Left');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Left');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentBottom_Center" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Center');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Center');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Center');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartTitleAlignmentBottom_Right" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartTitleAlignment', this, 'Bottom_Right');" onmouseout="window.wizard.selectorMouseOut('ChartTitleAlignment', this, 'Bottom_Right');" onmousedown="window.wizard.selectorMouseDown('ChartTitleAlignment', event, 'Bottom_Right');" onmouseup="window.wizard.selectorMouseUp('ChartTitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
   </tbody>
 </table>
@@ -53,100 +53,14 @@
                     <input type="hidden" value="center" id="chwChartTitleAlignmentVerticalInput" name="title_vertical_alignment"/>
                   </div>
                 </fieldset>
-                <fieldset>
-                  <legend id="chwChartTitlePaddingLegend" title="Click to show or hide the padding properties of the chart title" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePadding'); return false;">Padding &gt;&gt;</legend>
-                  <div id="chwChartTitlePaddingDiv" class="chwHidden">
-                    <div class="chwCentered">
-                      <table class="chwMarginSelector">
-                        <tbody>
-                          <tr>
-                            <td colspan="3" title="Padding top" class="chwCentered"><input title="Padding top" id="chwChartTitlePaddingTopInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
-                          </tr>
-                          <tr>
-                            <td title="Padding left" class="chwLowered"><input title="Padding left" id="chwChartTitlePaddingLeftInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
-                            <td class="chwMarginCenter">Chart title</td>
-                            <td title="Padding right" class="chwLowered"><input title="Padding right" id="chwChartTitlePaddingRightInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
-                          </tr>
-                          <tr>
-                            <td title="Padding bottom" colspan="3" class="chwCentered"><input title="Padding bottom" id="chwChartTitlePaddingBottomInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <input type="hidden" id="chwChartTitlePaddingInput" name="title_padding" value="left:0;top:0;right:0;bottom:0"/>
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <legend id="chwChartTitleColorLegend" title="Click to show or hide the color properties of the chart title" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitleColor'); return false;">Color &gt;&gt;</legend>
-                  <div id="chwChartTitleColorDiv" class="chwHidden">
-                    <div>
-                      <label for="chwChartTitleColorInput">Font color:</label><br/>
-                      <select id="chwChartTitleColorInput" name="title_color" onchange="window.wizard.colorChoiceChanged('ChartTitleColor');">
-                        <option title="Don't use foreground color" class="chwTransparent" value="transparent">Transparent</option>
-                        <option title="Color code: #000000" class="chwBlack" value="black" selected="selected">Black</option>
-                        <option title="Color code: #FFFFFF" class="chwWhite" value="white">White</option>
-                        <option title="Color code: #C0C0C0" class="chwSilver" value="silver">Silver</option>
-                        <option title="Color code: #808080" class="chwGray" value="gray">Gray</option>
-                        <option title="Color code: #800000" class="chwMaroon" value="maroon">Maroon</option>
-                        <option title="Color code: #FF0000" class="chwRed" value="red">Red</option>
-                        <option title="Color code: #800080" class="chwPurple" value="purple">Purple</option>
-                        <option title="Color code: #FF00FF" class="chwFuchsia" value="fuchsia">Fuchsia</option>
-                        <option title="Color code: #008000" class="chwGreen" value="green">Green</option>
-                        <option title="Color code: #00FF00" class="chwLime" value="lime">Lime</option>
-                        <option title="Color code: #808000" class="chwOlive" value="olive">Olive</option>
-                        <option title="Color code: #FFA500" class="chwOrange" value="orange">Orange</option>
-                        <option title="Color code: #FFFF00" class="chwYellow" value="yellow">Yellow</option>
-                        <option title="Color code: #000080" class="chwNavy" value="navy">Navy</option>
-                        <option title="Color code: #0000FF" class="chwBlue" value="blue">Blue</option>
-                        <option title="Color code: #008080" class="chwTeal" value="teal">Teal</option>
-                        <option title="Color code: #00FFFF" class="chwAqua" value="aqua">Aqua</option>
-                        <option title="Custom foreground color (range: #000000 - #FFFFFF)" id="chwChartTitleColorCustomOption" value="#000000">Custom...</option>
-                      </select>
-                      <div id="chwChartTitleColorCustomGroup" class="chwCustomColorGroup">Custom color code:
-                      <input type="text" title="Custom foreground color (range: #000000 - #FFFFFF)" id="chwChartTitleColorCustomInput" value="#000000" class="chwCustomColor"
-                             onkeyup="window.wizard.showCustomColor('ChartTitleColor');"
-                             onblur="window.wizard.validateCustomColor('ChartTitleColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartTitleColor')"/>
-                      </div>
-                    </div>
-                    <div>
-                      <label for="chwChartTitleBackgroundColorInput">Background color:</label><br/>
-                      <select id="chwChartTitleBackgroundColorInput" name="title_background_color" onchange="window.wizard.colorChoiceChanged('ChartTitleBackgroundColor');">
-                        <option title="Don't use background color" class="chwTransparent" value="transparent" selected="selected">Transparent</option>
-                        <option title="Color code: #000000" class="chwBlack" value="black">Black</option>
-                        <option title="Color code: #FFFFFF" class="chwWhite" value="white">White</option>
-                        <option title="Color code: #C0C0C0" class="chwSilver" value="silver">Silver</option>
-                        <option title="Color code: #808080" class="chwGray" value="gray">Gray</option>
-                        <option title="Color code: #800000" class="chwMaroon" value="maroon">Maroon</option>
-                        <option title="Color code: #FF0000" class="chwRed" value="red">Red</option>
-                        <option title="Color code: #800080" class="chwPurple" value="purple">Purple</option>
-                        <option title="Color code: #FF00FF" class="chwFuchsia" value="fuchsia">Fuchsia</option>
-                        <option title="Color code: #008000" class="chwGreen" value="green">Green</option>
-                        <option title="Color code: #00FF00" class="chwLime" value="lime">Lime</option>
-                        <option title="Color code: #808000" class="chwOlive" value="olive">Olive</option>
-                        <option title="Color code: #FFA500" class="chwOrange" value="orange">Orange</option>
-                        <option title="Color code: #FFFF00" class="chwYellow" value="yellow">Yellow</option>
-                        <option title="Color code: #000080" class="chwNavy" value="navy">Navy</option>
-                        <option title="Color code: #0000FF" class="chwBlue" value="blue">Blue</option>
-                        <option title="Color code: #008080" class="chwTeal" value="teal">Teal</option>
-                        <option title="Color code: #00FFFF" class="chwAqua" value="aqua">Aqua</option>
-                        <option title="Custom background color (range: #000000 - #FFFFFF)" id="chwChartTitleBackgroundColorCustomOption" value="#FFFFFF">Custom...</option>
-                      </select>
-                      <div id="chwChartTitleBackgroundColorCustomGroup" class="chwCustomColorGroup">Custom color code:
-                      <input type="text" title="Custom background color (range: #000000 - #FFFFFF)" id="chwChartTitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
-                             onkeyup="window.wizard.showCustomColor('ChartTitleBackgroundColor');"
-                             onblur="window.wizard.validateCustomColor('ChartTitleBackgroundColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartTitleBackgroundColor')"/>
-                      </div>
-                    </div>
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <legend id="chwChartTitleFontLegend" title="Click to show or hide the font properties of the chart title" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitleFont'); return false;">Font &gt;&gt;</legend>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartTitleFontLegend" title="$msg.get("chwtitlefontlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitleFont'); return false;">$msg.get("chwfont") &gt;&gt;</legend>
                   <div id="chwChartTitleFontDiv" class="chwHidden">
-                    <div>
-                      <label for="chwChartTitleFontFamilyInput">Font family:</label>
-                      <select id="chwChartTitleFontFamilyInput" onchange="window.wizard.changeFont('ChartTitleFont');">
+                   <table summary="Layout for chart title font">
+                    <tbody>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontFamilyInput">$msg.get("chwfontfamily")</label></td>
+                      <td><select id="chwChartTitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
 #set($defaultfont = $fonthelper.getDefaultTitleFont())
 #foreach($font in $fonthelper.getAvailableFonts())
 #if($font == $defaultfont)
@@ -156,90 +70,184 @@
 #end
 #end
                       </select>
-                    </div>
-                    <div>
-                      <label for="chwChartTitleFontStyleInput">Font style:</label>
-                      <select id="chwChartTitleFontStyleInput" onchange="window.wizard.changeFont('ChartTitleFont');">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontStyleInput">$msg.get("chwfontstyle")</label></td>
+                      <td><select id="chwChartTitleFontStyleInput" title="$msg.get("chwfontstyletitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
 #set($defaultstyle = $fonthelper.getDefaultTitleStyle())
 #if($defaultstyle == "plain")
-                        <option value="plain" selected="selected">Normal</option>
+                        <option value="plain" selected="selected">$msg.get("chwplain")</option>
 #else
-                        <option value="plain">Normal</option>
+                        <option value="plain">$msg.get("chwplain")</option>
 #end
 #if($defaultstyle == "bold")
-                        <option value="bold" style="font-weight: bold;" selected="selected">Bold</option>
+                        <option value="bold" style="font-weight: bold;" selected="selected">$msg.get("chwbold")</option>
 #else
-                        <option value="bold" style="font-weight: bold;">Bold</option>
+                        <option value="bold" style="font-weight: bold;">$msg.get("chwbold")</option>
 #end
 #if($defaultstyle == "italic")
-                        <option value="italic" style="font-style: italic;" selected="selected">Italic</option>
+                        <option value="italic" style="font-style: italic;" selected="selected">$msg.get("chwitalic")</option>
 #else
-                        <option value="italic" style="font-style: italic;">Italic</option>
+                        <option value="italic" style="font-style: italic;">$msg.get("chwitalic")</option>
 #end
 #if($defaultstyle == "bold+italic")
-                        <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">Bold Italic</option>
+                        <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">$msg.get("chwbolditalic")</option>
 #else
-                        <option value="bold+italic" style="font-style: italic; font-weight: bold;">Bold Italic</option>
+                        <option value="bold+italic" style="font-style: italic; font-weight: bold;">$msg.get("chwbolditalic")</option>
 #end
                       </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartTitleFontSizeInput">$msg.get("chwfontsize")</label></td>
+#set($defaultsize = $fonthelper.getDefaultTitleSize())
+                      <td><input type="text" id="chwChartTitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartTitleFont');"/>pt
+                    </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    <input id="chwChartTitleFontInput" type="hidden" name="title_font" style="width: 400px;" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                  </div>
+                </fieldset>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartTitleColorLegend" title="$msg.get("chwtitlecolorlegend")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartTitleColor'); window.wizard.colorChoiceChanged('ChartTitleBackgroundColor'); window.wizard.flipAdvanced('ChartTitleColor'); return false;">$msg.get("chwcolor") &gt;&gt;</legend>
+                  <div id="chwChartTitleColorDiv" class="chwHidden">
+                    <div>
+                      <label for="chwChartTitleColorInput">$msg.get("chwforecolor")</label><br/>
+                      <select id="chwChartTitleColorInput" title="$msg.get("chwtitleforecolor")" name="title_color" onchange="window.wizard.colorChoiceChanged('ChartTitleColor');">
+                        <option title="$msg.get("chwtrasparenttitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
+                        <option title="#000000" class="chwBlack" value="black" selected="selected">$msg.get("chwblack")</option>
+                        <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
+                        <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
+                        <option title="#808080" class="chwGray" value="gray">$msg.get("chwgray")</option>
+                        <option title="#800000" class="chwMaroon" value="maroon">$msg.get("chwmaroon")</option>
+                        <option title="#FF0000" class="chwRed" value="red">$msg.get("chwred")</option>
+                        <option title="#800080" class="chwPurple" value="purple">$msg.get("chwpurple")</option>
+                        <option title="#FF00FF" class="chwFuchsia" value="fuchsia">$msg.get("chwfuchsia")</option>
+                        <option title="#008000" class="chwGreen" value="green">$msg.get("chwgreen")</option>
+                        <option title="#00FF00" class="chwLime" value="lime">$msg.get("chwlime")</option>
+                        <option title="#808000" class="chwOlive" value="olive">$msg.get("chwolive")</option>
+                        <option title="#FFA500" class="chwOrange" value="orange">$msg.get("chworange")</option>
+                        <option title="#FFFF00" class="chwYellow" value="yellow">$msg.get("chwyellow")</option>
+                        <option title="#000080" class="chwNavy" value="navy">$msg.get("chwnavy")</option>
+                        <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
+                        <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
+                        <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
+                        <option title="$msg.get("chwcustomcolor")" id="chwChartTitleColorCustomOption" value="#000000">$msg.get("chwcustom")</option>
+                      </select>
+                      <div id="chwChartTitleColorCustomGroup" class="chwCustomColorGroup">
+                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartTitleColorCustomInput" value="#000000" class="chwCustomColor"
+                             onkeyup="window.wizard.showCustomColor('ChartTitleColor');"
+                             onblur="window.wizard.validateCustomColor('ChartTitleColor');"
+                             onfocus="window.wizard.customColorValueFocus('ChartTitleColor')"/>
+                      </div>
                     </div>
                     <div>
-                      <label for="chwChartTitleFontSizeInput">Font size:</label>
-#set($defaultsize = $fonthelper.getDefaultTitleSize())
-                      <input type="text" id="chwChartTitleFontSizeInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartTitleFont');"/>
+                      <label for="chwChartTitleBackgroundColorInput">$msg.get("chwbackcolor")</label><br/>
+                      <select id="chwChartTitleBackgroundColorInput" title="$msg.get("chwtitlebackcolor")" name="title_background_color" onchange="window.wizard.colorChoiceChanged('ChartTitleBackgroundColor');">
+                        <option title="$msg.get("chwtrasparenttitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
+                        <option title="#000000" class="chwBlack" value="black">$msg.get("chwblack")</option>
+                        <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
+                        <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
+                        <option title="#808080" class="chwGray" value="gray">$msg.get("chwgray")</option>
+                        <option title="#800000" class="chwMaroon" value="maroon">$msg.get("chwmaroon")</option>
+                        <option title="#FF0000" class="chwRed" value="red">$msg.get("chwred")</option>
+                        <option title="#800080" class="chwPurple" value="purple">$msg.get("chwpurple")</option>
+                        <option title="#FF00FF" class="chwFuchsia" value="fuchsia">$msg.get("chwfuchsia")</option>
+                        <option title="#008000" class="chwGreen" value="green">$msg.get("chwgreen")</option>
+                        <option title="#00FF00" class="chwLime" value="lime">$msg.get("chwlime")</option>
+                        <option title="#808000" class="chwOlive" value="olive">$msg.get("chwolive")</option>
+                        <option title="#FFA500" class="chwOrange" value="orange">$msg.get("chworange")</option>
+                        <option title="#FFFF00" class="chwYellow" value="yellow">$msg.get("chwyellow")</option>
+                        <option title="#000080" class="chwNavy" value="navy">$msg.get("chwnavy")</option>
+                        <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
+                        <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
+                        <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
+                        <option title="$msg.get("chwcustomcolor")" id="chwChartTitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustom")</option>
+                      </select>
+                      <div id="chwChartTitleBackgroundColorCustomGroup" class="chwCustomColorGroup">
+                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartTitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
+                             onkeyup="window.wizard.showCustomColor('ChartTitleBackgroundColor');"
+                             onblur="window.wizard.validateCustomColor('ChartTitleBackgroundColor');"
+                             onfocus="window.wizard.customColorValueFocus('ChartTitleBackgroundColor')"/>
+                      </div>
                     </div>
-                    <input id="chwChartTitleFontInput" type="text" name="title_font" style="width: 400px;" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                  </div>
+                </fieldset>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartTitlePaddingLegend" title="$msg.get("chwtitlepaddinglegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePadding'); return false;">$msg.get("chwpadding") &gt;&gt;</legend>
+                  <div id="chwChartTitlePaddingDiv" class="chwHidden">
+                    <div class="chwCentered">
+                      <table class="chwMarginSelector">
+                        <tbody>
+                          <tr>
+                            <td colspan="3" title="$msg.get("chwpaddingtop")" class="chwCentered"><input title="$msg.get("chwpaddingtop")" id="chwChartTitlePaddingTopInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
+                          </tr>
+                          <tr>
+                            <td title="$msg.get("chwpaddingleft")" class="chwLowered"><input title="$msg.get("chwpaddingleft")" id="chwChartTitlePaddingLeftInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
+                            <td class="chwMarginCenter">$msg.get("chwcharttitle")</td>
+                            <td title="$msg.get("chwpaddingright")" class="chwLowered"><input title="$msg.get("chwpaddingright")" id="chwChartTitlePaddingRightInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
+                          </tr>
+                          <tr>
+                            <td title="$msg.get("chwpaddingbottom")" colspan="3" class="chwCentered"><input title="$msg.get("chwpaddingbottom")" id="chwChartTitlePaddingBottomInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartTitlePadding');"/>px</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <input type="hidden" id="chwChartTitlePaddingInput" name="title_padding" value="left:0;top:0;right:0;bottom:0"/>
                   </div>
                 </fieldset>
               </div>
             </fieldset>
           </div>
+
           <div id="chwChartSubtitleDiv" class="chwHidden">
-            <fieldset>
-              <legend id="chwChartSubtitleOptionsLegend" subtitle="Click to show or hide the properties of the chart subtitle" onclick="window.wizard.flipAdvanced('ChartSubtitleOptions');">Chart subtitle &gt;&gt;</legend>
+            <fieldset class="chwLargeFieldset">
+              <legend class="chwLargeLegend" id="chwChartSubtitleOptionsLegend" title="$msg.get("chwsubtitleoptionslegend")" onclick="window.wizard.flipAdvanced('ChartSubtitleOptions');">$msg.get("chwchartsubtitle") &gt;&gt;</legend>
               <div id="chwChartSubtitleOptionsDiv" class="chwHidden">
-                <label for="chwChartSubtitleInput">Label:</label>
-                <input type="text" id="chwChartSubtitleInput" name="subtitle"/>
-                <fieldset>
-                  <legend id="chwChartSubtitlePositionLegend" subtitle="Click to show or hide the positioning properties of the chart subtitle" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePosition');">Positioning &gt;&gt;</legend>
+                <label for="chwChartSubtitleInput">$msg.get("chwlabel")</label>
+                <input type="text" id="chwChartSubtitleInput" title="$msg.get("chwchartsubtitleinput")" name="subtitle" onchange="window.wizard.checkSubtitle('ChartSubtitle');"/>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartSubtitlePositionLegend" title="$msg.get("chwsubtitlepositionlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePosition');">$msg.get("chwpositioning") &gt;&gt;</legend>
                   <div id="chwChartSubtitlePositionDiv" class="chwHidden">
-                    <label for="chwChartSubtitlePositionInput">Subtitle placement:</label>
+                    <label for="chwChartSubtitlePositionInput">$msg.get("chwsubtitleplacement")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
     <tr>
-      <td colspan="3" id="chwChartSubtitlePositionTop" class="chwSelectedCell" subtitle="Top" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Top');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Top');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Top');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
+      <td colspan="3" id="chwChartSubtitlePositionTop" class="chwSelectedCell" title="$msg.get("chwtop")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Top');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Top');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Top');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartSubtitlePositionLeft" class="chwNormalCell" subtitle="Left" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitlePositionLeft" class="chwNormalCell" title="$msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
       <td class="chwDisabledCell"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitlePositionRight" class="chwNormalCell" subtitle="Right" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Right');"  onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitlePositionRight" class="chwNormalCell" title="$msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Right');"  onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartSubtitlePositionBottom" colspan="3" class="chwNormalCell" subtitle="Bottom" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Bottom');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Bottom');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Bottom');"  onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
+      <td id="chwChartSubtitlePositionBottom" colspan="3" class="chwNormalCell" title="$msg.get("chwbottom")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitlePosition', this, 'Bottom');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitlePosition', this, 'Bottom');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitlePosition', event, 'Bottom');"  onmouseup="window.wizard.selectorMouseUp('ChartSubtitlePosition', event);"><div class="chwLargeBlockDiv"/></td>
     </tr>
   </tbody>
 </table>
 </div>
                     <input type="hidden" value="top" id="chwChartSubtitlePositionInput" name="subtitle_position"/>
-                    <label for="chwChartSubtitleHorizontalAlignmentInput">Text alignment:</label>
+                    <label for="chwChartSubtitleHorizontalAlignmentInput">$msg.get("chwalignment")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
   <tbody>
     <tr>
-      <td id="chwChartSubtitleAlignmentTop_Left" class="chwNormalCell" subtitle="Top Left" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentTop_Center" class="chwNormalCell" subtitle="Top Center" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentTop_Right" class="chwNormalCell" subtitle="Top Right" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentTop_Left" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentTop_Center" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentTop_Right" class="chwNormalCell" title="$msg.get("chwtop") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Top_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Top_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Top_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartSubtitleAlignmentCenter_Left" class="chwNormalCell" subtitle="Center Left" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentCenter_Center" class="chwSelectedCell" subtitle="Center" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentCenter_Right" class="chwNormalCell" subtitle="Center Right" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentCenter_Left" class="chwNormalCell" title="$msg.get("chwcenter") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentCenter_Center" class="chwSelectedCell" title="$msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentCenter_Right" class="chwNormalCell" title="$msg.get("chwcenter") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Center_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Center_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Center_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
     <tr>
-      <td id="chwChartSubtitleAlignmentBottom_Left" class="chwNormalCell" subtitle="Bottom Left" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentBottom_Center" class="chwNormalCell" subtitle="Bottom Center" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
-      <td id="chwChartSubtitleAlignmentBottom_Right" class="chwNormalCell" subtitle="Bottom Right" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentBottom_Left" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwleft")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Left');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Left');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Left');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentBottom_Center" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwcenter")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Center');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Center');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Center');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
+      <td id="chwChartSubtitleAlignmentBottom_Right" class="chwNormalCell" title="$msg.get("chwbottom") $msg.get("chwright")" onmouseover="window.wizard.selectorMouseOver('ChartSubtitleAlignment', this, 'Bottom_Right');" onmouseout="window.wizard.selectorMouseOut('ChartSubtitleAlignment', this, 'Bottom_Right');" onmousedown="window.wizard.selectorMouseDown('ChartSubtitleAlignment', event, 'Bottom_Right');" onmouseup="window.wizard.selectorMouseUp('ChartSubtitleAlignment', event);"><div class="chwNormalBlockDiv"/></td>
     </tr>
   </tbody>
 </table>
@@ -248,100 +256,14 @@
                     <input type="hidden" value="center" id="chwChartSubtitleAlignmentVerticalInput" name="subtitle_vertical_alignment"/>
                   </div>
                 </fieldset>
-                <fieldset>
-                  <legend id="chwChartSubtitlePaddingLegend" subtitle="Click to show or hide the padding properties of the chart subtitle" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePadding'); return false;">Padding &gt;&gt;</legend>
-                  <div id="chwChartSubtitlePaddingDiv" class="chwHidden">
-                    <div class="chwCentered">
-                      <table class="chwMarginSelector">
-                        <tbody>
-                          <tr>
-                            <td colspan="3" subtitle="Padding top" class="chwCentered"><input subtitle="Padding top" id="chwChartSubtitlePaddingTopInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
-                          </tr>
-                          <tr>
-                            <td subtitle="Padding left" class="chwLowered"><input subtitle="Padding left" id="chwChartSubtitlePaddingLeftInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
-                            <td class="chwMarginCenter">Chart subtitle</td>
-                            <td subtitle="Padding right" class="chwLowered"><input subtitle="Padding right" id="chwChartSubtitlePaddingRightInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
-                          </tr>
-                          <tr>
-                            <td subtitle="Padding bottom" colspan="3" class="chwCentered"><input subtitle="Padding bottom" id="chwChartSubtitlePaddingBottomInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <input type="hidden" id="chwChartSubtitlePaddingInput" name="subtitle_padding" value="left:0;top:0;right:0;bottom:0"/>
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <legend id="chwChartSubtitleColorLegend" subtitle="Click to show or hide the color properties of the chart subtitle" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitleColor'); return false;">Color &gt;&gt;</legend>
-                  <div id="chwChartSubtitleColorDiv" class="chwHidden">
-                    <div>
-                      <label for="chwChartSubtitleColorInput">Font color:</label><br/>
-                      <select id="chwChartSubtitleColorInput" name="subtitle_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleColor');">
-                        <option subtitle="Don't use foreground color" class="chwTransparent" value="transparent">Transparent</option>
-                        <option subtitle="Color code: #000000" class="chwBlack" value="black" selected="selected">Black</option>
-                        <option subtitle="Color code: #FFFFFF" class="chwWhite" value="white">White</option>
-                        <option subtitle="Color code: #C0C0C0" class="chwSilver" value="silver">Silver</option>
-                        <option subtitle="Color code: #808080" class="chwGray" value="gray">Gray</option>
-                        <option subtitle="Color code: #800000" class="chwMaroon" value="maroon">Maroon</option>
-                        <option subtitle="Color code: #FF0000" class="chwRed" value="red">Red</option>
-                        <option subtitle="Color code: #800080" class="chwPurple" value="purple">Purple</option>
-                        <option subtitle="Color code: #FF00FF" class="chwFuchsia" value="fuchsia">Fuchsia</option>
-                        <option subtitle="Color code: #008000" class="chwGreen" value="green">Green</option>
-                        <option subtitle="Color code: #00FF00" class="chwLime" value="lime">Lime</option>
-                        <option subtitle="Color code: #808000" class="chwOlive" value="olive">Olive</option>
-                        <option subtitle="Color code: #FFA500" class="chwOrange" value="orange">Orange</option>
-                        <option subtitle="Color code: #FFFF00" class="chwYellow" value="yellow">Yellow</option>
-                        <option subtitle="Color code: #000080" class="chwNavy" value="navy">Navy</option>
-                        <option subtitle="Color code: #0000FF" class="chwBlue" value="blue">Blue</option>
-                        <option subtitle="Color code: #008080" class="chwTeal" value="teal">Teal</option>
-                        <option subtitle="Color code: #00FFFF" class="chwAqua" value="aqua">Aqua</option>
-                        <option subtitle="Custom foreground color (range: #000000 - #FFFFFF)" id="chwChartSubtitleColorCustomOption" value="#000000">Custom...</option>
-                      </select>
-                      <div id="chwChartSubtitleColorCustomGroup" class="chwCustomColorGroup">Custom color code:
-                      <input type="text" subtitle="Custom foreground color (range: #000000 - #FFFFFF)" id="chwChartSubtitleColorCustomInput" value="#000000" class="chwCustomColor"
-                             onkeyup="window.wizard.showCustomColor('ChartSubtitleColor');"
-                             onblur="window.wizard.validateCustomColor('ChartSubtitleColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleColor')"/>
-                      </div>
-                    </div>
-                    <div>
-                      <label for="chwChartSubtitleBackgroundColorInput">Background color:</label><br/>
-                      <select id="chwChartSubtitleBackgroundColorInput" name="subtitle_background_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor');">
-                        <option subtitle="Don't use background color" class="chwTransparent" value="transparent" selected="selected">Transparent</option>
-                        <option subtitle="Color code: #000000" class="chwBlack" value="black">Black</option>
-                        <option subtitle="Color code: #FFFFFF" class="chwWhite" value="white">White</option>
-                        <option subtitle="Color code: #C0C0C0" class="chwSilver" value="silver">Silver</option>
-                        <option subtitle="Color code: #808080" class="chwGray" value="gray">Gray</option>
-                        <option subtitle="Color code: #800000" class="chwMaroon" value="maroon">Maroon</option>
-                        <option subtitle="Color code: #FF0000" class="chwRed" value="red">Red</option>
-                        <option subtitle="Color code: #800080" class="chwPurple" value="purple">Purple</option>
-                        <option subtitle="Color code: #FF00FF" class="chwFuchsia" value="fuchsia">Fuchsia</option>
-                        <option subtitle="Color code: #008000" class="chwGreen" value="green">Green</option>
-                        <option subtitle="Color code: #00FF00" class="chwLime" value="lime">Lime</option>
-                        <option subtitle="Color code: #808000" class="chwOlive" value="olive">Olive</option>
-                        <option subtitle="Color code: #FFA500" class="chwOrange" value="orange">Orange</option>
-                        <option subtitle="Color code: #FFFF00" class="chwYellow" value="yellow">Yellow</option>
-                        <option subtitle="Color code: #000080" class="chwNavy" value="navy">Navy</option>
-                        <option subtitle="Color code: #0000FF" class="chwBlue" value="blue">Blue</option>
-                        <option subtitle="Color code: #008080" class="chwTeal" value="teal">Teal</option>
-                        <option subtitle="Color code: #00FFFF" class="chwAqua" value="aqua">Aqua</option>
-                        <option subtitle="Custom background color (range: #000000 - #FFFFFF)" id="chwChartSubtitleBackgroundColorCustomOption" value="#FFFFFF">Custom...</option>
-                      </select>
-                      <div id="chwChartSubtitleBackgroundColorCustomGroup" class="chwCustomColorGroup">Custom color code:
-                      <input type="text" subtitle="Custom background color (range: #000000 - #FFFFFF)" id="chwChartSubtitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
-                             onkeyup="window.wizard.showCustomColor('ChartSubtitleBackgroundColor');"
-                             onblur="window.wizard.validateCustomColor('ChartSubtitleBackgroundColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleBackgroundColor')"/>
-                      </div>
-                    </div>
-                  </div>
-                </fieldset>
-                <fieldset>
-                  <legend id="chwChartSubtitleFontLegend" subtitle="Click to show or hide the font properties of the chart subtitle" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitleFont'); return false;">Font &gt;&gt;</legend>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartSubtitleFontLegend" title="$msg.get("chwsubtitlefontlegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitleFont'); return false;">$msg.get("chwfont") &gt;&gt;</legend>
                   <div id="chwChartSubtitleFontDiv" class="chwHidden">
-                    <div>
-                      <label for="chwChartSubtitleFontFamilyInput">Font family:</label>
-                      <select id="chwChartSubtitleFontFamilyInput" onchange="window.wizard.changeFont('ChartSubtitleFont');">
+                   <table summary="Layout for chart subtitle font">
+                    <tbody>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontFamilyInput">$msg.get("chwfontfamily")</label></td>
+                      <td><select id="chwChartSubtitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartSubtitleFont');">
 #set($defaultfont = $fonthelper.getDefaultSubtitleFont())
 #foreach($font in $fonthelper.getAvailableFonts())
 #if($font == $defaultfont)
@@ -351,42 +273,134 @@
 #end
 #end
                       </select>
-                    </div>
-                    <div>
-                      <label for="chwChartSubtitleFontStyleInput">Font style:</label>
-                      <select id="chwChartSubtitleFontStyleInput" onchange="window.wizard.changeFont('ChartSubtitleFont');">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontStyleInput">$msg.get("chwfontstyle")</label></td>
+                      <td><select id="chwChartSubtitleFontStyleInput" title="$msg.get("chwfontstyletitle")" onchange="window.wizard.changeFont('ChartSubtitleFont');">
 #set($defaultstyle = $fonthelper.getDefaultSubtitleStyle())
 #if($defaultstyle == "plain")
-                        <option value="plain" selected="selected">Normal</option>
+                        <option value="plain" selected="selected">$msg.get("chwplain")</option>
 #else
-                        <option value="plain">Normal</option>
+                        <option value="plain">$msg.get("chwplain")</option>
 #end
 #if($defaultstyle == "bold")
-                        <option value="bold" style="font-weight: bold;" selected="selected">Bold</option>
+                        <option value="bold" style="font-weight: bold;" selected="selected">$msg.get("chwbold")</option>
 #else
-                        <option value="bold" style="font-weight: bold;">Bold</option>
+                        <option value="bold" style="font-weight: bold;">$msg.get("chwbold")</option>
 #end
 #if($defaultstyle == "italic")
-                        <option value="italic" style="font-style: italic;" selected="selected">Italic</option>
+                        <option value="italic" style="font-style: italic;" selected="selected">$msg.get("chwitalic")</option>
 #else
-                        <option value="italic" style="font-style: italic;">Italic</option>
+                        <option value="italic" style="font-style: italic;">$msg.get("chwitalic")</option>
 #end
 #if($defaultstyle == "bold+italic")
-                        <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">Bold Italic</option>
+                        <option value="bold+italic" style="font-style: italic; font-weight: bold;" selected="selected">$msg.get("chwbolditalic")</option>
 #else
-                        <option value="bold+italic" style="font-style: italic; font-weight: bold;">Bold Italic</option>
+                        <option value="bold+italic" style="font-style: italic; font-weight: bold;">$msg.get("chwbolditalic")</option>
 #end
                       </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="chwFormLabelCell"><label for="chwChartSubtitleFontSizeInput">$msg.get("chwfontsize")</label></td>
+#set($defaultsize = $fonthelper.getDefaultSubtitleSize())
+                      <td><input type="text" id="chwChartSubtitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartSubtitleFont');"/>pt
+                    </td>
+                    </tr>
+                    </tbody>
+                    </table>
+                    <input id="chwChartSubtitleFontInput" type="hidden" name="subtitle_font" style="width: 400px;" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                  </div>
+                </fieldset>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartSubtitleColorLegend" title="$msg.get("chwsubtitlecolorlegend")" class="chwExpander" onclick="window.wizard.colorChoiceChanged('ChartSubtitleColor'); window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor'); window.wizard.flipAdvanced('ChartSubtitleColor'); return false;">$msg.get("chwcolor") &gt;&gt;</legend>
+                  <div id="chwChartSubtitleColorDiv" class="chwHidden">
+                    <div>
+                      <label for="chwChartSubtitleColorInput">$msg.get("chwforecolor")</label><br/>
+                      <select id="chwChartSubtitleColorInput" title="$msg.get("chwsubtitleforecolor")" name="subtitle_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleColor');">
+                        <option title="$msg.get("chwtrasparentsubtitle")" class="chwTransparent" value="transparent">$msg.get("chwtransparent")</option>
+                        <option title="#000000" class="chwBlack" value="black" selected="selected">$msg.get("chwblack")</option>
+                        <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
+                        <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
+                        <option title="#808080" class="chwGray" value="gray">$msg.get("chwgray")</option>
+                        <option title="#800000" class="chwMaroon" value="maroon">$msg.get("chwmaroon")</option>
+                        <option title="#FF0000" class="chwRed" value="red">$msg.get("chwred")</option>
+                        <option title="#800080" class="chwPurple" value="purple">$msg.get("chwpurple")</option>
+                        <option title="#FF00FF" class="chwFuchsia" value="fuchsia">$msg.get("chwfuchsia")</option>
+                        <option title="#008000" class="chwGreen" value="green">$msg.get("chwgreen")</option>
+                        <option title="#00FF00" class="chwLime" value="lime">$msg.get("chwlime")</option>
+                        <option title="#808000" class="chwOlive" value="olive">$msg.get("chwolive")</option>
+                        <option title="#FFA500" class="chwOrange" value="orange">$msg.get("chworange")</option>
+                        <option title="#FFFF00" class="chwYellow" value="yellow">$msg.get("chwyellow")</option>
+                        <option title="#000080" class="chwNavy" value="navy">$msg.get("chwnavy")</option>
+                        <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
+                        <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
+                        <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
+                        <option title="$msg.get("chwcustomcolor")" id="chwChartSubtitleColorCustomOption" value="#000000">$msg.get("chwcustom")</option>
+                      </select>
+                      <div id="chwChartSubtitleColorCustomGroup" class="chwCustomColorGroup">
+                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartSubtitleColorCustomInput" value="#000000" class="chwCustomColor"
+                             onkeyup="window.wizard.showCustomColor('ChartSubtitleColor');"
+                             onblur="window.wizard.validateCustomColor('ChartSubtitleColor');"
+                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleColor')"/>
+                      </div>
                     </div>
                     <div>
-                      <label for="chwChartSubtitleFontSizeInput">Font size:</label>
-#set($defaultsize = $fonthelper.getDefaultSubtitleSize())
-                      <input type="text" id="chwChartSubtitleFontSizeInput" value="$defaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartSubtitleFont');"/>
+                      <label for="chwChartSubtitleBackgroundColorInput">$msg.get("chwbackcolor")</label><br/>
+                      <select id="chwChartSubtitleBackgroundColorInput" title="$msg.get("chwsubtitlebackcolor")" name="subtitle_background_color" onchange="window.wizard.colorChoiceChanged('ChartSubtitleBackgroundColor');">
+                        <option title="$msg.get("chwtrasparentsubtitle")" class="chwTransparent" value="transparent" selected="selected">$msg.get("chwtransparent")</option>
+                        <option title="#000000" class="chwBlack" value="black">$msg.get("chwblack")</option>
+                        <option title="#FFFFFF" class="chwWhite" value="white">$msg.get("chwwhite")</option>
+                        <option title="#C0C0C0" class="chwSilver" value="silver">$msg.get("chwsilver")</option>
+                        <option title="#808080" class="chwGray" value="gray">$msg.get("chwgray")</option>
+                        <option title="#800000" class="chwMaroon" value="maroon">$msg.get("chwmaroon")</option>
+                        <option title="#FF0000" class="chwRed" value="red">$msg.get("chwred")</option>
+                        <option title="#800080" class="chwPurple" value="purple">$msg.get("chwpurple")</option>
+                        <option title="#FF00FF" class="chwFuchsia" value="fuchsia">$msg.get("chwfuchsia")</option>
+                        <option title="#008000" class="chwGreen" value="green">$msg.get("chwgreen")</option>
+                        <option title="#00FF00" class="chwLime" value="lime">$msg.get("chwlime")</option>
+                        <option title="#808000" class="chwOlive" value="olive">$msg.get("chwolive")</option>
+                        <option title="#FFA500" class="chwOrange" value="orange">$msg.get("chworange")</option>
+                        <option title="#FFFF00" class="chwYellow" value="yellow">$msg.get("chwyellow")</option>
+                        <option title="#000080" class="chwNavy" value="navy">$msg.get("chwnavy")</option>
+                        <option title="#0000FF" class="chwBlue" value="blue">$msg.get("chwblue")</option>
+                        <option title="#008080" class="chwTeal" value="teal">$msg.get("chwteal")</option>
+                        <option title="#00FFFF" class="chwAqua" value="aqua">$msg.get("chwaqua")</option>
+                        <option title="$msg.get("chwcustomcolor")" id="chwChartSubtitleBackgroundColorCustomOption" value="#FFFFFF">$msg.get("chwcustom")</option>
+                      </select>
+                      <div id="chwChartSubtitleBackgroundColorCustomGroup" class="chwCustomColorGroup">
+                        <input type="text" title="$msg.get("chwcustomcolor")" id="chwChartSubtitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
+                             onkeyup="window.wizard.showCustomColor('ChartSubtitleBackgroundColor');"
+                             onblur="window.wizard.validateCustomColor('ChartSubtitleBackgroundColor');"
+                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleBackgroundColor')"/>
+                      </div>
                     </div>
-                    <input id="chwChartSubtitleFontInput" type="hidden" name="subtitle_font" value="name:$defaultfont;style:$defaultstyle;size:$defaultsize"/>
+                  </div>
+                </fieldset>
+                <fieldset class="chwSmallFieldset">
+                  <legend class="chwSmallLegend" id="chwChartSubtitlePaddingLegend" title="$msg.get("chwsubtitlepaddinglegend")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePadding'); return false;">$msg.get("chwpadding") &gt;&gt;</legend>
+                  <div id="chwChartSubtitlePaddingDiv" class="chwHidden">
+                    <div class="chwCentered">
+                      <table class="chwMarginSelector">
+                        <tbody>
+                          <tr>
+                            <td colspan="3" title="$msg.get("chwpaddingtop")" class="chwCentered"><input title="$msg.get("chwpaddingtop")" id="chwChartSubtitlePaddingTopInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
+                          </tr>
+                          <tr>
+                            <td title="$msg.get("chwpaddingleft")" class="chwLowered"><input title="$msg.get("chwpaddingleft")" id="chwChartSubtitlePaddingLeftInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
+                            <td class="chwMarginCenter">$msg.get("chwchartsubtitle")</td>
+                            <td title="$msg.get("chwpaddingright")" class="chwLowered"><input title="$msg.get("chwpaddingright")" id="chwChartSubtitlePaddingRightInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
+                          </tr>
+                          <tr>
+                            <td title="$msg.get("chwpaddingbottom")" colspan="3" class="chwCentered"><input title="$msg.get("chwpaddingbottom")" id="chwChartSubtitlePaddingBottomInput" type="text" class="chwNormalInput" value="0" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 0, 512)) window.wizard.changeInserts('ChartSubtitlePadding');"/>px</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <input type="hidden" id="chwChartSubtitlePaddingInput" name="subtitle_padding" value="left:0;top:0;right:0;bottom:0"/>
                   </div>
                 </fieldset>
               </div>
             </fieldset>
           </div>
-        </div>

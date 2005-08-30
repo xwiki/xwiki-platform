@@ -95,13 +95,18 @@ td{
  overflow: auto;
 }
 
-fieldset{
-  border: #BBB 1px solid;
+fieldset.chwLargeFieldset, fieldset.chwSmallFieldset{
+  border: #5368A6 1px solid;
   margin: 8px;
   padding: 6px;
+  padding-bottom: 16px;
 }
 
-legend{
+fieldset.chwSmallFieldset{
+  border: #BBB 1px solid;
+}
+
+legend.chwLargeLegend, legend.chwSmallLegend{
   color: #5368A6;
   background-color: #B6C5F2;
   background-color: #FFF;
@@ -111,9 +116,17 @@ legend{
   cursor: pointer;
 }
 
-.chwExpander{
+legend.chwSmallLegend{
   font-size: 12px;
   font-weight: 600;
+}
+
+input{
+  margin-bottom: 0px;
+}
+
+label{
+  margin-left: 8px;
 }
 
 #chwButtons{
@@ -249,6 +262,8 @@ td.chwDisabledCell{
 
 .chwCustomColorGroup{
   display: none;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 }
 
 .chwCustomColor{
@@ -267,6 +282,9 @@ td.chwDisabledCell{
 .chwMarginSelector td{
   vertical-align: middle;
 }
+.chwFontFamily{
+  max-width: 240px;
+}
 .chwLargeInput{
   text-align: center;
   width: 100%;
@@ -278,13 +296,21 @@ td.chwDisabledCell{
   margin: 0px;
   vertical-align: text-top;
 }
+.chwSmallInput{
+  width: 32px;
+  margin-right: 0px;
+}
 .chwMarginCenter{
   font-size: 28px;
-  padding: 4px;
+  padding: 0px;
   color: #BBB;
   border: #BBB 1px dashed;
 }
 
 td.chwLowered{
   vertical-align: text-bottom;
+}
+
+td.chwFormLabelCell{
+  vertical-align: middle;
 }

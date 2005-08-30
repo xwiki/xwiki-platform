@@ -103,7 +103,7 @@ function chwColorChooser(property){
    */
   this.colorChoiceChanged = function(){
     if (this.element.value.indexOf('#') == 0){
-      this.customGroup.style.display="block";
+      this.customGroup.style.display="inline";
     }
     else {
       this.customGroup.style.display="none";
@@ -227,6 +227,8 @@ function chwWizard(){
 
   // Used for form element validation
   var storedValue;
+  // Locale dependent values for the "show" and "hide" terms
+  var showWord, hideWord;
 
   adjustPage = function(show, hide){
     var a = 0, b=0;
@@ -272,8 +274,10 @@ function chwWizard(){
     return pageIndex;
   }
 
-  this.initialize = function(theSkinDirectory){
+  this.initialize = function(theSkinDirectory, theShowWord, theHideWord){
     skinDirectory = theSkinDirectory;
+    showWord = theShowWord;
+    hideWord = theHideWord;
     activePage = pageOrder[0];
     document.getElementById('chw' + activePage + 'Wizard').className = "chwActivePage";
     selectedChartType = document.getElementById("chwChartTypeInput").value;
@@ -414,10 +418,12 @@ function chwWizard(){
     var legend = document.getElementById('chw' + elementName + 'Legend');
     if(legend.firstChild.nodeValue.indexOf(">>") >= 0){
       legend.firstChild.nodeValue = legend.firstChild.nodeValue.replace(">>", "<<");
+      legend.title = legend.title.replace(showWord, hideWord);
       document.getElementById('chw' + elementName + 'Div').className = 'chwVisible';
     }
     else{
       legend.firstChild.nodeValue = legend.firstChild.nodeValue.replace("<<", ">>");
+      legend.title = legend.title.replace(hideWord, showWord);
       document.getElementById('chw' + elementName + 'Div').className = 'chwHidden';
     }
   }
@@ -434,6 +440,7 @@ function chwWizard(){
 //      document.getElementById('chw' + elementName + 'AdvancedDiv').className = 'chwHidden';
     }
   }
+
 
   this.showNextPage = function(){
     if(!nextEnabled) return false;

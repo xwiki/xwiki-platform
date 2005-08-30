@@ -11,7 +11,7 @@ $!xwiki.getWebPreference("meta")
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
 </head>
-<body onload='window.wizard.initialize("$xwiki.getSkinFile("")");'>
+<body onload='window.wizard.initialize("$xwiki.getSkinFile("")", "$msg.get("chwshow")", "$msg.get("chwhide")");'>
 #template("header.vm")
 <form id="chwForm" action="$doc.getURL("createchart")" method="post" onsubmit="alert('submit');">
 <div id="chartWizard">
@@ -19,7 +19,7 @@ $!xwiki.getWebPreference("meta")
     <tbody>
       <tr>
         <td colspan="2" id="chwNavigation">
-#template("chartnavigationimages.vm")
+#template("chwnavigationimages.vm")
       </td>
     </tr>
     <tr>

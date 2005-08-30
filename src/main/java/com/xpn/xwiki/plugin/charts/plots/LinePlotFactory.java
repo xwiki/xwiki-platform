@@ -1,7 +1,6 @@
 package com.xpn.xwiki.plugin.charts.plots;
 
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -29,9 +28,9 @@ public class LinePlotFactory  implements PlotFactory {
 		
 		if (hasNumericHeader(dataSource, params)) {
 			NumberAxis domainAxis = new NumberAxis();
-			ValueAxis rangeAxis = new NumberAxis();
-			ChartCustomizer.customizeValueAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
-			ChartCustomizer.customizeValueAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);   
+			NumberAxis rangeAxis = new NumberAxis();
+			ChartCustomizer.customizeNumberAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
+			ChartCustomizer.customizeNumberAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);   
 			
 			XYItemRenderer renderer = XYItemRendererFactory.getInstance().create(params);
 

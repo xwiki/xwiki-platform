@@ -14,7 +14,7 @@ public class AllTests extends TestSuite {
         addTest(new TestSuite(DataSourceFactoryTest.class));
         addTest(new TestSuite(ChartParamsTest.class));
     }
-      
+     
     public static void main(String[] args) {
         TestRunner.run(new AllTests());
     }

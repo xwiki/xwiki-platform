@@ -5,12 +5,19 @@ import java.awt.Font;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jfree.chart.axis.DateTickMarkPosition;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.RangeType;
 import org.jfree.ui.HorizontalAlignment;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
@@ -94,8 +101,8 @@ public class ChartParams {
 	public static final String LEGEND_ITEM_GRAPHIC_LOCATION = "legend_item_graphic_location";
 	public static final String LEGEND_ITEM_GRAPHIC_PADDING = "legend_item_graphic_padding";
 
-	public static final String AXIS_DOMAIN_PREFIX = "axis_domain_";
-	public static final String AXIS_RANGE_PREFIX = "axis_range_";
+	public static final String AXIS_DOMAIN_PREFIX = "domain_axis_";
+	public static final String AXIS_RANGE_PREFIX = "range_axis_";
 	
 	public static final String AXIS_VISIBLE_SUFIX = "visible";
 	
@@ -120,9 +127,30 @@ public class ChartParams {
 	public static final String AXIS_TICK_MARK_STROKE_SUFFIX = "tick_mark_stroke";
 
 	public static final String PLOTXY_AXIS_GRIDLINE_VISIBLE = "gridline_visible";
-	public static final String PLOTXY_AXIS_GRIDLINE_COLOR = "gridline_color";
+	public static final String PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX = "gridline_color";
 	public static final String PLOTXY_AXIS_GRIDLINE_STROKE = "gridline_stroke";
+	
+	public static final String VALUE_AXIS_AUTO_RANGE_SUFFIX = "auto_range";
+	public static final String VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX = "auto_range_min_size";
+	public static final String VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX = "auto_tick_unit";
+	public static final String VALUE_AXIS_LOWER_BOUND_SUFFIX = "lower_bound";
+	public static final String VALUE_AXIS_UPPER_BOUND_SUFFIX = "upper_bound";
+	public static final String VALUE_AXIS_LOWER_MARGIN_SUFFIX = "lower_margin";
+	public static final String VALUE_AXIS_UPPER_MARGIN_SUFFIX = "upper_margin";
+	public static final String VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX = "vertical_tick_labels";
 
+	public static final String NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX = "auto_range_includes_zero";
+	public static final String NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX = "auto_range_sticky_zero";
+	public static final String NUMBER_AXIS_RANGE_TYPE_SUFFIX = "range_type";
+	public static final String NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX = "number_tick_unit";
+	public static final String NUMBER_AXIS_NUMBER_FORMAT_SUFFIX = "number_format";
+	
+	public static final String DATE_AXIS_DATE_FORMAT_SUFFIX = "date_format";
+	public static final String DATE_AXIS_MAXIMUM_DATE_SUFFIX = "maximum_date";
+	public static final String DATE_AXIS_MINIMUM_DATE_SUFFIX = "minimum_date";
+	public static final String DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX = "tick_mark_position";
+	public static final String DATE_AXIS_DATE_TICK_UNIT_SUFFIX = "date_tick_unit";
+	
 	public ChartParams() {
 		this((ChartParams)null);
 	}
@@ -206,7 +234,6 @@ public class ChartParams {
 		
 		addParam(new PlotOrientationChartParam(PLOTXY_ORIENTATION));
 		addParam(new Point2DChartParam(PLOTXY_QUADRANT_ORIGIN));
-//		addParam(new ColorsChartParam(PLOTXY_QUADRANT_COLORS));
 		addParam(new ListChartParam(new ColorChartParam(PLOTXY_QUADRANT_COLORS)));
 
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
@@ -221,7 +248,6 @@ public class ChartParams {
 		addAxisParams(AXIS_RANGE_PREFIX);
 	}
 	
-	// 16x2
 	private void addAxisParams(String prefix) {
 		addParam(new BooleanChartParam(prefix+AXIS_VISIBLE_SUFIX));
 		
@@ -246,11 +272,31 @@ public class ChartParams {
 		addParam(new StrokeChartParam(prefix+AXIS_TICK_MARK_STROKE_SUFFIX));
 		
 		addParam(new BooleanChartParam(prefix+PLOTXY_AXIS_GRIDLINE_VISIBLE));
-		addParam(new ColorChartParam(prefix+PLOTXY_AXIS_GRIDLINE_COLOR));
+		addParam(new ColorChartParam(prefix+PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
 		addParam(new StrokeChartParam(prefix+PLOTXY_AXIS_GRIDLINE_STROKE));
+		
+		addParam(new BooleanChartParam(prefix+VALUE_AXIS_AUTO_RANGE_SUFFIX));
+		addParam(new DoubleChartParam(prefix+VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX));
+		addParam(new BooleanChartParam(prefix+VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX));
+		addParam(new DoubleChartParam(prefix+VALUE_AXIS_LOWER_BOUND_SUFFIX));
+		addParam(new DoubleChartParam(prefix+VALUE_AXIS_UPPER_BOUND_SUFFIX));
+		addParam(new DoubleChartParam(prefix+VALUE_AXIS_LOWER_MARGIN_SUFFIX));
+		addParam(new DoubleChartParam(prefix+VALUE_AXIS_UPPER_MARGIN_SUFFIX));
+		addParam(new BooleanChartParam(prefix+VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX));
+
+		addParam(new BooleanChartParam(prefix+NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX));
+		addParam(new BooleanChartParam(prefix+NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX));
+		addParam(new RangeTypeChartParam(prefix+NUMBER_AXIS_RANGE_TYPE_SUFFIX));
+		addParam(new NumberTickUnitChartParam(prefix+NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
+		addParam(new NumberFormatChartParam(prefix+NUMBER_AXIS_NUMBER_FORMAT_SUFFIX));
+		
+		addParam(new DateFormatChartParam(prefix+DATE_AXIS_DATE_FORMAT_SUFFIX));
+		addParam(new DateChartParam(prefix+DATE_AXIS_MINIMUM_DATE_SUFFIX));
+		addParam(new DateChartParam(prefix+DATE_AXIS_MAXIMUM_DATE_SUFFIX));
+		addParam(new DateTickMarkPositionChartParam(prefix+DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX));
+		addParam(new DateTickUnitChartParam(prefix+DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
 	}
 	
-	//8x2
 	private void addTitleParams(String prefix) {
 		addParam(new StringChartParam(prefix+TITLE_SUFFIX));
 		addParam(new ColorChartParam(prefix+TITLE_BACKGROUND_COLOR_SUFFIX));
@@ -434,6 +480,78 @@ public class ChartParams {
 		}
 	}
 	
+//	public Range getRange(String name) {
+//		ChartParam param = (ChartParam)paramMap.get(name);
+//		if (param != null && param.getType() == Range.class) {
+//			return (Range)get(name);
+//		} else {
+//			return null;
+//		}
+//	}
+	
+	public RangeType getRangeType(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == RangeType.class) {
+			return (RangeType)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public NumberTickUnit getNumberTickUnit(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == NumberTickUnit.class) {
+			return (NumberTickUnit)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public NumberFormat getNumberFormat(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == NumberFormat.class) {
+			return (NumberFormat)get(name);
+		} else {
+			return null;
+		}
+	}
+
+	public DateFormat getDateFormat(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == DateFormat.class) {
+			return (DateFormat)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public Date getDate(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == Date.class) {
+			return (Date)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public DateTickMarkPosition getDateTickMarkPosition(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == DateTickMarkPosition.class) {
+			return (DateTickMarkPosition)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public DateTickUnit getDateTickUnit(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == DateTickUnit.class) {
+			return (DateTickUnit)get(name);
+		} else {
+			return null;
+		}
+	}
+	
 	public List getList(String name) {
 		ChartParam param = (ChartParam)paramMap.get(name);
 		if (param != null && param.getType() == List.class) {
@@ -451,7 +569,7 @@ public class ChartParams {
 			return null;
 		}
 	}
-	
+
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		Iterator it = valueMap.keySet().iterator();

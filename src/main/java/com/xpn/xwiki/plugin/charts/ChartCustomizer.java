@@ -9,6 +9,8 @@ import java.util.List;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.Axis;
 import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
@@ -67,7 +69,7 @@ public class ChartCustomizer {
     		for (int i = 0; i<list.size(); i++) {
     			renderer.setSeriesPaint(i, (Color)list.get(i));
     		}
-// TODO: how the fuck do we get rid of the default values -- we don't! :(
+// TODO: how the f*** do we get rid of the default values -- we don't! :(
 //    		for (int i = list.size(); renderer.getSeriesPaint(i) != null; i++) {
 //    			renderer.setSeriesPaint(i, null);
 //    		}
@@ -183,9 +185,9 @@ public class ChartCustomizer {
     	if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
     		if (params.getBoolean(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
         		plot.setDomainGridlinesVisible(true);
-        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR) != null) {
+        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX) != null) {
         			plot.setDomainGridlinePaint(params.getColor(ChartParams.AXIS_DOMAIN_PREFIX
-        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR));
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
         		}
         		
         		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
@@ -200,9 +202,9 @@ public class ChartCustomizer {
     	if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
     		if (params.getBoolean(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
         		plot.setRangeGridlinesVisible(true);
-        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR) != null) {
+        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX) != null) {
         			plot.setRangeGridlinePaint(params.getColor(ChartParams.AXIS_RANGE_PREFIX
-        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR));
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
         		}
         		
         		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
@@ -322,11 +324,84 @@ public class ChartCustomizer {
     public static void customizeCategoryAxis(CategoryAxis axis, ChartParams params, String prefix) {
     	customizeAxis(axis, params, prefix);
     }
-    
+
     public static void customizeValueAxis(ValueAxis axis, ChartParams params, String prefix) {
     	customizeAxis(axis, params, prefix);
+    	
+    	if (params.get(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_SUFFIX) != null) {
+    		axis.setAutoRange(params.getBoolean(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_SUFFIX).booleanValue());
+		}
+    	if (axis.isAutoRange()) { // work only with auto range
+    		if (params.get(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX) != null) {
+    			axis.setAutoRangeMinimumSize(params.getDouble(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX).doubleValue());
+    		}    		
+			if (params.get(prefix+ChartParams.VALUE_AXIS_LOWER_MARGIN_SUFFIX) != null) {
+				axis.setLowerMargin(params.getDouble(prefix+ChartParams.VALUE_AXIS_LOWER_MARGIN_SUFFIX).doubleValue());
+			}
+			if (params.get(prefix+ChartParams.VALUE_AXIS_UPPER_MARGIN_SUFFIX) != null) {
+				axis.setUpperMargin(params.getDouble(prefix+ChartParams.VALUE_AXIS_UPPER_MARGIN_SUFFIX).doubleValue());
+			}
+    	} else { // work only when auto range is off
+			if (params.get(prefix+ChartParams.VALUE_AXIS_LOWER_BOUND_SUFFIX) != null) {
+				axis.setLowerBound(params.getDouble(prefix+ChartParams.VALUE_AXIS_LOWER_BOUND_SUFFIX).doubleValue());
+			}
+			if (params.get(prefix+ChartParams.VALUE_AXIS_UPPER_BOUND_SUFFIX) != null) {
+				axis.setUpperBound(params.getDouble(prefix+ChartParams.VALUE_AXIS_UPPER_BOUND_SUFFIX).doubleValue());
+			}    		
+    	}
+    	if (params.get(prefix+ChartParams.VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX) != null) {
+    		axis.setAutoTickUnitSelection(params.getBoolean(prefix+ChartParams.VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX).booleanValue());
+		}
+    	if (params.get(prefix+ChartParams.VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX) != null) {
+    		axis.setVerticalTickLabels(params.getBoolean(prefix+ChartParams.VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX).booleanValue());
+		}
     }
-    
+
+    public static void customizeNumberAxis(NumberAxis axis, ChartParams params, String prefix) {
+    	customizeValueAxis(axis, params, prefix);
+    	if (axis.isAutoRange()) { // work only with auto range
+        	if (params.get(prefix+ChartParams.NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX) != null) {
+        		axis.setAutoRangeIncludesZero(params.getBoolean(prefix+ChartParams.NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX).booleanValue());
+    		}
+        	if (params.get(prefix+ChartParams.NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX) != null) {
+        		axis.setAutoRangeStickyZero(params.getBoolean(prefix+ChartParams.NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX).booleanValue());
+    		}
+    	}
+    	if (params.get(prefix+ChartParams.NUMBER_AXIS_RANGE_TYPE_SUFFIX) != null) {
+    		axis.setRangeType(params.getRangeType(prefix+ChartParams.NUMBER_AXIS_RANGE_TYPE_SUFFIX));
+    	}
+    	if (!axis.isAutoTickUnitSelection()) {
+	    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX) != null) {
+	    		axis.setTickUnit(params.getNumberTickUnit(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
+	    	}
+    	}
+    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX) != null) {
+    		axis.setNumberFormatOverride(params.getNumberFormat(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX));
+    	}
+    }
+
+    public static void customizeDateAxis(DateAxis axis, ChartParams params, String prefix) {
+    	customizeValueAxis(axis, params, prefix);
+
+    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_SUFFIX) != null) {
+    		axis.setDateFormatOverride(params.getDateFormat(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_SUFFIX));
+    	}
+    	if (params.get(prefix+ChartParams.DATE_AXIS_MAXIMUM_DATE_SUFFIX) != null) {
+    		axis.setMaximumDate(params.getDate(prefix+ChartParams.DATE_AXIS_MAXIMUM_DATE_SUFFIX));
+    	}
+    	if (params.get(prefix+ChartParams.DATE_AXIS_MINIMUM_DATE_SUFFIX) != null) {
+    		axis.setMinimumDate(params.getDate(prefix+ChartParams.DATE_AXIS_MINIMUM_DATE_SUFFIX));
+    	}
+    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX) != null) {
+    		axis.setTickMarkPosition(params.getDateTickMarkPosition(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX));
+    	}
+    	if (!axis.isAutoTickUnitSelection()) {
+	    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX) != null) {
+	    		axis.setTickUnit(params.getDateTickUnit(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
+	    	}
+    	}
+    }
+
     public static void customizeChart(JFreeChart jfchart, ChartParams params) {
         // title
         if (params.get(ChartParams.TITLE_PREFIX+ChartParams.TITLE_SUFFIX) != null) {

@@ -143,7 +143,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         
         // test internal links
         renderTest(wikibase, "Test link: [#anchorname]",
-            "<a href=\"#anchorname\"></a>", false, getXWikiContext());
+            "<a href=\"#anchorname\">anchorname</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [internal link>#anchorname]",
             "<a href=\"#anchorname\">internal link</a>", false, getXWikiContext());
         }

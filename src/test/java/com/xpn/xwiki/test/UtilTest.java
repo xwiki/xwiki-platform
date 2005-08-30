@@ -170,19 +170,26 @@ public class UtilTest extends HibernateClassesTest {
       assertNull(result.get("j"));
     }
 
+
+
     public void testSecureLaszloCode() throws XWikiException {
-      String result = Util.secureLaszloCode("<image src=\"../../../toto.gif\">");
-      assertTrue("Code is not secure", (result.indexOf("..")==-1));
-        result = Util.secureLaszloCode("<image src=../../../toto.gif >");
-              assertTrue("Code is not secure", (result.indexOf("..")==-1));
-        result = Util.secureLaszloCode("<image src=\"/../../../toto.gif\">");
-              assertTrue("Code is not secure", (result.indexOf("\"/")==-1));
-        result = Util.secureLaszloCode("<image src=\"../../../toto.gif\">");
-              assertTrue("Code is not secure", (result.indexOf("..")==-1));
-        result = Util.secureLaszloCode("<image src=\"..../../../toto.gif\">");
-              assertTrue("Code is not secure", (result.indexOf("toto.gif")!=-1));
-        result = Util.secureLaszloCode("<image anything=\"../../../toto.gif\">");
-              assertTrue("Code is not secure", (result.indexOf("\"/")==-1));
+        testSecureLaszloCode("<image src=\"../../../toto.gif\" />");
+        testSecureLaszloCode("<image src=../../../toto.gif />");
+        testSecureLaszloCode("<image src=\"/../../../toto.gif\" />");
+        testSecureLaszloCode("<image src=\"../../../toto.gif\" />");
+        testSecureLaszloCode("<image src=\"..../../../toto.gif\" />");
+        testSecureLaszloCode("<image anything=\"../../../toto.gif\" />");
+    }
+
+    private void testSecureLaszloCode(String data) throws XWikiException {
+        try {
+            String result = Util.secureLaszloCode(data);
+            assertTrue("Code is not secure", (result.indexOf("..")==-1));
+        } catch (XWikiException e) {
+            if ((e.getCode()!=XWikiException.ERROR_LASZLO_INVALID_DOTDOT)
+                &&(e.getCode()!=XWikiException.ERROR_LASZLO_INVALID_XML))
+                throw e;
+        }
     }
 
 }

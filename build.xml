@@ -253,7 +253,9 @@
             	<fileset dir="${java.test.src.dir}">
             		<include name="**/*Test.java"/>
                     <exclude name="**/Abstract*.java"/>
-                    <!-- TODO: Why do we exclude this test? -->
+                    <!-- Excluded because integration code not yet commited -->
+                    <exclude name="**/BackLinksIntegrationTest.java"/>
+                    <!-- Excluded because hibernate store is the one used -->
                     <exclude name="**/StoreRCSFileTest.java"/>
                 </fileset>
             </batchtest>
@@ -280,7 +282,7 @@
 
         <mkdir dir="${test.reports.dir}" />
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${tests.build.dir}"
-            haltonfailure="no" fork="on" >
+            haltonfailure="no" fork="on"  maxmemory="256m" >
 
             <classpath>
                 <pathelement path="${tests.build.dir}" />
@@ -292,19 +294,20 @@
 
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${cactus.test.src.dir}">
-                    <include name="**/ServletAuthTest.java"/>
+                    <include name="**/*Test.java"/>
                     <exclude name="**/AllTests.java"/>
                     <exclude name="**/AllServletTests.java"/>
                     <exclude name="**/ServletTest.java"/>
                     <exclude name="**/XWikiIntegrationTest.java"/>
+                    <exclude name="**/atom/**" />
                 </fileset>
             </batchtest>
 
             <containerset>
               <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="9080" todir="${test.reports.dir}"/>                
+                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
               <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="9080" todir="${test.reports.dir}"/>
+                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
             </containerset>
         </cactus> 
         <delete file="${cactus.warfile}" />

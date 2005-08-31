@@ -216,6 +216,19 @@
             encoding="ISO-8859-1"/>
     </target>
 
+	<target name="jar" depends="xwiki" description="Packages xwiki as a jar">
+		<jar destfile="${release.dir}/xwiki.jar">
+			<!--  classes -->
+		    <fileset dir="${classes.dir}">
+		        <include name="**/*.class"/>
+		    </fileset>
+		    <!-- resources -->
+		    <fileset dir="${resources.main.src.dir}">
+		        <include name="**/*"/>
+		    </fileset>
+		</jar>		
+	</target>
+	
     <target name="tests" depends="junit-check,prepare,xwiki">
     	<copy todir="${tests.build.dir}">
             <fileset dir="${resources.test.src.dir}"/>
@@ -362,6 +375,9 @@
         <exclude name="**/xwiki-*.cfg" />
         <lib refid="libs.main.fileset" />
         <lib refid="libs.exo.fileset" />
+        <!-- <webinf dir="${main.src.dir}">
+            <include name="jboss-web.xml"/>
+        </webinf>  -->
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />

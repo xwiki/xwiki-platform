@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DateChartParam extends DateFormatChartParam {
@@ -31,9 +32,9 @@ public class DateChartParam extends DateFormatChartParam {
 			format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		}
 		try {
-			return format.parse(getStringParam(map, ""));
+			return format.parse(getStringArg(map, "value"));
 		} catch (ParseException e) {
-			throw new ParamException("Invalid value for parameter :"+getName(), e);
+			throw new InvalidParamException("Invalid value for parameter :"+getName(), e);
 		}
 	}
 }

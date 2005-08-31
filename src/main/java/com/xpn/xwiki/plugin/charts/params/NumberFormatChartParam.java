@@ -4,6 +4,8 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class NumberFormatChartParam extends LocaleChartParam {
@@ -28,11 +30,11 @@ public class NumberFormatChartParam extends LocaleChartParam {
 
 	public Object convert(String value) throws ParamException {
 		Map map = parseMap(value);
-		String type = getStringParam(map, TYPE);
+		String type = getStringArg(map, TYPE);
 		Locale locale;
 		try {
 			locale = (Locale)super.convert(value);
-		} catch (ParamException e) {
+		} catch (MissingArgumentException e) {
 			locale = null;
 		}
 		
@@ -67,8 +69,8 @@ public class NumberFormatChartParam extends LocaleChartParam {
 				return NumberFormat.getPercentInstance();
 			}			
 		} else {
-			throw new ParamException("Invalid value for parameter "+getName()+
-			"Unknown type argument: "+type);
+			throw new InvalidArgumentException("Invalid value for parameter "
+					+ getName() + ": Unexpected value for type argument: " + type);
 		}
 	}
 }

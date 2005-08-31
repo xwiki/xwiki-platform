@@ -1,13 +1,15 @@
 package com.xpn.xwiki.plugin.charts.params;
 
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jfree.chart.axis.DateTickUnit;
 
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
-public class DateTickUnitChartParam extends AbstractChartParam {
+public class DateTickUnitChartParam extends DateFormatChartParam {
 	private Map unitChoice;
 	
 	public DateTickUnitChartParam(String name) {
@@ -37,8 +39,13 @@ public class DateTickUnitChartParam extends AbstractChartParam {
 
 	public Object convert(String value) throws ParamException {
 		Map map = parseMap(value);
-		int unit = ((Integer)getChoiceParam(map, "unit", unitChoice)).intValue();
-		int count = getIntParam(map, "count");
-		return new DateTickUnit(unit, count); //TODO: inherit DateFormat
+		DateFormat format;
+		int unit = ((Integer)getChoiceArg(map, "unit", unitChoice)).intValue();
+		int count = getIntArg(map, "count");
+		try {
+			return new DateTickUnit(unit, count, (DateFormat)super.convert(value));
+		} catch (MissingArgumentException e) {
+			return new DateTickUnit(unit, count);
+		}
 	}
 }

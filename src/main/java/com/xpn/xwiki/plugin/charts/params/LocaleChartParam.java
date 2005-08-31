@@ -3,6 +3,7 @@ package com.xpn.xwiki.plugin.charts.params;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class LocaleChartParam extends AbstractChartParam {
@@ -24,16 +25,16 @@ public class LocaleChartParam extends AbstractChartParam {
 
 	public Object convert(String value) throws ParamException {
 		Map map = parseMap(value);
-		String language = getStringParam(map, LANGUAGE);
+		String language = getStringArg(map, LANGUAGE);
 		try {
-			String country = getStringParam(map, COUNTRY);
+			String country = getStringArg(map, COUNTRY);
 			try {
-				String variant = getStringParam(map, VARIANT);
+				String variant = getStringArg(map, VARIANT);
 				return new Locale(language, country, variant);
-			} catch (ParamException e) {
+			} catch (MissingArgumentException e) {
 				return new Locale(language, country);
 			}
-		} catch (ParamException e) {
+		} catch (MissingArgumentException e) {
 			return new Locale(language);
 		}		
 	}

@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public abstract class AbstractChartParam implements ChartParam {
@@ -52,81 +54,72 @@ public abstract class AbstractChartParam implements ChartParam {
 		return getName();
 	}
 	
-	protected String getStringParam(Map map, String name) throws ParamException {
+	protected String getStringArg(Map map, String name) throws MissingArgumentException {
 		String value = (String)map.get(name);
 		if (value != null) {
 			return value;
 		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+": When " + 
-					map.size() + " values are present one has to be " + name);
+			throw new MissingArgumentException("Invalid value for the parameter "
+					+ getName() + ": Argument " + name + " is mandatory.");
 		}
 	}
 
-	protected int getIntParam(Map map, String name) throws ParamException {
-		String value = (String)map.get(name);
-		if (value != null) {
-			try {
-				return Integer.parseInt(value);
-			} catch (NumberFormatException e) {
-				throw new ParamException("Non-integer value for the parameter "+getName());
-			}
-		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+": When " + 
-					map.size() + " values are present one has to be " + name);
-		}
+	protected String getStringOptionalArg(Map map, String name) {
+		return (String)map.get(name);
 	}
-	
-	protected float getFloatParam(Map map, String name) throws ParamException {
-		String value = (String)map.get(name);
-		if (value != null) {
-			try {
-				return Float.parseFloat(value);
-			} catch (NumberFormatException e) {
-				throw new ParamException("Non-float value for the parameter "+getName());
-			}
-		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
-					map.size() + " values are present one has to be " + name);
-		}
-	}
-	
-	protected double getDoubleParam(Map map, String name) throws ParamException {
-		String value = (String)map.get(name);
-		if (value != null) {
-			try {
-				return Double.parseDouble(value);
-			} catch (NumberFormatException e) {
-				throw new ParamException("Non-double value for the parameter "+getName());
-			}
-		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
-					map.size() + " values are present one has to be " + name);
+
+	protected int getIntArg(Map map, String name)
+			throws MissingArgumentException, InvalidArgumentException {
+		String value = getStringArg(map, name);
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			throw new InvalidArgumentException("Invalid value for the parameter "
+					+ getName() + ": Non-integer value for the " + name + " argument.");
 		}
 	}
 
-	protected Object getChoiceParam(Map map, String name,
-			Map choices) throws ParamException {
-		String value = getStringParam(map, name);
+	protected float getFloatArg(Map map, String name)
+			throws MissingArgumentException, InvalidArgumentException {
+		String value = getStringArg(map, name);
+		try {
+			return Float.parseFloat(value);
+		} catch (NumberFormatException e) {
+			throw new InvalidArgumentException("Invalid value for the parameter "
+					+getName() + ": Non-float value for the " + name + " argument.");
+		}
+	}
+	
+	protected double getDoubleArg(Map map, String name)
+			throws MissingArgumentException, InvalidArgumentException { 
+		String value = getStringArg(map, name);
+		try {
+			return Double.parseDouble(value);
+		} catch (NumberFormatException e) {
+			throw new InvalidArgumentException("Invalid value for the parameter "
+					+getName() + ": Non-double value for the " + name + " argument.");
+		}
+	}
+
+	protected Object getChoiceArg(Map map, String name, Map choices)
+			throws MissingArgumentException, InvalidArgumentException {
+		String value = getStringArg(map, name);
 		Object obj = choices.get(value);
 		if (obj != null) {
 			return obj;
 		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+
-					": accepted values are " + choices.keySet() + "; encountered:" + value);
+			throw new InvalidArgumentException("Invalid value for the parameter "+getName()+
+					": The accepted values for the " + name + "argument are "
+					+ choices.keySet() + "; encountered: " + value);
 		}
 	}
 	
-	protected List getListParam(Map map, String name) throws ParamException {
-		String value = (String)map.get(name);
-		if (value != null) {
-			return parseList(value);
-		} else {
-			throw new ParamException("Invalid value for the parameter "+getName()+": When " +
-					map.size() + " values are present one has to be " + name);
-		}
+	protected List getListArg(Map map, String name)
+			throws MissingArgumentException {
+		return parseList(getStringArg(map, name));
 	}
 	
-	protected Map parseMap(String value) throws ParamException {
+	protected Map parseMap(String value) throws InvalidArgumentException {
 		String[] args = value.split(MAP_SEPARATOR);
 		if (args.length == 0 || (args.length == 1 && args[0].length() == 0)) {
 			return new HashMap(0);
@@ -135,8 +128,8 @@ public abstract class AbstractChartParam implements ChartParam {
 		for (int i = 0; i<args.length; i++) {
 			String[] split = args[i].split(MAP_ASSIGNMENT);
 			if (split.length != 2) {
-				throw new ParamException("Invalid value for the parameter "+getName()+": "
-						+ "name" + MAP_ASSIGNMENT + "value \"" + 
+				throw new InvalidArgumentException("Invalid value for the parameter "
+						+getName()+": " + "name" + MAP_ASSIGNMENT + "value \"" + 
 						MAP_SEPARATOR + "\"-separated list expected");
 			}
 			result.put(split[0].trim(), split[1].trim());
@@ -144,16 +137,17 @@ public abstract class AbstractChartParam implements ChartParam {
 		return result;
 	}
 
-	protected Map parseMap(String value, int expectedTokenCount) throws ParamException {
+	protected Map parseMap(String value, int expectedTokenCount)
+			throws InvalidArgumentException {
 		Map result = parseMap(value);
 		if (result.size() != expectedTokenCount) {
-			throw new ParamException("Invalid number of values given to the "
+			throw new InvalidArgumentException("Invalid number of arguments given to the "
 					+ getName() + " parameter; expected:"+expectedTokenCount);
 		}
 		return result;
 	}
 	
-	protected List parseList(String value) throws ParamException {
+	protected List parseList(String value) {
 		String[] args = value.split(LIST_SEPARATOR);
 		if (args.length == 0 || (args.length == 1 && args[0].length() == 0)) {
 			return new ArrayList(0);
@@ -165,7 +159,7 @@ public abstract class AbstractChartParam implements ChartParam {
 		return result;
 	}
 	
-	protected List toFloatList(List list) throws ParamException {
+	protected List toFloatList(List list) throws InvalidArgumentException {
 		List result = new ArrayList(list.size());
 		Iterator it = list.iterator();
 		while (it.hasNext()) {
@@ -173,14 +167,14 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				result.add(new Float(value));
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid value for the parameter "+getName()+": "+
-						"non-float value for " + name );
+				throw new InvalidArgumentException("Invalid value for the parameter "
+						+ getName() + ": Non-float value for " + name );
 			}			
 		}
 		return result;
 	}
 	
-	protected float[] toFloatArray(List list) throws ParamException {
+	protected float[] toFloatArray(List list) throws InvalidArgumentException {
 		float[] result = new float[list.size()];
 		Iterator it = list.iterator(); int i = 0;
 		while (it.hasNext()) {
@@ -188,8 +182,8 @@ public abstract class AbstractChartParam implements ChartParam {
 			try {
 				result[i] = Float.parseFloat(value);
 			} catch (NumberFormatException e) {
-				throw new ParamException("Invalid value for the parameter "+getName()+": "+
-						"non-float value for " + name);
+				throw new InvalidArgumentException("Invalid value for the parameter "
+						+ getName()+": Non-float value for " + name);
 			}
 			i++;
 		}

@@ -3,6 +3,7 @@ package com.xpn.xwiki.plugin.charts.params;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public abstract class ChoiceChartParam extends AbstractChartParam {
@@ -27,12 +28,13 @@ public abstract class ChoiceChartParam extends AbstractChartParam {
 		if (value != null) {
 			return value;
 		} else {
-			throw new ParamException("Invalid parameter value: " +
+			throw new InvalidParamException("Invalid parameter value: " +
 					"Accepted values for the " + getName() + " parameter are "
-					+ choices.toString() + "; encountered:" + selector);
+					+ choices.toString() + "; encountered: " + selector);
 		}
 	}
 
 	protected abstract void init();
+	
 	public abstract Class getType();
 }

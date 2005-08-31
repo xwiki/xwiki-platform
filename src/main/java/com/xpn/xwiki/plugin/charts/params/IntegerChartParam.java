@@ -1,5 +1,6 @@
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class IntegerChartParam extends AbstractChartParam implements ChartParam {
@@ -20,7 +21,7 @@ public class IntegerChartParam extends AbstractChartParam implements ChartParam 
         try {
 	        return new Integer(value);
         } catch (NumberFormatException nfe) {
-			throw new ParamException("Noninteger value for the "+getName()+" parameter", nfe);
+			throw new InvalidParamException("Noninteger value for the "+getName()+" parameter", nfe);
         }
 	}
 }

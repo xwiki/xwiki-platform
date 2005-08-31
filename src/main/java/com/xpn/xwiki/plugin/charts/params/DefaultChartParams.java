@@ -18,7 +18,7 @@ public class DefaultChartParams extends ChartParams {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public static synchronized DefaultChartParams getInstance() {
 		if (uniqueInstance == null) {
 			uniqueInstance = new DefaultChartParams();

@@ -2,6 +2,8 @@ package com.xpn.xwiki.plugin.charts;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.LocaleMacro;
@@ -62,22 +64,45 @@ public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWiki
 	        		ChartParams.TITLE_PREFIX+ChartParams.TITLE_SUFFIX);
 	        Integer height = chartParams.getInteger(ChartParams.HEIGHT);
 	        Integer width = chartParams.getInteger(ChartParams.WIDTH);
+	        Map imageAttr = chartParams.getMap(ChartParams.IMAGE_ATTRIBUTES);
+	        Map linkAttr = chartParams.getMap(ChartParams.LINK_ATTRIBUTES);
 	        
-	        // output the links
+	        // output the image links
 	        StringBuffer sbuffer = new StringBuffer();
 	        sbuffer.append("<a href=\""+ chart.getPageURL() + "\" ");
-	        sbuffer.append("title=\""+chart.getTitle()+"\">");
+	        if (title != null) {
+	        	sbuffer.append("title=\"" + title + "\"");
+	        }
+	        if (linkAttr != null) {
+		        Iterator it = linkAttr.keySet().iterator();
+		        while (it.hasNext()) {
+		        	String name = (String)it.next();
+		        	String value = (String)imageAttr.get(name);
+			        sbuffer.append(name+"=\"" + value + "\" ");
+		        }
+	        }
+	        sbuffer.append(">");
 	        sbuffer.append("<img src=\"");
 	        sbuffer.append(chart.getImageURL());
 	        sbuffer.append("\" ");
-	        sbuffer.append("alt=\""+ title + "\" ");
-	        if (height != null) {
-		        sbuffer.append("height=\"" + height + "\" ");
+	        if (title != null) {
+	        	sbuffer.append("alt=\""+ title + "\" ");
 	        }
-	        if (width != null) {
-	        	sbuffer.append("width=\"" + width + "\" ");
-	        }
-	        sbuffer.append("\" />");
+	        sbuffer.append("height=\"" + height + "\" ");
+        	sbuffer.append("width=\"" + width + "\" ");
+        	if (imageAttr != null) {
+        		Iterator it = imageAttr.keySet().iterator();
+		        while (it.hasNext()) {
+		        	String name = (String)it.next();
+		        	if (name != ChartParams.HEIGHT && name != ChartParams.WIDTH) {
+			        	String value = (String)imageAttr.get(name);
+				        sbuffer.append(name + "=\"" + value + "\" ");
+		        	} else {
+		        		throw exception("The image " + name + " can only be set by the " + name + "parameter");
+		        	}
+		        }
+        	}
+	        sbuffer.append("/>");
 	        sbuffer.append("</a>");
 	        
 	        writer.write(sbuffer.toString());

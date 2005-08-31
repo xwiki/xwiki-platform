@@ -23,10 +23,10 @@ public class RectangleInsetsChartParam extends AbstractChartParam {
 	public Object convert(String value) throws ParamException {
 		Map map = parseMap(value, 4);
 		return new RectangleInsets(
-				getDoubleParam(map, "top"),
-				getDoubleParam(map, "left"),
-				getDoubleParam(map, "bottom"),
-				getDoubleParam(map, "right")
+				getDoubleArg(map, "top"),
+				getDoubleArg(map, "left"),
+				getDoubleArg(map, "bottom"),
+				getDoubleArg(map, "right")
 		);
 	}
 }

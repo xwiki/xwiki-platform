@@ -1,5 +1,6 @@
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class FloatChartParam extends AbstractChartParam {
@@ -20,7 +21,7 @@ public class FloatChartParam extends AbstractChartParam {
         try {
 	        return new Float(value);
         } catch (NumberFormatException nfe) {
-			throw new ParamException("Non-float value for the "+getName()+" parameter", nfe);
+			throw new InvalidParamException("Non-float value for the "+getName()+" parameter", nfe);
         }
 	}
 }

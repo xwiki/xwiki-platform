@@ -33,9 +33,14 @@ public class ChartParams {
 	
 	public static final String TYPE = "type";
 	public static final String SOURCE = "source";
-	public static final String WIDTH = "width";
-	public static final String HEIGHT = "height";
+	
 	public static final String SERIES = "series";
+
+	public static final String HEIGHT = "height";
+	public static final String WIDTH = "width";
+	public static final String IMAGE_ATTRIBUTES = "image_attributes";
+	public static final String LINK_ATTRIBUTES = "link_attributes";
+
 	public static final String RENDERER = "renderer";
 	
 	public static final String RENDERER_COLOR = "renderer_color";
@@ -151,6 +156,9 @@ public class ChartParams {
 	public static final String DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX = "tick_mark_position";
 	public static final String DATE_AXIS_DATE_TICK_UNIT_SUFFIX = "date_tick_unit";
 	
+	public static final String TIME_PERIOD_CLASS = "time_period";
+	public static final String DATE_FORMAT = "date_format";
+
 	public ChartParams() {
 		this((ChartParams)null);
 	}
@@ -186,10 +194,13 @@ public class ChartParams {
 		this.parent = parent;
 		addParam(new StringChartParam(TYPE, false));
 		addParam(new MapChartParam(SOURCE, false));
-		addParam(new IntegerChartParam(WIDTH));
+
 		addParam(new IntegerChartParam(HEIGHT));
+		addParam(new IntegerChartParam(WIDTH));
+		addParam(new MapChartParam(LINK_ATTRIBUTES));
+		addParam(new MapChartParam(IMAGE_ATTRIBUTES));
+
 		addParam(new StringChartParam(RENDERER));
-		
 		addParam(new ColorChartParam(RENDERER_COLOR));
 		addParam(new StrokeChartParam(RENDERER_STROKE));
 		addParam(new ShapeChartParam(RENDERER_SHAPE));
@@ -212,7 +223,6 @@ public class ChartParams {
 		addParam(new ListChartParam(new ColorChartParam(RENDERER_SERIES_ITEM_LABEL_COLORS)));
 		addParam(new ListChartParam(new FontChartParam(RENDERER_SERIES_ITEM_LABEL_FONTS)));
 
-		
 		addParam(new BooleanChartParam(BORDER_VISIBLE));
 		addParam(new ColorChartParam(BORDER_COLOR));
 		addParam(new StrokeChartParam(BORDER_STROKE));
@@ -246,6 +256,9 @@ public class ChartParams {
 
 		addAxisParams(AXIS_DOMAIN_PREFIX);
 		addAxisParams(AXIS_RANGE_PREFIX);
+		
+		addParam(new TimePeriodClassChartParam(TIME_PERIOD_CLASS));
+		addParam(new DateFormatChartParam(DATE_FORMAT));
 	}
 	
 	private void addAxisParams(String prefix) {
@@ -547,6 +560,15 @@ public class ChartParams {
 		ChartParam param = (ChartParam)paramMap.get(name);
 		if (param != null && param.getType() == DateTickUnit.class) {
 			return (DateTickUnit)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public Class getClass(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == Class.class) {
+			return (Class)get(name);
 		} else {
 			return null;
 		}

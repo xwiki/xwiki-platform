@@ -370,10 +370,11 @@ public class ChartCustomizer {
     	if (params.get(prefix+ChartParams.NUMBER_AXIS_RANGE_TYPE_SUFFIX) != null) {
     		axis.setRangeType(params.getRangeType(prefix+ChartParams.NUMBER_AXIS_RANGE_TYPE_SUFFIX));
     	}
-    	if (!axis.isAutoTickUnitSelection()) {
-	    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX) != null) {
-	    		axis.setTickUnit(params.getNumberTickUnit(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
-	    	}
+    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX) != null) {
+        	if (axis.isAutoTickUnitSelection()) {
+        		axis.setAutoTickUnitSelection(false);
+        	}
+    		axis.setTickUnit(params.getNumberTickUnit(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
     	}
     	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX) != null) {
     		axis.setNumberFormatOverride(params.getNumberFormat(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX));
@@ -395,10 +396,11 @@ public class ChartCustomizer {
     	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX) != null) {
     		axis.setTickMarkPosition(params.getDateTickMarkPosition(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX));
     	}
-    	if (!axis.isAutoTickUnitSelection()) {
-	    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX) != null) {
-	    		axis.setTickUnit(params.getDateTickUnit(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
-	    	}
+    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX) != null) {
+        	if (axis.isAutoTickUnitSelection()) {
+        		axis.setAutoTickUnitSelection(false);
+        	}
+    		axis.setTickUnit(params.getDateTickUnit(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
     	}
     }
 

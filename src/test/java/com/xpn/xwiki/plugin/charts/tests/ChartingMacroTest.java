@@ -91,6 +91,7 @@ public class ChartingMacroTest extends TestCase {
 		params.getParams().put("title", "A title");
 		params.getParams().put("type", "pie");
 		params.getParams().put("source", "type:table;doc:Page;table_number:0;range:A1-D4;has_header_row:true;has_header_column:true");
+		params.getParams().put("image_attributes", "name:value");
 		
 		StringWriter swriter = new StringWriter();
 		macro.execute(swriter, params);

@@ -21,6 +21,6 @@ public class Point2DChartParam extends AbstractChartParam {
 
 	public Object convert(String value) throws ParamException {
 		Map map = parseMap(value, 2);
-		return new Point2D.Double(getDoubleParam(map, "x"), getDoubleParam(map, "y"));
+		return new Point2D.Double(getDoubleArg(map, "x"), getDoubleArg(map, "y"));
 	}
 }

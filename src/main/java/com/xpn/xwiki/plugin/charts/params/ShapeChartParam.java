@@ -49,7 +49,7 @@ public class ShapeChartParam extends AbstractChartParam {
 		try {
 			return choice.convert(value);
 		} catch (ParamException e) {
-			// TODO: custom shapes?
+			// TODO: custom shapes
 			throw e;
 		}
 	}

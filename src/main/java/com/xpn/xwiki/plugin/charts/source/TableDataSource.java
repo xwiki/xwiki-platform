@@ -26,6 +26,13 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 
     public static final String COMMA_SELECTOR = "comma";
     public static final String PERIOD_SELECTOR = "period";
+
+    public static final int DEFAULT_TABLE_NUMBER = 0;
+    public static final String DEFAULT_RANGE= "*";
+    public static final boolean DEFAULT_HAS_HEADER_ROW = true;
+    public static final boolean DEFAULT_HAS_HEADER_COLUMN = true;
+    public static final String DEFAULT_DECIMAL_SYMBOL = PERIOD_SELECTOR;
+    public static final boolean DEFAULT_IGNORE_ALPHA = false;
     
     public static final char COMMA = ',';
     public static final char PERIOD = '.';
@@ -46,10 +53,10 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
     		throws DataSourceException {
 		init(defObject.getName(),
 			defObject.getIntValue(TABLE_NUMBER),
-			defObject.getStringValue(RANGE)==""?null:defObject.getStringValue(RANGE),
+			defObject.getStringValue(RANGE)==""?DEFAULT_RANGE:defObject.getStringValue(RANGE),
 			defObject.getIntValue(HAS_HEADER_ROW) == 1,
 			defObject.getIntValue(HAS_HEADER_COLUMN) == 1,
-			defObject.getStringValue(DECIMAL_SYMBOL)==""?null:
+			defObject.getStringValue(DECIMAL_SYMBOL)==""?DEFAULT_DECIMAL_SYMBOL:
 				defObject.getStringValue(DECIMAL_SYMBOL),
 			defObject.getIntValue(IGNORE_ALPHA) == 1, context);
     }
@@ -58,8 +65,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
     		throws DataSourceException {
 		String doc = (String)params.get(DOC);
 		if (doc == null) {
-			throw new DataSourceException("Missing argument "
-					+DOC+" for parameter source");
+			doc = context.getDoc().getFullName();
 		}
 		
 		String n = (String)params.get(TABLE_NUMBER);
@@ -72,14 +78,12 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 						+" for parameter source: integer value expected");
 			}
 		} else {
-			throw new DataSourceException("Missing argument "
-					+TABLE_NUMBER+" for parameter source");
+			number = DEFAULT_TABLE_NUMBER;
 		}
 		
 		String range = (String)params.get(RANGE);
-		if (doc == null) {
-			throw new DataSourceException("Missing argument "
-					+RANGE+" for parameter source");
+		if (range == null) {
+			range = DEFAULT_RANGE;
 		}
 
 		String hhr = (String)params.get(HAS_HEADER_ROW);
@@ -87,8 +91,7 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 		if (hhr != null) {
 			hasHeaderRow = hhr.equalsIgnoreCase("true");
 		} else {
-			throw new DataSourceException("Missing argument "
-					+HAS_HEADER_ROW+" for parameter source");
+			hasHeaderRow = DEFAULT_HAS_HEADER_ROW;
 		}
 		
 		String hhc = (String)params.get(HAS_HEADER_COLUMN);
@@ -96,16 +99,17 @@ public class TableDataSource extends DefaultDataSource implements DataSource {
 		if (hhc != null) {
 			hasHeaderColumn = hhc.equalsIgnoreCase("true");
 		} else {
-			throw new DataSourceException("Missing argument "
-					+HAS_HEADER_COLUMN+" for parameter source");
+			hasHeaderColumn = DEFAULT_HAS_HEADER_COLUMN;
 		}
 
 		String decimal = (String)params.get(DECIMAL_SYMBOL);
 
 		String ia = (String)params.get(IGNORE_ALPHA);
-		boolean ignoreAlpha = false;
+		boolean ignoreAlpha;
 		if (ia != null) {
-			ignoreAlpha = ia.equalsIgnoreCase("true");
+			ignoreAlpha = ia.equals("true");
+		} else {
+			ignoreAlpha = DEFAULT_IGNORE_ALPHA;
 		}
 				
 		init(doc, number, range, hasHeaderRow, hasHeaderColumn, decimal, ignoreAlpha, context);

@@ -2,6 +2,8 @@ package com.xpn.xwiki.plugin.charts.params;
 
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class MapChartParam extends AbstractChartParam {
@@ -19,6 +21,10 @@ public class MapChartParam extends AbstractChartParam {
 	}
 
 	public Object convert(String value) throws ParamException {
-		return parseMap(value);
+		try {
+			return parseMap(value);
+		} catch (InvalidArgumentException e) {
+			throw new InvalidParamException(e);
+		}
 	}
 }

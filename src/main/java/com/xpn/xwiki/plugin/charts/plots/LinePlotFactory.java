@@ -34,7 +34,7 @@ public class LinePlotFactory  implements PlotFactory {
 			
 			XYItemRenderer renderer = XYItemRendererFactory.getInstance().create(params);
 
-			XYDataset dataset = XYDatasetFactory.getInstance().create(dataSource, params);
+			XYDataset dataset = TableXYDatasetFactory.getInstance().create(dataSource, params);
 			
 			XYPlot plot = new XYPlot(dataset, domainAxis, rangeAxis, renderer);
 			

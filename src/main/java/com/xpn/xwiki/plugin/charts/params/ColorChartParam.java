@@ -4,10 +4,11 @@ import java.awt.Color;
 import java.awt.Shape;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class ColorChartParam extends AbstractChartParam {
-	private ChartParam choice;
+	private ChartParam colorChoice;
 	
 	public ColorChartParam(String name) {
 		super(name);
@@ -24,7 +25,7 @@ public class ColorChartParam extends AbstractChartParam {
 	}
 	
 	public void init() {
-		choice = new ChoiceChartParam(getName()) {			
+		colorChoice = new ChoiceChartParam(getName()) {			
 			protected void init() {
 				addChoice("black", new Color(0x000000));
 				addChoice("silver", new Color(0xC0C0C0));
@@ -53,10 +54,10 @@ public class ColorChartParam extends AbstractChartParam {
 
 	public Object convert(String value) throws ParamException {
 		try {
-			return choice.convert(value);
+			return colorChoice.convert(value);
 		} catch (ParamException e) {
 			if (value.length() == 0) {
-		       	throw new ParamException("Empty color parameter "+getName());
+		       	throw new InvalidParamException("Empty color parameter " + getName());
 			}
 			if (value.charAt(0) == '#') {
 		        value = value.substring(1);
@@ -64,16 +65,16 @@ public class ColorChartParam extends AbstractChartParam {
 		        try {
 		        	intValue = Integer.parseInt(value, 16);
 		        } catch (NumberFormatException nfe) {
-					throw new ParamException("Color parameter "+getName()+" is not a valid hexadecimal number");
+					throw new InvalidParamException("Color parameter " + getName() + " is not a valid hexadecimal number");
 		        }
 		        return new Color(intValue);				
 	        } else {
 	        	Map map = parseMap(value, 4);
 	        	try {
-		        	return new Color(getIntParam(map, "red"), getIntParam(map, "green"),
-		        			getIntParam(map, "blue"), getIntParam(map, "alpha"));
+		        	return new Color(getIntArg(map, "red"), getIntArg(map, "green"),
+		        			getIntArg(map, "blue"), getIntArg(map, "alpha"));
 	        	} catch (IllegalArgumentException iae) {
-	        		throw new ParamException("Color component out of range (0-255)");
+	        		throw new InvalidParamException("Color component out of range (0-255)");
 	        	}
 	        }
 		}

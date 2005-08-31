@@ -5,6 +5,7 @@ import java.awt.Stroke;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class StrokeChartParam extends AbstractChartParam {
@@ -39,36 +40,36 @@ public class StrokeChartParam extends AbstractChartParam {
 		Map map = parseMap(value);
 		switch (map.size()) {
 			case 0: return new BasicStroke();
-			case 1: return new BasicStroke(getFloatParam(map, "width"));
+			case 1: return new BasicStroke(getFloatArg(map, "width"));
 			case 3: return new BasicStroke(
-							getFloatParam(map, "width"),
+							getFloatArg(map, "width"),
 							getCapParam(map, "cap"),
 							getJoinParam(map, "join")
 					);
 			case 4: return new BasicStroke(
-							getFloatParam(map, "width"),
+							getFloatArg(map, "width"),
 							getCapParam(map, "cap"),
 							getJoinParam(map, "join"),
-							getFloatParam(map, "miterlimit")
+							getFloatArg(map, "miterlimit")
 					);
 			case 6: return new BasicStroke(
-					getFloatParam(map, "width"),
+					getFloatArg(map, "width"),
 					getCapParam(map, "cap"),
 					getJoinParam(map, "join"),
-					getFloatParam(map, "miterlimit"),
-					toFloatArray(getListParam(map, "dash")),
-					getFloatParam(map, "dash_phase")
+					getFloatArg(map, "miterlimit"),
+					toFloatArray(getListArg(map, "dash")),
+					getFloatArg(map, "dash_phase")
 			);
-			default: throw new ParamException(
-					"Invalid number of paramaters in stroke value: "+map.size());
+			default: throw new InvalidParamException("Invalid value for the parameter "
+					+ getName() + ": Invalid number of arguments: "+map.size());
 		}
 	}
 
 	private int getCapParam(Map map, String name) throws ParamException {
-		return ((Integer)getChoiceParam(map, name, capChoices)).intValue();
+		return ((Integer)getChoiceArg(map, name, capChoices)).intValue();
 	}
 	
 	private int getJoinParam(Map map, String name) throws ParamException {
-		return ((Integer)getChoiceParam(map, name, joinChoices)).intValue();
+		return ((Integer)getChoiceArg(map, name, joinChoices)).intValue();
 	}
 }

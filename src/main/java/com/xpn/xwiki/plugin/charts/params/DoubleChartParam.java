@@ -1,5 +1,6 @@
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DoubleChartParam extends AbstractChartParam {
@@ -20,7 +21,7 @@ public class DoubleChartParam extends AbstractChartParam {
         try {
 	        return new Double(value);
         } catch (NumberFormatException nfe) {
-			throw new ParamException("Non-double value for the "+getName()+" parameter", nfe);
+			throw new InvalidParamException("Non-double value for the "+getName()+" parameter", nfe);
         }
 	}
 }

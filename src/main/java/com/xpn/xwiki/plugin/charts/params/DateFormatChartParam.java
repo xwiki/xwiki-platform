@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DateFormatChartParam extends LocaleChartParam {
@@ -51,24 +53,24 @@ public class DateFormatChartParam extends LocaleChartParam {
 		
 		Integer dateStyle, timeStyle;
 		try {
-			dateStyle = (Integer)getChoiceParam(map, DATE_STYLE, styleChoices);
-		} catch (ParamException e) {
+			dateStyle = (Integer)getChoiceArg(map, DATE_STYLE, styleChoices);
+		} catch (MissingArgumentException e) {
 			dateStyle = null;
 		}
 		try {
-			timeStyle = (Integer)getChoiceParam(map, TIME_STYLE, styleChoices);
-		} catch (ParamException e) {
+			timeStyle = (Integer)getChoiceArg(map, TIME_STYLE, styleChoices);
+		} catch (MissingArgumentException e) {
 			timeStyle = null;
 		}
 
 		Locale locale;
 		try {
 			locale = (Locale)super.convert(value);
-		} catch (ParamException e) {
+		} catch (MissingArgumentException e) {
 			locale = null;
 		}
 
-		String type = getStringParam(map, TYPE);
+		String type = getStringArg(map, TYPE);
 		
 		if (type.equals(DATE)) {
 			if (dateStyle != null) {
@@ -101,15 +103,15 @@ public class DateFormatChartParam extends LocaleChartParam {
 				return DateFormat.getDateTimeInstance();
 			}
 		} else if (type.equals(CUSTOM)) {
-			String pattern = getStringParam(map, PATTERN);
+			String pattern = getStringArg(map, PATTERN);
 			if (locale != null) {
 				return new SimpleDateFormat(pattern, locale);
 			} else{
 				return new SimpleDateFormat(pattern);
 			}
 		} else {
-			throw new ParamException("Invalid value for parameter "+getName()+
-					"Unknown type: "+type);
+			throw new InvalidArgumentException("Invalid value for parameter "
+					+ getName() + ": Unexpected value for type argument: "+type);
 		}
 	}
 }

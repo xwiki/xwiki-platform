@@ -9,14 +9,14 @@ import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.source.DataSource;
 
-public class XYDatasetFactory {
-	private static XYDatasetFactory uniqueInstance = new XYDatasetFactory();
+public class TableXYDatasetFactory {
+	private static TableXYDatasetFactory uniqueInstance = new TableXYDatasetFactory();
 	
-	private XYDatasetFactory() {
+	private TableXYDatasetFactory() {
 		// empty
 	}
 
-	public static XYDatasetFactory getInstance() {
+	public static TableXYDatasetFactory getInstance() {
 		return uniqueInstance;
 	}
 
@@ -27,6 +27,18 @@ public class XYDatasetFactory {
 		
 		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
 		if (dataSeries.equals("columns")) {
+			if (!dataSource.hasHeaderColumn()) {
+				throw new GenerateException("Header column required");
+			}
+			for (int column = 0; column<dataSource.getColumnCount(); column++) {
+				XYSeries series = new XYSeries(dataSource.hasHeaderRow()
+						?dataSource.getHeaderRowValue(column):"", false, false);
+				for (int row = 0; row<dataSource.getRowCount(); row++) {
+					series.add(Double.parseDouble(dataSource.getHeaderColumnValue(row)),
+							dataSource.getCell(row, column));
+				}
+				dataset.addSeries(series);
+			}
 			
 		} else if (dataSeries.equals("rows")) {
 			if (!dataSource.hasHeaderRow()) {

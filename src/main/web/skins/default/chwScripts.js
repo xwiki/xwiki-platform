@@ -190,6 +190,7 @@ Insert     => Insertion point
  */
 function chwWizard(){
   var skinDirectory;
+  /** The order of the wizard pages */
   var pageOrder = ["Data", "Type", "Titles", "Axes", "Grid", "Labels", "Legend", "Space", "Colors", "Insert"];
   /** The active (selected) wizard page. */
   var activePage;
@@ -223,6 +224,12 @@ function chwWizard(){
   }
   var selectorObjects = new Object();
   var colorObjects = new Object();
+  /** The Next button */
+  var nextBtn;
+  /** The Back button */
+  var backBtn;
+  /** The Finish button */
+  var finishBtn;
   var backEnabled = false;
   var nextEnabled = false;
   var finishEnabled =false;
@@ -275,11 +282,38 @@ function chwWizard(){
     }
     return pageIndex;
   }
+  enableBack = function(){
+    backBtn.className = 'chwButton';
+    backEnabled = true;
+  }
+  disableBack = function(){
+    backBtn.className = 'chwButtonDisabled';
+    backEnabled = false;
+  }
+  enableNext = function(){
+    nextBtn.className = 'chwButton';
+    nextEnabled = true;
+  }
+  disableNext = function(){
+    nextBtn.className = 'chwButtonDisabled';
+    nextEnabled = false;
+  }
+  enableFinish = function(){
+    finishBtn.className = 'chwButton';
+    finishEnabled = true;
+  }
+  disableFinish = function(){
+    finishBtn.className = 'chwButtonDisabled';
+    finishEnabled = false;
+  }
 
   this.initialize = function(theSkinDirectory, theShowWord, theHideWord){
     skinDirectory = theSkinDirectory;
     showWord = theShowWord;
     hideWord = theHideWord;
+    backBtn    = document.getElementById("chwBackButton");
+    nextBtn    = document.getElementById("chwNextButton");
+    finishBtn  = document.getElementById("chwFinishButton");
     activePage = pageOrder[0];
     document.getElementById('chw' + activePage + 'Wizard').className = "chwActivePage";
     selectedChartType = document.getElementById("chwChartTypeInput").value;
@@ -369,6 +403,7 @@ function chwWizard(){
     }
   }
 
+  /** Highlight the navigation button when the mouse moves over it */
   this.enterButton = function(elementName){
     if(!enabledPages[elementName]) return false;
     var element = document.getElementById("chw" + elementName + "WizardButton");
@@ -377,6 +412,7 @@ function chwWizard(){
     element.src = src;
   }
 
+  /** Dehighlight the navigation button when the mouse moves out of it */
   this.leaveButton = function(elementName){
     if(!enabledPages[elementName]) return;
     var element = document.getElementById("chw" + elementName + "WizardButton");
@@ -487,6 +523,11 @@ function chwWizard(){
     if(!finishEnabled) return false;
     document.getElementById('chwForm').submit();
     return false;
+  }
+  
+  this.setValidDatasource = function(dataString){
+    document.getElementById('chwDataSourceInput').value = dataString;
+    enableNext();
   }
 
   this.storeValue = function(value){

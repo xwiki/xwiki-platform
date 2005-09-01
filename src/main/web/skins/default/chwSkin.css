@@ -90,9 +90,9 @@ td{
 }
 
 #chwOptions{
- width: 385px;
- height: 420px;
- overflow: auto;
+  width: 385px;
+  height: 420px;
+  overflow: auto;
 }
 
 fieldset.chwLargeFieldset, fieldset.chwSmallFieldset{

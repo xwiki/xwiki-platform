@@ -14,8 +14,8 @@
                     <input id="chwDataTypeTablePage" title="$msg.get("chwdatatypetablepagetitle")/>
                     <label for="chwDataTypeTableIndex">$msg.get("chwdatatypetableindexlabel")</label>
                     <input id="chwDataTypeTableIndex" title="$msg.get("chwdatatypetableindextitle")/-->
-                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("view", "xpage=chw/tdwwizard")', '_blank', 'location=0,scrollbars=1,menubar=0,toolbar=0,status=0,directories=0,height=400,width=600');">$msg.get("chwinvoketablewizard")</span>
-                    <input type="text" class="chwLargeField" disabled='disabled'/>
+                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("view", "xpage=chw/tdwwizard")', '_blank', 'location=0,scrollbars=0,menubar=0,toolbar=0,status=0,directories=0,height=470,width=700');">$msg.get("chwinvoketablewizard")</span>
+                    <input id="chwDataSourceInput" type="text" class="chwLargeField" name="source"/>
                   </div>
                 </div>
               </fieldset>

@@ -29,23 +29,62 @@ function tdwWizard(){
     startColumnIndex, endColumnIndex;
   // The table in which the selection is made
   var table;
+  // The XWiki Document
+  var doc;
+  var hasValidSelection = false;
   /*
      The 'div' element where all available tables that 
      can be used as data sources are inserted
    */
   var container;
+  /** The "Please wait" message */
+  var waitingMsg;
+  /** The "No tables found" message */
+  var notablesMsg;
+  /** The "Select range" message */
+  var selectMsg;
+  /** The Next button */
+  var nextBtn;
+  /** The Back button */
+  var backBtn;
+  /** The Finish button */
+  var finishBtn;
   /*
      The prefix address of the table fetch page
    */
   var baseAddress;
+  /*
+     The prefix address of the skin files
+   */
+  var skinDirectory;
+  /** The order of the wizard pages */
+  var pageOrder = ["Doc", "Range", "Extra"];
+  /** The active (selected) wizard page. */
+  var activePage;
+  /** The enabled wizard pages. Blocks activation of disabled pages. */
+  var enabledPages = {
+    Doc    : true,
+    Range  : false,
+    Extra  : false
+  }
+  var backEnabled = false;
+  var nextEnabled = true;
+  var finishEnabled = false;
 
   /*
     Wizard initialization:
     - adds global event listeners
-   */ 
-  this.init = function(address){
-    container = document.getElementById("tdwTables")
+   */
+  this.initialize = function(address, directory){
+    container   = document.getElementById("tdwTables");
+    waitingMsg  = document.getElementById("tdwWaiting");
+    notablesMsg = document.getElementById("tdwNoTables");
+    selectMsg   = document.getElementById("tdwSelectRange");
+    backBtn     = document.getElementById("tdwBackButton");
+    nextBtn     = document.getElementById("tdwNextButton");
+    finishBtn   = document.getElementById("tdwFinishButton");
     baseAddress = address;
+    skinDirectory = directory;
     if(document.documentElement.addEventListener){
       document.documentElement.addEventListener('mouseup', onMouseUp, true);
     }
@@ -54,8 +93,204 @@ function tdwWizard(){
       document.documentElement.attachEvent('onselectstart', onSelectStartIE);
       document.documentElement.attachEvent('onselect', onSelectIE);
     }
+    activePage = pageOrder[0];
+    document.getElementById('tdw' + activePage + 'Wizard').className = "tdwActivePage";
+    document.getElementById("tdw" + activePage + "WizardButton").className = "tdwNavigationImage";
+  }
+
+  getPageIndex = function(pageName){
+    for(var i = 0; i < pageOrder.length; i++){
+      if(pageOrder[i] == pageName) return i;
+    }
+  }
+
+  getNextPageIndex = function(pageIndex){
+    if(pageIndex >= pageOrder.length - 1){
+      return -1;
+    }
+    return pageIndex + 1;
+  }
+  getPrevPageIndex = function(pageIndex){
+    return pageIndex - 1;
   }
   
+  enableBack = function(){
+    backBtn.className = 'tdwButton';
+    backEnabled = true;
+  }
+  disableBack = function(){
+    backBtn.className = 'tdwButtonDisabled';
+    backEnabled = false;
+  }
+  enableNext = function(){
+    nextBtn.className = 'tdwButton';
+    nextEnabled = true;
+  }
+  disableNext = function(){
+    nextBtn.className = 'tdwButtonDisabled';
+    nextEnabled = false;
+  }
+  enableFinish = function(){
+    finishBtn.className = 'tdwButton';
+    finishEnabled = true;
+  }
+  disableFinish = function(){
+    finishBtn.className = 'tdwButtonDisabled';
+    finishEnabled = false;
+  }
+  enablePage = function(page){
+    enabledPages[page] = true;
+    var button = document.getElementById("tdw" + page + "WizardButton");
+    button.className = "tdwNavigationImage";
+    if(button.src.indexOf("Hover.png") >= 0){
+      button.src = skinDirectory + "chwTaskCompletedHover.png";
+    }
+    else{
+      button.src = skinDirectory + "chwTaskCompleted.png";
+    }
+  }
+  disablePage = function(page){
+    enabledPages[page] = false;
+    var button = document.getElementById("tdw" + page + "WizardButton");
+    button.className = "tdwNavigationImageDisabled";
+    button.src = skinDirectory + "chwTaskWaiting.png";
+  }
+
+  this.showWizardPage = function(newPage){
+    if(activePage == newPage) return;
+    if(!enabledPages[newPage]) return;
+
+    // See if this was the first visible page, in order to enable the Back button
+    var currentPage = getPageIndex(activePage);
+    if(currentPage == 0){
+      // Enable the Back button
+      document.getElementById("tdwBackButton").className = "tdwButton";
+      backEnabled = true;
+    }
+    // See if this was the last visible page, in order to enable the Next button
+    var nextPage = getNextPageIndex(currentPage);
+    if(nextPage == -1){
+      // Enable the Next button
+      document.getElementById("tdwNextButton").className = "tdwButton";
+      nextEnabled = true;
+    }
+
+    // Hide the previous page
+    document.getElementById("tdw" + activePage + "Wizard").className = 'tdwInactivePage';
+    var button = document.getElementById("tdw" + activePage + "WizardButton");
+    if(button.src.indexOf("Hover.png") >= 0){
+      button.src = skinDirectory + "chwTaskCompletedHover.png";
+    }
+    else{
+      button.src = skinDirectory + "chwTaskCompleted.png";
+    }
+
+    activePage = newPage;
+    if(activePage == 'Range' && !hasValidSelection){
+      disableNext();
+    }
+
+    // See if this is the first visible page, in order to disable the Back button
+    var currentPage = getPageIndex(activePage);
+    if(currentPage == 0){
+      // Disable the Back button
+      document.getElementById("tdwBackButton").className = "tdwButtonDisabled";
+      backEnabled = false;
+      enableNext();
+    }
+    // See if this is the last visible page, in order to disable the Next button
+    var nextPage = getNextPageIndex(currentPage);
+    if(nextPage == -1){
+      // Disable the Next button
+      document.getElementById("tdwNextButton").className = "tdwButtonDisabled";
+      nextEnabled = false;
+    }
+
+    // Show the selected page
+    document.getElementById("tdw" + activePage + "Wizard").className = 'tdwActivePage';
+    button = document.getElementById("tdw" + activePage + "WizardButton");
+    if(button.src.indexOf("Hover.png") >= 0){
+      button.src = skinDirectory + "chwTaskCompletingHover.png";
+    }
+    else{
+      button.src = skinDirectory + "chwTaskCompleting.png";
+    }
+  }
+
+  /** Show the next wizard page (if the current page is not the last) */
+  this.showNextPage = function(){
+    if(!nextEnabled) return false;
+    var currentPage = getPageIndex(activePage);
+    if(currentPage == 0){
+      this.getTablesFromPage(document.getElementById('tdwPageInput').value);
+    }
+    var nextPage = getNextPageIndex(currentPage);
+    nextPage = pageOrder[nextPage];
+    enablePage(nextPage);
+    this.showWizardPage(nextPage);
+    return false;
+  }
+
+  /** Show the previous wizard page (if the current page is not the first) */
+  this.showPrevPage = function(){
+    if(!backEnabled) return false;
+    enableNext();
+    var currentPage = getPageIndex(activePage);
+    var prevPage = getPrevPageIndex(currentPage);
+    prevPage = pageOrder[prevPage];
+    this.showWizardPage(prevPage);
+    return false;
+  }
+
+  this.change = function(){
+    disablePage('Range');
+    disablePage('Extra');
+    disableFinish();
+  }
+
+  var getRange = function(){
+    switch(selectionType){
+      case 'table':
+        return '*';
+      case 'columns':
+        return String.fromCharCode(64 + startColumnIndex) + '-' + String.fromCharCode(64 + endColumnIndex);
+      case 'rows':
+        return startRowIndex + '-' + endRowIndex;
+      case 'cells':
+        return String.fromCharCode(64 + startColumnIndex) + startRowIndex + '-' + String.fromCharCode(64 + endColumnIndex) + endRowIndex;
+    }
+    return '*';
+  }
+
+  this.finish = function(){
+    if(!finishEnabled) return false;
+    if(!window.opener) return false;
+    //has_header_row:true;has_header_column:false
+    window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:true;has_header_column:true');
+    window.close();
+    return false;
+  }
+
+  /** Highlight the navigation button when the mouse moves over it */
+  this.enterButton = function(elementName){
+    if(!enabledPages[elementName]) return false;
+    var element = document.getElementById("tdw" + elementName + "WizardButton");
+    var src = element.src;
+    if(src.indexOf('Hover.png') >= 0) return;
+    src = src.substring(0, src.indexOf(".png")) + "Hover.png";
+    element.src = src;
+  }
+
+  /** Dehighlight the navigation button when the mouse moves out of it */
+  this.leaveButton = function(elementName){
+    if(!enabledPages[elementName]) return;
+    var element = document.getElementById("tdw" + elementName + "WizardButton");
+    var src = element.src;
+    if(src.indexOf('Hover.png') < 0) return;
+    src = src.substring(0, src.indexOf("Hover.png")) + ".png";
+    element.src = src;
+  }
+
   // Obtain the table, row and column number from a table cell's id
   var parseId = function(id){
     var table  = getTableIndex(id);
@@ -123,6 +358,7 @@ function tdwWizard(){
   */
   var onMouseDownCommon = function(id){
     unselect();
+    hasValidSelection = false;
     selectionState = 'none';
     var tidx = getTableIndex(id);
     var ridx = getRowIndex(id);
@@ -132,6 +368,9 @@ function tdwWizard(){
         // The whole table is selected
         document.getElementById('T' + tidx).className = 'tdwSelectedTable';
         selectionType = 'table';
+        enableNext();
+        enableFinish();
+        hasValidSelection = true;
       }
       else{
         // A whole column is selected
@@ -158,8 +397,13 @@ function tdwWizard(){
     endRowIndex   = ridx;
     startColumnIndex = cidx;
     endColumnIndex   = cidx;
+    if(!hasValidSelection){
+      disableNext();
+      disableFinish();
+      disablePage('Extra');
+    }
   }
-  
+
   /*
      Left button pressed on a cell wrapper for most browsers...
    */
@@ -378,6 +622,9 @@ function tdwWizard(){
       startColumnIndex = endColumnIndex;
       endColumnIndex = tmp;
     }
+    hasValidSelection = true;
+    enableNext();
+    enableFinish();
   }
 
   // Left button released wrapper for most browsers...
@@ -416,7 +663,7 @@ function tdwWizard(){
     evt.cancelBubble = true;
     return false;
   }
-  
+
   // Remove the previous contents of the table container
   var clearOldTables = function(){
     while(container.hasChildNodes()){
@@ -468,7 +715,7 @@ function tdwWizard(){
       container.appendChild(foreignContainer.firstChild);
     }
   }
-  
+
   /* 
      The request object is a data memer in order to be visible
      in the callback function
@@ -478,6 +725,17 @@ function tdwWizard(){
      Request the table data
   */
   this.getTablesFromPage = function(page){
+    notablesMsg.className = 'tdwHidden';
+    selectMsg.className = 'tdwHidden';
+    container.className = 'tdwHidden';
+    waitingMsg.className = 'tdwMessage';
+    hasValidSelection = false;
+    doc = page.replace('/', '.');
+    selectionType = 'none';
+    selectionState = 'none';
+    disablePage('Extra');
+    disableNext();
+    disableFinish();
     if(window.XMLHttpRequest){
       request = new XMLHttpRequest();
     }
@@ -495,14 +753,21 @@ function tdwWizard(){
   */
   this.handleRequest = function(){
     if(request.readyState == 4){
+      waitingMsg.className = 'tdwHidden';
       if(request.responseXML){
         try{
           if(request.responseXML.getElementsByTagName('div').item(0).getAttribute('id') != 'tdwEnvelope'){
-            alert("The requested document is not valid.");
+            document.getElementById('tdwNoTablePageName').firstChild.nodeValue = doc;
+            notablesMsg.className = 'tdwErrorMessage';
             return;
           }
           else{
             var envelope = request.responseXML.getElementsByTagName('div').item(0);
+            if(envelope.getElementsByTagName('table').length == 0){
+              document.getElementById('tdwNoTablePageName').firstChild.nodeValue = doc;
+              notablesMsg.className = 'tdwErrorMessage';
+              return;
+            }
             clearOldTables();
             try{
               addTables(envelope);
@@ -512,11 +777,14 @@ function tdwWizard(){
               container.innerHTML = request.responseText.substring(request.responseText.indexOf("<table"), request.responseText.indexOf("</div>"));
               prepareTables(container);
             }
+            selectMsg.className = 'tdwMessage';
+            container.className = 'tdwTables';
             return;
           }
         }
         catch(e){
-          alert("The requested document is not valid.");
+          document.getElementById('tdwNoTablePageName').firstChild.nodeValue = doc;
+          notablesMsg.className = 'tdwErrorMessage';
         }
       }
       else{

@@ -14,31 +14,60 @@ $!xwiki.getWebPreference("meta")
 </head>
 #set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
 #set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
-<body onload="window.wizard.init('$baseAddress');">
-
-<div id="chartWizard">
-  <table id="chwWizard" summary="Chart Wizard Content">
+<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("")');">
+<div id="tableWizard">
+  <table id="tdwWizard" summary="Table Datasource Wizard Content">
     <tbody>
       <tr>
-        <td colspan="2" id="chwNavigation">
-#template("chw/tdw/navigationimages.vm")
+        <td id="tdwNavigation">
+#template("chw/tdwnavigationimages.vm")
       </td>
     </tr>
     <tr>
-      <td id="chwOptions">
-      </td>
-      <td id="chwPreview">
-        <img id="chwPreviewImg" src="$xwiki.getSkinFile("chwSamplePieChart.png")" alt="Chart Type: Bars" title="Chart Type: Bars"/>
+      <td id="tdwOptions">
+        <div id="tdwDocWizard" class="tdwInactivePage">
+          <fieldset id="tdwDocWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwDocOptionsLegend" class="tdwLargeLegend" title="$msg.get("tdwdoctitle")">$msg.get("tdwdoclegend")</legend>
+            <div id="tdwDocOptionsDiv" class="tdwVisible">
+              <label for="tdwPageInput">$msg.get("tdwdocselectlabel")</label>
+              <select id="tdwPageInput" class="tdwListbox" size="16" onchange="window.wizard.change()">
+#set($currentPage = $doc.getFullName())
+#foreach($prefix in $xwiki.getSpaces())
+#foreach($page in $xwiki.getSpaceDocsName($prefix))
+#if($currentPage == "$prefix.$page")
+                <option value="$prefix.$page" selected="selected">$prefix.$page</option>
+#else
+                <option value="$prefix.$page">$prefix.$page</option>
+#end
+#end
+#end
+              </select>
+            </div>
+          </fieldset>
+        </div>
+        <div id="tdwRangeWizard" class="tdwInactivePage">
+          <fieldset id="tdwRangeWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwRangeOptionsLegend" class="tdwLargeLegend" title="$msg.get("tdwrangetitle")">$msg.get("tdwrangelegend")</legend>
+            <span id="tdwWaiting" class="tdwHidden">$msg.get("tdwwaitingmsg")</span>
+            <span id="tdwNoTables" class="tdwHidden">$msg.get("tdwnotablesmsg")</span>
+            <span id="tdwSelectRange" class="tdwHidden">$msg.get("tdwslectrangemsg")</span>
+            <div id="tdwRangeOptionsDiv" class="tdwVisible">
+              <div id="tdwTables" class='tdwTables'></div>
+            </div>
+          </fieldset>
+        </div>
+        <div id="tdwExtraWizard" class="tdwInactivePage">
+          <fieldset id="tdwExtraWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwExtraOptionsLegend" class="tdwLargeLegend" title="$msg.get("tdwextratitle")">$msg.get("tdwextralegend")</legend>
+          </fieldset>
+        </div>
       </td>
     </tr>
     <tr>
-      <td id="chwButtons" colspan="2"><a href="#" onclick="history.go(-1); return false;" title="Cancel the chart creation process and return to the previous page" class="chwButton">Cancel</a><a id="chwBackButton" href="#" onclick="window.wizard.showPrevPage(); return false;" title="Go to previous wizard page" accesskey="b" class="chwButtonDisabled">Back</a><a id="chwNextButton" href="#" onclick="window.wizard.showNextPage(); return false;" title="Go to next wizard page" accesskey="n" class="chwButtonDisabled">Next</a><a id="chwFinishButton" href="#" onclick="window.wizard.finish(); return false;" title="Done!" class="chwButtonDisabled">Finish</a></td>
+      <td id="tdwButtons"><a href="#" onclick="window.close(); return false;" title="$msg.get("tdwcanceltitle")" class="tdwButton">$msg.get("tdwcancel")</a><a id="tdwBackButton" href="#" onclick="window.wizard.showPrevPage(); return false;" title="$msg.get("tdwbacktitle")Go to previous wizard page" accesskey="b" class="tdwButtonDisabled">$msg.get("tdwback")</a><a id="tdwNextButton" href="#" onclick="window.wizard.showNextPage(); return false;" title="$msg.get("tdwnexttilte")Go to next wizard page" accesskey="n" class="tdwButton">$msg.get("tdwnext")</a><a id="tdwFinishButton" href="#" onclick="window.wizard.finish(); return false;" title="$msg.get("tdwfinishtitle")" class="tdwButtonDisabled">$msg.get("tdwfinish")</a></td>
     </tr>
   </tbody>
   </table>
 </div>
-<input type="text" id="tdwPage" value="$doc.getFullName()"></input>
-<span onclick="window.wizard.getTablesFromPage(document.getElementById('tdwPage').value);">Get tables</span>
-<div id="tdwTables" class='tdwTables'></div>
 </body>
 </html>

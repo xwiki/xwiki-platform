@@ -4,31 +4,28 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>New chart wizard</title>
+<title>Table data source wizard</title>
 <meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
 <meta http-equiv="imagetoolbar" content="no"/>
 $!xwiki.getWebPreference("meta") 
-<link href="$xwiki.getSkinFile("chwSkin.css")" rel="stylesheet" type="text/css"/>
+<link href="$xwiki.getSkinFile("tdwSkin.css")" rel="stylesheet" type="text/css"/>
 #template("stylesheets.vm")
-<script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("tdwScripts.js")"></script>
 </head>
-<body onload='window.wizard.initialize("$xwiki.getSkinFile("")", "$msg.get("chwshow")", "$msg.get("chwhide")");'>
-#template("header.vm")
-<form id="chwForm" action="$doc.getURL("createchart")" method="post" onsubmit="alert('submit');">
+#set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
+#set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
+<body onload="window.wizard.init('$baseAddress');">
+
 <div id="chartWizard">
   <table id="chwWizard" summary="Chart Wizard Content">
     <tbody>
       <tr>
         <td colspan="2" id="chwNavigation">
-#template("chw/navigationimages.vm")
+#template("chw/tdw/navigationimages.vm")
       </td>
     </tr>
     <tr>
       <td id="chwOptions">
-#template("chw/datapage.vm")
-#template("chw/typepage.vm")
-#template("chw/titlepage.vm")
-#template("chw/axispage.vm")
       </td>
       <td id="chwPreview">
         <img id="chwPreviewImg" src="$xwiki.getSkinFile("chwSamplePieChart.png")" alt="Chart Type: Bars" title="Chart Type: Bars"/>
@@ -40,7 +37,8 @@ $!xwiki.getWebPreference("meta")
   </tbody>
   </table>
 </div>
-</form>
-#template("chw/colorpicker.vm")
+<input type="text" id="tdwPage" value="$doc.getFullName()"></input>
+<span onclick="window.wizard.getTablesFromPage(document.getElementById('tdwPage').value);">Get tables</span>
+<div id="tdwTables" class='tdwTables'></div>
 </body>
 </html>

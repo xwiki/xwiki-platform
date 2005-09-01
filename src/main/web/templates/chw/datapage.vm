@@ -1,0 +1,28 @@
+        <div id="chwDataWizard" class="chwInactivePage">
+          <fieldset id="chwDataWizardFieldset" class="chwLargeFieldset">
+            <legend id="chwDataOptionsLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('DataOptions');" title="$msg.get("chwdatasourcetitle")">$msg.get("chwdatasourcelegend") &lt;&lt;</legend>
+            <div id="chwDataOptionsDiv" class="chwVisible">
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataCreateLegend" name="create" checked="checked"/><label for="chwDataCreateLegend">$msg.get("chwdatacreatelegend")</label></legend>
+                <div id="chwDataCreateDiv">
+                  <label for="chwDataCreateTypeInput">$msg.get("chwdatacreatetypelable")</input>
+                  <select id="chwDataCreateTypeInput" title="$msg.get("chwdatacreatetypetitle")" onchange="window.wizard.createTypeChanged()">
+                    <option value="table" title="$msg.get("chwdatatypetabletitle")" selected="selected">$msg.get("chwdatatypetable")</option>
+                  </select>
+                  <div id="chwDataTypeTableDiv" class="chwInline">
+                    <!--label for="chwDataTypeTablePage">$msg.get("chwdatatypetablepagelabel")</label>
+                    <input id="chwDataTypeTablePage" title="$msg.get("chwdatatypetablepagetitle")/>
+                    <label for="chwDataTypeTableIndex">$msg.get("chwdatatypetableindexlabel")</label>
+                    <input id="chwDataTypeTableIndex" title="$msg.get("chwdatatypetableindextitle")/-->
+                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("view", "xpage=chw/tdwwizard")', '_blank', 'location=0,scrollbars=1,menubar=0,toolbar=0,status=0,directories=0,height=400,width=600');">$msg.get("chwinvoketablewizard")</span>
+                    <input type="text" class="chwLargeField" disabled='disabled'/>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataReuseLegend" name="create"/><label for="chwDataReuseLegend">$msg.get("chwdatareuselegend")</label></legend>
+                <input type="text" name="source" value="type:table;doc:Main.WebHome;table_number:3;range:A-B;has_header_row:true;has_header_column:false"/>
+              </fieldset>
+            </div>
+          </fieldset>
+        </div>

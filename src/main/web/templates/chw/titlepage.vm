@@ -8,8 +8,7 @@
                 <fieldset class="chwSmallFieldset">
                   <legend class="chwSmallLegend" id="chwChartTitlePositionLegend" title="$msg.get("chwtitlepositiontitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartTitlePosition');">$msg.get("chwpositioninglegend") &gt;&gt;</legend>
                   <div id="chwChartTitlePositionDiv" class="chwHidden">
-
-<table summary="chwtTitlePositioningLayout" class="chwTitlePositioningLayout">
+<table summary="Chart title positioning layout" class="chwTitlePositioningLayout">
   <tbody>
    <tr>
      <td class="chwTitlePositioningUnitLeft">
@@ -154,7 +153,8 @@
                         <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartTitleColorCustomInput" value="#000000" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartTitleColor');"
                              onblur="window.wizard.validateCustomColor('ChartTitleColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartTitleColor')"/>
+                             onfocus="window.wizard.customColorValueFocus('ChartTitleColor'); window.wizard.showCustomColor('ChartTitleColor'); window.wizard.validateCustomColor('ChartTitleColor');"/>
+                        <span class="chwColorPickerInvoker" title="$msg.get("chwinvokecolorpickertitle")" onclick="window.colorPicker.show(document.getElementById('chwChartTitleColorCustomInput'));">$msg.get("chwinvokecolorpicker")</span>
                       </div>
                     </div>
                     <div>
@@ -184,7 +184,8 @@
                         <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartTitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartTitleBackgroundColor');"
                              onblur="window.wizard.validateCustomColor('ChartTitleBackgroundColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartTitleBackgroundColor')"/>
+                             onfocus="window.wizard.customColorValueFocus('ChartTitleBackgroundColor'); window.wizard.showCustomColor('ChartTitleBackgroundColor'); window.wizard.validateCustomColor('ChartTitleBackgroundColor');"/>
+                        <span class="chwColorPickerInvoker" title="$msg.get("chwinvokecolorpickertitle")" onclick="window.colorPicker.show(document.getElementById('chwChartTitleBackgroundColorCustomInput'));">$msg.get("chwinvokecolorpicker")</span>
                       </div>
                     </div>
                   </div>
@@ -224,7 +225,15 @@
                 <input type="text" id="chwChartSubtitleInput" title="$msg.get("chwchartsubtitleinputtitle")" name="subtitle" onchange="window.wizard.checkSubtitle('ChartSubtitle');"/>
                 <fieldset class="chwSmallFieldset">
                   <legend class="chwSmallLegend" id="chwChartSubtitlePositionLegend" title="$msg.get("chwsubtitlepositiontitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('ChartSubtitlePosition');">$msg.get("chwpositioninglegend") &gt;&gt;</legend>
+
+
+
                   <div id="chwChartSubtitlePositionDiv" class="chwHidden">
+                  
+<table summary="Chart subtitle positioning layout" class="chwTitlePositioningLayout">
+  <tbody>
+   <tr>
+     <td class="chwTitlePositioningUnitLeft">
                     <label for="chwChartSubtitlePositionInput">$msg.get("chwsubtitleplacementlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
@@ -244,6 +253,8 @@
 </table>
 </div>
                     <input type="hidden" value="top" id="chwChartSubtitlePositionInput" name="subtitle_position"/>
+     </td>
+     <td class="chwTitlePositioningUnitRight">
                     <label for="chwChartSubtitleHorizontalAlignmentInput">$msg.get("chwalignmentlabel")</label>
 <div class="chwCentered">
 <table class="chwPositionSelector">
@@ -266,6 +277,10 @@
   </tbody>
 </table>
 </div>
+</td>
+</tr>
+</tbody>
+</table>
                     <input type="hidden" value="center" id="chwChartSubtitleAlignmentHorizontalInput" name="subtitle_horizontal_alignment"/>
                     <input type="hidden" value="center" id="chwChartSubtitleAlignmentVerticalInput" name="subtitle_vertical_alignment"/>
                   </div>
@@ -354,7 +369,8 @@
                         <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleColorCustomInput" value="#000000" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartSubtitleColor');"
                              onblur="window.wizard.validateCustomColor('ChartSubtitleColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleColor')"/>
+                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleColor'); window.wizard.showCustomColor('ChartSubtitleColor'); window.wizard.validateCustomColor('ChartSubtitleColor');"/>
+                        <span class="chwColorPickerInvoker" title="$msg.get("chwinvokecolorpickertitle")" onclick="window.colorPicker.show(document.getElementById('chwChartSubtitleColorCustomInput'));">$msg.get("chwinvokecolorpicker")</span>
                       </div>
                     </div>
                     <div>
@@ -384,7 +400,8 @@
                         <input type="text" title="$msg.get("chwcustomcolortitle")" id="chwChartSubtitleBackgroundColorCustomInput" value="#FFFFFF" class="chwCustomColor"
                              onkeyup="window.wizard.showCustomColor('ChartSubtitleBackgroundColor');"
                              onblur="window.wizard.validateCustomColor('ChartSubtitleBackgroundColor');"
-                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleBackgroundColor')"/>
+                             onfocus="window.wizard.customColorValueFocus('ChartSubtitleBackgroundColor'); window.wizard.showCustomColor('ChartSubtitleBackgroundColor'); window.wizard.validateCustomColor('ChartSubtitleBackgroundColor');"/>
+                        <span class="chwColorPickerInvoker" title="$msg.get("chwinvokecolorpickertitle")" onclick="window.colorPicker.show(document.getElementById('chwChartSubtitleBackgroundColorCustomInput'));">$msg.get("chwinvokecolorpicker")</span>
                       </div>
                     </div>
                   </div>

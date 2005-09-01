@@ -224,7 +224,7 @@ function chwWizard(){
   var selectorObjects = new Object();
   var colorObjects = new Object();
   var backEnabled = false;
-  var nextEnabled = true;
+  var nextEnabled = false;
   var finishEnabled =false;
 
   // Used for form element validation
@@ -302,6 +302,16 @@ function chwWizard(){
     else{
       this.LMB = 1;
     }
+
+    /*
+       Create color picker...
+     */
+    window.colorPicker = new ColorPicker(
+                         document.getElementById("chwColorpickerHSMap"),
+                         document.getElementById("chwColorpickerLMap"),
+                         document.getElementById("chwColorpickerLPointer"),
+                         document.getElementById("chwColorPickerShow"),
+                         document.getElementById("chwColorCodeDisplay"));
   }
 
   this.showWizardPage = function(newPage){
@@ -552,3 +562,502 @@ function chwWizard(){
 }
 
 window.wizard = new chwWizard();
+
+
+/*
+   The color picker class
+   Allows choosing a custom color, using, visually,
+   the hue, saturation and luminance values
+ */
+function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
+  /*
+     The image element representing the hue X saturation color map
+   */
+  this.hsmap       = hsmap;
+  /*
+     The image element representing the luminance map
+   */
+  this.lmap        = lmap;
+  /*
+     The "arrow" that points to the apropriate luminance level
+   */
+  this.lpointer    = lpointer;
+  /*
+     The table cell that will contain the
+     "arrow" that points to the apropriate luminance level
+   */
+  this.lpointerContainer = lpointer.parentNode;
+  /*
+     The div element that will get the chosen color
+   */
+  this.colorShower = colorShower;
+  /*
+     The input element that will display the chosen color's code
+   */
+  this.codeDisplay = codeDisplay;
+
+
+  this.container = document.getElementById('chwColorPicker');
+  this.fieldset  = document.getElementById('chwColorPickerFieldset');
+  this.hueComponent = document.getElementById('chwColorpickerHue');
+  this.satComponent = document.getElementById('chwColorpickerSaturation');
+  this.lumComponent = document.getElementById('chwColorpickerLightness');
+  this.redComponent = document.getElementById('chwColorpickerRed');
+  this.greenComponent = document.getElementById('chwColorpickerGreen');
+  this.blueComponent = document.getElementById('chwColorpickerBlue');
+
+  /*
+     The stored HSL values
+   */
+  this.hue = 159;
+  this.sat = 85;
+  this.lum = 120;
+  /*
+     The stored RGB values
+   */
+  this.red   = 80;
+  this.green = 100;
+  this.blue  = 160;
+  
+  /*
+     The stored color code
+   */
+  this.storedValue = "";
+
+  /*
+     The code of the left mouse button
+     Browser dependent
+   */
+  this.LMB = (window.ActiveXObject ? 1 : 0);
+  
+  /*
+      The element that invoked the color picker,
+      which will recieve the picked color code
+   */
+  this.reqester = null;
+  
+  /* 
+      Positioning data
+   */
+  this.left = 120;
+  this.top = 120;
+
+  /*
+     Compute the minimum of 3 numbers
+   */
+  this.min3 = function(a, b, c){
+    if(a <= b && a <= c) return a;
+    if(b <= a && b <= c) return b;
+    return c;
+  }
+  /*
+     Compute the maximum of 3 numbers
+   */
+  this.max3 = function(a, b, c){
+    if(a >= b && a >= c) return a;
+    if(b >= a && b >= c) return b;
+    return c;
+  }
+
+  /*
+     Checks if a string is a valid #****** code
+   */
+  this.validCode = function(code){
+    if(!code.match("^#[0-9a-fA-F]{6}$")) return false;
+    return true;
+  }
+
+  /*
+     HSL to RGB conversion
+     Allow obtaining the actual #rrggbb code from the
+     h, s, l values
+   */
+  this.hsl2rgb = function (hue,sat,lum) {
+    var _val, _max, _min, _part, _half, _hi, _lo, _mid;
+    var _r, _g, _b;
+    _val = (lum / 240) * 255;
+    if (lum >= 120) {
+      _max = 255;
+      _min = _val - (255 - _val);
+    } else if(lum < 120) {
+      _min = 0;
+      _max = _val * 2;
+    }
+    _part = sat / 240;
+    _half = (_max - _min) / 2;
+    _hi = _half * _part;
+    _lo = _half - _hi;
+    if (sat == 0 || _max == _min) {
+      _r = _val;
+      _g = _val;
+      _b = _val;
+    } else if (hue < 40) {
+      _r = _max - _lo;
+      _b = _min + _lo;
+      _mid = hue / 40;
+      _g = ((_r - _b) * _mid) + _b;
+    } else if (hue >= 200 && hue <= 240) {
+      _r = _max - _lo;
+      _g = _min + _lo;
+      _mid = (240 - hue) / 40;
+      _b = ((_r - _g) * _mid) + _g;
+    } else if (hue >= 80 && hue < 120) {
+      _g = _max - _lo;
+      _r = _min + _lo;
+      _mid = (hue - 80) / 40;
+      _b = ((_g - _r) * _mid) + _r;
+    } else if (hue >= 40 && hue < 80) {
+      _g = _max - _lo;
+      _b = _min + _lo;
+      _mid = (80 - hue) / 40;
+      _r = ((_g - _b) * _mid) + _b;
+    } else if (hue >= 160 && hue < 200) {
+      _b = _max - _lo;
+      _g = _min + _lo;
+      _mid = (hue - 160) / 40;
+      _r = ((_b - _g) * _mid) + _g;
+    } else if (hue >= 120 && hue < 160) {
+      _b = _max - _lo;
+      _r = _min + _lo;
+      _mid = (160 - hue) / 40;
+      _g = ((_b - _r) * _mid) + _r;
+    }
+    red = Math.round(_r);
+    green = Math.round(_g);
+    blue = Math.round(_b);
+    return {red : red, green : green, blue : blue};
+  }
+
+  this.hsl2code = function(H, S, L){
+    var rgb = this.hsl2rgb(H, S, L);
+    return this.rgb2code(rgb.red, rgb.green, rgb.blue);
+  }
+  
+  /*
+     RGB to HSL conversion
+     Allow obtaining the h, s, l values from the
+     r, g, b values
+   */
+  this.rgb2hsl = function(red, green, blue){
+    var R = red / 255;
+    var G = green / 255;
+    var B = blue / 255;
+
+    var min = this.min3(R, G, B);
+    var max = this.max3(R, G, B);
+    var delta = max - min;
+
+    var L = (max + min) / 2;
+    var H, S;
+
+    if (delta == 0){
+      H = 0;
+      S = 0;
+    }
+    else{
+      if (L < 0.5) S = delta / (max + min);
+      else S = delta / (2 - (max + min));
+      var deltaR = (((max - R) / 6) + (max / 2)) / delta;
+      var deltaG = (((max - G) / 6) + (max / 2)) / delta;
+      var deltaB = (((max - B) / 6) + (max / 2)) / delta;
+
+      if      ( R == max ) H = deltaB - deltaG
+      else if ( G == max ) H = (1 / 3) + deltaR - deltaB
+      else if ( B == max ) H = (2 / 3) + deltaG - deltaR
+
+      if ( H < 0 ) H += 1
+      if ( H > 1 ) H -= 1
+    }
+    return {hue : Math.round(H * 240), sat : Math.round(S * 240), lum : Math.round(L * 240)};
+  }
+
+  this.setValues = function(R, G, B, H, S, L){
+    this.red = R;
+    this.green = G;
+    this.blue = B;
+    this.hue = H;
+    this.sat = S;
+    this.lum = L;
+  }
+
+  this.setComponents = function(R, G, B, H, S, L, code){
+    this.redComponent.value = R;
+    this.greenComponent.value = G;
+    this.blueComponent.value = B;
+    this.hueComponent.value = H;
+    this.satComponent.value = S;
+    this.lumComponent.value = L;
+    this.colorShower.style.backgroundColor = code;
+    this.codeDisplay.value = code;
+    this.lpointerContainer.style.backgroundPosition = "0 " + (240 - L) + "px";
+    this.lmap.style.backgroundColor = this.hsl2code(H, S, 120);
+    this.storedValue = code;
+  }
+
+  /*
+     RGB to #****** conversion
+     Join the RGB values into a #****** string
+   */
+  this.rgb2code = function(red, green, blue){
+    red = Math.round(red).toString(16);
+    if (red.length == 1) red = "0" + red;
+    green = Math.round(green).toString(16);
+    if(green.length == 1) green = "0" + green;
+    blue = Math.round(blue).toString(16);
+    if(blue.length == 1) blue ="0" + blue;
+    return "#" + red + green + blue;
+  }
+  /*
+     Parse a #****** code into rgb values
+   */
+  this.code2rgb = function(code){
+    if(!this.validCode(code)) return false;
+    var red = Number("0x" + code.substring(1, 3));
+    var green = Number("0x" + code.substring(3, 5));
+    var blue = Number("0x" + code.substring(5));
+    return {red : red, green : green, blue : blue};
+  }
+  /*
+     Obtain the coordinates of the hot point in the target
+     Browser dependent
+   */
+  this.getTargetEltX = function(event, elt){
+    var x;
+    if (event.offsetX !== undefined) x = event.offsetX;
+    else {
+      x = event.screenX - document.getBoxObjectFor(elt).screenX;
+    }
+    if(x < 0) x = 0;
+    if(x > 240) x = 240;
+    return x;
+  }
+
+  this.getTargetEltY = function(event, elt){
+    var y;
+    if (event.offsetY !== undefined) y = event.offsetY;
+    else {
+      y = event.screenY - document.getBoxObjectFor(elt).screenY;
+    }
+    if(y < 0) y = 0;
+    if(y > 240) y = 240;
+    return y;
+  }
+
+  /*
+     The user "picked" new values for h and s from the hsmap.
+     The color is updated.
+   */
+  this.hsChanged = function(event, elt){
+    var hue = this.getTargetEltX(event, elt) - 0;
+    if(hue > 240) hue = 240;
+    if(hue < 0) hue = 0;
+    var sat = 240 - this.getTargetEltY(event, elt);
+    if(sat > 240) sat = 240;
+    if(sat < 0) sat = 0;
+    var rgb = this.hsl2rgb(hue, sat, this.lum);
+    var colorcode = this.rgb2code(rgb.red, rgb.green, rgb.blue);
+    if(!this.validCode(colorcode)) return;
+    this.setValues(rgb.red, rgb.green, rgb.blue, hue, sat, this.lum);
+    this.setComponents(rgb.red, rgb.green, rgb.blue, hue, sat, this.lum, colorcode);
+  }
+  
+  /*
+     The user "picked" a new value for l from the lmap.
+     The color is updated and the lpointer is moved to the apropriate 
+     position.
+   */
+  this.lChanged = function(event, elt){
+    var lum = 240 - (this.getTargetEltY(event, elt));
+    if(lum > 240) lum = 240;
+    if(lum < 0) lum = 0;
+    var rgb = this.hsl2rgb(this.hue, this.sat, lum);
+    var colorcode = this.rgb2code(rgb.red, rgb.green, rgb.blue);
+    if(!this.validCode(colorcode)) return;
+    this.setValues(rgb.red, rgb.green, rgb.blue, this.hue, this.sat, lum);
+    this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, colorcode);
+  }
+  /*
+     The user entered a custom color code in the 
+     code display input.
+     Update the colorShow and the luminance 
+     pointer.
+   */
+  this.htmlCodeChanged = function(){
+    var colorcode = this.codeDisplay.value;
+    if(colorcode.charAt(0) != '#') colorcode = '#' + colorcode;
+    if(!this.validCode(colorcode)){
+      return;
+    }
+    var rgb = this.code2rgb(colorcode);
+    var hsl = this.rgb2hsl(rgb.red, rgb.green, rgb.blue);
+    this.setValues(rgb.red, rgb.green, rgb.blue, hsl.hue, hsl.sat, hsl.lum);
+    this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, colorcode);
+  }
+  this.rgbCodeChanged = function(){
+    var red = this.redComponent.value - 0;
+    if(red > 255) red = 255;
+    if(red < 0) red = 0;
+    var green = this.greenComponent.value - 0;
+    if(green > 255) green = 255;
+    if(green < 0) green = 0;
+    var blue = this.blueComponent.value - 0;
+    if(blue > 255) blue = 255;
+    if(blue < 0) blue = 0;
+    if(red != red || green != green || blue != blue){
+      this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, this.storedValue);
+      return;
+    }
+    var colorcode = this.rgb2code(red, green, blue);
+    if(!this.validCode(colorcode)){
+      this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, this.storedValue);
+      return;
+    }
+    var hsl = this.rgb2hsl(red, green, blue);
+    this.setValues(red, green, blue, hsl.hue, hsl.sat, hsl.lum);
+    this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, colorcode);
+  }
+  this.hslCodeChanged = function(){
+    var hue = this.hueComponent.value - 0;
+    if(hue > 240) hue = 240;
+    if(hue < 0) hue = 0;
+    var sat = this.satComponent.value - 0;
+    if(sat > 240) sat = 240;
+    if(sat < 0) sat = 0;
+    var lum = this.lumComponent.value - 0;
+    if(lum > 240) lum = 240;
+    if(lum < 0) lum = 0;
+    if(hue != hue || sat != sat || lum != lum){
+      this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, this.storedValue);
+      return;
+    }
+    var colorcode = this.hsl2code(hue, sat, lum);
+    if(!this.validCode(colorcode)){
+      this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, this.storedValue);
+      return;
+    }
+    var rgb = this.hsl2rgb(hue, sat, lum);
+    this.setValues(rgb.red, rgb.green, rgb.blue, hue, sat, lum);
+    this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, colorcode);
+  }
+
+  /*
+     The user chose a new color characteristic from one of the maps.
+     The information is updated.
+   */
+  this.colorPicked = function(event, elt){
+    if (elt == this.hsmap){
+      this.hsChanged(event, elt);
+    }
+    else if (elt == this.lmap || elt == this.lpointer){
+      this.lChanged(event, elt);
+    }
+  }
+  
+  /*
+     Left mouse button pressed.
+     Entering "picking mode"...
+   */
+  this.mouseDown = function(event, elt){
+    if (event.button != this.LMB) return true;
+    else {
+      this.picking = true;
+      this.crtPickingTarget = elt;
+      this.colorPicked(event, elt);
+      try{
+        event.preventDefault();
+      }
+      catch(e){
+        event.returnValue = false;
+      }
+      return false;
+    }
+  }
+  /*
+     Mouse moving over the picker's maps.
+     If in picking mode, pick the coresponding color.
+     Else do nothing.
+   */
+  this.mouseMove = function(event, elt){
+    if (this.picking == true && this.crtPickingTarget == elt){
+      if(window.ActiveXObject){
+        if(event.srcElement == this.crtPickingTarget){
+          this.colorPicked(event, elt);
+        }
+      }
+      else{
+        this.colorPicked(event, elt);
+      }
+    }
+
+    event.returnValue = false;
+  }
+
+  /*
+     Left mouse button released.
+     Exiting "picking mode".
+   */
+  this.mouseUp = function(event, elt){
+    this.picking = false;
+    this.crtPickingTarget = null;
+  }
+
+  this.filterKeys = function(event){
+  }
+
+  this.show = function(requester, color){
+    if(color === undefined){
+      color = requester.value;
+    }
+    this.requester = requester;
+    this.storedValue = color;
+    var rgb = this.code2rgb(color);
+    var hsl = this.rgb2hsl(rgb.red, rgb.green, rgb.blue);
+    this.setValues(rgb.red, rgb.green, rgb.blue, hsl.hue, hsl.sat, hsl.lum);
+    this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, color);
+    this.container.style.display = 'block';
+    if(window.ActiveXObject){
+      // this is an ugly way of avoiding an Internet Explorer 'feature'
+      //  that puts select elements on top of everything else,
+      //  completely ignoring the z-index.
+      var selects = document.getElementsByTagName('select');
+      for(var i = 0; i < selects.length; i++){
+        selects.item(i).style.visibility = 'hidden';
+      }
+    }
+    if(document.width && document.getBoxObjectFor){
+      this.fieldset.style.left = this.max3(document.width / 2 - document.getBoxObjectFor(this.fieldset).width / 2, 0, 0) + 'px';
+    }
+    else if(document.body.clientWidth){
+      this.fieldset.style.left = this.max3(document.body.clientWidth / 2 - this.fieldset.clientWidth / 2, 0, 0) + 'px';
+    }
+  }
+
+  this.OK = function(event){
+    if(window.ActiveXObject){
+      // this is an ugly way of avoiding an Internet Explorer 'feature'
+      //  that puts select elements on top of everything else,
+      //  completely ignoring the z-index.
+      var selects = document.getElementsByTagName('select');
+      for(var i = 0; i < selects.length; i++){
+        selects.item(i).style.visibility = 'visible';
+      }
+    }
+    this.requester.value = this.storedValue;
+    this.container.style.display = 'none';
+    this.requester.focus();
+    eval(this.requester.getAttribute('onfocus'));
+  }
+  this.Cancel = function(event){
+    if(window.ActiveXObject){
+      // this is an ugly way of avoiding an Internet Explorer 'feature'
+      //  that puts select elements on top of everything else,
+      //  completely ignoring the z-index.
+      var selects = document.getElementsByTagName('select');
+      for(var i = 0; i < selects.length; i++){
+        selects.item(i).style.visibility = 'visible';
+      }
+    }
+    this.container.style.display = 'none';
+    this.requester.focus();
+  }
+}

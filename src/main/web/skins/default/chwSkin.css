@@ -151,6 +151,10 @@ label{
   display: block;
 }
 
+.chwInline{
+  display: inline;
+}
+
 .chwInactivePage, .chwHidden{
   display: none;
 }
@@ -164,6 +168,10 @@ input, select{
   margin: 5px;
   margin-bottom: 10px;
   vertical-align: middle;
+}
+
+.chwLargeField{
+  width: 95%;
 }
 
 #chwPreview{
@@ -276,6 +284,10 @@ td.chwDisabledCell{
 .chwCustomColor{
 }
 
+.chwCustomColorGroup input{
+  width: 56px;
+}
+
 /*
   Margin selector
  */
@@ -335,4 +347,159 @@ td.chwTitlePositioningUnitLeft{
 
 td.chwTitlePositioningUnitRight{
   border-left: #BBB 1px solid;
+}
+
+
+
+.chwColorPickerInvoker, .chwDatSourceWizardInvoker{
+	text-decoration: none;
+	color: #FFF;
+	padding: 4px 5px 1px;
+	margin: 0px 4px;
+  cursor: pointer;
+  background-color: #5368A6;
+  border: 1px solid #5368A6;
+}
+#chwColorPicker{
+  position: absolute;
+  z-index: 1199;
+  display: none;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+#chwColorPickerFieldset{
+  margin: 0px;
+  position: relative;
+  z-index: 1200;
+  left: 200px;
+  top: 100px;
+  width: 275px;
+  background-color: #fdfdfd;
+  border-width: 2px;
+  border-style: outset;
+  padding-bottom: 0px;
+}
+
+#chwColorPickerScreen{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+#chwColorPickerFieldset legend{
+/*  color: #fff;
+  background-color: #000;
+  background-color: #5368A6;*/
+  cursor: default;
+}
+
+#chwColorpickerControlsTable{
+  width: 265px;
+  margin-bottom: 12px;
+}
+
+.chwColorpickerHSDiv{
+  border: inset 1px;
+  padding: 0px;
+  margin: 0px;
+}
+.chwColorpickerHSImg{
+  cursor: crosshair;
+  width: 240px;
+  height: 241px;
+  margin: 0px;
+  padding: 0px;
+  display: block;
+}
+
+.chwColorpickerLDiv{
+  border: inset 1px;
+  padding: 0px;
+  margin: 0px;
+}
+.chwColorpickerLImg{
+  width: 10px;
+  height: 241px;
+  cursor: crosshair;
+  margin: 0px;
+  padding: 0px;
+  display: block;
+  background-color: #5064A0;
+}
+
+.chwColorpickerShow{
+  width: 56px;
+  height: 45px;
+  margin-top: 5px;
+  background-color: #5064A0;
+  border: inset 2px;
+  display: block;
+  float: none;
+  clear: both;
+}
+
+.chwColorpickerLPointerImg{
+  width: 10px;
+  height: 241px;
+  padding: 0px;
+  border: none;
+  border-width: 0px;
+  margin: 0px;
+  line-height: 1px;
+  clear: both;
+}
+
+.chwColorpickerLPointerContainer{
+  vertical-align: top;
+  padding: 0px;
+  background-repeat: repeat-x;
+  background-position: 0px 120px;
+  width: 10px;
+  height: 241px;
+  line-height: 1px;
+}
+
+.chwColorpickerHtmlCode{
+  width: 56px;
+  display: block;
+  float: none;
+  clear: both;
+  margin: 5px 0px 0px;
+}
+.chwColorpickerComponents{
+  text-align: right;
+  border: 0px solid red;
+  vertical-align: middle;
+  border: 0px solid red;
+  width: 100px;
+}
+.chwColorInput{
+  margin: 5px 0px 0px;
+  width: 48px;
+}
+
+#chwColorpickerButtons{
+  text-align: right;
+  margin-right: 8px;
+}
+.chwColorpickerButton{
+  padding-top: 10px;
+  text-align: center;
+}
+.chwColorpickerButton .chwButton{
+}
+
+#chwColorpickerShowContainer{
+  text-align: left;
+  border: 0px solid red;
+  width: 64px;
+}
+
+select{
+  z-index: -10;
 }

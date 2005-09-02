@@ -14,13 +14,13 @@
                     <input id="chwDataTypeTablePage" title="$msg.get("chwdatatypetablepagetitle")/>
                     <label for="chwDataTypeTableIndex">$msg.get("chwdatatypetableindexlabel")</label>
                     <input id="chwDataTypeTableIndex" title="$msg.get("chwdatatypetableindextitle")/-->
-                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("view", "xpage=chw/tdwwizard")', '_blank', 'location=0,scrollbars=0,menubar=0,toolbar=0,status=0,directories=0,height=470,width=700');">$msg.get("chwinvoketablewizard")</span>
-                    <input id="chwDataSourceInput" type="text" class="chwLargeField" name="source"/>
+                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("chartwizard", "xpage=chw/tdwwizard")', 'chwDatasourceWizard', 'location=0,scrollbars=0,menubar=0,toolbar=0,statusbar=0,directories=0,height=470,width=700');">$msg.get("chwinvoketablewizard")</span>
+                    <input id="chwDataSourceInput" type="hidden" class="chwLargeField" name="source"/>
                   </div>
                 </div>
               </fieldset>
               <fieldset class="chwSmallFieldset">
-                <legend class="chwSmallLegend"><input type="radio" id="chwDataReuseLegend" name="create"/><label for="chwDataReuseLegend">$msg.get("chwdatareuselegend")</label></legend>
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataReuseLegend" name="create" disabled="disabled"/><label for="chwDataReuseLegend">$msg.get("chwdatareuselegend")</label></legend>
                 <input type="text" name="source" value="type:table;doc:Main.WebHome;table_number:3;range:A-B;has_header_row:true;has_header_column:false"/>
               </fieldset>
             </div>

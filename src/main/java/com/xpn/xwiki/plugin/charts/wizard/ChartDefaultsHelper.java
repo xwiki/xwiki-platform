@@ -1,18 +1,20 @@
-package com.xpn.xwiki.plugin.charts;
+package com.xpn.xwiki.plugin.charts.wizard;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
 import org.jfree.chart.JFreeChart;
 
-public class FontHelper {
-  public FontHelper(){
+import com.xpn.xwiki.plugin.charts.source.TableDataSource;
+
+public class ChartDefaultsHelper {
+  public ChartDefaultsHelper(){
   }
 
   public String getDefaultTitleFont(){
       return JFreeChart.DEFAULT_TITLE_FONT.getFamily();
   }
-
+  
   public String getDefaultTitleSize(){
       return JFreeChart.DEFAULT_TITLE_FONT.getSize() + "";
   }

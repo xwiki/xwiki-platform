@@ -58,14 +58,15 @@ function tdwWizard(){
    */
   var skinDirectory;
   /** The order of the wizard pages */
-  var pageOrder = ["Doc", "Range", "Extra"];
+  var pageOrder = ["Doc", "Range", "Extra", "Save"];
   /** The active (selected) wizard page. */
   var activePage;
   /** The enabled wizard pages. Blocks activation of disabled pages. */
   var enabledPages = {
     Doc    : true,
     Range  : false,
-    Extra  : false
+    Extra  : false,
+    Save   : false
   }
   var backEnabled = false;
   var nextEnabled = true;
@@ -245,6 +246,7 @@ function tdwWizard(){
   this.change = function(){
     disablePage('Range');
     disablePage('Extra');
+    disablePage('Save');
     disableFinish();
   }
 
@@ -266,7 +268,7 @@ function tdwWizard(){
     if(!finishEnabled) return false;
     if(!window.opener) return false;
     //has_header_row:true;has_header_column:false
-    window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:true;has_header_column:true');
+    window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:' + document.getElementById('tdwRowHeaderInput').checked + ';has_header_column:' + document.getElementById('tdwColumnHeaderInput').checked + ';ignore_alpha:' + document.getElementById('tdwIgnoreAlphaInput').checked + ';decimal_symbol:' + (document.getElementById('tdwDecimalSymbolInput').checked ? 'comma' : 'period'));
     window.close();
     return false;
   }
@@ -401,6 +403,7 @@ function tdwWizard(){
       disableNext();
       disableFinish();
       disablePage('Extra');
+      disablePage('Save');
     }
   }
 
@@ -734,6 +737,7 @@ function tdwWizard(){
     selectionType = 'none';
     selectionState = 'none';
     disablePage('Extra');
+    disablePage('Save');
     disableNext();
     disableFinish();
     if(window.XMLHttpRequest){

@@ -74,8 +74,8 @@
                     <tr>
                       <td class="chwFormLabelCell"><label for="chwChartTitleFontFamilyInput">$msg.get("chwfontfamilylabel")</label></td>
                       <td><select id="chwChartTitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
-#set($chwdefaultfont = $fonthelper.getDefaultTitleFont())
-#foreach($chwfont in $fonthelper.getAvailableFonts())
+#set($chwdefaultfont = $chartDefaults.getDefaultTitleFont())
+#foreach($chwfont in $chartDefaults.getAvailableFonts())
 #if($chwfont == $chwdefaultfont)
                         <option value="$chwfont" style="font-family: $chwfont, sans-serif;" selected="selected">$chwfont</option>
 #else
@@ -88,7 +88,7 @@
                     <tr>
                       <td class="chwFormLabelCell"><label for="chwChartTitleFontStyleInput">$msg.get("chwfontstylelabel")</label></td>
                       <td><select id="chwChartTitleFontStyleInput" title="$msg.get("chwfontstyletitle")" onchange="window.wizard.changeFont('ChartTitleFont');">
-#set($chwdefaultstyle = $fonthelper.getDefaultTitleStyle())
+#set($chwdefaultstyle = $chartDefaults.getDefaultTitleStyle())
 #if($chwdefaultstyle == "plain")
                         <option value="plain" selected="selected">$msg.get("chwplain")</option>
 #else
@@ -114,7 +114,7 @@
                     </tr>
                     <tr>
                       <td class="chwFormLabelCell"><label for="chwChartTitleFontSizeInput">$msg.get("chwfontsizelabel")</label></td>
-#set($chwdefaultsize = $fonthelper.getDefaultTitleSize())
+#set($chwdefaultsize = $chartDefaults.getDefaultTitleSize())
                       <td><input type="text" id="chwChartTitleFontSizeInput" title="$msg.get("chwfontsizetitle")" class="chwSmallInput" value="$chwdefaultsize" onfocus="window.wizard.storeValue(this.value);" onchange="if(window.wizard.validateNumber(this, 1, 128)) window.wizard.changeFont('ChartTitleFont');"/>pt
                     </td>
                     </tr>
@@ -293,7 +293,7 @@
                     <tr>
                       <td class="chwFormLabelCell"><label for="chwChartSubtitleFontFamilyInput">$msg.get("chwfontfamilylabel")</label></td>
                       <td><select id="chwChartSubtitleFontFamilyInput" class="chwFontFamily" title="$msg.get("chwfontfamilytitle")" onchange="window.wizard.changeFont('ChartSubtitleFont');">
-#foreach($chwfont in $fonthelper.getAvailableFonts())
+#foreach($chwfont in $chartDefaults.getAvailableFonts())
 #if($chwfont == $chwdefaultfont)
                         <option value="$chwfont" style="font-family: $chwfont, sans-serif;" selected="selected">$chwfont</option>
 #else

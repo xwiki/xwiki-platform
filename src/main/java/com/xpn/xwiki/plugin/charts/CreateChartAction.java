@@ -24,6 +24,7 @@ public class CreateChartAction extends XWikiAction {
         Map map = map(request);
         try {
         	params = new ChartParams(map, DefaultChartParams.getInstance());
+        	params.check();
         } catch (ParamException e) {
         	throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
         			XWikiException.ERROR_XWIKI_UNKNOWN, e.getMessage(), e);

@@ -172,56 +172,56 @@ public class ChartCustomizer {
     		plot.setOutlineStroke(params.getStroke(ChartParams.PLOT_OUTLINE_STROKE));
     	}
     	
-    	if (params.get(ChartParams.PLOT_ZOOM) != null) {
-    		plot.zoom(params.getDouble(ChartParams.PLOT_ZOOM).doubleValue());
-    	}
+//    	if (params.get(ChartParams.PLOT_ZOOM) != null) {
+//    		plot.zoom(params.getDouble(ChartParams.PLOT_ZOOM).doubleValue());
+//    	}
     }
     
     public static void customizeXYPlot(XYPlot plot, ChartParams params) {
-    	if (params.get(ChartParams.PLOTXY_ORIENTATION) != null) {
-    		plot.setOrientation(params.getPlotOrientation(ChartParams.PLOTXY_ORIENTATION));
+    	if (params.get(ChartParams.XYPLOT_ORIENTATION) != null) {
+    		plot.setOrientation(params.getPlotOrientation(ChartParams.XYPLOT_ORIENTATION));
     	}
     	
-    	if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
-    		if (params.getBoolean(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
+    	if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX) != null) {
+    		if (params.getBoolean(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX).booleanValue()) {
         		plot.setDomainGridlinesVisible(true);
         		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX) != null) {
         			plot.setDomainGridlinePaint(params.getColor(ChartParams.AXIS_DOMAIN_PREFIX
         					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
         		}
         		
-        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
+        		if (params.get(ChartParams.AXIS_DOMAIN_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX) != null) {
         			plot.setDomainGridlineStroke(params.getStroke(ChartParams.AXIS_DOMAIN_PREFIX
-        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE));
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX));
         		}
     		} else {
     			plot.setDomainGridlinesVisible(false);
     		}
     	}
 
-    	if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE) != null) {
-    		if (params.getBoolean(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE).booleanValue()) {
+    	if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX) != null) {
+    		if (params.getBoolean(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX).booleanValue()) {
         		plot.setRangeGridlinesVisible(true);
         		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX) != null) {
         			plot.setRangeGridlinePaint(params.getColor(ChartParams.AXIS_RANGE_PREFIX
         					+ ChartParams.PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
         		}
         		
-        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE) != null) {
+        		if (params.get(ChartParams.AXIS_RANGE_PREFIX + ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX) != null) {
         			plot.setRangeGridlineStroke(params.getStroke(ChartParams.AXIS_RANGE_PREFIX
-        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE));
+        					+ ChartParams.PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX));
         		}
     		} else {
     			plot.setRangeGridlinesVisible(false);
     		}
     	}
     	
-    	if (params.get(ChartParams.PLOTXY_QUADRANT_ORIGIN) != null) {
-    		plot.setQuadrantOrigin(params.getPoint2D(ChartParams.PLOTXY_QUADRANT_ORIGIN));
+    	if (params.get(ChartParams.XYPLOT_QUADRANT_ORIGIN) != null) {
+    		plot.setQuadrantOrigin(params.getPoint2D(ChartParams.XYPLOT_QUADRANT_ORIGIN));
     	}
     	
-    	if (params.get(ChartParams.PLOTXY_QUADRANT_COLORS) != null) {
-    		List colors = params.getList(ChartParams.PLOTXY_QUADRANT_COLORS);
+    	if (params.get(ChartParams.XYPLOT_QUADRANT_COLORS) != null) {
+    		List colors = params.getList(ChartParams.XYPLOT_QUADRANT_COLORS);
     		for (int i = 0; i<4 && i<colors.size(); i++) {
     			if (colors.get(i) != null) {
     				plot.setQuadrantPaint(i, (Color)colors.get(i));
@@ -321,10 +321,6 @@ public class ChartCustomizer {
     	}
     }
 
-    public static void customizeCategoryAxis(CategoryAxis axis, ChartParams params, String prefix) {
-    	customizeAxis(axis, params, prefix);
-    }
-
     public static void customizeValueAxis(ValueAxis axis, ChartParams params, String prefix) {
     	customizeAxis(axis, params, prefix);
     	
@@ -335,11 +331,11 @@ public class ChartCustomizer {
     		if (params.get(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX) != null) {
     			axis.setAutoRangeMinimumSize(params.getDouble(prefix+ChartParams.VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX).doubleValue());
     		}    		
-			if (params.get(prefix+ChartParams.VALUE_AXIS_LOWER_MARGIN_SUFFIX) != null) {
-				axis.setLowerMargin(params.getDouble(prefix+ChartParams.VALUE_AXIS_LOWER_MARGIN_SUFFIX).doubleValue());
+			if (params.get(prefix+ChartParams.AXIS_LOWER_MARGIN_SUFFIX) != null) {
+				axis.setLowerMargin(params.getDouble(prefix+ChartParams.AXIS_LOWER_MARGIN_SUFFIX).doubleValue());
 			}
-			if (params.get(prefix+ChartParams.VALUE_AXIS_UPPER_MARGIN_SUFFIX) != null) {
-				axis.setUpperMargin(params.getDouble(prefix+ChartParams.VALUE_AXIS_UPPER_MARGIN_SUFFIX).doubleValue());
+			if (params.get(prefix+ChartParams.AXIS_UPPER_MARGIN_SUFFIX) != null) {
+				axis.setUpperMargin(params.getDouble(prefix+ChartParams.AXIS_UPPER_MARGIN_SUFFIX).doubleValue());
 			}
     	} else { // work only when auto range is off
 			if (params.get(prefix+ChartParams.VALUE_AXIS_LOWER_BOUND_SUFFIX) != null) {
@@ -376,22 +372,22 @@ public class ChartCustomizer {
         	}
     		axis.setTickUnit(params.getNumberTickUnit(prefix+ChartParams.NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
     	}
-    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX) != null) {
-    		axis.setNumberFormatOverride(params.getNumberFormat(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_SUFFIX));
+    	if (params.get(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_OVERRIDE_SUFFIX) != null) {
+    		axis.setNumberFormatOverride(params.getNumberFormat(prefix+ChartParams.NUMBER_AXIS_NUMBER_FORMAT_OVERRIDE_SUFFIX));
     	}
     }
 
     public static void customizeDateAxis(DateAxis axis, ChartParams params, String prefix) {
     	customizeValueAxis(axis, params, prefix);
 
-    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_SUFFIX) != null) {
-    		axis.setDateFormatOverride(params.getDateFormat(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_SUFFIX));
+    	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_OVERRIDE_SUFFIX) != null) {
+    		axis.setDateFormatOverride(params.getDateFormat(prefix+ChartParams.DATE_AXIS_DATE_FORMAT_OVERRIDE_SUFFIX));
     	}
-    	if (params.get(prefix+ChartParams.DATE_AXIS_MAXIMUM_DATE_SUFFIX) != null) {
-    		axis.setMaximumDate(params.getDate(prefix+ChartParams.DATE_AXIS_MAXIMUM_DATE_SUFFIX));
+    	if (params.get(prefix+ChartParams.DATE_AXIS_UPPER_DATE_SUFFIX) != null) {
+    		axis.setMaximumDate(params.getDate(prefix+ChartParams.DATE_AXIS_UPPER_DATE_SUFFIX));
     	}
-    	if (params.get(prefix+ChartParams.DATE_AXIS_MINIMUM_DATE_SUFFIX) != null) {
-    		axis.setMinimumDate(params.getDate(prefix+ChartParams.DATE_AXIS_MINIMUM_DATE_SUFFIX));
+    	if (params.get(prefix+ChartParams.DATE_AXIS_LOWER_DATE_SUFFIX) != null) {
+    		axis.setMinimumDate(params.getDate(prefix+ChartParams.DATE_AXIS_LOWER_DATE_SUFFIX));
     	}
     	if (params.get(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX) != null) {
     		axis.setTickMarkPosition(params.getDateTickMarkPosition(prefix+ChartParams.DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX));
@@ -402,6 +398,26 @@ public class ChartCustomizer {
         	}
     		axis.setTickUnit(params.getDateTickUnit(prefix+ChartParams.DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
     	}
+    }
+
+    public static void customizeCategoryAxis(CategoryAxis axis, ChartParams params, String prefix) {
+    	customizeAxis(axis, params, prefix);
+    	
+    	if (params.get(prefix+ChartParams.CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX) != null) {
+    		axis.setCategoryMargin(params.getDouble(prefix+ChartParams.CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX).doubleValue());
+		}
+    	if (params.get(prefix+ChartParams.CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX) != null) {
+    		axis.setCategoryLabelPositions(params.getCategoryLabelPositions(prefix+ChartParams.CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX));
+		}
+    	if (params.get(prefix+ChartParams.CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX) != null) {
+    		axis.setCategoryLabelPositionOffset(params.getInteger(prefix+ChartParams.CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX).intValue());
+		}
+    	if (params.get(prefix+ChartParams.CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX) != null) {
+    		axis.setMaximumCategoryLabelLines(params.getInteger(prefix+ChartParams.CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX).intValue());
+		}
+    	if (params.get(prefix+ChartParams.CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX) != null) {
+    		axis.setMaximumCategoryLabelWidthRatio(params.getFloat(prefix+ChartParams.CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX).floatValue());
+		}
     }
 
     public static void customizeChart(JFreeChart jfchart, ChartParams params) {

@@ -1,6 +1,7 @@
 package com.xpn.xwiki.plugin.charts;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.Map;
@@ -108,6 +109,9 @@ public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWiki
 	        writer.write(sbuffer.toString());
 		} catch (XWikiException xwe) {
 			writer.write("Charting exception: "+xwe.getFullMessage());
+		} catch (Throwable t) {
+			writer.write("Unexpected charting exception: "+t.getMessage());
+			t.printStackTrace(new PrintWriter(writer));
 		}
 	}
 	

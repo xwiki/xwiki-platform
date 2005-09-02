@@ -13,6 +13,7 @@ import org.jfree.ui.RectangleInsets;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.params.ColorChartParam;
+import com.xpn.xwiki.plugin.charts.params.DefaultChartParams2;
 import com.xpn.xwiki.plugin.charts.params.FontChartParam;
 import com.xpn.xwiki.plugin.charts.params.RectangleInsetsChartParam;
 import com.xpn.xwiki.plugin.charts.params.StrokeChartParam;
@@ -155,6 +156,10 @@ public class ChartParamsTest extends TestCase {
 //			System.out.println(families[i]);
 //		}		
 //	}
+	
+	public void testDefaultParams() throws ParamException {
+		ChartParams params = DefaultChartParams2.getInstance();
+	}
 	
 	public void testSource() throws ParamException {
 		ChartParams params = new ChartParams();

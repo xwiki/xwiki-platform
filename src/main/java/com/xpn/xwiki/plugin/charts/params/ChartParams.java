@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
+import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.axis.NumberTickUnit;
@@ -24,6 +26,7 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.VerticalAlignment;
 
+import com.xpn.xwiki.plugin.charts.exceptions.MissingMandatoryParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class ChartParams {
@@ -42,7 +45,7 @@ public class ChartParams {
 	public static final String LINK_ATTRIBUTES = "link_attributes";
 
 	public static final String RENDERER = "renderer";
-	
+
 	public static final String RENDERER_COLOR = "renderer_color";
 	public static final String RENDERER_STROKE = "renderer_stroke";
 	public static final String RENDERER_SHAPE = "renderer_shape";
@@ -85,18 +88,17 @@ public class ChartParams {
 	
 	public static final String ANTI_ALIAS = "anti_alias";
 	public static final String BACKGROUND_COLOR = "background_color";
-	
+
 	public static final String PLOT_BACKGROUND_COLOR = "plot_background_color";
 	public static final String PLOT_BACKGROUND_ALPHA = "plot_background_alpha";
 	public static final String PLOT_FOREGROUND_ALPHA = "plot_foreground_alpha";
 	public static final String PLOT_INSERTS = "plot_inserts";
 	public static final String PLOT_OUTLINE_COLOR = "plot_outline_color";
 	public static final String PLOT_OUTLINE_STROKE = "plot_outline_stroke";
-	public static final String PLOT_ZOOM = "plot_zoom";
 	
-	public static final String PLOTXY_ORIENTATION = "plot_orientation";
-	public static final String PLOTXY_QUADRANT_ORIGIN = "plot_quadrant_origin";
-	public static final String PLOTXY_QUADRANT_COLORS = "plot_quadrant_colors";
+	public static final String XYPLOT_ORIENTATION = "plot_orientation";
+	public static final String XYPLOT_QUADRANT_ORIGIN = "plot_quadrant_origin";
+	public static final String XYPLOT_QUADRANT_COLORS = "plot_quadrant_colors";
 	
 	public static final String LEGEND_BACKGROUND_COLOR = "legend_background_color";
 	public static final String LEGEND_ITEM_FONT = "legend_item_font";
@@ -131,30 +133,36 @@ public class ChartParams {
 	public static final String AXIS_TICK_MARK_COLOR_SUFFIX = "tick_mark_color";
 	public static final String AXIS_TICK_MARK_STROKE_SUFFIX = "tick_mark_stroke";
 
-	public static final String PLOTXY_AXIS_GRIDLINE_VISIBLE = "gridline_visible";
+	public static final String PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX = "gridline_visible";
 	public static final String PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX = "gridline_color";
-	public static final String PLOTXY_AXIS_GRIDLINE_STROKE = "gridline_stroke";
+	public static final String PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX = "gridline_stroke";
 	
 	public static final String VALUE_AXIS_AUTO_RANGE_SUFFIX = "auto_range";
 	public static final String VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX = "auto_range_min_size";
 	public static final String VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX = "auto_tick_unit";
 	public static final String VALUE_AXIS_LOWER_BOUND_SUFFIX = "lower_bound";
 	public static final String VALUE_AXIS_UPPER_BOUND_SUFFIX = "upper_bound";
-	public static final String VALUE_AXIS_LOWER_MARGIN_SUFFIX = "lower_margin";
-	public static final String VALUE_AXIS_UPPER_MARGIN_SUFFIX = "upper_margin";
+	public static final String AXIS_LOWER_MARGIN_SUFFIX = "lower_margin";
+	public static final String AXIS_UPPER_MARGIN_SUFFIX = "upper_margin";
 	public static final String VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX = "vertical_tick_labels";
 
 	public static final String NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX = "auto_range_includes_zero";
 	public static final String NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX = "auto_range_sticky_zero";
 	public static final String NUMBER_AXIS_RANGE_TYPE_SUFFIX = "range_type";
 	public static final String NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX = "number_tick_unit";
-	public static final String NUMBER_AXIS_NUMBER_FORMAT_SUFFIX = "number_format";
+	public static final String NUMBER_AXIS_NUMBER_FORMAT_OVERRIDE_SUFFIX = "number_format";
 	
-	public static final String DATE_AXIS_DATE_FORMAT_SUFFIX = "date_format";
-	public static final String DATE_AXIS_MAXIMUM_DATE_SUFFIX = "maximum_date";
-	public static final String DATE_AXIS_MINIMUM_DATE_SUFFIX = "minimum_date";
+	public static final String DATE_AXIS_DATE_FORMAT_OVERRIDE_SUFFIX = "date_format_override";
+	public static final String DATE_AXIS_UPPER_DATE_SUFFIX = "upper_date";
+	public static final String DATE_AXIS_LOWER_DATE_SUFFIX = "lower_date";
 	public static final String DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX = "tick_mark_position";
 	public static final String DATE_AXIS_DATE_TICK_UNIT_SUFFIX = "date_tick_unit";
+	
+	public static final String CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX = "category_margin";
+	public static final String CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX = "label_positions";
+	public static final String CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX = "label_position_offset";
+	public static final String CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX = "maximum_label_lines";
+	public static final String CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX = "maximul_label_width_ratio";
 	
 	public static final String TIME_PERIOD_CLASS = "time_period";
 	public static final String DATE_FORMAT = "date_format";
@@ -239,12 +247,10 @@ public class ChartParams {
 		addParam(new RectangleInsetsChartParam(PLOT_INSERTS));
 		addParam(new ColorChartParam(PLOT_OUTLINE_COLOR));
 		addParam(new StrokeChartParam(PLOT_OUTLINE_STROKE));
-		addParam(new DoubleChartParam(PLOT_ZOOM));
-		addParam(new DoubleChartParam(PLOT_ZOOM));
-		
-		addParam(new PlotOrientationChartParam(PLOTXY_ORIENTATION));
-		addParam(new Point2DChartParam(PLOTXY_QUADRANT_ORIGIN));
-		addParam(new ListChartParam(new ColorChartParam(PLOTXY_QUADRANT_COLORS)));
+
+		addParam(new PlotOrientationChartParam(XYPLOT_ORIENTATION));
+		addParam(new Point2DChartParam(XYPLOT_QUADRANT_ORIGIN));
+		addParam(new ListChartParam(new ColorChartParam(XYPLOT_QUADRANT_COLORS)));
 
 		addParam(new ColorChartParam(LEGEND_BACKGROUND_COLOR));
 		addParam(new FontChartParam(LEGEND_ITEM_FONT));
@@ -284,30 +290,36 @@ public class ChartParams {
 		addParam(new ColorChartParam(prefix+AXIS_TICK_MARK_COLOR_SUFFIX));
 		addParam(new StrokeChartParam(prefix+AXIS_TICK_MARK_STROKE_SUFFIX));
 		
-		addParam(new BooleanChartParam(prefix+PLOTXY_AXIS_GRIDLINE_VISIBLE));
+		addParam(new BooleanChartParam(prefix+PLOTXY_AXIS_GRIDLINE_VISIBLE_SUFFIX));
 		addParam(new ColorChartParam(prefix+PLOTXY_AXIS_GRIDLINE_COLOR_SUFFIX));
-		addParam(new StrokeChartParam(prefix+PLOTXY_AXIS_GRIDLINE_STROKE));
+		addParam(new StrokeChartParam(prefix+PLOTXY_AXIS_GRIDLINE_STROKE_SUFFIX));
 		
 		addParam(new BooleanChartParam(prefix+VALUE_AXIS_AUTO_RANGE_SUFFIX));
 		addParam(new DoubleChartParam(prefix+VALUE_AXIS_AUTO_RANGE_MIN_SIZE_SUFFIX));
 		addParam(new BooleanChartParam(prefix+VALUE_AXIS_AUTO_TICK_UNIT_SUFFIX));
 		addParam(new DoubleChartParam(prefix+VALUE_AXIS_LOWER_BOUND_SUFFIX));
 		addParam(new DoubleChartParam(prefix+VALUE_AXIS_UPPER_BOUND_SUFFIX));
-		addParam(new DoubleChartParam(prefix+VALUE_AXIS_LOWER_MARGIN_SUFFIX));
-		addParam(new DoubleChartParam(prefix+VALUE_AXIS_UPPER_MARGIN_SUFFIX));
+		addParam(new DoubleChartParam(prefix+AXIS_LOWER_MARGIN_SUFFIX));
+		addParam(new DoubleChartParam(prefix+AXIS_UPPER_MARGIN_SUFFIX));
 		addParam(new BooleanChartParam(prefix+VALUE_AXIS_VERTICAL_TICK_LABELS_SUFFIX));
 
 		addParam(new BooleanChartParam(prefix+NUMBER_AXIS_AUTO_RANGE_INCLUDES_ZERO_SUFFIX));
 		addParam(new BooleanChartParam(prefix+NUMBER_AXIS_AUTO_RANGE_STICKY_ZERO_SUFFIX));
 		addParam(new RangeTypeChartParam(prefix+NUMBER_AXIS_RANGE_TYPE_SUFFIX));
 		addParam(new NumberTickUnitChartParam(prefix+NUMBER_AXIS_NUMBER_TICK_UNIT_SUFFIX));
-		addParam(new NumberFormatChartParam(prefix+NUMBER_AXIS_NUMBER_FORMAT_SUFFIX));
+		addParam(new NumberFormatChartParam(prefix+NUMBER_AXIS_NUMBER_FORMAT_OVERRIDE_SUFFIX));
 		
-		addParam(new DateFormatChartParam(prefix+DATE_AXIS_DATE_FORMAT_SUFFIX));
-		addParam(new DateChartParam(prefix+DATE_AXIS_MINIMUM_DATE_SUFFIX));
-		addParam(new DateChartParam(prefix+DATE_AXIS_MAXIMUM_DATE_SUFFIX));
+		addParam(new DateFormatChartParam(prefix+DATE_AXIS_DATE_FORMAT_OVERRIDE_SUFFIX));
+		addParam(new DateChartParam(prefix+DATE_AXIS_LOWER_DATE_SUFFIX));
+		addParam(new DateChartParam(prefix+DATE_AXIS_UPPER_DATE_SUFFIX));
 		addParam(new DateTickMarkPositionChartParam(prefix+DATE_AXIS_DATE_TICK_MARK_POSITION_SUFFIX));
 		addParam(new DateTickUnitChartParam(prefix+DATE_AXIS_DATE_TICK_UNIT_SUFFIX));
+
+		addParam(new DoubleChartParam(prefix+CATEGORY_AXIS_CATEGORY_MARGIN_SUFFIX));
+		addParam(new CategoryLabelPositionsChartParam(prefix+CATEGORY_AXIS_LABEL_POSITIONS_SUFFIX));
+		addParam(new IntegerChartParam(prefix+CATEGORY_AXIS_LABEL_POSITION_OFFSET_SUFFIX));
+		addParam(new IntegerChartParam(prefix+CATEGORY_AXIS_MAXIMUM_LABEL_LINES_SUFFIX));
+		addParam(new FloatChartParam(prefix+CATEGORY_AXIS_MAXIMUM_LABEL_WIDTH_RATIO_SUFFIX));
 	}
 	
 	private void addTitleParams(String prefix) {
@@ -334,8 +346,25 @@ public class ChartParams {
 		}
 	}
 	
+	protected void set(String name, Object obj) throws ParamException {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (obj == null || param.getType().isInstance(obj)) {
+			valueMap.put(name, obj);
+		} else {
+			throw new InvalidParameterException("Invalid value type for parameter "
+					+ param.getName() + " ; expected type: "+ param.getType());
+		}
+	}
+	
 	public void check() throws ParamException {
-		// TODO: check if the mandatory parameters have a value
+		Iterator it = paramMap.values().iterator();
+		while (it.hasNext()) {
+			ChartParam param = (ChartParam)it.next();
+			if (!param.isOptional() && valueMap.get(param.getName()) == null) {
+				throw new MissingMandatoryParamException(
+						"No value given for mandatory parameter " + param.getName());
+			}
+		}
 	}
 	
 	public Object get(String name) {
@@ -569,6 +598,15 @@ public class ChartParams {
 		ChartParam param = (ChartParam)paramMap.get(name);
 		if (param != null && param.getType() == Class.class) {
 			return (Class)get(name);
+		} else {
+			return null;
+		}
+	}
+	
+	public CategoryLabelPositions getCategoryLabelPositions(String name) {
+		ChartParam param = (ChartParam)paramMap.get(name);
+		if (param != null && param.getType() == CategoryLabelPositions.class) {
+			return (CategoryLabelPositions)get(name);
 		} else {
 			return null;
 		}

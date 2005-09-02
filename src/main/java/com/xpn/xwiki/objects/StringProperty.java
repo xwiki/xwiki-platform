@@ -24,43 +24,9 @@ package com.xpn.xwiki.objects;
 
 
 
-public class StringProperty extends BaseProperty {
-    private String value;
-
+public class StringProperty extends BaseStringProperty {
 
     public StringProperty() {
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = (String)value;
-    }
-
-    public String toText() {
-        String value = (String)getValue();
-        if (value!=null)
-         return value;
-        else
-         return "";
-    }
-
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
-         return false;
-
-       if ((getValue()==null)
-            && (((StringProperty)obj).getValue()==null))
-         return true;
-
-       return getValue().equals(((StringProperty)obj).getValue());
-    }
-
-    public Object clone() {
-        StringProperty property = (StringProperty) super.clone();
-        property.setValue(getValue());
-        return property;
+      super();
     }
 }

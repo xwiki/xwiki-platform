@@ -239,7 +239,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             try {
                 if (stmt!=null) stmt.close();
                 if (bTransaction)
-                    endTransaction(context, true);
+                    endTransaction(context, false, false);
             }
             catch (Exception e) {
             }
@@ -325,8 +325,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             String database = context.getDatabase();
             try {
                 if ( log.isDebugEnabled() ) log.debug("Switch database to: " + database);
-                if (database!=null)
-                    session.connection().setCatalog(database);
+                if (database!=null) {
+                    if (!database.equals(session.connection().getCatalog()))
+                          session.connection().setCatalog(database);
+                }
             } catch (Exception e) {
                 Object[] args = { database };
                 throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
@@ -393,7 +395,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
     }
 
-    public void endTransaction(XWikiContext context, boolean commit)
+    public void endTransaction(XWikiContext context, boolean commit) {
+        endTransaction(context, commit, false);
+    }
+
+    public void endTransaction(XWikiContext context, boolean commit, boolean rollback)
             throws HibernateException {
         Session session = null;
         try {
@@ -406,8 +412,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
                 if (commit) {
                     transaction.commit();
-                } else {
-                    // Don't commit the transaction, can be faster for read-only operations
+                } else if (rollback) {
                     transaction.rollback();
                 }
             }
@@ -515,7 +520,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -718,7 +723,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC,
@@ -726,7 +731,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
 
             // End monitoring timer
@@ -1058,7 +1063,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 }
             }
             if (bTransaction) {
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             }
         } catch (Exception e) {
             Object[] args = { object.getName() };
@@ -1068,7 +1073,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
 
@@ -1160,7 +1165,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             if (bTransaction) {
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             }
         }
         catch (Exception e) {
@@ -1172,7 +1177,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1348,7 +1353,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             if (bTransaction) {
-                endTransaction(context, true);
+                endTransaction(context, false, false);
             }
         } catch (Exception e) {
             Object[] args = { bclass.getName() };
@@ -1357,7 +1362,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1461,7 +1466,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
             doc.setAttachmentList(list);
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -1471,7 +1476,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1612,7 +1617,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             session.load(content, new Long(content.getId()));
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -1621,7 +1626,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1642,7 +1647,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             session.load(archive, new Long(archive.getId()));
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
@@ -1651,7 +1656,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1678,7 +1683,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_LOCK,
@@ -1686,7 +1691,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
         return lock;
@@ -1761,7 +1766,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             links = query.list();
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_LINKS,
@@ -1770,7 +1775,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
         return links;
@@ -1792,7 +1797,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             backlinks = query.list();
 
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
         }
         catch (Exception e) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS,
@@ -1801,7 +1806,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
         return backlinks;
@@ -1946,7 +1951,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 list.add(name);
             }
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             return list;
         }
         catch (Exception e) {
@@ -1955,7 +1960,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
         }
     }
@@ -1992,7 +1997,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 list.add(it.next());
             }
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             return list;
         }
         catch (Exception e) {
@@ -2002,7 +2007,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
 
             // End monitoring timer
@@ -2071,7 +2076,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 list.add(it.next());
             }
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             return list;
         }
         catch (Exception e) {
@@ -2081,7 +2086,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
 
             // End monitoring timer
@@ -2154,7 +2159,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
 
             // End monitoring timer
@@ -2226,7 +2231,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 }
             }
             if (bTransaction)
-                endTransaction(context, false);
+                endTransaction(context, false, false);
             return list;
         }
         catch (Exception e) {
@@ -2237,7 +2242,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         } finally {
             try {
                 if (bTransaction)
-                    endTransaction(context, false);
+                    endTransaction(context, false, false);
             } catch (Exception e) {}
 
             // End monitoring timer

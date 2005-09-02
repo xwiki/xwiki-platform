@@ -75,27 +75,21 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     }
 
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        store.saveXWikiDoc(doc, context);
-        doc.setStore(store);
-        String key = getKey(doc, context);
-        // We need to flush so that caches
-        // on the cluster are informed about the change
-        getCache().flushEntry(key);
-        getCache().putInCache(key, doc);
-        getPageExistCache().flushEntry(key);
-        getPageExistCache().putInCache(key, new Boolean(true));
+        saveXWikiDoc(doc, context, true);
     }
 
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.saveXWikiDoc(doc, context, bTransaction);
-        doc.setStore(store);
         String key = getKey(doc, context);
-        // We need to flush so that caches
-        // on the cluster are informed about the change
-        getCache().flushEntry(key);
-        getCache().putInCache(key, doc);
-        getPageExistCache().flushEntry(key);
-        getPageExistCache().putInCache(key, new Boolean(true));
+        synchronized(key) {
+            store.saveXWikiDoc(doc, context, bTransaction);
+            doc.setStore(store);
+            // We need to flush so that caches
+            // on the cluster are informed about the change
+            getCache().flushEntry(key);
+            getCache().putInCache(key, doc);
+            getPageExistCache().flushEntry(key);
+            getPageExistCache().putInCache(key, new Boolean(true));
+        }
     }
 
     public void flushCache() {
@@ -116,19 +110,21 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc, context);
-        try {
-            doc = (XWikiDocument) getCache().getFromCache(key);
-            doc.setFromCache(true);
-        } catch (XWikiCacheNeedsRefreshException e) {
+        synchronized (key) {
             try {
-                doc = store.loadXWikiDoc(doc, context);
-                doc.setStore(store);
-            } catch (XWikiException xwikiexception) {
-                getCache().cancelUpdate(key);
-                throw xwikiexception;
+                doc = (XWikiDocument) getCache().getFromCache(key);
+                doc.setFromCache(true);
+            } catch (XWikiCacheNeedsRefreshException e) {
+                try {
+                    doc = store.loadXWikiDoc(doc, context);
+                    doc.setStore(store);
+                } catch (XWikiException xwikiexception) {
+                    getCache().cancelUpdate(key);
+                    throw xwikiexception;
+                }
+                getCache().putInCache(key, doc);
+                getPageExistCache().putInCache(key, new Boolean(!doc.isNew()));
             }
-            getCache().putInCache(key, doc);
-            getPageExistCache().putInCache(key, new Boolean(!doc.isNew()));
         }
         return doc;
     }
@@ -141,10 +137,12 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc, context);
-        store.deleteXWikiDoc(doc, context);
-        getCache().flushEntry(key);
-        getPageExistCache().flushEntry(key);
-        getPageExistCache().putInCache(key, new Boolean(false));
+        synchronized(key) {
+            store.deleteXWikiDoc(doc, context);
+            getCache().flushEntry(key);
+            getPageExistCache().flushEntry(key);
+            getPageExistCache().putInCache(key, new Boolean(false));
+        }
     }
 
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -260,28 +258,32 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.search(sql, nb, start, whereParams, context);
     }
 
-    public void cleanUp(XWikiContext context) {
+    public synchronized void cleanUp(XWikiContext context) {
         store.cleanUp(context);
     }
 
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
-        store.createWiki(wikiName, context);
+        synchronized(wikiName) {
+            store.createWiki(wikiName, context);
+        }
     }
 
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc,context);
-        try {
+        synchronized(key) {
             try {
-                Boolean result = (Boolean) getPageExistCache().getFromCache(key);
-                return result.booleanValue();
-            } catch (XWikiCacheNeedsRefreshException e) {
-                getPageExistCache().cancelUpdate(key);
+                try {
+                    Boolean result = (Boolean) getPageExistCache().getFromCache(key);
+                    return result.booleanValue();
+                } catch (XWikiCacheNeedsRefreshException e) {
+                    getPageExistCache().cancelUpdate(key);
+                }
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
+            boolean result = store.exists(doc, context);
+            getPageExistCache().putInCache(key, new Boolean(result));
+            return result;
         }
-        boolean result = store.exists(doc, context);
-        getPageExistCache().putInCache(key, new Boolean(result));
-        return result;
     }
 
     public XWikiCache getCache() {
@@ -304,7 +306,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.getCustomMappingPropertyList(bclass);
     }
 
-    public void injectCustomMappings(XWikiContext context) throws XWikiException {
+    public synchronized void injectCustomMappings(XWikiContext context) throws XWikiException {
         store.injectCustomMappings(context);
     }
 }

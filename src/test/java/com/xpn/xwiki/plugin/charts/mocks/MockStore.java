@@ -246,7 +246,11 @@ public class MockStore implements XWikiStoreInterface {
     
     public void injectCustomMappings(XWikiContext context) throws XWikiException {
     }
-    
+
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
+        return null;  
+    }
+
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
     	return false;
     }

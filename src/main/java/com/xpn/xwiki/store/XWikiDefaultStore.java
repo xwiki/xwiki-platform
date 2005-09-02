@@ -76,4 +76,7 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
         return new ArrayList();
     }
 
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+        return searchDocuments(wheresql,  distinctbyname, customMapping, true, nb, start, context);
+    }
 }

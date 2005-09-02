@@ -201,6 +201,9 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.searchDocuments(wheresql, nb, start, context);
     }
 
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
+        return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb, start, context);
+    }
 
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
         store.saveAttachmentContent(attachment, context, bTransaction);
@@ -309,4 +312,5 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     public synchronized void injectCustomMappings(XWikiContext context) throws XWikiException {
         store.injectCustomMappings(context);
     }
+
 }

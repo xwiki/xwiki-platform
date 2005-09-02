@@ -410,7 +410,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 "Not implemented");
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Not implemented");
     }

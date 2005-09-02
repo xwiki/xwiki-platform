@@ -1479,7 +1479,7 @@ public class XWikiDocument {
             saveAttachmentContent((XWikiAttachment) attachmentList.get(i), context);
         }
     }
-
+    
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
         String database = context.getDatabase();
         try {

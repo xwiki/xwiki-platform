@@ -935,10 +935,18 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             else
                 query = session.createQuery("select obj.id from BaseObject as obj where obj.id = :id");
             query.setInteger("id", object.getId());
-            if (query.uniqueResult()==null)
-                session.save((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
-            else
-                session.update((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+            if (query.uniqueResult()==null) {
+                if (stats)
+                 session.save(object);
+                else
+                 session.save((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+            }
+            else {
+                if (stats)
+                 session.update(object);
+                else
+                 session.update((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+            }
 
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
@@ -1098,7 +1106,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 Object map = dynamicSession.get((String) bclass.getName(),new Integer(object.getId()));
-                dynamicSession.delete(map);
+                dynamicSession.delete((Object) map);
                 if (evict)
                     dynamicSession.evict(map);
             }
@@ -1113,9 +1121,24 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     }
                 }
             }
-            session.delete(object);
-            if (evict)
-                session.evict(object);
+
+            // In case of custom class we need to force it as BaseObject
+            // to delete the xwikiobject row
+            if (!(object.getClassName().equals(BaseObject.class.getName()))) {
+                BaseObject cobject = new BaseObject();
+                cobject.setName(object.getName());
+                cobject.setClassName(object.getClassName());
+                cobject.setNumber(object.getNumber());
+                cobject.setId(object.getId());
+                session.delete(cobject);
+                if (evict)
+                    session.evict(cobject);
+            } else {
+                session.delete(object);
+                if (evict)
+                    session.evict(object);
+            }
+
             if (bTransaction) {
                 endTransaction(context, true);
             }
@@ -2168,7 +2191,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
@@ -2214,8 +2237,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 Object[] result = (Object[]) it.next();
 
                 XWikiDocument doc = new XWikiDocument((String)result[0], (String)result[1]);
-                if (context.getWiki().getRightService().checkAccess("view", doc, context)==false)
-                    continue;
+                if (checkRight) {
+                    if (context.getWiki().getRightService().checkAccess("view", doc, context)==false)
+                        continue;
+                }
 
                 String name = doc.getFullName();
                 if (distinctbyname) {
@@ -2394,7 +2419,8 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext context) throws XWikiException {
-        List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null", context);
+        List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null",
+                                    true, false, false, 0, 0, context);
         boolean result = false;
 
         for (int i=0;i<list.size();i++) {

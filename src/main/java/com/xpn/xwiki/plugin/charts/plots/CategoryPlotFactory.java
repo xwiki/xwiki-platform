@@ -14,7 +14,7 @@ import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.source.DataSource;
 
-public class CategoryPlotFactory implements PlotFactory {
+public class CategoryPlotFactory {
 	private static CategoryPlotFactory uniqueInstance = new CategoryPlotFactory();
 	
 	private CategoryPlotFactory() {
@@ -25,7 +25,7 @@ public class CategoryPlotFactory implements PlotFactory {
 		return uniqueInstance;
 	}
 
-	public Plot create(DataSource dataSource, ChartParams params)
+	public Plot create(DataSource dataSource, CategoryItemRenderer renderer, ChartParams params)
 			throws GenerateException, DataSourceException {
 		String dataSeries = params.getString(ChartParams.SERIES);
 		
@@ -34,11 +34,13 @@ public class CategoryPlotFactory implements PlotFactory {
 		ChartCustomizer.customizeCategoryAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
 		ChartCustomizer.customizeValueAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);    
 		
-		CategoryItemRenderer renderer = CategoryItemRendererFactory.getInstance().create(params);
-
+		Class rendererClass = params.getClass(ChartParams.RENDERER);
+		
+		ChartCustomizer.customizeCategoryItemRenderer(renderer, params);
+		
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		
-		if (dataSeries.equals("columns")) {
+		if ("columns".equals(dataSeries)) {
 			for (int row = 0; row<dataSource.getRowCount(); row++) {
 				for (int column = 0; column<dataSource.getColumnCount(); column++) {
 					dataset.addValue(dataSource.getCell(row, column),
@@ -47,7 +49,7 @@ public class CategoryPlotFactory implements PlotFactory {
 					);
 				}
 			}
-		} else if (dataSeries.equals("rows")) {
+		} else if ("rows".equals(dataSeries)) {
 			for (int row = 0; row<dataSource.getRowCount(); row++) {
 				for (int column = 0; column<dataSource.getColumnCount(); column++) {
 					dataset.addValue(dataSource.getCell(row, column),
@@ -57,7 +59,7 @@ public class CategoryPlotFactory implements PlotFactory {
 				}
 			}
 		} else {
-			throw new GenerateException("Invalid series parameter");					
+			throw new GenerateException("Invalid series parameter: "+dataSeries);					
 		}
 		return new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
 	}

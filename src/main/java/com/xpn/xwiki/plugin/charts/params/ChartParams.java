@@ -208,7 +208,7 @@ public class ChartParams {
 		addParam(new MapChartParam(LINK_ATTRIBUTES));
 		addParam(new MapChartParam(IMAGE_ATTRIBUTES));
 
-		addParam(new StringChartParam(RENDERER));
+		addParam(new RendererClassChartParam(RENDERER));
 		addParam(new ColorChartParam(RENDERER_COLOR));
 		addParam(new StrokeChartParam(RENDERER_STROKE));
 		addParam(new ShapeChartParam(RENDERER_SHAPE));

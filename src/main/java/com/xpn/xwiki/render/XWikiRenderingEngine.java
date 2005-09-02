@@ -24,6 +24,8 @@ package com.xpn.xwiki.render;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.xpn.xwiki.XWiki;
@@ -37,7 +39,7 @@ import com.xpn.xwiki.util.Util;
 public class XWikiRenderingEngine {
 
     private List renderers = new ArrayList();
-    private HashMap renderermap = new HashMap();
+    private HashMap renderermap = new LinkedHashMap();
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
         if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
@@ -69,17 +71,26 @@ public class XWikiRenderingEngine {
         renderers.add(renderer);
         renderermap.put(name, renderer);
     }
-
+    
     public XWikiRenderer getRenderer(String name) {
-    	return (XWikiRenderer)renderermap.get(name);
-// prior version    	
-//        for (int i=0;i<renderers.size();i++) {
-//            XWikiRenderer renderer = (XWikiRenderer) renderers.get(i);
-//            if (renderer.getClass().getName().equals(name))
-//                return renderer;
-//        }
-//        return null;
-    }
+		return (XWikiRenderer) renderermap.get(name);
+	}
+
+	public List getRendererList() {
+		return (List) ((ArrayList) renderers).clone();
+	}
+
+	public List getRendererNames() {
+		return new LinkedList(renderermap.keySet());
+	}
+	
+	public XWikiRenderer removeRenderer(String name) {
+		XWikiRenderer result = (XWikiRenderer) renderermap.remove(name);
+		if (result != null) {
+			renderers.remove(result);
+		}
+		return result;
+	}
 
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
            return renderText(doc.getTranslatedContent(context), doc, context);

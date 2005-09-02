@@ -1,10 +1,13 @@
 package com.xpn.xwiki.plugin.charts.plots;
 
+import java.lang.reflect.Constructor;
+
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 
 import com.xpn.xwiki.plugin.charts.ChartCustomizer;
@@ -26,14 +29,27 @@ public class TimePlotFactory implements PlotFactory {
 	
 	public Plot create(DataSource dataSource, ChartParams params)
 			throws GenerateException, DataSourceException {
+		
+		Class rendererClass = params.getClass(ChartParams.RENDERER);
+		XYItemRenderer renderer;
+		if (rendererClass != null) {
+			try {
+				Constructor ctor = rendererClass.getConstructor(new Class[] {});
+				renderer = (XYItemRenderer)ctor.newInstance(new Object[] { });
+			} catch (Throwable e) {
+				throw new GenerateException(e);
+			}
+		} else {
+			renderer = new XYLineAndShapeRenderer();
+		}
+		ChartCustomizer.customizeXYItemRenderer(renderer, params);
+		
         DateAxis domainAxis = new DateAxis();
 		ChartCustomizer.customizeDateAxis(domainAxis, params, ChartParams.AXIS_DOMAIN_PREFIX);
 
         NumberAxis rangeAxis = new NumberAxis();
-		ChartCustomizer.customizeNumberAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);   
         rangeAxis.setAutoRangeIncludesZero(false);  // override default
-
-		XYItemRenderer renderer = XYItemRendererFactory.getInstance().create(params);
+		ChartCustomizer.customizeNumberAxis(rangeAxis, params, ChartParams.AXIS_RANGE_PREFIX);   
 
 		XYDataset dataset = TimeSeriesCollectionFactory.getInstance().create(dataSource, params);
 

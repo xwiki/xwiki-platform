@@ -12,6 +12,7 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.AbstractRenderer;
@@ -170,14 +171,18 @@ public class ChartCustomizer {
     	
     	if (params.get(ChartParams.PLOT_OUTLINE_STROKE) != null) {
     		plot.setOutlineStroke(params.getStroke(ChartParams.PLOT_OUTLINE_STROKE));
-    	}
+    	}    	
+    }
+    
+    public static void customizePiePlot(PiePlot plot, ChartParams params) {
+    	customizePlot(plot, params);
+
     	
-//    	if (params.get(ChartParams.PLOT_ZOOM) != null) {
-//    		plot.zoom(params.getDouble(ChartParams.PLOT_ZOOM).doubleValue());
-//    	}
     }
     
     public static void customizeXYPlot(XYPlot plot, ChartParams params) {
+    	customizePlot(plot, params);
+    	
     	if (params.get(ChartParams.XYPLOT_ORIENTATION) != null) {
     		plot.setOrientation(params.getPlotOrientation(ChartParams.XYPLOT_ORIENTATION));
     	}

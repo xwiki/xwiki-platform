@@ -1,18 +1,24 @@
 package com.xpn.xwiki.plugin.charts;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.radeox.macro.table.Table;
 import org.radeox.macro.table.TableBuilder;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.source.TableDataSource;
 import com.xpn.xwiki.render.PreTagSubstitution;
+import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 
 public class RadeoxHelper {
 	private XWikiRenderer renderer;
@@ -26,12 +32,48 @@ public class RadeoxHelper {
         this.document = document;
     }
 
+    public String getPreRadeoxContent() {
+    	XWikiRenderingEngine engine = context.getWiki().getRenderingEngine();
+    	Iterator it = engine.getRendererNames().iterator();
+    	LinkedHashMap map = new LinkedHashMap();
+    	boolean found = false;
+    	while (it.hasNext()) {
+    		String name = (String)it.next();    		
+    		XWikiRenderer renderer = engine.getRenderer(name);
+    		if (renderer instanceof XWikiRadeoxRenderer || found) {
+    			found = true;
+    			map.put(name, renderer);
+    		}
+    	}
+    	
+    	it = map.keySet().iterator();
+    	while (it.hasNext()) {
+    		engine.removeRenderer((String)it.next());
+    	}
+    	
+    	String result;
+    	try {
+    		result = engine.renderDocument(document, context);
+    	} catch (XWikiException e) {
+    		StringWriter writer = new StringWriter();
+    		e.printStackTrace(new PrintWriter(writer));
+    		result = writer.toString();
+    	} finally {
+        	it = map.keySet().iterator();
+        	while (it.hasNext()) {
+        		String name = (String)it.next();
+        		engine.addRenderer(name, (XWikiRenderer)map.get(name));
+        	}
+    	}
+    	return result;
+    }
+    
     /**
      * @return The string content of all the the tables in the document  
      */
 	public String[] getTableStrings() {
 		ArrayList tables = new ArrayList();
-		String content = document.getContent();
+		String content = getPreRadeoxContent();//document.getContent();
 
         // Remove the content that is inside "{pre}"
 		content = (new PreTagSubstitution(context.getUtil(), true)).substitute(content);
@@ -67,7 +109,7 @@ public class RadeoxHelper {
 	 * @return The string content of the given table, or null, when no such table exists 
 	 */
 	public String getTableString(int idx) {
-		String content = document.getContent();
+		String content = getPreRadeoxContent(); //document.getContent();
 
         // Remove the content that is inside "{pre}"
 		content = (new PreTagSubstitution(context.getUtil(), true)).substitute(content);

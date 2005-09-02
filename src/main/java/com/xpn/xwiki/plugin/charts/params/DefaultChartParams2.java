@@ -44,7 +44,7 @@ public class DefaultChartParams2 extends ChartParams {
 		set(LINK_ATTRIBUTES, new HashMap());
 		set(IMAGE_ATTRIBUTES, new HashMap());
 
-		set(RENDERER, "default");
+		set(RENDERER, (Class)null); // default renderer is chart type dependent
 		set(RENDERER_COLOR, AbstractRenderer.DEFAULT_PAINT);
 		set(RENDERER_STROKE, AbstractRenderer.DEFAULT_STROKE);
 		set(RENDERER_SHAPE, AbstractRenderer.DEFAULT_SHAPE);

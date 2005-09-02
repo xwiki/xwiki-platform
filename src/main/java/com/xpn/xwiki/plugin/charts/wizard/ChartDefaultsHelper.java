@@ -5,8 +5,6 @@ import java.awt.GraphicsEnvironment;
 
 import org.jfree.chart.JFreeChart;
 
-import com.xpn.xwiki.plugin.charts.source.TableDataSource;
-
 public class ChartDefaultsHelper {
   public ChartDefaultsHelper(){
   }

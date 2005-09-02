@@ -1,5 +1,8 @@
 package com.xpn.xwiki.plugin.charts.tests;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -30,18 +33,20 @@ public class RadeoxHelperTest extends TestCase {
         table0 = "Category | Sales (K€)\n" +
 			"Category 1 | 100\n" +
 			"Category 2 | 50\n" +
-			"Category 3 | 50\n" +
+			"Category $var | 50\n" +
 			"Total | =sum(B2:B4)";
         
         table1 = "A single cell";
   
         doc.setContent("some text\n" +
+        		"#set($var = 3)\n" +
         		"{pre}a{table}b{/pre}\n" +
         		"{table}\n" + table0 + "\n{table}\n" +
         		"some other text\n" +
         		"{table}\n" + table1 + "\n{table}\n" +
         		"end");
 
+        table0 = table0.replaceAll("\\$var", "3");
         this.rhelper = new RadeoxHelper(doc, context);
 	}
 	
@@ -82,10 +87,17 @@ public class RadeoxHelperTest extends TestCase {
 		Assert.assertEquals(table1, rhelper.getTableString(1));
 	}
 
-	public void testRenderTable() {
-
+	public void testGetPreRadeoxContent() {
+		List list = (ArrayList)((ArrayList)context.getWiki()
+				.getRenderingEngine().getRendererList()).clone();
+//		System.out.println(list);
+		System.out.println(rhelper.getPreRadeoxContent());
+		Assert.assertEquals(list, context.getWiki()
+				.getRenderingEngine().getRendererList());
+//		System.out.println(context.getWiki().getRenderingEngine().getRendererList());
 	}
 
+	
 	private String table0, table1;
 	private RadeoxHelper rhelper;
     private XWiki xwiki;

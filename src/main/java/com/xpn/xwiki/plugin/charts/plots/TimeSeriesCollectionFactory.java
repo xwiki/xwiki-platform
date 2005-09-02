@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
@@ -43,9 +42,32 @@ public class TimeSeriesCollectionFactory {
 		}
 		
 		if (dataSeries.equals("columns")) {
-			
-			throw new NotImplementedException(); // TODO!!!
-			
+			if (!dataSource.hasHeaderColumn()) {
+				throw new GenerateException("Header column required");
+			}
+			for (int column = 0; column<dataSource.getColumnCount(); column++) {
+				String seriesName;
+				if (dataSource.hasHeaderRow()) {
+					seriesName = dataSource.getHeaderRowValue(column);
+				} else {
+					seriesName = "";
+				}
+
+				TimeSeries series = new TimeSeries(seriesName, timePeriodClass);
+				
+				for (int row = 0; row<dataSource.getRowCount(); row++) {
+					RegularTimePeriod period;
+					try {
+						Date date = format.parse(dataSource.getHeaderColumnValue(row));
+						Constructor ctor = timePeriodClass.getConstructor(new Class[] {Date.class});
+						period = (RegularTimePeriod)ctor.newInstance(new Object[] {date});
+					} catch (Exception e) {
+						throw new GenerateException(e);
+					}
+					series.add(period, dataSource.getCell(row, column));
+				}
+				dataset.addSeries(series);
+			}			
 		} else if (dataSeries.equals("rows")) {
 			if (!dataSource.hasHeaderRow()) {
 				throw new GenerateException("Header row required");

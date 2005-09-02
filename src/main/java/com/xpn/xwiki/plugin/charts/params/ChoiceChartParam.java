@@ -30,7 +30,7 @@ public abstract class ChoiceChartParam extends AbstractChartParam {
 		} else {
 			throw new InvalidParamException("Invalid parameter value: " +
 					"Accepted values for the " + getName() + " parameter are "
-					+ choices.toString() + "; encountered: " + selector);
+					+ choices.keySet().toString() + "; encountered: " + selector);
 		}
 	}
 

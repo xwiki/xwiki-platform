@@ -1,9 +1,13 @@
 package com.xpn.xwiki.plugin.charts.plots;
 
+import java.lang.reflect.Constructor;
+
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
@@ -46,6 +50,19 @@ public class PiePlotFactory implements PlotFactory {
 			throw new GenerateException("Invalid series parameter:"+dataSeries);
 		}
 		
-		return new PiePlot(dataset);
+		Class plotClass = params.getClass(ChartParams.RENDERER);
+		PiePlot plot;
+		if (plotClass != null) {
+			try {
+				Constructor ctor = plotClass.getConstructor(new Class[] {PieDataset.class});
+				plot = (PiePlot)ctor.newInstance(new Object[] { dataset });
+			} catch (Throwable e) {
+				throw new GenerateException(e);
+			}
+		} else {
+			plot = new PiePlot(dataset);
+		}
+		ChartCustomizer.customizePiePlot(plot, params);
+		return plot;
 	}
 }

@@ -5,20 +5,12 @@ import java.awt.GraphicsEnvironment;
 
 import org.jfree.chart.JFreeChart;
 
-public class ChartDefaultsHelper {
-  public ChartDefaultsHelper(){
+public class FontHelper {
+  public FontHelper(){
   }
 
-  public String getDefaultTitleFont(){
-      return JFreeChart.DEFAULT_TITLE_FONT.getFamily();
-  }
-  
-  public String getDefaultTitleSize(){
-      return JFreeChart.DEFAULT_TITLE_FONT.getSize() + "";
-  }
-
-  public String getDefaultTitleStyle(){
-      int style = JFreeChart.DEFAULT_TITLE_FONT.getStyle();
+  public String getFontStyleAsString(Font font){
+      int style = font.getStyle();
       if(style == Font.BOLD) return "bold";
       if(style == Font.ITALIC) return "italic";
       if(style == Font.BOLD + Font.ITALIC) return "bold+italic";

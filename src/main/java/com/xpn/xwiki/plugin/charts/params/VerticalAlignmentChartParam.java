@@ -15,7 +15,7 @@ public class VerticalAlignmentChartParam extends ChoiceChartParam {
 	public Class getType() {
 		return VerticalAlignment.class;
 	}
-	
+
 	public void init() {
 		addChoice("top", VerticalAlignment.TOP);
 		addChoice("bottom", VerticalAlignment.BOTTOM);

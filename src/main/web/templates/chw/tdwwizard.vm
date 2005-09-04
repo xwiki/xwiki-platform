@@ -12,9 +12,11 @@ $!xwiki.getWebPreference("meta")
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("tdwScripts.js")"></script>
 </head>
+#set($saveAddress = $xwiki.getURL("Main.WebHome", "objectadd"))
+#set($saveAddress = $saveAddress.substring(0, $saveAddress.indexOf("Main/WebHome")))
 #set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
 #set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
-<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("")');">
+<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("")', '$saveAddress');">
 <div id="tableWizard">
   <table id="tdwWizard" summary="Table Datasource Wizard Content">
     <tbody>
@@ -32,13 +34,11 @@ $!xwiki.getWebPreference("meta")
               <label for="tdwPageInput">$msg.get("tdwdocselectlabel")</label>
               <select id="tdwPageInput" class="tdwListbox" size="16" onchange="window.wizard.change()">
 #set($currentPage = $doc.getFullName())
-#foreach($prefix in $xwiki.getSpaces())
-#foreach($page in $xwiki.getSpaceDocsName($prefix))
-#if($currentPage == "$prefix.$page")
-                <option value="$prefix.$page" selected="selected">$prefix.$page</option>
+#foreach($page in $xwiki.searchDocuments("where doc.content like '%{table}%'"))
+#if($currentPage == "$page")
+                <option value="$page" selected="selected">$page</option>
 #else
-                <option value="$prefix.$page">$prefix.$page</option>
-#end
+                <option value="$page">$page</option>
 #end
 #end
               </select>
@@ -49,6 +49,7 @@ $!xwiki.getWebPreference("meta")
           <fieldset id="tdwRangeWizardFieldset" class="tdwLargeFieldset">
             <legend id="tdwRangeOptionsLegend" class="tdwLargeLegend">$msg.get("tdwrangelegend")</legend>
             <span id="tdwWaiting" class="tdwHidden">$msg.get("tdwwaitingmsg")</span>
+            <span id="tdwRequestError" class="tdwHidden">$msg.get("tdwrequesterrormsg")</span>
             <span id="tdwNoTables" class="tdwHidden">$msg.get("tdwnotablesmsg")</span>
             <span id="tdwSelectRange" class="tdwHidden">$msg.get("tdwslectrangemsg")</span>
             <div id="tdwRangeOptionsDiv" class="tdwVisible">
@@ -64,11 +65,11 @@ $!xwiki.getWebPreference("meta")
                 <legend id="tdwHeadersLegend" class="tdwSmallLegend">$msg.get("tdwheaderslegend")</legend>
                 <div id="tdwHeadersDiv" class="chwVisible">
                   <div id="tdwRowHeaderDiv">
-                    <input type="checkbox" id="tdwRowHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderRow()) checked="checked" #end/>
+                    <input type="checkbox" id="tdwRowHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderRow() == "true") checked="checked" #end/>
                     <label for="tdwRowHeaderInput">$msg.get("tdwrowheader")</label>
                   </div>
                   <div id="tdwColumnHeaderDiv">
-                    <input type="checkbox" id="tdwColumnHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderColumn()) checked="checked" #end/>
+                    <input type="checkbox" id="tdwColumnHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderColumn() == "true") checked="checked" #end/>
                     <label for="tdwColumnHeaderInput">$msg.get("tdwcolumnheader")</label>
                   </div>
                 </div>
@@ -77,25 +78,27 @@ $!xwiki.getWebPreference("meta")
                 <legend id="tdwFormatLegend" class="tdwSmallLegend">$msg.get("tdwformatlegend")</legend>
                 <div id="tdwFormatDiv" class="chwVisible">
                   <div id="tdwIgnoreAlphaDiv">
-                    <input type="checkbox" id="tdwIgnoreAlphaInput" #if($datasourceDefaults.getDefaultIgnoreAlpha()) checked="checked" #end/>
+                    <input type="checkbox" id="tdwIgnoreAlphaInput" #if($datasourceDefaults.getDefaultIgnoreAlpha() == "true") checked="checked" #end/>
                     <label for="tdwIgnoreAlphaInput">$msg.get("tdwignorealpha")</label>
                   </div>
                   <div id="tdwDecimalSymbolDiv">
                     <input type="checkbox" id="tdwDecimalSymbolInput" #if($datasourceDefaults.getDefaultDecimalSymbol() == "comma") checked="checked" #end/>
-                    <!--select id="tdwDecimalSymbolInput">
-                      <option value="period" title="$msg.get("tdwperiod")" #if($datasourceDefaults.getDefaultDecimalSymbol() == "period") selected="selected" #end>.</option>
-                      <option value="comma" title="$msg.get("tdwcomma")" #if($datasourceDefaults.getDefaultDecimalSymbol() == "comma") selected="selected" #end>,</option>
-                    </select-->
                     <label for="tdwDecimalSymbolInput">$msg.get("tdwdecimalsymbol")</label>
                   </div>
                 </div>
               </fieldset>
+              <fieldset class="tdwSmallFieldset">
+                <legend id="tdwSaveOptionsLegend" class="tdwSmallLegend">$msg.get("tdwsavelegend")</legend>
+                <div id="tdwSaveOptionsDiv" class="tdwVisible">
+                  <input type="checkbox" id="tdwSaveInput" onclick="window.wizard.flipVisible('Save', this.checked);" onchange="window.wizard.flipVisible('Save', this.checked);"/>
+                  <label for="tdwSaveInput">$msg.get("tdwsavesource")</label>
+                  <div id="tdwSaveDiv" class="tdwHidden">
+                    <label for="tdwSaveNameInput">$msg.get("tdwsavename")</label>
+                    <input type="text" id="tdwSaveNameInput"/>
+                  </div>
+                </div>
+              </fieldset>
             </div>
-          </fieldset>
-        </div>
-        <div id="tdwSaveWizard" class="tdwInactivePage">
-          <fieldset id="tdwSaveWizardFieldset" class="tdwLargeFieldset">
-            <legend id="tdwSaveOptionsLegend" class="tdwLargeLegend">$msg.get("tdwsavelegend")</legend>
           </fieldset>
         </div>
       </td>
@@ -105,6 +108,7 @@ $!xwiki.getWebPreference("meta")
     </tr>
   </tbody>
   </table>
+  <span style="display:none;" id="tdwSaveNoNameMsg">$msg.get("tdwnonamedata")</span>
 </div>
 </body>
 </html>

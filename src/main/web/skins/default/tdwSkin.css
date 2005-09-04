@@ -5,7 +5,7 @@
   margin: auto;
   text-align: center;
   width: 700px;
-  height: 470;
+  height: 470px;
 }
 #tdwWizard{
   width: 700px;
@@ -43,6 +43,10 @@ fieldset.tdwLargeFieldset, fieldset.tdwSmallFieldset{
   padding: 6px;
   padding-bottom: 16px;
 }
+fieldset.tdwSmallFieldset{
+  border: #BBB 1px solid;
+}
+
 legend.tdwLargeLegend, legend.tdwSmallLegend{
   color: #5368A6;
   background-color: #B6C5F2;
@@ -55,6 +59,12 @@ legend.tdwLargeLegend, legend.tdwSmallLegend{
 legend.tdwLargeLegend{
   border: #5368A6 1px solid;
 }
+
+legend.tdwSmallLegend{
+  font-size: 12px;
+  font-weight: 600;
+}
+
 img.tdwNavigationImage, img.tdwNavigationImageDisabled{
 	margin: 3px 4px 2px 3px;
 	height: 16px;
@@ -133,7 +143,7 @@ img.tdwNavigationImage{
 }
 
 tbody.tdwUnselectedTable{
-  background-color: none;
+  background-color: transparent;
 }
 tbody.tdwSelectedTable{
   background-color: #F7F0D2;
@@ -145,7 +155,7 @@ tbody.tdwSelectedTable th, tr.tdwSelectedRow th, th.tdwSelectedCell{
 }
 
 tr.tdwUnselectedRow, col.tdwUnselectedColumn{
-  background-color: none;
+  background-color: transparent;
 }
 
 col.tdwSelectedColumn{

@@ -97,7 +97,7 @@ td{
 
 fieldset.chwLargeFieldset, fieldset.chwSmallFieldset{
   border: #5368A6 1px solid;
-  margin: 8px;
+  margin: 0px 8px 8px;
   padding: 6px;
   padding-bottom: 16px;
 }
@@ -138,6 +138,7 @@ label{
 
 #chwButtons{
 	padding: 8px 12px 8px 12px;
+  text-align: right;
 }
 
 .chwActivePage, .chwInactivePage{
@@ -163,7 +164,17 @@ label{
   text-align: center;
   margin: auto;
 }
-
+.chwAction{
+  cursor: pointer;
+}
+.chwNotice{
+  display: block;
+  color: #5368A6;
+  font-size: larger;
+}
+.chwLimited{
+  max-width: 350px;
+}
 input, select{
   margin: 5px;
   margin-bottom: 10px;

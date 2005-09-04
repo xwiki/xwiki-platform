@@ -693,7 +693,7 @@ public class Document extends Api {
         if (hasAccessLevel("edit"))
             doc.insertText(text, marker, context);
     }
-    
+
     public boolean equals(java.lang.Object arg0) {
     	if (!(arg0 instanceof Document)) return false;
     	Document d = (Document) arg0;

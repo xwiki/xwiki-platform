@@ -24,14 +24,14 @@ $!xwiki.getWebPreference("meta")
       </td>
     </tr>
     <tr>
+      <td id="chwPreview">
+        <img id="chwPreviewImg" src="$xwiki.getSkinFile("chwSampleBarChart.png")" alt="Chart Type: Bars" title="Chart Type: Bars"/>
+      </td>
       <td id="chwOptions">
 #template("chw/datapage.vm")
 #template("chw/typepage.vm")
 #template("chw/titlepage.vm")
 #template("chw/axispage.vm")
-      </td>
-      <td id="chwPreview">
-        <img id="chwPreviewImg" src="$xwiki.getSkinFile("chwSamplePieChart.png")" alt="Chart Type: Bars" title="Chart Type: Bars"/>
       </td>
     </tr>
     <tr>

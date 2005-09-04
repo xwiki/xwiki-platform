@@ -35,8 +35,8 @@ import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DefaultChartParams2 extends ChartParams {
 	public static DefaultChartParams2 uniqueInstance;
-	
-	private DefaultChartParams2() throws ParamException {
+
+	protected DefaultChartParams2() throws ParamException {
 		set(SERIES, "columns");
 		
 		set(HEIGHT, new Integer(600));
@@ -179,6 +179,6 @@ public class DefaultChartParams2 extends ChartParams {
 		if (uniqueInstance == null) {
 			uniqueInstance = new DefaultChartParams2();
 		}
-		return uniqueInstance; 
+		return uniqueInstance;
 	}
 }

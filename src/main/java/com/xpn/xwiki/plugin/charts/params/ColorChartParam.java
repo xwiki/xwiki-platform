@@ -23,7 +23,7 @@ public class ColorChartParam extends AbstractChartParam {
 	public Class getType() {
 		return Color.class;
 	}
-	
+
 	public void init() {
 		colorChoice = new ChoiceChartParam(getName()) {			
 			protected void init() {

@@ -1,8 +1,6 @@
 $response.setContentType("text/xml")
-#*$response.setCharacterEncoding("UTF-8")*#
 <?xml version="1.0" encoding="$response.getCharacterEncoding()"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
 <html xmlns='http://www.w3.org/1999/xhtml'>
 	<head>
 		<title>Tables from the page $doc.getFullName()</title>
@@ -12,7 +10,7 @@ $response.setContentType("text/xml")
 
 		#set ( $tables = $rhelper.getTables() )
 		#set ( $tidx = 0 )
-		
+
 		#foreach ($table in $tables)
 			#set ( $rowCount = $rhelper.getTableRowCount($table) )
 			#set ( $colCount = $rhelper.getTableColumnCount($table) )
@@ -47,5 +45,6 @@ $response.setContentType("text/xml")
 		#end
 
 		</div>
+    <div id="tdwObjectCount">$doc.getObjectNumbers("XWiki.TableDataSource")</div>
 	</body>
 </html>

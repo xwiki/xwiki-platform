@@ -39,6 +39,8 @@ function tdwWizard(){
   var container;
   /** The "Please wait" message */
   var waitingMsg;
+  /** The "Error requesting page" message */
+  var requestErrorMsg;
   /** The "No tables found" message */
   var notablesMsg;
   /** The "Select range" message */
@@ -49,24 +51,23 @@ function tdwWizard(){
   var backBtn;
   /** The Finish button */
   var finishBtn;
-  /*
-     The prefix address of the table fetch page
-   */
+  /** The prefix address of the table fetch page */
   var baseAddress;
-  /*
-     The prefix address of the skin files
-   */
+  /** The prefix address of the skin files */
   var skinDirectory;
+  /** The address of the page where the definition object should be sent */
+  var saveAddress;
+  /** The new object number */
+  var objectNumber;
   /** The order of the wizard pages */
-  var pageOrder = ["Doc", "Range", "Extra", "Save"];
+  var pageOrder = ["Doc", "Range", "Extra"];
   /** The active (selected) wizard page. */
   var activePage;
   /** The enabled wizard pages. Blocks activation of disabled pages. */
   var enabledPages = {
     Doc    : true,
     Range  : false,
-    Extra  : false,
-    Save   : false
+    Extra  : false
   }
   var backEnabled = false;
   var nextEnabled = true;
@@ -76,9 +77,10 @@ function tdwWizard(){
     Wizard initialization:
     - adds global event listeners
    */
-  this.initialize = function(address, directory){
+  this.initialize = function(address, directory, saveAddr){
     container   = document.getElementById("tdwTables");
     waitingMsg  = document.getElementById("tdwWaiting");
+    requestErrorMsg = document.getElementById("tdwRequestError");
     notablesMsg = document.getElementById("tdwNoTables");
     selectMsg   = document.getElementById("tdwSelectRange");
     backBtn     = document.getElementById("tdwBackButton");
@@ -86,6 +88,7 @@ function tdwWizard(){
     finishBtn   = document.getElementById("tdwFinishButton");
     baseAddress = address;
     skinDirectory = directory;
+    saveAddress = saveAddr;
     if(document.documentElement.addEventListener){
       document.documentElement.addEventListener('mouseup', onMouseUp, true);
     }
@@ -97,6 +100,9 @@ function tdwWizard(){
     activePage = pageOrder[0];
     document.getElementById('tdw' + activePage + 'Wizard').className = "tdwActivePage";
     document.getElementById("tdw" + activePage + "WizardButton").className = "tdwNavigationImage";
+    if(document.getElementById('tdwPageInput').selectedIndex == -1){
+      disableNext();
+    }
   }
 
   getPageIndex = function(pageName){
@@ -246,8 +252,18 @@ function tdwWizard(){
   this.change = function(){
     disablePage('Range');
     disablePage('Extra');
-    disablePage('Save');
     disableFinish();
+    enableNext();
+  }
+
+  this.flipVisible = function(elementName, visible){
+    var element = document.getElementById('tdw' + elementName + 'Div');
+    if(visible){
+      element.className = 'tdwVisible';
+    }
+    else{
+      element.className = 'tdwHidden';
+    }
   }
 
   var getRange = function(){
@@ -267,8 +283,20 @@ function tdwWizard(){
   this.finish = function(){
     if(!finishEnabled) return false;
     if(!window.opener) return false;
-    //has_header_row:true;has_header_column:false
-    window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:' + document.getElementById('tdwRowHeaderInput').checked + ';has_header_column:' + document.getElementById('tdwColumnHeaderInput').checked + ';ignore_alpha:' + document.getElementById('tdwIgnoreAlphaInput').checked + ';decimal_symbol:' + (document.getElementById('tdwDecimalSymbolInput').checked ? 'comma' : 'period'));
+    if(document.getElementById('tdwSaveInput').checked){
+      if(document.getElementById('tdwSaveNameInput').value == ""){
+        if(!confirm(document.getElementById('tdwSaveNoNameMsg').firstChild.nodeValue)) return false;
+      }
+      if(saveObject()){
+        window.opener.wizard.setValidDatasource('type:object;doc:' + doc + ';class:TableDataSource;object_number:' + objectNumber);
+      }
+      else{
+        return false;
+      }
+    }
+    else{
+      window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:' + document.getElementById('tdwRowHeaderInput').checked + ';has_header_column:' + document.getElementById('tdwColumnHeaderInput').checked + ';ignore_alpha:' + document.getElementById('tdwIgnoreAlphaInput').checked + ';decimal_symbol:' + (document.getElementById('tdwDecimalSymbolInput').checked ? 'comma' : 'period'));
+    }
     window.close();
     return false;
   }
@@ -403,7 +431,6 @@ function tdwWizard(){
       disableNext();
       disableFinish();
       disablePage('Extra');
-      disablePage('Save');
     }
   }
 
@@ -725,9 +752,40 @@ function tdwWizard(){
   */
   var request;
   /*
+     Save the object by sending an ObjectAd request
+   */
+  var saveObject = function(){
+    var objectData = "classname=XWiki.TableDataSource";
+    objectData += "&XWiki.TableDataSource_datasource_name=" + encodeURI(document.getElementById('tdwSaveNameInput').value);
+    objectData += "&XWiki.TableDataSource_table_number=" + table;
+    objectData += "&XWiki.TableDataSource_range=" + getRange();
+    objectData += "&XWiki.TableDataSource_has_header_row=" + (document.getElementById('tdwRowHeaderInput').checked ? '1' : '0');
+    objectData += "&XWiki.TableDataSource_has_header_column=" + (document.getElementById('tdwColumnHeaderInput').checked ? '1' : '0');
+    objectData += "&XWiki.TableDataSource_ignore_alpha=" + (document.getElementById('tdwIgnoreAlphaInput').checked ? '1' : '0');
+    objectData += "&XWiki.TableDataSource_decimal_symbol=" + (document.getElementById('tdwDecimalSymbolInput').checked ? 'comma' : 'period');
+
+    if(window.XMLHttpRequest){
+      request = new XMLHttpRequest();
+    }
+    else{
+      request = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    request.open("POST", saveAddress + doc.replace('.', '/'), false);
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+    try{
+      request.send(objectData);
+    }
+    catch(ex){
+      alert("Object could not be saved due to a connection problem.\n\n" + ex);
+      return false;
+    }
+    return true;
+  }
+  /*
      Request the table data
   */
   this.getTablesFromPage = function(page){
+    requestErrorMsg.className = 'tdwHidden';
     notablesMsg.className = 'tdwHidden';
     selectMsg.className = 'tdwHidden';
     container.className = 'tdwHidden';
@@ -737,7 +795,6 @@ function tdwWizard(){
     selectionType = 'none';
     selectionState = 'none';
     disablePage('Extra');
-    disablePage('Save');
     disableNext();
     disableFinish();
     if(window.XMLHttpRequest){
@@ -758,6 +815,16 @@ function tdwWizard(){
   this.handleRequest = function(){
     if(request.readyState == 4){
       waitingMsg.className = 'tdwHidden';
+      try{
+        if(request.status !== 200){
+          requestErrorMsg.className = 'tdwErrorMessage';
+          return;
+        }
+      }
+      catch(e){
+        requestErrorMsg.className = 'tdwErrorMessage';
+        return;
+      }
       if(request.responseXML){
         try{
           if(request.responseXML.getElementsByTagName('div').item(0).getAttribute('id') != 'tdwEnvelope'){
@@ -767,6 +834,7 @@ function tdwWizard(){
           }
           else{
             var envelope = request.responseXML.getElementsByTagName('div').item(0);
+            objectNumber = request.responseXML.getElementsByTagName('div').item(1).firstChild.nodeValue;
             if(envelope.getElementsByTagName('table').length == 0){
               document.getElementById('tdwNoTablePageName').firstChild.nodeValue = doc;
               notablesMsg.className = 'tdwErrorMessage';
@@ -792,7 +860,7 @@ function tdwWizard(){
         }
       }
       else{
-        alert("The requested document is not valid.");
+        requestErrorMsg.className = 'tdwErrorMessage';
         return;
       }
     }

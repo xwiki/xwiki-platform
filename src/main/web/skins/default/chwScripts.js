@@ -39,7 +39,7 @@ function chwPositionSelector(property, type, defaultPosition){
     else {
       element.className = "chwNormalCellHighlighted";
     }
-  } 
+  }
   /*
      Highlight the element
      (set the apropriate css class)
@@ -220,6 +220,24 @@ function chwWizard(){
              Type   : ["ChartType"],
              Titles : ["ChartTitle", "ChartSubtitle"],
              Axes   : ["XAxis", "YAxis"]
+             },
+    Line    : {
+             Data   : [],
+             Type   : ["ChartType"],
+             Titles : ["ChartTitle", "ChartSubtitle"],
+             Axes   : ["XAxis", "YAxis"]
+             },
+    Area    : {
+             Data   : [],
+             Type   : ["ChartType"],
+             Titles : ["ChartTitle", "ChartSubtitle"],
+             Axes   : ["XAxis", "YAxis"]
+             },
+    Time    : {
+             Data   : [],
+             Type   : ["ChartType"],
+             Titles : ["ChartTitle", "ChartSubtitle"],
+             Axes   : ["XAxis", "YAxis"]
              }
   }
   var selectorObjects = new Object();
@@ -233,6 +251,8 @@ function chwWizard(){
   var backEnabled = false;
   var nextEnabled = false;
   var finishEnabled =false;
+  var hasDefinedSource = false;
+  var hasReusedSource = true;
 
   // Used for form element validation
   var storedValue;
@@ -447,7 +467,11 @@ function chwWizard(){
       document.getElementById("chw" + wizardPage + "WizardButton").className = "chwNavigationImageDisabled";
       document.getElementById("chw" + wizardPage + "WizardButton").src = skinDirectory + "chwTaskWaiting.png";
     }
+    document.getElementById('chw' + selectedChartType + 'Subtypes').className = 'chwHidden';
+    document.getElementById('chw' + selectedChartType + 'SubtypeInput').disabled = true;
     selectedChartType = newChartType;
+    document.getElementById('chw' + selectedChartType + 'Subtypes').className = 'chwVisible';
+    document.getElementById('chw' + selectedChartType + 'SubtypeInput').disabled = false;
     var currentPage = getPageIndex(activePage);
     for(var i = 0; i < currentPage; i++){
       if(!activatedElements[selectedChartType][pageOrder[i]]) continue;
@@ -462,6 +486,16 @@ function chwWizard(){
     document.getElementById("chw" + activePage + "WizardButton").src = skinDirectory + "chwTaskCompleting.png";
   }
 
+  /*
+     Change chart subtype
+   */
+  this.changeChartSubtype = function(subtype){
+  // TODO: Write me
+  }
+
+  /*
+     Show or hide the contents of a fieldset when the user clicks the legend
+   */
   this.flipAdvanced = function(elementName){
     var legend = document.getElementById('chw' + elementName + 'Legend');
     if(legend.firstChild.nodeValue.indexOf(">>") >= 0){
@@ -473,6 +507,34 @@ function chwWizard(){
       legend.firstChild.nodeValue = legend.firstChild.nodeValue.replace("<<", ">>");
       legend.title = legend.title.replace(hideWord, showWord);
       document.getElementById('chw' + elementName + 'Div').className = 'chwHidden';
+    }
+  }
+  
+  /*
+     Change the source type (Define or Reuse)
+   */
+  this.changeSourceType = function(type){
+    switch(type){
+      case 'Reuse':
+        document.getElementById('chwDataDefineDiv').className = 'chwHidden';
+        document.getElementById('chwDataReuseDiv').className = 'chwVisible';
+        if(hasReusedSource){
+          enableNext();
+        }
+        else{
+          disableNext();
+        }
+        break;
+      case 'Define':
+        document.getElementById('chwDataDefineDiv').className = 'chwVisible';
+        document.getElementById('chwDataReuseDiv').className = 'chwHidden';
+        if(hasDefinedSource){
+          enableNext();
+        }
+        else{
+          disableNext();
+        }
+        break;
     }
   }
 
@@ -524,10 +586,12 @@ function chwWizard(){
     document.getElementById('chwForm').submit();
     return false;
   }
-  
+
   this.setValidDatasource = function(dataString){
     document.getElementById('chwDataSourceInput').value = dataString;
+    document.getElementById('chwDefineHasDatasource').className = 'chwNotice';
     enableNext();
+    hasDefinedSource = true;
   }
 
   this.storeValue = function(value){

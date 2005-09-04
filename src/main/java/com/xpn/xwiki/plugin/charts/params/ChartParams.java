@@ -366,7 +366,7 @@ public class ChartParams {
 			}
 		}
 	}
-	
+
 	public Object get(String name) {
 		Object result = valueMap.get(name);
 		if (result != null) {

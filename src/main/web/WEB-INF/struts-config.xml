@@ -261,31 +261,31 @@
     </action>
     
     <action path="/charting/"
-			type="com.xpn.xwiki.plugin.charts.ChartingAction"
+			type="com.xpn.xwiki.plugin.charts.actions.ChartingAction"
 			name="charting"
 			scope="request">
 	</action>
 
     <action path="/gettables/"
-            type="com.xpn.xwiki.plugin.charts.GetTablesAction"
+            type="com.xpn.xwiki.plugin.charts.actions.GetTablesAction"
             name="gettables"
             scope="request">
     </action>
     
     <action path="/createchart/"
-            type="com.xpn.xwiki.plugin.charts.CreateChartAction"
+            type="com.xpn.xwiki.plugin.charts.actions.CreateChartAction"
             name="createchart"
             scope="request">
     </action>
 
     <action path="/previewchart/"
-            type="com.xpn.xwiki.plugin.charts.PreviewChartAction"
+            type="com.xpn.xwiki.plugin.charts.actions.PreviewChartAction"
             name="previewchart"
             scope="request">
     </action>
 
     <action path="/chartwizard/"
-            type="com.xpn.xwiki.plugin.charts.ChartWizardAction"
+            type="com.xpn.xwiki.plugin.charts.actions.ChartWizardAction"
             name="chartwizard"
             scope="request">
     </action>

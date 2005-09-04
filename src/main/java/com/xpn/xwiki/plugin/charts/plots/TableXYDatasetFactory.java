@@ -32,7 +32,7 @@ public class TableXYDatasetFactory {
 			}
 			for (int column = 0; column<dataSource.getColumnCount(); column++) {
 				XYSeries series = new XYSeries(dataSource.hasHeaderRow()
-						?dataSource.getHeaderRowValue(column):"", false, false);
+						?dataSource.getHeaderRowValue(column):("Series "+(column+1)), false, false);
 				for (int row = 0; row<dataSource.getRowCount(); row++) {
 					series.add(Double.parseDouble(dataSource.getHeaderColumnValue(row)),
 							dataSource.getCell(row, column));
@@ -46,7 +46,7 @@ public class TableXYDatasetFactory {
 			}
 			for (int row = 0; row<dataSource.getRowCount(); row++) {
 				XYSeries series = new XYSeries(dataSource.hasHeaderColumn()
-						?dataSource.getHeaderColumnValue(row):"", false, false);
+						?dataSource.getHeaderColumnValue(row):("Series "+(row+1)), false, false);
 				for (int column = 0; column<dataSource.getColumnCount(); column++) {
 					series.add(Double.parseDouble(dataSource.getHeaderRowValue(column)),
 							dataSource.getCell(row, column));

@@ -1,4 +1,4 @@
-package com.xpn.xwiki.plugin.charts;
+package com.xpn.xwiki.plugin.charts.actions;
 
 import org.apache.velocity.VelocityContext;
 

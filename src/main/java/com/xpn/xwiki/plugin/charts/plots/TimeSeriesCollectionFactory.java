@@ -50,7 +50,7 @@ public class TimeSeriesCollectionFactory {
 				if (dataSource.hasHeaderRow()) {
 					seriesName = dataSource.getHeaderRowValue(column);
 				} else {
-					seriesName = "";
+					seriesName = "Series "+(column+1);
 				}
 
 				TimeSeries series = new TimeSeries(seriesName, timePeriodClass);
@@ -77,7 +77,7 @@ public class TimeSeriesCollectionFactory {
 				if (dataSource.hasHeaderColumn()) {
 					seriesName = dataSource.getHeaderColumnValue(row);
 				} else {
-					seriesName = "";
+					seriesName = "Series "+(row+1);
 				}
 
 				TimeSeries series = new TimeSeries(seriesName, timePeriodClass);

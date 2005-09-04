@@ -84,14 +84,14 @@ public class XWikiRenderingEngine {
 		return new LinkedList(renderermap.keySet());
 	}
 	
-	public XWikiRenderer removeRenderer(String name) {
+	protected XWikiRenderer removeRenderer(String name) {
 		XWikiRenderer result = (XWikiRenderer) renderermap.remove(name);
 		if (result != null) {
 			renderers.remove(result);
 		}
 		return result;
 	}
-
+	
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
            return renderText(doc.getTranslatedContent(context), doc, context);
     }

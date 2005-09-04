@@ -34,7 +34,7 @@ public class PiePlotFactory implements PlotFactory {
 					String category = dataSource.getHeaderColumnValue(row);
 					dataset.setValue(category, dataSource.getCell(row, 0));
 				} else {
-					dataset.setValue("", dataSource.getCell(row, 0));						
+					dataset.setValue("Category "+(row+1), dataSource.getCell(row, 0));						
 				}
 			}
 		} else if (dataSeries.equals("rows")) {
@@ -43,7 +43,7 @@ public class PiePlotFactory implements PlotFactory {
 					String category = dataSource.getHeaderRowValue(column);
 					dataset.setValue(category, dataSource.getCell(0, column));
 				} else {
-					dataset.setValue("", dataSource.getCell(0, column));						
+					dataset.setValue("Category "+(column+1), dataSource.getCell(0, column));						
 				}
 			}
 		} else {

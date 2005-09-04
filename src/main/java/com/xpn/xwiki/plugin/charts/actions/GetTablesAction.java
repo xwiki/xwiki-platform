@@ -1,9 +1,10 @@
-package com.xpn.xwiki.plugin.charts;
+package com.xpn.xwiki.plugin.charts.actions;
 
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.charts.RadeoxHelper;
 import com.xpn.xwiki.web.XWikiAction;
 
 /**

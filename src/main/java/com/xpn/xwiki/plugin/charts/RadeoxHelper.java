@@ -1,10 +1,7 @@
 package com.xpn.xwiki.plugin.charts;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.radeox.macro.table.Table;
@@ -16,56 +13,38 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.source.TableDataSource;
 import com.xpn.xwiki.render.PreTagSubstitution;
-import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 
 public class RadeoxHelper {
-	private XWikiRenderer renderer;
+	// lazily initiated single CustomXWikiRenderingEngine instance
+	static private volatile XWikiRenderingEngine customEngine;
+
+	private XWikiRenderer radeoxRenderer;
 	private XWikiContext context;
     private XWikiDocument document;
     private static final String TABLE = "{table}";
 
-    public RadeoxHelper(XWikiDocument document, XWikiContext context) {
+    public RadeoxHelper(XWikiDocument document, XWikiContext context) throws XWikiException {
         this.context = context;
-        this.renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
+        this.radeoxRenderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
         this.document = document;
     }
 
     public String getPreRadeoxContent() {
-    	XWikiRenderingEngine engine = context.getWiki().getRenderingEngine();
-    	Iterator it = engine.getRendererNames().iterator();
-    	LinkedHashMap map = new LinkedHashMap();
-    	boolean found = false;
-    	while (it.hasNext()) {
-    		String name = (String)it.next();    		
-    		XWikiRenderer renderer = engine.getRenderer(name);
-    		if (renderer instanceof XWikiRadeoxRenderer || found) {
-    			found = true;
-    			map.put(name, renderer);
-    		}
-    	}
-    	
-    	it = map.keySet().iterator();
-    	while (it.hasNext()) {
-    		engine.removeRenderer((String)it.next());
-    	}
-    	
-    	String result;
     	try {
-    		result = engine.renderDocument(document, context);
+    		// double checking locking
+    		if (customEngine == null) {
+    			synchronized (RadeoxHelper.class) {
+    	    		if (customEngine == null) {
+    	    			customEngine = new CustomXWikiRenderingEngine(context.getWiki(), context);
+    	    		}
+    			}
+    		}
+			return customEngine.renderDocument(document, context);
     	} catch (XWikiException e) {
-    		StringWriter writer = new StringWriter();
-    		e.printStackTrace(new PrintWriter(writer));
-    		result = writer.toString();
-    	} finally {
-        	it = map.keySet().iterator();
-        	while (it.hasNext()) {
-        		String name = (String)it.next();
-        		engine.addRenderer(name, (XWikiRenderer)map.get(name));
-        	}
+    		return document.getContent(); // this should not happen very often ... i hope
     	}
-    	return result;
     }
     
     /**
@@ -152,7 +131,7 @@ public class RadeoxHelper {
 	public String getRenderedTable(int idx) {
 		String tableString = getTableString(idx);
 		if (tableString != null) {
-			return renderer.render("{table}\n"+tableString+"\n{table}", null, null, context);
+			return radeoxRenderer.render("{table}\n"+tableString+"\n{table}", null, null, context);
 		} else {
 			return null;
 		}

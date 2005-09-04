@@ -26,7 +26,7 @@ public class ChartingPluginApi extends Api {
 	public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {
 		return plugin.generateChart(params, context);
 	}
-	
+		
     public void outputFile(String filename, XWikiContext context) throws IOException {
     	plugin.outputFile(filename, context);
     }

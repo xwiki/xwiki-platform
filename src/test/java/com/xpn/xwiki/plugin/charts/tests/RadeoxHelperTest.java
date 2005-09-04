@@ -27,6 +27,7 @@ public class RadeoxHelperTest extends TestCase {
         this.context = new XWikiContext();
         
         this.xwiki = new XWiki(this.config, this.context);
+        
         this.context.setWiki(this.xwiki);
         this.doc = new XWikiDocument("XWiki", "Document");
         

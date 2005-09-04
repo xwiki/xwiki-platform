@@ -44,8 +44,8 @@ public class CategoryPlotFactory {
 			for (int row = 0; row<dataSource.getRowCount(); row++) {
 				for (int column = 0; column<dataSource.getColumnCount(); column++) {
 					dataset.addValue(dataSource.getCell(row, column),
-							dataSource.hasHeaderRow()?dataSource.getHeaderRowValue(column):"",
-							dataSource.hasHeaderColumn()?dataSource.getHeaderColumnValue(row):""
+							dataSource.hasHeaderRow()?dataSource.getHeaderRowValue(column):("Category "+(column+1)),
+							dataSource.hasHeaderColumn()?dataSource.getHeaderColumnValue(row):("Series "+(row+1))
 					);
 				}
 			}
@@ -53,8 +53,8 @@ public class CategoryPlotFactory {
 			for (int row = 0; row<dataSource.getRowCount(); row++) {
 				for (int column = 0; column<dataSource.getColumnCount(); column++) {
 					dataset.addValue(dataSource.getCell(row, column),
-							dataSource.hasHeaderColumn()?dataSource.getHeaderColumnValue(row):"",
-							dataSource.hasHeaderRow()?dataSource.getHeaderRowValue(column):""
+							dataSource.hasHeaderColumn()?dataSource.getHeaderColumnValue(row):("Category "+(row+1)),
+							dataSource.hasHeaderRow()?dataSource.getHeaderRowValue(column):("Series "+(column+1))
 					);
 				}
 			}

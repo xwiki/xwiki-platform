@@ -34,7 +34,6 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 public class ChartingPlugin extends XWikiDefaultPlugin implements
 		XWikiPluginInterface {
-
 	public ChartingPlugin(String name, String className, XWikiContext context) {
 		super(name, className, context);
 		init(context);
@@ -42,7 +41,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 	
     public void init(XWikiContext context) {
         super.init(context);
-
+        
         File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         tempDir = new File(dir, "charts");
         try {
@@ -53,8 +52,8 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
     public String getName() {
         return "charting";
     }
-
-	public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {
+    
+    public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {
 		try {
 			// Obtain the corresponding data source and wrap it into a data source object 
 			DataSource dataSource = MainDataSourceFactory.getInstance()

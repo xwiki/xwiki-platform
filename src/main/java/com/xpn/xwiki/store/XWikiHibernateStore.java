@@ -180,35 +180,41 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     // Let's synchronize this, to only update one schema at a time
     public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException {
-        // No updating of schema if we have a config parameter saying so
         try {
-            if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-                if (log.isErrorEnabled())
-                    log.error("Schema update deactivated for wiki " + context.getDatabase());
-                return;
-            }
+            // No updating of schema if we have a config parameter saying so
+            try {
+                if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
+                    if (log.isInfoEnabled())
+                        log.info("Schema update deactivated for wiki " + context.getDatabase());
+                    return;
+                }
 
-            if (log.isErrorEnabled())
-                log.error("Schema update for wiki " + context.getDatabase());
+                if (log.isInfoEnabled())
+                    log.info("Schema update for wiki " + context.getDatabase());
 
-        } catch (Exception e) {}
+            } catch (Exception e) {}
 
-        String fullName = ((context!=null)&&(context.getWiki()!=null)&&(context.getWiki().isMySQL())) ?  "concat('xwd_web','.','xwd_name)" : "xwd_fullname";
-        String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
-        String[] addSQL = {
-            // Make sure we have no null valued in integer fields
-            "update xwikidoc set xwd_translation=0 where xwd_translation is null",
-            "update xwikidoc set xwd_language='' where xwd_language is null",
-            "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
-            "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
+            String fullName = ((context!=null)&&(context.getWiki()!=null)&&(context.getWiki().isMySQL())) ?  "concat('xwd_web','.','xwd_name)" : "xwd_fullname";
+            String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
+            String[] addSQL = {
+                // Make sure we have no null valued in integer fields
+                "update xwikidoc set xwd_translation=0 where xwd_translation is null",
+                "update xwikidoc set xwd_language='' where xwd_language is null",
+                "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
+                "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null" };
 
-        String[] sql = new String[schemaSQL.length+addSQL.length];
-        for (int i=0;i<schemaSQL.length;i++)
-            sql[i] = schemaSQL[i];
-        for (int i=0;i<addSQL.length;i++)
-            sql[i + schemaSQL.length] = addSQL[i];
+            String[] sql = new String[schemaSQL.length+addSQL.length];
+            for (int i=0;i<schemaSQL.length;i++)
+                sql[i] = schemaSQL[i];
+            for (int i=0;i<addSQL.length;i++)
+                sql[i + schemaSQL.length] = addSQL[i];
 
-        updateSchema(sql, context);
+            updateSchema(sql, context);
+        } finally {
+
+            if (log.isInfoEnabled())
+                log.info("Schema update for wiki " + context.getDatabase() + " done");
+        }
     }
 
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext context) throws HibernateException {
@@ -222,7 +228,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         boolean bTransaction = true;
 
         try {
-            bTransaction = beginTransaction(context);
+            bTransaction = beginTransaction(false, context);
             session = getSession(context);
             connection = session.connection();
             setDatabase(session, context);
@@ -278,11 +284,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         finally {
             try {
                 if (stmt!=null) stmt.close();
+            } catch (Exception e)  {};
+            try {
                 if (bTransaction)
                     endTransaction(context, true);
-            }
-            catch (Exception e) {
-            }
+            } catch (Exception e) {}
 
             // End monitoring timer
             if (monitor!=null)
@@ -338,26 +344,37 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public boolean beginTransaction(XWikiContext context)
-            throws HibernateException, XWikiException {
-            return beginTransaction(null, context);
+            throws XWikiException {
+            return beginTransaction(null, true, context);
     }
-    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context)
+
+    public boolean beginTransaction(boolean withTransaction, XWikiContext context)
+            throws XWikiException {
+            return beginTransaction(null, withTransaction, context);
+    }
+
+    public boolean beginTransaction(SessionFactory sfactory, XWikiContext context) throws XWikiException {
+        return beginTransaction(sfactory, true, context);
+    }
+
+    public boolean beginTransaction(SessionFactory sfactory, boolean withTransaction, XWikiContext context)
             throws HibernateException, XWikiException {
 
         Transaction transaction = getTransaction(context);
         Session session = getSession(context);
 
         if (((session==null)&&(transaction!=null))
-                ||((transaction==null)&&(session!=null))) {
+                ||((transaction==null)&&(session!=null)&&withTransaction)) {
             if ( log.isWarnEnabled() ) log.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
             return false;
         }
 
-        if (transaction!=null) {
+        if (session!=null) {
             if ( log.isDebugEnabled() ) log.debug("Taking session from context " + session);
             if ( log.isDebugEnabled() ) log.debug("Taking transaction from context " + transaction);
             return false;
         }
+
         if (session==null) {
             if ( log.isDebugEnabled() ) log.debug("Trying to get session from pool");
             if (sfactory==null)
@@ -374,10 +391,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             setSession(session, context);
             setDatabase(session, context);
 
-            if ( log.isDebugEnabled() ) log.debug("Trying to open transaction");
-            transaction = session.beginTransaction();
-            if ( log.isDebugEnabled() ) log.debug("Opened transaction " + transaction);
-            setTransaction(transaction, context);
+            if (withTransaction) {
+                if ( log.isDebugEnabled() ) log.debug("Trying to open transaction");
+                transaction = session.beginTransaction();
+                if ( log.isDebugEnabled() ) log.debug("Opened transaction " + transaction);
+                setTransaction(transaction, context);
+            }
         }
         return true;
     }
@@ -399,7 +418,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         endTransaction(context, commit, false);
     }
 
-    public void endTransaction(XWikiContext context, boolean commit, boolean rollback)
+    public void endTransaction(XWikiContext context, boolean commit, boolean withTransaction)
             throws HibernateException {
         Session session = null;
         try {
@@ -410,9 +429,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             if (transaction!=null) {
                 if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
-                if (commit) {
+                if (commit&&withTransaction) {
                     transaction.commit();
-                } else if (rollback) {
+                } else if (withTransaction) {
                     transaction.rollback();
                 }
             }
@@ -494,7 +513,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (monitor!=null)
                 monitor.startTimer("hibernate");
 
-            bTransaction = bTransaction && beginTransaction(context);
+            bTransaction = bTransaction && beginTransaction(false, context);
             Session session = getSession(context);
             String fullName = doc.getFullName();
 
@@ -636,7 +655,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             checkHibernate(context);
 
             SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
-            bTransaction = bTransaction && beginTransaction(sfactory, context);
+            bTransaction = bTransaction && beginTransaction(sfactory, false, context);
             Session session = getSession(context);
 
             try {
@@ -1018,7 +1037,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1172,7 +1191,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1346,7 +1365,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1477,7 +1496,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1629,7 +1648,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1658,7 +1677,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1693,7 +1712,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1779,7 +1798,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1809,7 +1828,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         try {
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(context);
+                bTransaction = beginTransaction(false, context);
             }
             Session session = getSession(context);
 
@@ -1963,7 +1982,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         boolean bTransaction = true;
         try {
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
             Query query = session.createQuery("select bclass.name from BaseClass as bclass");
@@ -2000,7 +2019,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (monitor!=null)
                 monitor.startTimer("hibernate");
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
             if (whereParams != null)
                 sql = sql + generateWhereStatement(sql, whereParams);
@@ -2087,7 +2106,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (monitor!=null)
                 monitor.startTimer("hibernate", query.getQueryString());
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
             if (start!=0)
                 query.setFirstResult(start);
@@ -2158,7 +2177,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 monitor.startTimer("hibernate", ssql);
 
             checkHibernate(context);
-            bTransaction = beginTransaction(context);
+            bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
             Query query = session.createQuery(ssql);
             if (start!=0)
@@ -2222,7 +2241,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (bTransaction) {
                 // Inject everything until we know what's needed
                 SessionFactory sfactory = customMapping ? injectCustomMappingsInSessionFactory(context) : getSessionFactory();
-                bTransaction = beginTransaction(sfactory, context);
+                bTransaction = beginTransaction(sfactory, false, context);
             }
             Session session = getSession(context);
 

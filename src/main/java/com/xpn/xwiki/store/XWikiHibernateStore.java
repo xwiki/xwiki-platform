@@ -364,7 +364,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         Session session = getSession(context);
 
         if (((session==null)&&(transaction!=null))
-                ||((transaction==null)&&(session!=null)&&withTransaction)) {
+                ||((transaction==null)&&(session!=null))) {
             if ( log.isWarnEnabled() ) log.warn("Incompatible session (" + session + ") and transaction (" + transaction + ") status");
             return false;
         }
@@ -391,12 +391,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             setSession(session, context);
             setDatabase(session, context);
 
-            if (withTransaction) {
-                if ( log.isDebugEnabled() ) log.debug("Trying to open transaction");
-                transaction = session.beginTransaction();
-                if ( log.isDebugEnabled() ) log.debug("Opened transaction " + transaction);
-                setTransaction(transaction, context);
-            }
+            if ( log.isDebugEnabled() )
+                log.debug("Trying to open transaction");
+            transaction = session.beginTransaction();
+            if ( log.isDebugEnabled() )
+                log.debug("Opened transaction " + transaction);
+            setTransaction(transaction, context);
         }
         return true;
     }
@@ -429,9 +429,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             if (transaction!=null) {
                 if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
-                if (commit&&withTransaction) {
+                if (commit) {
                     transaction.commit();
-                } else if (withTransaction) {
+                } else {
                     transaction.rollback();
                 }
             }

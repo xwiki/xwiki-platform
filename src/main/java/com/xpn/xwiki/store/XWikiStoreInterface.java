@@ -75,4 +75,6 @@ public interface XWikiStoreInterface {
     public void injectCustomMappings(XWikiContext context) throws XWikiException;
 
     List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException;
+
+    void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
 }

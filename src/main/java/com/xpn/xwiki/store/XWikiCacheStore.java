@@ -313,4 +313,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.injectCustomMappings(context);
     }
 
+    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
+        store.injectUpdatedCustomMappings(context);
+    }
 }

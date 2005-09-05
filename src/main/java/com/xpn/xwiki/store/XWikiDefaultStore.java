@@ -72,6 +72,9 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
     public void injectCustomMappings(XWikiContext context) throws XWikiException {
     }
 
+    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
+    }
+    
     public List getCustomMappingPropertyList(BaseClass bclass) {
         return new ArrayList();
     }

@@ -2413,6 +2413,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         setSessionFactory(sfactory);
     }
 
+    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
+        Configuration config = getConfiguration();
+        setSessionFactory(injectInSessionFactory(config));
+    }
+
     public SessionFactory injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
         boolean result = injectCustomMapping(bclass, context);
         if (result==false)

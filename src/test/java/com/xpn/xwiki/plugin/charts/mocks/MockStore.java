@@ -251,6 +251,9 @@ public class MockStore implements XWikiStoreInterface {
         return null;  
     }
 
+    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
+    }
+
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
     	return false;
     }

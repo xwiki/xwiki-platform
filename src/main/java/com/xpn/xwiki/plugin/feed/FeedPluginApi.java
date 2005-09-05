@@ -56,4 +56,8 @@ public class FeedPluginApi extends Api {
         return plugin.getFeed(sfeed, force, context);
     }
 
+    public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException {
+        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, context);
+    }
+
 }

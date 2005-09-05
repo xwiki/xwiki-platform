@@ -51,6 +51,7 @@ import org.dom4j.io.XMLWriter;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 
@@ -64,6 +65,7 @@ public class Package {
     private String  licence = "GPL";
     private String  authorName = "XWiki";
     private List    files = null;
+    private List    customMappingFiles = null;
     private boolean backupPack = false;
     private boolean withVersions = true;
 
@@ -124,6 +126,10 @@ public class Package {
         return files;
     }
 
+    public List getCustomMappingFiles() {
+        return customMappingFiles;
+    }
+
     public boolean isWithVersions() {
         return withVersions;
     }
@@ -135,6 +141,7 @@ public class Package {
     public Package()
     {
         files = new ArrayList();
+        customMappingFiles = new ArrayList();
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException {
@@ -155,6 +162,9 @@ public class Package {
         DocumentInfo docinfo = new DocumentInfo(doc);
         docinfo.setAction(defaultAction);
         files.add(docinfo);
+        BaseClass bclass =  doc.getxWikiClass();
+        if (bclass.getCustomMapping()!=null)
+         customMappingFiles.add(docinfo);
         return true;
     }
 
@@ -325,10 +335,23 @@ public class Package {
         }
     }
 
+
+
     public int install(XWikiContext context) throws XWikiException {
         if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
+
+        boolean hasCustomMappings = false;
+        for (int j = 0;j<customMappingFiles.size();j++)
+        {
+            DocumentInfo docinfo = (DocumentInfo)files.get(j);
+            BaseClass bclass = docinfo.getDoc().getxWikiClass();
+            hasCustomMappings |= context.getWiki().getStore().injectCustomMapping(bclass, context);
+        }
+
+        if (hasCustomMappings)
+            context.getWiki().getStore().injectUpdatedCustomMappings(context);
 
         for (int i = 0; i < files.size(); i++)
         {

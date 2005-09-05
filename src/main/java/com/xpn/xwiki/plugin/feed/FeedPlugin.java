@@ -24,10 +24,7 @@ package com.xpn.xwiki.plugin.feed;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,6 +92,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     public SyndFeed getFeeds(String sfeeds, XWikiContext context) throws IOException {
+            return getFeeds(sfeeds, true, context);
+    }
+
+    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, XWikiContext context) throws IOException {
         String[] feeds;
         if (sfeeds.indexOf("\n") != -1)
             feeds = sfeeds.split("\n");
@@ -120,7 +121,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         outputFeed.setEntries(entries);
         for (int i = 0; i < feeds.length; i++)
         {
-            SyndFeed feed = getFeed(feeds[i], context);
+            SyndFeed feed = getFeed(feeds[i], ignoreInvalidFeeds, context);
             if (feed != null)
                 entries.addAll(feed.getEntries());
         }
@@ -131,10 +132,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
 
     public SyndFeed getFeed(String sfeed, XWikiContext context) throws IOException {
-        return getFeed(sfeed, false, context);
+        return getFeed(sfeed, true, false, context);
     }
 
     public SyndFeed getFeed(String sfeed, boolean force, XWikiContext context) throws IOException {
+        return getFeed(sfeed, true, force, context);
+    }
+
+    public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force, XWikiContext context) throws IOException {
         SyndFeed feed = null;
         if (!force)
         try {
@@ -146,7 +151,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
 
         if (feed==null)
-         feed = getFeedForce(sfeed, context);
+         feed = getFeedForce(sfeed, ignoreInvalidFeeds, context);
 
         if (feed!=null)
          feedCache.putInCache(sfeed, feed);
@@ -154,16 +159,26 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return feed;
     }
 
-    public SyndFeed getFeedForce(String sfeed, XWikiContext context) throws IOException {
-            SyndFeedInput input = new SyndFeedInput();
-            SyndFeed feed = null;
-            URL feedURL = new URL(sfeed);
+    public SyndFeed getFeedForce(String sfeed, boolean ignoreInvalidFeeds, XWikiContext context) throws IOException {
             try {
+                SyndFeedInput input = new SyndFeedInput();
+                SyndFeed feed = null;
+                URL feedURL = new URL(sfeed);
                 feed = input.build(new XmlReader(feedURL));
+                return feed;
             }
             catch (Exception ex) {
-                throw new java.io.IOException("Error processing " + feedURL + ": " + ex.getMessage());
+                if (ignoreInvalidFeeds) {
+                    Map map = (Map) context.get("invalidFeeds");
+                    if (map==null) {
+                        map = new HashMap();
+                        context.put("invalidFeeds", map);
+                    }
+                    map.put(sfeed, ex);
+                    return null;
+                }
+
+                throw new java.io.IOException("Error processing " + sfeed + ": " + ex.getMessage());
             }
-            return feed;
         }
 }

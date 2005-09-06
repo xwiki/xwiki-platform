@@ -100,7 +100,9 @@ public class Utils {
 
         if (!context.isFinished()) {
             if (context.getResponse() instanceof XWikiServletResponse) {
-                response.setContentLength(content.length());
+                // Set the content length to the numnber of bytes, not the
+                // string length, so as to handle multi-byte encodings
+                response.setContentLength(content.getBytes().length);
             }
 
             try {

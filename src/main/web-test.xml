@@ -135,17 +135,17 @@
         <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
     </taglib>
 
-  <env-entry>
-      <env-entry-name>XWikiConfig</env-entry-name>
-      <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
-      <env-entry-type>java.lang.String</env-entry-type>
-  </env-entry>
-
   <resource-ref>
       <description>DB Connection</description>
       <res-ref-name>jdbc/XWikiDS</res-ref-name>
       <res-type>javax.sql.DataSource</res-type>
       <res-auth>Container</res-auth>
   </resource-ref>
+
+  <env-entry>
+      <env-entry-name>XWikiConfig</env-entry-name>
+      <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
+      <env-entry-type>java.lang.String</env-entry-type>
+  </env-entry>
 
 </web-app>

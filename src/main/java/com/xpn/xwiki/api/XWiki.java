@@ -59,7 +59,7 @@ public class XWiki extends Api {
      }
 
      public String getRequestURL() throws XWikiException {
-         return com.xpn.xwiki.XWiki.getRequestURL(context.getRequest()).toString();
+         return context.getURLFactory().getRequestURL(context).toString();
      }
 
      /**

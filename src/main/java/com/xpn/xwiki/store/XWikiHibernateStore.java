@@ -672,11 +672,6 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             // Loading the attachment list
             loadAttachmentList(doc, context, false);
 
-            // Loading the backlinks list
-            if (context.getWiki().hasBacklinks(context)){
-                loadBacklinks(doc.getFullName(),context,true);
-            }
-
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
             bclass.setName(doc.getFullName());

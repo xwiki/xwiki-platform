@@ -22,15 +22,15 @@
  */
 package com.xpn.xwiki.render;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -40,6 +40,7 @@ public class XWikiRenderingEngine {
 
     private List renderers = new ArrayList();
     private HashMap renderermap = new LinkedHashMap();
+    private XWikiCache cache = new OSCacheCache();
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
         if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
@@ -65,6 +66,12 @@ public class XWikiRenderingEngine {
         } else {
             addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
         }
+
+        try {
+        String capacity = xwiki.Param("xwiki.render.cache.capacity");
+        if (capacity != null)
+            cache.setCapacity(Integer.parseInt(capacity));
+        } catch (Exception e) {}
     }
 
     public void addRenderer(String name, XWikiRenderer renderer) {
@@ -105,6 +112,19 @@ public class XWikiRenderingEngine {
     }
 
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
+        String key = getKey(text, contentdoc, includingdoc);
+        try {
+            XWikiRenderingCache cacheObject = null;
+            cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
+            if ((cacheObject!=null)&&cacheObject.isValid()) {
+                XWikiRequest request = context.getRequest();
+                boolean refresh = "1".equals((request!=null) ? request.get("refresh") : "");
+                if (!refresh)
+                 return cacheObject.getContent();
+            }
+        } catch (Exception e) {
+        }
+
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
@@ -148,12 +168,23 @@ public class XWikiRenderingEngine {
             context.getWiki().getPluginManager().endRendering(context);
         }
 
-        return content;
+         try {
+          int cacheDuration = context.getCacheDuration();
+          if (cacheDuration>0) {
+             XWikiRenderingCache cacheObject = new XWikiRenderingCache(key, content, cacheDuration, new Date());
+             cache.putInCache(key, (Object)cacheObject);
+           }
+         } catch (Exception e) {}
+         return content;
         }
         finally {
                if (monitor!=null)
                    monitor.endTimer("rendering");
         }
+    }
+
+    private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc) {
+        return "" + contentdoc.getFullName() + "-" + includingdoc.getFullName() + "-" + text.hashCode();
     }
 
     public void flushCache() {

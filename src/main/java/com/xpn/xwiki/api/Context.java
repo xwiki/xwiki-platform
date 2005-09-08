@@ -125,4 +125,12 @@ public class Context extends Api {
     public void setFinished(boolean finished) {
         context.setFinished(finished);
     }
+
+    public int getCacheDuration() {
+        return context.getCacheDuration();
+    }
+
+    public void setCacheDuration(int duration) {
+        context.setCacheDuration(duration);
+    }
 }

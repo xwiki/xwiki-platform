@@ -61,8 +61,9 @@ public class XWikiContext extends Hashtable {
    private XmlRpcServer xmlRpcServer;
    private String wikiOwner;
    private XWikiDocument wikiServer;
+   private int cacheDuration = 0;
 
-   public XWikiContext() {
+    public XWikiContext() {
    }
 
    public XWiki getWiki() {
@@ -239,4 +240,11 @@ public class XWikiContext extends Hashtable {
         return wikiServer;
     }
 
+    public int getCacheDuration() {
+        return cacheDuration;
+    }
+
+    public void setCacheDuration(int cacheDuration) {
+        this.cacheDuration = cacheDuration;
+    }
 }

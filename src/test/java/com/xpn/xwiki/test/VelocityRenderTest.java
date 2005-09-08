@@ -20,6 +20,7 @@ package com.xpn.xwiki.test;
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -121,6 +122,20 @@ public class VelocityRenderTest extends HibernateTestCase {
         doc2.setContent("#includeMacros(\"Test.WebHome\")\n#hello()");
         store.saveXWikiDoc(doc2, getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc2, "coucou", false, getXWikiContext());
+    }
+
+    public void testCacheRenderer() throws XWikiException {
+        XWikiRenderingEngine wikirenderer = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        String content = "$context.setCacheDuration(10) $xwiki.date.time";
+        String result = AbstractRenderTest.renderTest(wikirenderer, content, "", false, getXWikiContext());
+        AbstractRenderTest.renderTest(wikirenderer, content, result, false, getXWikiContext());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        String result2 = AbstractRenderTest.renderTest(wikirenderer, content, "", false, getXWikiContext());
+        assertNotSame("Results should be regenerated because of delay", result, result2);
     }
 
  }

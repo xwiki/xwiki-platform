@@ -190,6 +190,7 @@ public class XWikiRenderingEngine {
     public void flushCache() {
         for (int i=0;i<renderers.size();i++)
            ((XWikiRenderer)renderers.get(i)).flushCache();
+        cache.flushAll();
     }
 
     public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {

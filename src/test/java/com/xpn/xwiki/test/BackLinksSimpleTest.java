@@ -30,56 +30,65 @@ import java.util.List;
 
 public class BackLinksSimpleTest extends HibernateTestCase {
 
-    XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
-
     public void setUp() throws Exception {
         super.setUp();
         getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
     }
 
     public void testSimpleBackLinksHibStore0() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
         List expected_list = new ArrayList();
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore1() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        testDoc.setContent("[Test.B]");
         List expected_list = new ArrayList();
         expected_list.add("Test.B");
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore2() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        testDoc.setContent("[Test.C]");
         List expected_list = new ArrayList();
         expected_list.add("Test.C");
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore3() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        testDoc.setContent("[Test.B] [Test.C]");
         List expected_list = new ArrayList();
         expected_list.add("Test.B");
         expected_list.add("Test.C");
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore4() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        testDoc.setContent("[Test.A] [Test.B] [Test.C]");
         List expected_list = new ArrayList();
         expected_list.add("Test.A");
         expected_list.add("Test.B");
         expected_list.add("Test.C");
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore5() throws XWikiException {
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        testDoc.setContent("[Test.A] [Test.B] [Test.C]");
         List expected_list = new ArrayList();
         expected_list.add("Test.A");
         expected_list.add("Test.B");
         expected_list.add("Test.C");
-        testSimpleBackLinksHibStore(expected_list);
-        testSimpleBackLinksHibStore(expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
+        testSimpleBackLinksHibStore(testDoc, expected_list);
     }
 
     public void testSimpleBackLinksHibStore6() throws XWikiException {
-
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiHibernateStore store = getXWiki().getHibernateStore();
         store.beginTransaction(getXWikiContext());
    //     StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), "insert into xwikilinks values ('0','Test.A','SaveBackLinks')", getXWikiContext() );
@@ -91,10 +100,8 @@ public class BackLinksSimpleTest extends HibernateTestCase {
         testSimpleBackLinksHibStoreDelete(expected_list);
     }
 
-
-
-    public void testSimpleBackLinksHibStore(List expected_list) throws XWikiException, HibernateException {
-
+    public void testSimpleBackLinksHibStore(XWikiDocument testDoc, List expected_list) throws XWikiException, HibernateException {
+   //     XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
         List formatted_list = new ArrayList();
         long id = testDoc.getId();
         String fullName = testDoc.getFullName();
@@ -111,7 +118,7 @@ public class BackLinksSimpleTest extends HibernateTestCase {
             formatted_list.add(tempLink);
         }
 
-        getXWiki().getStore().saveLinks(formatted_list, getXWikiContext(), true);
+        getXWiki().getStore().saveLinks(testDoc, getXWikiContext(), true);
         List loadedbacklinks = getXWiki().getStore().loadLinks(testDoc.getId(), getXWikiContext(), true);
 
         if (expected_list.size()==0){
@@ -128,7 +135,7 @@ public class BackLinksSimpleTest extends HibernateTestCase {
     }
 
     public void testSimpleBackLinksHibStoreDelete(List expected_list) throws XWikiException, HibernateException {
-        //   XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
+        XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
         List formatted_list = new ArrayList();
         if (expected_list.size()!=0){
             long id = testDoc.getId();

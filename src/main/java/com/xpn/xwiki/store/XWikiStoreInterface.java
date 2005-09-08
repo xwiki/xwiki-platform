@@ -60,7 +60,7 @@ public interface XWikiStoreInterface {
     public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
     public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
     public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
-    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException;
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
     public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException;

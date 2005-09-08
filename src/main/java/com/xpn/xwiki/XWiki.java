@@ -1438,6 +1438,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
         needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
+        needsUpdate |= bclass.addBooleanField("backlinks", "Backlinks", "yesno");
 
         needsUpdate |= bclass.addTextField("skin", "Skin", 30);
         // This one should not be in the prefs
@@ -3142,7 +3143,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void setReadOnly (boolean readOnly) {
         isReadOnly = readOnly;
-
     }
 
     public void deleteAllDocuments(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -3155,5 +3155,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         deleteDocument(doc, context);
     }
+
+    public void refreshLinks(XWikiContext context)throws XWikiException{
+       // refreshes all Links of each doc of the wiki
+        List docs = this.search("select doc.fullName from XWikiDocument as doc", context);
+        for (int i=0;i<docs.size();i++){
+            XWikiDocument myDoc = this.getDocument((String)docs.get(i), context);
+            myDoc.getStore().saveLinks(myDoc, context, true);
+        }
+    }
+
+    public boolean hasBacklinks(XWikiContext context) {
+        String bl = getXWikiPreference("backlinks", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.backlinks"));
+    }
+
 }
 

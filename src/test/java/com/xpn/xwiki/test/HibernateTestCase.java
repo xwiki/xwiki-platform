@@ -52,6 +52,7 @@ public class HibernateTestCase extends TestCase {
         // TODO: StoreHibernateTest should be refactored with this class in mind 
         this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
         this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
+        this.config.put("xwiki.backlinks", "");
 
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");
@@ -87,7 +88,7 @@ public class HibernateTestCase extends TestCase {
         return this.xwiki;
     }
 
-    // Helper test methçds below
+    // Helper test methods below
     
     public static void runSQL(XWikiHibernateStore hibstore, String sql, XWikiContext context) {
         try {

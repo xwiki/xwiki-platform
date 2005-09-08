@@ -268,7 +268,7 @@ public class MockStore implements XWikiStoreInterface {
     public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException{
         return null;
     };
-    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException{};
-    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{};
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException{};
 
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{};
 }

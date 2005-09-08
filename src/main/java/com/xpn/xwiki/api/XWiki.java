@@ -25,12 +25,7 @@ package com.xpn.xwiki.api;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.jrcs.diff.Chunk;
 
@@ -866,4 +861,16 @@ public class XWiki extends Api {
             xwiki.setReadOnly(ro);
         }
     }
+
+    public void refreshLinks() throws XWikiException{
+        if (hasAdminRights()){
+            xwiki.refreshLinks(context);
+        }
+    }
+
+    public boolean hasBacklinks() throws XWikiException {
+            return xwiki.hasBacklinks(context);
+    }
+
 }
+

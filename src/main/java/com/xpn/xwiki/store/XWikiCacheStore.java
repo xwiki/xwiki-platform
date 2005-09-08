@@ -245,8 +245,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.loadBacklinks(fullName, context, bTransaction);
     }
 
-    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.saveLinks( links, context, bTransaction);
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException {
+        store.saveLinks(doc, context, bTransaction);
     }
 
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {

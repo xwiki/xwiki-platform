@@ -27,6 +27,7 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.*;
@@ -343,13 +344,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         }
     }
 
-    public boolean beginTransaction(XWikiContext context)
-            throws XWikiException {
+    public boolean beginTransaction(XWikiContext context) throws XWikiException {
             return beginTransaction(null, true, context);
     }
 
-    public boolean beginTransaction(boolean withTransaction, XWikiContext context)
-            throws XWikiException {
+    public boolean beginTransaction(boolean withTransaction, XWikiContext context) throws XWikiException {
             return beginTransaction(null, withTransaction, context);
     }
 
@@ -378,9 +377,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         if (session==null) {
             if ( log.isDebugEnabled() ) log.debug("Trying to get session from pool");
             if (sfactory==null)
-             session = (SessionImpl)getSessionFactory().openSession();
+                session = (SessionImpl)getSessionFactory().openSession();
             else
-             session = sfactory.openSession();
+                session = sfactory.openSession();
 
             if ( log.isDebugEnabled() ) log.debug("Taken session from pool " + session);
 
@@ -615,7 +614,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 }
             }
 
-           // doc.saveLinks(context);
+
+            if (context.getWiki().hasBacklinks(context)){
+                saveLinks(doc, context, true);
+            }
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -671,7 +673,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             loadAttachmentList(doc, context, false);
 
             // Loading the backlinks list
-          //  loadBacklinks(doc.getFullName(),context,true);
+            if (context.getWiki().hasBacklinks(context)){
+                loadBacklinks(doc.getFullName(),context,true);
+            }
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
@@ -706,9 +710,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 if (!className.equals("")) {
                     BaseObject newobject;
                     if (className.equals(doc.getFullName()))
-                     newobject = bclass.newCustomClassInstance(context);
+                        newobject = bclass.newCustomClassInstance(context);
                     else
-                     newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
+                        newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
                     if (newobject!=null) {
                         newobject.setId(object.getId());
                         newobject.setClassName(object.getClassName());
@@ -857,7 +861,9 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             // deleting XWikiLinks
-         //   deleteLinks(doc.getId(),context,true);
+            if (context.getWiki().hasBacklinks(context)){
+                deleteLinks(doc.getId(),context,true);
+            }
 
             BaseClass bclass = doc.getxWikiClass();
             if ((bclass==null)&&(bclass.getName()!=null)) {
@@ -983,7 +989,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     for (int i=0;i<object.getFieldsToRemove().size();i++) {
                         BaseProperty prop = (BaseProperty) object.getFieldsToRemove().get(i);
                         if (!handledProps.contains(prop.getName()))
-                         session.delete(prop);
+                            session.delete(prop);
                     }
                     object.setFieldsToRemove(new ArrayList());
                 }
@@ -998,7 +1004,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                                 "Field {0} in object {1} has an invalid name", null, args);
                     }
                     if (!handledProps.contains(prop.getName()))
-                     saveXWikiProperty(prop, context, false);
+                        saveXWikiProperty(prop, context, false);
                 }
             }
 
@@ -1061,7 +1067,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 // We need to get it from the document otherwise
                 // we will go in an endless loop
                 if (doc!=null)
-                 bclass = doc.getxWikiClass();
+                    bclass = doc.getxWikiClass();
             }
 
             List handledProps = new ArrayList();
@@ -1740,7 +1746,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException {
-        try {        
+        try {
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -1854,7 +1860,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         return backlinks;
     }
 
-    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1862,27 +1868,28 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
             Session session = getSession(context);
 
-            // verifying there's a unique docId and fullName
-            long docId = ((XWikiLink)links.get(0)).getDocId();
-            String fullName = ((XWikiLink)links.get(0)).getFullName();
-            for (int i=0;i<links.size();i++){
-                if ( (docId != ((XWikiLink)links.get(i)).getDocId())
-                        || !(fullName.equals(((XWikiLink)links.get(i)).getFullName())) ){
-                    throw new Exception() ;
-                }
-            }
-
             // need to delete existing links before saving the page's one
-            deleteLinks(docId,context, bTransaction);
+            deleteLinks(doc.getId(), context, bTransaction);
 
-            // XWikiLink is the object declared in the Hibernate mapping
-            if (((XWikiLink)links.get(0)).getLink() != null){
+            // necessary to blank links from doc
+            context.remove("links");
+
+            // call to RenderEngine and converting the list of links into a list of backlinks
+            XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
+            renderer.render(doc.getContent(), doc, doc, context);
+
+            List links = (List)context.get("links");
+
+            if (links != null){
                 for (int i=0;i<links.size();i++) {
-                    XWikiLink link = (XWikiLink)links.get(i);
+                    // XWikiLink is the object declared in the Hibernate mapping
+                    XWikiLink link = new XWikiLink();
+                    link.setDocId(doc.getId());
+                    link.setLink((String)links.get(i));
+                    link.setFullName(doc.getFullName());
                     session.save(link);
                 }
             }
-
 
             if (bTransaction) {
                 endTransaction(context, true);
@@ -2391,7 +2398,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiDocument doc, XWikiContext context) throws XWikiException {
         boolean result = injectCustomMappings(doc, context);
         if (result==false)
-         return null;
+            return null;
 
         Configuration config = getConfiguration();
         SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
@@ -2421,7 +2428,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     public SessionFactory injectCustomMappingsInSessionFactory(BaseClass bclass, XWikiContext context) throws XWikiException {
         boolean result = injectCustomMapping(bclass, context);
         if (result==false)
-         return getSessionFactory();
+            return getSessionFactory();
 
         Configuration config = getConfiguration();
         return injectInSessionFactory(config);
@@ -2448,12 +2455,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         boolean result = false;
 
         for (int i=0;i<list.size();i++) {
-          XWikiDocument doc = (XWikiDocument)list.get(i);
-          result |= injectCustomMapping(doc.getxWikiClass(), context);
+            XWikiDocument doc = (XWikiDocument)list.get(i);
+            result |= injectCustomMapping(doc.getxWikiClass(), context);
         }
 
         if (result==false)
-         return getSessionFactory();
+            return getSessionFactory();
 
         Configuration config = getConfiguration();
         return injectInSessionFactory(config);
@@ -2477,17 +2484,17 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException {
         String custommapping = doc1class.getCustomMapping();
         if ((custommapping==null)||(custommapping.equals("")))
-         return false;
+            return false;
 
         Configuration config = getConfiguration();
 
         // don't add a mapping that's already there
         if (config.getClassMapping(doc1class.getName())!=null)
-         return true;
+            return true;
 
         Configuration mapconfig = makeMapping(doc1class.getName(), custommapping);
         if (!isValidCustomMapping(doc1class.getName(), mapconfig, doc1class))
-          throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
 
         config.addXML(makeMapping(doc1class.getName() , "xwikicustom_" + doc1class.getName().replace('.','_'), custommapping));
         config.buildMappings();

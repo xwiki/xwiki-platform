@@ -77,6 +77,7 @@ public class AllTests {
         suite.addTestSuite(HibernateCustomClassTest.class);
         suite.addTestSuite(PackageTest.class);
         suite.addTestSuite(QueryPluginTest.class);
+        suite.addTestSuite(StoreTest.class);
         //$JUnit-END$
 
         return suite;

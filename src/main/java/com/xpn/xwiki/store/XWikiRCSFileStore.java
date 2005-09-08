@@ -466,7 +466,7 @@ public class XWikiRCSFileStore extends XWikiDefaultStore {
                 "Not implemented");
     }
 
-    public void saveLinks(List links, XWikiContext context, boolean bTransaction) throws XWikiException {
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException {
         throw new XWikiException( XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Not implemented");
     }

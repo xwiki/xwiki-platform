@@ -1525,41 +1525,15 @@ public class XWikiDocument {
         }
     }
 
-    public void saveLinks(XWikiContext context) throws XWikiException{
-        // necessary to blank links from doc
-        context.remove("links");
-
-        // call to RenderEngine and converting the list of links into a list of backlinks
-        XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
-
- //       XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("com.xpn.xwiki.render.XWikiRadeoxRenderer");
-        renderer.render(getContent(), this, this, context);
-
-        List links = (List)context.get("links");
-        List backlinks = new ArrayList();
-        if (links != null){
-            for (int i=0; i<links.size();i++){
-                XWikiLink link = new XWikiLink();
-                link.setDocId(getId());
-                link.setLink((String)links.get(i));
-                link.setFullName(getFullName());
-                backlinks.add(link);
-            }
-        } else {
-            XWikiLink link = new XWikiLink();
-            link.setDocId(getId());
-            link.setLink("");
-            link.setFullName(getFullName());
-            backlinks.add(link);          
-        }
-        getStore().saveLinks(backlinks,context, true);
-    }
-
     public List getBacklinks(XWikiContext context) throws XWikiException {
-        return getStore().loadBacklinks(getFullName(),context ,true);
-    }
+         return getStore().loadBacklinks(getFullName(),context ,true);
+     }
 
-    public void renameProperties(String className, Map fieldsToRename) {
+    public List getLinks(XWikiContext context) throws XWikiException {
+         return getStore().loadLinks(getId(), context, true);
+     }
+
+      public void renameProperties(String className, Map fieldsToRename) {
         Vector objects = getObjects(className);
         if (objects==null)
             return;
@@ -2202,4 +2176,5 @@ public class XWikiDocument {
     public void setWikiNode(Object wikiNode) {
         this.wikiNode = wikiNode;
     }
+
 }

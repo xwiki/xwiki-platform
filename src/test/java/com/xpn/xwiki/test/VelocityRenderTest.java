@@ -126,11 +126,11 @@ public class VelocityRenderTest extends HibernateTestCase {
 
     public void testCacheRenderer() throws XWikiException {
         XWikiRenderingEngine wikirenderer = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
-        String content = "$context.setCacheDuration(10) $xwiki.date.time";
+        String content = "$context.setCacheDuration(1) $xwiki.date.time";
         String result = AbstractRenderTest.renderTest(wikirenderer, content, "", false, getXWikiContext());
         AbstractRenderTest.renderTest(wikirenderer, content, result, false, getXWikiContext());
         try {
-            Thread.sleep(10000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }

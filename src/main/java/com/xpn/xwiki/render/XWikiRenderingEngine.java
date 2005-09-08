@@ -114,8 +114,12 @@ public class XWikiRenderingEngine {
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
         String key = getKey(text, contentdoc, includingdoc);
         try {
-            XWikiRenderingCache cacheObject = null;
-            cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
+            XWikiRenderingCache cacheObject = null;            
+            try {
+                cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
+            } catch (XWikiCacheNeedsRefreshException e2) {
+                cache.cancelUpdate(key);
+            }
             if ((cacheObject!=null)&&cacheObject.isValid()) {
                 XWikiRequest request = context.getRequest();
                 boolean refresh = "1".equals((request!=null) ? request.get("refresh") : "");

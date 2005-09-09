@@ -22,19 +22,18 @@
  */
 package com.xpn.xwiki.plugin.calendar;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import org.apache.velocity.VelocityContext;
 
 public class CalendarData {
     private List cdata = new ArrayList();
@@ -87,7 +86,10 @@ public class CalendarData {
                 defaultUser = doc.getFullName();
             }
         }
-        String defaultDescription = "[" + doc.getFullName() + "]";
+
+        String defaultDescription = "";
+        if (doc!=null)
+             defaultDescription = "[" + doc.getFullName() + "]";
 
         Vector bobjs = doc.getObjects("XWiki.CalendarEvent");
         if (bobjs!=null) {
@@ -102,7 +104,7 @@ public class CalendarData {
             String description = "";
 
             try {
-                description = (String) ((StringProperty)bobj.get("description")).getValue();
+                description = (String) ((LargeStringProperty)bobj.get("description")).getValue();
             } catch (Exception e) {}
 
             Date dateStart = null;
@@ -176,6 +178,26 @@ public class CalendarData {
         }
         return result.toString();
     }
+
+    public String getContent(Calendar tddate, String velocityScript, XWikiContext context) {
+        VelocityContext vcontext = new VelocityContext();
+        vcontext.put("date", tddate);
+        ArrayList events = new ArrayList();
+        for (int i=0;i<cdata.size();i++) {
+            CalendarEvent event = (CalendarEvent) cdata.get(i);
+            int idate = tddate.get(Calendar.YEAR) * 1000 + tddate.get(Calendar.DAY_OF_YEAR);
+            int isdate = event.getDateStart().get(Calendar.YEAR) * 1000 + event.getDateStart().get(Calendar.DAY_OF_YEAR);
+            Calendar dtend = (Calendar) event.getDateEnd().clone();
+            // dtend.add(Calendar.SECOND, -1);
+            int iedate = dtend.get(Calendar.YEAR) * 1000 + dtend.get(Calendar.DAY_OF_YEAR);
+            if ((idate>= isdate)&&(idate<=iedate)) {
+                   events.add(event);
+                }
+        }
+        vcontext.put("events", events);
+        return XWikiVelocityRenderer.evaluate(velocityScript, "", vcontext, context);
+    }
+
 
     public void addCalendarData(CalendarEvent event) {
         cdata.add(event);

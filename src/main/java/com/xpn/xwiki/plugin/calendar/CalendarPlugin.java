@@ -205,7 +205,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 }
 
                 // determine URL for this calendar day
-                String content = calendarData.getContent(cal, context);
+                String content;
+                String script = (String)calendarParams.get("script");
+
+                if (script==null)
+                 content = calendarData.getContent(cal, context);
+                else
+                 content = calendarData.getContent(cal, script, context);
 
                 if // day is today then use today style
                 ((          cal.get(Calendar.DAY_OF_MONTH)

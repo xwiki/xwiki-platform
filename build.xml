@@ -388,7 +388,7 @@
 		file="${main.src.dir}/web.xml" />
     </target>
 
-    <target name="release" depends="xwiki">
+    <target name="release" depends="jar">
       <mkdir dir="${release.dir}" />
       <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web.xml" >
         <exclude name="**/web*.xml" />

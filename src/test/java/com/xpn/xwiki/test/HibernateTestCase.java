@@ -52,7 +52,7 @@ public class HibernateTestCase extends TestCase {
         // TODO: StoreHibernateTest should be refactored with this class in mind 
         this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
         this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
-        this.config.put("xwiki.backlinks", "");
+        this.config.put("xwiki.backlinks", "1");
 
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");

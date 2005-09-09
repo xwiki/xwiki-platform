@@ -112,9 +112,9 @@ public class XWikiRenderingEngine {
     }
 
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
-        String key = getKey(text, contentdoc, includingdoc);
+        String key = getKey(text, contentdoc, includingdoc, context);
         try {
-            XWikiRenderingCache cacheObject = null;            
+            XWikiRenderingCache cacheObject = null;
             try {
                 cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
             } catch (XWikiCacheNeedsRefreshException e2) {
@@ -187,8 +187,9 @@ public class XWikiRenderingEngine {
         }
     }
 
-    private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc) {
-        return "" + contentdoc.getFullName() + "-" + includingdoc.getFullName() + "-" + text.hashCode();
+    private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
+        return context.getDatabase() + "-" + contentdoc.getDatabase() + ":" + contentdoc.getFullName() + "-"
+                + includingdoc.getDatabase() + ":" + includingdoc.getFullName() + "-" + text.hashCode();
     }
 
     public void flushCache() {

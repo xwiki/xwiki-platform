@@ -36,11 +36,7 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
 
     private static final Log log = LogFactory.getLog(XWikiPortletURLFactory.class);
 
-    public XWikiPortletURLFactory(URL serverURL, String servletPath, String actionPath) {
-        super(serverURL, servletPath, actionPath);
-    }
-
-    public XWikiPortletURLFactory(XWikiContext context) {
+    public void init(XWikiContext context) {
         URL url = context.getURL();
 
         try {

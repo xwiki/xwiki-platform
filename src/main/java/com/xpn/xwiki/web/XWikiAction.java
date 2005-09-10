@@ -93,8 +93,10 @@ public abstract class XWikiAction extends Action
 
             // Add the form to the context
             context.setForm((XWikiForm) form);
-
             XWiki xwiki = XWiki.getXWiki(context);
+            
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+            context.setURLFactory(urlf);
 
             // Any error before this will be treated using a redirection to an error page
 
@@ -193,7 +195,7 @@ public abstract class XWikiAction extends Action
             // End request
             if (monitor!=null)
                 monitor.endRequest();
-
+ 
             MDC.remove("url");
         }
     }

@@ -10,7 +10,8 @@ import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 
 public class PDFAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {
-        context.setURLFactory(new PdfURLFactory(context));
+        XWikiURLFactory urlf = context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF, context);
+        context.setURLFactory(urlf);
         PdfExportImpl pdfexport = new PdfExportImpl();
         XWikiDocument doc = context.getDoc();
         handleRevision(context);

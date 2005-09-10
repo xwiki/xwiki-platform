@@ -28,8 +28,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class XWikiXMLRPCURLFactory extends XWikiServletURLFactory {
-    public XWikiXMLRPCURLFactory(XWikiContext context) {
-        super(context);
+    public XWikiXMLRPCURLFactory() {
     }
 
     public String getURL(URL url, XWikiContext context) {

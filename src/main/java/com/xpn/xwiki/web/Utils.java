@@ -206,23 +206,18 @@ public class Utils {
         context.setAction(action);
         context.setDatabase(dbname);
 
-
+        int mode = 0;
         if (request instanceof XWikiXMLRPCRequest) {
-         context.setMode(XWikiContext.MODE_XMLRPC);
-         XWikiURLFactory urlf = new XWikiXMLRPCURLFactory(context);
-         context.setURLFactory(urlf);
+            mode = XWikiContext.MODE_XMLRPC;
         }
         else if (request instanceof XWikiServletRequest) {
-         context.setMode(XWikiContext.MODE_SERVLET);
-         XWikiURLFactory urlf = new XWikiServletURLFactory(context);
-         context.setURLFactory(urlf);
+            mode = XWikiContext.MODE_SERVLET;
         }
         else if (request instanceof XWikiPortletRequest) {
-         context.setMode(XWikiContext.MODE_PORTLET);
-         XWikiURLFactory urlf = new XWikiPortletURLFactory(context);
-         context.setURLFactory(urlf);
+            mode = XWikiContext.MODE_PORTLET;
         }
-
+        context.setMode(mode);
+        
         return context;
     }
 

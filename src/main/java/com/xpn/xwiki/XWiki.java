@@ -114,6 +114,8 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactoryService;
+import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface {
@@ -129,6 +131,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiGroupService groupService;
     private XWikiStatsService statsService;
     private XWikiCacheService cacheService;
+    private XWikiURLFactoryService urlFactoryService;
 
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
@@ -168,7 +171,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return configPath;
    }
 
-    public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
+   public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = null;
         String xwikiname = "xwiki";
         XWiki xwiki = null;
@@ -2670,6 +2673,40 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
         return statsService;
+    }
+
+    public XWikiURLFactoryService getURLFactoryService()
+    {
+        if (urlFactoryService == null)
+        {
+
+            log.info("Initializing URLFactory Service...");
+
+            String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
+
+            if (urlFactoryServiceClass != null)
+            {
+                try
+                {
+                    if (log.isDebugEnabled()) log.debug("Using custom URLFactory Service Class " + urlFactoryServiceClass + ".");
+                    urlFactoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass).newInstance();
+                    urlFactoryService.init(this);
+                    log.debug("Initialized URLFactory Service using Reflection.");
+                }
+                catch (Exception e)
+                {
+                    urlFactoryService = null;
+                    log.warn("Failed to initialize URLFactory Service  " + urlFactoryServiceClass + " using Reflection, trying default implementation using 'new'.", e);
+                }
+            }
+            if (urlFactoryService == null)
+            {
+                if (log.isDebugEnabled()) log.debug("Using default URLFactory Service Class " + urlFactoryServiceClass + ".");
+                urlFactoryService = new XWikiURLFactoryServiceImpl();
+                urlFactoryService.init(this);
+            }
+        }
+        return urlFactoryService;
     }
 
     public Object getService(String className) throws XWikiException {

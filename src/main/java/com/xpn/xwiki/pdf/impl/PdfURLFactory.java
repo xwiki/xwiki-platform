@@ -57,14 +57,6 @@ public class PdfURLFactory extends XWikiServletURLFactory {
         }
     }
 
-    public PdfURLFactory(URL serverURL, String servletPath, String actionPath) {
-        super(serverURL, servletPath, actionPath);
-    }
-
-    public PdfURLFactory(XWikiContext context) {
-        super(context);
-    }
-
     public String getURL(URL url, XWikiContext context) {
         if (url==null)
             return "";

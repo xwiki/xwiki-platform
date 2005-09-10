@@ -27,6 +27,7 @@ import java.net.URL;
 import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactory {
+    public void init(XWikiContext context);
     public URL createURL(String web, String name, XWikiContext context);
     public URL createURL(String web, String name, String action, XWikiContext context);
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);

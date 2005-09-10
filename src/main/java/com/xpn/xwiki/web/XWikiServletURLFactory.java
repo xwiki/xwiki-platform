@@ -35,13 +35,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public XWikiServletURLFactory() {
     }
 
+    // Used by tests
     public XWikiServletURLFactory(URL serverURL, String servletPath, String actionPath) {
         this.serverURL = serverURL;
         this.servletPath = servletPath;
         this.actionPath = actionPath;
     }
 
+    // Used by tests
     public XWikiServletURLFactory(XWikiContext context) {
+        init(context);
+    }
+    
+    public void init(XWikiContext context) {
         URL url = context.getURL();
         String path = url.getPath();
         servletPath = path.substring(0, path.indexOf('/', 1) + 1);

@@ -299,6 +299,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
 
     public void updateSchema(BaseClass bclass, XWikiContext context) throws XWikiException {
+        String custommapping = bclass.getCustomMapping();
+        if ((custommapping==null)||(custommapping.equals("")))
+         return;
+        
         Configuration config = makeMapping(bclass.getName(), bclass.getCustomMapping());
         if (isValidCustomMapping(bclass.getName(), config, bclass)==false) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING,

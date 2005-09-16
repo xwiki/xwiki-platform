@@ -46,20 +46,21 @@ public class SecHibernateQuery extends HibernateQuery {
 	private boolean security = false;
 	private List _allowdocs	= new ArrayList();
 	public boolean constructWhere(StringBuffer sb) {		
-		boolean r = super.constructWhere(sb);		
+		boolean r = super.constructWhere(sb);
 		if (security) {
 			if (r)
 				sb.append(" and ");
 			else
 				sb.append(" where ");
-			sb.append("doc.id in (");
-			String comma = ""; 
+			sb.append("doc.id in (:secdocids)"); // TODO: secdocids is reserved word of query api.
+			_addHqlParam("secdocids", _allowdocs);
+			/*String comma = "";
 			for (Iterator iter = _allowdocs.iterator(); iter.hasNext();) {
 				Long element = (Long) iter.next();
 				sb.append(comma).append(element.toString());
 				comma = ",";
 			}
-			sb.append(")");
+			sb.append(")");*/
 			return true;
 		} else return r;		
 	}
@@ -115,7 +116,7 @@ public class SecHibernateQuery extends HibernateQuery {
 				doc = getStore().loadXWikiDoc(doc, getContext());
 				result.add(new Document(doc, getContext()));
 			} else if (element instanceof BaseObject) {
-				hbstore.loadXWikiObject((BaseObject) element, getContext(), true);
+				getHibernateStore().loadXWikiObject((BaseObject) element, getContext(), true);
 				result.add(new com.xpn.xwiki.api.Object((BaseObject) element, getContext()));
 			} else if (element instanceof XWikiAttachment) { // TODO: get document. Impossible for now
 				XWikiAttachment attach = (XWikiAttachment) element;
@@ -131,14 +132,14 @@ public class SecHibernateQuery extends HibernateQuery {
 		_viewRight.add("doc.fullname");
 		_viewRight.add("obj.name");
 	}
-	public List getNeededRight() { // TODO: if select of many objects?
+	public List getNeededRight() {
 		if (translator==null)
 			translator = new XWikiHibernateQueryTranslator(getQueryTree());
 		boolean bview = false;
 		boolean bquery = false;
 		final String[] sels = StringUtils.split(_select.toString().toLowerCase()," ,");
 		for (int i=0; i<sels.length; i++) {
-			final String sel = sels[i];			
+			final String sel = sels[i];
 			if (_viewRight.contains(sel))
 				bview = true;
 			else

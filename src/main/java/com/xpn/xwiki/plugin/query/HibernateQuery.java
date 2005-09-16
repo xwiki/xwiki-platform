@@ -66,12 +66,15 @@ import com.xpn.xwiki.util.Util;
 public class HibernateQuery extends DefaultQuery {
 	private static final Log log = LogFactory.getLog(HibernateQuery.class);
 	
-	protected XWikiHibernateStore			hbstore;
+	//protected XWikiHibernateStore			hbstore;
 	protected XWikiHibernateQueryTranslator translator;
 	public HibernateQuery(QueryRootNode tree, IQueryFactory qf) {
 		super(tree, qf);
-		this.hbstore = getContext().getWiki().getHibernateStore();
+		//this.hbstore = getContext().getWiki().getHibernateStore();
 		//translator = new XWikiHibernateQueryTranslator( getQueryTree() );
+	}
+	public XWikiHibernateStore getHibernateStore() {
+		return (XWikiHibernateStore) getContext().getWiki().getHibernateStore();
 	}
 	
 	/** @return true, if something added */
@@ -105,7 +108,7 @@ public class HibernateQuery extends DefaultQuery {
 		if (log.isDebugEnabled())
 			log.debug("hql: "+hql);
 		
-		return hqlexec(hql, null, _fetchSize, _firstResult);
+		return hqlexec(hql, _hqlparams, _fetchSize, _firstResult);
 	}
 	
 	protected SepStringBuffer	_select		= new SepStringBuffer(",");
@@ -133,20 +136,19 @@ public class HibernateQuery extends DefaultQuery {
 	        QName[] select = node.getSelectProperties();
 	        if (n2e(_mainobj).equals(""))
 				throw new TranslateException("what object?");
+	        if (_isdistinct)
+				_select.append("distinct ");
 			if (select.length>0) {
-				if (_isdistinct)
-					_select.append("distinct ");
-				
 				for (int i=0; i<select.length; i++) {
 					final QName sel = select[i];
 					final String hqlpropname = getProp(sel, _mainobj);
 					_select.appendSeparator().append(hqlpropname);
 				}
 			} else {
-				if (_isdistinct)
-					_select.append("distinct ");
 				_select.append(_mainobj);
 			}
+			/*if (_isdistinct)
+				_select.append(")");*/
 	        return data;
 		}
 		
@@ -203,7 +205,7 @@ public class HibernateQuery extends DefaultQuery {
 			if (data==null) {
 				throw new TranslateException("No object for relation");			
 			}
-			final String obj = (String) data;
+			//final String obj = (String) data;
 			throw new TranslateException("Not implemented");
 			/*final StringBuffer sb = (StringBuffer) data;
 			sb.append(" ");
@@ -395,11 +397,6 @@ public class HibernateQuery extends DefaultQuery {
 			return n;
 		}
 		Set _fromclass = new HashSet();
-		//Map _objpropClass = new HashMap();
-		private String _addnewfrom(String sf) {
-			final String scl = (String) _mapObjClass.get(sf);
-			return _addnewfrom(sf, scl);			
-		}
 		private String _addnewfrom(String sf, String scl) {			
 			if (scl==null)
 				throw new TranslateException("addfrom: Undefined object "+scl);			
@@ -570,10 +567,10 @@ public class HibernateQuery extends DefaultQuery {
             if (monitor!=null)
                 monitor.startTimer("hibernate");
             
-            hbstore.checkHibernate(getContext());
-            bTransaction = hbstore.beginTransaction(getContext());            
+            getHibernateStore().checkHibernate(getContext());
+            bTransaction = getHibernateStore().beginTransaction(getContext());            
                         
-			final Session ses = hbstore.getSession(getContext());
+			final Session ses = getHibernateStore().getSession(getContext());
 			final Query q = ses.createQuery(hql);			
 			if (params!=null && !params.isEmpty()) {
 				for (Iterator iter = params.keySet().iterator(); iter.hasNext();) {
@@ -593,7 +590,7 @@ public class HibernateQuery extends DefaultQuery {
 			r = q.list();
 			
 			if (bTransaction)
-                hbstore.endTransaction(getContext(), false);
+				getHibernateStore().endTransaction(getContext(), false);
 			return r;
 		} catch (Throwable e) {
 			Object[] args = { hql };
@@ -602,7 +599,7 @@ public class HibernateQuery extends DefaultQuery {
 		} finally {
 			try {
 				if (bTransaction)
-					hbstore.endTransaction(getContext(), false);
+					getHibernateStore().endTransaction(getContext(), false);
 			} catch (Exception e) {}
 			// End monitoring timer
 			if (monitor!=null)
@@ -613,5 +610,10 @@ public class HibernateQuery extends DefaultQuery {
 		if (d!=_isdistinct)
 			translator = null;
 		return super.setDistinct(d);
+	}
+	
+	Map _hqlparams = new HashMap();
+	protected void _addHqlParam(String pn, Object v) {
+		_hqlparams.put(pn, v);
 	}
 }

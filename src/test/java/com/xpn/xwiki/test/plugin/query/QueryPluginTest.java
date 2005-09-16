@@ -36,20 +36,21 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.plugin.query.QueryFactory;
+import com.xpn.xwiki.plugin.query.IQueryFactory;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.test.Utils;
 
 public class QueryPluginTest extends HibernateTestCase {
-	QueryFactory qf;
+	IQueryFactory qf;
 	
 	protected void setUp() throws Exception {		
 		super.setUp();
 		getXWiki().setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.query.QueryPlugin", getXWikiContext()));
         QueryPlugin plugin = (QueryPlugin) getXWiki().getPluginManager().getPlugin("query");
-        qf = (QueryFactory) plugin.getPluginApi(plugin, getXWikiContext());
+        //qf = (QueryFactory) plugin.getPluginApi(plugin, getXWikiContext());
+        qf = plugin;
 	}
 	
 	public void checkequals(List lst, Object[] exps) throws XWikiException, InvalidQueryException {
@@ -436,5 +437,19 @@ public class QueryPluginTest extends HibernateTestCase {
 		testsearch("/*/*/obj/Test/Contains/@f:category2",	new Object[]{"1|2"});
 		// Hibernate(even 3.1) could not return lists..(NullPointer in parser) maybe needed special select query. question is posted
 		//testsearch("/*/*/obj/Test/Contains/@f:dblist",		new Object[]{Arrays.asList(new Object[]{"XWikiUsers", "test2"})});
+	}
+	
+	public void testDistinct() throws XWikiException, InvalidQueryException {
+		XWikiHibernateStore hb = getXWiki().getHibernateStore();
+		hb.beginTransaction(getXWikiContext());
+		XWikiDocument doc1 = new XWikiDocument("Test", "TestObject");
+		hb.saveXWikiDoc(doc1, getXWikiContext());
+		XWikiDocument doc2 = new XWikiDocument("Test2", "TestObject");
+		hb.saveXWikiDoc(doc2, getXWikiContext());
+		hb.endTransaction(getXWikiContext(), true);
+		
+		testsearch("//*/*/@name",			new Object[]{"TestObject", "TestObject"});
+		checkequals(qf.getDocs("*.*", "@name", "").setDistinct(true).list(), new Object[]{"TestObject"});
+		checkequals(qf.getDocs("*.*", "(@name,@name)", "").setDistinct(true).list(), new Object[]{new Object[]{"TestObject", "TestObject"}});
 	}
 }

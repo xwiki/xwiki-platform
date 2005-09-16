@@ -33,20 +33,20 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.plugin.query.QueryFactory;
+import com.xpn.xwiki.plugin.query.IQueryFactory;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.test.Utils;
 
 public class QueryPluginApiTest extends HibernateTestCase {
-	QueryFactory qf;
+	IQueryFactory qf;
 	
 	protected void setUp() throws Exception {		
 		super.setUp();
-		getXWiki().setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.query.QueryPluginApi", getXWikiContext()));
+		getXWiki().setPluginManager(new XWikiPluginManager("com.xpn.xwiki.plugin.query.QueryPlugin", getXWikiContext()));
         QueryPlugin plugin = (QueryPlugin) getXWiki().getPluginManager().getPlugin("query");
-        qf = (QueryFactory) plugin.getPluginApi(plugin, getXWikiContext());
+        qf = (IQueryFactory) plugin.getPluginApi(plugin, getXWikiContext());
 	}
 	
 	public void testsearch(String sxq, Object[] exps) throws XWikiException, InvalidQueryException {

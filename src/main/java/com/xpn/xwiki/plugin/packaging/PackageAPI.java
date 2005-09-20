@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.packaging;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -122,6 +123,17 @@ public class PackageAPI   extends Api {
         return plugin.add(docFullName, context);
     }
 
+    public void setDocumentAction(String docFullName, int action)
+    {
+        Iterator it = plugin.getFiles().iterator();
+        while (it.hasNext())
+        {
+            DocumentInfo docInfos = (DocumentInfo)it.next();
+            if (docInfos.getFullName().compareTo(docFullName) == 0)
+                docInfos.setAction(action);
+        }
+    }
+
 
     public String export() throws IOException, XWikiException {
         context.getResponse().setContentType("application/zip");
@@ -142,5 +154,14 @@ public class PackageAPI   extends Api {
     public void backupWiki() throws XWikiException, IOException {
         plugin.addAllWikiDocuments(context);
         this.export();
+    }
+
+    public String toXml()
+    {
+        return plugin.toXml();
+    }
+
+    public int install() throws XWikiException {
+        return plugin.install(context);
     }
 }

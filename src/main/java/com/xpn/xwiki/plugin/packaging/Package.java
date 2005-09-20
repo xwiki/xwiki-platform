@@ -33,6 +33,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -62,7 +63,7 @@ public class Package {
     private String  name = "My package";
     private String  description = "";
     private String  version = "1.0.0";
-    private String  licence = "GPL";
+    private String  licence = "LGPL";
     private String  authorName = "XWiki";
     private List    files = null;
     private List    customMappingFiles = null;
@@ -254,6 +255,8 @@ public class Package {
 
         try {
             description = ReadZipInfoFile(zis);
+            if (description == null)
+                throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             bais = new ByteArrayInputStream(file);
             zis = new ZipInputStream(bais);
             while ((entry = zis.getNextEntry()) != null) {
@@ -261,20 +264,39 @@ public class Package {
                     continue;
                 else {
                     XWikiDocument doc = readFromXML(readFromInputStream(zis));
-
-                    this.add(doc, context);
+                    if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description))
+                        this.add(doc, context);
+                    else
+                        throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "document does not exist in package definition");
                 }
             }
-
-
-            if (description == null)
-                files.clear();
-            else
-                updateFileInfos(description);
+            updateFileInfos(description);
         } catch (DocumentException e) {
             throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
         }
         return "";
+    }
+
+    private boolean documentExistInPackageFile(String docName, String language, Document xml)
+    {
+        Element docFiles = xml.getRootElement();
+        Element infosFiles = docFiles.element("files");
+
+        List ListFile =  infosFiles.elements("file");
+        Iterator it = ListFile.iterator();
+        while(it.hasNext())
+        {
+            Element el = (Element)it.next();
+            String tmpDocName = el.getStringValue();
+            if (tmpDocName.compareTo(docName) !=  0)
+                continue;
+            String tmpLanguage = el.attributeValue("language");
+            if (tmpLanguage==null)
+             tmpLanguage = "";
+            if (tmpLanguage.compareTo(language) ==  0)
+                return true;
+        }
+        return false;
     }
 
     private void updateFileInfos(Document xml)
@@ -312,8 +334,8 @@ public class Package {
 
     public int testInstall(XWikiContext context)
     {
-        if (log.isErrorEnabled())
-            log.error("Package test install");
+        if (log.isDebugEnabled())
+            log.debug("Package test install");
 
         int result = DocumentInfo.INSTALL_IMPOSSIBLE;
         try {
@@ -330,8 +352,8 @@ public class Package {
             }
             return result;
         } finally {
-            if (log.isErrorEnabled())
-                log.error("Package test install result " + result);
+            if (log.isDebugEnabled())
+                log.debug("Package test install result " + result);
         }
     }
 
@@ -363,6 +385,9 @@ public class Package {
     private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
         if (log.isDebugEnabled())
          log.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
+
+        if (doc.getAction() == DocumentInfo.ACTION_SKIP_INSTALL)
+            return  DocumentInfo.INSTALL_OK;
 
         int status = doc.testInstall(context);
         if (status == DocumentInfo.INSTALL_IMPOSSIBLE) {

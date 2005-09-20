@@ -42,6 +42,7 @@ public class DocumentInfo
     public final static int     ACTION_OVERWRITE = 0;
     public final static int     ACTION_SKIP = 1;
     public final static int     ACTION_MERGE = 2;
+    public final static int     ACTION_SKIP_INSTALL = 3;
 
     public final static int     INSTALL_IMPOSSIBLE = 0;
     public final static int     INSTALL_ALREADY_EXIST = 1;
@@ -151,6 +152,8 @@ public class DocumentInfo
             return "overwrite";
         if (status == ACTION_SKIP)
             return "skip";
+        if (status == ACTION_SKIP_INSTALL)
+            return "skip install";
         return "Not defined";
     }
 
@@ -162,6 +165,8 @@ public class DocumentInfo
             return ACTION_OVERWRITE;
         if (status.compareTo("skip") == 0)
             return ACTION_SKIP;
+        if (status.compareTo("skip install") == 0)
+            return ACTION_SKIP_INSTALL;
         return ACTION_NOT_DEFINED;
     }
 

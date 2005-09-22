@@ -3211,5 +3211,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "1".equals(Param("xwiki.backlinks"));
     }
 
+    public XWikiDocument renamePage (XWikiDocument doc, XWikiContext context, String newFullName) throws XWikiException {
+        XWikiDocument renamedDoc = doc.renameDocument(newFullName, context);
+        saveDocument(renamedDoc, context);
+        deleteDocument(doc, context);
+        refreshLinks(context);
+        return renamedDoc;
+    }
 }
 

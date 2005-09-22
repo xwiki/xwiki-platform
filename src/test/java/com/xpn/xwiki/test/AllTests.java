@@ -78,6 +78,10 @@ public class AllTests {
         suite.addTestSuite(PackageTest.class);
         suite.addTestSuite(QueryPluginTest.class);
         suite.addTestSuite(StoreTest.class);
+        suite.addTestSuite(BackLinksTest.class);
+        suite.addTestSuite(BackLinksSimpleTest.class);
+        suite.addTestSuite(BackLinksHibernateTest.class);
+        suite.addTestSuite(BackLinksIntegrationTest.class);
         //$JUnit-END$
 
         return suite;

@@ -872,5 +872,10 @@ public class XWiki extends Api {
             return xwiki.hasBacklinks(context);
     }
 
+    public void renamePage (XWikiDocument doc, String newFullName) throws XWikiException {
+       if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)){
+            xwiki.renamePage(doc, context, newFullName) ;
+        }
+    }
 }
 

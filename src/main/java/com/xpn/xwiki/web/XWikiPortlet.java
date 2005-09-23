@@ -62,6 +62,8 @@ public class XWikiPortlet extends GenericPortlet {
     protected boolean prepareAction(String action, XWikiRequest request, XWikiResponse response,
                                     XWikiEngineContext engine_context, XWikiContext context) throws XWikiException, IOException {
         XWiki xwiki = XWiki.getXWiki(context);
+        XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+        context.setURLFactory(urlf);
         VelocityContext vcontext = XWikiVelocityRenderer.prepareContext(context);
         return xwiki.prepareDocuments(request, context, vcontext);
     }

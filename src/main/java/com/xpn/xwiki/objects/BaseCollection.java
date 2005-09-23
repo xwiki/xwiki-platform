@@ -195,7 +195,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
          catch (Exception e) {
             return 0;
-        }
+        }             
     }
 
     public void setLongValue(String name, long value) {

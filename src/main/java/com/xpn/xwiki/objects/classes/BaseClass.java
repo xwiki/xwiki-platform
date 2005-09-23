@@ -284,7 +284,24 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getCustomMapping() {
+        if ("XWiki.XWikiPreferences".equals(getName()))
+          return "internal";
         return customMapping;
+    }
+
+    public boolean hasCustomMapping() {
+        String cMapping = getCustomMapping();
+        return (cMapping!=null)&&(!"".equals(cMapping));
+    }
+
+    public boolean hasExternalCustomMapping() {
+        String cMapping = getCustomMapping();
+        return (cMapping!=null)&&(!"".equals(cMapping))
+                &&(!"internal".equals(cMapping));
+    }
+
+    public boolean hasInternalCustomMapping() {
+        return "internal".equals(customMapping);
     }
 
     public boolean isCustomMappingValid(XWikiContext context) throws XWikiException {

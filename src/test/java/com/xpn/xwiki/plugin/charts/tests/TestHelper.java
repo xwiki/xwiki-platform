@@ -42,7 +42,7 @@ public class TestHelper {
 			boolean hasHeaderRow, boolean hasHeaderColumn,
 			String decimal, boolean ignoreAlpha) throws XWikiException {
 
-		BaseObject xobject = (BaseObject)xclass.newObject();
+		BaseObject xobject = (BaseObject)xclass.newObject(context);
         
         xobject.setIntValue(TableDataSource.TABLE_NUMBER, tableNumber);
 		xobject.setStringValue(TableDataSource.RANGE, range);

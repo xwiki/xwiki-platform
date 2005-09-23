@@ -32,12 +32,16 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 
 
 
 public class XWikiCacheStore implements XWikiCacheStoreInterface {
+
+    private static final Log log = LogFactory.getLog(XWikiCacheStore.class);
 
     private XWikiStoreInterface store;
     private XWikiCache cache;
@@ -110,22 +114,39 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc, context);
+        if (log.isDebugEnabled())
+         log.debug("Cache: begin for doc " + key + " in cache");
+
         synchronized (key) {
             try {
+                if (log.isDebugEnabled())
+                 log.debug("Cache: Trying to get doc " + key + " from cache");
                 doc = (XWikiDocument) getCache().getFromCache(key);
                 doc.setFromCache(true);
+                if (log.isDebugEnabled())
+                 log.debug("Cache: got doc " + key + " from cache");
             } catch (XWikiCacheNeedsRefreshException e) {
                 try {
+                    if (log.isDebugEnabled())
+                     log.debug("Cache: Trying to get doc " + key + " for real");
                     doc = store.loadXWikiDoc(doc, context);
                     doc.setStore(store);
+                    if (log.isDebugEnabled())
+                     log.debug("Cache: Got doc " + key + " for real");
                 } catch (XWikiException xwikiexception) {
+                    if (log.isDebugEnabled())
+                     log.debug("Cache: exception while getting doc " + key + " for real");
                     getCache().cancelUpdate(key);
                     throw xwikiexception;
                 }
+                if (log.isDebugEnabled())
+                 log.debug("Cache: put doc " + key + " in cache");
                 getCache().putInCache(key, doc);
                 getPageExistCache().putInCache(key, new Boolean(!doc.isNew()));
             }
         }
+        if (log.isDebugEnabled())
+         log.debug("Cache: end for doc " + key + " in cache");
         return doc;
     }
 

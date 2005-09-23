@@ -217,7 +217,6 @@ public class Utils {
             mode = XWikiContext.MODE_PORTLET;
         }
         context.setMode(mode);
-        
         return context;
     }
 
@@ -236,8 +235,7 @@ public class Utils {
      *
      * @exception IllegalArgumentException if the data is malformed
      *
-     *  Code borrowed from Apache Tomcat 5.0
-     */
+     *  Code borrowed from Apache Tomcat 5.0        */
     public static Map parseParameters(String data, String encoding)
         throws UnsupportedEncodingException {
 

@@ -280,7 +280,10 @@ public class Utils {
         doc.setObject(wclass.getName(), 0, object);
 
         object.setClassName(wclass.getName());
-        object.setName(name);
+        if ((doc.getName()==null)||"".equals(doc.getName()))
+         object.setName(name);
+        else
+         object.setName(doc.getFullName());
         object.put("first_name", ((PropertyClass)wclass.get("first_name")).fromString("Ludovic"));
         object.put("last_name", ((PropertyClass)wclass.get("last_name")).fromString("Von Dubost"));
         object.put("age", ((PropertyClass)wclass.get("age")).fromString("33"));

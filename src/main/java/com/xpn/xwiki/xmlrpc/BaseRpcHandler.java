@@ -28,10 +28,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.*;
 
 public class BaseRpcHandler extends Object {
 
@@ -46,10 +43,12 @@ public class BaseRpcHandler extends Object {
     }
 
     public XWikiContext init() throws XWikiException {
-          XWikiContext context = Utils.prepareContext("", request, response, econtext);
-          XWiki.getXWiki(context);
-          XWikiVelocityRenderer.prepareContext(context);
-          return context;
+        XWikiContext context = Utils.prepareContext("", request, response, econtext);
+        XWiki xwiki = XWiki.getXWiki(context);
+        XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+        context.setURLFactory(urlf);
+        XWikiVelocityRenderer.prepareContext(context);
+        return context;
     }
 
 

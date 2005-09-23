@@ -81,6 +81,11 @@
         <url-pattern>/testbin/*</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>action</servlet-name>
+        <url-pattern>/xwiki/*</url-pattern>
+    </servlet-mapping>
+
     <!-- The Usual Welcome File List -->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

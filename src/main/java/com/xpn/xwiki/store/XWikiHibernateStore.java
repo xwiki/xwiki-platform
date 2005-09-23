@@ -98,7 +98,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
         String[] string_types = { "string" , "text" , "clob" };
         String[] number_types = { "integer" , "long" , "float", "double", "big_decimal", "big_integer", "yes_no", "true_false" };
         String[] date_types = { "date" , "time" , "timestamp" };
-        String[] boolean_types = { "boolean" , "yes_no" , "true_false" };
+        String[] boolean_types = { "boolean" , "yes_no" , "true_false", "integer" };
         validTypesMap = new HashMap();
         validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass" , string_types);
         validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass" , string_types);
@@ -304,10 +304,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
          return;
         
         Configuration config = makeMapping(bclass.getName(), bclass.getCustomMapping());
-        if (isValidCustomMapping(bclass.getName(), config, bclass)==false) {
+        /* if (isValidCustomMapping(bclass.getName(), config, bclass)==false) {
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING,
                     "Cannot update schema for class " + bclass.getName() + " because of an invalid mapping");
-        }
+        } */
 
         String[] sql = getSchemaUpdateScript(config, context);
         updateSchema(sql, context);
@@ -974,7 +974,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
-            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
+            if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
                 // save object using the custom mapping
                 Map objmap = object.getMap();
                 handledProps = bclass.getCustomMappingPropertyList(context);
@@ -1075,12 +1075,20 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             List handledProps = new ArrayList();
-            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
-                handledProps = bclass.getCustomMappingPropertyList(context);
-                Session dynamicSession = session.getSession(EntityMode.MAP);
-                Object map = dynamicSession.load((String) bclass.getName(),new Integer(object.getId()));
-                bclass.fromValueMap((Map)map, object);
-            }
+            try {
+                if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
+                    Session dynamicSession = session.getSession(EntityMode.MAP);
+                    Object map = dynamicSession.load((String) bclass.getName(),new Integer(object.getId()));
+                    // Let's make sure to look for null fields in the dynamic mapping
+                    bclass.fromValueMap((Map)map, object);
+                    handledProps = bclass.getCustomMappingPropertyList(context);
+                    for (Iterator it = handledProps.iterator();it.hasNext();) {
+                        String prop = (String)it.next();
+                        if (((Map)map).get(prop)==null)
+                            handledProps.remove(prop);
+                    }
+                }
+            } catch (Exception e) {}
 
             if (!className.equals("internal")) {
                 HashMap map = new HashMap();
@@ -1091,6 +1099,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     Object obj = it.next();
                     Object[] result = (Object[]) obj;
                     String name = (String)result[0];
+                    // No need to load fields already loaded from
+                    // custom mapping
+                    if (handledProps.contains(name))
+                      continue;
                     String classType = (String)result[1];
                     BaseProperty property = (BaseProperty) Class.forName(classType).newInstance();
                     property.setObject(object);
@@ -1131,7 +1143,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             // Let's check if the class has a custom mapping
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
-            if ((bclass!=null)&&(bclass.getCustomMapping()!=null)&&(!bclass.getCustomMapping().equals(""))) {
+            if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 Object map = dynamicSession.get((String) bclass.getName(),new Integer(object.getId()));
@@ -1407,6 +1419,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
+
+            if (bclass.hasExternalCustomMapping())
+                setSessionFactory(injectCustomMappingsInSessionFactory(bclass, context));
+
         } catch (Exception e) {
             Object[] args = { bclass.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS,
@@ -2400,9 +2416,13 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        // If we haven't turned of dynamic custom mappings we should not inject them
+        if (context.getWiki().hasDynamicCustomMappings()==false)
+           return getSessionFactory();
+
         boolean result = injectCustomMappings(doc, context);
         if (result==false)
-            return null;
+            return getSessionFactory();
 
         Configuration config = getConfiguration();
         SessionFactoryImpl sfactory = (SessionFactoryImpl) config.buildSessionFactory();
@@ -2454,6 +2474,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public SessionFactory injectCustomMappingsInSessionFactory(XWikiContext context) throws XWikiException {
+        // If we haven't turned of dynamic custom mappings we should not inject them
+        if (context.getWiki().hasDynamicCustomMappings()==false)
+           return getSessionFactory();
+
         List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null",
                                     true, false, false, 0, 0, context);
         boolean result = false;
@@ -2471,6 +2495,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        // If we haven't turned of dynamic custom mappings we should not inject them
+        if (context.getWiki().hasDynamicCustomMappings()==false)
+           return false;
+
         boolean result = false;
         Iterator it = doc.getxWikiObjects().values().iterator();
         while (it.hasNext()) {
@@ -2486,9 +2514,13 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
     }
 
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException {
+        // If we haven't turned of dynamic custom mappings we should not inject them
+        if (context.getWiki().hasDynamicCustomMappings()==false)
+           return false;
+
         String custommapping = doc1class.getCustomMapping();
-        if ((custommapping==null)||(custommapping.equals("")))
-            return false;
+        if (!doc1class.hasExternalCustomMapping())
+           return false;
 
         Configuration config = getConfiguration();
 
@@ -2532,7 +2564,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     public List getCustomMappingPropertyList(BaseClass bclass) {
         List list = new ArrayList();
-        Configuration hibconfig = makeMapping(bclass.getName(), bclass.getCustomMapping());
+        Configuration hibconfig;
+        if (bclass.hasExternalCustomMapping())
+          hibconfig = makeMapping(bclass.getName(), bclass.getCustomMapping());
+        else
+          hibconfig = getConfiguration();
         PersistentClass mapping = hibconfig.getClassMapping(bclass.getName());
         if (mapping==null)
             return null;

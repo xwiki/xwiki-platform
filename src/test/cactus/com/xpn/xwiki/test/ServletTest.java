@@ -105,6 +105,17 @@ public abstract class ServletTest extends ServletTestCase {
         webRequest.setURL(host + ":9080", "/" + appname , "/testbin", "/" + action + "/Main/" + docname, query);
     }
 
+    public static void setSimpleUrl(WebRequest webRequest, String web, String docname, String query) {
+        webRequest.setURL("127.0.0.1:9080", "/xwiki", "", "/" + web + "/" + docname, query);
+    }
+
+    public static void setVerySimpleUrl(WebRequest webRequest, String web, String docname, String query) {
+        if (web.equals("Main"))
+            webRequest.setURL("127.0.0.1:9080", "/xwiki", "", "/" + docname, query);
+        else
+            webRequest.setURL("127.0.0.1:9080", "/xwiki", "", "/" + web + "/" + docname, query);
+    }
+
     public String getHibpath() {
         // Usefull in case we need to understand where we are
         String path = (new File(".")).getAbsolutePath();

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.cfg.Configuration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -324,6 +326,26 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         } finally {
             getXWiki().getHibernateStore().endTransaction(getXWikiContext(), false);
         }
+    }
+
+    public void testReadDeadlock() throws XWikiException, SQLException {
+        XWikiDocument doc1 = new XWikiDocument("Test", "HCMClass1");
+        Utils.prepareClass(doc1, "Test.HCMClass1");
+        getXWiki().saveDocument(doc1, getXWikiContext());
+
+        XWikiDocument doc2 = new XWikiDocument("Test", "HCMClass2");
+        Utils.prepareClass(doc1, "Test.HCMClass2");
+        getXWiki().saveDocument(doc2, getXWikiContext());
+
+        Utils.prepareObject(doc1, "Test.HCMClass2");
+        getXWiki().saveDocument(doc1, getXWikiContext());
+        Utils.prepareObject(doc2, "Test.HCMClass1");
+        getXWiki().saveDocument(doc2, getXWikiContext());
+
+        getXWiki().flushCache();
+        // This should not deadlock
+        System.out.println("BEGIN TEST");
+        getXWiki().getDocument("Test.HCMClass1", getXWikiContext());
     }
 
 }

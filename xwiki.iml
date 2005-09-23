@@ -149,6 +149,7 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web-test.xml" version="2.3" />
+    <deploymentDescriptor name="context.xml" url="file://$MODULE_DIR$/src/main/web/META-INF/context.xml" version="5.x" />
     <webroots>
       <root url="file://$MODULE_DIR$/src/main/web" relative="/" />
     </webroots>

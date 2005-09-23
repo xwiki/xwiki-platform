@@ -53,6 +53,8 @@ public class HibernateTestCase extends TestCase {
         this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
         this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
         this.config.put("xwiki.backlinks", "1");
+        this.config.put("xwiki.store.cache","1");
+        this.config.put("xwiki.store.cache.capacity", "100");
 
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");
@@ -164,6 +166,7 @@ public class HibernateTestCase extends TestCase {
             runSQL(hibstore, "delete from xwikidateclasses", context);
             runSQL(hibstore, "delete from xwikistringclasses", context);
             runSQL(hibstore, "delete from xwikidblistclasses", context);
+            runSQL(hibstore, "delete from xwikiextlistclasses", context);
             runSQL(hibstore, "delete from xwikiclassesprop", context);
             runSQL(hibstore, "delete from xwikiclasses", context);
             runSQL(hibstore, "delete from xwikidates", context);

@@ -109,11 +109,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
@@ -280,7 +276,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 String uri = request.getRequestURI();
                 int i1 = host.indexOf(".");
                 String servername = (i1 != -1) ? host.substring(0, i1) : host;
-                appname = uri.substring(1, uri.indexOf("/", 2));
+
+                XWikiURLFactory urlf = context.getURLFactory();
+                if ((urlf!=null)&&(urlf instanceof XWikiServletURLFactory)
+                        &&("".equals(((XWikiServletURLFactory)urlf).getServletPath())))
+                    appname = "xwiki";
+                else
+                    appname = uri.substring(1, uri.indexOf("/", 2));
+
                 if ("0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
                     appname = servername;
                 } else {
@@ -685,10 +688,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public XWikiDocument getDocumentFromPath(String path, XWikiContext context) throws XWikiException {
         String web, name;
-        int i1 = path.indexOf("/", 1);
-        int i2 = path.indexOf("/", i1 + 1);
+        int i1 = 0;
+        int i2;
+        if (StringUtils.countMatches(path, "/")>2)
+         i1 = path.indexOf("/", 1);
+
+        if (StringUtils.countMatches(path, "/")>1) {
+         i2 = path.indexOf("/", i1 + 1);
+         web = path.substring(i1 + 1, i2);
+        }
+        else {
+            i2 = 0;
+            web = context.getWiki().getDefaultWeb(context);
+        }
         int i3 = path.indexOf("/", i2 + 1);
-        web = path.substring(i1 + 1, i2);
         if (i3 == -1)
             name = path.substring(i2 + 1);
         else
@@ -1435,6 +1448,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return bclass;
 
         bclass.setName("XWiki.XWikiPreferences");
+        bclass.setCustomMapping("internal");
 
         needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
         needsUpdate |= bclass.addTextField("language", "Language", 5);
@@ -3208,7 +3222,40 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return true;
         if ("0".equals(bl))
             return false;
-        return "1".equals(Param("xwiki.backlinks"));
+        return "1".equals(Param("xwiki.backlinks", "0"));
+    }
+
+    public boolean hasCustomMappings() {
+        return "1".equals(Param("xwiki.store.hibernate.custommapping", "1"));
+    }
+
+    public boolean hasDynamicCustomMappings() {
+        return "1".equals(Param("xwiki.store.hibernate.custommapping.dynamic", "0"));
+    }
+
+    public String getDefaultWeb(XWikiContext context) {
+        String dweb = getXWikiPreference("defaultweb", "", context);
+        if ("".equals(dweb))
+            return Param("xwiki.defaultweb", "Main");
+        else
+            return dweb;
+    }
+
+    public boolean useDefaultWeb(XWikiContext context) {
+        String bl = getXWikiPreference("usedefaultweb", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.usedefaultweb", "0"));
+    }
+
+    public String getDefaultPage(XWikiContext context) {
+        String dweb = getXWikiPreference("defaultpage", "", context);
+        if ("".equals(dweb))
+            return Param("xwiki.defaultpage", "WebHome");
+        else
+            return dweb;
     }
 
     public XWikiDocument renamePage (XWikiDocument doc, XWikiContext context, String newFullName) throws XWikiException {

@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.XWikiContext;
 
 public class BooleanMetaClass extends PropertyMetaClass {
 
@@ -40,7 +41,7 @@ public class BooleanMetaClass extends PropertyMetaClass {
         safeput("displayType", type_class);
     }
 
-    public BaseCollection newObject() {
+    public BaseCollection newObject(XWikiContext context) {
         return new BooleanClass();
     }
 

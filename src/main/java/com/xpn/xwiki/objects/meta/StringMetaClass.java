@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.XWikiContext;
 
 public class StringMetaClass extends PropertyMetaClass {
 
@@ -42,7 +43,7 @@ public class StringMetaClass extends PropertyMetaClass {
     safeput("size", size_class);
   }
 
-    public BaseCollection newObject() {
+    public BaseCollection newObject(XWikiContext context) {
           return new StringClass();
     }
 }

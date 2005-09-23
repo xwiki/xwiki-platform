@@ -28,7 +28,7 @@ public class PropAddAction extends XWikiAction {
             MetaClass mclass = xwiki.getMetaclass();
             PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
             if (pmclass!=null) {
-                PropertyClass pclass = (PropertyClass) pmclass.newObject();
+                PropertyClass pclass = (PropertyClass) pmclass.newObject(context);
                 pclass.setObject(bclass);
                 pclass.setName(propName);
                 pclass.setPrettyName(propName);

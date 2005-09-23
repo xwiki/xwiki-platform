@@ -25,6 +25,7 @@ package com.xpn.xwiki.api;
 import java.util.Iterator;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -61,8 +62,8 @@ public class Class extends Collection {
          return null;
     }
 
-    public Object newObject() {
-        return new Object((BaseObject)getBaseClass().newObject(), context);
+    public Object newObject() throws XWikiException {
+        return new Object((BaseObject)getBaseClass().newObject(context), context);
     }
 
 }

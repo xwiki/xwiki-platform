@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.XWikiContext;
 
 public class DBListMetaClass extends ListMetaClass {
 
@@ -41,7 +42,7 @@ public class DBListMetaClass extends ListMetaClass {
         safeput("sql", sql_class);
     }
 
-    public BaseCollection newObject() {
+    public BaseCollection newObject(XWikiContext context) {
         return new DBListClass();
     }
 }

@@ -26,6 +26,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.XWikiContext;
 
 public class DateMetaClass extends PropertyMetaClass {
 
@@ -57,7 +58,7 @@ public class DateMetaClass extends PropertyMetaClass {
     safeput("dateFormat", dateformat_class);
   }
 
-  public BaseCollection newObject() {
+  public BaseCollection newObject(XWikiContext context) {
         return new DateClass();
   }
 }

@@ -979,7 +979,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 Map objmap = object.getMap();
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
-                dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
+                query = session.createQuery("select obj.id from " + bclass.getName() + " as obj where obj.id = :id");
+                query.setInteger("id", object.getId());
+                if (query.uniqueResult()==null)
+                    dynamicSession.save((String) bclass.getName(), objmap);
+                else
+                    dynamicSession.update((String) bclass.getName(), objmap);
             }
 
             if (!object.getClassName().equals("internal")) {

@@ -1835,7 +1835,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 return -3;
             }
 
-            BaseObject newobject = (BaseObject) baseclass.fromMap(map);
+            BaseObject newobject = (BaseObject) baseclass.fromMap(map, context);
             newobject.setName(fullwikiname);
             doc.addObject(baseclass.getName(), newobject);
             doc.setParent(parent);
@@ -1866,7 +1866,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
 
-        BaseObject memberobj = (BaseObject) gclass.newObject();
+        BaseObject memberobj = (BaseObject) gclass.newObject(context);
         memberobj.setClassName(gclass.getName());
         memberobj.setName(allgroupdoc.getFullName());
         memberobj.setStringValue("member", fullwikiname);
@@ -1888,7 +1888,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc) throws XWikiException {
         BaseClass rclass = getRightsClass(context);
         // Add protection to the page
-        BaseObject newrightsobject = (BaseObject) rclass.newObject();
+        BaseObject newrightsobject = (BaseObject) rclass.newObject(context);
         newrightsobject.setClassName(rclass.getName());
         newrightsobject.setName(fullwikiname);
         newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
@@ -1896,7 +1896,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         newrightsobject.setIntValue("allow", 1);
         doc.addObject(rclass.getName(), newrightsobject);
 
-        BaseObject newuserrightsobject = (BaseObject) rclass.newObject();
+        BaseObject newuserrightsobject = (BaseObject) rclass.newObject(context);
         newuserrightsobject.setClassName(rclass.getName());
         newuserrightsobject.setName(fullwikiname);
         newuserrightsobject.setStringValue("users", fullwikiname);

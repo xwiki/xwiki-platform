@@ -68,14 +68,14 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return null;  //To change body of implemented methods use Options | File Templates.
     }
 
-    public BaseCollection newObject() {
-        BaseObject bobj = new BaseObject();
+    public BaseCollection newObject(XWikiContext context) throws XWikiException {
+        BaseObject bobj = newCustomClassInstance(context);
         bobj.setClassName(getName());
         return bobj;
     }
 
-    public BaseCollection fromMap(Map map) {
-        BaseCollection object = newObject();
+    public BaseCollection fromMap(Map map, XWikiContext context) throws XWikiException {
+        BaseCollection object = newObject(context);
         return fromMap(map, object);
     }
 
@@ -257,10 +257,14 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public boolean addDateField(String fieldName, String fieldPrettyName) {
-        return addDateField(fieldName, fieldPrettyName, null);
+        return addDateField(fieldName, fieldPrettyName, null, 1);
     }
 
     public boolean addDateField(String fieldName, String fieldPrettyName, String dformat) {
+        return addDateField(fieldName, fieldPrettyName, dformat, 1);
+    }
+
+    public boolean addDateField(String fieldName, String fieldPrettyName, String dformat, int emptyIsToday) {
         if (get(fieldName)==null) {
             DateClass date_class = new DateClass();
             date_class.setName(fieldName);
@@ -268,6 +272,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             if (dformat!=null)
                 date_class.setDateFormat(dformat);
             date_class.setObject(this);
+            date_class.setEmptyIsToday(emptyIsToday);
             put(fieldName, date_class);
             return true;
         }

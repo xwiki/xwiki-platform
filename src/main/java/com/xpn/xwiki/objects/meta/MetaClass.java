@@ -27,6 +27,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.XWikiContext;
 
 public class MetaClass extends BaseClass {
 
@@ -79,7 +80,7 @@ public class MetaClass extends BaseClass {
         MetaClass.metaClass = metaClass;
     }
 
-    public BaseCollection newObject() {
+    public BaseCollection newObject(XWikiContext context) {
         return new BaseClass();
     }
 

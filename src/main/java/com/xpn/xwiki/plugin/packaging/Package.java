@@ -406,7 +406,9 @@ public class Package {
                     // let's log the error but not stop
                     result = DocumentInfo.INSTALL_ERROR;
                     if (log.isErrorEnabled())
-                     log.error("Failed to delete document " + deleteddoc.getFullName(), e);
+                     log.error("Failed to delete document " + deleteddoc.getFullName());
+                    if (log.isDebugEnabled())
+                     log.debug("Failed to delete document " + deleteddoc.getFullName(), e);
                 }
             }
             try {
@@ -421,7 +423,9 @@ public class Package {
                 doc.getDoc().saveAllAttachments(context);
             } catch (XWikiException e) {
                 if (log.isErrorEnabled())
-                 log.error("Failed to save document " + doc.getFullName(), e);
+                 log.error("Failed to save document " + doc.getFullName());
+                if (log.isDebugEnabled())
+                 log.debug("Failed to save document " + doc.getFullName(), e);
                 result = DocumentInfo.INSTALL_ERROR;
             }
         }

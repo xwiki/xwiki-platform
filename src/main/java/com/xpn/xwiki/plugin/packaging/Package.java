@@ -383,6 +383,8 @@ public class Package {
     }
 
     private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
+        int result = DocumentInfo.INSTALL_OK;
+
         if (log.isDebugEnabled())
          log.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
 
@@ -398,7 +400,14 @@ public class Package {
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST)
             {
                 XWikiDocument deleteddoc = context.getWiki().getDocument(doc.getFullName(), context);
-                context.getWiki().deleteDocument(deleteddoc, context);        
+                try {
+                context.getWiki().deleteDocument(deleteddoc, context);
+                } catch (Exception e) {
+                    // let's log the error but not stop
+                    result = DocumentInfo.INSTALL_ERROR;
+                    if (log.isErrorEnabled())
+                     log.error("Failed to delete document " + deleteddoc.getFullName(), e);
+                }
             }
             try {
                 if (!backupPack)
@@ -411,11 +420,12 @@ public class Package {
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
             } catch (XWikiException e) {
-                e.printStackTrace();
-                return DocumentInfo.INSTALL_ERROR;
+                if (log.isErrorEnabled())
+                 log.error("Failed to save document " + doc.getFullName(), e);
+                result = DocumentInfo.INSTALL_ERROR;
             }
         }
-        return DocumentInfo.INSTALL_OK;
+        return result;
     }
 
 

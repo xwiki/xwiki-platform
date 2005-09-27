@@ -25,11 +25,14 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -37,6 +40,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -45,6 +49,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 /**
@@ -85,16 +90,21 @@ public abstract class XWikiAction extends Action
 //        String action = mapping.getName();
 
         MonitorPlugin monitor = null;
+        FileUploadPlugin fileupload = null;
+        XWikiContext context = null;
         try {
             XWikiRequest request = new XWikiServletRequest(req);
             XWikiResponse response = new XWikiServletResponse(resp);
-            XWikiContext context = Utils.prepareContext(mapping.getName(), request, response,
+            context = Utils.prepareContext(mapping.getName(), request, response,
             		new XWikiServletContext(servlet.getServletContext()));
 
             // Add the form to the context
             context.setForm((XWikiForm) form);
             XWiki xwiki = XWiki.getXWiki(context);
             
+            // Parses multipart so that parms in multipart are available for all actions
+            fileupload = handleMultipart(req, context);
+
             XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
 
@@ -195,11 +205,44 @@ public abstract class XWikiAction extends Action
             // End request
             if (monitor!=null)
                 monitor.endRequest();
+            if (fileupload!=null)
+                fileupload.cleanFileList(context);
  
             MDC.remove("url");
         }
     }
     
+    private FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context)
+    {
+        FileUploadPlugin fileupload = null;
+        try
+        {
+            if (request instanceof MultipartRequestWrapper)
+            {
+                fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
+                fileupload.loadFileList(context);
+                context.put("fileuploadplugin", fileupload);
+                MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
+                List fileItems = fileupload.getFileItems(context);
+                for (Iterator iter = fileItems.iterator(); iter.hasNext();)
+                {
+                    FileItem item = (FileItem) iter.next();
+                    if (item.isFormField())
+                    {
+                        String sName = item.getFieldName();
+                        String sValue = item.getString();
+                        mpreq.setParameter(sName, sValue);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return fileupload;
+    }
+
     public String getRealPath(String path) {
         return servlet.getServletContext().getRealPath(path);
     }

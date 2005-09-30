@@ -26,8 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.core.query.QueryRootNode;
+import org.apache.jackrabbit.name.QName;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -35,6 +35,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjPropProperty;
+import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /** Security version of HibernateQuery */
@@ -52,17 +54,44 @@ public class SecHibernateQuery extends HibernateQuery {
 				sb.append(" and ");
 			else
 				sb.append(" where ");
-			sb.append("doc.id in (:secdocids)"); // TODO: secdocids is reserved word of query api.
+			String docname = translator.getLastNameClass(qn_xwiki_document);
+			if (docname==null)
+				throw new TranslateException("To be implemented!"); // TODO:do
+			sb.append(docname).append(".id in (:secdocids)"); // TODO: secdocids is reserved parametr.
 			_addHqlParam("secdocids", _allowdocs);
-			/*String comma = "";
-			for (Iterator iter = _allowdocs.iterator(); iter.hasNext();) {
-				Long element = (Long) iter.next();
-				sb.append(comma).append(element.toString());
-				comma = ",";
-			}
-			sb.append(")");*/
 			return true;
-		} else return r;		
+		} else return r;
+	}
+
+	Set isReturnClasses = new HashSet();
+	boolean isQueryRight = false;
+	boolean isViewRight = false;
+	boolean isAllow = true;
+	protected void _addSelect(ObjProperty p) {
+		super._addSelect(p);
+		if (ObjProperty.class.equals(p.getClass())) {
+			isReturnClasses.add(p.objclass);				
+		}
+		if (ObjPropProperty.class.equals(p.getClass())) {
+			ObjPropProperty p1 = (ObjPropProperty) p;
+			if (XWikiDocument.class.equals(p1.objclass)) {
+				if ("name".equals(p1.propname) || "fullName".equals(p1.propname))
+					isViewRight = true;
+				else
+					isQueryRight = true;
+			} else if (BaseObject.class.equals(p1.objclass)) {
+				if ("name".equals(p1.propname))
+					isViewRight = true;
+				else
+					isQueryRight = true;
+			}
+		} else
+			isQueryRight = true;
+	}
+	protected void _addPropClass(Class class1) {
+		super._addPropClass(class1);
+		if (PasswordClass.class.equals(class1))
+			isAllow = false;
 	}
 	
 	public List list() throws XWikiException {
@@ -70,20 +99,33 @@ public class SecHibernateQuery extends HibernateQuery {
 			translator = new XWikiHibernateQueryTranslator(getQueryTree());
 		if (!isAllowed())
 			throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Access denied for query");
-		final XWikiRightService rightserv = getContext().getWiki().getRightService();		
+		final XWikiRightService rightserv = getContext().getWiki().getRightService();
 		final List rights = getNeededRight();
 		final String user = getContext().getUser();
 		
-		final SepStringBuffer _real_select = _select;
-		_allowdocs.clear();
+		final SepStringBuffer _real_select = _select;		
 		try {
-			_select = new SepStringBuffer("doc", null);
-			List doclst = null;
-		
+			_allowdocs.clear();
+			String docname = translator.getLastNameClass(qn_xwiki_document);
+			if (docname==null) {
+				QName lclass = translator.getLastQNClass();
+				if (qn_xwiki_object.equals(lclass)) {
+					final String objname = translator.getLastNameClass(lclass); 
+					docname = translator.newXWikiObj(qn_xwiki_document);
+					_where.appendWithSep(docname).append(".fullName=").append(objname).append(".name");
+				} else if (qn_xwiki_attachment.equals(lclass)) {
+					final String attname = translator.getLastNameClass(lclass); 
+					docname = translator.newXWikiObj(qn_xwiki_document);
+					_where.appendWithSep(docname).append(".id=").append(attname).append(".docId");
+				} else
+					throw new TranslateException("Class not exist");
+			}
+			_select = new SepStringBuffer(docname, null);
+			
 			security = false;
 			int fr = _firstResult; _firstResult = -1;
 			int fs = _fetchSize; _fetchSize = -1;
-			doclst = super.list();
+			final List doclst = super.list();
 			_firstResult = fr;
 			_fetchSize = fs;
 			for (Iterator iter = doclst.iterator(); iter.hasNext();) {
@@ -92,6 +134,8 @@ public class SecHibernateQuery extends HibernateQuery {
 					boolean r = true;
 					for (int i=0; i<rights.size(); i++) {
 						r &= rightserv.hasAccessLevel((String) rights.get(i), user, element.getFullName(), getContext());
+						if (!r)
+							break;
 					}
 					if (r)
 						_allowdocs.add(new Long(element.getId()));
@@ -104,8 +148,7 @@ public class SecHibernateQuery extends HibernateQuery {
 		security = true;
 		
 		final List lst = super.list();
-		String sel = _select.toString();
-		if (!sel.equals("doc") && !sel.equals("obj"))
+		if (!isReturnClasses.contains(jcl_xwiki_classes.get(qn_xwiki_object)) && !isReturnClasses.contains(jcl_xwiki_classes.get(qn_xwiki_document)))
 			return lst;
 		// wrapping
 		final List result = new ArrayList();
@@ -126,35 +169,15 @@ public class SecHibernateQuery extends HibernateQuery {
 		}
 		return result;
 	}
-	static Set _viewRight = new HashSet();
-	static {
-		_viewRight.add("doc.name");
-		_viewRight.add("doc.fullname");
-		_viewRight.add("obj.name");
-	}
 	public List getNeededRight() {
-		if (translator==null)
-			translator = new XWikiHibernateQueryTranslator(getQueryTree());
-		boolean bview = false;
-		boolean bquery = false;
-		final String[] sels = StringUtils.split(_select.toString().toLowerCase()," ,");
-		for (int i=0; i<sels.length; i++) {
-			final String sel = sels[i];
-			if (_viewRight.contains(sel))
-				bview = true;
-			else
-				bquery = true;
-		}
 		final List r = new ArrayList(2);
-		if (bview)
+		if (isViewRight)
 			r.add("view");
-		if (bquery)
+		if (isQueryRight)
 			r.add("query");
 		return r;
 	}
 	public boolean isAllowed() {
-		if (translator==null)
-			translator = new XWikiHibernateQueryTranslator(getQueryTree());
-		return !translator._propclass.contains(PasswordClass.class);
-	}
+		return isAllow;
+	}	
 }

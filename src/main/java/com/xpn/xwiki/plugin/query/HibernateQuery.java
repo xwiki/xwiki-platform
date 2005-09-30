@@ -23,16 +23,15 @@ package com.xpn.xwiki.plugin.query;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.core.query.AndQueryNode;
+import org.apache.jackrabbit.core.query.DefaultQueryNodeVisitor;
 import org.apache.jackrabbit.core.query.DerefQueryNode;
 import org.apache.jackrabbit.core.query.ExactQueryNode;
 import org.apache.jackrabbit.core.query.LocationStepQueryNode;
@@ -54,11 +53,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 
@@ -66,12 +68,9 @@ import com.xpn.xwiki.util.Util;
 public class HibernateQuery extends DefaultQuery {
 	private static final Log log = LogFactory.getLog(HibernateQuery.class);
 	
-	//protected XWikiHibernateStore			hbstore;
 	protected XWikiHibernateQueryTranslator translator;
 	public HibernateQuery(QueryRootNode tree, IQueryFactory qf) {
 		super(tree, qf);
-		//this.hbstore = getContext().getWiki().getHibernateStore();
-		//translator = new XWikiHibernateQueryTranslator( getQueryTree() );
 	}
 	public XWikiHibernateStore getHibernateStore() {
 		return (XWikiHibernateStore) getContext().getWiki().getHibernateStore();
@@ -116,13 +115,46 @@ public class HibernateQuery extends DefaultQuery {
 	protected SepStringBuffer	_where		= new SepStringBuffer(" and ");
 	protected SepStringBuffer	_userwhere	= new SepStringBuffer(" and ");
 	protected SepStringBuffer	_order		= new SepStringBuffer(",");
-	protected String		 	_mainobj	= null;
-	protected String		 	_classname	= null;
+	
+	protected void _addSelect(ObjProperty p) {		
+		_select.appendWithSep(p.getHqlName());
+	}
+	protected void _addPropClass(Class class1) {} // used in SecHibernateQuery
+		
+	static QName fromJCRName(String s) {
+		try {
+			return QName.fromJCRName(s, XWikiNamespaceResolver.getInstance());
+		} catch (Throwable e) {
+			throw new TranslateException("unknown name:"+s, e);
+		}
+	}
+	// jcr class constants
+	static final QName	qn_xwiki_document	= fromJCRName("xwiki:document");
+	static final QName	qn_xwiki_object		= fromJCRName("xwiki:object");
+	static final QName	qn_xwiki_attachment	= fromJCRName("xwiki:attachment");
+	static final QName	qn_property			= fromJCRName("property");
+	static final QName	qn_flexproperty		= fromJCRName("f:property");
+	/** Abridgement of jcr classes */
+	static final Map	abr_xwiki_classes	= new HashMap();
+	/** Mapping of jcr classes to Hibernate classes */
+	static final Map	hbn_xwiki_classes	= new HashMap();
+	static final Map	jcl_xwiki_classes	= new HashMap();
+	static {
+		abr_xwiki_classes.put(fromJCRName("doc"),		qn_xwiki_document);
+		abr_xwiki_classes.put(fromJCRName("obj"),		qn_xwiki_object);
+		abr_xwiki_classes.put(fromJCRName("attach"),	qn_xwiki_attachment);
+		hbn_xwiki_classes.put(qn_xwiki_document,		"XWikiDocument");
+		hbn_xwiki_classes.put(qn_xwiki_object,			"BaseObject");
+		hbn_xwiki_classes.put(qn_xwiki_attachment,		"XWikiAttachment");
+		jcl_xwiki_classes.put(qn_xwiki_document,		XWikiDocument.class);
+		jcl_xwiki_classes.put(qn_xwiki_object,			BaseObject.class);
+		jcl_xwiki_classes.put(qn_xwiki_attachment,		XWikiAttachment.class);
+	}
 	
 	protected class XWikiHibernateQueryTranslator implements QueryNodeVisitor {
 		XWikiHibernateQueryTranslator(QueryNode node) {
 			super();
-			node.accept(this, null);			
+			node.accept(this, null);
 		}
 
 		public Object visit(QueryRootNode node, Object data) {
@@ -130,34 +162,223 @@ public class HibernateQuery extends DefaultQuery {
 	        traverse(node.getLocationNode(), data);
 	        // order by
 	        OrderQueryNode order = node.getOrderNode();
+	        QName mainclass = getLastQNClass();
+	        String mainobj = getLastNameClass(mainclass);
+	        Object[] args = new Object[]{mainobj, mainclass};
 	        if (order != null) {
-	            traverse(order, _mainobj);
+	            traverse(order, args);
 	        }
 	        QName[] select = node.getSelectProperties();
-	        if (n2e(_mainobj).equals(""))
+	        if (n2e(mainobj).equals(""))
 				throw new TranslateException("what object?");
 	        if (_isdistinct)
 				_select.append("distinct ");
 			if (select.length>0) {
 				for (int i=0; i<select.length; i++) {
 					final QName sel = select[i];
-					final String hqlpropname = getProp(sel, _mainobj);
-					_select.appendSeparator().append(hqlpropname);
+					final ObjProperty prop = getProp(sel, mainobj, mainclass);					 
+					_addSelect(prop);					
 				}
 			} else {
-				_select.append(_mainobj);
+				_addSelect(new ObjProperty(mainobj, (Class) jcl_xwiki_classes.get(mainclass)));
 			}
-			/*if (_isdistinct)
-				_select.append(")");*/
 	        return data;
 		}
 		
-		private Object NAryVisit(NAryQueryNode node, Object data, String operand) {
-			if (data==null) {
+		public Object visit(PathQueryNode node, Object data) {
+			final QueryNode[] ps = (QueryNode[]) node.getOperands();
+			if (ps.length < 1)
+				throw new TranslateException("path must be");
+			
+			final QName[] nodesclass = new QName[ps.length];
+			final boolean[] nodeflag = new boolean[ps.length];
+			// get types
+			for (int i=0; i<ps.length; i++) {
+				final int ind = i;
+				final LocationStepQueryNode lsqn = (LocationStepQueryNode) ps[i];
+				lsqn.acceptOperands(new DefaultQueryNodeVisitor() {
+					public Object visit(AndQueryNode arg0, Object arg1) {
+						final QueryNode[] qns = arg0.getOperands();
+						for (int i=0; i<qns.length; i++)
+							qns[i].accept(this, arg1);
+						return null;
+					}
+					public Object visit(NodeTypeQueryNode node, Object data) {
+						nodesclass[ind] = node.getValue();
+						return super.visit(node, data);
+					}
+				}, null);
+			}
+			for (int i=0; i<ps.length; i++) {
+				final LocationStepQueryNode lsqn = (LocationStepQueryNode) ps[i];
+				QName qn = lsqn.getNameTest();
+				QName xwcl = (QName) abr_xwiki_classes.get(qn);
+				if (ps.length-i>=2 && qn_xwiki_attachment.equals(xwcl) && !((LocationStepQueryNode)ps[i+1]).getIncludeDescendants()
+						&& nodesclass[i]==null && nodesclass[i+1]==null) {				
+					final NodeTypeQueryNode ntqn = new NodeTypeQueryNode(ps[i+1], xwcl);
+					nodesclass[i+1] = ntqn.getValue();
+					((LocationStepQueryNode)ps[i+1]).addOperand( ntqn );
+					nodeflag[i]=true;
+					nodeflag[i+1]=true;
+				}
+				if (ps.length-i>=3 && xwcl!=null && !((LocationStepQueryNode)ps[i+1]).getIncludeDescendants() 
+						&& !((LocationStepQueryNode)ps[i+2]).getIncludeDescendants()
+						&& nodesclass[i]==null && nodesclass[i+1]==null && nodesclass[i+2]==null) {					
+					final NodeTypeQueryNode ntqn = new NodeTypeQueryNode(ps[i+2], xwcl);
+					nodesclass[i+2] = ntqn.getValue();
+					((LocationStepQueryNode)ps[i+2]).addOperand( ntqn );
+					nodeflag[i]=true;
+					nodeflag[i+1]=true;
+					nodeflag[i+2]=true;
+				}
+				if (ps.length-i>=2 && !nodeflag[i] && !nodeflag[i+1] && !((LocationStepQueryNode)ps[i+1]).getIncludeDescendants() 
+						&& nodesclass[i]==null && nodesclass[i+1]==null) {
+					final NodeTypeQueryNode ntqn = new NodeTypeQueryNode(ps[i+1], qn_xwiki_document); 
+					nodesclass[i+1] = ntqn.getValue();
+					((LocationStepQueryNode)ps[i+1]).addOperand( ntqn );
+					nodeflag[i]=true;
+					nodeflag[i+1]=true;
+				}
+			}
+			
+			// name[&space] in objects,docs,attachs
+			for (int i=0; i<ps.length; i++) {
+				final LocationStepQueryNode lsqn = (LocationStepQueryNode) ps[i];
+				final QName qncl = nodesclass[i];
+				final QName qname  = lsqn.getNameTest(); // get name
+				if (qname!=null && !"".equals(qname.getNamespaceURI()))
+					continue;
+				if (qn_xwiki_attachment.equals(qncl) && qname!=null) {
+					lsqn.addPredicate( new RelationQueryNode(
+						lsqn, fromJCRName("filename"), qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+					));
+				}
+				if (qncl!=null ) { // space
+					QName qspace = null;
+					if (i>0 && nodesclass[i-1]==null)
+						qspace = ((LocationStepQueryNode)ps[i-1]).getNameTest(); // get space					
+					if (qspace !=null && !"".equals(qspace.getNamespaceURI()))
+						continue;
+					if (qn_xwiki_document.equals(qncl)) {
+						if (qspace!=null)
+							lsqn.addPredicate( new RelationQueryNode(
+									lsqn, fromJCRName("web"), qspace.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+							));
+						if (qname!=null)
+							lsqn.addPredicate( new RelationQueryNode(
+									lsqn, fromJCRName("name"), qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+							));
+					} else if (qn_xwiki_object.equals(qncl)) {
+						final RelationQueryNode rqn = getXWikiQNameRelation(lsqn, "className", qspace, qname);
+						if (rqn!=null)
+							lsqn.addPredicate( rqn );
+						if (qspace!=null && qname!=null)
+							_objClassName.put(lsqn, qspace.getLocalName()+"."+qname.getLocalName());
+					}
+				}
+				if (qn_xwiki_object.equals(qncl)) {
+					final QName qnpClassName = fromJCRName("className");
+					lsqn.acceptOperands(new DefaultQueryNodeVisitor() {
+						public Object visit(AndQueryNode node, Object data) {
+							final QueryNode[] qns = node.getOperands();
+							for (int i=0; i<qns.length; i++)
+								qns[i].accept(this, data);
+							return null;
+						}
+						public Object visit(RelationQueryNode arg0, Object arg1) {
+							if (qnpClassName.equals(arg0.getProperty()))
+								_objClassName.put(lsqn, arg0.getStringValue());
+							return null;
+						}
+					}, null);
+				}
+			}
+			
+			String lastobj  = null;
+			QName lastclass = null;
+			for (int i=0; i<ps.length; i++) {
+				final LocationStepQueryNode lsqn = (LocationStepQueryNode) ps[i];
+				final QName qncl = nodesclass[i];
+				if (qncl==null) continue;
+				final Object[] res = (Object[]) traverse(lsqn, new Object[]{"",  qncl, lastobj, lastclass});
+				lastobj = (String) res[0];
+				lastclass = qncl;
+			}
+
+			return data;
+		}
+		/** @param data - Object[]{String curname="", QName curclass, String ParentName, QName ParentClass } */
+		public Object visit(LocationStepQueryNode node, Object data) {
+			final Object[] args = (Object[]) data;
+			QName qclass = (QName) args[1];
+			String parentname = (String) args[2];
+			QName parentclass = (QName) args[3];
+			
+			String objname = newXWikiObj(qclass);
+			args[0] = objname;
+			if (qn_xwiki_object.equals(qclass)) {
+				final String s = (String) _objClassName.get(node);
+				_objClassName.remove(node);
+				_objClassName.put(objname, s);
+			}
+			if (parentclass!=null) {
+				if (!qn_xwiki_document.equals(parentclass))
+					throw new TranslateException("Only xwiki:document have childrens");
+				if (qn_xwiki_attachment.equals(qclass)) {
+					_where.appendWithSep(objname).append(".docId=").append(parentname).append(".id");
+				} else if (qn_xwiki_object.equals(qclass)) {
+					_where.appendWithSep(objname).append(".name=").append(parentname).append(".fullName");					
+				} else if (qn_xwiki_document.equals(qclass)) {
+					_where.appendWithSep(objname).append(".parent=").append(parentname).append(".fullName");
+				}
+			}
+			
+			traverse(node.getOperands(), data);
+			return data;
+		}
+		
+		Map nameQueue = new HashMap();
+		QName _lastClass = null;
+		private String newNameClass(QName qn) {
+			if (hbn_xwiki_classes.get(qn)!=null)
+				_lastClass = qn;
+			Integer n = (Integer) nameQueue.get(qn);
+			if (n==null) {
+				nameQueue.put(qn, new Integer(0));
+				return qn.getLocalName() + "0";
+			} else {
+				n = new Integer(n.intValue()+1);
+				nameQueue.put(qn, n);
+				return qn.getLocalName() + n;
+			}
+		}
+		protected QName getLastQNClass() {
+			return _lastClass;
+		}
+		protected String getLastNameClass(QName qn) {
+			Integer n = (Integer) nameQueue.get(qn);
+			if (n==null)
+				return null; // class not used yet
+			return qn.getLocalName() + n;
+		}		
+		protected String newXWikiObj(QName qclass) {
+			String hbclass = (String) hbn_xwiki_classes.get(qclass);
+			if (hbclass==null)
+				throw new TranslateException("Class "+qclass+" is not found");
+			return newXWikiObj(qclass, hbclass);
+		}
+		protected String newXWikiObj(QName qname, String hbclass) {
+			String newobjname = newNameClass(qname); 
+			_from.appendWithSep(hbclass).append(" as ").append(newobjname);
+			return newobjname;
+		}
+		
+		private Object NAryVisit(NAryQueryNode node, Object data, String operand) {			
+			if (data==null)
 				throw new TranslateException("No object for relation");
-			}		
-			final String obj = (String) data;
 			boolean bracket = false;
+			if (node.getParent() instanceof LocationStepQueryNode)
+				_userwhere.appendSeparator();
 	        if (node.getParent() instanceof LocationStepQueryNode
 	                || node.getParent() instanceof AndQueryNode
 	                || node.getParent() instanceof NotQueryNode) {
@@ -170,13 +391,13 @@ public class HibernateQuery extends DefaultQuery {
 	        QueryNode[] operands = node.getOperands();
 	        for (int i = 0; i < operands.length; i++) {
 	        	_userwhere.append(or);
-	            traverse(operands[i], obj);
+	            traverse(operands[i], data);
 	            or = operand;
 	        }
 	        if (bracket) {
 	        	_userwhere.append(")");
 	        }
-	        return obj;
+	        return data;
 		}
 
 		public Object visit(OrQueryNode node, Object data) {
@@ -188,34 +409,34 @@ public class HibernateQuery extends DefaultQuery {
 		}
 
 		public Object visit(NotQueryNode node, Object data) {
-			if (data==null) {
-				throw new TranslateException("No object for relation");
-			}
-			final String obj = (String) data;
+			if (data==null)
+				throw new TranslateException("No object for relation");			
 			QueryNode[] operands = node.getOperands();
-			if (operands.length > 0) {				
-	            _userwhere.append(" NOT (");
-	            traverse(operands[0], obj);
+			if (node.getParent() instanceof LocationStepQueryNode)
+				_userwhere.appendSeparator();
+			String sep = "";
+			for (int i=0; i<operands.length; i++) {
+				_userwhere.append(sep);
+				_userwhere.append(" NOT (");
+	            traverse(operands[i], data);
 	            _userwhere.append(")");
-	        }
-			return obj;
+	            sep = "AND";
+			}
+			return data;
 		}
 
 		public Object visit(ExactQueryNode node, Object data) {
 			if (data==null) {
 				throw new TranslateException("No object for relation");			
 			}
-			//final String obj = (String) data;
-			throw new TranslateException("Not implemented");
-			/*final StringBuffer sb = (StringBuffer) data;
-			sb.append(" ");
-			sb.append(node.getPropertyName().toString());
-			sb.append("='").append( tosqlstring( node.getValue().toString() ) ).append("'");*/
-			//return obj;
+			throw new TranslateException("Not implemented. (That is it?)");
 		}
 
 		public Object visit(NodeTypeQueryNode node, Object data) {
-			throw new TranslateException("Not implemented");			
+			// This was handled in visit(PathQueryNode,..)
+			if (node.getParent() instanceof AndQueryNode)
+				_userwhere.append("(true=true)");
+			return data;
 		}
 
 		public Object visit(TextsearchQueryNode node, Object data) { // jcr:contain
@@ -223,114 +444,37 @@ public class HibernateQuery extends DefaultQuery {
 				throw new TranslateException("No object for relation");			
 			if (node.getPropertyName()==null)
 				throw new TranslateException("Full search is not implemented");
-			final String obj = (String) data;
-			final String hqlprop = getProp(node.getPropertyName(), obj);
-			int type = getPropType(node.getPropertyName(), obj);
+			final Object[] args = (Object[]) data;
+			final String obj = (String) args[0];
+			final QName objclass = (QName) args[1];
+			final ObjProperty prop = getProp(node.getPropertyName(), obj, objclass);			
+			int type = prop.getResultType();
+			if (node.getParent() instanceof LocationStepQueryNode)
+				_userwhere.appendSeparator();
 			if (type==TYPE_DEFAULT)
-				_userwhere.append(hqlprop).append(" LIKE ").append("'%").append(node.getQuery()).append("%'");
+				_userwhere.append(prop.getHqlName()).append(" LIKE ").append("'%").append(node.getQuery()).append("%'");
 			else if (type==TYPE_LIST)
-				_userwhere.append("'").append(node.getQuery()).append("'").append(" in elements(").append(hqlprop).append(")");
-			return obj;
-		}
-		
-		private String _getLocationNodeName(QueryNode p) {
-			QName qn = ((LocationStepQueryNode)p).getNameTest();
-			if (qn==null) return "*";
-			return tosqlstring( qn.getLocalName() );
-		}
-		public Object visit(PathQueryNode node, Object data) {
-			//final StringBuffer sb = (StringBuffer) data;
-			final QueryNode[] ps = node.getOperands();
-			if (ps.length < 1) {
-				throw new TranslateException("path must be");
-			}
-			final String sSpace = _getLocationNodeName(ps[0]);
-			if (ps.length==1) {
-				_addfrom("doc");
-				_mainobj = "doc.web";
-				_isdistinct = true;
-				traverse(ps[0], "doc.web");
-			} else {
-				if (!n2e(sSpace).equals("*")) {
-					_addfrom("doc");
-					_where.appendSeparator().append("doc.web='").append(sSpace).append("'");				
-				}
-				traverse(ps[0], "doc.web");
-				final String sDoc = _getLocationNodeName(ps[1]);
-				_addfrom("doc");
-				if (!sDoc.equals("*")) {
-					_where.appendSeparator().append("doc.name='").append(sDoc).append("'");
-				}
-				traverse(ps[1], "doc");
-				if (ps.length==2) {
-					_mainobj = "doc";
-				} else {
-					final String sProp = _getLocationNodeName(ps[2]);
-					if (sProp.equals("attach")) {
-						if (ps.length!=4) {
-							throw new TranslateException("node attach should be with ../attach/filename");						
-						}
-						final String sAttach = _getLocationNodeName(ps[3]);
-						_addfrom("attach");
-						_where.appendSeparator().append("attach.docId=doc.id");
-						if (!sAttach.equals("*")) {
-							_where.appendSeparator().append("attach.filename='").append(sAttach).append("'");
-						}
-						traverse(ps[2], null);
-						traverse(ps[3], "attach");
-						_mainobj = "attach";
-					} else if (sProp.equals("obj")) {
-						if (ps.length!=5) {
-							throw new TranslateException("node obj should be with .../obj/space/classname. Query of space not implemented");						
-						}
-						final String sClassSp	= _getLocationNodeName(ps[3]);
-						final String sClass		= _getLocationNodeName(ps[4]);
-						_addfrom("obj");
-						_where.appendSeparator().append("obj.name=doc.fullName");
-						boolean bcs = sClassSp.equals("*");
-						boolean bcn = sClass.equals("*");
-						if (bcs && !bcn) {
-							_where.appendSeparator().append("obj.className like '%.").append(sClass).append("\'");
-						} else if (!bcs && bcn) {
-							_where.appendSeparator().append("obj.className like '").append(sClassSp).append(".%'");
-						} else if (!bcs && !bcn) {
-							_where.appendSeparator().append("obj.className='").append(sClassSp).append(".").append(sClass).append("\'");
-						}
-						_classname = sClassSp+"."+sClass;
-						_objClassName.put("obj", _classname);
-						
-						traverse(ps[2], null);
-						traverse(ps[3], null);
-						_mainobj = "obj";
-						traverse(ps[4], "obj");
-					} else {
-						throw new TranslateException("Undefined node of document: "+sProp);
-					}
-				}
-			}
-			return data;
-		}
-
-		public Object visit(LocationStepQueryNode node, Object data) {
-			traverse(node.getOperands(), data);
+				_userwhere.append("'").append(node.getQuery()).append("'").append(" in elements(").append(prop.getHqlName()).append(")");
 			return data;
 		}
 		
 		public Object visit(RelationQueryNode node, Object data) {
-			if (data==null) {
+			if (data==null)
 				throw new TranslateException("No object for relation");
-			}
-			final String obj  = (String)data;
+			
+			final Object[] args = (Object[]) data;
+			final String obj = (String) args[0];
+			final QName objclass = (QName) args[1];
+			
 			final QName prop = node.getProperty();			
-			if (!(node.getParent() instanceof AndQueryNode)
-				&& !(node.getParent() instanceof OrQueryNode))
-					_userwhere.appendSeparator();
-			String sprop = getProp(prop, obj);
-			_userwhere.append(sprop);
+			if (node.getParent() instanceof LocationStepQueryNode)
+				_userwhere.appendSeparator();
+			final ObjProperty oprop = getProp(prop, obj, objclass);			
+			_userwhere.append(oprop.getHqlName());
 			int op = node.getOperation();
 			final String sop = (String) _mapOphql.get(new Integer(op));
 			_userwhere.append(sop);
-	        int vt = node.getValueType(); 
+	        int vt = node.getValueType();
 	        if (vt == QueryConstants.TYPE_DOUBLE) {
 	        	_userwhere.append(node.getDoubleValue());
 	        } else if (vt == QueryConstants.TYPE_LONG) {
@@ -348,11 +492,16 @@ public class HibernateQuery extends DefaultQuery {
 		}
 
 		public Object visit(OrderQueryNode node, Object data) {
-			final String obj = (String) data;
+			if (data==null)
+				throw new TranslateException("No object for relation");
+			final Object[] args = (Object[]) data;
+			final String obj = (String) args[0];
+			final QName objclass = (QName) args[1];
+			
 			final OrderQueryNode.OrderSpec[] specs = node.getOrderSpecs();
 	        for (int i = 0; i < specs.length; i++) {
-	        	final String sprop = getProp(specs[i].getProperty(), obj);	        	
-	        	_order.appendSeparator().append(sprop);
+	        	final ObjProperty oprop = getProp(specs[i].getProperty(), obj, objclass);
+	        	_order.appendSeparator().append(oprop.getHqlName());
 	        	if (!specs[i].isAscending())
 	        		_order.append(" DESC");
 	        }
@@ -371,47 +520,25 @@ public class HibernateQuery extends DefaultQuery {
 	        }
 	        indent --;
 	    }
-		private final void traverse(QueryNode node, Object buffer) {
+		private final Object traverse(QueryNode node, Object buffer) {			
 			indent ++;
-			node.accept(this, buffer);
+			final Object r = node.accept(this, buffer);
 			indent --;
-		}
-				
-		private Set _isfrom = new HashSet();
-		private void _addfrom(String sf) {
-			if (!_isfrom.contains(sf)) {
-				String scl = (String) _mapObjClass.get(sf);
-				if (scl==null)
-					throw new TranslateException("addfrom: Undefined object "+sf);
-				_from.appendSeparator().append(scl).append(" as ").append(sf);
-				_isfrom.add(sf);
-			}
-		}
-		Map ObjNumb = new HashMap();
-		Integer getNextObjNumb(String sf) {
-			if (ObjNumb.get(sf)==null) {
-				ObjNumb.put(sf, new Integer(1));
-			}
-			final Integer n = (Integer) ObjNumb.get(sf);		
-			ObjNumb.put(sf, new Integer(n.intValue()+1));
-			return n;
-		}
-		Set _fromclass = new HashSet();
-		private String _addnewfrom(String sf, String scl) {			
-			if (scl==null)
-				throw new TranslateException("addfrom: Undefined object "+scl);			
-			Integer n = getNextObjNumb(sf);
-			final String r = sf+n;
-			_from.appendSeparator().append(scl).append(" as ").append(r);
-			_fromclass.add(scl);
 			return r;
 		}
-		/*private String _addjoin(String what, String name) {
-			Integer n = getNextObjNumb(name);
-			final String r = name+n;
-			_from.append(" join ").append(what).append(" ").append(r);
-			return r;
-		}*/
+		
+		private RelationQueryNode getXWikiQNameRelation(LocationStepQueryNode par, String prop, QName qspace, QName qname) {
+			if (qspace==null && qname==null) {
+				return null;
+			} else if (qspace!=null && qname!=null) {
+				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+"."+qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL);
+			} else if (qspace!=null && qname==null) {
+				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+".%", RelationQueryNode.OPERATION_LIKE);
+			} else if (qspace==null && qname!=null) {
+				return new RelationQueryNode(par, fromJCRName(prop), "%."+qname.getLocalName(), RelationQueryNode.OPERATION_LIKE);
+			}
+			return null;			
+		}
 				
 		private final String n2e(String s) {
 			return s==null?"":s;
@@ -422,38 +549,37 @@ public class HibernateQuery extends DefaultQuery {
 			//return s.replace('\'', '`');
 		}
 		
-		public class TranslateException extends RuntimeException {
-			private static final long serialVersionUID = 1L;
-			public TranslateException(String string) {
-				super(string);
-			}
-			public TranslateException(String string, Throwable e) {
-				super(string, e);
-			}
-		}
 		/** Map obj - BaseClass.name */
 		Map _objClassName	= new HashMap();
-		///** "obj:flex-prop" - string property for hql */ 
-		//Map _props			= new HashMap();
 		/** set of used PropertyClass */
-		Set _propclass		= new HashSet();
-		public String getProp(QName qname, String obj) {
+		//Set _propclass		= new HashSet();
+		public ObjProperty getProp(QName qname, String obj, QName objclass) {
 			final String prop = qname.getLocalName();
 			ObjProperty oprop = (ObjProperty) _propertyes.get(obj+"|"+prop);
 			if (oprop!=null)
-				return oprop.hqlname;
+				return oprop;
 			
 			if (XWikiNamespaceResolver.NS_DOC_URI.equals(qname.getNamespaceURI())) {
-				_addfrom("doc");				
-				return "doc"+ (prop.equals("self")?"":"."+prop);
+				final String docname = getLastNameClass(qn_xwiki_document);
+				if (prop.equals("self"))
+					return new ObjProperty(docname, XWikiDocument.class);
+				else
+					return new ObjPropProperty(docname, XWikiDocument.class, prop);
 			}
 			if (XWikiNamespaceResolver.NS_OBJ_URI.equals(qname.getNamespaceURI())) {
-				_addfrom("obj");
-				return "obj"+(prop.equals("self")?"":"."+prop);
+				final String objname = getLastNameClass(qn_xwiki_object);
+				if (prop.equals("self"))
+					return new ObjProperty(objname, BaseObject.class);
+				else
+					return new ObjPropProperty(objname, BaseObject.class, prop);
 			}
+			Class objjclass = (Class) jcl_xwiki_classes.get(getLastQNClass());
 			if (!XWikiNamespaceResolver.NS_FLEX_URI.equals(qname.getNamespaceURI()))
-				return obj+"."+prop;
-						
+				return new ObjPropProperty(obj, objjclass, prop);
+			
+			if (!qn_xwiki_object.equals(objclass))
+				throw new TranslateException("flex attributes is only for xwiki:object");
+			
 			final String classname = (String) _objClassName.get(obj);
 			if (classname==null)
 				throw new TranslateException("ClassName for "+obj+" not found");
@@ -471,55 +597,75 @@ public class HibernateQuery extends DefaultQuery {
 			PropertyClass pc = (PropertyClass) bc.get(prop);
 			if (pc==null)
 				throw new TranslateException("Couldn`t find property "+prop+" of class "+classname);
-			_propclass.add(pc.getClass());
+			
+			_addPropClass(pc.getClass());			
 			final Class propclass = pc.newProperty().getClass();
 			String propclassname = propclass.getName();
 			
-			String result = _addnewfrom(prop, propclassname);
+			String hqls = newXWikiObj(qname, propclassname);
 			
-			_where.appendSeparator().append("obj.id=").append(result).append(".id.id")
-				.appendSeparator().append(result).append(".name='").append(prop).append("'");
+			_where.appendSeparator().append(obj).append(".id=").append(hqls).append(".id.id")
+				.appendSeparator().append(hqls).append(".name='").append(prop).append("'");
 			
-			String val = (String) _mapPropValue.get(propclassname);
-			if (val==null)
-				val = "value";
-			result += "." + val;
-			//if (propclass.equals(DBStringListProperty.class))
-			//	result = _addjoin(result, prop+"_"+val);			
+			String suff = (String) _mapPropValue.get(propclassname);
+			if (suff==null)
+				suff = "value";
+			hqls += "."+suff;
 			
-			oprop = new ObjProperty(obj, prop, result, pc.getClass(), propclass);
+			oprop = new ObjFlexProperty(obj, objjclass, pc.getClass(), prop, hqls, propclass);
 			_propertyes.put(obj+"|"+prop, oprop);
 			
-			return result;
+			return oprop;
 		}
+
 		static final int TYPE_DEFAULT = -1;
 		static final int TYPE_LIST = TYPE_DEFAULT-1;
-		protected int getPropType(QName prop, String obj) {
-			getProp(prop, obj);
-			ObjProperty oprop = getObjProperty(prop.getLocalName(), obj);
-			if (oprop==null)
-				return TYPE_DEFAULT;
-			if (oprop.propertyclass.equals(DBStringListProperty.class))
-				return TYPE_LIST;
-			return TYPE_DEFAULT;
-		}
 		protected ObjProperty getObjProperty(String prop, String obj) {
 			return (ObjProperty) _propertyes.get(obj+"|"+prop);
 		}
 		/**	 obj:prop - ObjProperty */
-		Map _propertyes = new HashMap(); 
-		class ObjProperty {			
-			String	object,
-					propname,
-					hqlname;
-			Class	basepropclass,
-					propertyclass;
-			public ObjProperty(String obj, String prop, String hqlname, Class bpclass, Class propclass) {
-				this.object = obj;
+		Map _propertyes = new HashMap();
+		class ObjProperty {
+			String	obj;
+			Class	objclass;			
+			public ObjProperty(String obj, Class objclass) {
+				this.obj = obj;
+				this.objclass = objclass;
+			}
+			public int getResultType() {				
+				return TYPE_DEFAULT;
+			}
+			public String getHqlName() {				
+				return obj;
+			}
+		}
+		class ObjPropProperty extends ObjProperty {
+			String	propname;						
+			public ObjPropProperty(String obj, Class objclass, String prop) {
+				super(obj, objclass);
 				this.propname = prop;
+			}
+			public String getHqlName() {				
+				return obj+"."+propname;
+			}
+		}
+		class ObjFlexProperty extends ObjPropProperty {
+			String	hqlname;
+			Class	baseclass,
+					propertyclass;
+			public ObjFlexProperty(String obj, Class objclass, Class baseclass, String prop, String hqlname, Class propertyclass) {
+				super(obj, objclass, prop);
 				this.hqlname = hqlname;
-				this.basepropclass = bpclass;
-				this.propertyclass = propclass;
+				this.baseclass = baseclass;
+				this.propertyclass = propertyclass;
+			}
+			public String getHqlName() {				
+				return hqlname;
+			}
+			public int getResultType() {
+				if (propertyclass.equals(DBStringListProperty.class))
+					return TYPE_LIST;
+				return TYPE_DEFAULT;
 			}
 		}
 	}
@@ -544,13 +690,13 @@ public class HibernateQuery extends DefaultQuery {
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_NULL),		" is null ");
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_NOT_NULL),	" is not null ");
 	}
-	private static Map _mapObjClass = new HashMap();
+	/*private static Map _mapObjClass = new HashMap();
 	static {
 		_mapObjClass.put("doc",		"XWikiDocument");
 		_mapObjClass.put("attach",	"XWikiAttachment");
 		_mapObjClass.put("obj",		"BaseObject");
 		_mapObjClass.put("prop",	"BaseProperty");
-	}
+	}*/
 	/** Value name for classes properties */
 	private static Map _mapPropValue = new HashMap();
 	static {
@@ -604,6 +750,18 @@ public class HibernateQuery extends DefaultQuery {
 			// End monitoring timer
 			if (monitor!=null)
 				monitor.endTimer("hibernate");
+		}
+	}
+	static public class TranslateException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		public TranslateException(String string) {
+			super(string);
+		}
+		public TranslateException(String string, Throwable e) {
+			super(string, e);
+		}
+		public TranslateException(Throwable e) {
+			super(e);
 		}
 	}
 	public IQuery setDistinct(boolean d) {

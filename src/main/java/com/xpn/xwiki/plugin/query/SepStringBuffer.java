@@ -2,9 +2,9 @@ package com.xpn.xwiki.plugin.query;
 
 /** StringBuffer with Separator */
 public class SepStringBuffer {
-	String _separator;
-	String sep = "";
-	public StringBuffer sb;
+	final String _separator;
+	String cursep = "";
+	public final StringBuffer sb;
 	public SepStringBuffer(String separator) {		
 		this._separator = separator;
 		sb = new StringBuffer();
@@ -14,14 +14,14 @@ public class SepStringBuffer {
 		sb = new StringBuffer(text);
 	}
 	public final SepStringBuffer appendSeparator() {
-		sb.append(sep);
-		sep = _separator;
+		sb.append(cursep);
+		cursep = _separator;
 		return this;
 	}
 	
-	public int length() { return sb.length(); }
+	public final int length() { return sb.length(); }
 	
-	public String toString() { return sb.toString(); }
+	public final String toString() { return sb.toString(); }
 	
 	public final SepStringBuffer append(String s) { sb.append(s); return this; }	
 	public final SepStringBuffer append(Object s) { sb.append(s); return this; }

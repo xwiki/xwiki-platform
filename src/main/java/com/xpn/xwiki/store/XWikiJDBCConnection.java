@@ -120,13 +120,15 @@ public class XWikiJDBCConnection implements Connection {
         return getConnection().prepareCall(s, i, i1);
     }
 
-    public Map<String, Class<?>> getTypeMap() throws SQLException {
+
+    public Map getTypeMap() throws SQLException {
         return getConnection().getTypeMap();
     }
 
-    public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
+    public void setTypeMap(Map map) throws SQLException {
         getConnection().setTypeMap(map);
     }
+
 
     public void setHoldability(int i) throws SQLException {
         getConnection().setHoldability(i);

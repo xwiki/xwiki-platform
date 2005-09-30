@@ -107,11 +107,11 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         getXWikiContext().put("doc", doc);
 
         renderTest(wikibase, "Test link: [Web Home]",
-                "Main/WebHome", false, getXWikiContext());
+                "Main/", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home]",
                 "Web Home</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home]",
-                "Main/WebHome", false, getXWikiContext());
+                "Main/", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home12]",
                 "Web+Home12", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Web Home12]",
@@ -119,7 +119,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
                 "Other Text", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome]",
-                "Main/WebHome", false, getXWikiContext());
+                "Main/", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome12]",
                 "Other Text", false, getXWikiContext());
         renderTest(wikibase, "Test link: [Other Text|WebHome12]",
@@ -163,11 +163,11 @@ public class RadeoxRenderTest extends AbstractRenderTest {
            getXWikiContext().put("doc", doc);
 
            renderTestInTable(wikibase, "Test link: [Web Home]",
-                   "Main/WebHome", false, getXWikiContext());
+                   "Main/", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home]",
                    "Web Home</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home]",
-                   "Main/WebHome", false, getXWikiContext());
+                   "Main/", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home12]",
                    "Web Home12", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Web Home12]",
@@ -175,7 +175,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
                    "Other Text", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome]",
-                   "Main/WebHome", false, getXWikiContext());
+                   "Main/", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
                    "Other Text", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [Other Text>WebHome12]",
@@ -226,9 +226,9 @@ public class RadeoxRenderTest extends AbstractRenderTest {
 
         String res = renderTest(wikibase, "Test link: [xwikitest2:Main.WebHome]",
                 "127.0.0.1", false, getXWikiContext());
-        assertTrue("Cannot find view link", res.indexOf("Main/WebHome")!=-1 );
+        assertTrue("Cannot find view link", res.indexOf("Main/")!=-1 );
         res = renderTest(wikibase, "Test link: [xwikitest2:Main.WebHome12]",
                   "127.0.0.1", false, getXWikiContext());
-        assertTrue("Cannot find edit link", res.indexOf("edit/Main/WebHome")!=-1 );
+        assertTrue("Cannot find edit link", res.indexOf("edit/Main/")!=-1 );
       }
 }

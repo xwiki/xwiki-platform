@@ -28,6 +28,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -362,5 +363,4 @@ public class StoreTest extends HibernateTestCase {
         assertEquals(doc3.getAuthor(), Utils.author2);
         assertEquals(doc3.getVersion(), Utils.version2);
     }
-
 }

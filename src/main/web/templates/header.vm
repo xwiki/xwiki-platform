@@ -27,13 +27,16 @@
 #if($context.getMode()==0)
 #set( $logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
 #if ($context.getUser().equals("XWiki.XWikiGuest"))
-<a href="../../login/XWiki/XWikiLogin?xredirect=$logredir">$msg.get("login")</a><br />
-<a href="../../view/XWiki/RegisterNewUser">$msg.get("register")</a>
+#set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))
+#set($regurl = $xwiki.getURL("XWiki.RegisterNewUser"))
+<a href="$loginurl">$msg.get("login")</a><br />
+<a href="$regurl">$msg.get("register")</a>
 #else
+#set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
 #set($docuser = $xwiki.getDocument($context.user))
 #set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
 $msg.get("hello") <a href="$docuser.getURL("view")">$docuser.display("first_name", "view", $objuser)</a><br />
-<a href="../../logout/XWiki/XWikiLogout?xredirect=$logredir">$msg.get("logout")</a>
+<a href="$logouturl">$msg.get("logout")</a>
 #end
 #end
   </div>

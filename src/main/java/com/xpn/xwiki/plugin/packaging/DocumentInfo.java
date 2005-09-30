@@ -34,7 +34,7 @@ public class DocumentInfo
     private int                 installable = INSTALL_IMPOSSIBLE;
     private int                 action = ACTION_NOT_DEFINED;
     private int                 fileType;
-
+                                                                    
     public final static int     TYPE_SAMPLE = 0;
     public final static int     TYPE_NORMAL = 1;
 

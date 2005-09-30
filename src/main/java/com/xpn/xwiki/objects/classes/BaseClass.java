@@ -27,10 +27,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 import org.dom4j.dom.DOMElement;
 
 import com.xpn.xwiki.XWikiContext;
@@ -123,7 +127,24 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public Object clone() {
         BaseClass bclass = (BaseClass) super.clone();
+        bclass.setCustomClass(getCustomClass());
+        bclass.setCustomMapping(getCustomMapping());
         return bclass;
+    }
+
+    public boolean equals(Object obj) {
+        if (!super.equals(obj))
+            return false;
+
+        BaseClass bclass = (BaseClass) obj;
+
+        if (!getCustomClass().equals(bclass.getCustomClass()))
+            return false;
+
+        if (!getCustomMapping().equals(bclass.getCustomMapping()))
+            return false;
+
+        return true;
     }
 
     public void merge(BaseClass bclass) {
@@ -140,6 +161,14 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         el.addText((getName()==null) ? "" : getName());
         cel.add(el);
 
+        el = new DOMElement("customClass");
+        el.addText((getCustomClass()==null) ? "" : getCustomClass());
+        cel.add(el);
+
+        el = new DOMElement("customMapping");
+        el.addText((getCustomMapping()==null) ? "" : getCustomMapping());
+        cel.add(el);
+
         Iterator it = getFieldList().iterator();
         while (it.hasNext()) {
             PropertyClass bprop = (PropertyClass)it.next();
@@ -150,9 +179,21 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public void fromXML(Element cel) throws XWikiException {
         try {
+            int j = 1;
             setName(cel.element("name").getText());
+            Element cclel = cel.element("customClass");
+            if (cclel!=null) {
+                setCustomClass(cclel.getText());
+                j++;
+            }
+            Element cmapel = cel.element("customMapping");
+            if (cclel!=null) {
+                setCustomMapping(cmapel.getText());
+                j++;
+            }
+
             List list = cel.elements();
-            for (int i=1;i<list.size();i++) {
+            for (int i=j;i<list.size();i++) {
                 Element pcel = (Element) list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
@@ -164,6 +205,23 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION, "Error instanciating property class", e, null);
+        }
+    }
+
+    public void fromXML(String xml) throws XWikiException {
+        SAXReader reader = new SAXReader();
+        Document domdoc;
+
+        try {
+            StringReader in = new StringReader(xml);
+            domdoc = reader.read(in);
+        } catch (DocumentException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
+        }
+
+        Element docel = domdoc.getRootElement();
+        if (docel!=null) {
+            fromXML(docel);
         }
     }
 
@@ -286,6 +344,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     public String getCustomMapping() {
         if ("XWiki.XWikiPreferences".equals(getName()))
           return "internal";
+        if (customMapping==null)
+          return "";
         return customMapping;
     }
 
@@ -328,6 +388,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getCustomClass() {
+        if (customClass==null)
+         return "";
         return customClass;
     }
 
@@ -347,7 +409,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException { {
-        BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
+        BaseClass bclass = context.getWiki().getStore().loadXWikiClass(className, context);
         BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
         return object;
     }

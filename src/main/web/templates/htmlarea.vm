@@ -6,7 +6,7 @@
 </script>
 <!-- load the main HTMLArea file, this will take care of loading the CSS and
     other required core scripts. -->
-<script type="text/javascript" src="../../../htmlarea/htmlarea.js"></script>
+<script type="text/javascript" src="/xwiki/htmlarea/htmlarea.js"></script>
 
 <script type="text/javascript">
       HTMLArea.loadPlugin("ContextMenu");

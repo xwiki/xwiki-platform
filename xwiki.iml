@@ -4,6 +4,7 @@
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/build/xwiki" />
     <exploded url="file://$MODULE_DIR$/release/xwiki/web" />
+    <exclude-exploded />
     <output-test url="file://$MODULE_DIR$/build/xwiki_test" />
     <content url="file://$MODULE_DIR$/src/main/web" />
     <orderEntry type="inheritedJdk" />

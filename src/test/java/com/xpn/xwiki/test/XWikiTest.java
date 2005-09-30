@@ -27,6 +27,8 @@ import java.util.HashMap;
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -262,5 +264,92 @@ public class XWikiTest extends HibernateTestCase {
         AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
+    public void testXWikiPrefs() throws XWikiException {
+        XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
+        System.out.println("JDBC Calls for init");
+        hibstore.getBatcherStats().printSQLList(System.out);
+        hibstore.resetBatcherStats();
 
+        getXWiki().getDocument("Main.WebHome", context);
+        System.out.println("JDBC Calls for getDocument");
+        hibstore.getBatcherStats().printSQLList(System.out);
+
+        getXWiki().flushCache();
+        hibstore.resetBatcherStats();
+        getXWiki().getPrefsClass(context);
+        System.out.println("JDBC Calls for first getPrefsClass");
+        hibstore.getBatcherStats().printSQLList(System.out);
+
+        getXWiki().flushCache();
+        hibstore.resetBatcherStats();
+        getXWiki().getPrefsClass(context);
+        System.out.println("JDBC Calls for second getPrefsClass");
+        hibstore.getBatcherStats().printSQLList(System.out);
+    }
+
+    public void testXWikiInit() throws XWikiException {
+
+        XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
+        System.out.println("JDBC Calls for init");
+        hibstore.getBatcherStats().printSQLList(System.out);
+        hibstore.resetBatcherStats();
+        getXWiki().flushCache();
+
+        // Let's reinit completely
+        this.xwiki = new XWiki(this.config, this.context, null, true);
+        this.xwiki.setDatabase("xwikitest");
+        this.context.setWiki(this.xwiki);
+        getXWiki().flushCache();
+
+        System.out.println("JDBC Calls for re-init");
+        hibstore.getBatcherStats().printSQLList(System.out);
+        hibstore.resetBatcherStats();
+
+        // Let's reinit completely a second time
+        this.xwiki = new XWiki(this.config, this.context, null, true);
+        this.xwiki.setDatabase("xwikitest");
+        this.context.setWiki(this.xwiki);
+        getXWiki().flushCache();
+
+        System.out.println("JDBC Calls for re-init 2");
+        hibstore.getBatcherStats().printSQLList(System.out);
+        hibstore.resetBatcherStats();
+        getXWiki().flushCache();
+
+        // Let's read the home document
+        getXWiki().getDocument("Main.WebHome", context);
+        System.out.println("JDBC Calls for getDocument");
+        hibstore.getBatcherStats().printSQLList(System.out);
+    }
+
+    public void testXWikiDocElements() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument();
+
+        assertTrue("doc should have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertTrue("doc should have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+
+        doc.setElement(XWikiDocument.HAS_ATTACHMENTS, true);
+        assertTrue("doc should have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertTrue("doc should have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+
+        doc.setElement(XWikiDocument.HAS_ATTACHMENTS, false);
+        doc.setElement(XWikiDocument.HAS_OBJECTS, true);
+        assertFalse("doc should not have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertTrue("doc should  have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+
+        doc.setElement(XWikiDocument.HAS_ATTACHMENTS, true);
+        doc.setElement(XWikiDocument.HAS_OBJECTS, false);
+        assertTrue("doc should have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertFalse("doc should not have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+
+        doc.setElement(XWikiDocument.HAS_ATTACHMENTS, true);
+        doc.setElement(XWikiDocument.HAS_OBJECTS, true);
+        assertTrue("doc should have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertTrue("doc should have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+
+        doc.setElement(XWikiDocument.HAS_ATTACHMENTS, false);
+        doc.setElement(XWikiDocument.HAS_OBJECTS, false);
+        assertFalse("doc should not have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
+        assertFalse("doc should not have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+    }
 }

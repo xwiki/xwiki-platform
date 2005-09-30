@@ -42,6 +42,8 @@ public class EditForm extends XWikiForm
     private String template;
     private String language;
     private String defaultLanguage;
+    private String title;
+    private String comment;
 
     public void readRequest() {
         XWikiRequest request = getRequest();
@@ -52,6 +54,8 @@ public class EditForm extends XWikiForm
         setTemplate(request.getParameter("template"));
         setCreator(request.getParameter("creator"));
         setLanguage(request.getParameter("language"));
+        setTitle(request.getParameter("title"));
+        setComment(request.getParameter("comment"));
         setDefaultLanguage(request.getParameter("default_language"));
     }
 
@@ -140,6 +144,21 @@ public class EditForm extends XWikiForm
     public void setDefaultLanguage(String defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
     }
-}
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+}
 

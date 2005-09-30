@@ -18,6 +18,10 @@
             <column name="XWD_NAME" length="255" not-null="true"/>
         </property>
 
+        <property name="title" type="string">
+            <column name="XWD_TITLE" length="255" not-null="false"/>
+        </property>
+
         <property name="language" type="string">
             <column name="XWD_LANGUAGE" length="5" />
         </property>
@@ -34,12 +38,20 @@
             <column name="XWD_DATE" not-null="true"/>
         </property>
 
+        <property name="contentUpdateDate" type="timestamp">
+            <column name="XWD_CONTENT_UPDATE_DATE" />
+        </property>
+
         <property name="creationDate" type="timestamp">
             <column name="XWD_CREATION_DATE" />
         </property>
 
         <property name="author" type="string">
             <column name="XWD_AUTHOR" length="255"/>
+        </property>
+
+        <property name="contentAuthor" type="string">
+            <column name="XWD_CONTENT_AUTHOR" length="255"/>
         </property>
 
         <property name="creator" type="string">
@@ -65,6 +77,15 @@
         <property name="parent" type="string">
             <column name="XWD_PARENT" length="511"/>
         </property>
+
+        <property name="xWikiClassXML" type="string">
+            <column name="XWD_CLASS_XML" length="20000" not-null="false"/>
+        </property>
+
+        <property name="elements" type="integer">
+            <column name="XWD_ELEMENTS" />
+        </property>
+
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
@@ -554,5 +575,93 @@
         </property>
     </class>
 
+    <!-- XWikiPreferences custom mapping -->
+    <class entity-name="XWiki.XWikiPreferences" table="xwikipreferences">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWP_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="language" type="string">
+            <column name="XWP_LANGUAGE" length="255"/>
+        </property>
+        <property name="default_language" type="string">
+            <column name="XWP_DEFAULT_LANGUAGE" length="255"/>
+        </property>
+        <property name="multilingual" type="integer">
+            <column name="XWP_MULTI_LINGUAL" />
+        </property>
+        <property name="authenticate_edit" type="integer">
+            <column name="XWP_AUTHENTICATE_EDIT" />
+        </property>
+        <property name="authenticate_view" type="integer">
+            <column name="XWP_AUTHENTICATE_VIEW" />
+        </property>
+        <property name="backlinks" type="integer">
+            <column name="XWP_BACKLINKS" />
+        </property>
+        <property name="skin" type="string">
+            <column name="XWP_SKIN" length="255"/>
+        </property>
+        <property name="stylesheet" type="string">
+            <column name="XWP_STYLESHEET" length="255"/>
+        </property>
+        <property name="stylesheets" type="string">
+            <column name="XWP_STYLESHEETS" length="255"/>
+        </property>
+        <property name="editor" type="string">
+            <column name="XWP_EDITOR" length="255"/>
+        </property>
+        <property name="editbox_width" type="string">
+            <column name="XWP_EDITBOX_WIDTH" length="255"/>
+        </property>
+        <property name="editbox_height" type="string">
+            <column name="XWP_EDITBOX_HEIGHT" length="255"/>
+        </property>
+        <property name="webcopyright" type="string">
+            <column name="XWP_WEBCOPYRIGHT" length="255"/>
+        </property>
+        <property name="title" type="string">
+            <column name="XWP_TITLE" length="255"/>
+        </property>
+        <property name="version" type="string">
+            <column name="XWP_VERSION" length="255"/>
+        </property>
+        <property name="menu" type="string">
+            <column name="XWP_MENU" length="60000" />
+        </property>
+        <property name="meta" type="string">
+            <column name="XWP_META" length="60000" />
+        </property>
+        <property name="use_email_verification" type="integer">
+            <column name="XWP_USE_EMAIL_VERIFICATION" />
+        </property>
+        <property name="smtp_server" type="string">
+            <column name="XWP_SMTP_SERVER" length="255"/>
+        </property>
+        <property name="admin_email" type="string">
+            <column name="XWP_ADMIN_EMAIL" length="255"/>
+        </property>
+        <property name="validation_email_content" type="string">
+            <column name="XWP_VALIDATION_EMAIL_CONTENT" length="60000" />
+        </property>
+        <property name="confirmation_email_content" type="string">
+            <column name="XWP_CONFIRMATION_EMAIL_CONTENT" length="60000" />
+        </property>
+        <property name="macros_languages" type="string">
+            <column name="XWP_MACROS_LANGUAGE" length="255" />
+        </property>
+        <property name="macros_velocity" type="string">
+            <column name="XWP_MACROS_VELOCITY" length="255" />
+        </property>
+        <property name="macros_groovy" type="string">
+            <column name="XWP_MACROS_GROOVY" length="255" />
+        </property>
+        <property name="macros_wiki2" type="string">
+            <column name="XWP_MACROS_WIKI2" length="255" />
+        </property>
+        <property name="macros_mapping" type="string">
+            <column name="XWP_MACROS_MAPPING" length="60000" />
+        </property>
+    </class>
 </hibernate-mapping>
 

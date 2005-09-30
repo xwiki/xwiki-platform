@@ -32,7 +32,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
@@ -76,6 +75,7 @@ import java.util.zip.ZipOutputStream;
 public class XWikiDocument {
     private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
+    private String title;
     private String parent;
     private String web;
     private String name;
@@ -84,7 +84,9 @@ public class XWikiDocument {
     private String format;
     private String creator;
     private String author;
+    private String contentAuthor;
     private Archive archive;
+    private Date contentUpdateDate;
     private Date updateDate;
     private Date creationDate;
     private Version version;
@@ -102,8 +104,16 @@ public class XWikiDocument {
     // Used to make sure the MetaData String is regenerated
     private boolean isMetaDataDirty = false;
 
+    public static final int HAS_ATTACHMENTS = 1;
+    public static final int HAS_OBJECTS = 2;
+    private static final int HAS_CLASS = 4;
+
+    private int elements = HAS_OBJECTS | HAS_ATTACHMENTS;
+
     // Meta Data
     private BaseClass xWikiClass;
+    private String xWikiClassXML;
+
     private Map xWikiObjects = new HashMap();
 
     private List attachmentList;
@@ -254,6 +264,22 @@ public class XWikiDocument {
         setFullName(name, null);
     }
 
+    public String getTitle() {
+        if (title==null)
+            return "";
+        else
+            return title;
+    }
+
+    public void setTitle(String title) {
+        if (title==null)
+            title = "";
+        this.title = title;
+        if (!title.equals(this.title)) {
+            setMetaDataDirty(true);
+        }
+    }
+
     public String getFormat() {
         if (format==null)
             return "";
@@ -275,11 +301,25 @@ public class XWikiDocument {
             return author.trim();
     }
 
+    public String getContentAuthor() {
+        if (contentAuthor==null)
+            return "";
+        else
+            return contentAuthor.trim();
+    }
+
     public void setAuthor(String author) {
         if (!getAuthor().equals(this.author)) {
             setMetaDataDirty(true);
         }
         this.author = author;
+    }
+
+    public void setContentAuthor(String contentAuthor) {
+        if (!getContentAuthor().equals(this.contentAuthor)) {
+            setMetaDataDirty(true);
+        }
+        this.contentAuthor = contentAuthor;
     }
 
     public String getCreator() {
@@ -304,7 +344,7 @@ public class XWikiDocument {
     }
 
     public void setDate(Date date) {
-        if (!date.equals(this.updateDate)) {
+        if ((date!=null)&&(!date.equals(this.updateDate))) {
             setMetaDataDirty(true);
         }
         this.updateDate = date;
@@ -318,10 +358,24 @@ public class XWikiDocument {
     }
 
     public void setCreationDate(Date date) {
-        if (!creationDate.equals(this.creationDate)) {
+        if ((date!=null)&&(!creationDate.equals(this.creationDate))) {
             setMetaDataDirty(true);
         }
         this.creationDate = date;
+    }
+
+    public Date getContentUpdateDate() {
+        if (contentUpdateDate==null)
+            return new Date();
+        else
+            return contentUpdateDate;
+    }
+
+    public void setContentUpdateDate(Date date) {
+        if ((date!=null)&&(!date.equals(this.contentUpdateDate))) {
+            setMetaDataDirty(true);
+        }
+        this.contentUpdateDate = date;
     }
 
     public String getMeta() {
@@ -925,6 +979,10 @@ public class XWikiDocument {
         if (parent!=null)
             setParent(parent);
 
+        String title = eform.getTitle();
+        if (title!=null)
+            setTitle(title);
+
         String creator = eform.getCreator();
         if ((creator!=null)&&(!creator.equals(getCreator()))) {
             if ((getCreator().equals(context.getUser()))
@@ -1047,11 +1105,15 @@ public class XWikiDocument {
         doc.setRCSArchive(getRCSArchive());
         doc.setRCSVersion(getRCSVersion());
         doc.setAuthor(getAuthor());
+        doc.setContentAuthor(getContentAuthor());
         doc.setContent(getContent());
         doc.setContentDirty(isContentDirty());
         doc.setDate(getDate());
+        doc.setContentUpdateDate(getContentUpdateDate());
+        doc.setTitle(getTitle());
         doc.setFormat(getFormat());
         doc.setFromCache(isFromCache());
+        doc.setElements(getElements());
         doc.setId(getId());
         doc.setMeta(getMeta());
         doc.setMetaDataDirty(isMetaDataDirty());
@@ -1067,6 +1129,7 @@ public class XWikiDocument {
         doc.setLanguage(getLanguage());
         doc.setTranslation(getTranslation());
         doc.setxWikiClass((BaseClass)getxWikiClass().clone());
+        doc.setxWikiClassXML(getxWikiClassXML());
         doc.mergexWikiObjects(this);
         doc.copyAttachments(this);
         return doc;
@@ -1093,6 +1156,9 @@ public class XWikiDocument {
         if (!getAuthor().equals(doc.getAuthor()))
             return false;
 
+        if (!getContentAuthor().equals(doc.getContentAuthor()))
+            return false;
+
         if (!getParent().equals(doc.getParent()))
             return false;
 
@@ -1111,10 +1177,16 @@ public class XWikiDocument {
         if (getDate().getTime() != doc.getDate().getTime())
             return false;
 
+        if (getContentUpdateDate().getTime() != doc.getContentUpdateDate().getTime())
+            return false;
+
         if (getCreationDate().getTime() != doc.getCreationDate().getTime())
             return false;
 
         if (!getFormat().equals(doc.getFormat()))
+            return false;
+
+        if (!getTitle().equals(doc.getTitle()))
             return false;
 
         if (!getContent().equals(doc.getContent()))
@@ -1152,8 +1224,7 @@ public class XWikiDocument {
             }
         }
 
-
-        return true;
+       return true;
     }
 
     public String toXML(Document doc, XWikiContext context) {
@@ -2175,6 +2246,33 @@ public class XWikiDocument {
 
     public void setWikiNode(Object wikiNode) {
         this.wikiNode = wikiNode;
+    }
+
+    public String getxWikiClassXML() {
+        return xWikiClassXML;
+    }
+
+    public void setxWikiClassXML(String xWikiClassXML) {
+        this.xWikiClassXML = xWikiClassXML;
+    }
+
+    public int getElements() {
+        return elements;
+    }
+
+    public void setElements(int elements) {
+        this.elements = elements;
+    }
+
+    public void setElement(int element, boolean toggle) {
+        if (toggle)
+            elements = elements | element;
+        else
+            elements = elements & (~element);
+    }
+
+    public boolean hasElement(int element) {
+        return ((elements & element) == element);
     }
 
 }

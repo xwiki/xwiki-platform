@@ -254,8 +254,20 @@ public class MockStore implements XWikiStoreInterface {
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
     }
 
+    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException {
+        return null;
+    }
+
+    public BaseClass loadXWikiClassFromCache(BaseClass bclass, XWikiContext context) throws XWikiException {
+        return null;  
+    }
+
+    public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
+        return null;  
+    }
+
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {
-    	return false;
+        return false;
     }
     
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException {

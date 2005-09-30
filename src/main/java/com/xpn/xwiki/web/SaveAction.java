@@ -6,8 +6,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
+import java.util.Date;
+
 public class SaveAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
+    public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
@@ -49,5 +51,5 @@ public class SaveAction extends XWikiAction {
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 }

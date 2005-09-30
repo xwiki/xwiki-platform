@@ -41,9 +41,10 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 public class HibernateTestCase extends TestCase {
     public static final String HIB_LOCATION = "/hibernate-test.cfg.xml";
 
-    private XWiki xwiki;
-    private XWikiConfig config;
-    private XWikiContext context;
+    protected XWiki xwiki;
+    protected XWikiConfig config;
+    protected XWikiContext context;
+    protected int iCount = 0;
 
     protected void setUp() throws Exception {
         this.config = new XWikiConfig();
@@ -59,12 +60,16 @@ public class HibernateTestCase extends TestCase {
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");
 
+
+
         this.xwiki = new XWiki(this.config, this.context);
         this.xwiki.setDatabase("xwikitest");
 
         this.context.setWiki(this.xwiki);
-        
+
         cleanUp(this.xwiki.getHibernateStore(), this.context);
+        iCount = this.xwiki.getHibernateStore().getBatcherStats().getPreparedSQLCounter();
+
         this.xwiki.flushCache();
 
         Velocity.init(getClass().getResource("/velocity.properties").getFile());

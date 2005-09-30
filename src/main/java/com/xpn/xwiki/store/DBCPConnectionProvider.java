@@ -216,7 +216,7 @@ public class DBCPConnectionProvider implements ConnectionProvider {
     public Connection getConnection() throws SQLException {
         Connection conn = null;
         try {
-                conn = ds.getConnection();
+                conn = new XWikiJDBCConnection(ds.getConnection());
         }
         finally {
             logStatistics();

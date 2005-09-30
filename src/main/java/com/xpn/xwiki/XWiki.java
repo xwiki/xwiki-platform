@@ -219,8 +219,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         updateDatabase(appname, false, context);
     }
     public synchronized void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException, XWikiException {
-        String database = context.getDatabase()
-                ;
+        String database = context.getDatabase();
+        
         try {
             List wikilist = getVirtualWikiList();
             context.setDatabase(appname);
@@ -1430,7 +1430,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
+  /*
+ public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1498,6 +1499,78 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         if (needsUpdate)
             saveDocument(doc, context);
+        return bclass;
+    }
+    */
+
+    public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
+        XWikiDocument doc;
+        BaseClass bclass;
+        boolean needsUpdate = false;
+
+        bclass = new BaseClass();
+        bclass.setName("XWiki.XWikiPreferences");
+        bclass = getStore().loadXWikiClass(bclass, context);
+        if (context.get("initdone") != null)
+            return bclass;
+
+        bclass.setName("XWiki.XWikiPreferences");
+        bclass.setCustomMapping("internal");
+
+        needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
+        needsUpdate |= bclass.addTextField("language", "Language", 5);
+        needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
+        needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
+        needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
+        needsUpdate |= bclass.addBooleanField("backlinks", "Backlinks", "yesno");
+
+        needsUpdate |= bclass.addTextField("skin", "Skin", 30);
+        // This one should not be in the prefs
+        PropertyInterface baseskinProp = bclass.get("baseskin");
+        if (baseskinProp != null) {
+            bclass.removeField("baseskin");
+            needsUpdate = true;
+        }
+        needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
+        needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
+
+        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
+        needsUpdate |= bclass.addTextField("editbox_width", "Editbox Width", 5);
+        needsUpdate |= bclass.addTextField("editbox_height", "Editbox Height", 5);
+
+        needsUpdate |= bclass.addTextField("webcopyright", "Copyright", 30);
+        needsUpdate |= bclass.addTextField("title", "Title", 30);
+        needsUpdate |= bclass.addTextField("version", "Version", 30);
+        needsUpdate |= bclass.addTextAreaField("menu", "Menu", 60, 8);
+        needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
+
+        needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
+        needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
+        needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
+        needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
+        needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
+
+
+        needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
+        needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
+        needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
+        needsUpdate |= bclass.addTextField("macros_wiki2", "Macros for new Wiki Parser", 60);
+        needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
+
+        if (needsUpdate) {
+            doc = getDocument("XWiki.XWikiPreferences", context);
+            doc = new XWikiDocument();
+            doc.setWeb("XWiki");
+            doc.setName("XWikiPreferences");
+
+            String content = doc.getContent();
+            if ((content == null) || (content.equals(""))) {
+                doc.setContent("1 XWiki Users");
+            }
+
+            doc.setxWikiClass(bclass);
+            saveDocument(doc, context);
+        }
         return bclass;
     }
 

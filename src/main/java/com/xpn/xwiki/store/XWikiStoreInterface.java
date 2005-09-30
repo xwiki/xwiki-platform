@@ -73,8 +73,10 @@ public interface XWikiStoreInterface {
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public List getCustomMappingPropertyList(BaseClass bclass);
     public void injectCustomMappings(XWikiContext context) throws XWikiException;
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException;
+    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
+    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException;
+    public BaseClass loadXWikiClassFromCache(BaseClass bclass, XWikiContext context) throws XWikiException;
 
-    List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException;
-
-    void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
+    BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException;
 }

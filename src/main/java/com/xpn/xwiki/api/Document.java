@@ -89,6 +89,10 @@ public class Document extends Api {
         return doc.getVersion();
     }
 
+    public String getTitle() {
+        return doc.getTitle();
+    }
+
     public String getFormat() {
         return doc.getFormat();
     }
@@ -97,8 +101,16 @@ public class Document extends Api {
         return doc.getAuthor();
     }
 
+    public String getContentAuthor() {
+        return doc.getContentAuthor();
+    }
+
     public Date getDate() {
         return doc.getDate();
+    }
+
+    public Date getContentUpdateDate() {
+        return doc.getContentUpdateDate();
     }
 
     public Date getCreationDate() {

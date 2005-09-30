@@ -16,6 +16,7 @@ XWiki . $!doc.web . $!doc.name
 $!xwiki.getWebPreference("meta")
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
 </head>
 <body>
 #else

@@ -18,6 +18,10 @@
             <column name="XWD_NAME" length="255" not-null="true"/>
         </property>
 
+        <property name="title" type="string">
+            <column name="XWD_TITLE" length="255" not-null="true"/>
+        </property>
+
         <property name="language" type="string">
             <column name="XWD_LANGUAGE" length="5" />
         </property>
@@ -34,16 +38,24 @@
             <column name="XWD_DATE" not-null="true"/>
         </property>
 
+        <property name="contentUpdateDate" type="timestamp">
+            <column name="XWD_CONTENT_UPDATE_DATE" />
+        </property>
+
         <property name="creationDate" type="timestamp">
             <column name="XWD_CREATION_DATE" />
         </property>
 
         <property name="author" type="string">
-            <column name="XWD_AUTHOR" length="255"/>
+            <column name="XWD_AUTHOR" length="255" not-null="true"/>
+        </property>
+
+        <property name="contentAuthor" type="string">
+            <column name="XWD_CONTENT_AUTHOR" length="255" not-null="true"/>
         </property>
 
         <property name="creator" type="string">
-            <column name="XWD_CREATOR" length="255"/>
+            <column name="XWD_CREATOR" length="255" not-null="true" />
         </property>
 
         <property name="web" type="string">
@@ -63,8 +75,17 @@
         </property>
 
         <property name="parent" type="string">
-            <column name="XWD_PARENT" length="511"/>
+            <column name="XWD_PARENT" length="511" not-null="true"/>
         </property>
+
+        <property name="xWikiClassXML" type="string">
+            <column name="XWD_CLASS_XML" length="20000" not-null="false"/>
+        </property>
+
+        <property name="elements" type="integer">
+            <column name="XWD_ELEMENTS" />
+        </property>
+
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">

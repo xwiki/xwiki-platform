@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiBatcher;
 
 /**
  * ===================================================================
@@ -1923,6 +1924,39 @@ public class ViewEditTest extends ServletTest {
 
     public void testViewUltraSimpleURL() throws IOException, Throwable {
         launchTest();
+    }
+
+
+
+    public void beginViewCountQueries(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewOkTest", context);
+        Utils.content1 = content;
+        setUrl(webRequest, "view", "ViewOkTest");
+    }
+
+    public void endViewCountQueries(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewCountQueries() throws IOException, Throwable {
+        XWikiBatcher.getSQLStats().resetStats();
+        launchTest();
+        XWikiBatcher.getSQLStats().printSQLList(System.out);
+        XWikiBatcher.getSQLStats().resetStats();
+        launchTest();
+        XWikiBatcher.getSQLStats().printSQLList(System.out);
     }
 
 }

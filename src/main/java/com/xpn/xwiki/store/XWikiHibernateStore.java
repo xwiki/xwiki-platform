@@ -1667,6 +1667,11 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if ((bclass2!=null)&&(bclass.hasExternalCustomMapping()))
                 setSessionFactory(injectCustomMappingsInSessionFactory(bclass, context));
 
+            if (bclass2==null) {
+                bclass2 = new BaseClass();
+                bclass2.setName(bclass.getName());
+            }
+
             return bclass2;
         } catch (Exception e) {
             Object[] args = { bclass.getName() };

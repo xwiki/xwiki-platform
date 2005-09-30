@@ -47,15 +47,7 @@ public class HibernateTestCase extends TestCase {
     protected int iCount = 0;
 
     protected void setUp() throws Exception {
-        this.config = new XWikiConfig();
-
-        // TODO: Should probably be modified to use a memory store for testing or a mock store
-        // TODO: StoreHibernateTest should be refactored with this class in mind 
-        this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
-        this.config.put("xwiki.backlinks", "1");
-        this.config.put("xwiki.store.cache","1");
-        this.config.put("xwiki.store.cache.capacity", "100");
+        getConfig();
 
         this.context = new XWikiContext();
         this.context.setDatabase("xwikitest");
@@ -73,6 +65,18 @@ public class HibernateTestCase extends TestCase {
         this.xwiki.flushCache();
 
         Velocity.init(getClass().getResource("/velocity.properties").getFile());
+    }
+
+    protected void getConfig() {
+        this.config = new XWikiConfig();
+
+        // TODO: Should probably be modified to use a memory store for testing or a mock store
+        // TODO: StoreHibernateTest should be refactored with this class in mind
+        this.config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
+        this.config.put("xwiki.store.hibernate.path", getClass().getResource(HibernateTestCase.HIB_LOCATION).getFile());
+        this.config.put("xwiki.backlinks", "1");
+        this.config.put("xwiki.store.cache","1");
+        this.config.put("xwiki.store.cache.capacity", "100");
     }
 
     protected void tearDown() {

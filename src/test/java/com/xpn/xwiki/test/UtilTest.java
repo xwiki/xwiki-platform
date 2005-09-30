@@ -114,10 +114,10 @@ public class UtilTest extends HibernateClassesTest {
         getXWikiContext().setURLFactory(factory);
 
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/view/Main/Toto"),
+                     new URL("http://www.xwiki.org/xwiki/bin/Main/Toto"),
                      factory.createURL("Main", "Toto", getXWikiContext()));
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/view/XWiki/Toto"),
+                     new URL("http://www.xwiki.org/xwiki/bin/XWiki/Toto"),
                      factory.createURL("XWiki", "Toto", getXWikiContext()));
         assertEquals("URL is incorrect",
                      new URL("http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto"),

@@ -134,6 +134,11 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         }
     }
 
+    protected void getConfig() {
+        super.getConfig();
+        this.config.put("xwiki.store.hibernate.custommapping.dynamic", "1");
+    }
+
     public void testGetCustomMapping() throws XWikiException {
         XWikiDocument doc1 = new XWikiDocument("Test", "HCMClass");
         Utils.prepareAdvancedObject(doc1, "Test.HCMClass");

@@ -1511,6 +1511,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         bclass = new BaseClass();
         bclass.setName("XWiki.XWikiPreferences");
         bclass = getStore().loadXWikiClass(bclass, context);
+        if (bclass==null)
+            bclass = new BaseClass();
+                 
         if (context.get("initdone") != null)
             return bclass;
 

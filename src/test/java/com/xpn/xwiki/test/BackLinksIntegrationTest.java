@@ -44,6 +44,11 @@ public class BackLinksIntegrationTest extends HibernateTestCase {
         getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/" , "bin/"));
     }
 
+    protected void getConfig() {
+        super.getConfig();
+        this.config.put("xwiki.backlinks", "1");
+    }
+
     public void testBacklinksParam() throws XWikiException {
 
         getXWiki().getConfig().setProperty("xwiki.backlinks","");

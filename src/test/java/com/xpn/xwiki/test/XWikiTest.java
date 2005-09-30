@@ -101,15 +101,15 @@ public class XWikiTest extends HibernateTestCase {
         map.put("last_name", "Dubost");
         getXWiki().createUser("LudovicDubost", map, "", "", "view, edit", getXWikiContext());
         String result = getXWiki().getUserName("XWiki.LudovicDubost", getXWikiContext());
-        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result );
+        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result );
         result = getXWiki().getUserName("xwikitest:XWiki.LudovicDubost", getXWikiContext());
-        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
+        assertEquals("getUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
         result = getXWiki().getLocalUserName("XWiki.LudovicDubost", getXWikiContext());
-        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
         result = getXWiki().getLocalUserName("xwikitest:XWiki.LudovicDubost", getXWikiContext());
-        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/XWiki/LudovicDubost\">Ludovic Dubost</a></span>", result);
         result = getXWiki().getLocalUserName("XWiki.LudovicDubost", "$first_name", getXWikiContext());
-        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/view/XWiki/LudovicDubost\">Ludovic</a></span>", result);
+        assertEquals("getLocalUserName failed", "<span class=\"wikilink\"><a href=\"/xwiki/bin/XWiki/LudovicDubost\">Ludovic</a></span>", result);
         result = getXWiki().getLocalUserName("XWiki.LudovicDubost", "$first_name", false, getXWikiContext());
         assertEquals("getLocalUserName failed", "Ludovic", result);
     }

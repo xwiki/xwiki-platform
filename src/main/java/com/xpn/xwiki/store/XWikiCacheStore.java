@@ -216,6 +216,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     }
 
     public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException {
+        String bclassName = bclass.getName();
         String key = getKey(bclass, context);
 
         synchronized (key) {
@@ -240,10 +241,15 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
                     getClassCache().cancelUpdate(key);
                     throw xwikiexception;
                 }
-                if (bclass.getFieldList().size()>0)
+                if ((bclass!=null)&&(bclass.getFieldList().size()>0))
                  getClassCache().putInCache(key, bclass);
             }
         }
+        if (bclass==null) {
+            bclass = new BaseClass();
+            bclass.setName(bclassName);
+        }
+         
         return bclass;
     }
 

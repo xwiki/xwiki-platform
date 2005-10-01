@@ -575,10 +575,10 @@ public class QueryPluginTest extends HibernateTestCase {
 		doc3.setParent("Test.Doc2");
 		hb.saveXWikiDoc(doc3, getXWikiContext());
 		
-		testSearchXP1("/Test/Doc/*/element(*, xwiki:document)", doc2); // list all childs of Test.Doc
-		testSearchXP1("/Test/Doc/doc/*/*", doc2);
-		testSearchXP1("/Test/Doc/*/*/*/*", doc3); // list all 2 level childs of Test.Doc
-		testSearchXP1("/Test/Doc/doc/*/*/doc/*/*", doc3);
+		testSearchXP1("/Test/Doc/*/element(*, xwiki:document)/@fullName", "Test.Doc2"); // list all childs of Test.Doc
+		testSearchXP1("/Test/Doc/doc/*/*/@name", "Doc2");
+		testSearchXP1("/Test/Doc/*/*/*/*/(@web,@name)", new Object[]{"Test", "Doc3"}); // list all 2 level childs of Test.Doc
+		testSearchXP1("/Test/Doc/doc/*/*/doc/*/*/@fullName", "Test.Doc3");
 		
 		//testsearch("/Test/Doc//element(*, xwiki:document)", new Object[]{}); // list all descendants! of Test.Doc. How implement this?
 	}

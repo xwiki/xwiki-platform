@@ -95,11 +95,14 @@ public class QueryPluginApiTest extends HibernateTestCase {
 	}
 	
 	public void testQueryRights() throws XWikiException, InvalidQueryException {
-		XWikiHibernateStore hb = getXWiki().getHibernateStore();	
-        
-		XWikiDocument doc1, doc = doc1 = new XWikiDocument("Test", "Test0");
+		XWikiHibernateStore hb = getXWiki().getHibernateStore();		
+		XWikiDocument doc0, doc = doc0 = new XWikiDocument("Class", "Class0");		
+		BaseClass bclass1, bclass = bclass1 = Utils.prepareClass(doc, "Class.Class0");
+		getXWiki().getStore().saveXWikiDoc(doc0, getXWikiContext());
+		
+		XWikiDocument doc1 = doc = new XWikiDocument("Test", "Test0");
+		BaseClass bclass2 = Utils.prepareClass(doc, "Test.Test0");
 		doc.setAuthor("Artem");
-		BaseClass bclass1, bclass = bclass1 = Utils.prepareClass(doc, "Test.Test0");
 		BaseObject object1, object = object1 = new BaseObject();
         doc.setObject(bclass.getName(), 0, object);
         object.setClassName(bclass.getName());
@@ -107,36 +110,43 @@ public class QueryPluginApiTest extends HibernateTestCase {
         object.put("first_name", ((PropertyClass)bclass.get("first_name")).fromString("Artem"));
         object.put("password", ((PropertyClass)bclass.get("password")).fromString("sesame"));
         getXWiki().getStore().saveXWikiDoc(doc1, getXWikiContext());
-        
+                
         /*hb.beginTransaction(getXWikiContext());        
         bclass1 = (BaseClass) hbload(BaseClass.class, new Long(bclass.getId()));
         object1 = (BaseObject) hbload(BaseObject.class, new Long(object1.getId()));
         doc1 = (XWikiDocument) hbload(XWikiDocument.class, new Long(doc1.getId()));*/        
         
-        Document secdoc1 = new Document(doc1, getXWikiContext());
+        //hb.beginTransaction(false, getXWikiContext());
+        //doc = (XWikiDocument) hb.getSession(getXWikiContext()).load(XWikiDocument.class, new Long(doc1.getId()));
+        getXWiki().flushCache();
+        //hb.beginTransaction(true, getXWikiContext());
+        doc = getXWiki().getStore().loadXWikiDoc(new XWikiDocument("Test", "Test0"), getXWikiContext());
+        Document secdoc1 = new Document(doc, getXWikiContext());
+        //object = (BaseObject) hb.getSession(getXWikiContext()).load(BaseObject.class, new Integer(object1.getId()));
         Object secobj1	 = new com.xpn.xwiki.api.Object(object1, getXWikiContext());
         getXWiki().flushCache();
         testSearchXPnQl1("/Test/Test0", "select * from xwiki:document where fullName='Test.Test0'", secdoc1);
         testSearchXP("//doc/Test/Test0",								new Object[]{secdoc1});
         testSearchXPnQl1("//element(Test0, xwiki:document)",	"select * from xwiki:document where name='Test0'", secdoc1);
-        testSearchXPnQl1("/*/element(*, xwiki:document)", "select * from xwiki:document", secdoc1);
+        testSearchXPnQl1("/Test/element(*, xwiki:document)", "select * from xwiki:document where web='Test'", secdoc1);
+        //hb.endTransaction(getXWikiContext(), false);
         
-        testSearchXPnQl("/Test/Test0/@name", "select name from xwiki:document", new Object[]{"Test0"});
+        testSearchXPnQl("/Test/Test0/@name", "select name from xwiki:document where fullName='Test.Test0'", new Object[]{"Test0"});
         testSearchXP1("/element(Test0, xwiki:document)/@name",		"Test0");
         
         testSearchXPnQl1("/Test/Test0/@web", "select web from xwiki:document where name='Test0'", "Test");
         testSearchXPnQl1("/Test/Test0/(@name,@author)", "select name,author from xwiki:document where name='Test0'",	new Object[]{"Test0", "Artem"});
         testSearchXP("/Test/Test0/@fullName",						new Object[]{"Test.Test0"});
-        testSearchXP("/Test/Test0/obj/Test/Test0",					new Object[]{secobj1});
-        testSearchXP("/*/*/obj/Test/Test0",					new Object[]{secobj1});
-        testSearchXPnQl1("//obj/Test/Test0", "select * from xwiki:object where name='Test.Test0'", secobj1);
-        testSearchXP("/Test/Test0/obj/Test/Test0/@name",				new Object[]{"Test.Test0"});        
-        testSearchXP("/Test/Test0/obj/Test/Test0/@f:first_name",		new Object[]{"Artem"});
-        testSearchXP("/Test/Test0/obj/Test/Test0/(@name,@f:first_name)",		new Object[]{new Object[]{"Test.Test0","Artem"}});
-        testSearchXPnQl1("//obj/Test/Test0/(@name,@f:first_name)", "select name,f:first_name from xwiki:object where className='Test.Test0'",	new Object[]{"Test.Test0","Artem"});
+        testSearchXP("/Test/Test0/obj/Class/Class0",					new Object[]{secobj1});
+        testSearchXP("/*/*/obj/Class/Class0",						new Object[]{secobj1});
+        testSearchXPnQl1("//obj/*/*", "select * from xwiki:object", secobj1);
+        testSearchXP("/Test/Test0/obj/Class/Class0/@name",				new Object[]{"Test.Test0"});        
+        testSearchXP("/Test/Test0/obj/Class/Class0/@f:first_name",		new Object[]{"Artem"});
+        testSearchXP("/Test/Test0/obj/Class/Class0/(@name,@f:first_name)",		new Object[]{new Object[]{"Test.Test0","Artem"}});
+        testSearchXPnQl1("//obj/Class/Class0/(@name,@f:first_name)", "select name,f:first_name from xwiki:object where className='Class.Class0'",	new Object[]{"Test.Test0","Artem"});
         
         try {
-        	testSearchXP("//Test/Test0/obj/Test/Test0/@f:password",	EMPTY);
+        	testSearchXP("//Test/Test0/obj/Class/Class0/@f:password",	EMPTY);
         	assertTrue(false);
         } catch (XWikiException e) {
         	assertEquals(e.getCode(), XWikiException.ERROR_XWIKI_ACCESS_DENIED);
@@ -155,13 +165,13 @@ public class QueryPluginApiTest extends HibernateTestCase {
         testSearchXPnQl("/Test/Test0/@web", "select web from xwiki:document where name='Test0'", EMPTY);
         testSearchXPnQl("/Test/Test0/(@name,@author)", "select name,author from xwiki:document where name='Test0'",	EMPTY);
         testSearchXP("/Test/Test0/@fullName",						EMPTY);
-        testSearchXP("/Test/Test0/obj/Test/Test0",					EMPTY);
-        testSearchXP("/*/*/obj/Test/Test0",							EMPTY);
-        testSearchXPnQl("//obj/Test/Test0", "select * from xwiki:object where name='Test.Test0'", EMPTY);
-        testSearchXP("/Test/Test0/obj/Test/Test0/@name",					EMPTY);        
-        testSearchXP("/Test/Test0/obj/Test/Test0/@f:first_name",			EMPTY);
-        testSearchXP("/Test/Test0/obj/Test/Test0/(@name,@f:first_name)",	EMPTY);
-        testSearchXPnQl("//obj/Test/Test0/(@name,@f:first_name)", "select name,f:first_name from xwiki:object where className='Test.Test0'",	EMPTY);
+        testSearchXP("/Test/Test0/obj/Class/Class0",					EMPTY);
+        testSearchXP("/*/*/obj/Class/Class0",							EMPTY);
+        testSearchXPnQl("//obj/Class/Class0", "select * from xwiki:object where className='Class.Class0'", EMPTY);
+        testSearchXP("/Test/Test0/obj/Class/Class0/@name",					EMPTY);        
+        testSearchXP("/Test/Test0/obj/Class/Class0/@f:first_name",			EMPTY);
+        testSearchXP("/Test/Test0/obj/Class/Class0/(@name,@f:first_name)",	EMPTY);
+        testSearchXPnQl("//obj/Class/Class0/(@name,@f:first_name)", "select name,f:first_name from xwiki:object where className='Class.Class0'",	EMPTY);
                 
         Utils.updateRight(getXWiki(), getXWikiContext(), "Test.Test0", "XWiki.XWikiGuest", "", "query", false, false);
         getXWiki().flushCache();
@@ -170,11 +180,11 @@ public class QueryPluginApiTest extends HibernateTestCase {
         testSearchXP("//Test/Test0/@web",								EMPTY);
         testSearchXP("//Test/Test0/@fullName",						new Object[]{"Test.Test0"});
         testSearchXP("//Test/Test0/(@name,@author)",					EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0",					EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0/@name",				new Object[]{"Test.Test0"});
-        testSearchXP("//Test/Test0/obj/Test/Test0/@classname",		EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0/@f:first_name",		EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0/(@name,@f:first_name)",		EMPTY);
+        testSearchXP("//Test/Test0/obj/Class/Class0",					EMPTY);
+        testSearchXP("//Test/Test0/obj/Class/Class0/@name",				new Object[]{"Test.Test0"});
+        testSearchXP("//Test/Test0/obj/Class/Class0/@classname",		EMPTY);
+        testSearchXP("//Test/Test0/obj/Class/Class0/@f:first_name",		EMPTY);
+        testSearchXP("//Test/Test0/obj/Class/Class0/(@name,@f:first_name)",		EMPTY);
         
         Utils.updateRight(getXWiki(), getXWikiContext(), "Test.Test0", "XWiki.XWikiGuest", "", "view", false, false);
         getXWiki().flushCache();
@@ -185,9 +195,9 @@ public class QueryPluginApiTest extends HibernateTestCase {
         testSearchXP("//Test/Test0/@web",								new Object[]{"Test"});
         testSearchXP("//Test/Test0/@fullName",						EMPTY);
         testSearchXP("//Test/Test0/(@name,@creationDate)",			EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0",					new Object[]{secobj1});
-        testSearchXP("//Test/Test0/obj/Test/Test0/@name",				EMPTY);
-        testSearchXP("//Test/Test0/obj/Test/Test0/@f:first_name",		new Object[]{"Artem"});
-        testSearchXP("//Test/Test0/obj/Test/Test0/(@name,@f:first_name)",		EMPTY);        
+        testSearchXP("//Test/Test0/obj/Class/Class0",					new Object[]{secobj1});
+        testSearchXP("//Test/Test0/obj/Class/Class0/@name",				EMPTY);
+        testSearchXP("//Test/Test0/obj/Class/Class0/@f:first_name",		new Object[]{"Artem"});
+        testSearchXP("//Test/Test0/obj/Class/Class0/(@name,@f:first_name)",		EMPTY);        
 	}
 }

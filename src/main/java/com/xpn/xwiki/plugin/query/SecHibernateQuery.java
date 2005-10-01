@@ -120,7 +120,7 @@ public class SecHibernateQuery extends HibernateQuery {
 				} else
 					throw new TranslateException("Class not exist");
 			}
-			_select = new SepStringBuffer(docname, null);
+			_select = new SepStringBuffer(docname+".id,"+docname+".fullName", null);
 			
 			security = false;
 			int fr = _firstResult; _firstResult = -1;
@@ -129,16 +129,17 @@ public class SecHibernateQuery extends HibernateQuery {
 			_firstResult = fr;
 			_fetchSize = fs;
 			for (Iterator iter = doclst.iterator(); iter.hasNext();) {
-				XWikiDocument element = (XWikiDocument) iter.next();
+				Object[] element = (Object[]) iter.next();
+				//XWikiDocument element = (XWikiDocument) iter.next();
 				try {
 					boolean r = true;
 					for (int i=0; i<rights.size(); i++) {
-						r &= rightserv.hasAccessLevel((String) rights.get(i), user, element.getFullName(), getContext());
+						r &= rightserv.hasAccessLevel((String) rights.get(i), user, (String)element[1], getContext());
 						if (!r)
 							break;
 					}
 					if (r)
-						_allowdocs.add(new Long(element.getId()));
+						_allowdocs.add(element[0]);
 				} catch (XWikiException e) {}
 			}
 		} finally {

@@ -21,10 +21,14 @@
     default="release"
     basedir="." >
 
+
     <!-- Allow any user specific values to override the defaults -->
     <property file="${user.home}/build.properties" />
     <!-- Allow user defaults for this project -->
     <property file="build.properties" />
+
+    <!-- This setting will be used if not overided by build.properties -->
+    <property name="jdbc.filter" value="hsqldb_filters.properties" />
 
     <!-- The following line is used to read the version -->
     <property file="src/main/web/WEB-INF/xwiki.cfg" />
@@ -59,12 +63,7 @@
     <property name="doc.dir" value="${basedir}/doc" />
     <property name="javadoc.dir" value="${doc.dir}/api" />
 
-	<!-- TODO: Change location of files that are used by the build and not by the tests.
-	     There are 2 that I can see:
-	     - hsqldb_filters.properties
-	     - hibernate config file that is generated
-	     They should go in a different directory -->
-    <property name="tests.filtersfile" value="${resources.test.src.dir}/mysql_filters.properties" />
+    <property name="tests.filtersfile" value="${resources.test.src.dir}/${jdbc.filter}" />
 
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
@@ -201,7 +200,7 @@
 
         <copy todir="${build.dir}/web/WEB-INF/classes">
             <fileset dir="${build.dir}/web/WEB-INF">
-                <include name="hibernate*.cfg.xml" />
+                <include name="hibernate.cfg.xml" />
             </fileset>
         </copy>
 
@@ -230,10 +229,20 @@
 		</jar>
 	</target>
 
-    <target name="tests" depends="junit-check,prepare,xwiki">
+    <target name="prepare-tests">
     	<copy todir="${tests.build.dir}">
             <fileset dir="${resources.test.src.dir}"/>
         </copy>
+        <filter filtersfile="${tests.filtersfile}"/>
+        <copy file="${resources.test.src.dir}/hibernate-test-template.cfg.xml"
+            tofile="${tests.build.dir}/hibernate-test.cfg.xml"
+            filtering="true" overwrite="true" />
+        <copy file="${tests.build.dir}/hibernate-test.cfg.xml"
+            tofile="${tests.build.dir}/hibernate.cfg.xml"
+            overwrite="true" />
+    </target>
+
+    <target name="tests" depends="junit-check,prepare,xwiki,prepare-tests">
         <javac destdir="${tests.build.dir}"
             classpath="${libs};${libs.tests};${tests.build.dir};${classes.dir}"
             debug="on" optimize="on" deprecation="on" source="1.4"
@@ -242,10 +251,6 @@
         	<src path="${java.test.src.dir}" />
         	<src path="${cactus.test.src.dir}" />
         </javac>
-        <filter filtersfile="${tests.filtersfile}"/>
-        <copy file="${resources.test.src.dir}/hibernate-test-template.cfg.xml"
-            tofile="${tests.build.dir}/hibernate-test.cfg.xml"
-            filtering="true" overwrite="true" />
     </target>
 
     <target name="test.client" depends="xwiki, tests">
@@ -274,20 +279,18 @@
         </junit>
     </target>
 
-    <target name="test.server.prepare" depends="release">
-
+    <target name="test.server.prepare" depends="release,prepare-tests">
       <!-- Cactify the web-app archive -->
       <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
         <classes dir="${tests.build.dir}"/>
           <lib refid="libs.tests.fileset" />
-        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/">
-          <include name="hibernate-test.cfg.xml"/>
+        <zipfileset dir="${tests.build.dir}" prefix="WEB-INF/">
+          <include name="hibernate.cfg.xml"/>
         </zipfileset>
-        <zipfileset dir="${resources.test.src.dir}" prefix="WEB-INF/">
-          <include name="xwiki-test.cfg"/>
+        <zipfileset dir="${tests.build.dir}" prefix="WEB-INF/">
+          <include name="xwiki.cfg"/>
         </zipfileset>
       </cactifywar>
-
     </target>
 
     <target name="test.server" depends="tests, test.server.prepare">

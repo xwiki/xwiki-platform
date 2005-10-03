@@ -68,7 +68,7 @@
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
-      includes="hibernate-3.0.3.jar,c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,odmg-3.0.jar,oscache-2.0.2.jar,jgroups-2.2.5.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
+      includes="hibernate-3.0.3.jar,c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,hsqldb-1.7.3.jar,odmg-3.0.jar,oscache-2.0.2.jar,jgroups-2.2.5.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
      	commons-beanutils-1.7.0.jar,commons-codec-1.3.jar,commons-collections-3.1.jar,commons-dbcp-1.2.1.jar,commons-digester-1.6.jar,commons-fileupload-1.0.jar,commons-lang-2.1.jar,commons-logging-1.0.4.jar,commons-pool-1.1.jar,commons-net-1.1.0.jar,commons-httpclient-2.0.2.jar,ecs-1.4.2.jar,oro-2.0.8.jar,log4j-1.2.8.jar,
      	org.apache.commons.jrcs.rcs.jar,
      	struts-1.2.4.jar,
@@ -98,7 +98,7 @@
      	includes="picocontainer-1.0.jar,exoplatform.container-1.0.jar,exoplatform.services.chart.api-1.0.jar,exoplatform.services.chart.impl-1.0.jar,exoplatform.services.common.api-1.0.jar,exoplatform.services.organization.api-1.0.jar,exoplatform.services.organization.impl-1.0.jar,exoplatform.services.security.api-1.0.jar,exoplatform.services.security.impl-1.0.jar,exoplatform.services.database.api-1.0.jar,exoplatform.services.database.impl-1.0.jar,exo-base-services-1.0.jar,exo-chart-service-1.0.jar,exo-chart-service-impl-1.0.jar,exo-commons-1.0.jar,exo-organization-service-1.0.jar,exo-security-service-1.0.jar" />
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
-        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar,hsqldb-1.7.3.jar" />
+        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />
 
     <pathconvert pathsep=";" property="libs.main" refid="libs.main.fileset" />
     <pathconvert pathsep=";" property="libs.exo" refid="libs.exo.fileset" />
@@ -142,11 +142,12 @@
 
     <target name="prepare">
         <propertyfile file="src/main/web/WEB-INF/version.properties" >
-            <entry key="build.number" type="int" value="1" operation="+" />
+            <entry key="build.number" type="int" value="1" operation="+" pattern="0000" />
         </propertyfile>
         <property file="src/main/web/WEB-INF/version.properties" />
         <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
+        <property name="test.warfile" value="${release.dir}/xwiki.war" />
         <property name="exo.warfile" value="${release.dir}/xwiki-exo-${version}.war" />
         <property name="cactus.warfile" value="${release.dir}/xwiki.war" />
         <mkdir dir="${build.dir}" />
@@ -281,16 +282,21 @@
 
     <target name="test.server.prepare" depends="release,prepare-tests">
       <!-- Cactify the web-app archive -->
-      <cactifywar srcfile="${release.warfile}" destfile="${cactus.warfile}">
+      <copy file="${resources.test.src.dir}/xwiki.cfg" 
+		tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+      <copy file="${resources.test.src.dir}/hibernate-test.cfg.xml" 
+		tofile="${build.dir}/web/WEB-INF/hibernate-test.cfg.xml" overwrite="true" />
+      <war warfile="${test.warfile}" basedir="${build.dir}/web" 
+		webxml="${main.src.dir}/web-test.xml" >
         <classes dir="${tests.build.dir}"/>
-          <lib refid="libs.tests.fileset" />
-        <zipfileset dir="${tests.build.dir}" prefix="WEB-INF/">
-          <include name="hibernate.cfg.xml"/>
-        </zipfileset>
-        <zipfileset dir="${tests.build.dir}" prefix="WEB-INF/">
-          <include name="xwiki.cfg"/>
-        </zipfileset>
-      </cactifywar>
+        <exclude name="**/web*.xml" />
+        <exclude name="**/xwiki-*.cfg" />
+        <exclude name="**/hibernate.cfg.xml" />
+        <lib refid="libs.main.fileset" />
+        <lib refid="libs.xwiki.fileset" />
+        <lib refid="libs.tests.fileset" />
+        <lib refid="libs.exo.fileset" />
+      </war>
     </target>
 
     <target name="test.server" depends="tests, test.server.prepare">

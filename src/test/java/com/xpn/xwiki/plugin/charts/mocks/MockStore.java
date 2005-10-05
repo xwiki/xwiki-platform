@@ -262,8 +262,11 @@ public class MockStore implements XWikiStoreInterface {
         return null;  
     }
 
+    public void putXWikiClassInCache(BaseClass bclass, XWikiContext context) throws XWikiException {
+    }
+
     public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
-        return null;  
+        return null;
     }
 
     public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException {

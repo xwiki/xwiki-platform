@@ -209,6 +209,11 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         }
     }
 
+    public void putXWikiClassInCache(BaseClass bclass, XWikiContext context) throws XWikiException {
+        String key = getKey(bclass, context);
+        getClassCache().putInCache(key, bclass);
+    }
+
     public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
         BaseClass bclass = new BaseClass();
         bclass.setName(className);

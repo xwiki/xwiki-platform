@@ -79,6 +79,9 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
         return null;
     }
 
+    public void putXWikiClassInCache(BaseClass bclass, XWikiContext context) throws XWikiException {
+    }
+
     public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
         BaseClass bclass = new BaseClass();
         bclass.setName(className);

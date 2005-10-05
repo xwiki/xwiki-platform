@@ -1605,7 +1605,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             if (bTransaction==false) {
                 // We need to check if we have not already loaded this
-                bclass2 = loadXWikiClassFromCache(bclass, context);
+                bclass2 = context.getWiki().getStore().loadXWikiClassFromCache(bclass, context);
             }
 
             if (bclass2==null) {
@@ -1663,6 +1663,10 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
+
+            if ((bclass2!=null)&&(bTransaction==false))
+                context.getWiki().getStore().putXWikiClassInCache(bclass, context);
+
 
             if ((bclass2!=null)&&(bclass.hasExternalCustomMapping()))
                 setSessionFactory(injectCustomMappingsInSessionFactory(bclass, context));

@@ -555,6 +555,10 @@ public class XWiki extends Api {
         return xwiki.getAttachmentURL(fullname, filename, context);
     }
 
+    public String getURL(String fullname) throws XWikiException {
+        return xwiki.getURL(fullname, "view", context);
+    }
+
     public String getURL(String fullname, String action) throws XWikiException {
         return xwiki.getURL(fullname, action, context);
     }

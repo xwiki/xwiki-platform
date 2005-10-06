@@ -253,7 +253,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         bclass2.setName(bclass.getName());
 
         // Read object2
-        store.loadXWikiClass(bclass2, getXWikiContext(), true);
+        bclass2 = store.loadXWikiClass(bclass2, getXWikiContext(), true);
 
         // Verify object2
         Utils.assertProperty(bclass2, bclass, "first_name");

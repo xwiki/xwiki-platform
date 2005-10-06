@@ -409,7 +409,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException { {
-        BaseClass bclass = context.getWiki().getStore().loadXWikiClass(className, context);
+        BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
         return object;
     }

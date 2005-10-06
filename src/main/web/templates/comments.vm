@@ -9,7 +9,7 @@ $message
 #end
 <div id="xwikicontent">
 <div id="xwikiaddcomment">
-#if($context.hasAccessLevel("comment", $doc.fullName)==false)
+#if($xwiki.hasAccessLevel("comment")==false)
 $msg.get("nocommentswithoutright")
 #else
 #set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())

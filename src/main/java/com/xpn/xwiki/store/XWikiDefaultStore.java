@@ -75,26 +75,6 @@ public abstract class XWikiDefaultStore implements XWikiStoreInterface {
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
     }
 
-    public BaseClass loadXWikiClassFromCache(BaseClass bclass, XWikiContext context) throws XWikiException {
-        return null;
-    }
-
-    public void putXWikiClassInCache(BaseClass bclass, XWikiContext context) throws XWikiException {
-    }
-
-    public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
-        BaseClass bclass = new BaseClass();
-        bclass.setName(className);
-        return loadXWikiClass(bclass, context);
-    }
-    
-    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(bclass.getName());
-        doc = loadXWikiDoc(doc, context);
-        return doc.getxWikiClass();
-    }
-
     public List getCustomMappingPropertyList(BaseClass bclass) {
         return new ArrayList();
     }

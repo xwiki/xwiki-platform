@@ -279,6 +279,8 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 "update xwikidoc set xwd_default_language='' where xwd_default_language is null",
                 "update xwikidoc set xwd_fullname=" + fullName + " where xwd_fullname is null",
                 "update xwikidoc set xwd_elements=3 where xwd_elements is null",
+                "delete from xwikiproperties where xwp_name like 'editbox_%' and xwp_classtype='com.xpn.xwiki.objects.LongProperty'",
+                "delete from xwikilongs where xwl_name like 'editbox_%'"    
                 };
 
             String[] sql = new String[schemaSQL.length+addSQL.length];
@@ -893,7 +895,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 doc.setxWikiClass(bclass);
             } else if (useClassesTable(false, context)) {
                 bclass.setName(doc.getFullName());
-                loadXWikiClass(bclass, context, false);
+                bclass = loadXWikiClass(bclass, context, false);
                 doc.setxWikiClass(bclass);
             }
 
@@ -1556,7 +1558,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             Session session = getSession(context);
 
 
-// Verify if the property already exists
+            // Verify if the property already exists
             Query query = session.createQuery("select obj.id from BaseClass as obj where obj.id = :id");
             query.setInteger("id", bclass.getId());
             if (query.uniqueResult()==null)
@@ -1601,82 +1603,42 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
     public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context, boolean bTransaction) throws XWikiException {
         try {
-            BaseClass bclass2 = null;
-
-            if (bTransaction==false) {
-                // We need to check if we have not already loaded this
-                bclass2 = context.getWiki().getStore().loadXWikiClassFromCache(bclass, context);
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(false, context);
             }
+            Session session = getSession(context);
 
-            if (bclass2==null) {
-                if (bTransaction) {
-                    checkHibernate(context);
-                    bTransaction = beginTransaction(false, context);
+            try {
+                session.load(bclass, new Integer(bclass.getId()));
+
+                HashMap map = new HashMap();
+                Query query = session.createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id order by prop.number asc");
+                query.setInteger("id", bclass.getId());
+                Iterator it = query.list().iterator();
+                while (it.hasNext()) {
+                    Object obj = it.next();
+                    Object[] result = (Object[]) obj;
+                    String name = (String)result[0];
+                    String classType = (String)result[1];
+                    PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
+                    property.setName(name);
+                    property.setObject(bclass);
+                    session.load(property, property);
+                    bclass.addField(name, property);
                 }
-                Session session = getSession(context);
-
-                if (bTransaction) {
-                    // If we are not loading from a document load we should get the xml in the document table
-                    // we can't load the full document because we could have a deadlock
-                    // If we are loading from a document load we don't reload the document
-                    // because this has already been tried.
-                    XWikiDocument doc =  new XWikiDocument();
-                    doc.setFullName(bclass.getName());
-                    // Otherwise let's try getting it from
-                    try {
-                        session.load(doc, new Long(doc.getId()));
-                        String cxml = doc.getxWikiClassXML();
-                        if (cxml!=null) {
-                            bclass.fromXML(cxml);
-                            bclass.setName(doc.getFullName());
-                            bclass2 = bclass;
-                        }
-                    } catch (ObjectNotFoundException e) {};
-                }
-
-                if ((bclass2==null)&&useClassesTable(false, context)) {
-                    try {
-                        session.load(bclass, new Integer(bclass.getId()));
-                        bclass2 = bclass;
-
-                        HashMap map = new HashMap();
-                        Query query = session.createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id order by prop.number asc");
-                        query.setInteger("id", bclass.getId());
-                        Iterator it = query.list().iterator();
-                        while (it.hasNext()) {
-                            Object obj = it.next();
-                            Object[] result = (Object[]) obj;
-                            String name = (String)result[0];
-                            String classType = (String)result[1];
-                            PropertyClass property = (PropertyClass) Class.forName(classType).newInstance();
-                            property.setName(name);
-                            property.setObject(bclass);
-                            session.load(property, property);
-                            bclass.addField(name, property);
-                        }
-                    }
-                    catch (ObjectNotFoundException e) {
-                    }
-                }
+            }
+            catch (ObjectNotFoundException e) {
             }
 
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
 
-            if ((bclass2!=null)&&(bTransaction==false))
-                context.getWiki().getStore().putXWikiClassInCache(bclass, context);
-
-
-            if ((bclass2!=null)&&(bclass.hasExternalCustomMapping()))
+            if ((bclass!=null)&&(bclass.hasExternalCustomMapping()))
                 setSessionFactory(injectCustomMappingsInSessionFactory(bclass, context));
 
-            if (bclass2==null) {
-                bclass2 = new BaseClass();
-                bclass2.setName(bclass.getName());
-            }
-
-            return bclass2;
+            return bclass;
         } catch (Exception e) {
             Object[] args = { bclass.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_CLASS,
@@ -2266,7 +2228,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
-            Query query = session.createQuery("select doc.name from XWikiDocument as doc where doc.xWikiClassXML is not null");
+            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc where doc.xWikiClassXML is not null");
             Iterator it = query.list().iterator();
             List list = new ArrayList();
             while (it.hasNext()) {

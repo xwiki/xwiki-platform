@@ -243,7 +243,7 @@ $xwiki.getUserName("xwiki:${username}")
   <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
   <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
   #foreach ($doc in $docs)
-    #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${SpaceName}.${doc}"))
+    #if ($xwiki.hasAccessLevel("view", "${context.database}:${SpaceName}.${doc}"))
 
     <tr><td>[${doc}>${SpaceName}.${doc}]</td><td><input type="checkbox" name="ToExport" value="${SpaceName}.${doc}" /></td><td><input type="radio" name="${SpaceName}.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="merge" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="skip" /></td> </tr>
 
@@ -261,7 +261,7 @@ $xwiki.getUserName("xwiki:${username}")
     <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
     <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
     #foreach ($doc in $docs)
-      #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:XWiki.${doc}"))
+      #if ($xwiki.hasAccessLevel("view", "${context.database}:XWiki.${doc}"))
 
       <tr><td>[${doc}>XWiki.${doc}]</td><td><input type="checkbox" name="ToExport" value="XWiki.${doc}" /></td><td><input type="radio" name="XWiki.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="merge" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="skip" /></td> </tr>
 

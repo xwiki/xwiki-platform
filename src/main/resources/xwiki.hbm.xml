@@ -82,7 +82,7 @@
             <column name="XWD_CLASS_XML" length="20000" not-null="false"/>
         </property>
 
-        <property name="elements" type="integer">
+        <property name="elements" type="integer" not-null="true">
             <column name="XWD_ELEMENTS" />
         </property>
 

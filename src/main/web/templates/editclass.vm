@@ -95,7 +95,7 @@ $msg.get("propname"): <input type="text" name="propname" value="" size="20" />
 <select name="classname" size="1">
 <option value="---">$msg.get("selectclass")</option>
 #foreach ($classname in $xwiki.classList)
-#!if ($rsvc.hasAccessLevel("edit", $context.user,  $classname, true, $context))
+#!if ($xwiki.hasAccessLevel("edit", $classname))
 #set($classdoc = $xwiki.getDocument($classname))
 <option value="$classdoc.getURL("edit", "xpage=editclass")">$classname</option>
 #!end

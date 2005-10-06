@@ -124,20 +124,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         try {
             if ((context==null)||(context.getWiki()==null))
                 return null;
-            XWikiDocument doc = context.getWiki().getDocument(name, context);
-         if (doc==null)
-          return null;
-        else
-         return doc.getxWikiClass();
+            return context.getWiki().getClass(name, context);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-
-    /*public void setxWikiClass(BaseClass xWikiClass) {
-        setClassName(xWikiClass.getName());
-    }*/
 
     public String getStringValue(String name) {
         BaseProperty prop = (BaseProperty) safeget(name);

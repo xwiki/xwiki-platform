@@ -49,21 +49,19 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     private XWikiCache classCache;
     private XWikiCache prefsCache;
     private int cacheCapacity = 100;
-    private int classCacheCapacity = 100;
     private int prefsCacheCapacity = 1000;
     private int pageExistCacheCapacity = 10000;
 
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) {
         setStore(store);
-        initCache(cacheCapacity, pageExistCacheCapacity, getPrefsCacheCapacity(), getClassCacheCapacity(), context);
+        initCache(cacheCapacity, pageExistCacheCapacity, getPrefsCacheCapacity(), context);
     }
 
-    public void initCache(int capacity, int pageExistCacheCapacity, int prefsCacheCapacity, int classCacheCapacity, XWikiContext context) {
+    public void initCache(int capacity, int pageExistCacheCapacity, int prefsCacheCapacity, XWikiContext context) {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
         setCache(cacheService.newCache(capacity));
         setPageExistCache(cacheService.newCache(pageExistCacheCapacity));
         setPrefsCache(cacheService.newCache(prefsCacheCapacity));
-        setClassCache(cacheService.newCache(classCacheCapacity));
     }
 
     public void setCacheCapacity(int capacity) {
@@ -99,29 +97,17 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
             getCache().putInCache(key, doc);
             getPageExistCache().flushEntry(key);
             getPageExistCache().putInCache(key, new Boolean(true));
-
-            // We need to populate the class cache
-            BaseClass bclass = doc.getxWikiClass();
-            if (bclass.getFieldList().size()>0)
-             getClassCache().putInCache(key, bclass);
-            else
-             getClassCache().flushEntry(key);
         }
     }
 
     public void flushCache() {
         getCache().flushAll();
         getPageExistCache().flushAll();
-        getClassCache().flushAll();
         getPrefsCache().flushAll();
     }
 
     public String getKey(XWikiDocument doc, XWikiContext context) {
         return getKey(doc.getFullName(), doc.getLanguage(), context);
-    }
-
-    public String getKey(BaseClass bclass, XWikiContext context) {
-        return getKey(bclass.getName(), "", context);
     }
 
     public String getKey(String fullName, String language, XWikiContext context) {
@@ -165,10 +151,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
                 if (log.isDebugEnabled())
                  log.debug("Cache: put doc " + key + " in cache");
 
-                // We need to populate the class cache
-                BaseClass bclass = doc.getxWikiClass();
-                if (bclass.getFieldList().size()>0)
-                 getClassCache().putInCache(key, bclass);
                 getCache().putInCache(key, doc);
                 getPageExistCache().putInCache(key, new Boolean(!doc.isNew()));
             }
@@ -189,7 +171,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         synchronized(key) {
             store.deleteXWikiDoc(doc, context);
             getCache().flushEntry(key);
-            getClassCache().flushEntry(key);
             getPageExistCache().flushEntry(key);
             getPageExistCache().putInCache(key, new Boolean(false));
         }
@@ -197,65 +178,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
         return store.getXWikiDocVersions(doc, context);
-    }
-
-    public BaseClass loadXWikiClassFromCache(BaseClass bclass, XWikiContext context) throws XWikiException {
-        String key = getKey(bclass, context);
-        try {
-            return (BaseClass) getClassCache().getFromCache(key);
-        } catch (XWikiCacheNeedsRefreshException e) {
-            getCache().cancelUpdate(key);
-            return null;
-        }
-    }
-
-    public void putXWikiClassInCache(BaseClass bclass, XWikiContext context) throws XWikiException {
-        String key = getKey(bclass, context);
-        getClassCache().putInCache(key, bclass);
-    }
-
-    public BaseClass loadXWikiClass(String className, XWikiContext context) throws XWikiException {
-        BaseClass bclass = new BaseClass();
-        bclass.setName(className);
-        return loadXWikiClass(bclass, context);
-    }
-
-    public BaseClass loadXWikiClass(BaseClass bclass, XWikiContext context) throws XWikiException {
-        String bclassName = bclass.getName();
-        String key = getKey(bclass, context);
-
-        synchronized (key) {
-            // Let's first look into the document
-            try {
-                XWikiDocument doc  = (XWikiDocument) getCache().getFromCache(key);
-                bclass = doc.getxWikiClass();
-                if (bclass.getFieldList().size()>0)
-                 getClassCache().putInCache(key, bclass);
-                return bclass;
-            } catch (XWikiCacheNeedsRefreshException e) {
-                getCache().cancelUpdate(key);
-            }
-
-            // Then let's look in our class cache
-            try {
-                bclass = (BaseClass) getClassCache().getFromCache(key);
-            } catch (XWikiCacheNeedsRefreshException e) {
-                try {
-                    bclass = store.loadXWikiClass(bclass, context);
-                } catch (XWikiException xwikiexception) {
-                    getClassCache().cancelUpdate(key);
-                    throw xwikiexception;
-                }
-                if ((bclass!=null)&&(bclass.getFieldList().size()>0))
-                 getClassCache().putInCache(key, bclass);
-            }
-        }
-        if (bclass==null) {
-            bclass = new BaseClass();
-            bclass.setName(bclassName);
-        }
-         
-        return bclass;
     }
 
     public List getClassList(XWikiContext context) throws XWikiException {
@@ -426,29 +348,12 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.injectUpdatedCustomMappings(context);
     }
 
-    public XWikiCache getClassCache() {
-        return classCache;
-    }
-
-    public void setClassCache(XWikiCache classCache) {
-        this.classCache = classCache;
-    }
-
     public XWikiCache getPrefsCache() {
         return prefsCache;
     }
 
     public void setPrefsCache(XWikiCache prefsCache) {
         this.prefsCache = prefsCache;
-    }
-
-    public int getClassCacheCapacity() {
-        return classCacheCapacity;
-    }
-
-    public void setClassCacheCapacity(int classCacheCapacity) {
-        this.classCacheCapacity = classCacheCapacity;
-        getClassCache().setCapacity(classCacheCapacity);
     }
 
     public int getPrefsCacheCapacity() {

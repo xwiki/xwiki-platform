@@ -92,7 +92,7 @@ public class XWikiStats extends BaseCollection {
     }
 
     public Object clone() {
-        BaseObject object = (BaseObject) super.clone();
+        BaseCollection object = (BaseCollection) super.clone();
         return object;
     }
 

@@ -97,5 +97,6 @@ public class XWikiBatcher extends BatchingBatcher {
     protected void doExecuteBatch(PreparedStatement ps) throws SQLException, HibernateException {
         getSQLStats().incrementExecuteBatchCounter();
         super.doExecuteBatch(ps);
+        getSQLStats().resetOnNextSQL();
     }
 }

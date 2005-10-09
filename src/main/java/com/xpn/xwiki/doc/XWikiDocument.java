@@ -1145,6 +1145,15 @@ public class XWikiDocument {
         }
     }
 
+    public void loadAttachments(XWikiContext context) throws XWikiException {
+        Iterator attit = getAttachmentList().iterator();
+        while (attit.hasNext()) {
+            XWikiAttachment attachment = (XWikiAttachment) attit.next();
+            attachment.loadContent(context);
+            attachment.loadArchive(context);
+        }
+    }
+
     public boolean equals(Object object) {
         XWikiDocument doc = (XWikiDocument) object;
         if (!getName().equals(doc.getName()))

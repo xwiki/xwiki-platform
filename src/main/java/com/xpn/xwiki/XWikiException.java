@@ -26,6 +26,8 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.xml.transform.TransformerException;
@@ -34,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.hibernate.JDBCException;
+import com.xpn.xwiki.store.XWikiBatcher;
 
 public class XWikiException extends Exception {
 
@@ -119,7 +122,7 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION = 4001;
     public static final int ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION = 4002;
-    
+
     public static final int ERROR_XWIKI_PERLPLUGIN_START_EXCEPTION = 6001;
     public static final int ERROR_XWIKI_PERLPLUGIN_START = 6002;
     public static final int ERROR_XWIKI_PERLPLUGIN_PERLSERVER_EXCEPTION = 6003;
@@ -134,7 +137,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_USER_INIT = 8001;
     public static final int ERROR_XWIKI_USER_CREATE = 8002;
     public static final int ERROR_XWIKI_USER_INACTIVE = 8003;
-    
+
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
     public static final int ERROR_XWIKI_ACCESS_TOKEN_INVALID = 9002;
 
@@ -285,6 +288,15 @@ public class XWikiException extends Exception {
         StringBuffer buffer = new StringBuffer(getMessage());
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
+        buffer.append("\n");
+        List list = XWikiBatcher.getSQLStats().getRecentSqlList();
+        if (list.size()>0) {
+            buffer.append("Recent SQL:\n");
+            for  (int i=0;i<list.size();i++) {
+                buffer.append(list.get(i));
+                buffer.append("\n");
+            }
+        }
         return buffer.toString();
     }
 

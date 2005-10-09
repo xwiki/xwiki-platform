@@ -24,7 +24,6 @@
 <property name="connection.pool_size">50</property>
 <property name="statement_cache.size">50</property>
 <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
-<property name="jdbc.factory_class">com.xpn.xwiki.store.XWikiBatcherFactory</property>    
     <!-- Mapping files -->
 <mapping resource="xwiki.hbm.xml"/>
 </session-factory>

@@ -1363,37 +1363,37 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 Object map = dynamicSession.get((String) bclass.getName(),new Integer(object.getId()));
-                dynamicSession.delete((Object) map);
                 if (evict)
                     dynamicSession.evict(map);
+                dynamicSession.delete((Object) map);
             }
 
             if (!object.getClassName().equals("internal")) {
                 for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
                     BaseProperty property = (BaseProperty)it.next();
                     if (!handledProps.contains(property.getName())) {
-                        session.delete(property);
                         if (evict)
                             session.evict(property);
+                        session.delete(property);
                     }
                 }
             }
 
             // In case of custom class we need to force it as BaseObject
             // to delete the xwikiobject row
-            if (!(object.getClassName().equals(BaseObject.class.getName()))) {
+            if (!"".equals(bclass.getCustomClass())) {
                 BaseObject cobject = new BaseObject();
                 cobject.setName(object.getName());
                 cobject.setClassName(object.getClassName());
                 cobject.setNumber(object.getNumber());
                 cobject.setId(object.getId());
-                session.delete(cobject);
                 if (evict)
                     session.evict(cobject);
+                session.delete(cobject);
             } else {
-                session.delete(object);
                 if (evict)
                     session.evict(object);
+                session.delete(object);
             }
 
             if (bTransaction) {

@@ -18,6 +18,8 @@ public class XWikiBatcherStats {
     private static final Log log = LogFactory.getLog(XWikiBatcherStats.class);
 
     private List sqlList = new ArrayList();
+    private List recentSqlList = new ArrayList();
+    private boolean resetOnNextSQL = false;
     private int preparedSQLCounter = 0;
     private int executeBatchCounter = 0;
     private int abortBatchCounter = 0;
@@ -37,8 +39,25 @@ public class XWikiBatcherStats {
         return sqlList;
     }
 
+    public List getRecentSqlList() {
+        return recentSqlList;
+    }
+
+    public void resetRecentSqlList() {
+        recentSqlList = new ArrayList();
+    }
+
     public void addToSqlList(String sql) {
+        if (resetOnNextSQL) {
+            resetRecentSqlList();
+            resetOnNextSQL = false;
+        }
+        this.recentSqlList.add(sql);
         this.sqlList.add(sql);
+    }
+
+    public void resetOnNextSQL() {
+        resetOnNextSQL = true;
     }
 
     public int getPreparedSQLCounter() {

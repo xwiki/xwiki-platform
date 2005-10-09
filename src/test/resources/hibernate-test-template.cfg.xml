@@ -25,7 +25,7 @@
 <property name="statement_cache.size">50</property>
 <property name="dialect">@dialect@</property>
 <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
-<property name="jdbc.factory_class">com.xpn.xwiki.store.XWikiBatcherFactory</property>
+<!-- <property name="jdbc.factory_class">com.xpn.xwiki.store.XWikiBatcherFactory</property> -->
 <!-- Mapping files -->
 <mapping resource="xwiki.hbm.xml"/>
 </session-factory>

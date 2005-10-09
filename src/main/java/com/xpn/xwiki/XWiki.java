@@ -2180,6 +2180,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     return false;
 
                 if (wikilanguage == null) {
+                    // Make sure attachments are loaded
+                    sdoc.loadAttachments(context);
                     if (docname.equals(targetdocname))
                         tdoc = (XWikiDocument) sdoc.clone();
                     else
@@ -2217,6 +2219,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (ttdoc != tdoc)
                             return false;
 
+                        // Make sure attachments are loaded
+                        stdoc.loadAttachments(context);
+
                         if (docname.equals(targetdocname))
                             ttdoc = (XWikiDocument) stdoc.clone();
                         else
@@ -2236,6 +2241,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilanguage, context);
                     if (targetWiki != null)
                         context.setDatabase(targetWiki);
+
+                    // Make sure attachments are loaded
+                    stdoc.loadAttachments(context);
+
                     if (docname.equals(targetdocname))
                         tdoc = (XWikiDocument) stdoc.clone();
                     else

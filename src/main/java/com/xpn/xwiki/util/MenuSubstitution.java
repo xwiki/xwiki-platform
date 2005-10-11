@@ -20,7 +20,7 @@ public class MenuSubstitution extends WikiSubstitution {
     public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput patternMatcherInput, PatternMatcher patternMatcher, Pattern pattern) {
         String page = matchResult.group(1);
         stringBuffer.append("\"$xwiki.getURL(\"");
-        stringBuffer.append(page.replace("/", "."));
+        stringBuffer.append(page.replace('/', '.'));
         stringBuffer.append("\",\"view\")\"");
     }
 }

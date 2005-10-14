@@ -265,7 +265,7 @@ public class Document extends Api {
         for (int i=0;i<objects.size();i++) {
             BaseObject bobj = (BaseObject) objects.get(i);
             if (bobj!=null) {
-                result.add(new Object(bobj, context));
+                result.add(newObjectApi(bobj, context));
             }
         }
         return result;
@@ -282,7 +282,7 @@ public class Document extends Api {
             if (obj==null)
                 return null;
             else
-                return new Object(obj, context);
+                return newObjectApi(obj, context);
         } catch (Exception e) {
             return null;
         }
@@ -294,7 +294,7 @@ public class Document extends Api {
             if (obj==null)
                 return null;
             else
-                return new Object(obj, context);
+                return newObjectApi(obj, context);
         } catch (Exception e) {
             return null;
         }
@@ -306,7 +306,7 @@ public class Document extends Api {
             if (obj==null)
                 return null;
             else
-                return new Object(obj, context);
+                return newObjectApi(obj, context);
         } catch (Exception e) {
             return null;
         }
@@ -318,7 +318,7 @@ public class Document extends Api {
             if (obj==null)
                 return null;
             else
-                return new Object(obj, context);
+                return newObjectApi(obj, context);
         } catch (Exception e) {
             return null;
         }
@@ -330,10 +330,14 @@ public class Document extends Api {
             if (obj==null)
                 return null;
             else
-                return new Object(obj, context);
+                return newObjectApi(obj, context);
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private Object newObjectApi(BaseObject obj, XWikiContext context) {
+        return obj.newObjectApi(obj, context);
     }
 
     public String getXMLContent() throws XWikiException {

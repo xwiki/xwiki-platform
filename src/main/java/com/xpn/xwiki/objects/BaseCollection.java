@@ -197,6 +197,47 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
+
+    public float getFloatValue(String name) {
+        try {
+        NumberProperty prop = (NumberProperty)safeget(name);
+        if (prop==null)
+         return 0;
+        else
+         return ((Number)prop.getValue()).floatValue();
+        }
+         catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public void setFloatValue(String name, float value) {
+        NumberProperty property = new FloatProperty();
+        property.setName(name);
+        property.setValue(new Float(value));
+        safeput(name, property);
+    }
+
+    public double getDoubleValue(String name) {
+        try {
+        NumberProperty prop = (NumberProperty)safeget(name);
+        if (prop==null)
+         return 0;
+        else
+         return ((Number)prop.getValue()).doubleValue();
+        }
+         catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public void setDoubleValue(String name, double value) {
+        NumberProperty property = new DoubleProperty();
+        property.setName(name);
+        property.setValue(new Double(value));
+        safeput(name, property);
+    }
+
     public Date getDateValue(String name) {
         try {
         DateProperty prop = (DateProperty)safeget(name);
@@ -221,8 +262,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         ListProperty prop = (ListProperty)safeget(name);
         if (prop==null)
          return new HashSet();
-        else
-         return (Set)prop.getValue();
+        else {
+            return new HashSet((Collection)prop.getValue());
+        }
     }
 
     public void setSetValue(String name, Set value) {

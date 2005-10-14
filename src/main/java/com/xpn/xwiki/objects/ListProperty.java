@@ -34,6 +34,15 @@ import org.hibernate.collection.PersistentCollection;
 
 public class ListProperty extends BaseProperty {
     protected List list = new ArrayList();
+    private String formStringSeparator = "|";
+
+    public String getFormStringSeparator() {
+        return formStringSeparator;
+    }
+
+    public void setFormStringSeparator(String formStringSeparator) {
+        this.formStringSeparator = formStringSeparator;
+    }
 
     public Object getValue() {
         return getList();
@@ -61,7 +70,7 @@ public class ListProperty extends BaseProperty {
 
     public String toFormString() {
         CharacterFilter filter = new CharacterFilter();
-        filter.addAttribute("|", "\\|");
+        filter.addAttribute(formStringSeparator, "\\" + formStringSeparator);
 
         List list = getList();
         Iterator it = list.iterator();
@@ -71,7 +80,7 @@ public class ListProperty extends BaseProperty {
         StringBuffer result = new StringBuffer();
         result.append(it.next());
         while (it.hasNext()) {
-            result.append("|");
+            result.append(formStringSeparator);
             result.append(filter.process((String)it.next()));
         }
         return result.toString();

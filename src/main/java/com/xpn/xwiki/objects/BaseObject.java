@@ -176,4 +176,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         }
     }
 
+    public com.xpn.xwiki.api.Object newObjectApi(BaseObject obj, XWikiContext context) {
+        return new com.xpn.xwiki.api.Object(obj, context);
+    }
 }

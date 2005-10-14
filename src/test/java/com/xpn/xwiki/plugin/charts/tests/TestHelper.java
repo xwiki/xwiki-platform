@@ -19,7 +19,7 @@ public class TestHelper {
 		BaseClass xclass = new BaseClass();
 		xclass.setClassName(className);
 
-		xclass.addNumberField(TableDataSource.TABLE_NUMBER, TableDataSource.TABLE_NUMBER, 30, "int");
+		xclass.addNumberField(TableDataSource.TABLE_NUMBER, TableDataSource.TABLE_NUMBER, 30, "integer");
 		xclass.addTextField(TableDataSource.RANGE, TableDataSource.RANGE, 30);
 		xclass.addBooleanField(TableDataSource.HAS_HEADER_ROW, TableDataSource.HAS_HEADER_ROW, "");
 		xclass.addBooleanField(TableDataSource.HAS_HEADER_COLUMN, TableDataSource.HAS_HEADER_COLUMN, "");

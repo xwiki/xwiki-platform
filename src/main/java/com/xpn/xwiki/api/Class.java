@@ -63,7 +63,8 @@ public class Class extends Collection {
     }
 
     public Object newObject() throws XWikiException {
-        return new Object((BaseObject)getBaseClass().newObject(context), context);
+        BaseObject obj = (BaseObject)getBaseClass().newObject(context);
+        return obj.newObjectApi(obj, context);
     }
 
 }

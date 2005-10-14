@@ -125,6 +125,24 @@ public class ClassesTest extends TestCase {
         assertEquals("StaticList failed on multiple value", property.toFormString(), "1|2");
     }
 
+    public void testStaticListTextInput() {
+        StaticListClass pclass = new StaticListClass();
+        pclass.setMultiSelect(true);
+        pclass.setDisplayType("input");
+
+        ListProperty property;
+        property = (ListProperty)pclass.fromString ("1");
+        assertEquals ("StaticList on single value (multiple choices with text input)", property.toText(), "1");
+        assertEquals ("StaticList on single value (multiple choices with text input)", property.toFormString(),"1");
+        property = (ListProperty)pclass.fromString ("1, 2 3,4");
+        assertEquals("StaticList failed on multiple value (multiple choices with text input)", property.toText(), "1 2 3 4");
+        assertEquals("StaticList failed on multiple value (multiple choices with text input)", property.toFormString(), "1|2|3|4");
+        property = (ListProperty)pclass.fromString ("1 2,3,4");
+        assertEquals("StaticList failed on multiple value (multiple choices with text input)", property.toText(), "1 2 3 4");
+        assertEquals("StaticList failed on multiple value (multiple choices with text input)", property.toFormString(), "1|2|3|4");
+    }
+
+    
     public void testBasicDisplayers() throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);

@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.classes;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -113,14 +114,24 @@ public abstract class ListClass extends PropertyClass {
             lprop = new StringListProperty();
         else
             lprop = new StringProperty();
+
+        if (isMultiSelect() && getDisplayType().equals("input")) {
+            ((ListProperty)lprop).setFormStringSeparator(" ");
+        }
+
+
         return lprop;
     }
 
     public BaseProperty fromString(String value) {
         BaseProperty prop = newProperty();
-        if (isMultiSelect())
+        if (isMultiSelect()) {
+          if (!getDisplayType().equals("input")) {
             ((ListProperty)prop).setList(getListFromString(value));
-        else
+          } else {
+            ((ListProperty)prop).setList(Arrays.asList(StringUtils.split(value," ,|")));
+          }
+        } else
             prop.setValue(value);
         return prop;
     }
@@ -186,7 +197,7 @@ public abstract class ListClass extends PropertyClass {
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        if (getDisplayType()=="input") {
+        if (getDisplayType().equals("input")) {
             input input = new input();
             BaseProperty prop = (BaseProperty) object.safeget(name);
             if (prop!=null) input.setValue(prop.toFormString());

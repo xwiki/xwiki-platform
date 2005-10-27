@@ -101,9 +101,10 @@ public class SkinAction extends XWikiAction {
             if (is==null)
              return false;
 
+            int nRead = 0;
             byte[] data = new byte[65535];
-            while (is.read(data)!=-1) {
-                response.getOutputStream().write(data);
+            while ((nRead = is.read(data)) !=-1) {
+                response.getOutputStream().write(data,0,nRead);
             }
             return true;
         } catch (IOException e) {

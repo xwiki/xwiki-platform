@@ -115,6 +115,7 @@
             #xwikiitem($doc.getURL("delete") "delete")
           #end
           #if (!$isReadOnly)
+            #xwikiitem($doc.getURL("chartwizard") "chartwizard")
             #xwikiitem($doc.getURL("edit", "xpage=editrights") "editrights")
           #end
         #end

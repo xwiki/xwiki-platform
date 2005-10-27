@@ -15,12 +15,7 @@
   </div>
 
 <div id="xwikititle">
-#if ($doc.parent.length() > 0)
-<h1>$parent &gt; $!headertitle</h1>
-#else
-<h1>$!headertitle</h1>
-#end
-   <h2>$!headersubtitle</h2>
+<h1>$!doclink</h1>
 </div>
 <div id="xwikilinks">
   <div id="xwikimenu">

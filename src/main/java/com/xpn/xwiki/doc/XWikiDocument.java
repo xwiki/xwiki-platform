@@ -271,6 +271,40 @@ public class XWikiDocument {
             return title;
     }
 
+    public String getDisplayTitle() {
+        String title = getTitle();
+        if (title.equals("")) {
+         title = extractTitle();
+        }
+        if (title.equals(""))
+         return getName();
+        else
+         return title;
+    }
+
+    public String extractTitle() {
+        try {
+            String content = getContent();
+            int i1 = 0;
+            int i2;
+
+            while (true) {
+                i2 = content.indexOf("\n", i1);
+                String title = "";
+                if (i2!=-1)
+                    title = content.substring(i1, i2).trim();
+                else
+                    title = content.substring(i1).trim();
+                if ((!title.equals(""))&&(title.matches("1(\\.1)?\\s+.+")))
+                    return title.substring(title.indexOf(" ")).trim();
+                if (i2==-1)
+                    break;
+                i1 = i2 + 1;
+            }
+        } catch (Exception e) {}
+        return "";
+    }
+
     public void setTitle(String title) {
         if (title==null)
             title = "";
@@ -2282,6 +2316,43 @@ public class XWikiDocument {
 
     public boolean hasElement(int element) {
         return ((elements & element) == element);
+    }
+
+    public String getDefaultEditURL(XWikiContext context) throws XWikiException {
+        com.xpn.xwiki.XWiki xwiki = context.getWiki();
+        if (getContent().indexOf("includeForm(")!=-1) {
+            return getEditURL("inline", "", context);
+        } else {
+            String editor = xwiki.getEditorPreference(context);
+            return getEditURL("edit", editor, context);
+        }
+    }
+
+    public String getEditURL(String action, String mode, XWikiContext context) throws XWikiException {
+        com.xpn.xwiki.XWiki xwiki = context.getWiki();
+        String language = "";
+        XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+        String realLang = tdoc.getRealLanguage(context);
+        if ((xwiki.isMultiLingual(context)==true)&&(!realLang.equals(""))) {
+            language = realLang;
+        }
+        return getEditURL(action, mode, language, context);
+    }
+
+    public String getEditURL(String action, String mode, String language, XWikiContext context) {
+        StringBuffer editparams = new StringBuffer();
+        if (!mode.equals(""))  {
+            editparams.append("xpage=");
+            editparams.append(mode);
+        }
+
+        if (!language.equals(""))  {
+            if (!mode.equals(""))
+                editparams.append("&");
+            editparams.append("language=");
+            editparams.append(language);
+        }
+        return getURL(action, editparams.toString(), context);
     }
 
 }

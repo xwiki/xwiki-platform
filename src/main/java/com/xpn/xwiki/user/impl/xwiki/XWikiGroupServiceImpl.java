@@ -98,7 +98,16 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
         try {
             if (event==XWikiNotificationInterface.EVENT_CHANGE) {
-                groupCache.flushEntry(newdoc.getDatabase() + ":" + newdoc.getFullName());
+                boolean flushCache = false;
+
+                if ((olddoc!=null)&&(olddoc.getObjects("XWiki.XWikiGroups")!=null))
+                 flushCache = true;
+
+                if ((newdoc!=null)&&(newdoc.getObjects("XWiki.XWikiGroups")!=null))
+                 flushCache = true;
+
+                if (flushCache)
+                 groupCache.flushAll();
             }
         } catch (Exception e) {
             e.printStackTrace();

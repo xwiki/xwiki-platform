@@ -775,6 +775,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         textarea.setCols(cols);
         textarea.setName("content");
+        textarea.setID("content");
         textarea.addElement(scontent);
         return textarea.toString();
     }
@@ -1419,6 +1420,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
         needsUpdate |= bclass.addStaticListField("imtype", "IM Type", "---|AIM|Yahoo|Jabber|MSN|Skype|ICQ");
         needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
+        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
@@ -1472,7 +1474,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
 
-        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "Text|Wysiwyg");
+        needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
         needsUpdate |= bclass.addTextField("editbox_width", "Editbox Width", 5);
         needsUpdate |= bclass.addTextField("editbox_height", "Editbox Height", 5);
 
@@ -1919,7 +1921,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         newrightsobject.setClassName(rclass.getName());
         newrightsobject.setName(fullwikiname);
         newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
-        newrightsobject.setStringValue("levelsye", userRights);
+        newrightsobject.setStringValue("levels", userRights);
         newrightsobject.setIntValue("allow", 1);
         doc.addObject(rclass.getName(), newrightsobject);
 
@@ -3292,5 +3294,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return getDocument(fullName, context).getxWikiClass();
     }
 
+    public String getEditorPreference(XWikiContext context) {
+        String pref = getUserPreference("editor", context);
+        if (pref.equals(""))
+         pref = Param("xwiki.editor", "");
+        return pref.toLowerCase();
+    }
 }
 

@@ -1,3 +1,4 @@
+#if($request.xpage!="wyswiyg")
 <div class="xwikimenutitle">Basic Syntax</div>
 <div class="xwikimenulinks">
 <pre>
@@ -20,6 +21,7 @@
 # Numbered list item
 </pre>
 </div>
+#end
 <div class="xwikimenutitle">Links</div>
 <div class="xwikimenulinks">
 <pre>

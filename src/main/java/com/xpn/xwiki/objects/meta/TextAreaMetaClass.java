@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.XWikiContext;
 
 public class TextAreaMetaClass extends StringMetaClass {
@@ -41,6 +42,16 @@ public TextAreaMetaClass() {
     rows_class.setSize(5);
     rows_class.setNumberType("integer");
     safeput("rows", rows_class);
+
+    StaticListClass editor_class = new StaticListClass(this);
+    editor_class.setName("editor");
+    editor_class.setPrettyName("Editor");
+    editor_class.setValues("---|Text|Text2|Wysiwyg");
+    editor_class.setRelationalStorage(false);
+    editor_class.setDisplayType("select");
+    editor_class.setMultiSelect(false);
+    editor_class.setSize(1);
+    safeput("editor", editor_class);
   }
 
 

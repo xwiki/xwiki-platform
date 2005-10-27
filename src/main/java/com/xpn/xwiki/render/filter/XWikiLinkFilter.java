@@ -227,6 +227,16 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
      */
 
     protected String getWikiView(String name) {
-        return name;
+        return convertWikiWords(name);
     }
+
+    public static String convertWikiWords(String name) {
+        try {
+            name = name.substring(name.indexOf(".") + 1);
+            return name.replaceAll("([a-z])([A-Z])", "$1 $2");
+        } catch (Exception e) {
+            return name;
+        }
+    }
+
 }

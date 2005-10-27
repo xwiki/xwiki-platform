@@ -93,6 +93,10 @@ public class Document extends Api {
         return doc.getTitle();
     }
 
+    public String getDisplayTitle() {
+        return doc.getDisplayTitle();
+    }
+
     public String getFormat() {
         return doc.getFormat();
     }
@@ -720,8 +724,19 @@ public class Document extends Api {
         return doc.getBacklinks(context);
     }
 
-   public List getLinks () throws XWikiException {
+    public List getLinks () throws XWikiException {
         return doc.getLinks(context);
     }
 
+    public String getDefaultEditURL() throws XWikiException {
+        return doc.getDefaultEditURL(context);
+    }
+
+    public String getEditURL(String action, String mode) throws XWikiException {
+        return doc.getEditURL(action, mode, context);
+    }
+
+    public String getEditURL(String action, String mode, String language) {
+        return doc.getEditURL(action, mode, language, context);
+    }
 }

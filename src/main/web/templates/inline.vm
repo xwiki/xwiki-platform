@@ -29,4 +29,5 @@ $cdoc.getRenderedContent()
 </div>
 #end
 </form>
+#template("textarea_wysiwyg.vm")
 #template("editfooter.vm")

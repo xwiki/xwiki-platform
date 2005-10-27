@@ -23,6 +23,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
+import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -56,14 +57,69 @@ public class TextAreaClass extends StringClass {
         setIntValue("rows", rows);
     }
 
+    public String getEditor() {
+        return getStringValue("editor").toLowerCase();
+    }
+
+    public boolean isWysiwyg(XWikiContext context) {
+        String editor = context.getRequest().get("xeditmode");
+        if (editor!=null) {
+            if (editor.equals("text"))
+                return false;
+            if (editor.equals("wysiwyg"))
+                return true;
+        }
+
+        editor = getEditor();
+
+        if (editor!=null) {
+            if (editor.equals("text"))
+                return false;
+            if (editor.equals("wysiwyg"))
+                return true;
+        }
+
+        editor = context.getWiki().getEditorPreference(context);
+
+        if (editor!=null) {
+            if (editor.equals("text"))
+                return false;
+            if (editor.equals("wysiwyg"))
+                return true;
+        }
+
+        return false;
+    }
+
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        boolean isWysiwyg = isWysiwyg(context);
         textarea textarea = new textarea();
+        String tname = prefix + name;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) textarea.addElement(prop.toFormString());
 
-        textarea.setName(prefix + name);
+        textarea.setName(tname);
+        textarea.setID(tname);
         textarea.setCols(getSize());
-        textarea.setRows(getRows());
+        textarea.setRows(getRows() + (isWysiwyg ? 2 : 0));
+
+
+        // Let's add the Wysiwyg JS
+        if (isWysiwyg) {
+            String wysiwyg = (String) context.get("editor_wysiwyg");
+            if (wysiwyg==null) {
+                wysiwyg = tname;
+            } else {
+                wysiwyg += "," + tname;
+            }
+            context.put("editor_wysiwyg", wysiwyg);
+        } else {
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            vcontext.put("textareaName", tname);
+            vcontext.put("textarea", textarea);
+            String addscript = context.getWiki().parseTemplate("textarea_text.vm", context);
+            buffer.append(addscript);
+        }
         buffer.append(textarea.toString());
     }
 }

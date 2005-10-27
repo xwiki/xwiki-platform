@@ -45,7 +45,7 @@
         #set($editaction = "edit")
 ## Check WYSISYG editing option
         #if($xwiki.getUserPreference("editor")=="Wysiwyg")
-          #set($editparams="xpage=htmlarea")
+          #set($editparams="xpage=wysiwyg")
         #end
       #end
 ## Check language option
@@ -65,7 +65,7 @@
     #if($hasedit)
       #xwikiimglink($doc.getURL("attach") $xwiki.getSkinFile("addFile.gif") "$msg.get('addattachment') ($doc.getAttachmentList().size())")
     #end
-## End "Add Atachament" link
+## End "Add Attachment" link
 ## Begin "PDF" link
     #xwikiimglink($doc.getExternalURL("pdf", "$!{revparams}") $xwiki.getSkinFile("pdf.gif") $msg.get("pdf"))
 ## End "PDF" link
@@ -85,13 +85,13 @@
 ## Edit section
         #if($hasedit)
           <div class="xwikimenutitle">$msg.get("edit")</div>
-          #if ($xwiki.isMultiLingual()==true && !$isReadOnly)
+          #if (($xwiki.isMultiLingual()==true) && !$isReadOnly)
             #if ($tdoc.realLanguage!="")
               #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}") "editcontent")
-              #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}&xpage=htmlarea") "edithtmlcontent")
+              #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}&xpage=wysiwyg") "edithtmlcontent")
             #else
               #xwikiitem($doc.getURL("edit") "editcontent")
-              #xwikiitem($doc.getURL("edit","xpage=htmlarea") "edithtmlcontent")
+              #xwikiitem($doc.getURL("edit","xpage=wysiwyg") "edithtmlcontent")
             #end
             <span class="xwikimoreactionitem">
               <a href="$doc.getURL("edit", "language=en")">$msg.get("edit") En</a>
@@ -104,6 +104,7 @@
           #else
             #if (!$isReadOnly)
               #xwikiitem($doc.getURL("edit") "editcontent")
+              #xwikiitem($doc.getURL("edit","xpage=wysiwyg") "edithtmlcontent")
             #end
           #end
           #if (!$isReadOnly)

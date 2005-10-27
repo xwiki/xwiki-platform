@@ -53,6 +53,8 @@ $msg.get("editincludepagemsg")
 $msg.get("youareediting"): $tdoc.language
 <br /><br />
 #end
+$msg.get("titlefield"):&nbsp;<input type="text" name="title" value="$!tdoc.title" size="60" />
+<br /><br />
 #includeHelp("EditWikiToolbar")
 $xwiki.getTextArea($tdoc.content)
 <br/>
@@ -84,7 +86,6 @@ $msg.get("creator"):&nbsp;$!doc.creator
 #end
 </div>
 </form>
-#includeHelp("EditHelp")
          </div>
             </div>
             <div id="col-b" class="sidecol">

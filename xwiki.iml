@@ -50,7 +50,7 @@
     <setting name="EXPLODED_URL" value="file://$MODULE_DIR$/release/xwiki/web" />
     <setting name="EXPLODED_ENABLED" value="true" />
     <setting name="JAR_URL" value="file://$MODULE_DIR$/release/xwiki.war" />
-    <setting name="JAR_ENABLED" value="true" />
+    <setting name="JAR_ENABLED" value="false" />
     <setting name="SYNC_EXPLODED_DIR" value="false" />
     <setting name="BUILD_ON_FRAME_DEACTIVATION" value="false" />
     <setting name="RUN_JASPER_VALIDATION" value="false" />

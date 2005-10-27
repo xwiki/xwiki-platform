@@ -1,0 +1,15 @@
+#set($editors = $context.get("editor_wysiwyg"))
+#if($editors)
+<script language="javascript" type="text/javascript" src="/xwiki/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript" src="/xwiki/wiki_editor/wiki_editor.js"></script>
+<script language="javascript" type="text/javascript">
+	wikiEditor.init({
+		elements : "$editors",
+		mode: "exact",
+		content_css: "$xwiki.getSkinFile("style.css")",
+		debug : false,
+		remove_linebreaks : false,
+		wiki_plugins: 'core'
+	});
+</script>
+#end

@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.filter.XWikiLinkFilter;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class XWikiTest extends HibernateTestCase {
@@ -351,5 +352,39 @@ public class XWikiTest extends HibernateTestCase {
         doc.setElement(XWikiDocument.HAS_OBJECTS, false);
         assertFalse("doc should not have attachments", doc.hasElement(XWikiDocument.HAS_ATTACHMENTS));
         assertFalse("doc should not have objects", doc.hasElement(XWikiDocument.HAS_OBJECTS));
+    }
+
+    public void testExtractTitle() {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName("Test.MyDoc");
+        doc.setContent("1 Hello\r\nThis is a text\r\n1.1 another title\r\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("1 Hello \r\nThis is a text\r\n1.1 another title\r\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("1.1 Hello\r\nThis is a text\r\n1.1 another title\r\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("1.1 Hello \r\nThis is a text\r\n1.1 another title\r\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("\r\n1 Hello\r\nThis is a text\r\n1.1 another title\r\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("\n1 Hello\nThis is a text\n1.1 another title\nSome more text");
+        assertEquals("Extract title incorrect", "Hello", doc.extractTitle());
+        doc.setContent("\nHello\nThis is a text\nAnother text\nSome more text");
+        assertEquals("Extract title incorrect", "", doc.extractTitle());
+    }
+    public void testReplaceCapitals() {
+        String text;
+        text = "Hello John";
+        assertEquals("Replacement failed for " + text, text, XWikiLinkFilter.convertWikiWords(text));
+        text = "Hello john Wayne";
+        assertEquals("Replacement failed for " + text, text, XWikiLinkFilter.convertWikiWords(text));
+        text = "HelloJohn";
+        assertEquals("Replacement failed for " + text, "Hello John", XWikiLinkFilter.convertWikiWords(text));
+        text = "HellojohnWayne";
+        assertEquals("Replacement failed" + text, "Hellojohn Wayne", XWikiLinkFilter.convertWikiWords(text));
+        text = "helloJohnwayne";
+        assertEquals("Replacement failed" + text, "hello Johnwayne", XWikiLinkFilter.convertWikiWords(text));
+        text = "HelloJohnWayne";
+        assertEquals("Replacement failed" + text, "Hello John Wayne", XWikiLinkFilter.convertWikiWords(text));
     }
 }

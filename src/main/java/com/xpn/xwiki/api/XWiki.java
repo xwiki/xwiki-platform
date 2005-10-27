@@ -881,5 +881,9 @@ public class XWiki extends Api {
             xwiki.renamePage(doc, context, newFullName) ;
         }
     }
+
+    public String getEditorPreference() {
+        return xwiki.getEditorPreference(context);
+    }
 }
 

@@ -129,6 +129,7 @@
     </target>
 
     <!-- Define the Cactus tasks -->
+<!--
     <taskdef resource="cactus.tasks">
         <classpath>
             <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
@@ -139,6 +140,7 @@
             <pathelement location="${lib.dir}/aspectjrt-1.2.1.jar"/>
         </classpath>
     </taskdef>
+-->
 
     <target name="prepare">
         <propertyfile file="src/main/web/WEB-INF/version.properties" >
@@ -326,16 +328,16 @@
 
             <containerset>
               <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
+                  port="18080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
               <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
+                  port="18080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
             </containerset>
         </cactus>
         <delete file="${cactus.warfile}" />
     </target>
 
-    <target name="test" depends="test.client, test.server" />
-    <target name="test.clover" depends="clover-check, test.client, test.server" />
+    <target name="test" depends="test.client" />
+    <target name="test.clover" depends="clover-check, test.client" />
 
     <target name="clover.report" depends=""  if="clover.available">
         <mkdir dir="${doc.dir}/clover" />

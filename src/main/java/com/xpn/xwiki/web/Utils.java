@@ -67,7 +67,7 @@ public class Utils {
             &&(!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 1, context)!=0) {
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context)!=0) {
                     if (context.getDoc()!=null)
                      response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
                 }

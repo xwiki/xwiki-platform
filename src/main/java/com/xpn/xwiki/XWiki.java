@@ -1081,7 +1081,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getWebCopyright(XWikiContext context) {
         try {
-            String result = getXWikiPreference("webcopyright", "", context);
+            String result = getWebPreference("webcopyright", "", context);
             if (!result.trim().equals(""))
                 return result;
         } catch (Exception e) {

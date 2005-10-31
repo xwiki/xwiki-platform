@@ -25,6 +25,7 @@ package com.xpn.xwiki.plugin.flickr;
 import com.aetrion.flickr.Authentication;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.RequestContext;
+import com.aetrion.flickr.photos.SearchParameters;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 
@@ -38,6 +39,13 @@ public class FlickrPluginApi extends Api {
 
     public FlickrPlugin getPlugin() {
         return plugin;
+    }
+    
+    /**
+     * @return new SearchParameters instance.  Useful for velocity scripts.
+     */
+    public SearchParameters getSearchParameters() {
+    	return new SearchParameters();
     }
 
     public void setPlugin(FlickrPlugin plugin) {

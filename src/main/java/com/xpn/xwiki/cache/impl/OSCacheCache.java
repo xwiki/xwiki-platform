@@ -23,10 +23,13 @@
 package com.xpn.xwiki.cache.impl;
 
 import java.util.Date;
+import java.util.Properties;
 
 import com.opensymphony.oscache.base.Cache;
 import com.opensymphony.oscache.base.EntryRefreshPolicy;
 import com.opensymphony.oscache.base.NeedsRefreshException;
+import com.opensymphony.oscache.base.Config;
+import com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 
@@ -39,6 +42,19 @@ public class OSCacheCache implements XWikiCache {
 
     public OSCacheCache(int capacity) {
        cache = new Cache(true, false, false, null, capacity);
+    }
+
+    public OSCacheCache(int capacity, boolean diskCache, String path) {
+       if (diskCache==false)
+        cache = new Cache(true, false, false, null, capacity);
+       else {
+           cache = new Cache(true, true, false, null, capacity);
+           DiskPersistenceListener dpl = new DiskPersistenceListener();
+           Properties p = new Properties();
+           p.put("cache.path", path);
+           dpl.configure(new Config(p));
+           cache.setPersistenceListener(dpl);
+       }
     }
 
     public void setCapacity(int capacity) {

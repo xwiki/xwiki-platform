@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     protected URL serverURL;
@@ -46,7 +47,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public XWikiServletURLFactory(XWikiContext context) {
         init(context);
     }
-    
+
     public void init(XWikiContext context) {
         URL url = context.getURL();
         String path = url.getPath();
@@ -161,7 +162,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     }
 
     private void addName(StringBuffer newpath, String name, String action, XWikiContext context) {
-        if (!name.equals(context.getWiki().getDefaultPage(context))||(!action.equals("view"))) {
+        XWiki xwiki = context.getWiki();
+        if ((xwiki.useDefaultAction(context))
+                ||(!name.equals(xwiki.getDefaultPage(context))||(!action.equals("view")))) {
             newpath.append(encode(name, context));
         }
     }

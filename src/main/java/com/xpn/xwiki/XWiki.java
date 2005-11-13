@@ -3274,6 +3274,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "1".equals(Param("xwiki.usedefaultweb", "0"));
     }
 
+    public boolean useDefaultAction(XWikiContext context) {
+        String bl = getXWikiPreference("usedefaultaction", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.usedefaultaction", "0"));
+    }
+
     public String getDefaultPage(XWikiContext context) {
         String dweb = getXWikiPreference("defaultpage", "", context);
         if ("".equals(dweb))

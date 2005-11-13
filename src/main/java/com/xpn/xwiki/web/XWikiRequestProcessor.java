@@ -32,8 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor {
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String result = super.processPath(httpServletRequest, httpServletResponse);
-        if (StringUtils.countMatches(result, "/")<=2)
+        if (StringUtils.countMatches(result, "/")<=2) {
           return "/view/";
+        }
         else
           return result.substring(0,result.indexOf("/",1)+1);
     }

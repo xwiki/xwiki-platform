@@ -277,7 +277,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
              addLinkToContext(newdoc.getFullName(), context);
 
             String editor = context.getWiki().getEditorPreference(context);
-            if (!editor.equals(""))
+            if ((!editor.equals("")&&(!editor.equals("text"))))
                 querystring += "&xpage=" + editor;
 
             URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),

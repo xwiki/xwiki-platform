@@ -22,9 +22,10 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.io.Serializable;
 
 
-public abstract class BaseElement implements ElementInterface {
+public abstract class BaseElement implements ElementInterface, Serializable {
     private String name;
     private String prettyName;
 
@@ -62,7 +63,7 @@ public abstract class BaseElement implements ElementInterface {
         } else if (!element.getPrettyName().equals(getPrettyName()))
             return false;
 
-		if (!(element.getClass().equals(this.getClass())))
+        if (!(element.getClass().equals(this.getClass())))
             return false;
 
         return true;

@@ -20,15 +20,18 @@ package com.xpn.xwiki.test;
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import java.util.List;
 
 public class HibernateClassesTest extends HibernateTestCase {
 
     public void testDBListDisplayers() throws XWikiException, HibernateException {
 
         getXWiki().getUserClass(getXWikiContext());
-        
+
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseObject obj = doc.getObject(doc.getxWikiClass().getName(), 0);
@@ -36,4 +39,19 @@ public class HibernateClassesTest extends HibernateTestCase {
         ClassesTest.testDisplayer("dblist", obj, doc.getxWikiClass(),
             "XWikiUsers", "<option selected='selected' value='XWikiUsers' label='XWikiUsers'>", getXWikiContext());
     }
+
+    public void testCreateAndDeleteClass() throws XWikiException, HibernateException {
+        XWiki xwiki = getXWiki();
+        xwiki.getUserClass(getXWikiContext());
+        List list = xwiki.getClassList(context);
+        assertTrue("List should contain user class", list.contains("XWiki.XWikiUsers"));
+        XWikiDocument doc = xwiki.getDocument("XWiki.XWikiUsers", context);
+        xwiki.deleteDocument(doc, context);
+        list = xwiki.getClassList(context);
+        assertFalse("List should not contain user class", list.contains("XWiki.XWikiUsers"));
+        xwiki.getUserClass(getXWikiContext());
+        list = xwiki.getClassList(context);
+        assertTrue("List should contain user class", list.contains("XWiki.XWikiUsers"));
+    }
+
 }

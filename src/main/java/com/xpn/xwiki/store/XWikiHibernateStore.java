@@ -1081,7 +1081,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             }
 
             BaseClass bclass = doc.getxWikiClass();
-            if ((bclass==null)&&(bclass.getName()!=null)) {
+            if ((bclass.getFieldList().size()>0)&&(useClassesTable(true, context))) {
                 deleteXWikiClass(bclass, context, false);
             }
 
@@ -1370,11 +1370,12 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
 
             if (!object.getClassName().equals("internal")) {
                 for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
-                    BaseProperty property = (BaseProperty)it.next();
+                    BaseElement property = (BaseElement) it.next();
                     if (!handledProps.contains(property.getName())) {
                         if (evict)
                             session.evict(property);
-                        session.delete(property);
+                        if (session.get(property.getClass(), property)!=null)
+                            session.delete(property);
                     }
                 }
             }

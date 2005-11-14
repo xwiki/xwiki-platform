@@ -9,7 +9,7 @@ $message
 <form id="edit" method="post" action="$doc.getURL("preview")">
 <p>
 <input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="template" value="$!doc.template" />
+<input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="language" value="$!doc.language" />
 #set($force = $!request.get("force"))
 #if (($doc.getLocked()==true)&&(!$force))

@@ -27,7 +27,7 @@
 #set($xredirect=$!request.getParameter("xredirect"))
 <form id="edit" method="post" action="$doc.getURL("preview")">
 <p>
-<input type="hidden" name="template" value="$!tdoc.template" />
+<input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="language" value="$!tdoc.language" />
 </p>

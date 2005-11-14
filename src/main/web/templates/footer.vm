@@ -1,9 +1,9 @@
 <div id="xwikifooter" class="clear">
  <div id="xwikidocinfo">
  #if ($doc.parent.length() > 0)
- $parentlink &gt; $!doclink
+ $parent &gt; $!headertitle
  #else
- $!docfooterlink
+ $!headertitle
  #end
  ($tdoc.getRealLanguage())
  <br />

@@ -64,7 +64,18 @@
     <property name="javadoc.dir" value="${doc.dir}/api" />
 
     <property name="tests.filtersfile" value="${resources.test.src.dir}/${jdbc.filter}" />
-
+    
+    <!-- Standalone package properties -->
+    <property name="standalone.base.dir" value="${basedir}/standalone"/>
+    <property name="standalone.jetty.archive.dir" value="jetty-5.1.5"/>
+    <property name="standalone.jetty.archive" value="${standalone.base.dir}/${standalone.jetty.archive.dir}.zip"/>
+    <property name="standalone.package.name" value="xwikionjetty"/>
+    <property name="standalone.release.dir" value="${release.dir}/${standalone.package.name}"/>
+    
+    <fileset id="standalone.db.bootstrap" dir="${standalone.base.dir}/db" includes="xwiki_db.*"/>
+    <fileset id="standalone.config" dir="${standalone.base.dir}/config" includes="xwiki.cfg, hibernate.cfg.hsql.xml"/>
+    <fileset id="standalone.scripts" dir="${standalone.base.dir}/scripts" includes="*"/>
+    
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
@@ -442,6 +453,47 @@
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
             <tarfileset dir="${basedir}" includes="license.txt,gpl.txt" />
         </tar>
+    </target>
+    
+    <target name="standalone" depends="release">
+    	<!-- unzip jetty archive into standalone release dir -->
+	<!-- exclude some jetty provided jar files in order to avoid clashes -->
+	<!-- these jars are provided by xwiki -->    	
+
+    	<unzip src="${standalone.jetty.archive}" dest="${release.dir}">
+    		<patternset>
+    			<exclude name="**/ext/xercesImpl.jar"/>
+    			<exclude name="**/ext/xml-apis.jar"/>
+    			<exclude name="**/ext/xmlParserAPIs-2.5.jar"/>
+    		</patternset>
+    	</unzip>
+    	<move todir="${standalone.release.dir}">
+	    <fileset dir="${release.dir}/${standalone.jetty.archive.dir}"/>
+  	</move>
+    	
+    	<!-- remove example webapps -->
+    	<delete file="${standalone.release.dir}/webapps/javadoc.war"/>
+    	<delete dir="${standalone.release.dir}/webapps/template"/>
+    
+    	<!-- explode xwiki war file into jetty/webapps -->
+    	<mkdir dir="${standalone.release.dir}/webapps/xwiki"/>
+    	<unwar src="${release.warfile}" dest="${standalone.release.dir}/webapps/xwiki"/>
+    	
+    	<!-- replace configuration files with standalone version -->
+    	<copy todir="${standalone.release.dir}/webapps/xwiki/WEB-INF" overwrite="true">
+    		<fileset refid="standalone.config"/>
+    	</copy>
+    	
+    	<!-- install db bootstrap -->
+    	<mkdir dir="${standalone.release.dir}/db"/>
+    	<copy todir="${standalone.release.dir}/db">
+	        <fileset refid="standalone.db.bootstrap" />
+	</copy>
+	
+	<!-- install start/stop scripts -->
+	<copy todir="${standalone.release.dir}">
+		<fileset refid="standalone.scripts"/>
+	</copy>
     </target>
 
     <target name="all"  depends="release, test, doc, src.dist" />

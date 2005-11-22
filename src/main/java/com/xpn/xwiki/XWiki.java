@@ -534,6 +534,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return Util.getFileContent(new InputStreamReader(is));
     }
 
+    public byte[] getResourceContentAsBytes(String name) throws IOException {
+        InputStream is = null;
+        if (getEngineContext() != null) {
+
+            try {
+                is = getResourceAsStream(name);
+            } catch (Exception e) {
+            }
+        }
+
+        if (is == null)
+            return Util.getFileContentAsBytes(new File(name));
+
+        return Util.getFileContentAsBytes(is);
+    }
+
     public boolean resourceExists(String name) {
         InputStream ris = null;
         if (getEngineContext() != null) {

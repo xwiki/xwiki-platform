@@ -22,13 +22,7 @@
  */
 package com.xpn.xwiki.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -193,6 +187,21 @@ public class Util {
             content.append("\n");
             line = fr.readLine();
         }
+    }
+
+    public static byte[] getFileContentAsBytes(File file) throws IOException {
+        return getFileContentAsBytes(new FileInputStream(file));
+    }
+
+    public static byte[] getFileContentAsBytes(InputStream is) throws IOException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] data = new byte[65536];
+        int nb = 0;
+        while((nb = bis.read(data))>0) {
+            baos.write(data, 0, nb);
+        }
+        return baos.toByteArray();
     }
 
     public static boolean contains(String name, String list, String sep) {

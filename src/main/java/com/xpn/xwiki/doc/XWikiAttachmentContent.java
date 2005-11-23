@@ -69,7 +69,7 @@ public class XWikiAttachmentContent {
 
     public void setContent(byte[] content) {
         if (content==null)
-         content = null;
+         this.content = null;
         else {
             if (!content.equals(this.content))
                 setContentDirty(true);

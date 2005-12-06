@@ -22,7 +22,11 @@
 
 package com.xpn.xwiki.api;
 
+import java.util.Collection;
+
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 public class User extends Api {
@@ -38,6 +42,12 @@ public class User extends Api {
             return user;
         else
             return null;
+    }
+    
+    public boolean isUserInGroup(String groupName) throws XWikiException {
+    	XWikiGroupService groupService = context.getWiki().getGroupService();
+    	Collection groups = groupService.listGroupsForUser(user.getUser(), context);
+    	return groups.contains(groupName);
     }
 
 }

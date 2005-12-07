@@ -1009,7 +1009,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // Read XWikiAttachment
                 XWikiAttachment attachment = null;
                 List list = doc.getAttachmentList();
-                String shortname = filename.substring(0, filename.indexOf(".") + 1);
+                String shortname = filename.substring(0, filename.indexOf("."));
                 attachment = doc.getAttachment(shortname);
 
                 if (attachment != null) {

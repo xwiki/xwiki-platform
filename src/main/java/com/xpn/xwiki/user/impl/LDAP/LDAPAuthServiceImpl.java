@@ -183,7 +183,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             } catch (Exception e) {}
 
             if (context.isVirtual()) {
-                if (DN==null && DN.length()!=0) {
+                if (DN==null || DN.length()==0) {
                     // Then we check in the main database
                     String db = context.getDatabase();
                     try {

@@ -122,6 +122,9 @@ public class XWikiDocument {
     private boolean fromCache = false;
     private ArrayList objectsToRemove = new ArrayList();
 
+    // Template by default assign to a view
+    private String defaultTemplate;
+    
     private Object wikiNode;
 
     private XWikiStoreInterface store;
@@ -1027,6 +1030,10 @@ public class XWikiDocument {
         String defaultLanguage = eform.getDefaultLanguage();
         if (defaultLanguage!=null)
             setDefaultLanguage(defaultLanguage);
+        
+        String defaultTemplate = eform.getDefaultTemplate();
+        if (defaultTemplate!=null)
+            setDefaultTemplate(defaultTemplate);        
 
         // This is now done before
         // readFromTemplate(eform, context);
@@ -1160,6 +1167,7 @@ public class XWikiDocument {
         doc.setParent(getParent());
         doc.setCreator(getCreator());
         doc.setDefaultLanguage(getDefaultLanguage());
+        doc.setDefaultTemplate(getDefaultTemplate());
         doc.setLanguage(getLanguage());
         doc.setTranslation(getTranslation());
         doc.setxWikiClass((BaseClass)getxWikiClass().clone());
@@ -2354,5 +2362,13 @@ public class XWikiDocument {
         }
         return getURL(action, editparams.toString(), context);
     }
+
+	public String getDefaultTemplate() {
+		return defaultTemplate;
+	}
+
+	public void setDefaultTemplate(String defaultTemplate) {
+		this.defaultTemplate = defaultTemplate;
+	}
 
 }

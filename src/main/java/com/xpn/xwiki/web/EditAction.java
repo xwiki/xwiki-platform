@@ -23,6 +23,9 @@ public class EditAction extends XWikiAction {
         String creator = peform.getCreator();
         if (creator!=null)
             doc.setCreator(creator);
+        String defaultTemplate = peform.getDefaultTemplate();
+        if (defaultTemplate!=null)
+            doc.setDefaultTemplate(defaultTemplate);
         String defaultLanguage = peform.getDefaultLanguage();
         if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
             doc.setDefaultLanguage(defaultLanguage);

@@ -148,6 +148,10 @@ public class Document extends Api {
     public String getDefaultLanguage() {
         return doc.getDefaultLanguage();
     }
+    
+    public String getDefaultTemplate() {
+        return doc.getDefaultTemplate();
+    }
 
     public List getTranslationList() throws XWikiException {
         return doc.getTranslationList(context);

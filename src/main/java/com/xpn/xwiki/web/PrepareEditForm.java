@@ -28,6 +28,7 @@ public class PrepareEditForm extends XWikiForm {
     private String template;
     private String parent;
     private String defaultLanguage;
+    private String defaultTemplate;
     private String creator;
     private boolean lockForce;
 
@@ -37,6 +38,7 @@ public class PrepareEditForm extends XWikiForm {
         setParent(request.getParameter("parent"));
         setCreator(request.getParameter("creator"));
         setDefaultLanguage(request.getParameter("defaultLanguage"));
+        setDefaultTemplate(request.getParameter("defaultTemplate"));
         setLockForce("1".equals(request.getParameter("lockforce")));
     }
 
@@ -48,6 +50,14 @@ public class PrepareEditForm extends XWikiForm {
         this.template = template;
     }
 
+    public String getDefaultTemplate() {
+        return defaultTemplate;
+    }
+
+    public void setDefaultTemplate(String template) {
+        this.defaultTemplate = template;
+    }   
+    
     public String getParent() {
         return parent;
     }

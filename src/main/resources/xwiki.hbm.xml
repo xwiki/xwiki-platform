@@ -85,6 +85,10 @@
         <property name="elements" type="integer" not-null="true">
             <column name="XWD_ELEMENTS" />
         </property>
+        
+        <property name="defaultTemplate" type="string">
+            <column name="XWD_DEFAULT_TEMPLATE" />
+        </property>
 
     </class>
 

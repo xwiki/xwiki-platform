@@ -16,8 +16,8 @@
 #else
 #set($colsclass = "hide-both")
 #end
-<script language="javascript" type="text/javascript" src="/xwiki/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="/xwiki/wiki_editor/wiki_editor.js"></script>
+<script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
 <script language="javascript" type="text/javascript">
 	wikiEditor.init({
 	    language: "en",
@@ -27,8 +27,8 @@
 		debug : false,
 		remove_linebreaks : false,
 		plugins: 'table, contextmenu, paste, searchreplace',
-		wiki_images_path : '/xwiki/bin/download/$doc.web/$doc.name/',
-        wiki_attach_path : '/xwiki/bin/view/$doc.web/$doc.name',
+		wiki_images_path : '${request.contextPath}/bin/download/$doc.web/$doc.name/',
+        	wiki_attach_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
         wiki_plugins: 'core,attachments'
 	});
 

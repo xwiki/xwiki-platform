@@ -77,6 +77,11 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 // Put the Grrovy Context in the context
                 // so that includes can use it..
                 context.put("gcontext", gcontext);
+                //add XWikiMessageTool to the context
+                if (context.get("msg") != null)
+                	gcontext.put("msg", context.get("msg"));
+                else
+                	context.getWiki().prepareResources(context);                
             }
             return gcontext;
         }

@@ -1967,6 +1967,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext!=null)
                 vcontext.put("msg", msg);
+            Map gcontext = (Map) context.get("gcontext");
+            if (gcontext != null)
+            	gcontext.put("msg", msg);
         }
     }
 

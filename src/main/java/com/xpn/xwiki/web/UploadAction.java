@@ -26,6 +26,7 @@ public class UploadAction extends XWikiAction {
                 i = fname.indexOf("/");
             filename = fname.substring(i+1);
         }
+        filename = filename.replaceAll("\\+"," ");
 
         // Read XWikiAttachment
         XWikiAttachment attachment = doc.getAttachment(filename);

@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class XWikiDefaultPlugin implements XWikiPluginInterface {
     private String name;
@@ -88,5 +89,9 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface {
     }
 
     public void endRendering(XWikiContext context) {
+    }
+    
+    public XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context) {
+    	return image;
     }
 }

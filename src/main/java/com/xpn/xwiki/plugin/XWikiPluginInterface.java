@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 public interface XWikiPluginInterface {
     String getClassName();
@@ -53,5 +54,6 @@ public interface XWikiPluginInterface {
     String insidePREHandler(String line, XWikiContext context);
     String endRenderingHandler(String line, XWikiContext context);
     Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context);
+    XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context);
 
 }

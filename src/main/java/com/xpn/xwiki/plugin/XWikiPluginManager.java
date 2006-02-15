@@ -29,6 +29,7 @@ import java.util.Vector;
 import org.apache.commons.lang.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class XWikiPluginManager {
     private Vector plugins = new Vector();
@@ -175,6 +176,16 @@ public class XWikiPluginManager {
             } catch (Exception e)
             {}
         }
+    }
+
+    public XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context) {
+	for (int i=0;i<plugins.size();i++) {
+	    try {
+		image = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).downloadAttachment(image, context);
+	    } catch (Exception e)
+	    {}
+	}
+	return image;
     }
 
 }

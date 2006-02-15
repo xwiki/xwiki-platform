@@ -6,6 +6,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 public class DownloadAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {
@@ -31,6 +32,8 @@ public class DownloadAction extends XWikiAction {
                     "Attachment {0} not found", null, args);
         }
 
+	XWikiPluginManager plugins = context.getWiki().getPluginManager();
+	attachment = plugins.downloadAttachment(attachment, context);
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);

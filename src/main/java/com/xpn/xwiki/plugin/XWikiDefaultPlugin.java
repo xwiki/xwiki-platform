@@ -91,7 +91,7 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface {
     public void endRendering(XWikiContext context) {
     }
     
-    public XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context) {
-    	return image;
+    public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
+    	return attachment;
     }
 }

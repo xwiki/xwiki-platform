@@ -178,14 +178,13 @@ public class XWikiPluginManager {
         }
     }
 
-    public XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context) {
+    public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
 	for (int i=0;i<plugins.size();i++) {
 	    try {
-		image = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).downloadAttachment(image, context);
 	    } catch (Exception e)
 	    {}
 	}
-	return image;
+	return attachment;
     }
 
 }

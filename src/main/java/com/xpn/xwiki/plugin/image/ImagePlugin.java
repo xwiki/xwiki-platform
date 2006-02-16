@@ -89,47 +89,47 @@ public class ImagePlugin extends XWikiDefaultPlugin {
 			imageCache.flushAll();
 	}
 
-	public XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context) {
+	public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
 
 		int height = 0;
-		XWikiAttachment imageclone = null;
+		XWikiAttachment attachmentClone = null;
 		try {
 			
 			height = Integer.parseInt(context.getRequest().getParameter("height"));
 			
-			imageclone = (XWikiAttachment) image.clone();
-			String key = imageclone.getId() + "-" + TYPE_PNG + "-" + height;
+			attachmentClone = (XWikiAttachment) attachment.clone();
+			String key = attachmentClone.getId() + "-" + TYPE_PNG + "-" + height;
 			
 			if (imageCache != null) {
 				try {
-					imageclone.setContent((byte []) imageCache.getFromCache(key));
+					attachmentClone.setContent((byte []) imageCache.getFromCache(key));
 				} catch (XWikiCacheNeedsRefreshException e) {
 					try {
-						imageclone = this.getImageByHeight(imageclone, height, context);
-						imageCache.putInCache(key, imageclone.getContent(context));
+						attachmentClone = this.getImageByHeight(attachmentClone, height, context);
+						imageCache.putInCache(key, attachmentClone.getContent(context));
 					} catch (Exception e2) {
 						imageCache.cancelUpdate(key);
 						throw e2;
 					}
 				}
 			} else {
-				imageclone = this.getImageByHeight(imageclone, height, context);
+				attachmentClone = this.getImageByHeight(attachmentClone, height, context);
 			}
 		} catch (Exception e) {
-			imageclone = image;
+			attachmentClone = attachment;
 		} finally {
-			return imageclone;
+			return attachmentClone;
 		}
 	}
 
-	public XWikiAttachment getImageByHeight(XWikiAttachment image, int thumbnailHeight, XWikiContext context) throws Exception {
+	public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context) throws Exception {
 		
-		if (getType(image.getMimeType(context)) == 0)
+		if (getType(attachment.getMimeType(context)) == 0)
 			throw new PluginException(name,  PluginException.ERROR_XWIKI_NOT_IMPLEMENTED,
 					"Only JPG, PNG or BMP images are supported.");
 
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		Image imgOri = tk.createImage(image.getContent(context));
+		Image imgOri = tk.createImage(attachment.getContent(context));
 
 		MediaTracker mediaTracker = new MediaTracker(new Container());
 		mediaTracker.addImage(imgOri, 0);
@@ -157,9 +157,9 @@ public class ImagePlugin extends XWikiDefaultPlugin {
 		ImageIO.write(imgTN, "PNG", bout);
 
 		
-		image.setContent(bout.toByteArray());
+		attachment.setContent(bout.toByteArray());
 		
-		return image;
+		return attachment;
 	}
 
 	public static int getType(String mimeType) {

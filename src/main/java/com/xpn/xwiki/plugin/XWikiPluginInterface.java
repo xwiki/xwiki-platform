@@ -54,6 +54,6 @@ public interface XWikiPluginInterface {
     String insidePREHandler(String line, XWikiContext context);
     String endRenderingHandler(String line, XWikiContext context);
     Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context);
-    XWikiAttachment downloadAttachment(XWikiAttachment image, XWikiContext context);
+    XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context);
 
 }

@@ -209,7 +209,7 @@ public class Util {
         return ArrayUtils.contains(sarray, name);
     }
 
-    public String noaccents(String text) {
+    public static String noaccents(String text) {
         String temp = text;
         String orig = "אגהיטךכמןפצשûü";
         String targ = "aaaeeeeiioouuu";

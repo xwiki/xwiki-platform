@@ -176,7 +176,11 @@ import org.codehaus.groovy.runtime.InvokerHelper;
                if (c == '\"') {
                    sw.write('\\');
                }
-               sw.write(c);
+               if ((c!='\r')&&(c!='\n'))
+                 sw.write(c);
+               else if (c=='\n') {
+                 sw.write("\");out.println();out.print(\"");
+               }
            }
            endScript(sw);
            String result = sw.toString();
@@ -190,7 +194,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
        }
 
        private void endScript(StringWriter sw) {
-           sw.write("\");\n");
+           sw.write("\");");
        }
 
        /**

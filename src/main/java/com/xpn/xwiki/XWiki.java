@@ -1858,7 +1858,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public void sendMessage(String sender, String recipient, String message, XWikiContext context) throws XWikiException {
-        String[] recip = {recipient};
+        String[] recip = recipient.split(",");
         sendMessage(sender, recip, message, context);
     }
 

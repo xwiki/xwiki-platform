@@ -201,12 +201,20 @@ public class Document extends Api {
         return doc.getAttachmentURL(filename, action, context);
     }
 
+    public String getURL() {
+        return doc.getURL("view", context);
+    }
+
     public String getURL(String action) {
         return doc.getURL(action, context);
     }
 
     public String getURL(String action, String querystring) {
         return doc.getURL(action, querystring, context);
+    }
+
+    public String getExternalURL() {
+        return doc.getExternalURL("view", context);
     }
 
     public String getExternalURL(String action) {

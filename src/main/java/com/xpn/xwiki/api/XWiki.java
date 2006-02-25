@@ -214,11 +214,17 @@ public class XWiki extends Api {
     }
 
     public List search(String wheresql) throws XWikiException {
-        return xwiki.search(wheresql, context);
+        if (checkProgrammingRights())
+         return xwiki.search(wheresql, context);
+        else
+         return null;
     }
 
     public List search(String wheresql, int nb, int start) throws XWikiException {
-        return xwiki.search(wheresql, nb, start, context);
+        if (checkProgrammingRights())
+         return xwiki.search(wheresql, nb, start, context);
+        else
+         return null;
     }
 
     public List searchDocuments(String wheresql) throws XWikiException {
@@ -230,15 +236,33 @@ public class XWiki extends Api {
     }
 
     public List searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException {
+        if (checkProgrammingRights())
          return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
-     }
+        else
+         return null;
+    }
 
     public List searchDocuments(String wheresql, boolean distinctbylanguage) throws XWikiException {
-        return xwiki.getStore().searchDocuments(wheresql, context);
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, context));
     }
 
     public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start) throws XWikiException {
-        return xwiki.getStore().searchDocuments(wheresql, nb, start, context);
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, context));
+    }
+
+    private List wrapDocs(List docs)
+    {
+        List result = new ArrayList();
+        if (docs != null)
+        {
+            for (Iterator iter = result.iterator(); iter.hasNext();)
+            {
+                XWikiDocument doc = (XWikiDocument) iter.next();
+                Document wrappedDoc = new Document(doc, context);
+                result.add(wrappedDoc);
+            }
+        }
+        return result;
     }
 
     public String parseContent(String content) {

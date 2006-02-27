@@ -17,7 +17,7 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 30 déc. 2003
+ * Date: 30 dï¿½c. 2003
  * Time: 09:12:48
  */
 package com.xpn.xwiki.web;
@@ -39,7 +39,7 @@ public class PrepareEditForm extends XWikiForm {
         setCreator(request.getParameter("creator"));
         setDefaultLanguage(request.getParameter("defaultLanguage"));
         setDefaultTemplate(request.getParameter("defaultTemplate"));
-        setLockForce("1".equals(request.getParameter("lockforce")));
+        setLockForce("1".equals(request.getParameter("force")));
     }
 
     public String getTemplate() {

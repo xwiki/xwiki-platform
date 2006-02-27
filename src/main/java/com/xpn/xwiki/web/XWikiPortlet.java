@@ -184,7 +184,7 @@ public class XWikiPortlet extends GenericPortlet {
                     (new CancelAction()).action(context);
                 }
                 else if (action.equals("lock")) {
-                    (new Lockction()).action(context);
+                    (new LockAction()).action(context);
                 }
 				else if (action.equals("delete")) {
                     (new DeleteAction()).action(context);

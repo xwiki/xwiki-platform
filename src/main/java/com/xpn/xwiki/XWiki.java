@@ -2571,14 +2571,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     "User {0} account is inactive", null, args);
         }
 
-        if (isMultiLingual(context)) {
-            XWikiDocument tdoc = doc.getTranslatedDocument(context);
-            context.put("tdoc", tdoc);
-            vcontext.put("tdoc", new Document(tdoc, context));
-        } else {
-            context.put("tdoc", doc);
-            vcontext.put("tdoc", new Document(doc, context));
-        }
+        XWikiDocument tdoc = doc.getTranslatedDocument(context);
+        context.put("tdoc", tdoc);
+        vcontext.put("tdoc", new Document(tdoc, context));
         return true;
     }
 

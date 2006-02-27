@@ -70,6 +70,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             actionMap.put("logout", "login");
             actionMap.put("loginerror", "login");
             actionMap.put("view", "view");
+            actionMap.put("viewrev", "view");
             actionMap.put("plain", "view");
             actionMap.put("raw", "view");
             actionMap.put("attach", "view");

@@ -266,6 +266,9 @@ public class XWikiPortlet extends GenericPortlet {
             if (action.equals("view")) {
                 renderResult = (new ViewAction()).render(context);
             }
+            else if ( action.equals("viewrev")) {
+                renderResult = (new ViewrevAction()).render(context);
+            }
             else if ( action.equals("inline")) {
                 renderResult = (new InlineAction()).render(context);
             }

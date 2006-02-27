@@ -1007,7 +1007,17 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                 archive = basedoc.getRCSArchive();
             }
 
-            Version v = archive.getRevisionVersion(version);
+            Version v = null;
+            try {
+              v = archive.getRevisionVersion(version);
+            } catch (Exception e) {}
+
+            if (v==null) {
+                Object[] args = { doc.getFullName(), version.toString() };
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                        "Version {1} does not exist while reading document {0}", null,args);                
+            }
+
             if (!version.equals(v.toString())) {
                 doc.setVersion(version);
                 return doc;
@@ -1037,6 +1047,8 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             // as the new document (in case there was a name change
             doc.setName(basedoc.getName());
             doc.setWeb(basedoc.getWeb());
+        } catch (XWikiException e) {
+            throw e;
         } catch (Exception e) {
             Object[] args = { doc.getFullName(), version.toString() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION,

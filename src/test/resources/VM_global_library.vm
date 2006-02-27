@@ -22,7 +22,7 @@ $xwiki.includeForm($topic)
 
 #macro( versions )
 #foreach( $rev in $tdoc.getRecentRevisions(4) )
-<a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
+<a href="$doc.getURL("viewrev", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
 #end
 #if ($tdoc.realLanguage!="")
 <a href="$doc.getURL("view", "xpage=diff&language=${tdoc.realLanguage}")">$msg.get("diff")</a><span class="xwikisep"> | </span>

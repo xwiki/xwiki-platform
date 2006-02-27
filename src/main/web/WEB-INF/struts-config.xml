@@ -78,8 +78,18 @@
             name="view"
             scope="request">
         <forward name="view" path="/templates/view.vm"/>
+        <forward name="notexist" path="/templates/notexist.vm"/>
         <forward name="plain" path="/templates/plain.vm"/>
     </action>
+    <!---Add by me-->
+    <action path="/viewrev/"
+            type ="com.xpn.xwiki.web.ViewrevAction"
+            name="viewrev"
+            scope="request">
+        <forward name="notexist" path="/templates/notexist.vm"></forward>
+        <forward name="view" path="/templates/view.vm"></forward>
+    </action>
+
     <action path="/pdf/"
             type="com.xpn.xwiki.web.PDFAction"
             name="pdf"

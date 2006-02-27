@@ -662,8 +662,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } catch (XWikiException e) {
             if (revision.equals("1.1") || revision.equals("1.0"))
                 newdoc = new XWikiDocument(doc.getWeb(), doc.getName());
-            else
-                throw e;
+            else {
+                throw e;                
+            }
         }
         return newdoc;
     }

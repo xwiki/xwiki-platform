@@ -1959,5 +1959,82 @@ public class ViewEditTest extends ServletTest {
         XWikiBatcher.getSQLStats().printSQLList(System.out);
     }
 
+
+
+    public void beginViewRevNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(xwiki.getStore(), "Main", "ViewRevNotOkTest", context);
+        Utils.content1 = content;
+        XWikiDocument doc2 = xwiki.getDocument("Main.ViewRevNotOkTest", context);
+        xwiki.saveDocument(doc2, context);
+        xwiki.flushCache();
+        doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
+        xwiki.saveDocument(doc2, context);
+        setUrl(webRequest, "view", "ViewRevNotOkTest", "");
+        webRequest.addParameter("rev", "1.4");
+    }
+
+
+
+    public void endViewRevNotOk(WebResponse webResponse) throws XWikiException, HibernateException {
+
+        try {
+            String result = webResponse.getText();
+
+            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist")!=-1);
+            // verify
+          //  WebRequest request =  webResponse.getWebRequest();
+            //setUrl(request,"view","ViewRevOKTest");
+           // request.addParameter("rev","1.423");
+        }catch(Exception e){
+            System.out.println("This document ");
+        }
+        finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewRevNotOk() throws Throwable {
+        launchTest();
+
+    }
+
+
+    public void beginNewViewRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.content1 = "Hello $doc.name\n----\n";
+        Utils.createDoc(xwiki.getStore(), "Main", "NewViewRevOkTest", context);
+        Utils.content1 = content;
+        XWikiDocument doc2 = xwiki.getDocument("Main.NewViewRevOkTest", context);
+        xwiki.saveDocument(doc2, context);
+        doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
+        xwiki.saveDocument(doc2, context);
+        setUrl(webRequest, "viewrev", "NewViewRevOkTest", "");
+        webRequest.addParameter("rev", "1.4");
+    }
+
+
+
+    public void endNewViewRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist")!=-1);
+              } finally {
+           // clientTearDown();
+        }
+    }
+
+    public void testNewViewRevOk() throws Throwable {
+        launchTest();
+    }
+
+
 }
 

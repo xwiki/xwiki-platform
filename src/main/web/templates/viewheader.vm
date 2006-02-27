@@ -80,7 +80,11 @@
       <div id="xwikimoreactionsitems">
 ## View section
         <div class="xwikimenutitle">$msg.get("view")</div>
-        #xwikiitem($doc.getURL("view","xpage=code&$!{revparams}") "raw")
+        #if($context.action=="viewrev")
+          #xwikiitem($doc.getURL("view","xpage=code&$!{revparams}") "raw")
+        #else
+          #xwikiitem($doc.getURL("viewrev","xpage=code&$!{revparams}") "raw")
+        #end
         #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
 ## Edit section
         #if($hasedit)

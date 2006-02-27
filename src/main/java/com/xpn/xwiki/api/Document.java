@@ -54,6 +54,7 @@ import com.xpn.xwiki.util.Util;
 
 public class Document extends Api {
     private XWikiDocument doc;
+    private Object currentObj;
 
     public Document(XWikiDocument doc, XWikiContext context) {
         super(context);
@@ -420,6 +421,31 @@ public class Document extends Api {
         }
     }
 
+    public void use(Object object) {
+        currentObj = object;
+    }
+
+    public void use(String className) {
+        currentObj = getObject(className);
+    }
+
+    public void use(String className, int nb) {
+        currentObj = getObject(className, nb);
+    }
+
+    public String display(String fieldname) {
+        if (currentObj==null)
+         return doc.display(fieldname, context);
+        else
+         return doc.display(fieldname, "view", currentObj.getBaseObject(), context);
+    }
+
+    public String display(String fieldname, String mode) {
+        if (currentObj==null)
+         return doc.display(fieldname, mode, context);
+        else
+         return doc.display(fieldname, mode, currentObj.getBaseObject(), context);
+    }
 
     public String display(String fieldname, Object obj) {
         if (obj==null)
@@ -431,10 +457,6 @@ public class Document extends Api {
         if (obj==null)
             return "";
         return doc.display(fieldname, mode, obj.getBaseObject(), context);
-    }
-
-    public String display(String fieldname) {
-        return doc.display(fieldname, context);
     }
 
     public String displayForm(String className,String header, String format) {

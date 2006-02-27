@@ -22,7 +22,7 @@ function show(fieldname) {
 <div id="intro">
 $msg.get("welcometoobjecteditor")
 </div>
-<form id="update" method="post" action="$doc.getURL("save")">
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ( $first = 1)
@@ -91,7 +91,7 @@ $msg.get("youcan") <a href="$doc.getURL("objectremove" , "classname=${class.name
 <br /><br />
 #end
 <h3>$msg.get("addobject")</h3>
-<form id="objectadd" method="post" action="$doc.getURL("objectadd")">
+<form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()">
 <p style="text-align: center">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <select name="classname" size="1">
@@ -104,7 +104,7 @@ $msg.get("youcan") <a href="$doc.getURL("objectremove" , "classname=${class.name
 </p>
 </form>
 #if($xwiki.isVirtual())
-<form id="objectadd2" method="post" action="$doc.getURL("objectadd")">
+<form id="objectadd2" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()">
 <p style="text-align: center">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="text" name="classname" size="20" />

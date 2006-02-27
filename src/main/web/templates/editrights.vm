@@ -28,7 +28,7 @@ function show(fieldname) {
 $msg.get("welcometorightseditor")
 </div>
 
-<form id="update" method="post" action="$doc.getURL("save")">
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ( $first = 1)
@@ -87,7 +87,7 @@ $!{obj.number}: $!doc.display("users",$obj) $!doc.display("groups",$obj)</a><br 
 #end
 <br /><br />
 <h3>$msg.get("addrightentry")</h3>
-<form id="objectadd" method="post" action="$doc.getURL("objectadd")">
+<form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()">
 <p>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="hidden" name="classname" value="$classname" />

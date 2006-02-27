@@ -53,11 +53,14 @@ public class CancelAction extends XWikiAction {
         }
 
         String username = context.getUser();
-
         XWikiLock lock = tdoc.getLock(context);
-        if (lock != null && lock.getUserName().equals(username))
+        if (lock != null && lock.getUserName().equals(username)) {
+        if ("inline".equals(request.get("action")))
+            doc.removeLock(context);
+        else
             tdoc.removeLock(context);
-
+        }
+       
         // forward to view
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);

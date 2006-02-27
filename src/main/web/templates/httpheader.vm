@@ -16,9 +16,65 @@ XWiki . $!doc.web . $!doc.displayTitle
 $!xwiki.getWebPreference("meta")
 #template("stylesheets.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
 </head>
+#if(($context.action=="inline")||($context.action=="edit"))
+<script type="text/javascript">
+ var cancelEditNextOnunload;
+ var cancelCancelEditFlag = true;
+ var  lockEditFlag = false;
+
+ function cancelEditResponse(){
+ }
+
+ function cancelEdit(){
+     if (cancelCancelEditFlag) {
+       var surl = "$doc.getExternalURL("cancel")";
+       var myAjax = new Ajax.Request(
+                 surl,
+                 {
+                     method: 'get',
+                     parameters: "",
+                     asynchronous: false
+                 });
+        cancelCancelEditFlag = false;
+     }
+     if (cancelEditNextOnunload!=null)
+           cancelEditNextOnunload();
+ }
+
+ function lockEdit(){
+    if (lockEditFlag==false) {
+#if($context.action=="inline")
+      var surl = "$doc.getExternalURL("lock")?action=inline&language=${request.language}";
+#else
+      var surl = "$doc.getExternalURL("lock")?language=${request.language}";
+#end
+      var myAjax = new Ajax.Request(
+                surl,
+                {
+                    method: 'get',
+                    parameters: "",
+                    asynchronous: false
+                });
+       lockEditFlag = false;
+    }
+ }
+
+ function prepareCancelEdit() {
+     cancelEditNextOnunload = document.onunload;
+     document.onunload = cancelEdit;
+     lockEdit();
+ }
+ function cancelCancelEdit() {
+     cancelCancelEditFlag = false;
+ }
+</script>
+<body onUnload="cancelEdit()" onLoad="prepareCancelEdit()">
+#else
 <body>
+#end
 #else
 #template("stylesheets2.vm")
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>

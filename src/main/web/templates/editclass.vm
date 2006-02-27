@@ -19,7 +19,7 @@ function show(fieldname) {
           <div class="float-wrapper">
             <div id="col-a">
               <div class="main-content">
-<form id="propupdate" method="post" action="$doc.getURL("propupdate")">
+<form id="propupdate" method="post" action="$doc.getURL("propupdate")" onsubmit="cancelCancelEdit()">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <div id="intro">
 $msg.get("welcometoclasseditor")
@@ -71,7 +71,7 @@ currentfield = "$field.name";
 #end
 <br />
 <h3>$msg.get("addproperty")</h3>
-<form id="propadd" method="post" action="$doc.getURL("propadd")">
+<form id="propadd" method="post" action="$doc.getURL("propadd")" onsubmit="cancelCancelEdit()">
 <p style="text-align: center">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 $msg.get("propname"): <input type="text" name="propname" value="" size="20" />

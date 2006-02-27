@@ -154,6 +154,10 @@ public class XWikiPortlet extends GenericPortlet {
 
 				if (action.equals("save"))
 					form = new EditForm();
+                else if (action.equals("lock"))
+                    form = new EditForm();
+                else if (action.equals("cancel"))
+                    form = new EditForm();
                 else if (action.equals("rollback"))
                     form = new RollbackForm();
 				else if (action.equals("objectadd"))
@@ -178,6 +182,9 @@ public class XWikiPortlet extends GenericPortlet {
                 }
                 else if (action.equals("cancel")) {
                     (new CancelAction()).action(context);
+                }
+                else if (action.equals("lock")) {
+                    (new Lockction()).action(context);
                 }
 				else if (action.equals("delete")) {
                     (new DeleteAction()).action(context);

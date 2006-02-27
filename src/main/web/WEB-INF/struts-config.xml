@@ -30,6 +30,8 @@
                  type="com.xpn.xwiki.web.PrepareEditForm"/>
     <form-bean name="inline"
                  type="com.xpn.xwiki.web.PrepareEditForm"/>
+    <form-bean name="lock"
+                   type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="preview"
                type="com.xpn.xwiki.web.EditForm"/>
     <form-bean name="save"
@@ -298,6 +300,12 @@
             type="com.xpn.xwiki.plugin.charts.actions.ChartWizardAction"
             name="chartwizard"
             scope="request">
+    </action>
+
+    <action path="/lock/"
+            type="com.xpn.xwiki.web.LockAction"
+            name="lock"
+            score="request">
     </action>
 
   </action-mappings>

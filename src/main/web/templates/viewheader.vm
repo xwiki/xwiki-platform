@@ -113,25 +113,25 @@
           #end
           #if (!$isReadOnly)
             #xwikiitem($doc.getURL("inline") "editinline")
-            #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
+            #xwikiitem($doc.getURL("inline", "xpage=editobject") "editobject")
           #end
           #if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)
             #xwikiitem($doc.getURL("delete") "delete")
           #end
           #if (!$isReadOnly)
             #xwikiitem($doc.getURL("chartwizard") "chartwizard")
-            #xwikiitem($doc.getURL("edit", "xpage=editrights") "editrights")
+            #xwikiitem($doc.getURL("inline", "xpage=editrights") "editrights")
           #end
         #end
 ## Admin section
         #if($hasadmin && !$isReadOnly)
           <div class="xwikimenutitle">$msg.get("admin")</div>
           #xwikiitem($xwiki.getURL("${doc.web}.WebHome", "view") "space")
-          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit", "xpage=editprefs") "webprefs")
-          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit" , "xpage=editrights&global=1") "webrights")
-          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editprefs") "xwikiprefs")
-          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editrights&global=1") "xwikirights")
-          #xwikiitem($doc.getURL("edit", "xpage=editclass") "classeditor")
+          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "inline", "xpage=editprefs") "webprefs")
+          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "inline" , "xpage=editrights&global=1") "webrights")
+          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "inline", "xpage=editprefs") "xwikiprefs")
+          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "inline", "xpage=editrights&global=1") "xwikirights")
+          #xwikiitem($doc.getURL("inline", "xpage=editclass") "classeditor")
         #end
 ## Help section
         <div class="xwikimenutitle">$msg.get("help")</div>

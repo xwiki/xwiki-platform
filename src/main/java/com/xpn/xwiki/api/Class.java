@@ -42,6 +42,10 @@ public class Class extends Collection {
         return (BaseClass) getCollection();
     }
 
+    /**
+     *
+     * @return an array with the properties of the class
+     */
     public Element[] getProperties() {
         java.util.Collection coll = getCollection().getFieldList();
         if (coll==null)
@@ -54,10 +58,21 @@ public class Class extends Collection {
         return properties;
     }
 
+    /**
+     *
+     * @param name the name of the element
+     * @return the PropertyClass for the given name
+     * @see PropertyClass
+     * @see Element
+     */
     public Element get(String name) {
        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name), context);
     }
 
+    /**
+     *
+     * @return the BaseClass (without the wrapping) if you have the programming right.
+     */
     public BaseClass getXWikiClass() {
         if (checkProgrammingRights())
          return (BaseClass) getCollection();
@@ -65,6 +80,11 @@ public class Class extends Collection {
          return null;
     }
 
+    /**
+     *
+     * @return a new object from this class
+     * @throws XWikiException
+     */
     public Object newObject() throws XWikiException {
         BaseObject obj = (BaseObject)getBaseClass().newObject(context);
         return obj.newObjectApi(obj, context);

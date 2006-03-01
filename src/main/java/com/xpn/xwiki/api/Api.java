@@ -33,20 +33,36 @@ public class Api {
        this.context = context;
     }
 
+    /**
+     * check if the current user has the programming right
+     * @return true if he has
+     */
     public boolean checkProgrammingRights() {
         return hasProgrammingRights();
     }
 
+    /**
+     * check if the current user has the programming right
+     * @return true if he has
+     */
     public boolean hasProgrammingRights() {
             com.xpn.xwiki.XWiki xwiki = context.getWiki();
             return xwiki.getRightService().hasProgrammingRights(context);
     }
 
+    /**
+     * check if the current user has the Admin right
+     * @return true if he has
+     */
     public boolean hasAdminRights() {
             com.xpn.xwiki.XWiki xwiki = context.getWiki();
             return xwiki.getRightService().hasAdminRights(context);
     }
 
+    /**
+     * check if the current user has the given right
+     * @return true if he has
+     */
     public boolean hasAccessLevel(String right, String docname) throws XWikiException {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         return xwiki.getRightService().hasAccessLevel(right, context.getUser(), docname, context);        

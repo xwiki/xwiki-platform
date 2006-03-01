@@ -43,62 +43,128 @@ public class Attachment extends Api {
        this.attachment = attachment;
     }
 
+    /**
+     *
+     * @return the document the file is attached to
+     */
     public Document getDocument() {
         return doc;
     }
 
+
+    /**
+     *
+     * @return the document Id of the attachment
+     */
     public long getId() {
         return attachment.getId();
     }
 
+    /**
+     *
+     * @return the id of the document the file is attached to
+     */
     public long getDocId() {
         return doc.getId();
     }
 
+
+    /**
+     *
+     * @return the Attachment size
+     */
     public int getFilesize() {
         return attachment.getFilesize();
     }
 
+    /**
+     *
+     * @return the attachment name
+     */
     public String getFilename() {
         return attachment.getFilename();
     }
 
+    /**
+     *
+     * @return the login of the person who attach the file
+     */
     public String getAuthor() {
         return attachment.getAuthor();
     }
 
+    /**
+     *
+     * @return the last version number of the document
+     */
     public String getVersion() {
         return attachment.getVersion();
     }
 
+     /**
+     *
+     * @return the RCS object version of the document
+     */
     public Version getRCSVersion() {
          return attachment.getRCSVersion();
     }
 
+    /**
+     *
+     * @return the list of comments
+     */
     public String getComment() {
         return attachment.getComment();
     }
 
+    /**
+     *
+     * @return the date of the last uploaded version
+     */
     public Date getDate() {
         return attachment.getDate();
     }
 
+    /**
+     *
+     * @return the content of the attachment
+     * @throws XWikiException
+     */
     public byte[] getContent() throws XWikiException {
         return attachment.getContent(context);
     }
 
+    /**
+     *
+     * @return the rcs archive of the attachement
+     */
     public Archive getArchive() {
         return attachment.getArchive();
     }
+
+    /**
+     *
+     * @return a table with all versions object of the attachment
+     */
 
     public Version[] getVersions() {
         return attachment.getVersions();
     }
 
+    /**
+     *
+     * @return a list of string with all the versions number in String
+     * @throws XWikiException
+     */
     public List getVersionList() throws XWikiException {
         return attachment.getVersionList();
     }
 
+    /**
+     *
+     * @return the XWikiAttachment object (without the wrapping) if you have the programming right
+     * @see XWikiAttachment
+     */
     public XWikiAttachment getAttachment() {
         if (checkProgrammingRights())
             return attachment;
@@ -106,10 +172,18 @@ public class Attachment extends Api {
             return null;
     }
 
+    /**
+     *
+     * @return the mimetype of the attachment
+     */
     public String getMimeType() {
         return attachment.getMimeType(context);
     }
 
+    /**
+     *
+     * @return true if it's an image
+     */
     public boolean isImage() {
         return attachment.isImage(context);
     }

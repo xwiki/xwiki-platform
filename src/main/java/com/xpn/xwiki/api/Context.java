@@ -36,10 +36,18 @@ public class Context extends Api {
         super(context);
     }
 
+    /**
+     *
+     * @return an object which contains the Request context
+     */
     public XWikiRequest getRequest() {
        return context.getRequest();
     }
 
+    /**
+     *
+     * @return an object which contains the response object
+     */
     public XWikiResponse getResponse() {
        return context.getResponse();
     }
@@ -48,35 +56,67 @@ public class Context extends Api {
         return context.getMode();
     }
 
+    /**
+     *
+     * @return the current database name
+     */
     public String getDatabase() {
         return context.getDatabase();
     }
 
+    /**
+     *
+     * @return the original database
+     */
     public String getOriginalDatabase() {
         return context.getOriginalDatabase();
     }
 
+    /**
+     * set the database if you have the programming right
+     * @param database the data name
+     */
     public void setDatabase(String database) {
         if (checkProgrammingRights())
           context.setDatabase(database);
     }
 
+    /**
+     *
+     * @return the url Factory
+     */
     public XWikiURLFactory getURLFactory() {
-        return context. getURLFactory();
+        return context.getURLFactory();
     }
 
+    /**
+     *
+     * @return true if the server is in virtual mode (ie host more than one wiki)
+     */
     public boolean isVirtual() {
         return context.isVirtual();
     }
 
+    /**
+     *
+     * @return the requested action
+     */
     public String getAction() {
          return context.getAction();
     }
 
+    /**
+     *
+     * @return the language of the current user
+     */
     public String getLanguage() {
          return context.getLanguage();
     }
 
+    /**
+     *
+     * @return the XWiki object if you have the programming right
+     */
     public com.xpn.xwiki.XWiki getXWiki() {
         if (checkProgrammingRights())
          return context.getWiki();
@@ -84,6 +124,10 @@ public class Context extends Api {
          return null;
     }
 
+    /**
+     *
+     * @return the current requested document
+     */
     public XWikiDocument getDoc() {
         if (checkProgrammingRights())
          return context.getDoc();
@@ -91,15 +135,27 @@ public class Context extends Api {
          return null;
     }
 
+    /**
+     *
+     * @return the current user which made the request
+     */
     public String getUser() {
          return context.getUser();
     }
 
+    /**
+     * set the document if you have the programming right
+     * @param doc
+     */
     public void setDoc(XWikiDocument doc) {
         if (checkProgrammingRights())
           context.setDoc(doc);
     }
 
+    /**
+     *
+     * @return the unwrapped version of the context if you have the programming right
+     */
     public XWikiContext getContext() {
         if (checkProgrammingRights())
          return context;
@@ -127,10 +183,18 @@ public class Context extends Api {
         context.setFinished(finished);
     }
 
+    /**
+     *
+     * @return the cache duration
+     */
     public int getCacheDuration() {
         return context.getCacheDuration();
     }
 
+    /**
+     *
+     * @param duration in second
+     */
     public void setCacheDuration(int duration) {
         context.setCacheDuration(duration);
     }

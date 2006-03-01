@@ -652,11 +652,11 @@ public class Document extends Api {
     }
 
     public DocumentStats getCurrentMonthPageStats(String action) {
-        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getFullName(), "view", new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getFullName(), action, new Date(), context);
     }
 
     public DocumentStats getCurrentMonthWebStats(String action) {
-        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getWeb(), "view", new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getWeb(), action, new Date(), context);
     }
 
     public List getCurrentMonthRefStats() throws XWikiException {

@@ -633,7 +633,7 @@ public class XWiki extends Api {
     }
 
     public DocumentStats getCurrentMonthXWikiStats(String action) {
-       return context.getWiki().getStatsService(context).getDocMonthStats("", "view", new Date(), context);
+       return context.getWiki().getStatsService(context).getDocMonthStats("", action, new Date(), context);
     }
 
     public String getRefererText(String referer) {

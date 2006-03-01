@@ -160,7 +160,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             return;
         }
         // Unless this is a "view", "save" or "download" action, we are not interested
-        if (!(action.equals("view")||action.equals("save")))
+        if (!(action.equals("view")||action.equals("save")||action.equals("download")))
             return;
 
         // Let's save in the session the last elements view, saved

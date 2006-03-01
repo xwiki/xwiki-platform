@@ -1,48 +1,4 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author ludovic
- * @author sdumitriu
- */
-
-package com.xpn.xwiki.render.groovy;
-
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-import groovy.lang.Writable;
-import groovy.text.Template;
-import groovy.text.TemplateEngine;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Map;
-
-import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.runtime.InvokerHelper;
-
-/*
- * $Id: GroovyTemplateEngine.java 444 2005-01-20 00:06:15Z ldubost $version Mar 8, 2004 2:11:00 AM $user Exp $
  *
  * Copyright 2003 (C) Sam Pullara. All Rights Reserved.
  *
@@ -73,14 +29,38 @@ import org.codehaus.groovy.runtime.InvokerHelper;
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  *
+ * @author sam
+ * @author ludovic
+ * @author sdumitriu
  */
+
+package com.xpn.xwiki.render.groovy;
+
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import groovy.lang.Script;
+import groovy.lang.Writable;
+import groovy.text.Template;
+import groovy.text.TemplateEngine;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.Map;
+
+import org.codehaus.groovy.control.CompilationFailedException;
+import org.codehaus.groovy.runtime.InvokerHelper;
+
+
 
 
    /**
 * This simple template engine uses JSP <% %> script and <%= %> expression syntax.  It also lets you use normal groovy expressions in
 * the template text much like the new JSP EL functionality.  The variable 'out' is bound to the writer that the template is being written to.
 *
-* @author sam
 */
    public class GroovyTemplateEngine extends TemplateEngine {
 

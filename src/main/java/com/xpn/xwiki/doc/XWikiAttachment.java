@@ -27,13 +27,22 @@ package com.xpn.xwiki.doc;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.io.StringWriter;
+import java.io.IOException;
+import java.io.StringReader;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Node;
 import org.apache.commons.jrcs.rcs.Version;
 import org.dom4j.Element;
+import org.dom4j.Document ;
+import org.dom4j.DocumentException;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.io.SAXReader;
 import org.dom4j.dom.DOMElement;
+import org.dom4j.dom.DOMDocument;
 import org.hibernate.ObjectNotFoundException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -216,6 +225,28 @@ public class XWikiAttachment {
         isMetaDataDirty = metaDataDirty;
     }
 
+    public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context) throws XWikiException {
+        // implement
+        Element ele = toXML(bWithAttachmentContent,bWithVersions,context);
+
+        Document doc = new DOMDocument();
+        doc.setRootElement(ele);
+        OutputFormat outputFormat = new OutputFormat("", true);
+        if ((context==null)||(context.getWiki()==null))
+            outputFormat.setEncoding("UTF-8");
+        else
+            outputFormat.setEncoding(context.getWiki().getEncoding());
+        StringWriter out = new StringWriter();
+        XMLWriter writer = new XMLWriter( out, outputFormat );
+        try {
+            writer.write(doc);
+            return out.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public Element toXML(XWikiContext context) throws XWikiException {
         return toXML(false, false, context);
     }
@@ -277,6 +308,20 @@ public class XWikiAttachment {
             }
         }
         return docel;
+    }
+
+
+    public void fromXML(String data) throws XWikiException {
+        SAXReader reader = new SAXReader();
+        Document domdoc = null;
+        try {
+            StringReader in = new StringReader(data);
+            domdoc = reader.read(in);
+        } catch (DocumentException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
+        }
+        Element docel = domdoc.getRootElement();
+        fromXML(docel);
     }
 
     public void fromXML(Element docel) throws XWikiException {
@@ -411,7 +456,7 @@ public class XWikiAttachment {
             attachment_archive.setAttachment(this);
         }
 
-        attachment_archive.updateArchive(getContent(context));
+        attachment_archive.updateArchive(getContent(context), context);
     }
 
     public String getMimeType(XWikiContext context) {
@@ -431,5 +476,75 @@ public class XWikiAttachment {
             return false;
     }
 
+    public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException {
+
+        try {
+            context.getWiki().getStore().loadAttachmentArchive(this, context, true);
+
+            Archive archive = getArchive();
+
+            if (archive==null)
+             return null;
+
+            Version v = archive.getRevisionVersion(rev);
+            Object[] lines = archive.getRevision(v);
+            StringBuffer content = new StringBuffer();
+            for (int i=0;i<lines.length;i++) {
+                String line = lines[i].toString();
+                content.append(line);
+                if (i!=lines.length-1)
+                    content.append("\n");
+            }
+
+            String scontent = content.toString();
+            XWikiAttachment revattach = new XWikiAttachment();
+            revattach.fromXML(scontent);
+            return revattach;
+        }    catch (Exception e) {
+            Object[] args = { getFilename() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                    "Exception while manipulating the archive for file {0}", e, args);
+        }
+    }
+
+    /*
+    public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException {
+        XWikiAttachment revattach = null;
+
+        try {
+            Version[] versions = getDoc().getRevisions(context);
+            for (int i=0;i<versions.length;i++) {
+                Version version = versions[i];
+                XWikiDocument revdoc = context.getWiki().getDocument(getDoc(),version.toString(),context);
+                revattach = revdoc.getAttachment(getFilename());
+                if ((revattach!=null)&&revattach.getVersion().equals(rev))
+                    break;
+                revattach = null;
+            }
+            if (revattach==null)
+             return null;
+
+            context.getWiki().getStore().loadAttachmentArchive(this, context, true);
+            Archive archive = getArchive();
+            Version v = archive.getRevisionVersion(rev);
+            Object[] lines = archive.getRevision(v);
+            StringBuffer content = new StringBuffer();
+            for (int i=0;i<lines.length;i++) {
+                String line = lines[i].toString();
+                content.append(line);
+                if (i!=lines.length-1)
+                    content.append("\n");
+            }
+            String scontent = content.toString();
+            byte[] vcontent = Base64.decodeBase64(scontent.getBytes());
+            revattach.setContent(vcontent);
+            return revattach;
+        }    catch (Exception e) {
+            Object[] args = { getFilename() };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                    "Exception while manipulating the archive for file {0}", e, args);
+        }
+    }
+   */
 }
 

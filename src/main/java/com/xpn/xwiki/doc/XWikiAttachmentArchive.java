@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.rcs.Lines;
+import org.apache.commons.codec.binary.Base64;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -71,8 +72,10 @@ public class XWikiAttachmentArchive {
     }
 
     public byte[] getArchive(XWikiContext context) throws XWikiException {
-        if (archive==null)
-            updateArchive(attachment.getContent(context));
+        if (archive==null) {
+            if (context!=null)
+                updateArchive(attachment.getContent(context), context);
+        }
         if (archive==null)
             return new byte[0];
         else {
@@ -81,13 +84,15 @@ public class XWikiAttachmentArchive {
     }
 
     public void setArchive(byte[] data) throws XWikiException {
-        if (data==null) {
+        if ((data==null)||(data.length==0)) {
             archive = null;
 
         } else {
             try {
+                //attachment.fromXML(data.toString());
                 ByteArrayInputStream is = new ByteArrayInputStream(data);
                 archive = new Archive(getAttachment().getFilename(), is);
+
             }
             catch (Exception e) {
                 Object[] args = { getAttachment().getFilename() };
@@ -97,9 +102,9 @@ public class XWikiAttachmentArchive {
         }
     }
 
-    public void updateArchive(byte[] data) throws XWikiException {
+    public void updateArchive(byte[] data, XWikiContext context) throws XWikiException {
         try {
-            String sdata = data.toString();
+            String sdata = attachment.toStringXML(true, false, context);
             Lines lines = new Lines(sdata);
 
             if (archive!=null) {

@@ -35,7 +35,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -268,6 +267,12 @@ public class StoreTest extends HibernateTestCase {
         }
     }
 
+    public void testUpdateAttachmentReadWrite() throws XWikiException, IOException {
+        Utils.setStandardData();
+        attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+        updateAttachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+    }
+
     public void deleteAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
@@ -304,12 +309,6 @@ public class StoreTest extends HibernateTestCase {
         assertEquals("Attachment is still there", 0, attachlist.size());
     }
 
-
-    public void testUpdateAttachmentReadWrite() throws XWikiException, IOException {
-        Utils.setStandardData();
-        attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
-        updateAttachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
-    }
 
     public void testDeleteAttachmentReadWrite() throws XWikiException, IOException {
         Utils.setStandardData();
@@ -369,5 +368,83 @@ public class StoreTest extends HibernateTestCase {
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);
         assertEquals(doc3.getVersion(), Utils.version2);
+    }
+
+
+    public void testUpdateAttachmentArchiveReadWrite(XWikiStoreInterface store, byte[] attachcontenta, byte[] attachcontentb) throws XWikiException, IOException {
+        // Prepare data
+        XWikiDocument doc = xwiki.getDocument(Utils.web, Utils.name, getXWikiContext());
+        doc.setContent("content 0");
+        xwiki.saveDocument(doc, context);
+        for (int i=0;i<100;i++) {
+         doc.setContent("content " + i);
+         xwiki.saveDocument(doc, context);
+        }
+        XWikiAttachment attach = new XWikiAttachment(doc, "file.txt");
+        attach.setContent(attachcontenta);
+        attach.setAuthor("XWiki.Author1");
+        attach.setComment("Test comment 1");
+        doc.getAttachmentList().add(attach);
+        doc.saveAttachmentContent(attach, getXWikiContext());
+
+        doc.setContent("content 1");
+        xwiki.saveDocument(doc, context);
+
+        attach.setContent(attachcontentb);
+        attach.setAuthor("XWiki.Author2");
+        attach.setComment("Test comment 2");
+        doc.saveAttachmentContent(attach, getXWikiContext());
+
+        getXWiki().flushCache();
+
+        // Verify data
+        XWikiDocument doc1 = new XWikiDocument(Utils.web, Utils.name);
+        doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
+        List attachlist = doc1.getAttachmentList();
+        assertEquals("Attachment is not listed", 1, attachlist.size());
+        XWikiAttachment attach1 = (XWikiAttachment) attachlist.get(0);
+        assertEquals("Attachment version is not correct", "1.2", attach.getVersion());
+        byte[] attachcontent1 = attach1.getContent(getXWikiContext());
+        assertEquals("Attachment content size is not correct", attachcontentb.length, attachcontent1.length);
+        for (int i=0;i<attachcontent1.length;i++) {
+            assertEquals("Attachment content byte " + i + " is not correct", attachcontentb[i], attachcontent1[i]);
+        }
+
+        XWikiAttachment attach2 = attach1.getAttachmentRevision("1.1", context);
+        // Test that content of attach is the one from version 1.1
+        assertEquals("Attachment version is not correct","1.1",attach2.getVersion());
+        byte[] attachcontent2 = attach2.getContent(getXWikiContext());
+        assertEquals("Attachment content size is not correct", attachcontenta.length,attachcontent2.length);
+        for (int i=0; i<attachcontent2.length; i++) {
+           assertEquals("Attachment content byte " + i + " is not correct",attachcontenta[i], attachcontent2[i]);
+        }
+        assertEquals("Attachment author is not correct", attach2.getAuthor(),"XWiki.Author1");
+        assertEquals("Attachment comment is not correct", attach2.getComment(),"Test comment 1");
+    }
+
+
+    public void testUpdateAttachmentArchiveReadWrite() throws XWikiException, IOException {
+        XWikiStoreInterface store = getXWiki().getStore();
+        String contenta = "content a";
+        String contentb = "content b";
+        byte[] attachcontenta = contenta.getBytes();
+        byte[] attachcontentb = contentb.getBytes();
+        testUpdateAttachmentArchiveReadWrite(store, attachcontenta, attachcontentb);
+    }
+
+    public void testUpdateAttachmentArchiveReadWrite2() throws XWikiException, IOException {
+        XWikiStoreInterface store = getXWiki().getStore();
+        String contenta = "this is content a with \nanother line and\nfinishing with an end line\n";
+        String contentb = "this is content b with \nanother line and\nfinishing with tzo end line\n\n";
+        byte[] attachcontenta = contenta.getBytes();
+        byte[] attachcontentb = contentb.getBytes();
+        testUpdateAttachmentArchiveReadWrite(store, attachcontenta, attachcontentb);
+    }
+
+    public void testUpdateAttachmentArchiveReadWriteBinary() throws XWikiException, IOException {
+        XWikiStoreInterface store = getXWiki().getStore();
+        byte[] attachcontenta = Utils.getDataAsBytes(new File(Utils.filename));
+        byte[] attachcontentb = Utils.getDataAsBytes(new File(Utils.filename2));
+        testUpdateAttachmentArchiveReadWrite(store, attachcontenta, attachcontentb);
     }
 }

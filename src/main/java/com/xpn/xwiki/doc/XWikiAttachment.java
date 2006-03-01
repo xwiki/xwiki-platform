@@ -166,13 +166,13 @@ public class XWikiAttachment {
     }
 
     public String getComment() {
-        if (!comment.equals(this.comment)) {
-                setMetaDataDirty(true);
-            }
         return comment;
     }
 
     public void setComment(String comment) {
+        if (!comment.equals(this.comment)) {
+            setMetaDataDirty(true);
+        }
         this.comment = comment;
     }
 
@@ -195,9 +195,9 @@ public class XWikiAttachment {
 
     public boolean isContentDirty() {
         if (attachment_content==null)
-         return false;
+            return false;
         else
-         return attachment_content.isContentDirty();
+            return attachment_content.isContentDirty();
     }
 
     public void incrementVersion() {
@@ -215,59 +215,6 @@ public class XWikiAttachment {
     public void setMetaDataDirty(boolean metaDataDirty) {
         isMetaDataDirty = metaDataDirty;
     }
-
-    /*
-    // This code should not be needed..
-    // Meta Data archiving is done
-    // in the main document..
-    public Archive getRCSMetaArchive() {
-        return metaArchive;
-    }
-
-    public void setRCSMetaArchive(Archive metaArchive) {
-        this.metaArchive = metaArchive;
-    }
-
-
-    public String getMetaArchive() throws XWikiException {
-        if (metaArchive==null)
-            updateMetaArchive(toXML());
-        if (metaArchive==null)
-            return "";
-        else {
-            StringBuffer buffer = new StringBuffer();
-            metaArchive.toString(buffer);
-            return buffer.toString();
-        }
-    }
-
-    public void setMetaArchive(String text) throws XWikiException {
-        try {
-            StringInputStream is = new StringInputStream(text);
-            metaArchive = new Archive(getFilename(), is);
-        }
-        catch (Exception e) {
-            Object[] args = { getFilename() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for file {0}", e, args);
-        }
-    }
-
-    public void updateMetaArchive(String text) throws XWikiException {
-        try {
-            Lines lines = new Lines(text);
-            if (metaArchive!=null)
-                metaArchive.addRevision(lines.toArray(),"");
-            else
-                metaArchive = new Archive(lines.toArray(),getFilename(),getVersion());
-        }
-        catch (Exception e) {
-            Object[] args = { getFilename() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for file {0}", e, args);
-        }
-    }
-    */
 
     public Element toXML(XWikiContext context) throws XWikiException {
         return toXML(false, false, context);

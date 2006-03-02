@@ -69,28 +69,34 @@
     <!-- ========== Action Mapping Definitions ============================== -->
     <action-mappings>
 
-        <!-- XWiki Struts Application with Velocity -->
-        <action path="/xmlrpc/"
-                type="com.xpn.xwiki.web.XMLRPCAction"
-                name="xmlrpc"
-                scope="request">
-        </action>
-        <action path="/view/"
-                type="com.xpn.xwiki.web.ViewAction"
-                name="view"
-                scope="request">
-            <forward name="view" path="/templates/view.vm"/>
-            <forward name="notexist" path="/templates/notexist.vm"/>
-            <forward name="plain" path="/templates/plain.vm"/>
-        </action>
-        <!---Add by me-->
-        <action path="/viewrev/"
-                type="com.xpn.xwiki.web.ViewrevAction"
-                name="viewrev"
-                scope="request">
-            <forward name="notexist" path="/templates/notexist.vm"></forward>
-            <forward name="view" path="/templates/view.vm"></forward>
-        </action>
+    <!-- XWiki Struts Application with Velocity -->
+    <action path="/xmlrpc/"
+            type="com.xpn.xwiki.web.XMLRPCAction"
+            name="xmlrpc"
+            scope="request">
+    </action>
+    <action path="/view/"
+            type="com.xpn.xwiki.web.ViewAction"
+            name="view"
+            scope="request">
+        <forward name="view" path="/templates/view.vm"/>
+        <forward name="notexist" path="/templates/notexist.vm"/>
+        <forward name="plain" path="/templates/plain.vm"/>
+    </action>
+    <action path="/viewattachrev/"
+            type="com.xpn.xwiki.web.ViewAttachRevAction"
+            name="viewattachrev"
+            scope="request">
+        <forward name="viewattachrev" path="/templates/viewattachrev.vm"/>
+    </action>
+    <!---Add by me-->
+    <action path="/viewrev/"
+            type ="com.xpn.xwiki.web.ViewrevAction"
+            name="viewrev"
+            scope="request">
+        <forward name="notexist" path="/templates/notexist.vm"></forward>
+        <forward name="view" path="/templates/view.vm"></forward>
+    </action>
 
         <action path="/pdf/"
                 type="com.xpn.xwiki.web.PDFAction"
@@ -212,17 +218,21 @@
             <forward name="upload" path="/templates/attach.vm"/>
         </action>
 
-        <action path="/download/"
-                type="com.xpn.xwiki.web.DownloadAction"
-                name="download"
-                scope="request">
-        </action>
-
-        <action path="/dot/"
-                type="com.xpn.xwiki.web.DotAction"
-                name="dot"
-                scope="request">
-        </action>
+      <action path="/download/"
+          type="com.xpn.xwiki.web.DownloadAction"
+          name="download"
+          scope="request">
+      </action>
+      <action path="/downloadrev/"
+              type="com.xpn.xwiki.web.DownloadRevAction"
+              name="dowloadrev"
+              scope="request">
+      </action>
+      <action path="/dot/"
+          type="com.xpn.xwiki.web.DotAction"
+          name="dot"
+          scope="request">
+      </action>
 
         <action path="/svg/"
                 type="com.xpn.xwiki.web.SVGAction"

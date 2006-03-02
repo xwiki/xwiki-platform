@@ -475,6 +475,11 @@ public class XWikiDocument {
         return context.getURLFactory().getURL(url, context);
     }
 
+    public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context) {
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
     public String getURL(String action, boolean redirect, XWikiContext context) {
         URL url = context.getURLFactory().createURL(getWeb(), getName(), action, redirect, context);
         if (redirect) {

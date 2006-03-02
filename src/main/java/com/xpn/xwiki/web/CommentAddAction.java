@@ -60,6 +60,6 @@ public class CommentAddAction extends XWikiAction {
 
     public String render(XWikiContext context) throws XWikiException {
         context.put("message", "nocommentwithnewdoc");
-        return "docnotexist";
+        return "exception";
     }
 }

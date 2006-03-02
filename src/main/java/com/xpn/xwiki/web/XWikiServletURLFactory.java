@@ -242,6 +242,30 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         }
     }
 
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb, XWikiContext context) {
+        String action = "downloadrev";
+        StringBuffer newpath = new StringBuffer(servletPath);
+        newpath.append(actionPath);
+        addAction(newpath, action);
+        addSpace(newpath, web, action, context);
+        addName(newpath, name, action, context);
+        addFileName(newpath, filename, context);
+
+        String querystring = "rev=" + revision;
+        if ((querystring!=null)&&(!querystring.equals(""))) {
+            newpath.append("?");
+            newpath.append(querystring);
+            // newpath.append(querystring.replaceAll("&","&amp;"));
+        }
+
+        try {
+            return new URL(getServerURL(xwikidb, context), newpath.toString());
+        } catch (MalformedURLException e) {
+            // This should not happen
+            return null;
+        }
+    }
+
 
     public String getURL(URL url, XWikiContext context) {
         try {

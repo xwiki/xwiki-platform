@@ -58,6 +58,28 @@ public class PdfURLFactory extends XWikiServletURLFactory {
         }
     }
 
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb, XWikiContext context) {
+        try {
+            File tempdir = (File) context.get("pdfexportdir");
+            File file = new File(tempdir, web + "." + name + "." + filename);
+            if (!file.exists()) {
+                XWikiDocument doc = null;
+                doc = context.getWiki().getDocument(web + "." + name, context);
+                XWikiAttachment attachment = doc.getAttachment(filename).getAttachmentRevision(revision, context);
+                byte[] data = new byte[0];
+                data = attachment.getContent(context);
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(data);
+                fos.close();
+            }
+            return file.toURL();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
+        }
+    }
+
+
     public String getURL(URL url, XWikiContext context) {
         if (url==null)
             return "";

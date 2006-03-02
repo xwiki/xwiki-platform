@@ -45,6 +45,8 @@ public interface XWikiURLFactory {
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
     public URL createAttachmentURL(String filename, String web, String name, String action, XWikiContext context);
     public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context);
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, XWikiContext context);
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb, XWikiContext context);
     public URL getRequestURL(XWikiContext context);
     public String getURL(URL url, XWikiContext context);
 }

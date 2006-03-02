@@ -499,6 +499,7 @@ public class XWikiAttachment {
             String scontent = content.toString();
             XWikiAttachment revattach = new XWikiAttachment();
             revattach.fromXML(scontent);
+            revattach.setDoc(getDoc());
             return revattach;
         }    catch (Exception e) {
             Object[] args = { getFilename() };
@@ -506,45 +507,6 @@ public class XWikiAttachment {
                     "Exception while manipulating the archive for file {0}", e, args);
         }
     }
-
-    /*
-    public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException {
-        XWikiAttachment revattach = null;
-
-        try {
-            Version[] versions = getDoc().getRevisions(context);
-            for (int i=0;i<versions.length;i++) {
-                Version version = versions[i];
-                XWikiDocument revdoc = context.getWiki().getDocument(getDoc(),version.toString(),context);
-                revattach = revdoc.getAttachment(getFilename());
-                if ((revattach!=null)&&revattach.getVersion().equals(rev))
-                    break;
-                revattach = null;
-            }
-            if (revattach==null)
-             return null;
-
-            context.getWiki().getStore().loadAttachmentArchive(this, context, true);
-            Archive archive = getArchive();
-            Version v = archive.getRevisionVersion(rev);
-            Object[] lines = archive.getRevision(v);
-            StringBuffer content = new StringBuffer();
-            for (int i=0;i<lines.length;i++) {
-                String line = lines[i].toString();
-                content.append(line);
-                if (i!=lines.length-1)
-                    content.append("\n");
-            }
-            String scontent = content.toString();
-            byte[] vcontent = Base64.decodeBase64(scontent.getBytes());
-            revattach.setContent(vcontent);
-            return revattach;
-        }    catch (Exception e) {
-            Object[] args = { getFilename() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for file {0}", e, args);
-        }
-    }
-   */
+    
 }
 

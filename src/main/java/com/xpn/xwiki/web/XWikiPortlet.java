@@ -294,6 +294,9 @@ public class XWikiPortlet extends GenericPortlet {
             else if (action.equals("download")) {
                 renderResult = (new DownloadAction()).render(context);
             }
+            else if (action.equals("downloadrev")) {
+                renderResult = (new DownloadRevAction()).render(context);
+            }
             else if (action.equals("dot")) {
                 renderResult = (new DotAction()).render(context);
             }

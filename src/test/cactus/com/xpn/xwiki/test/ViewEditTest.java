@@ -448,7 +448,7 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         String content = Utils.content1;
-        Utils.content1 = "Template content";
+       // Utils.content1 = "Template content";
         Utils.createDoc(xwiki.getStore(), "Main", "SaveOkTestTemplate", bobject, bclass, context);
         Utils.content1 = content;
         setUrl(webRequest, "save", "SaveOkWithTestTemplate");
@@ -1488,8 +1488,8 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception") == -1);
-            assertTrue("Attach Delete should contain attachment text: " + result, result.indexOf("blablabla") != -1);
+            assertTrue("Attach Download  returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Attach Download should contain attachment text: " + result, result.indexOf("blablabla")!=-1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -2051,62 +2051,129 @@ public class ViewEditTest extends ServletTest {
         launchTest();
     }
 
-    public void beginAddCommentOk(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void testSaveWithTemplateNotOk() throws Throwable {
+      launchTest();
+    }
+
+    public void beginSaveWithTemplateNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Test.MyTestTemplate");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 1);
+        Utils.createDoc(xwiki.getStore(), "Test", "MyTestTemplate", bobject, bclass, context);
+        setUrl(webRequest, "save", "Test", "MyTestPage", "");
+        webRequest.addParameter("template", "Test.MyTestTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+        webRequest.addParameter("content", "XYZ");
+    }
+
+    public void endSaveWithTemplateNotOk(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Test.MyTestPage", context);
+            String content2 = doc2.getContent();
+            assertEquals("Content is not identical", "XYZ",content2);
+
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testSaveWithTemplateToDocExistNotOk() throws Throwable {
+      launchTest();
+    }
+
+    public void beginSaveWithTemplateToDocExistNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Test.MyTestTemplate");
+        Utils.prepareObject(doc, "Test.MyTestPage");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 2);
         String content = Utils.content1;
-        Utils.createDoc(xwiki.getStore(), "Main", "AddCommentOk", context);
+        Utils.content1 = "XYZ";
+        Utils.createDoc(xwiki.getStore(), "Test", "MyTestTemplate", bobject, bclass, context);
         Utils.content1 = content;
-        XWikiDocument doc2 = xwiki.getDocument("Main.AddCommentOk", context);
-        xwiki.saveDocument(doc2, context);
-        doc2.setContent("hello new test comment");
-        xwiki.saveDocument(doc2, context);
-        setUrl(webRequest, "commentadd", "AddCommentOk", "");
-        webRequest.addParameter("XWiki.XWikiComments_author", "XWiki.Admin");
-        webRequest.addParameter("XWiki.XWikiComments_date", "");
-        webRequest.addParameter("XWiki.XWikiComments_comment", "My comment");
+
+        Utils.createDoc(xwiki.getStore(), "Test", "MyTestPage", bobject, bclass, context);
+
+        setUrl(webRequest, "save", "Test", "MyTestPage", "");
+        webRequest.addParameter("template", "Test.MyTestTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+        webRequest.addParameter("content", "New content");
     }
 
-    public void endAddCommentOk(WebResponse webResponse) throws HibernateException, XWikiException {
-        String result = webResponse.getText();
-
-        // Make sure we clean the cache
-        xwiki.flushCache();
-        XWikiDocument doc = xwiki.getDocument("Main.AddCommentOk", context);
-        assertEquals("Could not find This comment", 1, doc.getComments().size());
+    public void endSaveWithTemplateToDocExistNotOk(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            String result = webResponse.getText();
+            XWikiDocument doc2 = xwiki.getDocument("Test.MyTestPage", context);
+            String content2 = doc2.getContent();
+            assertEquals("Content should still be XYZ", Utils.content1,content2);
+            // Verify return
+            assertTrue("Saving did not returned nice error message: " + result, (result.indexOf("You cannot create a document from a template when the document already exists.")!=-1));
+        } finally {
+            clientTearDown();
+        }
     }
 
-    public void testAddCommentOk() throws Throwable {
+    public void testAttachDownloadRev() throws Throwable {
         launchTest();
     }
 
 
-    public void beginAddCommentFail(WebRequest webRequest) throws HibernateException, XWikiException {
+    public void beginAttachDownloadRev(WebRequest webRequest) throws HibernateException, XWikiException, IOException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
-        setUrl(webRequest, "commentadd", "AddCommentFail", "");
-        webRequest.addParameter("XWiki.XWikiComments_author", "XWiki.Admin");
-        webRequest.addParameter("XWiki.XWikiComments_date", "");
-        webRequest.addParameter("XWiki.XWikiComments_comment", "My comment");
+
+        XWikiDocument doc1 = new XWikiDocument("Test", "AttachDownloadRevTest");
+        doc1.setContent(Utils.content1);
+        doc1.setAuthor(Utils.author);
+        doc1.setParent(Utils.parent);
+        xwiki.saveDocument(doc1, context);
+        XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
+        String attachcontent1 = "blablabla";
+        attachment1.setContent(attachcontent1.getBytes());
+
+        doc1.saveAttachmentContent(attachment1, context);
+        doc1.getAttachmentList().add(attachment1);
+        xwiki.saveDocument(doc1, context);
+
+        String attachcontent2 = "Another content";
+        attachment1.setContent(attachcontent2.getBytes());
+
+        doc1.saveAttachmentContent(attachment1, context);
+        doc1.getAttachmentList().add(attachment1);
+        xwiki.saveDocument(doc1, context);
+        setUrl(webRequest, "downloadrev", "Test", "AttachDownloadRevTest/" + Utils.filename, "");
+        webRequest.addParameter("rev","1.1");
     }
 
-    public void endAddCommentFail(WebResponse webResponse) throws HibernateException, XWikiException {
-        String result = webResponse.getText();
+    public void endAttachDownloadRev(WebResponse webResponse) throws XWikiException, HibernateException {
+        try {
+            String result = webResponse.getText();
+            // Verify return
+            assertTrue("Attach Download  returned exception: " + result, result.indexOf("Exception")==-1);
+            assertEquals("Attach Download should contain attachment text of revision 1.1", "blablabla", result);
 
-        // Make sure we clean the cache
-        xwiki.flushCache();
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
 
-        XWikiDocument doc = xwiki.getDocument("Main.AddCommentFail", context);
-        assertEquals("You can't comment when the document in article do not exist ", 0, doc.getComments().size());
-        assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("") != -1);
+            XWikiDocument doc2 = xwiki.getDocument("Test.AttachDownloadRevTest", context);
+            List list = doc2.getAttachmentList();
+            assertEquals("Document should have an attachement", 1, list.size());
+            XWikiAttachment attach1 = (XWikiAttachment)list.get(0);
+            assertEquals("Attachment should have version 1.2","1.2",attach1.getVersion());
+        } finally {
+            clientTearDown();
+        }
     }
-
-    public void testAddCommentFail() throws Throwable {
-        launchTest();
-    }
-
-
 }
 

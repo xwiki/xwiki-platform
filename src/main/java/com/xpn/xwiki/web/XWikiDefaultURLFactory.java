@@ -51,7 +51,11 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory {
     public URL createAttachmentURL(String filename, String web, String name, String action, XWikiContext context) {
         return createAttachmentURL(filename, web, name, action, context.getDatabase(), context);
     }
-    
+
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, XWikiContext context) {
+        return createAttachmentRevisionURL(filename, web, name, revision, context.getDatabase(), context);
+    }
+
     public URL getRequestURL(XWikiContext context)
     {
         return context.getURL();

@@ -142,12 +142,8 @@ public class Attachment extends Api {
         return attachment.getArchive();
     }
 
-    /**
-     *
-     * @return a table with all versions object of the attachment
-     */
-
-    public Version[] getVersions() {
+    public Version[] getVersions() throws XWikiException {
+        attachment.loadArchive(context);
         return attachment.getVersions();
     }
 
@@ -157,6 +153,7 @@ public class Attachment extends Api {
      * @throws XWikiException
      */
     public List getVersionList() throws XWikiException {
+        attachment.loadArchive(context);
         return attachment.getVersionList();
     }
 
@@ -186,5 +183,9 @@ public class Attachment extends Api {
      */
     public boolean isImage() {
         return attachment.isImage(context);
+    }
+
+     public XWikiAttachment getAttachmentRevision(String rev) throws XWikiException{
+        return attachment.getAttachmentRevision(rev, context);
     }
 }

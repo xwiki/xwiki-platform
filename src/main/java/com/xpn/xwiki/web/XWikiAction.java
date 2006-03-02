@@ -137,14 +137,20 @@ public abstract class XWikiAction extends Action {
                     monitor.setWikiPage(context.getDoc().getFullName());
 
                 String renderResult = null;
-
+                XWikiDocument doc = context.getDoc();
                 if (action(context)) {
                     renderResult = render(context);
                 }
 
                 if (renderResult != null) {
-                    String page = Utils.getPage(request, renderResult);
-                    Utils.parseTemplate(page, !page.equals("direct"), context);
+                    if ((doc.isNew() && ("view".equals(context.getAction())))) {
+                        String page = Utils.getPage(request, "docdoesnotexist");
+                        Utils.parseTemplate(page, context);
+                    } else {
+                        String page = Utils.getPage(request, renderResult);
+                        Utils.parseTemplate(page, !page.equals("direct"), context);
+                    }
+
                 }
                 return null;
             } catch (Throwable e) {

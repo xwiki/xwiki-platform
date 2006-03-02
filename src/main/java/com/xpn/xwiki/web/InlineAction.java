@@ -23,21 +23,22 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 
 public class InlineAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(InlineAction.class);
 
     public String render(XWikiContext context) throws XWikiException {
+
         XWikiDocument doc = context.getDoc();
+
         synchronized (doc) {
             XWikiForm form = context.getForm();
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -51,19 +52,25 @@ public class InlineAction extends XWikiAction {
             vcontext.put("doc", vdoc2);
 
             String parent = peform.getParent();
-            if (parent!=null)
+            if (parent != null)
                 doc2.setParent(parent);
             String creator = peform.getCreator();
-            if (creator!=null)
+            if (creator != null)
                 doc2.setCreator(creator);
             String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
+            if ((defaultLanguage != null) && !defaultLanguage.equals(""))
                 doc2.setDefaultLanguage(defaultLanguage);
             if (doc2.getDefaultLanguage().equals(""))
                 doc2.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+            try {
+                doc2.readFromTemplate(peform, context);
+            } catch (XWikiException e) {
+                if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
+                    return "docalreadyexists";
+                }
+            }
 
-            doc2.readFromTemplate(peform, context);
-            if (vdoc==vcdoc) {
+            if (vdoc == vcdoc) {
                 vcontext.put("cdoc", vdoc2);
             } else {
                 XWikiDocument cdoc = vcdoc.getDocument();
@@ -76,7 +83,7 @@ public class InlineAction extends XWikiAction {
             try {
                 XWikiLock lock = doc.getLock(context);
                 if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce()))
-                    doc.setLock(context.getUser(),context);
+                    doc.setLock(context.getUser(), context);
             } catch (Exception e) {
                 e.printStackTrace();
                 // Lock should never make XWiki fail

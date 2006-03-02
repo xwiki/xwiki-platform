@@ -109,6 +109,8 @@
                 name="inline"
                 scope="request">
             <forward name="inline" path="/templates/inline.vm"/>
+            <forward name="pageexist" path="/templates/inline.vm"/>
+
         </action>
 
         <action path="/preview/"

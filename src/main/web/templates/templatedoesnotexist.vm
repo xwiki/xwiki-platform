@@ -1,0 +1,17 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikicontent">
+
+    <center><h2>
+        $msg.get("thistemplatedoesnotexist")
+    </h2>
+    </center>
+    <br/><br/>
+
+</div>
+#template("basefooter.vm")
+#template("footer.vm")
+
+

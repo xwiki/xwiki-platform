@@ -24,6 +24,16 @@
 
 package com.xpn.xwiki.web;
 
+import com.novell.ldap.util.Base64;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.log4j.MDC;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -34,18 +44,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.log4j.MDC;
-
-import com.novell.ldap.util.Base64;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCURLFactory;
 
 public class Utils {
 
@@ -59,46 +57,51 @@ public class Utils {
         // Set content-type and encoding (this can be changed in the future by pages themselves)
         if (context.getResponse() instanceof XWikiPortletResponse) {
             response.setContentType("text/html");
-        }
-        else {
+        } else {
             response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
         }
 
         String action = context.getAction();
         if ((!"download".equals(action))
-            &&(!"skin".equals(action))) {
+                && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context)!=0) {
-                    if (context.getDoc()!=null)
-                     response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
+                    if (context.getDoc() != null)
+                        response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context)!=0) {
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
                     response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control","no-cache");
+                    response.setHeader("Cache-Control", "no-cache");
                 }
                 // Set an expires in one month
                 long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
-                if (expires==-1) {
+                if (expires == -1) {
                     response.setDateHeader("Expires", -1);
-                } else if (expires!=0) {
-                    response.setDateHeader("Expires", (new Date()).getTime() + 30*24*3600*1000L);
+                } else if (expires != 0) {
+                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
                 }
             }
         }
 
         if (("download".equals(action))
-            ||("skin".equals(action))) {
+                || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
-            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context)!=0) {
-                response.setHeader("Cache-Control","no-cache");
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
+                response.setHeader("Cache-Control", "no-cache");
             }
         }
 
 
         String content = context.getWiki().parseTemplate(template + ".vm", context);
         content = content.trim();
+
+        if (content.equals("")) {
+            // get Error template "This template does not exist
+            content = context.getWiki().parseTemplate("templatedoesnotexist.vm", context);
+            content = content.trim();
+        }
 
         if (!context.isFinished()) {
             if (context.getResponse() instanceof XWikiServletResponse) {
@@ -118,7 +121,7 @@ public class Utils {
         }
 
         try {
-             response.getWriter().flush();
+            response.getWriter().flush();
         } catch (Throwable e) {
         }
     }
@@ -126,7 +129,7 @@ public class Utils {
     public static String getRedirect(XWikiRequest request, String defaultRedirect) {
         String redirect;
         redirect = request.getParameter("xredirect");
-        if ((redirect == null)||(redirect.equals("")))
+        if ((redirect == null) || (redirect.equals("")))
             redirect = defaultRedirect;
         return redirect;
     }
@@ -134,23 +137,22 @@ public class Utils {
     public static String getRedirect(String action, XWikiContext context) {
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null)||(redirect.equals("")))
-           redirect = context.getDoc().getURL(action, true, context);
+        if ((redirect == null) || (redirect.equals("")))
+            redirect = context.getDoc().getURL(action, true, context);
         return redirect;
     }
 
     public static String getPage(XWikiRequest request, String defaultpage) {
         String page;
         page = request.getParameter("xpage");
-        if ((page == null)||(page.equals("")))
+        if ((page == null) || (page.equals("")))
             page = defaultpage;
         return page;
     }
 
-
     public static String getFileName(List filelist, String name) {
-        DefaultFileItem  fileitem = null;
-        for (int i=0;i<filelist.size();i++) {
+        DefaultFileItem fileitem = null;
+        for (int i = 0; i < filelist.size(); i++) {
             DefaultFileItem item = (DefaultFileItem) filelist.get(i);
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
@@ -158,15 +160,15 @@ public class Utils {
             }
         }
 
-        if (fileitem==null)
+        if (fileitem == null)
             return null;
 
         return fileitem.getName();
     }
 
     public static byte[] getContent(List filelist, String name) throws XWikiException {
-        DefaultFileItem  fileitem = null;
-        for (int i=0;i<filelist.size();i++) {
+        DefaultFileItem fileitem = null;
+        for (int i = 0; i < filelist.size(); i++) {
             DefaultFileItem item = (DefaultFileItem) filelist.get(i);
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
@@ -174,10 +176,10 @@ public class Utils {
             }
         }
 
-        if (fileitem==null)
+        if (fileitem == null)
             return null;
 
-        byte[] data = new byte[(int)fileitem.getSize()];
+        byte[] data = new byte[(int) fileitem.getSize()];
         InputStream fileis = null;
         try {
             fileis = fileitem.getInputStream();
@@ -211,11 +213,9 @@ public class Utils {
         int mode = 0;
         if (request instanceof XWikiXMLRPCRequest) {
             mode = XWikiContext.MODE_XMLRPC;
-        }
-        else if (request instanceof XWikiServletRequest) {
+        } else if (request instanceof XWikiServletRequest) {
             mode = XWikiContext.MODE_SERVLET;
-        }
-        else if (request instanceof XWikiPortletRequest) {
+        } else if (request instanceof XWikiPortletRequest) {
             mode = XWikiContext.MODE_PORTLET;
         }
         context.setMode(mode);
@@ -226,7 +226,7 @@ public class Utils {
      * Append request parameters from the specified String to the specified
      * Map.  It is presumed that the specified Map is not accessed from any
      * other thread, so no synchronization is performed.
-     * <p>
+     * <p/>
      * <strong>IMPLEMENTATION NOTE</strong>:  URL decoding is performed
      * individually on the parsed name and value elements, rather than on
      * the entire query string ahead of time, to properly deal with the case
@@ -234,12 +234,12 @@ public class Utils {
      * that would otherwise be interpreted as a delimiter.
      *
      * @param data Input string containing request parameters
-     *
-     * @exception IllegalArgumentException if the data is malformed
-     *
-     *  Code borrowed from Apache Tomcat 5.0        */
+     * @throws IllegalArgumentException if the data is malformed
+     *                                  <p/>
+     *                                  Code borrowed from Apache Tomcat 5.0
+     */
     public static Map parseParameters(String data, String encoding)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
 
         if ((data != null) && (data.length() > 0)) {
 
@@ -266,61 +266,60 @@ public class Utils {
      * Append request parameters from the specified String to the specified
      * Map.  It is presumed that the specified Map is not accessed from any
      * other thread, so no synchronization is performed.
-     * <p>
+     * <p/>
      * <strong>IMPLEMENTATION NOTE</strong>:  URL decoding is performed
      * individually on the parsed name and value elements, rather than on
      * the entire query string ahead of time, to properly deal with the case
      * where the name or value includes an encoded "=" or "&" character
      * that would otherwise be interpreted as a delimiter.
-     *
+     * <p/>
      * NOTE: byte array data is modified by this method.  Caller beware.
      *
-     * @param data Input string containing request parameters
+     * @param data     Input string containing request parameters
      * @param encoding Encoding to use for converting hex
-     *
-     * @exception UnsupportedEncodingException if the data is malformed
-     *
-     *  Code borrowed from Apache Tomcat 5.0
+     * @throws UnsupportedEncodingException if the data is malformed
+     *                                      <p/>
+     *                                      Code borrowed from Apache Tomcat 5.0
      */
     public static Map parseParameters(byte[] data, String encoding)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
 
         Map map = new HashMap();
 
         if (data != null && data.length > 0) {
-            int    pos = 0;
-            int    ix = 0;
-            int    ox = 0;
+            int pos = 0;
+            int ix = 0;
+            int ox = 0;
             String key = null;
             String value = null;
             while (ix < data.length) {
                 byte c = data[ix++];
                 switch ((char) c) {
-                case '&':
-                    value = new String(data, 0, ox, encoding);
-                    if (key != null) {
-                        putMapEntry(map, key, value);
-                        key = null;
-                    }
-                    ox = 0;
-                    break;
-                case '=':
-                    if (key == null) {
-                        key = new String(data, 0, ox, encoding);
+                    case '&':
+                        value = new String(data, 0, ox, encoding);
+                        if (key != null) {
+                            putMapEntry(map, key, value);
+                            key = null;
+                        }
                         ox = 0;
-                    } else {
+                        break;
+                    case '=':
+                        if (key == null) {
+                            key = new String(data, 0, ox, encoding);
+                            ox = 0;
+                        } else {
+                            data[ox++] = c;
+                        }
+                        break;
+                    case '+':
+                        data[ox++] = (byte) ' ';
+                        break;
+                    case '%':
+                        data[ox++] = (byte) ((convertHexDigit(data[ix++]) << 4)
+                                + convertHexDigit(data[ix++]));
+                        break;
+                    default:
                         data[ox++] = c;
-                    }
-                    break;
-                case '+':
-                    data[ox++] = (byte)' ';
-                    break;
-                case '%':
-                    data[ox++] = (byte)((convertHexDigit(data[ix++]) << 4)
-                                    + convertHexDigit(data[ix++]));
-                    break;
-                default:
-                    data[ox++] = c;
                 }
             }
             //The last value does not end in '&'.  So save it now.
@@ -336,25 +335,25 @@ public class Utils {
      * Convert a byte character value to hexidecimal digit value.
      *
      * @param b the character value byte
-     *
-     *  Code borrowed from Apache Tomcat 5.0
+     *          <p/>
+     *          Code borrowed from Apache Tomcat 5.0
      */
-    private static byte convertHexDigit( byte b ) {
-        if ((b >= '0') && (b <= '9')) return (byte)(b - '0');
-        if ((b >= 'a') && (b <= 'f')) return (byte)(b - 'a' + 10);
-        if ((b >= 'A') && (b <= 'F')) return (byte)(b - 'A' + 10);
+    private static byte convertHexDigit(byte b) {
+        if ((b >= '0') && (b <= '9')) return (byte) (b - '0');
+        if ((b >= 'a') && (b <= 'f')) return (byte) (b - 'a' + 10);
+        if ((b >= 'A') && (b <= 'F')) return (byte) (b - 'A' + 10);
         return 0;
     }
 
     /**
      * Put name value pair in map.
-     *
+     * <p/>
      * Put name and value pair in map.  When name already exist, add value
      * to array of values.
-     *
+     * <p/>
      * Code borrowed from Apache Tomcat 5.0
      */
-    private static void putMapEntry( Map map, String name, String value) {
+    private static void putMapEntry(Map map, String name, String value) {
         String[] newValues = null;
         String[] oldValues = (String[]) map.get(name);
         if (oldValues == null) {
@@ -377,7 +376,7 @@ public class Utils {
 
     public static String SQLFilter(String text) {
         try {
-            return text.replaceAll("'","''");
+            return text.replaceAll("'", "''");
         } catch (Exception e) {
             return text;
         }
@@ -389,24 +388,24 @@ public class Utils {
             ///String result = new String(bytes);
             return URLEncoder.encode(name, context.getWiki().getEncoding());
         } catch (Exception e) {
-         return name;
+            return name;
         }
     }
 
     public static String decode(String name, XWikiContext context) {
         try {
             // Make sure + is considered as a space
-            String result = name.replace('+',' ');
+            String result = name.replace('+', ' ');
 
             // It seems Internet Explorer can send us back UTF-8
             // instead of ISO-8859-1 for URLs
-             if (Base64.isValidUTF8(result.getBytes(), false))
-               result = new String(result.getBytes(), "UTF-8");
+            if (Base64.isValidUTF8(result.getBytes(), false))
+                result = new String(result.getBytes(), "UTF-8");
 
             // Still need to decode URLs
             return URLDecoder.decode(result, context.getWiki().getEncoding());
         } catch (Exception e) {
-         return name;
+            return name;
         }
     }
 

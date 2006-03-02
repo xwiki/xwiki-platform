@@ -97,8 +97,29 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                    principal = GetUserPrincipal(susername, context);
                    if (principal == null && attributes.size() > 0)
                    {
-                       CreateUserFromLDAP(susername, attributes, context);
-                       principal = GetUserPrincipal(susername, context);
+                	   // In case of Virtual Wikis, users should be added in the main wiki
+                	   	// if ldap is not configured for the virtual wiki
+						if (context.isVirtual()) {
+							String db = context.getDatabase();
+							try {
+								// Switch to the main database in case of
+								// virtual and if not local LDAP configuration
+								if (context.getWiki().getXWikiPreference("ldap_server", context) == null || context.getWiki().getXWikiPreference("ldap_server", context).length() == 0) {
+									context.setDatabase(context.getWiki().getDatabase());
+								}
+								try {
+									CreateUserFromLDAP(susername, attributes,	context);
+									principal = GetUserPrincipal(susername, context);
+								} catch (Exception e) {
+								}
+							} finally {
+								context.setDatabase(db);
+							}
+						} else {
+							CreateUserFromLDAP(susername, attributes, context);
+							principal = GetUserPrincipal(susername, context);
+						}
+						context.getWiki().flushCache();
                    }
                }
             }

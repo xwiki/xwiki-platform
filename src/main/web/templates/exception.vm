@@ -3,12 +3,19 @@
 #template("header.vm")
 #template("baseheader.vm")
 <div id="xwikicontent">
-$msg.get("problemoccured")
-<br /><br />
-$msg.get("detailedinformation"):<br />
-<pre>
-$exp.getFullMessage()
-</pre>
+    #set($message = $xwiki.parseMessage())
+    #if($message)
+    $message
+    #else
+    $msg.get("problemoccured")
+    #end
+    <br/><br/>
+    #if($exp)
+    $msg.get("detailedinformation"):<br/>
+    <pre>
+        $exp.getFullMessage()
+    </pre>
+    #end
 </div>
 #template("basefooter.vm")
 #template("footer.vm")

@@ -25,26 +25,6 @@
 
 package com.xpn.xwiki.test;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import javax.servlet.ServletException;
-
-import org.apache.cactus.WebRequest;
-import org.apache.cactus.WebResponse;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.struts.action.ActionServlet;
-import org.dom4j.DocumentException;
-import org.hibernate.HibernateException;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,10 +37,27 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.store.XWikiBatcher;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiBatcher;
+import org.apache.cactus.WebRequest;
+import org.apache.cactus.WebResponse;
+import org.apache.commons.httpclient.methods.multipart.FilePart;
+import org.apache.commons.httpclient.methods.multipart.Part;
+import org.apache.struts.action.ActionServlet;
+import org.dom4j.DocumentException;
+import org.hibernate.HibernateException;
 
+import javax.servlet.ServletException;
+import java.io.File;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 
 public class ViewEditTest extends ServletTest {
@@ -75,7 +72,7 @@ public class ViewEditTest extends ServletTest {
     public void endViewNotOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Page should have no version: " + result, result.indexOf("1.1")==-1);
+            assertTrue("Page should have no version: " + result, result.indexOf("1.1") == -1);
         } finally {
             clientTearDown();
         }
@@ -99,9 +96,9 @@ public class ViewEditTest extends ServletTest {
     public void endViewOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
-            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest") != -1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -120,15 +117,15 @@ public class ViewEditTest extends ServletTest {
         Utils.createDoc(xwiki.getStore(), "Main", "ViewRawOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewRawOkTest");
-        webRequest.addParameter("raw","1");
+        webRequest.addParameter("raw", "1");
     }
 
     public void endViewRawOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----") != -1);
         } finally {
             clientTearDown();
         }
@@ -147,15 +144,15 @@ public class ViewEditTest extends ServletTest {
         Utils.createDoc(xwiki.getStore(), "Main", "ViewRawOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewRawOkTest");
-        webRequest.addParameter("xpage","code");
+        webRequest.addParameter("xpage", "code");
     }
 
     public void endViewCodeOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----") != -1);
         } finally {
             clientTearDown();
         }
@@ -174,16 +171,16 @@ public class ViewEditTest extends ServletTest {
         Utils.createDoc(xwiki.getStore(), "Main", "ViewXMLOkTest", context);
         Utils.content1 = content;
         setUrl(webRequest, "view", "ViewXMLOkTest");
-        webRequest.addParameter("xpage","xml");
+        webRequest.addParameter("xpage", "xml");
     }
 
     public void endViewXMLOk(WebResponse webResponse) throws HibernateException, IllegalAccessException, DocumentException, ParseException, ClassNotFoundException, InstantiationException, XWikiException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
-            assertTrue("Could not find xml tags in content: " + result, result.indexOf("<content")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----") != -1);
+            assertTrue("Could not find xml tags in content: " + result, result.indexOf("<content") != -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -217,7 +214,7 @@ public class ViewEditTest extends ServletTest {
     public void endViewGetDocument(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find content in result:\n" + result, result.indexOf("Hello")!=-1);
+            assertTrue("Could not find content in result:\n" + result, result.indexOf("Hello") != -1);
         } finally {
             clientTearDown();
         }
@@ -243,7 +240,7 @@ public class ViewEditTest extends ServletTest {
     public void endViewDocumentLink(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find content in result:\n" + result, result.indexOf("<a href")!=-1);
+            assertTrue("Could not find content in result:\n" + result, result.indexOf("<a href") != -1);
         } finally {
             clientTearDown();
         }
@@ -269,10 +266,10 @@ public class ViewEditTest extends ServletTest {
     public void endPreviewOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find object hidden form nb: " + result, result.indexOf("<input type=\"hidden\" name=\"Main.PreviewOkTest_nb\" value=\"1\"")!=-1);
-            assertTrue("Could not find object hidden form value: " + result, result.indexOf("Main.PreviewOkTest_0_first_name")!=-1);
-            assertTrue("Could not find object hidden form value: " + result, result.indexOf("Ludovic")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find object hidden form nb: " + result, result.indexOf("<input type=\"hidden\" name=\"Main.PreviewOkTest_nb\" value=\"1\"") != -1);
+            assertTrue("Could not find object hidden form value: " + result, result.indexOf("Main.PreviewOkTest_0_first_name") != -1);
+            assertTrue("Could not find object hidden form value: " + result, result.indexOf("Ludovic") != -1);
         } finally {
             clientTearDown();
         }
@@ -297,7 +294,7 @@ public class ViewEditTest extends ServletTest {
     public void endEditOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Hello")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Hello") != -1);
         } finally {
             clientTearDown();
         }
@@ -324,9 +321,9 @@ public class ViewEditTest extends ServletTest {
     public void endEditObjectOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find object hidden form nb: " + result, result.indexOf("<input type=\"hidden\" name=\"Main.EditObjectOkTest_nb\" value=\"1\"")!=-1);
-            assertTrue("Could not find object form value: " + result, result.indexOf("Main.EditObjectOkTest_0_first_name")!=-1);
-            assertTrue("Could not find object form value: " + result, result.indexOf("Ludovic")!=-1);
+            assertTrue("Could not find object hidden form nb: " + result, result.indexOf("<input type=\"hidden\" name=\"Main.EditObjectOkTest_nb\" value=\"1\"") != -1);
+            assertTrue("Could not find object form value: " + result, result.indexOf("Main.EditObjectOkTest_0_first_name") != -1);
+            assertTrue("Could not find object form value: " + result, result.indexOf("Ludovic") != -1);
         } finally {
             clientTearDown();
         }
@@ -353,20 +350,20 @@ public class ViewEditTest extends ServletTest {
     public void endEditClassOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.NumberClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.StringClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.DBListClass") != -1);
         } finally {
             clientTearDown();
         }
     }
 
     public void testEditClassOk() throws Throwable {
-           launchTest();
-       }
+        launchTest();
+    }
 
 
     public void beginEditWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -389,8 +386,8 @@ public class ViewEditTest extends ServletTest {
     public void endEditWithTemplateOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Template content")!=-1);
-            assertTrue("Could not find parent: " + result, result.indexOf("TestParentComesFromTemplate")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Template content") != -1);
+            assertTrue("Could not find parent: " + result, result.indexOf("TestParentComesFromTemplate") != -1);
         } finally {
             clientTearDown();
         }
@@ -431,7 +428,7 @@ public class ViewEditTest extends ServletTest {
     public void endEditWithTemplateNotOk(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertFalse("Template content should be ignored: " + result, result.indexOf("Template content")!=-1);
+            assertFalse("Template content should be ignored: " + result, result.indexOf("Template content") != -1);
         } finally {
             clientTearDown();
         }
@@ -464,14 +461,14 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.SaveOkWithTestTemplate", context);
             String content2 = doc2.getContent();
-            assertEquals("Content is not identical", "Template content",content2);
+            assertEquals("Content is not identical", "Template content", content2);
             assertEquals("Parent is not identical", "XWiki.TestParentComesFromTemplate", doc2.getParent());
         } finally {
             clientTearDown();
@@ -494,11 +491,10 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-
     public void endViewLatestRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find zzz in Content: " + result, result.indexOf("zzzzzzzzzzzzzzzzzzzzzzzz")!=-1);
+            assertTrue("Could not find zzz in Content: " + result, result.indexOf("zzzzzzzzzzzzzzzzzzzzzzzz") != -1);
         } finally {
             clientTearDown();
         }
@@ -526,13 +522,12 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-
     public void endViewRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("ViewRevOkTest")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("ViewRevOkTest") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -566,12 +561,11 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-
     public void endViewRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("First name is Ludovic")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("First name is Ludovic") != -1);
         } finally {
             clientTearDown();
         }
@@ -635,17 +629,17 @@ public class ViewEditTest extends ServletTest {
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
         xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRawRevOkTest", "");
-        webRequest.addParameter("rev","1.2");
-        webRequest.addParameter("raw","1");
+        webRequest.addParameter("rev", "1.2");
+        webRequest.addParameter("raw", "1");
     }
 
 
     public void endViewRawRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----") != -1);
         } finally {
             clientTearDown();
         }
@@ -668,17 +662,17 @@ public class ViewEditTest extends ServletTest {
         doc2.setContent("zzzzzzzzzzzzzzzzzzzzzzzz");
         xwiki.saveDocument(doc2, context);
         setUrl(webRequest, "view", "ViewRawRevOkTest", "");
-        webRequest.addParameter("rev","1.2");
-        webRequest.addParameter("xpage","code");
+        webRequest.addParameter("rev", "1.2");
+        webRequest.addParameter("xpage", "code");
     }
 
 
     public void endViewCodeRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name")!=-1);
-            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find raw page name in content: " + result, result.indexOf("$doc.name") != -1);
+            assertTrue("Could not find raw hr in content: " + result, result.indexOf("----") != -1);
         } finally {
             clientTearDown();
         }
@@ -706,22 +700,22 @@ public class ViewEditTest extends ServletTest {
         StoreHibernateTest.cleanUp(hibstore, context);
         clientSetUp(hibstore);
         setUrl(webRequest, "save", "SaveTest");
-        webRequest.addParameter("content","Hello1Hello2Hello3");
-        webRequest.addParameter("parent","Main.WebHome");
+        webRequest.addParameter("content", "Hello1Hello2Hello3");
+        webRequest.addParameter("parent", "Main.WebHome");
     }
 
     public void endSave(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
-            assertEquals("Content is not indentical", "Hello1Hello2Hello3",content2);
+            assertEquals("Content is not indentical", "Hello1Hello2Hello3", content2);
             assertEquals("Parent is not identical", "Main.WebHome", doc2.getParent());
         } finally {
             clientTearDown();
@@ -739,14 +733,14 @@ public class ViewEditTest extends ServletTest {
         clientSetUp(hibstore);
         Utils.createDoc(xwiki.getStore(), "Main", "DeleteTest", context);
         setUrl(webRequest, "delete", "DeleteTest");
-        webRequest.addParameter("confirm","1");
+        webRequest.addParameter("confirm", "1");
     }
 
     public void endDelete(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Delete returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Delete returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -775,7 +769,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("DeleteWithoutConfirm returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("DeleteWithoutConfirm returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -806,7 +800,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Adding Property " + cclass.getName() + " returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Adding Property " + cclass.getName() + " returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -829,8 +823,8 @@ public class ViewEditTest extends ServletTest {
         beginAddProp(webRequest, "score", NumberClass.class);
     }
 
-    public void endAddNumberProp(WebResponse response)  throws XWikiException, HibernateException {
-            endAddProp(response, "score", NumberClass.class);
+    public void endAddNumberProp(WebResponse response) throws XWikiException, HibernateException {
+        endAddProp(response, "score", NumberClass.class);
     }
 
     public void testAddDateProp() throws IOException, Throwable {
@@ -841,8 +835,8 @@ public class ViewEditTest extends ServletTest {
         beginAddProp(webRequest, "birthday", DateClass.class);
     }
 
-    public void endAddDateProp(WebResponse response)  throws XWikiException, HibernateException {
-            endAddProp(response, "birthday", DateClass.class);
+    public void endAddDateProp(WebResponse response) throws XWikiException, HibernateException {
+        endAddProp(response, "birthday", DateClass.class);
     }
 
     public void testAddStringProp() throws IOException, Throwable {
@@ -853,8 +847,8 @@ public class ViewEditTest extends ServletTest {
         beginAddProp(webRequest, "category", StringClass.class);
     }
 
-    public void endAddStringProp(WebResponse response)  throws XWikiException, HibernateException {
-            endAddProp(response, "category", StringClass.class);
+    public void endAddStringProp(WebResponse response) throws XWikiException, HibernateException {
+        endAddProp(response, "category", StringClass.class);
     }
 
     public void testAddObject() throws Throwable {
@@ -879,15 +873,18 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.PropAddObject", context);
             BaseObject bobject = null;
-            try { bobject = (BaseObject) doc2.getObject("Main.PropAddObjectClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc2.getObject("Main.PropAddObjectClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Added Object does not exist", bobject);
 
             BaseClass bclass = bobject.getxWikiClass(context);
@@ -929,7 +926,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Adding Class returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -937,13 +934,17 @@ public class ViewEditTest extends ServletTest {
             XWikiDocument doc2 = xwiki.getDocument("Main.PropAddSecondObject", context);
             BaseObject bobject = null;
             try {
-                bobject = (BaseObject) doc2.getObject("Main.PropAddSecondObjectClass", 0); }
-            catch (Exception e) {}
+                bobject = (BaseObject) doc2.getObject("Main.PropAddSecondObjectClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("First Object does not exist", bobject);
             bobject = null;
             try {
-                bobject = (BaseObject) doc2.getObject("Main.PropAddSecondObjectClass", 1); }
-            catch (Exception e) {}
+                bobject = (BaseObject) doc2.getObject("Main.PropAddSecondObjectClass", 1);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Second Object does not exist", bobject);
 
             BaseClass bclass = bobject.getxWikiClass(context);
@@ -981,8 +982,10 @@ public class ViewEditTest extends ServletTest {
         XWikiDocument doc2 = xwiki.getDocument("Main.PropRemoveObject", context);
         BaseObject bobject2 = null;
         try {
-            bobject2 = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0); }
-        catch (Exception e) {}
+            bobject2 = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0);
+        }
+        catch (Exception e) {
+        }
         assertNotNull("Object does not exists", bobject2);
 
         setUrl(webRequest, "objectremove", "PropRemoveObject");
@@ -994,7 +997,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Remove Object returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Remove Object returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1002,8 +1005,10 @@ public class ViewEditTest extends ServletTest {
             XWikiDocument doc2 = xwiki.getDocument("Main.PropRemoveObject", context);
             BaseObject bobject = null;
             try {
-                bobject = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0); }
-            catch (Exception e) {}
+                bobject = (BaseObject) doc2.getObject("Main.PropRemoveObjectClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNull("Object still exists", bobject);
         } finally {
             clientTearDown();
@@ -1044,15 +1049,18 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateObject", context);
             BaseObject bobject = null;
-            try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateObjectClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc2.getObject("Main.PropUpdateObjectClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Updated Object does not exist", bobject);
 
             BaseClass bclass = bobject.getxWikiClass(context);
@@ -1064,9 +1072,9 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Updated Object should have age property", bobject.safeget("age"));
             assertNotNull("Updated Object should have name property", bobject.safeget("first_name"));
 
-            Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
+            Number age = (Number) ((NumberProperty) bobject.safeget("age")).getValue();
             assertEquals("Updated Object age property value is incorrect", new Integer(12), age);
-            String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            String name = (String) ((StringProperty) bobject.safeget("first_name")).getValue();
             assertEquals("Updated Object name property value is incorrect", "john", name);
         } finally {
             clientTearDown();
@@ -1104,7 +1112,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Updated Class returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Updated Class returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1120,8 +1128,11 @@ public class ViewEditTest extends ServletTest {
 
             XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateClassProp", context);
             BaseObject bobject = null;
-            try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateClassPropClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc2.getObject("Main.PropUpdateClassPropClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Updated Class does not exist", bobject);
 
             BaseClass bclass2 = bclass;
@@ -1136,15 +1147,14 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Updated Class should have age property", bobject.safeget("age"));
             assertNotNull("Updated Class should have name property", bobject.safeget("first_name"));
 
-            Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
+            Number age = (Number) ((NumberProperty) bobject.safeget("age")).getValue();
             assertEquals("Updated Class age property value is incorrect", new Integer(33), age);
-            String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            String name = (String) ((StringProperty) bobject.safeget("first_name")).getValue();
             assertEquals("Updated Class name property value is incorrect", "Ludovic", name);
         } finally {
             clientTearDown();
         }
     }
-
 
 
     public void testRenameClassProp() throws Throwable {
@@ -1177,7 +1187,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Rename Class returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Rename Class returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1196,8 +1206,11 @@ public class ViewEditTest extends ServletTest {
 
             // Check object in the Class
             BaseObject bobject = null;
-            try { bobject = (BaseObject) doc.getObject("Main.PropRenameClassPropClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc.getObject("Main.PropRenameClassPropClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Rename Class object does not exist", bobject);
 
             BaseClass bclass2 = bclass;
@@ -1219,15 +1232,18 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
             assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
 
-            Number age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
+            Number age = (Number) ((NumberProperty) bobject.safeget("age2")).getValue();
             assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
-            String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            String name = (String) ((StringProperty) bobject.safeget("first_name")).getValue();
             assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
 
             XWikiDocument doc2 = xwiki.getDocument("Main.PropRenameClassProp", context);
             bobject = null;
-            try { bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc2.getObject("Main.PropRenameClassPropClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Rename Class object does not exist", bobject);
 
             bclass2 = bclass;
@@ -1249,15 +1265,14 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Rename Class object should have age property", bobject.safeget("age2"));
             assertNotNull("Rename Class object should have name property", bobject.safeget("first_name"));
 
-            age = (Number)((NumberProperty)bobject.safeget("age2")).getValue();
+            age = (Number) ((NumberProperty) bobject.safeget("age2")).getValue();
             assertEquals("Rename Class age property value is incorrect", new Integer(33), age);
-            name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            name = (String) ((StringProperty) bobject.safeget("first_name")).getValue();
             assertEquals("Rename Class name property value is incorrect", "Ludovic", name);
         } finally {
             clientTearDown();
         }
     }
-
 
 
     public void testUpdateAdvancedObjectProp() throws Throwable {
@@ -1297,15 +1312,18 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Updated Object returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.PropUpdateAdvObject", context);
             BaseObject bobject = null;
-            try { bobject = (BaseObject) doc2.getObject("Main.PropUpdateAdvObjectClass", 0); }
-            catch (Exception e) {}
+            try {
+                bobject = (BaseObject) doc2.getObject("Main.PropUpdateAdvObjectClass", 0);
+            }
+            catch (Exception e) {
+            }
             assertNotNull("Updated Object does not exist", bobject);
 
             BaseClass bclass = bobject.getxWikiClass(context);
@@ -1317,20 +1335,20 @@ public class ViewEditTest extends ServletTest {
             assertNotNull("Updated Object should have age property", bobject.safeget("age"));
             assertNotNull("Updated Object should have name property", bobject.safeget("first_name"));
 
-            Number age = (Number)((NumberProperty)bobject.safeget("age")).getValue();
+            Number age = (Number) ((NumberProperty) bobject.safeget("age")).getValue();
             assertEquals("Updated Object age property value is incorrect", new Integer(12), age);
-            String name = (String)((StringProperty)bobject.safeget("first_name")).getValue();
+            String name = (String) ((StringProperty) bobject.safeget("first_name")).getValue();
             assertEquals("Updated Object name property value is incorrect", "john", name);
 
-            String category = (String)((StringProperty)bobject.safeget("category")).getValue();
+            String category = (String) ((StringProperty) bobject.safeget("category")).getValue();
             assertEquals("Updated Object category property value is incorrect", "2", category);
 
-            List category2 = (List)((ListProperty)bobject.safeget("category2")).getValue();
+            List category2 = (List) ((ListProperty) bobject.safeget("category2")).getValue();
             assertEquals("Updated Object category2 property size is incorrect", 2, category2.size());
             assertEquals("Updated Object category2 property item 1 is incorrect", "2", category2.get(0));
             assertEquals("Updated Object category2 property item 2 is incorrect", "3", category2.get(1));
 
-            List category3 = (List)((ListProperty)bobject.safeget("category3")).getValue();
+            List category3 = (List) ((ListProperty) bobject.safeget("category3")).getValue();
             assertEquals("Updated Object category3 property size is incorrect", 2, category3.size());
             assertEquals("Updated Object category3 property item 1 is incorrect", "2", category3.get(0));
             assertEquals("Updated Object category3 property item 2 is incorrect", "3", category3.get(1));
@@ -1338,7 +1356,6 @@ public class ViewEditTest extends ServletTest {
             clientTearDown();
         }
     }
-
 
 
     public void sendMultipart(WebRequest webRequest, File file) throws IOException {
@@ -1377,7 +1394,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1426,7 +1443,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1471,8 +1488,8 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception")==-1);
-            assertTrue("Attach Delete should contain attachment text: " + result, result.indexOf("blablabla")!=-1);
+            assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception") == -1);
+            assertTrue("Attach Delete should contain attachment text: " + result, result.indexOf("blablabla") != -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1514,7 +1531,7 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Attach Delete returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1528,7 +1545,7 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-    public static class MultipartSenderThread extends Thread  {
+    public static class MultipartSenderThread extends Thread {
 
         private PipedOutputStream out;
         private Part[] parts;
@@ -1565,7 +1582,7 @@ public class ViewEditTest extends ServletTest {
     public void endInclude(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Included Page")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Included Page") != -1);
         } finally {
             clientTearDown();
         }
@@ -1591,9 +1608,9 @@ public class ViewEditTest extends ServletTest {
     public void endIncludeEdit(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("includeTopic")!=-1);
-            assertTrue("Could not find Include page messages: " + result, result.indexOf("edit/Main/IncludeTest2")!=-1);
-            assertTrue("Could not find Include page messages: " + result, result.indexOf("edit/Main/IncludeTest3")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("includeTopic") != -1);
+            assertTrue("Could not find Include page messages: " + result, result.indexOf("edit/Main/IncludeTest2") != -1);
+            assertTrue("Could not find Include page messages: " + result, result.indexOf("edit/Main/IncludeTest3") != -1);
         } finally {
             clientTearDown();
         }
@@ -1614,7 +1631,7 @@ public class ViewEditTest extends ServletTest {
     public void endDefaultSkin(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"")!=-1);
+            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1);
         } finally {
             clientTearDown();
         }
@@ -1659,7 +1676,7 @@ public class ViewEditTest extends ServletTest {
     public void endWikiPageSkin(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"")!=-1);
+            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1);
         } finally {
             clientTearDown();
         }
@@ -1683,7 +1700,7 @@ public class ViewEditTest extends ServletTest {
     public void endWikiPageSkin2(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/testbin/skin/Main/TestSkin/style.css\"")!=-1);
+            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/testbin/skin/Main/TestSkin/style.css\"") != -1);
         } finally {
             clientTearDown();
         }
@@ -1709,7 +1726,7 @@ public class ViewEditTest extends ServletTest {
     public void endIncludeMacros(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("coucou")!=-1);
+            assertTrue("Could not find WebHome Content: " + result, result.indexOf("coucou") != -1);
         } finally {
             clientTearDown();
         }
@@ -1730,17 +1747,17 @@ public class ViewEditTest extends ServletTest {
         Utils.createDoc(xwiki.getStore(), "Main", "EditLock", bobject, bclass, context);
         setUrl(webRequest, "edit", "EditLock");
         webRequest.addParameter("xpage", "editclass");
-}
+    }
 
     public void endPutLockOnEdit(WebResponse webResponse) throws HibernateException, XWikiException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.NumberClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.StringClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass")!=-1);
-            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.DBListClass")!=-1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.NumberClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.StringClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.TextAreaClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.PasswordClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.BooleanClass") != -1);
+            assertTrue("Could not find Add Class: " + result, result.indexOf("com.xpn.xwiki.objects.classes.DBListClass") != -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
@@ -1781,22 +1798,22 @@ public class ViewEditTest extends ServletTest {
         XWikiLock thefirstlock = doc.getLock(context);
         assertNotNull("Lock exist", thefirstlock);
         setUrl(webRequest, "save", "SaveTest");
-        webRequest.addParameter("content","Hello1Hello2Hello3");
-        webRequest.addParameter("parent","Main.WebHome");
+        webRequest.addParameter("content", "Hello1Hello2Hello3");
+        webRequest.addParameter("parent", "Main.WebHome");
     }
 
     public void endUnlockOnSave(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
-            assertEquals("Content is not indentical", "Hello1Hello2Hello3",content2);
+            assertEquals("Content is not indentical", "Hello1Hello2Hello3", content2);
             assertEquals("Parent is not identical", "Main.WebHome", doc2.getParent());
             XWikiLock thefirstlock = doc2.getLock(context);
             assertNull("Lock removed", thefirstlock);
@@ -1835,14 +1852,14 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception")==-1);
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
 
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.SaveTest", context);
             String content2 = doc2.getContent();
-            assertEquals("Content is not indentical", "\n",content2);
+            assertEquals("Content is not indentical", "\n", content2);
             assertEquals("Parent is not identical", "", doc2.getParent());
             XWikiLock thefirstlock = doc2.getLock(context);
             assertNull("Lock removed", thefirstlock);
@@ -1865,9 +1882,9 @@ public class ViewEditTest extends ServletTest {
     public void endViewSimpleURL(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
-            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest") != -1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -1891,9 +1908,9 @@ public class ViewEditTest extends ServletTest {
     public void endViewVerySimpleURL(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
-            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest") != -1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -1917,9 +1934,9 @@ public class ViewEditTest extends ServletTest {
     public void endViewUltraSimpleURL(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
-            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest") != -1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -1928,7 +1945,6 @@ public class ViewEditTest extends ServletTest {
     public void testViewUltraSimpleURL() throws IOException, Throwable {
         launchTest();
     }
-
 
 
     public void beginViewCountQueries(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -1945,9 +1961,9 @@ public class ViewEditTest extends ServletTest {
     public void endViewCountQueries(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello")!=-1);
-            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest")!=-1);
-            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr")!=-1);
+            assertTrue("Could not find Hello in Content: " + result, result.indexOf("Hello") != -1);
+            assertTrue("Could not find page name in content: " + result, result.indexOf("ViewOkTest") != -1);
+            assertTrue("Could not find hr in content: " + result, result.indexOf("<hr") != -1);
         } finally {
             clientTearDown();
         }
@@ -1961,7 +1977,6 @@ public class ViewEditTest extends ServletTest {
         launchTest();
         XWikiBatcher.getSQLStats().printSQLList(System.out);
     }
-
 
 
     public void beginViewRevNotOk(WebRequest webRequest) throws HibernateException, XWikiException {
@@ -1982,18 +1997,17 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-
     public void endViewRevNotOk(WebResponse webResponse) throws XWikiException, HibernateException {
 
         try {
             String result = webResponse.getText();
 
-            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist")!=-1);
+            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist") != -1);
             // verify
-          //  WebRequest request =  webResponse.getWebRequest();
+            //  WebRequest request =  webResponse.getWebRequest();
             //setUrl(request,"view","ViewRevOKTest");
-           // request.addParameter("rev","1.423");
-        }catch(Exception e){
+            // request.addParameter("rev","1.423");
+        } catch (Exception e) {
             System.out.println("This document ");
         }
         finally {
@@ -2024,17 +2038,72 @@ public class ViewEditTest extends ServletTest {
     }
 
 
-
     public void endNewViewRevOk(WebResponse webResponse) throws XWikiException, HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist")!=-1);
-              } finally {
-           // clientTearDown();
+            assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist") != -1);
+        } finally {
+            // clientTearDown();
         }
     }
 
     public void testNewViewRevOk() throws Throwable {
+        launchTest();
+    }
+
+    public void beginAddCommentOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        String content = Utils.content1;
+        Utils.createDoc(xwiki.getStore(), "Main", "AddCommentOk", context);
+        Utils.content1 = content;
+        XWikiDocument doc2 = xwiki.getDocument("Main.AddCommentOk", context);
+        xwiki.saveDocument(doc2, context);
+        doc2.setContent("hello new test comment");
+        xwiki.saveDocument(doc2, context);
+        setUrl(webRequest, "commentadd", "AddCommentOk", "");
+        webRequest.addParameter("XWiki.XWikiComments_author", "XWiki.Admin");
+        webRequest.addParameter("XWiki.XWikiComments_date", "");
+        webRequest.addParameter("XWiki.XWikiComments_comment", "My comment");
+    }
+
+    public void endAddCommentOk(WebResponse webResponse) throws HibernateException, XWikiException {
+        String result = webResponse.getText();
+
+        // Make sure we clean the cache
+        xwiki.flushCache();
+        XWikiDocument doc = xwiki.getDocument("Main.AddCommentOk", context);
+        assertEquals("Could not find This comment", 1, doc.getComments().size());
+    }
+
+    public void testAddCommentOk() throws Throwable {
+        launchTest();
+    }
+
+
+    public void beginAddCommentFail(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        setUrl(webRequest, "commentadd", "AddCommentFail", "");
+        webRequest.addParameter("XWiki.XWikiComments_author", "XWiki.Admin");
+        webRequest.addParameter("XWiki.XWikiComments_date", "");
+        webRequest.addParameter("XWiki.XWikiComments_comment", "My comment");
+    }
+
+    public void endAddCommentFail(WebResponse webResponse) throws HibernateException, XWikiException {
+        String result = webResponse.getText();
+
+        // Make sure we clean the cache
+        xwiki.flushCache();
+
+        XWikiDocument doc = xwiki.getDocument("Main.AddCommentFail", context);
+        assertEquals("You can't comment when the document in article do not exist ", 0, doc.getComments().size());
+        assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("") != -1);
+    }
+
+    public void testAddCommentFail() throws Throwable {
         launchTest();
     }
 

@@ -28,13 +28,6 @@
 
 package com.xpn.xwiki.api;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-
-import org.apache.commons.jrcs.diff.Chunk;
-
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
@@ -44,13 +37,20 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import org.apache.commons.jrcs.diff.Chunk;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
 
     public XWiki(com.xpn.xwiki.XWiki xwiki, XWikiContext context) {
-       super(context);
-       this.xwiki = xwiki;
+        super(context);
+        this.xwiki = xwiki;
     }
 
     public com.xpn.xwiki.XWiki getXWiki() {
@@ -60,32 +60,34 @@ public class XWiki extends Api {
             return null;
     }
 
-     public String getVersion() {
-          return xwiki.getVersion();
-     }
+    public String getVersion() {
+        return xwiki.getVersion();
+    }
 
-     public String getRequestURL() throws XWikiException {
-         return context.getURLFactory().getRequestURL(context).toString();
-     }
+    public String getRequestURL() throws XWikiException {
+        return context.getURLFactory().getRequestURL(context).toString();
+    }
 
-     /**
-      * Loads an Document from the database. Rights are checked before sending back the document.
-      * @param fullname Fullname of the XWiki document to be loaded
-      * @return a Document object or null if it is not accessible
-      * @throws XWikiException
-      */
-     public Document getDocument(String fullname) throws XWikiException {
-         XWikiDocument doc = xwiki.getDocument(fullname, context);
-         if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)==false) {
-                    return null;
-                }
+    /**
+     * Loads an Document from the database. Rights are checked before sending back the document.
+     *
+     * @param fullname Fullname of the XWiki document to be loaded
+     * @return a Document object or null if it is not accessible
+     * @throws XWikiException
+     */
+    public Document getDocument(String fullname) throws XWikiException {
+        XWikiDocument doc = xwiki.getDocument(fullname, context);
+        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context) == false) {
+            return null;
+        }
 
-         Document newdoc = new Document(doc, context);
-         return newdoc;
-     }
+        Document newdoc = new Document(doc, context);
+        return newdoc;
+    }
 
     /**
      * Returns wether a document exists or not
+     *
      * @param fullname Fullname of the XWiki document to be loaded
      * @return true if the document exists, false if not
      * @throws XWikiException
@@ -96,13 +98,14 @@ public class XWiki extends Api {
 
     /**
      * Verify the rights the current user has on a document
+     *
      * @param docname fullname of the document
-     * @param right right to check ("view", "edit", "admin", "delete")
+     * @param right   right to check ("view", "edit", "admin", "delete")
      * @return true if it exists
      */
     public boolean checkAccess(String docname, String right) {
         try {
-            XWikiDocument doc =new XWikiDocument();
+            XWikiDocument doc = new XWikiDocument();
             doc.setFullName(docname, context);
             return context.getWiki().checkAccess(right, doc, context);
         } catch (XWikiException e) {
@@ -114,36 +117,37 @@ public class XWiki extends Api {
     /**
      * Loads an Document from the database. Rights are checked before sending back the document.
      *
-     * @param web  Space to use in case no space is defined in the fullname
+     * @param web      Space to use in case no space is defined in the fullname
      * @param fullname Fullname or relative name of the document to load
      * @return a Document object or null if it is not accessible
      * @throws XWikiException
      */
-     public Document getDocument(String web, String fullname) throws XWikiException {
-         XWikiDocument doc = xwiki.getDocument(web, fullname, context);
-         if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)==false) {
-                    return null;
-                }
+    public Document getDocument(String web, String fullname) throws XWikiException {
+        XWikiDocument doc = xwiki.getDocument(web, fullname, context);
+        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context) == false) {
+            return null;
+        }
 
-         Document newdoc = new Document(doc, context);
-         return newdoc;
-     }
+        Document newdoc = new Document(doc, context);
+        return newdoc;
+    }
 
     /**
      * Load a specific revision of a document
+     *
      * @param doc Document for which to load a specific revision
      * @param rev Revision number
-     * @return  Specific revision of a document
+     * @return Specific revision of a document
      * @throws XWikiException
      */
     public Document getDocument(Document doc, String rev) throws XWikiException {
-        if ((doc==null)||(doc.getDoc()==null))
+        if ((doc == null) || (doc.getDoc() == null))
             return null;
 
-        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context)==false) {
-                    // Finally we return null, otherwise showing search result is a real pain
-                   return null;
-               }
+        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(), doc.getFullName(), context) == false) {
+            // Finally we return null, otherwise showing search result is a real pain
+            return null;
+        }
 
         try {
             XWikiDocument revdoc = xwiki.getDocument(doc.getDoc(), rev, context);
@@ -158,43 +162,48 @@ public class XWiki extends Api {
 
     /**
      * Transform a text in a form compatible text
+     *
      * @param content text to transform
-     * @return  encoded result
+     * @return encoded result
      */
-     public String getFormEncoded(String content) {
+    public String getFormEncoded(String content) {
         return com.xpn.xwiki.XWiki.getFormEncoded(content);
-     }
+    }
 
     /**
      * Transform a text in a URL compatible text
+     *
      * @param content text to transform
-     * @return  encoded result
+     * @return encoded result
      */
 
     public String getURLEncoded(String content) {
-       return com.xpn.xwiki.XWiki.getURLEncoded(content);
+        return com.xpn.xwiki.XWiki.getURLEncoded(content);
     }
 
     /**
      * Transform a text in a XML compatible text
+     *
      * @param content text to transform
-     * @return  encoded result
+     * @return encoded result
      */
-     public String getXMLEncoded(String content) {
+    public String getXMLEncoded(String content) {
         return com.xpn.xwiki.XWiki.getXMLEncoded(content);
-     }
+    }
 
     /**
      * Output content in the edit content textarea
+     *
      * @param content content to output
      * @return the textarea text content
      */
-     public String getTextArea(String content) {
+    public String getTextArea(String content) {
         return com.xpn.xwiki.XWiki.getTextArea(content, context);
-     }
+    }
 
     /**
      * Output content in the edit content htmlarea
+     *
      * @param content content to output
      * @return the htmlarea text content
      */
@@ -204,6 +213,7 @@ public class XWiki extends Api {
 
     /**
      * Get the list of available classes in the wiki
+     *
      * @return list of classes names
      * @throws XWikiException
      */
@@ -213,6 +223,7 @@ public class XWiki extends Api {
 
     /**
      * Get the global MetaClass object
+     *
      * @return MetaClass object
      */
     public MetaClass getMetaclass() {
@@ -221,16 +232,16 @@ public class XWiki extends Api {
 
     public List search(String wheresql) throws XWikiException {
         if (checkProgrammingRights())
-         return xwiki.search(wheresql, context);
+            return xwiki.search(wheresql, context);
         else
-         return null;
+            return null;
     }
 
     public List search(String wheresql, int nb, int start) throws XWikiException {
         if (checkProgrammingRights())
-         return xwiki.search(wheresql, nb, start, context);
+            return xwiki.search(wheresql, nb, start, context);
         else
-         return null;
+            return null;
     }
 
     public List searchDocuments(String wheresql) throws XWikiException {
@@ -243,9 +254,9 @@ public class XWiki extends Api {
 
     public List searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException {
         if (checkProgrammingRights())
-         return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
+            return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
         else
-         return null;
+            return null;
     }
 
     public List searchDocuments(String wheresql, boolean distinctbylanguage) throws XWikiException {
@@ -256,13 +267,10 @@ public class XWiki extends Api {
         return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, context));
     }
 
-    private List wrapDocs(List docs)
-    {
+    private List wrapDocs(List docs) {
         List result = new ArrayList();
-        if (docs != null)
-        {
-            for (Iterator iter = result.iterator(); iter.hasNext();)
-            {
+        if (docs != null) {
+            for (Iterator iter = result.iterator(); iter.hasNext();) {
                 XWikiDocument doc = (XWikiDocument) iter.next();
                 Document wrappedDoc = new Document(doc, context);
                 result.add(wrappedDoc);
@@ -275,9 +283,24 @@ public class XWiki extends Api {
         return xwiki.parseContent(content, context);
     }
 
-    public String parseTemplate(String template) {
-            return xwiki.parseTemplate(template, context);
+    public String parseMessage() {
+        String message = (String) context.get("message");
+        if (message == null)
+            return null;
+        else {
+            return parseMessage(message);
         }
+
+    }
+
+    public String parseMessage(String id) {
+        XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
+        return parseContent(msg.get(id));
+    }
+
+    public String parseTemplate(String template) {
+        return xwiki.parseTemplate(template, context);
+    }
 
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
@@ -376,7 +399,7 @@ public class XWiki extends Api {
 
     public void flushCache() {
         if (hasProgrammingRights())
-         xwiki.flushCache();
+            xwiki.flushCache();
     }
 
     public void resetRenderingEngine() {
@@ -419,12 +442,12 @@ public class XWiki extends Api {
 
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin,
                              String baseWikiName, boolean failOnExist) throws XWikiException {
-                return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, "", null, failOnExist);
+        return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, "", null, failOnExist);
     }
 
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin,
                              String baseWikiName, String description, boolean failOnExist) throws XWikiException {
-                return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, null, failOnExist);
+        return createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, null, failOnExist);
     }
 
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin,
@@ -500,19 +523,19 @@ public class XWiki extends Api {
     }
 
     public boolean hasAccessLevel(String level) {
-       try {
-           return xwiki.getRightService().hasAccessLevel(level, context.getUser(), context.getDoc().getFullName(), context);
-       } catch (Exception e) {
-           return false;
-       }
+        try {
+            return xwiki.getRightService().hasAccessLevel(level, context.getUser(), context.getDoc().getFullName(), context);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean hasAccessLevel(String level, String user, String docname) {
-       try {
-           return xwiki.getRightService().hasAccessLevel(level, user, docname, context);
-       } catch (Exception e) {
-           return false;
-       }
+        try {
+            return xwiki.getRightService().hasAccessLevel(level, user, docname, context);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String renderText(String text, Document doc) {
@@ -526,7 +549,7 @@ public class XWiki extends Api {
     public String renderChunk(Chunk chunk, boolean source, Document doc) {
         StringBuffer buf = new StringBuffer();
         chunk.toString(buf, "", "\n");
-        if (source==true)
+        if (source == true)
             return buf.toString();
 
         try {
@@ -599,16 +622,16 @@ public class XWiki extends Api {
 
     public java.lang.Object getService(String className) throws XWikiException {
         if (hasProgrammingRights())
-         return xwiki.getService(className);
+            return xwiki.getService(className);
         else
-         return null;
+            return null;
     }
 
     public java.lang.Object getPortalService(String className) throws XWikiException {
         if (hasProgrammingRights())
-         return xwiki.getPortalService(className);
+            return xwiki.getPortalService(className);
         else
-         return null;
+            return null;
     }
 
     public List getArrayList() {
@@ -620,8 +643,8 @@ public class XWiki extends Api {
     }
 
     public List sort(List list) {
-            Collections.sort(list);
-            return list;
+        Collections.sort(list);
+        return list;
     }
 
     public void outputImage(BufferedImage image) throws IOException {
@@ -633,12 +656,12 @@ public class XWiki extends Api {
     }
 
     public DocumentStats getCurrentMonthXWikiStats(String action) {
-       return context.getWiki().getStatsService(context).getDocMonthStats("", action, new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats("", action, new Date(), context);
     }
 
     public String getRefererText(String referer) {
         try {
-         return xwiki.getRefererText(referer, context);
+            return xwiki.getRefererText(referer, context);
         } catch (Exception e) {
             return "";
         }
@@ -646,7 +669,7 @@ public class XWiki extends Api {
 
     public String getShortRefererText(String referer, int length) {
         try {
-         return xwiki.getRefererText(referer, context).substring(0, length);
+            return xwiki.getRefererText(referer, context).substring(0, length);
         } catch (Exception e) {
             return xwiki.getRefererText(referer, context);
         }
@@ -691,6 +714,7 @@ public class XWiki extends Api {
 
     /**
      * Returns a plugin from the plugin API. Plugin Rights can be verified.
+     *
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object
      */
@@ -700,6 +724,7 @@ public class XWiki extends Api {
 
     /**
      * Returns a plugin from the plugin API. Plugin Rights can be verified.
+     *
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object
      */
@@ -709,13 +734,14 @@ public class XWiki extends Api {
 
     /**
      * Returns the recently visited pages for a specific action
+     *
      * @param action ("view" or "edit")
-     * @param size how many recent actions to retrieve
+     * @param size   how many recent actions to retrieve
      * @return a ArrayList of document names
      */
     public java.util.Collection getRecentActions(String action, int size) {
         XWikiStatsService stats = context.getWiki().getStatsService(context);
-        if (stats==null)
+        if (stats == null)
             return new ArrayList();
         else
             return stats.getRecentActions(action, size, context);
@@ -723,6 +749,7 @@ public class XWiki extends Api {
 
     /**
      * Returns the Advertisement system from the preferences
+     *
      * @return "google" or "none"
      */
     public String getAdType() {
@@ -731,6 +758,7 @@ public class XWiki extends Api {
 
     /**
      * Returns the Advertisement client ID from the preferences
+     *
      * @return an Ad affiliate ID
      */
     public String getAdClientId() {
@@ -739,8 +767,9 @@ public class XWiki extends Api {
 
     /**
      * Retrieves a int from a String
+     *
      * @param str String to convert to int
-     * @return  the int or zero in case of exception
+     * @return the int or zero in case of exception
      */
     public int parseInt(String str) {
         try {
@@ -752,8 +781,9 @@ public class XWiki extends Api {
 
     /**
      * Retrieves a int from a String
+     *
      * @param str String to convert to int
-     * @return  the int or zero in case of exception
+     * @return the int or zero in case of exception
      */
     public Integer parseInteger(String str) {
         return new Integer(parseInt(str));
@@ -761,8 +791,9 @@ public class XWiki extends Api {
 
     /**
      * Retrieves a long from a String
+     *
      * @param str String to convert to long
-     * @return  the long or zero in case of exception
+     * @return the long or zero in case of exception
      */
     public long parseLong(String str) {
         try {
@@ -774,8 +805,9 @@ public class XWiki extends Api {
 
     /**
      * Retrieves a float from a String
+     *
      * @param str String to convert to float
-     * @return  the float or zero in case of exception
+     * @return the float or zero in case of exception
      */
     public float parseFloat(String str) {
         try {
@@ -787,8 +819,9 @@ public class XWiki extends Api {
 
     /**
      * Retrieves a double from a String
+     *
      * @param str String to convert to double
-     * @return  the double or zero in case of exception
+     * @return the double or zero in case of exception
      */
     public double parseDouble(String str) {
         try {
@@ -800,7 +833,8 @@ public class XWiki extends Api {
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
-     * @param surl url to retrieve
+     *
+     * @param surl     url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
      * @return Content of the specified URL
@@ -816,6 +850,7 @@ public class XWiki extends Api {
 
     /**
      * Returns the content of an HTTP/HTTPS URL
+     *
      * @param surl url to retrieve
      * @return Content of the specified URL
      * @throws IOException
@@ -830,7 +865,8 @@ public class XWiki extends Api {
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication as Bytes
-     * @param surl url to retrieve
+     *
+     * @param surl     url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
      * @return Content of the specified URL
@@ -846,6 +882,7 @@ public class XWiki extends Api {
 
     /**
      * Returns the content of an HTTP/HTTPS URL as Bytes
+     *
      * @param surl url to retrieve
      * @return Content of the specified URL
      * @throws IOException
@@ -860,6 +897,7 @@ public class XWiki extends Api {
 
     /**
      * Filters text to be include in = or like clause in SQL
+     *
      * @param text text to filter
      * @return filtered text
      */
@@ -869,8 +907,9 @@ public class XWiki extends Api {
 
     /**
      * Returns the list of Macros documents in the specified content
+     *
      * @param defaultweb Default Web to use for relative path names
-     * @param content Content to parse
+     * @param content    Content to parse
      * @return ArrayList of document names
      */
     public List getIncludedMacros(String defaultweb, String content) {
@@ -882,33 +921,31 @@ public class XWiki extends Api {
      * returns true if xwiki.readonly is set in the configuration file
      *
      * @return the value of xwiki.isReadOnly()
-     *
      * @see #com.xpn.xwiki.XWiki
-     *
      */
-    public boolean isReadOnly () {
+    public boolean isReadOnly() {
         return xwiki.isReadOnly();
     }
 
-    public void setReadOnly (boolean ro) {
+    public void setReadOnly(boolean ro) {
         if (hasAdminRights()) {
             xwiki.setReadOnly(ro);
         }
     }
 
-    public void refreshLinks() throws XWikiException{
-        if (hasAdminRights()){
+    public void refreshLinks() throws XWikiException {
+        if (hasAdminRights()) {
             xwiki.refreshLinks(context);
         }
     }
 
     public boolean hasBacklinks() throws XWikiException {
-            return xwiki.hasBacklinks(context);
+        return xwiki.hasBacklinks(context);
     }
 
-    public void renamePage (XWikiDocument doc, String newFullName) throws XWikiException {
-       if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)){
-            xwiki.renamePage(doc, context, newFullName) ;
+    public void renamePage(XWikiDocument doc, String newFullName) throws XWikiException {
+        if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)) {
+            xwiki.renamePage(doc, context, newFullName);
         }
     }
 

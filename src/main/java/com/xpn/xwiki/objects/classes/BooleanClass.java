@@ -51,9 +51,18 @@ public class BooleanClass extends PropertyClass {
         return dtype;
     }
 
+    public void setDefaultValue(int dvalue) {
+        setIntValue("defaultValue", dvalue);
+    }
+
+    public int getDefaultValue() {
+        return getIntValue("defaultValue", -1);
+    }
+
     public void setDisplayType(String type) {
         setStringValue("displayType", type);
     }
+
 
     public BaseProperty fromString(String value) {
         BaseProperty property = newProperty();
@@ -96,6 +105,12 @@ public class BooleanClass extends PropertyClass {
             Integer ivalue = (Integer)prop.getValue();
             if (ivalue!=null) {
                 int value = ivalue.intValue();
+                if (value==1)
+                    options[1].setSelected(true);
+                else if (value==0)
+                    options[2].setSelected(true);
+            }  else {
+                int value = getDefaultValue();
                 if (value==1)
                     options[1].setSelected(true);
                 else if (value==0)

@@ -26,10 +26,12 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Vector;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -94,6 +96,55 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             groupCache.cancelUpdate(key);
         }
         list.add(group);
+    }
+
+    public List listMemberForGroup(String group, XWikiContext context) throws XWikiException {
+        List list = new ArrayList();
+        String database = context.getDatabase();
+        String sql = "";
+
+        try {
+            String gshortname = Util.getName(group, context);
+            if (gshortname.equals("XWiki.XWikiAllGroup")) {
+                sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'";
+                return context.getWiki().getStore().searchDocumentsNames(sql, context);
+            }
+            else  {
+                XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
+                Vector v = docgroup.getObjects("XWiki.XWikiGroups");
+                for (int i=0;i<v.size();i++) {
+                    BaseObject bobj = (BaseObject) v.get(i);
+                    if (bobj!=null) {
+                        String members = bobj.getStringValue("member");
+                        if (members!=null) {
+                            String[] members2 = members.split(" ,");
+                            for (int j=0;j<members2.length;j++) {
+                                list.add(members2[i]);
+                            }
+                        }
+                    }
+                }
+                return list;
+            }
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    public List listAllGroups(XWikiContext context) throws XWikiException
+    {
+        String sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'";
+        return context.getWiki().getStore().searchDocumentsNames(sql, context);
+    }
+
+    public List listAllLevels(XWikiContext context) throws XWikiException {
+        List list = new ArrayList();
+        String levels ="admin,view,edit,comment,delete,register,programming";
+        String[] level =  levels.split(",");
+        for (int i=0; i<level.length; i++) {
+            list.add(level[i]);
+        }
+        return list;
     }
 
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {

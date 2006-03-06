@@ -27,6 +27,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.XWikiContext;
 
 public class MetaClass extends BaseClass {
@@ -50,6 +51,12 @@ public class MetaClass extends BaseClass {
         safeput(dblistclass.getName(), dblistclass);
         DateMetaClass dateclass = new DateMetaClass();
         safeput(dateclass.getName(), dateclass);
+        GroupsMetaClass groupsclass = new GroupsMetaClass();
+        safeput(groupsclass.getName(), groupsclass);
+        UsersMetaClass usersclass = new UsersMetaClass();
+        safeput(usersclass.getName(), usersclass);
+        LevelsMetaClass levelsclass = new LevelsMetaClass();
+        safeput(levelsclass.getName(), levelsclass);
     }
 
     public void safeput(String name, PropertyInterface property) {

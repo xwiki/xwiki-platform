@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.meta;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.XWikiContext;
 
 public class BooleanMetaClass extends PropertyMetaClass {
@@ -39,6 +40,13 @@ public class BooleanMetaClass extends PropertyMetaClass {
         type_class.setPrettyName("Display Type");
         type_class.setSize(20);
         safeput("displayType", type_class);
+
+        NumberClass default_value_class = new NumberClass(this);
+        default_value_class.setName("defaultValue");
+        default_value_class.setPrettyName("Default Value");
+        default_value_class.setSize(5);
+        default_value_class.setClassType("integer");
+        safeput("defaultValue", default_value_class);
     }
 
     public BaseCollection newObject(XWikiContext context) {

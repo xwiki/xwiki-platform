@@ -1555,9 +1555,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         bclass.setName("XWiki." + pagename);
 
-        needsUpdate |= bclass.addTextField("users", "Users", 80);
-        needsUpdate |= bclass.addTextField("groups", "Groups", 80);
-        needsUpdate |= bclass.addTextField("levels", "Levels", 80);
+        PropertyInterface groupsProp = bclass.get("groups");
+        if ((groupsProp != null) && !(groupsProp instanceof GroupsClass)) {
+            bclass.removeField("groups");
+            needsUpdate = true;
+        }
+        needsUpdate |= bclass.addGroupsField("groups", "Groups");
+
+        PropertyInterface levelsProp = bclass.get("levels");
+        if ((levelsProp != null) && !(levelsProp instanceof LevelsClass)) {
+            bclass.removeField("levels");
+            needsUpdate = true;
+        }
+        needsUpdate |= bclass.addLevelsField("levels", "Levels");
+
+        PropertyInterface usersProp = bclass.get("users");
+        if ((usersProp != null) && !(usersProp instanceof UsersClass)) {
+            bclass.removeField("users");
+            needsUpdate = true;
+        }
+        needsUpdate |= bclass.addUsersField("users", "Users");
 
         PropertyInterface allowProp = bclass.get("allow");
         if ((allowProp != null) && (allowProp instanceof NumberClass)) {
@@ -1565,6 +1582,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             needsUpdate = true;
         }
         needsUpdate |= bclass.addBooleanField("allow", "Allow/Deny", "allow");
+        BooleanClass afield = (BooleanClass) bclass.get("allow");
+        if (afield.getDefaultValue()!=1) {
+            afield.setDefaultValue(1);
+            needsUpdate = true;
+        }
+
 
         String content = doc.getContent();
         if ((content == null) || (content.equals("")))

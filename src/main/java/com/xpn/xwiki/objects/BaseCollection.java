@@ -164,15 +164,19 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
 
     public int getIntValue(String name) {
+        return getIntValue(name, 0);
+    }
+
+    public int getIntValue(String name, int default_value) {
         try {
         NumberProperty prop = (NumberProperty)safeget(name);
         if (prop==null)
-         return 0;
+         return default_value;
         else
          return ((Number)prop.getValue()).intValue();
         }
          catch (Exception e) {
-            return 0;
+            return default_value;
         }
     }
 

@@ -265,6 +265,60 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
+    public boolean addUsersField(String fieldName, String fieldPrettyName) {
+        return addUsersField(fieldName, fieldPrettyName, 5);
+    }
+
+    public boolean addUsersField(String fieldName, String fieldPrettyName,int size) {
+        if (get(fieldName) == null) {
+            UsersClass users_class = new UsersClass();
+            users_class.setName(fieldName);
+            users_class.setPrettyName(fieldPrettyName);
+            users_class.setSize(size);
+            users_class.setMultiSelect(true);
+            users_class.setObject(this);
+            put(fieldName, users_class);
+            return true;
+        }
+        return false ;
+    }
+
+    public boolean addLevelsField(String fieldName, String fieldPrettyName) {
+        return addLevelsField(fieldName, fieldPrettyName, 3);
+    }
+
+    public boolean addLevelsField(String fieldName, String fieldPrettyName,int size) {
+        if (get(fieldName) == null) {
+            LevelsClass levels_class = new LevelsClass();
+            levels_class.setName(fieldName);
+            levels_class.setPrettyName(fieldPrettyName);
+            levels_class.setSize(size);
+            levels_class.setMultiSelect(true);
+            levels_class.setObject(this);
+            put(fieldName, levels_class);
+            return true;
+        }
+        return false ;
+    }
+
+    public boolean addGroupsField(String fieldName, String fieldPrettyName) {
+        return addGroupsField(fieldName, fieldPrettyName, 5);
+    }
+
+    public boolean addGroupsField(String fieldName, String fieldPrettyName,int size) {
+        if (get(fieldName) == null) {
+            GroupsClass groups_class = new GroupsClass();
+            groups_class.setName(fieldName);
+            groups_class.setPrettyName(fieldPrettyName);
+            groups_class.setSize(size);
+            groups_class.setMultiSelect(true);
+            groups_class.setObject(this);
+            put(fieldName, groups_class);
+            return true;
+        }
+        return false ;
+    }
+
     public boolean addTemplateField(String fieldName, String fieldPrettyName) {
         return addTextAreaField(fieldName, fieldPrettyName, 80, 15);
     }

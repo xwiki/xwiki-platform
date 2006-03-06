@@ -39,6 +39,8 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.jrcs.rcs.Archive;
@@ -1337,10 +1339,46 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
                     if (handledProps.contains(name))
                       continue;
                     String classType = (String)result[1];
-                    BaseProperty property = (BaseProperty) Class.forName(classType).newInstance();
-                    property.setObject(object);
-                    property.setName(name);
-                    loadXWikiProperty(property, context, false);
+                    BaseProperty property = null;
+
+                    try {
+                        property = (BaseProperty) Class.forName(classType).newInstance();
+                        property.setObject(object);
+                        property.setName(name);
+                        loadXWikiProperty(property, context, false);
+                    } catch (Exception e) {
+                        // WORKAROUND IN CASE OF MIXMATCH BETWEEN STRING AND LARGESTRING
+                        try {
+                            if (property instanceof StringProperty) {
+                                LargeStringProperty property2 = new LargeStringProperty();
+                                property2.setObject(object);
+                                property2.setName(name);
+                                loadXWikiProperty(property2, context, false);
+                                property.setValue(property2.getValue());
+
+                                if (bclass!=null) {
+                                    if (bclass.get(name) instanceof TextAreaClass)
+                                     property = property2;
+                                }
+
+                            } else if (property instanceof LargeStringProperty) {
+                                StringProperty property2 = new StringProperty();
+                                property2.setObject(object);
+                                property2.setName(name);
+                                loadXWikiProperty(property2, context, false);
+                                property.setValue(property2.getValue());
+
+                                if (bclass!=null) {
+                                    if (bclass.get(name) instanceof StringClass)
+                                     property = property2;
+                                }
+                            } else
+                                throw e;
+                        } catch (Throwable e2) {
+                            throw e;
+                        }
+                    }
+
                     object.addField(name, property);
                 }
             }
@@ -1470,7 +1508,7 @@ public class XWikiHibernateStore extends XWikiDefaultStore {
             BaseCollection obj = property.getObject();
             Object[] args = { (obj!=null) ? obj.getName() : "unknown", property.getName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while saving property {1} of object {0}", e, args);
+                    "Exception while loading property {1} of object {0}", e, args);
 
         } finally {
             try {

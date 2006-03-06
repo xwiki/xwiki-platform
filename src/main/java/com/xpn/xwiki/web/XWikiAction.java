@@ -107,6 +107,8 @@ public abstract class XWikiAction extends Action {
                     response.sendRedirect(redirect);
                     return null;
                 }
+                else
+                  throw e;
             }
 
             // Parses multipart so that parms in multipart are available for all actions

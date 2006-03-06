@@ -43,8 +43,7 @@ import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -161,7 +160,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return configPath;
     }
 
-    public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
+    public synchronized static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = null;
         String xwikiname = "xwiki";
         XWiki xwiki = null;
@@ -249,7 +248,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return virtualWikiList;
     }
 
-    public static XWiki getXWiki(XWikiContext context) throws XWikiException {
+    public synchronized static XWiki getXWiki(XWikiContext context) throws XWikiException {
         XWiki xwiki = getMainXWiki(context);
 
         if (xwiki.isVirtual()) {
@@ -1396,18 +1395,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public BaseClass getUserClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getUserClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        try {
-            doc = getDocument("XWiki.XWikiUsers", context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setWeb("XWiki");
-            doc.setName("XWikiUsers");
-            needsUpdate = true;
-        }
+        doc = getDocument("XWiki.XWikiUsers", context);
 
         BaseClass bclass = doc.getxWikiClass();
         if (context.get("initdone") != null)
@@ -1442,18 +1434,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
 
-    public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        try {
-            doc = getDocument("XWiki.XWikiPreferences", context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setWeb("XWiki");
-            doc.setName("XWikiPreferences");
-            needsUpdate = true;
-        }
+        doc = getDocument("XWiki.XWikiPreferences", context);
 
         BaseClass bclass = doc.getxWikiClass();
         if (context.get("initdone") != null)
@@ -1515,7 +1500,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (menu.indexOf("../..") != -1) {
             MenuSubstitution msubst = new MenuSubstitution(context.getUtil());
             menu = msubst.substitute(menu);
-            doc.setStringValue("XWiki.XWikiPreferences", "menu", menu);
+            doc.setLargeStringValue("XWiki.XWikiPreferences", "menu", menu);
             needsUpdate = true;
         }
 
@@ -1524,7 +1509,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public BaseClass getGroupClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getGroupClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1553,7 +1538,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
 
-    public BaseClass getRightsClass(String pagename, XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getRightsClass(String pagename, XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1590,26 +1575,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public BaseClass getRightsClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getRightsClass(XWikiContext context) throws XWikiException {
         return getRightsClass("XWikiRights", context);
     }
 
-    public BaseClass getGlobalRightsClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getGlobalRightsClass(XWikiContext context) throws XWikiException {
         return getRightsClass("XWikiGlobalRights", context);
     }
 
-    public BaseClass getCommentsClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getCommentsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        try {
-            doc = getDocument("XWiki.XWikiComments", context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setWeb("XWiki");
-            doc.setName("XWikiComments");
-            needsUpdate = true;
-        }
+        doc = getDocument("XWiki.XWikiComments", context);
 
         BaseClass bclass = doc.getxWikiClass();
         if (context.get("initdone") != null)
@@ -1634,18 +1612,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public BaseClass getSkinClass(XWikiContext context) throws XWikiException {
+    public synchronized BaseClass getSkinClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
-        try {
-            doc = getDocument("XWiki.XWikiSkins", context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setWeb("XWiki");
-            doc.setName("XWikiSkins");
-            needsUpdate = true;
-        }
+        doc = getDocument("XWiki.XWikiSkins", context);
 
         BaseClass bclass = doc.getxWikiClass();
         if (context.get("initdone") != null)

@@ -145,14 +145,18 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
            return getStringValue(name);
        }
     public void setStringValue(String name, String value) {
-        StringProperty property = new StringProperty();
+        BaseStringProperty property = (BaseStringProperty) safeget(name);
+        if (property==null)
+         property = new StringProperty();
         property.setName(name);
         property.setValue(value);
         safeput(name, property);
     }
 
     public void setLargeStringValue(String name, String value) {
-        LargeStringProperty property = new LargeStringProperty();
+        BaseStringProperty property = (BaseStringProperty) safeget(name);
+        if (property==null)
+         property = new LargeStringProperty();
         property.setName(name);
         property.setValue(value);
         safeput(name, property);

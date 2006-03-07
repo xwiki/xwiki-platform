@@ -25,6 +25,7 @@ package com.xpn.xwiki.user.impl.exo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.Group;
@@ -73,5 +74,20 @@ public class ExoGroupServiceImpl implements XWikiGroupService {
     }
 
     public void addUserToGroup(String user, String database, String group) {
+    }
+
+    public List listMemberForGroup(String s, XWikiContext context) throws XWikiException {
+        // Implement for eXo
+        return new ArrayList();
+    }
+
+    public List listAllGroups(XWikiContext context) throws XWikiException {
+        // Implement for eXo
+        return new ArrayList();
+    }
+
+    public List listAllLevels(XWikiContext context) throws XWikiException {
+        // Implement for eXo
+        return new ArrayList();
     }
 }

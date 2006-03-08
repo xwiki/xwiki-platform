@@ -11,12 +11,49 @@
 <!--
 var currentfield = "";
 function show(fieldname) {
-  if (currentfield!="")
-    document.getElementById(currentfield).style.display="none";
-  document.getElementById(fieldname).style.display="block";
-  currentfield = fieldname;
+    if (currentfield!="")
+        document.getElementById(currentfield).style.display="none";
+    document.getElementById(fieldname).style.display="block";
+    currentfield = fieldname;
 }
-// -->
+
+function addUser(form, prefix) {
+    var username = form[prefix + "newuser"].value;
+    var select =  form[prefix + "users"][0];
+    if (username != null && username != "") {
+        length = select.options.length ;
+        dusername = username;
+        if (username.indexOf('.')==-1) {
+          xusername = "XWiki." + username;
+        }
+        else {
+          if (username.indexOf(":")==-1) {
+           dusername = username.substring(username.lastIndexOf(".")+1);
+          }
+          xusername = username
+        }
+        select.options[length] = new Option(dusername, xusername, true);
+    }
+}
+
+function addGroup(form, prefix) {
+    var groupname = form[prefix + "newgroup"].value;
+    var select =  form[prefix + "groups"][0];
+    if (groupname != null && groupname != "") {
+        length = select.options.length ;
+        dgroupname = groupname;
+        if (groupname.indexOf('.')==-1) {
+          xgroupname = "XWiki." + groupname;
+        }
+        else {
+          if (groupname.indexOf(":")==-1)
+           dgroupname = groupname.substring(groupname.lastIndexOf(".")+1);
+          xgroupname = groupname
+        }
+        select.options[length] = new Option(dgroupname, xgroupname, true);
+    }
+}
+-->
 </script>
 <div id="xwikicontent" class="large">
        <div id="columns">
@@ -44,13 +81,13 @@ $msg.get("welcometorightseditor")
 #set($class = $obj.xWikiClass)
     <tr>
         <td align="center">$!{obj.number}</td>
-        <td align="center">$!doc.displayEdit($class.users,"${class.name}_${obj.number}_",$obj)</td>
+        <td align="center">$!doc.displayEdit($class.users,"${class.name}_${obj.number}_",$obj) <br>
         <td align="center">$!doc.displayEdit($class.groups,"${class.name}_${obj.number}_",$obj)</td>
         <td align="center">$!doc.displayEdit($class.levels,"${class.name}_${obj.number}_",$obj)</td>
         <td align="center">$!doc.displayEdit($class.allow,"${class.name}_${obj.number}_",$obj)</td>
         <td align="center"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${xwiki.getURLEncoded($redirect)}")"
     onclick="return confirm('$msg.get("confirmobjectremove")')">
-    $msg.get("removethisrightentry")</a></td>
+    $msg.get("remove")</a></td>
     </tr>
 #end
  </table>
@@ -74,10 +111,9 @@ $msg.get("welcometorightseditor")
 <input type="button" value="$msg.get("saverights")" onclick="document.forms.update.submit()" />
 </p>
 <br />
-<h3>$msg.get("currentrights")</h3>
-<a href="" onclick="showobjects('$class.name'); return false;">$class.name</a><br />
 <div id="class_${class.name}">
 <br /><br />
+
 <h3>$msg.get("addrightentry")</h3>
 <form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()">
 <p>

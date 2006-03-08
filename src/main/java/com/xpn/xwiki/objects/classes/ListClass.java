@@ -71,6 +71,8 @@ public abstract class ListClass extends PropertyClass {
         setStringValue("displayType", type);
     }
 
+
+
     public int getSize() {
         return getIntValue("size");
     }

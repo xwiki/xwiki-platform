@@ -201,7 +201,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
         if (username.equals(superadmin)) {
             String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
             if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-                principal = new SimplePrincipal("superadmin");
+                principal = new SimplePrincipal("XWiki.superadmin");
                 return principal;
             } else {
                 return null;

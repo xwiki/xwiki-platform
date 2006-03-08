@@ -77,7 +77,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         if (username.equals(superadmin)) {
             String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
             if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-                return new SimplePrincipal("superadmin");
+                return new SimplePrincipal("XWiki.superadmin");
             } else {
                 return null;
             }

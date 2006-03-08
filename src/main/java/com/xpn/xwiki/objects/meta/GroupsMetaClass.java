@@ -1,6 +1,7 @@
 package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.classes.GroupsClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.XWikiContext;
 
@@ -9,6 +10,12 @@ public class GroupsMetaClass extends ListMetaClass {
         super();
         setPrettyName("Groups List Class");
         setName(GroupsClass.class.getName());
+
+        BooleanClass uselist_class = new BooleanClass(this);
+        uselist_class.setName("usesList");
+        uselist_class.setPrettyName("Uses List");
+        uselist_class.setDisplayType("yesno");
+        safeput("usesList", uselist_class);
 
     }
 

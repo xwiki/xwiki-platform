@@ -2,13 +2,15 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.xhtml.option;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.StringProperty;
 import org.apache.ecs.xhtml.select;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.*;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ public class UsersClass extends ListClass {
     public UsersClass(PropertyMetaClass wclass) {
         super("userslist", "Users List", wclass);
         setSize(6);
+        setUsesList(true);
     }
 
     public UsersClass() {
@@ -34,10 +37,15 @@ public class UsersClass extends ListClass {
             list = new ArrayList();
 
         }
-
-        list.remove("XWiki.XWikiGuest");
-        list.add(0, "XWiki.XWikiGuest");
         return list;
+    }
+
+    public boolean isUsesList() {
+        return (getIntValue("usesList")==1);
+    }
+
+    public void setUsesList(boolean usesList) {
+        setIntValue("usesList",usesList ? 1 : 0);
     }
 
     public BaseProperty newProperty() {
@@ -79,19 +87,34 @@ public class UsersClass extends ListClass {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
+        List list;
+        if (isUsesList())
+            list = getList(context);
+        else
+            list = new ArrayList();
 
-        List list = getList(context);
         List selectlist;
-
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
+        BaseProperty prop =  (BaseProperty)object.safeget(name);
+        if (prop==null) {
             selectlist = new ArrayList();
         } else {
-            selectlist = getListFromString((String) prop.getValue());
+            selectlist = getListFromString((String)prop.getValue());
         }
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
+
+        for (Iterator it=selectlist.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            if (!list.contains(value))
+                list.add(value);
+        }
+
+        // Make sure we have guest
+        list.remove("XWiki.XWikiGuest");
+        list.add(0,"XWiki.XWikiGuest");
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
             String value = it.next().toString();
             option option = new option(value, value);
             option.addElement(getText(value, context));
@@ -101,5 +124,24 @@ public class UsersClass extends ListClass {
         }
 
         buffer.append(select.toString());
+
+        if (!isUsesList()) {
+            input in = new input();
+            in.setName(prefix+"newuser");
+            in.setSize(15);
+            buffer.append("<br />");
+            buffer.append(in.toString());
+
+            button button = new button();
+            button.setTagText("Add");
+
+            button.setOnClick("addUser(this.form,'" + prefix + "'); return false;");
+            buffer.append(button.toString());
+        }
+
+        input in = new input();
+        in.setType("hidden");
+        in.setName(prefix + name);
+        buffer.append(in.toString());
     }
 }

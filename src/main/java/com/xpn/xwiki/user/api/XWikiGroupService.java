@@ -22,19 +22,24 @@
 
 package com.xpn.xwiki.user.api;
 
-import java.util.Collection;
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface XWikiGroupService {
     public void init(XWiki xwiki);
+
     public void flushCache();
+
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException;
-    public void addUserToGroup(String user, String database, String group);
+
+    public void addUserToGroup(String user, String database, String group) throws XWikiException;
+
     public List listMemberForGroup(String s, XWikiContext context) throws XWikiException;
+
     public List listAllGroups(XWikiContext context) throws XWikiException;
-    public List listAllLevels(XWikiContext context) throws XWikiException;
+
 }

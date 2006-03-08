@@ -28,6 +28,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GroovyTestRightService implements XWikiRightService {
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException {
         return true;
@@ -47,5 +50,9 @@ public class GroovyTestRightService implements XWikiRightService {
 
     public boolean hasAdminRights(XWikiContext context) {
         return true;
+    }
+
+    public List listAllLevels(XWikiContext context) throws XWikiException {
+        return new ArrayList();
     }
 }

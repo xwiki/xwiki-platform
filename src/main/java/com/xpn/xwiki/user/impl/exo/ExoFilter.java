@@ -22,24 +22,25 @@
 
 package com.xpn.xwiki.user.impl.exo;
 
-import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
+
+import javax.servlet.*;
+import java.io.IOException;
 
 
 public class ExoFilter implements Filter {
 
     public static final String EXO_CONTAINER = "portal";
+    public static FilterConfig filterCongif_ = null;
 
     public void init(FilterConfig filterConfig) throws ServletException {
+        if (filterConfig != null) {
+            filterCongif_ = filterConfig;
+        } else {
+            PortalContainer manager = RootContainer.getInstance().getPortalContainer(EXO_CONTAINER);
+            filterCongif_ = (FilterConfig) manager.getComponentInstanceOfType(FilterConfig.class);
+        }
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)

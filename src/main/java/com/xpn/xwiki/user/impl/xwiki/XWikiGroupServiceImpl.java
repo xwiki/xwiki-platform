@@ -23,15 +23,9 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -40,9 +34,15 @@ import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Vector;
 
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
     private XWikiCache groupCache;
@@ -62,7 +62,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         String database = context.getDatabase();
         try {
             String shortname = Util.getName(username);
-            String veryshortname = shortname.substring(shortname.indexOf(".")+1);
+            String veryshortname = shortname.substring(shortname.indexOf(".") + 1);
             String key = database + ":" + shortname;
             try {
                 list = (List) groupCache.getFromCache(key);
@@ -104,21 +104,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         String sql = "";
 
         try {
-            String gshortname = Util.getName(group, context);
-            if (gshortname.equals("XWiki.XWikiAllGroup")) {
+            if (group == null) {
                 sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'";
                 return context.getWiki().getStore().searchDocumentsNames(sql, context);
-            }
-            else  {
+            } else {
+                String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
                 Vector v = docgroup.getObjects("XWiki.XWikiGroups");
-                for (int i=0;i<v.size();i++) {
+                for (int i = 0; i < v.size(); i++) {
                     BaseObject bobj = (BaseObject) v.get(i);
-                    if (bobj!=null) {
+                    if (bobj != null) {
                         String members = bobj.getStringValue("member");
-                        if (members!=null) {
+                        if (members != null) {
                             String[] members2 = members.split(" ,");
-                            for (int j=0;j<members2.length;j++) {
+                            for (int j = 0; j < members2.length; j++) {
                                 list.add(members2[i]);
                             }
                         }
@@ -131,17 +130,16 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         }
     }
 
-    public List listAllGroups(XWikiContext context) throws XWikiException
-    {
+    public List listAllGroups(XWikiContext context) throws XWikiException {
         String sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'";
         return context.getWiki().getStore().searchDocumentsNames(sql, context);
     }
 
     public List listAllLevels(XWikiContext context) throws XWikiException {
         List list = new ArrayList();
-        String levels ="admin,view,edit,comment,delete,register,programming";
-        String[] level =  levels.split(",");
-        for (int i=0; i<level.length; i++) {
+        String levels = "admin,view,edit,comment,delete,register,programming";
+        String[] level = levels.split(",");
+        for (int i = 0; i < level.length; i++) {
             list.add(level[i]);
         }
         return list;
@@ -149,17 +147,17 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
         try {
-            if (event==XWikiNotificationInterface.EVENT_CHANGE) {
+            if (event == XWikiNotificationInterface.EVENT_CHANGE) {
                 boolean flushCache = false;
 
-                if ((olddoc!=null)&&(olddoc.getObjects("XWiki.XWikiGroups")!=null))
-                 flushCache = true;
+                if ((olddoc != null) && (olddoc.getObjects("XWiki.XWikiGroups") != null))
+                    flushCache = true;
 
-                if ((newdoc!=null)&&(newdoc.getObjects("XWiki.XWikiGroups")!=null))
-                 flushCache = true;
+                if ((newdoc != null) && (newdoc.getObjects("XWiki.XWikiGroups") != null))
+                    flushCache = true;
 
                 if (flushCache)
-                 groupCache.flushAll();
+                    groupCache.flushAll();
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,16 +1,18 @@
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import org.apache.ecs.xhtml.select;
-import org.apache.ecs.xhtml.option;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class UsersClass extends ListClass {
 
@@ -26,7 +28,7 @@ public class UsersClass extends ListClass {
     public List getList(XWikiContext context) {
         List list;
         try {
-            list = context.getWiki().getGroupService().listMemberForGroup("XWiki.XWikiAllGroup", context);
+            list = context.getWiki().getGroupService().listMemberForGroup(null, context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList();
@@ -34,7 +36,7 @@ public class UsersClass extends ListClass {
         }
 
         list.remove("XWiki.XWikiGuest");
-        list.add(0,"XWiki.XWikiGuest");
+        list.add(0, "XWiki.XWikiGuest");
         return list;
     }
 
@@ -50,7 +52,7 @@ public class UsersClass extends ListClass {
 
     public BaseProperty fromStringArray(String[] strings) {
         List list = new ArrayList();
-        for (int i=0;i<strings.length;i++)
+        for (int i = 0; i < strings.length; i++)
             list.add(strings[i]);
         BaseProperty prop = newProperty();
         prop.setValue(StringUtils.join(list.toArray(), ","));
@@ -61,43 +63,43 @@ public class UsersClass extends ListClass {
         return context.getWiki().getUserName(value, null, false, context);
     }
 
-        public static List getListFromString(String value) {
+    public static List getListFromString(String value) {
         List list = new ArrayList();
-        if (value==null)
+        if (value == null)
             return list;
 
         String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(value,", ");
-        for (int i=0;i<result.length;i++)
-            list.add(StringUtils.replace(result[i],"%SEP%", ","));
+        String[] result = StringUtils.split(value, ", ");
+        for (int i = 0; i < result.length; i++)
+            list.add(StringUtils.replace(result[i], "%SEP%", ","));
         return list;
     }
 
-      public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-            select select = new select(prefix + name, 1);
-            select.setMultiple(isMultiSelect());
-            select.setSize(getSize());
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        select select = new select(prefix + name, 1);
+        select.setMultiple(isMultiSelect());
+        select.setSize(getSize());
 
-            List list = getList(context);
-            List selectlist;
+        List list = getList(context);
+        List selectlist;
 
-            BaseProperty prop =  (BaseProperty)object.safeget(name);
-            if (prop==null) {
-                selectlist = new ArrayList();
-            } else {
-                selectlist = getListFromString((String)prop.getValue());
-            }
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop == null) {
+            selectlist = new ArrayList();
+        } else {
+            selectlist = getListFromString((String) prop.getValue());
+        }
 
-            // Add options from Set
-            for (Iterator it=list.iterator();it.hasNext();) {
-                String value = it.next().toString();
-                option option = new option(value, value);
-                option.addElement(getText(value, context));
-                if (selectlist.contains(value))
-                    option.setSelected(true);
-                select.addElement(option);
-            }
+        // Add options from Set
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            String value = it.next().toString();
+            option option = new option(value, value);
+            option.addElement(getText(value, context));
+            if (selectlist.contains(value))
+                option.setSelected(true);
+            select.addElement(option);
+        }
 
-            buffer.append(select.toString());
+        buffer.append(select.toString());
     }
 }

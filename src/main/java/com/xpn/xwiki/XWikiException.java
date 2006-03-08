@@ -25,21 +25,19 @@
 
 package com.xpn.xwiki;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.xml.transform.TransformerException;
-
+import com.xpn.xwiki.store.XWikiBatcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.hibernate.JDBCException;
-import com.xpn.xwiki.store.XWikiBatcher;
+
+import javax.servlet.ServletException;
+import javax.xml.transform.TransformerException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
+import java.util.List;
 
 public class XWikiException extends Exception {
 
@@ -145,6 +143,10 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
     public static final int ERROR_XWIKI_ACCESS_TOKEN_INVALID = 9002;
+    public static final int ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS = 9003;
+    public static final int ERROR_XWIKI_ACCESS_EXO_EXCEPTION_GROUPS = 9004;
+    public static final int ERROR_XWIKI_ACCESS_EXO_EXCEPTION_ADDING_USERS = 9005;
+    public static final int ERROR_XWIKI_ACCESS_EXO_EXCEPTION_LISTING_USERS = 9006;
 
     public static final int ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG = 10001;
     public static final int ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL = 10002;
@@ -248,8 +250,7 @@ public class XWikiException extends Exception {
         this.message = message;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("Error number ");
         buffer.append(getCode());
@@ -257,23 +258,18 @@ public class XWikiException extends Exception {
         buffer.append(getModuleName());
         buffer.append(": ");
 
-        if (message!=null)
-        {
-            if (args==null)
+        if (message != null) {
+            if (args == null)
                 buffer.append(message);
-            else
-            {
-                MessageFormat msgFormat = new MessageFormat (message);
-                try
-                {
+            else {
+                MessageFormat msgFormat = new MessageFormat(message);
+                try {
                     buffer.append(msgFormat.format(args));
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     buffer.append("Cannot format message " + message + " with args ");
-                    for (int i = 0; i< args.length ; i++)
-                    {
-                        if (i!=0)
+                    for (int i = 0; i < args.length; i++) {
+                        if (i != 0)
                             buffer.append(",");
                         buffer.append(args[i]);
                     }
@@ -281,23 +277,22 @@ public class XWikiException extends Exception {
             }
         }
 
-        if (exception!=null) {
-             buffer.append("\nWrapped Exception: ");
-             buffer.append(exception.getMessage());
+        if (exception != null) {
+            buffer.append("\nWrapped Exception: ");
+            buffer.append(exception.getMessage());
         }
         return buffer.toString();
     }
 
-    public String getFullMessage()
-    {
+    public String getFullMessage() {
         StringBuffer buffer = new StringBuffer(getMessage());
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
         buffer.append("\n");
         List list = XWikiBatcher.getSQLStats().getRecentSqlList();
-        if (list.size()>0) {
+        if (list.size() > 0) {
             buffer.append("Recent SQL:\n");
-            for  (int i=0;i<list.size();i++) {
+            for (int i = 0; i < list.size(); i++) {
                 buffer.append(list.get(i));
                 buffer.append("\n");
             }
@@ -307,16 +302,16 @@ public class XWikiException extends Exception {
 
     public void printStackTrace(PrintWriter s) {
         super.printStackTrace(s);
-        if (exception!=null) {
+        if (exception != null) {
             s.write("\n\nWrapped Exception:\n\n");
             if (exception instanceof org.hibernate.JDBCException) {
-                (((JDBCException)exception).getSQLException()).printStackTrace(s);
+                (((JDBCException) exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
-                (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+                (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
             } else if (exception instanceof ServletException) {
-                (((ServletException)exception).getRootCause()).printStackTrace(s);
+                (((ServletException) exception).getRootCause()).printStackTrace(s);
             } else if (exception instanceof TransformerException) {
-                (((TransformerException)exception).getCause()).printStackTrace(s);
+                (((TransformerException) exception).getCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }
@@ -325,16 +320,16 @@ public class XWikiException extends Exception {
 
     public void printStackTrace(PrintStream s) {
         super.printStackTrace(s);
-        if (exception!=null) {
+        if (exception != null) {
             s.print("\n\nWrapped Exception:\n\n");
             if (exception instanceof org.hibernate.JDBCException) {
-                (((JDBCException)exception).getSQLException()).printStackTrace(s);
+                (((JDBCException) exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
-                (((MethodInvocationException)exception).getWrappedThrowable()).printStackTrace(s);
+                (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
             } else if (exception instanceof ServletException) {
-                (((ServletException)exception).getRootCause()).printStackTrace(s);
+                (((ServletException) exception).getRootCause()).printStackTrace(s);
             } else if (exception instanceof TransformerException) {
-                (((TransformerException)exception).getCause()).printStackTrace(s);
+                (((TransformerException) exception).getCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }

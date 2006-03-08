@@ -22,72 +22,173 @@
 
 package com.xpn.xwiki.user.impl.exo;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import org.exoplatform.commons.utils.PageList;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.organization.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.organization.Group;
-import org.exoplatform.services.organization.OrganizationService;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-
 public class ExoGroupServiceImpl implements XWikiGroupService {
-    private OrganizationService organizationService;
+    private static OrganizationService organizationService;
+    private XWikiCache groupCache;
 
-    protected OrganizationService getOrganizationService() {
-       if (organizationService==null) {
-           PortalContainer manager = PortalContainer.getInstance();
-           organizationService = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
-       }
-       return organizationService;
-   }
+    protected GroupHandler getGroupHandler() {
+        if (organizationService == null) {
+            organizationService = getOrganizationService();
+        }
+        return organizationService.getGroupHandler();
+    }
+
+    public static OrganizationService getOrganizationService() {
+        if (organizationService == null) {
+            PortalContainer manager = PortalContainer.getInstance();
+            organizationService = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
+        }
+        return organizationService;
+    }
+
+    protected UserHandler getUserHandler() {
+        if (organizationService == null) {
+            organizationService = getOrganizationService();
+        }
+        return organizationService.getUserHandler();
+    }
+
+    protected MembershipHandler getMembershipHandler() {
+        if (organizationService == null) {
+            organizationService = getOrganizationService();
+        }
+        return organizationService.getMembershipHandler();
+    }
+
+    protected MembershipTypeHandler getMembershipTypeHandler() {
+        if (organizationService == null) {
+            organizationService = getOrganizationService();
+        }
+        return organizationService.getMembershipTypeHandler();
+    }
 
     public void init(XWiki xwiki) {
+        XWikiCacheService cacheService = xwiki.getCacheService();
+        groupCache = cacheService.newCache();
     }
 
     public void flushCache() {
+        groupCache.flushAll();
     }
 
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException {
+        GroupHandler groupHandler = getGroupHandler();
+        Collection groups = null;
         try {
-            if (username.startsWith("XWiki."))
+            if (username.startsWith("XWiki.")) {
                 username = username.substring(6);
-            Collection groups = getOrganizationService().findGroupsOfUser(username);
-	    ArrayList list = new ArrayList();
-	    if (groups==null)
-		    return list;
-	    Iterator it = groups.iterator();
-	    while (it.hasNext()) {
-	       Group group = (Group)it.next();
-   	       list.add(group.getGroupName());	       
-	    }
-	    return list;
+                groups = groupHandler.findGroupsOfUser(username);
+            }
+
+            ArrayList list = new ArrayList();
+            if (groups == null)
+                return list;
+            Iterator it = groups.iterator();
+            while (it.hasNext()) {
+                Group group = (Group) it.next();
+                list.add(group.getGroupName());
+            }
+            return list;
         } catch (Exception e) {
-            e.printStackTrace();
+            Object[] args = {username};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_LISTING_USERS,
+                    "Exception while listing groups for user {0}", e, args);
+
         }
-        return null;
     }
 
-    public void addUserToGroup(String user, String database, String group) {
+    public void addUserToGroup(String user, String database, String group) throws XWikiException {
+        // TODO: test this code
+
+        MembershipHandler membershipHandler = getMembershipHandler();
+        MembershipTypeHandler memberShipTypeHandler = getMembershipTypeHandler();
+        boolean broadcast = false;
+        Collection list = null;
+        // check user and group exist membership
+        try {
+            list = membershipHandler.findMembershipsByUserAndGroup(user, group);
+            // size = 0 -----> user and group does not exist membership
+            if (list.size() == 0) {
+                broadcast = true;
+            }
+
+            // link membership
+            MembershipType mst = memberShipTypeHandler.findMembershipType(group);
+            if (mst == null) {
+                mst = memberShipTypeHandler.createMembershipTypeInstance();
+            }
+            User username = getUserHandler().findUserByName(user);
+            Group groupname = getGroupHandler().findGroupById(group);
+            membershipHandler.linkMembership(username, groupname, mst, broadcast);
+        } catch (Exception e) {
+            Object[] args = {user, group};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_ADDING_USERS,
+                    "Exception while adding user {0} to group {1}", e, args);
+        }
     }
 
-    public List listMemberForGroup(String s, XWikiContext context) throws XWikiException {
-        // Implement for eXo
-        return new ArrayList();
+    public List listMemberForGroup(String group, XWikiContext context) throws XWikiException {
+        UserHandler userHandler = getUserHandler();
+
+        List usersList = new ArrayList();
+        List exoList = null;
+
+        try {
+            if (group == null) {
+                PageList plist = null;
+                plist = userHandler.getUserPageList(100);
+                exoList = plist.getAll();
+            } else
+                exoList = userHandler.findUsersByGroup(group).getAll();
+
+            if (exoList != null) {
+                for (int i = 0; i < exoList.size(); i++) {
+                    User user = (User) exoList.get(i);
+                    usersList.add(user.getUserName());
+                }
+            }
+            return usersList;
+        } catch (Exception e) {
+            Object[] args = {group};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS,
+                    "Exception while listing users for group {0}", e, args);
+        }
     }
 
     public List listAllGroups(XWikiContext context) throws XWikiException {
-        // Implement for eXo
-        return new ArrayList();
+        GroupHandler handlerGroup = getGroupHandler();
+        List allGroups = new ArrayList();
+        List exoGroups = null;
+        try {
+            exoGroups = (List) handlerGroup.getAllGroups();
+
+            if (exoGroups != null) {
+                for (int i = 0; i < exoGroups.size(); i++) {
+                    Group group = (Group) exoGroups.get(i);
+                    allGroups.add(group.getId());
+                }
+            }
+            return allGroups;
+        } catch (Exception e) {
+            Object[] args = {};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS,
+                    "Exception while listing groups", e, args);
+        }
     }
 
-    public List listAllLevels(XWikiContext context) throws XWikiException {
-        // Implement for eXo
-        return new ArrayList();
-    }
 }

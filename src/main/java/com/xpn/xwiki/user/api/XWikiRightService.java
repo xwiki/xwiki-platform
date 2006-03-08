@@ -25,10 +25,18 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import java.util.List;
+
 public interface XWikiRightService {
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
+
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context) throws XWikiException;
+
     public boolean hasProgrammingRights(XWikiContext context);
+
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context);
+
     public boolean hasAdminRights(XWikiContext context);
+
+    public List listAllLevels(XWikiContext context) throws XWikiException;
 }

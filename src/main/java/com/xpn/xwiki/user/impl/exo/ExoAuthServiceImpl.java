@@ -23,41 +23,47 @@
 
 package com.xpn.xwiki.user.impl.exo;
 
-import java.security.Principal;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.exception.ExoServiceException;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
 import org.exoplatform.services.security.SecurityService;
 import org.securityfilter.realm.SimplePrincipal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+import java.security.Principal;
+import java.util.HashMap;
 
 public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
-    private SecurityService securityService;
+    private SecurityService securityService_;
+    private static final Log log = LogFactory.getLog(ExoAuthServiceImpl.class);
 
     protected SecurityService getSecurityService() {
-       if (securityService==null) {
-           PortalContainer manager = PortalContainer.getInstance();
-           securityService = (SecurityService) manager.getComponentInstanceOfType(SecurityService.class);
-       }
-       return securityService;
-   }
+        if (securityService_ == null) {
+            PortalContainer manager = PortalContainer.getInstance();
+            securityService_ = (SecurityService) manager.getComponentInstanceOfType(SecurityService.class);
+        }
+        return securityService_;
+    }
 
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException {
-        if (context.getMode()==XWikiContext.MODE_PORTLET) {
+        if (context.getMode() == XWikiContext.MODE_PORTLET) {
             String user = context.getRequest().getRemoteUser();
-            if ((user==null)||user.equals(""))
-             user = "XWiki.XWikiGuest";
+            if ((user == null) || user.equals(""))
+                user = "XWiki.XWikiGuest";
             else
-             user = "XWiki." + user;
+                user = "XWiki." + user;
             context.setUser(user);
             return new XWikiUser(user);
         } else {
             XWikiUser user = super.checkAuth(context);
-            if (user==null)
+            if (user == null)
                 return new XWikiUser("XWiki.XWikiGuest");
             else
                 return new XWikiUser("XWiki." + user.getUser());
@@ -66,21 +72,106 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
 
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         String superadmin = "superadmin";
+        SecurityService securityService = getSecurityService();
+
         if (username.equals(superadmin)) {
             String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
-            if ((superadminpassword!=null)&&(superadminpassword.equals(password))) {
-                return new SimplePrincipal("XWiki.superadmin");
+            if ((superadminpassword != null) && (superadminpassword.equals(password))) {
+                return new SimplePrincipal("superadmin");
             } else {
                 return null;
             }
         }
 
         try {
-            if (getSecurityService().authenticate(username, password))
+            if (securityService.authenticate(username, password))
                 return new SimplePrincipal(username);
-        } catch (ExoServiceException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
+        /*
+        if(context != null){
+            String susername = username;
+            int i = username.indexOf(".");
+            if (i!=-1) susername = username.substring(i+1);
+            String exo = getExo_DN(susername,context) ;
+
+        }
+        */
         return null;
     }
+
+    public String getExo_DN(String susername, XWikiContext context) {
+        String EX = null;
+        if (context != null) {
+            // First we check in the local database
+            try {
+                String user = findUser(susername, context);
+                if (user != null && user.length() != 0) {
+                    EX = readExo_DN(user, context);
+                }
+            } catch (Exception e) {
+            }
+
+            if (context.isVirtual()) {
+                if (EX == null || EX.length() == 0) {
+                    // Then we check in the main database
+                    String db = context.getDatabase();
+                    try {
+                        context.setDatabase(context.getWiki().getDatabase());
+                        try {
+                            String user = findUser(susername, context);
+                            if (user != null && user.length() != 0)
+                                EX = readExo_DN(user, context);
+                        } catch (Exception e) {
+                        }
+                    } finally {
+                        context.setDatabase(db);
+                    }
+                }
+            }
+        }
+        return EX;
+    }
+
+    private String readExo_DN(String username, XWikiContext context) {
+        String EX = null;
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(username, context);
+            // We only allow empty password from users having a XWikiUsers object.
+            if (doc.getObject("XWiki.XWikiUsers") != null) {
+                EX = doc.getStringValue("XWiki.XWikiUsers", "exo_ex");
+            }
+
+        } catch (Throwable e) {
+        }
+        return EX;
+    }
+
+    private void CreateUserFromExo(String susername, HashMap attributes, XWikiContext context) throws XWikiException {
+        UserHandler userHandler = ExoGroupServiceImpl.getOrganizationService().getUserHandler();
+        User user = userHandler.createUserInstance();
+
+
+    }
+
+    private String getParam(String name, XWikiContext context) {
+        String param = "";
+        try {
+            param = context.getWiki().getXWikiPreference(name, context);
+        } catch (Exception e) {
+        }
+        if (param == null || "".equals(param)) {
+            try {
+                param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "exo_", "exo."));
+            } catch (Exception e) {
+            }
+        }
+        if (param == null)
+            param = "";
+        return param;
+    }
+
+
 }

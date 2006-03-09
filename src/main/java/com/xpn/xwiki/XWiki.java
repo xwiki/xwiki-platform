@@ -1029,7 +1029,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             if ((skin == null) || (skin.equals(""))) {
-                skin = getWebPreference("skin", "", context);
+                skin = getUserPreference("skin", context);
             }
             if (skin.equals("")) {
                 skin = Param("xwiki.defaultskin", "default");
@@ -3274,6 +3274,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if ("0".equals(bl))
             return false;
         return "1".equals(Param("xwiki.usedefaultweb", "0"));
+    }
+
+    public boolean showViewAction(XWikiContext context) {
+        String bl = getXWikiPreference("showviewaction", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.showviewaction", "1"));
     }
 
     public boolean useDefaultAction(XWikiContext context) {

@@ -445,7 +445,7 @@ public class Document extends Api {
         if (currentObj==null)
          return doc.display(fieldname, context);
         else
-         return doc.display(fieldname, "view", currentObj.getBaseObject(), context);
+         return doc.display(fieldname, currentObj.getBaseObject(), context);
     }
 
     public String display(String fieldname, String mode) {
@@ -720,6 +720,8 @@ public class Document extends Api {
     }
 
     public java.lang.Object get(String classOrFieldName) {
+        if (currentObj!=null)
+            return doc.display(classOrFieldName, currentObj.getBaseObject(), context);
         BaseObject object = doc.getFirstObject(classOrFieldName);
         if (object!=null) {
             return doc.display(classOrFieldName, object, context);

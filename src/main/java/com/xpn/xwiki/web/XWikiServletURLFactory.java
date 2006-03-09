@@ -123,7 +123,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
                          String xwikidb, XWikiContext context) {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
-        addAction(newpath, action);
+        addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
 
@@ -146,8 +146,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         }
     }
 
-    private void addAction(StringBuffer newpath, String action) {
-        if (!action.equals("view")) {
+    private void addAction(StringBuffer newpath, String action, XWikiContext context) {
+        boolean showViewAction = context.getWiki().showViewAction(context);
+        if ((!action.equals("view")||(showViewAction))) {
             newpath.append(action);
             newpath.append("/");
         }
@@ -202,7 +203,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context) {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
-        addAction(newpath, "skin");
+        addAction(newpath, "skin", context);
         addSpace(newpath, web, "skin", context);
         addName(newpath, name, "skin", context);
         addFileName(newpath, filename, context);
@@ -230,7 +231,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context) {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
-        addAction(newpath, action);
+        addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
@@ -246,7 +247,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         String action = "downloadrev";
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
-        addAction(newpath, action);
+        addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);

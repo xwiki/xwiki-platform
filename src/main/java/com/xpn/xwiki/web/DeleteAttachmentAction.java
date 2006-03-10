@@ -27,20 +27,22 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class DeleteAttachmentAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
+    public boolean action(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-
-        String path = request.getPathInfo();
-        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
         XWikiAttachment attachment = null;
+        String filename;
+        String path = request.getPathInfo();
+        if (context.getMode() == XWikiContext.MODE_PORTLET)
+            filename = request.getParameter("filename");
+        else
+            filename = Utils.decode(path.substring(path.lastIndexOf("/") + 1), context);
 
-        if (request.getParameter("id")!=null) {
+        if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-        }
-        else {
+        } else {
             attachment = doc.getAttachment(filename);
         }
 
@@ -49,5 +51,5 @@ public class DeleteAttachmentAction extends XWikiAction {
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 }

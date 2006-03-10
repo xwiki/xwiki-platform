@@ -32,7 +32,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -40,15 +39,12 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * <p>A simple action that handles the display and editing of an
@@ -106,13 +102,12 @@ public abstract class XWikiAction extends Action {
                     String redirect = context.getWiki().Param("xwiki.virtual.redirect");
                     response.sendRedirect(redirect);
                     return null;
-                }
-                else
-                  throw e;
+                } else
+                    throw e;
             }
 
             // Parses multipart so that parms in multipart are available for all actions
-            fileupload = handleMultipart(req, context);
+            fileupload = Utils.handleMultipart(req, context);
 
             XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
@@ -227,31 +222,6 @@ public abstract class XWikiAction extends Action {
 
             MDC.remove("url");
         }
-    }
-
-    private FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context) {
-        FileUploadPlugin fileupload = null;
-        try {
-            if (request instanceof MultipartRequestWrapper) {
-                fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
-                fileupload.loadFileList(context);
-                context.put("fileuploadplugin", fileupload);
-                MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
-                List fileItems = fileupload.getFileItems(context);
-                for (Iterator iter = fileItems.iterator(); iter.hasNext();) {
-                    FileItem item = (FileItem) iter.next();
-                    if (item.isFormField()) {
-                        String sName = item.getFieldName();
-                        String sValue = item.getString();
-                        mpreq.setParameter(sName, sValue);
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-        return fileupload;
     }
 
     public String getRealPath(String path) {

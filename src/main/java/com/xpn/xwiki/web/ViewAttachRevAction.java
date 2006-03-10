@@ -27,12 +27,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiAttachment;
-
-import java.io.IOException;
-import java.util.List;
-
+import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.velocity.VelocityContext;
 
 public class ViewAttachRevAction extends XWikiAction {
@@ -41,21 +37,25 @@ public class ViewAttachRevAction extends XWikiAction {
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
-        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
+        String filename;
+        if (context.getMode() == XWikiContext.MODE_PORTLET)
+            filename = request.getParameter("filename");
+        else
+            filename = Utils.decode(path.substring(path.lastIndexOf("/") + 1), context);
+
         XWikiAttachment attachment = null;
-        if (request.getParameter("id")!=null) {
+        if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-        }
-        else {
+        } else {
             attachment = doc.getAttachment(filename);
-            if (attachment == null ) {
+            if (attachment == null) {
                 context.put("message", "attachmentdoesnotexist");
                 return "exception";
             }
         }
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        vcontext.put("attachment",new Attachment((Document)vcontext.get("doc"), attachment, context));
+        vcontext.put("attachment", new Attachment((Document) vcontext.get("doc"), attachment, context));
 
         return "viewattachrev";
     }

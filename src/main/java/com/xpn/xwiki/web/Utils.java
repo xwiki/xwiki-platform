@@ -28,22 +28,23 @@ import com.novell.ldap.util.Base64;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
 import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.log4j.MDC;
+import org.apache.struts.upload.MultipartRequestWrapper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Utils {
 
@@ -198,7 +199,6 @@ public class Utils {
         // Test works with xwiki-test.cfg instead of xwiki.cfg
         XWikiContext context = new XWikiContext();
         String dbname = "xwiki";
-
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
         // Push the URL into the Log4j NDC context
@@ -407,6 +407,31 @@ public class Utils {
         } catch (Exception e) {
             return name;
         }
+    }
+
+    public static FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context) {
+        FileUploadPlugin fileupload = null;
+        try {
+            if (request instanceof MultipartRequestWrapper) {
+                fileupload = new FileUploadPlugin("fileupload", "fileupload", context);
+                fileupload.loadFileList(context);
+                context.put("fileuploadplugin", fileupload);
+                MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
+                List fileItems = fileupload.getFileItems(context);
+                for (Iterator iter = fileItems.iterator(); iter.hasNext();) {
+                    FileItem item = (FileItem) iter.next();
+                    if (item.isFormField()) {
+                        String sName = item.getFieldName();
+                        String sValue = item.getString();
+                        mpreq.setParameter(sName, sValue);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return fileupload;
     }
 
 }

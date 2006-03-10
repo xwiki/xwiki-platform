@@ -1583,7 +1583,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         needsUpdate |= bclass.addBooleanField("allow", "Allow/Deny", "allow");
         BooleanClass afield = (BooleanClass) bclass.get("allow");
-        if (afield.getDefaultValue()!=1) {
+        if (afield.getDefaultValue() != 1) {
             afield.setDefaultValue(1);
             needsUpdate = true;
         }
@@ -2543,8 +2543,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 doc = getDocument("Main.WebHome", context);
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
             doc = context.getDoc();
-        } else
-            doc = getDocumentFromPath(request.getPathInfo(), context);
+        } else {
+            String action = context.getAction();
+            if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline")))
+                doc = getDocument(request.getParameter("topic"), context);
+            else
+                doc = getDocumentFromPath(request.getPathInfo(), context);
+        }
 
         context.put("doc", doc);
         vcontext.put("doc", new Document(doc, context));

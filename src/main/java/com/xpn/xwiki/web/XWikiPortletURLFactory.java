@@ -24,15 +24,13 @@
 
 package com.xpn.xwiki.web;
 
-import java.net.URL;
-import java.util.Map;
-
-import javax.portlet.PortletURL;
-
+import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.xpn.xwiki.XWikiContext;
+import javax.portlet.PortletURL;
+import java.net.URL;
+import java.util.Map;
 
 public class XWikiPortletURLFactory extends XWikiServletURLFactory {
 
@@ -50,6 +48,35 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
         actionPath = "bin/";
     }
 
+    public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context) {
+        try {
+            XWikiResponse response = context.getResponse();
+            PortletURL purl;
+            if (action.equals("download"))
+                return super.createAttachmentURL(filename, web, name, action, xwikidb, context);    //To change body of overridden methods use File | Settings | File Templates.
+            else if (action.equals("viewattachrev")) {
+                purl = response.createRenderURL();
+                purl.setParameter("filename", filename);
+                purl.setParameter("action", action);
+                purl.setParameter("topic", web + "." + name);
+            } else {
+                purl = response.createActionURL();
+                purl.setParameter("topic", web + "." + name);
+                purl.setParameter("filename", filename);
+                purl.setParameter("action", action);
+            }
+
+            if (log.isDebugEnabled())
+                log.debug("Generated URL is: " + purl.toString());
+
+            return new URL(serverURL, purl.toString());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb, XWikiContext context) {
         try {
             if (log.isDebugEnabled())
@@ -59,15 +86,15 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
             XWikiResponse response = context.getResponse();
             PortletURL purl;
 
-            if (action.equals("view")||action.equals("viewrev")||action.equals("download")||action.equals("downloadrev")||action.equals("skin")||action.equals("dot"))
+            if (action.equals("view") || action.equals("viewrev") || action.equals("attach") || action.equals("download") || action.equals("downloadrev") || action.equals("viewattachrev") || action.equals("skin") || action.equals("dot"))
                 purl = response.createRenderURL();
-
-            if (action.equals("save")||action.equals("cancel")||action.equals("delete")||action.equals("propupdate")
-                    ||action.equals("propadd")||action.equals("propdelete")
-                    ||action.equals("objectadd")||action.equals("objectremove")
-                    ||action.equals("commentadd")||action.equals("editprefs")
-                    ||action.equals("upload")||action.equals("delattachment")
-                    ||action.equals("login")||action.equals("logout"))
+            else
+            if (action.equals("save") || action.equals("cancel") || action.equals("delete") || action.equals("propupdate")
+                    || action.equals("propadd") || action.equals("propdelete")
+                    || action.equals("objectadd") || action.equals("objectremove")
+                    || action.equals("commentadd") || action.equals("editprefs")
+                    || action.equals("upload") || action.equals("delattachment")
+                    || action.equals("login") || action.equals("logout"))
                 purl = response.createActionURL();
             else
                 purl = response.createRenderURL();
@@ -95,7 +122,7 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
     }
 
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context) {
-        if (redirect==false)
+        if (redirect == false)
             return createURL(web, name, action, context);
 
         try {

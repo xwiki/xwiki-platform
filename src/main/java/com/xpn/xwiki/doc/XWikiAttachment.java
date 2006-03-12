@@ -397,7 +397,7 @@ public class XWikiAttachment {
     }
 
 
-    public Version[] getVersions() {
+    public synchronized Version[] getVersions() {
         Node[] nodes = getArchive().changeLog();
         Version[] versions = new Version[nodes.length];
         for (int i=0;i<nodes.length;i++) {
@@ -408,7 +408,7 @@ public class XWikiAttachment {
 
     // We assume versions go from 1.1 to the current one
     // This allows not to read the full archive file
-    public List getVersionList() throws XWikiException {
+    public synchronized List getVersionList() throws XWikiException {
             List list = new ArrayList();
             Version v = new Version("1.1");
             while (true) {
@@ -430,12 +430,12 @@ public class XWikiAttachment {
 
     public void loadContent(XWikiContext context) throws XWikiException {
         if (attachment_content==null)
-            getDoc().getStore().loadAttachmentContent(this, context, true);
+            context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
     }
 
     public void loadArchive(XWikiContext context) throws XWikiException {
         if (attachment_archive==null)
-            getDoc().getStore().loadAttachmentArchive(this, context, true);
+            context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException {
@@ -444,7 +444,7 @@ public class XWikiAttachment {
 
         if (attachment_archive==null) {
              try {
-               getDoc().getStore().loadAttachmentArchive(this, context, true);
+               context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
              } catch (XWikiException e) {
                 if (!(e.getException() instanceof ObjectNotFoundException))
                     throw e;
@@ -479,7 +479,7 @@ public class XWikiAttachment {
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException {
 
         try {
-            context.getWiki().getStore().loadAttachmentArchive(this, context, true);
+            context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
 
             Archive archive = getArchive();
 

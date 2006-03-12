@@ -471,12 +471,22 @@ public class XWikiDocument {
     }
 
     public String getAttachmentURL(String filename, String action, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, context);
+        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, null, context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
+    public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context) {
+        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, querystring, context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, context);
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, null, context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
+    public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context) {
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, querystring, context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1614,7 +1624,7 @@ public class XWikiDocument {
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
 
-            getStore().saveAttachmentContent(attachment, context, true);
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context, true);
         } finally {
             if (database != null)
                 context.setDatabase(database);
@@ -1629,7 +1639,7 @@ public class XWikiDocument {
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
 
-            getStore().loadAttachmentContent(attachment, context, true);
+            context.getWiki().getAttachmentStore().loadAttachmentContent(attachment, context, true);
         } finally {
             if (database != null)
                 context.setDatabase(database);
@@ -1644,7 +1654,7 @@ public class XWikiDocument {
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
 
-            getStore().deleteXWikiAttachment(attachment, context, true);
+            context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
         } finally {
             if (database != null)
                 context.setDatabase(database);

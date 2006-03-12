@@ -180,12 +180,13 @@ public class XWikiPluginManager {
     }
 
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
-	for (int i=0;i<plugins.size();i++) {
-	    try {
-	    } catch (Exception e)
-	    {}
-	}
-	return attachment;
+        XWikiAttachment attach = attachment;
+        for (int i=0;i<plugins.size();i++) {
+            try {
+                attach = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).downloadAttachment(attach, context);
+            } catch (Exception e)
+            {}
+        }
+        return attach;
     }
-
 }

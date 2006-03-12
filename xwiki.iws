@@ -16,17 +16,15 @@
     <option name="CHANGE_AFTER" value="" />
   </component>
   <component name="CheckinPanelState">
-    <Excluded key="$PROJECT_DIR$/lib/groovy-1.0-beta-9.jar" />
-    <Excluded key="$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateBatcher.java" />
-    <Excluded key="$PROJECT_DIR$/src/com/xpn/xwiki/store/XWikiHibernateSession.java" />
-    <Excluded key="$PROJECT_DIR$/src/com/xpn/xwiki/user/impl/xwiki/MyPersistentLoginManager.java" />
-    <Excluded key="$PROJECT_DIR$/src/log4j.properties" />
-    <Excluded key="$PROJECT_DIR$/src/xhtml2fo.xsl" />
-    <Excluded key="$PROJECT_DIR$/test/xwiki.cfg" />
-    <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/version.properties" />
-    <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/xwiki-exo.cfg" />
-    <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/xwiki-test.cfg" />
-    <Excluded key="$PROJECT_DIR$/src/web/WEB-INF/xwiki.cfg" />
+    <Excluded key="C:\dev\java\xwiki\src\main\java\com\xpn\xwiki\user\impl\xwiki\MyFormAuthenticator.java" />
+    <Excluded key="C:\dev\java\xwiki\src\main\java\com\xpn\xwiki\user\impl\xwiki\XWikiAuthServiceImpl.java" />
+    <Excluded key="C:\dev\java\xwiki\src\main\java\com\xpn\xwiki\web\XWikiSpecialCache.java" />
+    <Excluded key="C:\dev\java\xwiki\src\main\resources\xwiki.hbm.xml" />
+    <Excluded key="C:\dev\java\xwiki\src\test\resources\hibernate-test.cfg.xml" />
+    <Excluded key="C:\dev\java\xwiki\src\test\resources\xwiki.cfg" />
+    <Excluded key="C:\dev\java\xwiki\xwiki.iml" />
+    <Excluded key="C:\dev\java\xwiki\xwiki.ipr" />
+    <Excluded key="C:\dev\java\xwiki\xwiki.iws" />
   </component>
   <component name="CodeStyleManager">
     <option name="USE_DEFAULT_CODE_STYLE_SCHEME" value="true" />
@@ -218,33 +216,7 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateStore.java" line="1054" class="com.xpn.xwiki.store.XWikiHibernateStore" package="com.xpn.xwiki.store">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcher.java" line="97" class="com.xpn.xwiki.store.XWikiBatcher" package="com.xpn.xwiki.store">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="208" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcher.java" line="94" class="com.xpn.xwiki.store.XWikiBatcher" package="com.xpn.xwiki.store">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -270,7 +242,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="231" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="230" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -283,7 +255,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="237" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="236" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -296,7 +268,33 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="403" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="402" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Document.java" line="432" class="com.xpn.xwiki.api.Document" package="com.xpn.xwiki.api">
+        <option name="ENABLED" value="true" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/src/main/web/WEB-INF/xwiki.cfg" line="27" class="Class at xwiki.cfg:27" package="">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -605,46 +603,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="wysiwyg.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/templates/wysiwyg.vm">
+      <file leaf-file-name="attach.vm" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/web/templates/attach.vm">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="21" selection-start="696" selection-end="696" vertical-scroll-proportion="0.09859155">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="fr.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/langs/fr.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="en.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/langs/en.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="tiny_mce.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/tiny_mce.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2745" column="68" selection-start="86433" selection-end="86438" vertical-scroll-proportion="0.33333334">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="attachwysiwyg.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/templates/attachwysiwyg.vm">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="35" selection-start="390" selection-end="390" vertical-scroll-proportion="0.33090025">
+            <state line="0" column="29" selection-start="21" selection-end="21" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -653,43 +615,74 @@
       <file leaf-file-name="wiki_editor.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/web/wiki_editor/wiki_editor.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="28" selection-start="82" selection-end="95" vertical-scroll-proportion="0.16545013">
+            <state line="456" column="12" selection-start="12666" selection-end="12666" vertical-scroll-proportion="0.81005585">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XWikiGroupServiceImpl.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/user/impl/xwiki/XWikiGroupServiceImpl.java">
+      <file leaf-file-name="tiny_mce.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/tiny_mce.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="105" column="24" selection-start="4253" selection-end="4253" vertical-scroll-proportion="0.7518248">
+            <state line="207" column="19" selection-start="10170" selection-end="10170" vertical-scroll-proportion="0.031657357">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="default.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/wiki_editor/themes/default.js">
+      <file leaf-file-name="InlineAction.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/InlineAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="18" column="36" selection-start="803" selection-end="803" vertical-scroll-proportion="0.20681265">
+            <state line="50" column="61" selection-start="2035" selection-end="2035" vertical-scroll-proportion="0.030797102">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationResources.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources.properties">
+      <file leaf-file-name="Utils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/Utils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="199" column="0" selection-start="6074" selection-end="6074" vertical-scroll-proportion="0.33576643">
+            <state line="32" column="13" selection-start="1232" selection-end="1232" vertical-scroll-proportion="0.030797102">
+              <folding>
+                <marker date="1142202654668" expanded="true" signature="16759:16765" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="XWikiAction.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="142" column="20" selection-start="5589" selection-end="5589" vertical-scroll-proportion="0.030797102">
+              <folding>
+                <marker date="1142202654688" expanded="true" signature="8882:8888" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MonitorPlugin.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/monitor/api/MonitorPlugin.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="59" column="54" selection-start="2312" selection-end="2312" vertical-scroll-proportion="0.82309127">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationResources_de.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_de.properties">
+      <file leaf-file-name="attachments.vm" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/web/templates/attachments.vm">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="10" selection-start="2104" selection-end="2104" vertical-scroll-proportion="0.5839416">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="editor_plugin.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/plugins/wikiplugin/editor_plugin.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="54" selection-start="1136" selection-end="1136" vertical-scroll-proportion="0.81005585">
               <folding />
             </state>
           </provider>
@@ -802,7 +795,7 @@
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" value="xwiki" />
-    <option name="LAST_EDITED_TAB_NAME" value="J2EE Build Settings" />
+    <option name="LAST_EDITED_TAB_NAME" value="Libraries (Classpath)" />
   </component>
   <component name="NamedScopeManager" />
   <component name="PackagesPane">
@@ -944,7 +937,45 @@
         <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
       </PATH_ELEMENT>
       <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\resources" />
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\java" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\java\com\xpn\xwiki" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+    </PATH>
+    <PATH>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="xwiki.ipr" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="xwikibase" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\java" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\java\com\xpn\xwiki" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\java\com\xpn\xwiki\store" />
         <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
       </PATH_ELEMENT>
     </PATH>
@@ -986,47 +1017,7 @@
         <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
       </PATH_ELEMENT>
       <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web\wiki_editor" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="xwiki.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="xwiki" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web\tiny_mce" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-    </PATH>
-    <PATH>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="xwiki.ipr" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="xwiki" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web\tiny_mce" />
-        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-      </PATH_ELEMENT>
-      <PATH_ELEMENT>
-        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web\tiny_mce\langs" />
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\web\templates" />
         <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
       </PATH_ELEMENT>
     </PATH>
@@ -1097,17 +1088,31 @@
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="true" />
   </component>
-  <component name="RecentsManager" />
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.xpn.xwiki.render.macro" />
+    </key>
+  </component>
+  <component name="Regex">
+    <option name="pos1" value="218" />
+    <option name="pos2" value="218" />
+    <option name="pos3" value="162" />
+    <option name="pos4" value="444" />
+    <option name="pos5" value="162" />
+    <option name="autoUpdate" value="true" />
+    <option name="referenceOn" value="false" />
+    <option name="referencePos" value="0" />
+  </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager">
     <activeType name="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" />
-    <tempConfiguration selected="true" default="false" name="XWikiTest.testReplaceCapitals" type="JUnit" factoryName="JUnit">
+    <tempConfiguration selected="false" default="false" name="HibernateClassesTest.testCreateAndDeleteClass" type="JUnit" factoryName="JUnit">
       <module name="xwiki" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="com.xpn.xwiki.test" />
-      <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.XWikiTest" />
-      <option name="METHOD_NAME" value="testReplaceCapitals" />
+      <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.HibernateClassesTest" />
+      <option name="METHOD_NAME" value="testCreateAndDeleteClass" />
       <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
@@ -1117,19 +1122,30 @@
         <value defaultName="wholeProject" />
       </option>
       <RunnerSettings RunnerId="Run" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2721" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <ConfigurationWrapper RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
     </tempConfiguration>
-    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.jsr45.JSR45ConfigurationFactory" factoryName="Local">
+    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
-      <option name="PORT" value="80" />
-      <option name="LOCAL" value="true" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="false" />
       <option name="OPEN_IN_BROWSER" value="true" />
       <option name="OPEN_IN_BROWSER_URL" value="/" />
       <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="JSP_PACKAGE" value="" />
-      <option name="VM_OPTS" value="" />
-      <option name="LOCAL_PORT" value="80" />
+      <RunnerSettings RunnerId="Run" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3384" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
     </configuration>
     <configuration selected="false" default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
@@ -1137,18 +1153,6 @@
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
-    </configuration>
-    <configuration selected="false" default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
     <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
@@ -1200,45 +1204,17 @@
         </SHUTDOWN>
       </ConfigurationWrapper>
     </configuration>
-    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
+    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.jsr45.JSR45ConfigurationFactory" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="false" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <RunnerSettings RunnerId="Run" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3384" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
-      <ConfigurationWrapper RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-    </configuration>
-    <configuration selected="false" default="true" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <module name="" />
-    </configuration>
-    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="7001" />
+      <option name="PORT" value="80" />
       <option name="LOCAL" value="true" />
       <option name="OPEN_IN_BROWSER" value="true" />
       <option name="OPEN_IN_BROWSER_URL" value="/" />
       <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="DOMAIN_PATH" value="" />
-      <option name="USER" value="weblogic" />
-      <option name="PASSWORD" value="weblogic" />
-      <option name="SERVER_NAME" value="myserver" />
-      <option name="DOMAIN_NAME" value="mydomain" />
+      <option name="JSP_PACKAGE" value="" />
+      <option name="VM_OPTS" value="" />
+      <option name="LOCAL_PORT" value="80" />
     </configuration>
     <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
       <module name="xwiki" />
@@ -1256,89 +1232,40 @@
         <value defaultName="wholeProject" />
       </option>
     </configuration>
-    <configuration selected="true" default="false" name="Tomcat 5" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat">
+    <configuration selected="false" default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
+    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
+      <option name="PORT" value="7001" />
       <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="false" />
-      <option name="OPEN_IN_BROWSER_URL" value="http://127.0.0.1:9080/" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx200m" />
-      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="exploded">
-        <option name="CONTEXT_PATH" value="/xwiki" />
-        <option name="MODULE_NAME" value="xwiki" />
-        <option name="DEPLOY" value="true" />
-      </J2EE_MODULE>
-      <RunnerSettings RunnerId="Run" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3515" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-        <EnvironmentVariables>
-          <option name="NAME" value="LANG" />
-          <option name="VALUE" value="fr_FR.ISO-8859-1" />
-          <option name="IS_PREDEFINED" value="false" />
-        </EnvironmentVariables>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-        <EnvironmentVariables>
-          <option name="NAME" value="LANG" />
-          <option name="VALUE" value="fr_FR.ISO-8859-1" />
-          <option name="IS_PREDEFINED" value="false" />
-        </EnvironmentVariables>
-      </ConfigurationWrapper>
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <option name="DOMAIN_PATH" value="" />
+      <option name="USER" value="weblogic" />
+      <option name="PASSWORD" value="weblogic" />
+      <option name="SERVER_NAME" value="myserver" />
+      <option name="DOMAIN_NAME" value="mydomain" />
     </configuration>
-    <configuration selected="true" default="false" name="XWiki.com" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="lanai.xpertnet.biz" />
-      <option name="PORT" value="5005" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1409" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
-      <ConfigurationWrapper RunnerId="Debug" />
-    </configuration>
-    <configuration selected="true" default="false" name="Groovy Export" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="groovy.lang.GroovyShell" />
-      <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="c:/dev/java/mforma/killerbee/tools/export.groovy" />
-      <option name="WORKING_DIRECTORY" value="file://c:/dev/java/mforma/killerbee/tools/" />
+    <configuration selected="false" default="true" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <module name="xwikibase" />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <module name="" />
     </configuration>
     <configuration selected="false" default="false" name="UtilTest" type="JUnit" factoryName="JUnit">
       <module name="xwikibase" />
@@ -1520,7 +1447,7 @@
       <ConfigurationWrapper RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
     </configuration>
-    <configuration selected="false" default="false" name="SearchTest" type="JUnit" factoryName="JUnit">
+    <configuration selected="true" default="false" name="SearchTest" type="JUnit" factoryName="JUnit">
       <module name="xwikibase" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -1906,16 +1833,104 @@
       <ConfigurationWrapper RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
     </configuration>
+    <configuration selected="true" default="false" name="XWiki.com" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="lanai.xpertnet.biz" />
+      <option name="PORT" value="5005" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1409" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
+    </configuration>
+    <configuration selected="true" default="false" name="Tomcat 5" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="false" />
+      <option name="OPEN_IN_BROWSER_URL" value="http://127.0.0.1:9080/" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx200m" />
+      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="jar">
+        <option name="CONTEXT_PATH" value="/xwiki" />
+        <option name="MODULE_NAME" value="xwiki" />
+        <option name="DEPLOY" value="true" />
+      </J2EE_MODULE>
+      <RunnerSettings RunnerId="Run" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3515" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+        <EnvironmentVariables>
+          <option name="NAME" value="LANG" />
+          <option name="VALUE" value="fr_FR.ISO-8859-1" />
+          <option name="IS_PREDEFINED" value="false" />
+        </EnvironmentVariables>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+        <EnvironmentVariables>
+          <option name="NAME" value="LANG" />
+          <option name="VALUE" value="fr_FR.ISO-8859-1" />
+          <option name="IS_PREDEFINED" value="false" />
+        </EnvironmentVariables>
+      </ConfigurationWrapper>
+    </configuration>
+    <configuration selected="true" default="false" name="Groovy Export" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="groovy.lang.GroovyShell" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="c:/dev/java/mforma/killerbee/tools/export.groovy" />
+      <option name="WORKING_DIRECTORY" value="file://c:/dev/java/mforma/killerbee/tools/" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <module name="xwikibase" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+    </configuration>
   </component>
   <component name="SQL">
-    <export>
-      <html table="border: 1px solid black; border-spacing:0px" cell="border: 1px solid black" header="background: darkgrey; font-weight:bold; text-align: center" row1="background: white" row2="background: lightgrey" alternate="true" interval="1" />
-      <csvExport delimiter="," text="&quot;" />
-    </export>
-    <general />
-    <databases savePasswords="false" encodePasswords="true" />
-    <queries save="false" />
-    <results primaryKeyCols="true">
+    <general confirmCommit="false" confirmRollback="false" confirmClose="false" />
+    <databases savePasswords="false" encodePasswords="false">
+      <database name="hsqxwiki" driver="jdbc:hsqldb" path="c:/Program Files/XWiki/xwikionjetty/db/xwiki_db" port="9001" jdbc.get_column_name="true" type="In-Process (File)" user="sa" current="true">
+        <customProperties locked="false" shared="true" />
+      </database>
+    </databases>
+    <queries projectClassLoader="false" save="false" stopOnError="true" />
+    <results primaryKeyCols="true" loadLOBs="true" saveTableConfig="false" nullString="">
+      <defaultFormat class="java.lang.String" format="Default" />
+      <defaultFormat class="java.lang.Number" format="Default" />
+      <defaultFormat class="java.util.Date" format="Default" />
+      <defaultFormat class="java.lang.Boolean" format="Default" />
       <rowLimit enabled="true" value="1000" />
       <resizeColumns toHeader="true" toContent="true" />
     </results>
@@ -1956,6 +1971,26 @@
   <component name="SvnConfiguration">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
+    <configuration useDefault="true">C:\Documents and Settings\ludovic.LUDOLAPTOP\Application Data\Subversion</configuration>
+  </component>
+  <component name="Talios.JiraConfigurationComponent" enableIssueTracking="false" autoRefresh="false" useExternalBrowser="false" refreshTimeout="0" annotateissues="false">
+    <servers />
+    <columns>
+      <column id="created" position="0" width="-1" />
+      <column id="key" position="1" width="-1" />
+      <column id="component" position="2" width="-1" />
+      <column id="title" position="3" width="-1" />
+      <column id="type" position="4" width="-1" />
+      <column id="priority" position="5" width="-1" />
+      <column id="status" position="6" width="-1" />
+      <column id="resolution" position="7" width="-1" />
+      <column id="assignee" position="8" width="-1" />
+      <column id="reporter" position="9" width="-1" />
+      <column id="updated" position="10" width="-1" />
+      <column id="dueDate" position="11" width="-1" />
+      <column id="version" position="12" width="-1" />
+      <column id="fixVersion" position="13" width="-1" />
+    </columns>
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -1972,27 +2007,28 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1084" height="736" extended-state="6" />
+    <frame x="0" y="0" width="1280" height="736" extended-state="0" />
     <editor active="true" />
     <layout>
+      <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.5983471" order="10" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="8" />
+      <window_info id="Regex" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.31006494" order="6" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.0746124" order="0" x="-87" y="100" width="469" height="491" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.23026316" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.27198696" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.34214875" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22168285" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.41282895" order="9" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3090909" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.28003973" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.20065789" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.31900826" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.15110683" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.32894737" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.48939642" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="sliding" type="sliding" visible="false" weight="0.40038684" order="0" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
-      <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.330033" order="10" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="0" />
       <window_info id="Aspects" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="RegexPlugin" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.330033" order="11" />
@@ -2026,11 +2062,12 @@
     <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
     <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
     <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
-    <option name="ERROR_OCCURED" value="false" />
-    <option name="ACTIVE_VCS_NAME" value="" />
+    <option name="ERROR_OCCURED" value="true" />
+    <option name="ACTIVE_VCS_NAME" value="svn" />
     <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="Fix a call to display which was forcing view mode&#10;Fix a bug in display which call to use&#10;Added default setting to show &quot;view&quot; action in URL and added param in xwiki.cfg to disable it&#10;Made skin a user preference" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -2083,23 +2120,30 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_it.properties">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Context.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="81" column="71" selection-start="2149" selection-end="2149" vertical-scroll-proportion="1.1576576">
+        <state line="200" column="35" selection-start="4656" selection-end="4656" vertical-scroll-proportion="1.3011364">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_fr.properties">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/plugin/image/ImagePlugin.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="157" column="16" selection-start="5153" selection-end="5153" vertical-scroll-proportion="0.6981982">
+        <state line="112" column="59" selection-start="3401" selection-end="3401" vertical-scroll-proportion="0.82492584">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_pt.properties">
+    <entry file="file://$PROJECT_DIR$/src/main/web/templates/viewattachrev.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="24" column="71" selection-start="928" selection-end="928" vertical-scroll-proportion="0.69602275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/web/templates/attachwysiwyg.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="112" selection-start="644" selection-end="644" vertical-scroll-proportion="0.031657357">
           <folding />
         </state>
       </provider>
@@ -2111,79 +2155,69 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_es.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="155" column="5" selection-start="5089" selection-end="5094" vertical-scroll-proportion="0.33576643">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_de.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="10" selection-start="2104" selection-end="2104" vertical-scroll-proportion="0.5839416">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="199" column="0" selection-start="6074" selection-end="6074" vertical-scroll-proportion="0.33576643">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/wiki_editor/themes/default.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="36" selection-start="803" selection-end="803" vertical-scroll-proportion="0.20681265">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/templates/attachwysiwyg.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="35" selection-start="390" selection-end="390" vertical-scroll-proportion="0.33090025">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/langs/fr.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/langs/en.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/tiny_mce.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2745" column="68" selection-start="86433" selection-end="86438" vertical-scroll-proportion="0.33333334">
+        <state line="207" column="19" selection-start="10170" selection-end="10170" vertical-scroll-proportion="0.031657357">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/InlineAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="61" selection-start="2035" selection-end="2035" vertical-scroll-proportion="0.030797102">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/web/tiny_mce/plugins/wikiplugin/editor_plugin.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="54" selection-start="1136" selection-end="1136" vertical-scroll-proportion="0.81005585">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/web/wiki_editor/wiki_editor.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="28" selection-start="82" selection-end="95" vertical-scroll-proportion="0.16545013">
+        <state line="456" column="12" selection-start="12666" selection-end="12666" vertical-scroll-proportion="0.81005585">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/user/impl/xwiki/XWikiGroupServiceImpl.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="24" selection-start="4253" selection-end="4253" vertical-scroll-proportion="0.7518248">
+        <state line="142" column="20" selection-start="5589" selection-end="5589" vertical-scroll-proportion="0.030797102">
+          <folding>
+            <marker date="1142202654688" expanded="true" signature="8882:8888" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/Utils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="13" selection-start="1232" selection-end="1232" vertical-scroll-proportion="0.030797102">
+          <folding>
+            <marker date="1142202654668" expanded="true" signature="16759:16765" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/monitor/api/MonitorPlugin.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="59" column="54" selection-start="2312" selection-end="2312" vertical-scroll-proportion="0.82309127">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/templates/wysiwyg.vm">
+    <entry file="file://$PROJECT_DIR$/src/main/web/templates/attach.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="21" selection-start="696" selection-end="696" vertical-scroll-proportion="0.09859155">
+        <state line="0" column="29" selection-start="21" selection-end="21" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/web/templates/attachments.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

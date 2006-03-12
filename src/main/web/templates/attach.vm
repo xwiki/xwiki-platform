@@ -20,7 +20,7 @@ $message
 <tr>
 <td>
 #if ($attach.isImage())
-<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" height="40" />
+<img src="$doc.getAttachmentURL("${attach.filename}", "download", "width=80")" alt="${attach.filename}" width="80" />
 #end
 </td><td><a href="$doc.getAttachmentURL("${attach.filename}", "download")">$attach.filename</a></td>
 <td align="center">$attach.version</td><td align="center">$attach.author</td><td align=center>$attach.filesize</td>

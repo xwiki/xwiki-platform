@@ -52,10 +52,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.*;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -83,10 +80,10 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.exoplatform.container.RootContainer;
+import org.exoplatform.container.PortalContainer;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -111,6 +108,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     private XWikiConfig config;
     private XWikiStoreInterface store;
+    private XWikiAttachmentStoreInterface attachmentStore;
     private XWikiRenderingEngine renderingEngine;
     private XWikiPluginManager pluginManager;
     private XWikiNotificationManager notificationManager;
@@ -447,6 +445,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } else
             setStore(basestore);
 
+        String attachmentStoreclass = Param("xwiki.store.attachment.class", "com.xpn.xwiki.store.XWikiHibernateAttachmentStore");
+        try {
+            Class[] classes = new Class[]{this.getClass(), context.getClass()};
+            Object[] args = new Object[]{this, context};
+            setAttachmentStore( (XWikiAttachmentStoreInterface) Class.forName(attachmentStoreclass).getConstructor(classes).newInstance(args));
+        } catch (InvocationTargetException e) {
+            Object[] args = {storeclass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load store class {0}", e.getTargetException(), args);
+        } catch (Exception e) {
+            Object[] args = {storeclass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load store class {0}", e, args);
+        }
+
         resetRenderingEngine(context);
 
         // Prepare the Plugin Engine
@@ -627,6 +642,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public XWikiStoreInterface getStore() {
         return store;
+    }
+
+    public XWikiAttachmentStoreInterface getAttachmentStore() {
+        return attachmentStore;
     }
 
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -1373,6 +1392,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void setStore(XWikiStoreInterface store) {
         this.store = store;
+    }
+
+    public void setAttachmentStore(XWikiAttachmentStoreInterface attachmentStore) {
+          this.attachmentStore = attachmentStore;
     }
 
     public void setVersion(String version) {
@@ -2206,7 +2229,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (attachlist.size() > 0) {
                         for (int i = 0; i < attachlist.size(); i++) {
                             XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                            getStore().saveAttachmentContent(attachment, false, context, true);
+                            getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                         }
                     }
 
@@ -2271,7 +2294,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (attachlist.size() > 0) {
                         for (int i = 0; i < attachlist.size(); i++) {
                             XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                            getStore().saveAttachmentContent(attachment, false, context, true);
+                            getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                         }
                     }
                 }

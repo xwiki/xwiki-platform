@@ -12,7 +12,7 @@
 <td>
 #if ($attach.isImage())
 <a href="$doc.getAttachmentURL("${attach.filename}", "download")" onclick="document.forms[0].href.value='$attach.filename'; return false;" >
-<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" height="40" border="0" />
+<img src="$doc.getAttachmentURL("${attach.filename}", "download", "width=80")" alt="${attach.filename}" width="80" border="0" />
 </a>
 #end
 </td><td><a href="$doc.getAttachmentURL("${attach.filename}", "download")" onclick="document.forms[0].href.value='$attach.filename'; return false;" >$attach.filename</a></td>

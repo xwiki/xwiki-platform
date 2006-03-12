@@ -19,10 +19,10 @@
     #foreach ($version in $attachment.getVersions())
     <tr>
     #set($attachrev = $attachment.getAttachmentRevision($version.toString()))
-    #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
+    #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}, "width=80"))
         <td>
              #if ($attachment.isImage())
-                <img src="${url}" alt="${attachment.filename}" height="40" />
+                <img src="${url}" alt="${attachment.filename}" width="80" />
              #end
         </td>
         <td align="center"><a href="" onclick="location='${url}'; return false;">$version</a> </td>

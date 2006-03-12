@@ -212,8 +212,16 @@ public class Document extends Api {
         return doc.getAttachmentURL(filename, action, context);
     }
 
+    public String getAttachmentURL(String filename, String action, String querystring) {
+        return doc.getAttachmentURL(filename, action, querystring, context);
+    }
+
     public String getAttachmentRevisionURL(String filename, String version) {
         return doc.getAttachmentRevisionURL(filename, version, context);
+    }
+
+    public String getAttachmentRevisionURL(String filename, String version, String querystring) {
+        return doc.getAttachmentRevisionURL(filename, version, querystring, context);
     }
 
     public String getURL() {

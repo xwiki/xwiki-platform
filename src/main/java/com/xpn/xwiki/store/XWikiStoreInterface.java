@@ -52,11 +52,6 @@ public interface XWikiStoreInterface {
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
-    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;
-    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;
     public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction) throws XWikiException;

@@ -238,26 +238,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb, start, context);
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.saveAttachmentContent(attachment, context, bTransaction);
-    }
-
-    public void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
-    }
-
-    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.loadAttachmentContent(attachment, context, bTransaction);
-    }
-
-    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.loadAttachmentArchive(attachment, context, bTransaction);
-    }
-
-    public void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
-        store.deleteXWikiAttachment(attachment, context, bTransaction);
-    }
-
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
         return store.loadLock(docId, context, bTransaction);
     }

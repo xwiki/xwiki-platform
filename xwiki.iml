@@ -46,11 +46,15 @@
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ACTIVE_VCS_NAME" value="svn" />
+    <option name="USE_PROJECT_VCS" value="false" />
+  </component>
   <component name="WebModuleBuildComponent">
     <setting name="EXPLODED_URL" value="file://$MODULE_DIR$/release/xwiki/web" />
     <setting name="EXPLODED_ENABLED" value="true" />
     <setting name="JAR_URL" value="file://$MODULE_DIR$/release/xwiki.war" />
-    <setting name="JAR_ENABLED" value="false" />
+    <setting name="JAR_ENABLED" value="true" />
     <setting name="SYNC_EXPLODED_DIR" value="false" />
     <setting name="BUILD_ON_FRAME_DEACTIVATION" value="false" />
     <setting name="RUN_JASPER_VALIDATION" value="false" />

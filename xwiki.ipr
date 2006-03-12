@@ -206,7 +206,7 @@
       <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="false" project-jdk-name="1.5" />
+  <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="false" project-jdk-name="1.5 (1)" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />
@@ -335,18 +335,19 @@
     <library name="ExoPlatform">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/picocontainer-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.impl-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.impl-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.organization.api-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.security.api-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.organization.impl-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.chart.api-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.common.api-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.container-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.impl-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/exoplatform.services.database.api-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jfreechart-1.0.0-rc1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jcommon-1.0.0-rc1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.database.impl-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.organization.impl-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.organization.api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.database.api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.common.api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.commons.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.sercurity.impl-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.chart.impl-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.chart.api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.service.sercurity.api-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/exo-platform.container-2.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -360,7 +361,7 @@
     </library>
     <library name="Groovy">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-01.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-04.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

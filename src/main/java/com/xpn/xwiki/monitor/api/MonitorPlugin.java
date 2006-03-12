@@ -70,8 +70,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             Thread cthread = Thread.currentThread();
             MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
             if (mdata!=null) {
-                activeTimerDataList.remove(cthread);
-                lastUnfinishedTimerDataList.add(mdata);
+                removeFromActiveTimerDataList(cthread);
+                addToLastUnfinishedTimerDataList(mdata);
                 if (log.isInfoEnabled()) {
                     log.info("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call endRequest");
                 }
@@ -85,6 +85,13 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void addToLastUnfinishedTimerDataList(MonitorData mdata) {
+        // We should remove the oldest entry
+        if (lastUnfinishedTimerDataList.isFull())
+         lastUnfinishedTimerDataList.remove(lastUnfinishedTimerDataList.get());
+        lastUnfinishedTimerDataList.add(mdata);
     }
 
     public void endRequest() {
@@ -103,14 +110,26 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             mdata.endRequest(true);
             addDuration(mdata.getDuration());
             addTimerDuration(mdata);
-            activeTimerDataList.remove(cthread);
-            lastTimerDataList.add(mdata);
+            removeFromActiveTimerDataList(cthread);
+            addToTimerDataList(mdata);
         } catch (Throwable e) {
             if (log.isWarnEnabled()) {
                 log.warn("MONITOR: endRequest failed with exception " + e);
                 e.printStackTrace();
             }
         }
+    }
+
+    private void removeFromActiveTimerDataList(Thread cthread) {
+        if (activeTimerDataList.containsKey(cthread))
+         activeTimerDataList.remove(cthread);
+    }
+
+    private void addToTimerDataList(MonitorData mdata) {
+        // We should remove the oldest entry
+        if (lastTimerDataList.isFull())
+         lastTimerDataList.remove(lastTimerDataList.get());
+        lastTimerDataList.add(mdata);
     }
 
     public void setWikiPage(String page) {

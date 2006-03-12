@@ -54,7 +54,7 @@ public class PdfURLFactory extends XWikiServletURLFactory {
             return file.toURL();
         } catch (Exception e) {
             e.printStackTrace();
-            return super.createAttachmentURL(filename, web, name, action, xwikidb, context);
+            return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
         }
     }
 

@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -273,14 +274,14 @@ public class StoreTest extends HibernateTestCase {
         updateAttachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
     }
 
-    public void deleteAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
+    public void deleteAttachmentReadWrite(XWikiStoreInterface store, XWikiAttachmentStoreInterface attachmentStore, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
         doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
         List attachlist = doc3.getAttachmentList();
         XWikiAttachment attachment3 = (XWikiAttachment) attachlist.get(0);
 
-        store.deleteXWikiAttachment(attachment3, getXWikiContext(), true);
+        attachmentStore.deleteXWikiAttachment(attachment3, getXWikiContext(), true);
 
         attachlist = doc3.getAttachmentList();
         assertEquals("Attachment is still there", 0, attachlist.size());
@@ -313,7 +314,7 @@ public class StoreTest extends HibernateTestCase {
     public void testDeleteAttachmentReadWrite() throws XWikiException, IOException {
         Utils.setStandardData();
         attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
-        deleteAttachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+        deleteAttachmentReadWrite(getXWiki().getStore(), getXWiki().getAttachmentStore(), Utils.web, Utils.name);
     }
 
     public void testDeleteDocWithAttachment() throws XWikiException, IOException {

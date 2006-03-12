@@ -250,7 +250,9 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
         return principal;
     }
 
-    protected String findUser(String susername, XWikiContext context) throws XWikiException {
+    protected String findUser(String susername2, XWikiContext context) throws XWikiException {
+        String susername = susername2.replaceAll(" ", "");
+
         // First lets look in the cache
         if (context.getWiki().exists("XWiki." + susername, context))
             return "XWiki." + susername;

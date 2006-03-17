@@ -114,8 +114,6 @@
      <fileset id="libs.tests.fileset" dir="${lib.dir}"
          includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />
 
-    <fileset id="libs.exo.fileset" dir="${lib.dir}"
-     	includes="picocontainer-1.0.jar,exoplatform.container-1.0.jar,exoplatform.services.chart.api-1.0.jar,exoplatform.services.chart.impl-1.0.jar,exoplatform.services.common.api-1.0.jar,exoplatform.services.organization.api-1.0.jar,exoplatform.services.organization.impl-1.0.jar,exoplatform.services.security.api-1.0.jar,exoplatform.services.security.impl-1.0.jar,exoplatform.services.database.api-1.0.jar,exoplatform.services.database.impl-1.0.jar,exo-base-services-1.0.jar,exo-chart-service-1.0.jar,exo-chart-service-impl-1.0.jar,exo-commons-1.0.jar,exo-organization-service-1.0.jar,exo-security-service-1.0.jar" />
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
         includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />

@@ -1,7 +1,17 @@
+<script type="text/javascript">
+    function checkDocumentContent() {
+       var content = document.forms.edit.content.value;
+       if (content == null || content == "") {
+           alert("$msg.get('wikicontentcannotbeempty')");
+           return false ;
+       }
+       return true;
+   }
+</script>
 #if ($showactions == 1)
 <a href="$doc.getURL("cancel")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("cancel")</a>
 <span> | </span>
-<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit();if (checkDocumentContent()) document.forms.edit.submit(); return false;">$msg.get("preview")</a>
 <span> | </span>
-<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit();if (checkDocumentContent()) document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 #end

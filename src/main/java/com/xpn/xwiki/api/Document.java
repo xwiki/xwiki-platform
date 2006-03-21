@@ -727,6 +727,18 @@ public class Document extends Api {
         }
     }
 
+    public Date getLockingDate() {
+        try {
+            XWikiLock lock = doc.getLock(context);
+            if (lock != null && !context.getUser().equals(lock.getUserName()))
+                return lock.getDate();
+            else
+                return null;
+        } catch (XWikiException e) {
+            return null;
+        }
+    }
+
     public java.lang.Object get(String classOrFieldName) {
         if (currentObj!=null)
             return doc.display(classOrFieldName, currentObj.getBaseObject(), context);
@@ -797,4 +809,21 @@ public class Document extends Api {
     public String getEditURL(String action, String mode, String language) {
         return doc.getEditURL(action, mode, language, context);
     }
+
+    public boolean isCurrentUserCreator() {
+        return doc.isCurrentUserCreator(context);
+    }
+
+    public boolean isCurrentUserPage() {
+        return doc.isCurrentUserPage(context);
+    }
+
+    public boolean isCurrentLocalUserPage() {
+        return doc.isCurrentLocalUserPage(context);
+    }
+
+    public boolean isCreator(String username) {
+        return doc.isCreator(username);
+    }
+
 }

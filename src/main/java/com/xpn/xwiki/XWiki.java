@@ -2195,6 +2195,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, XWikiContext context) throws XWikiException {
+        return copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, false, context);
+    }
+    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException {
         String db = context.getDatabase();
         try {
             if (sourceWiki != null)
@@ -2208,8 +2211,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     context.setDatabase(targetWiki);
                 XWikiDocument tdoc = getDocument(targetdocname, context);
                 // There is already an existing document
-                if (!tdoc.isNew())
-                    return false;
+                if (!tdoc.isNew()) {
+                    if (force) {
+                        // We need to delete the previous document
+                        deleteDocument(tdoc, context);
+                    } else {
+                     return false;
+                    }
+                }
 
                 if (wikilanguage == null) {
                     // Make sure attachments are loaded
@@ -2306,13 +2315,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, XWikiContext context) throws XWikiException {
+        return copyWikiWeb(web, sourceWiki, targetWiki, wikilanguage, false, context);
+    }
+
+    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, boolean clean, XWikiContext context) throws XWikiException {
         String db = context.getDatabase();
         int nb = 0;
-        try {
-            String sql = "";
-            if (web != null)
-                sql = "where doc.web = '" + Utils.SQLFilter(web) + "'";
+        String sql = "";
+        if (web != null)
+            sql = "where doc.web = '" + Utils.SQLFilter(web) + "'";
 
+        if (clean) {
+            try {
+                context.setDatabase(targetWiki);
+                List list = getStore().searchDocumentsNames(sql, context);
+                if (log.isInfoEnabled())
+                    log.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
+
+                for (Iterator it = list.iterator(); it.hasNext();) {
+                    String docname = (String) it.next();
+                    XWikiDocument doc = getDocument(docname, context);
+                    deleteDocument(doc, context);
+                }
+            } finally {
+                context.setDatabase(db);
+            }
+        }
+
+        try {
             context.setDatabase(sourceWiki);
             List list = getStore().searchDocumentsNames(sql, context);
             if (log.isInfoEnabled())
@@ -2328,6 +2358,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             context.setDatabase(db);
         }
     }
+
 
     public int copyWiki(String sourceWiki, String targetWiki, String language, XWikiContext context) throws XWikiException {
         return copyWikiWeb(null, sourceWiki, targetWiki, language, context);

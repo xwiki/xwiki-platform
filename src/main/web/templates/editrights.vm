@@ -94,7 +94,6 @@ $msg.get("welcometorightseditor")
 </form>
 </div>
 </div>
-</div>
 #includeHelp("EditRightsHelp")
          </div>
             </div>

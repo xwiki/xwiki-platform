@@ -167,6 +167,11 @@ public class XWikiContext extends Hashtable {
          return "XWiki.XWikiGuest";
     }
 
+    public String getLocalUser() {
+        String username = getUser();
+        return username.substring(username.indexOf(":") + 1);
+    }
+    
     public XWikiUser getXWikiUser() {
         return user;
     }
@@ -250,4 +255,5 @@ public class XWikiContext extends Hashtable {
     public void setCacheDuration(int cacheDuration) {
         this.cacheDuration = cacheDuration;
     }
+
 }

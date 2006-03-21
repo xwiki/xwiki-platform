@@ -2401,4 +2401,28 @@ public class XWikiDocument {
         }
     }
 
+    public boolean isCurrentUserCreator(XWikiContext context) {
+        return isCreator(context.getUser());
+    }
+
+    public boolean isCreator(String username) {
+        if (username.equals("XWiki.XWikiGuest"))
+         return false;
+       return username.equals(getCreator());
+    }
+
+    public boolean isCurrentUserPage(XWikiContext context) {
+        String username = context.getUser();
+        if (username.equals("XWiki.XWikiGuest"))
+         return false;
+        return context.getUser().equals(getFullName());
+    }
+
+    public boolean isCurrentLocalUserPage(XWikiContext context) {
+        String username = context.getLocalUser();
+        if (username.equals("XWiki.XWikiGuest"))
+         return false;
+        return context.getUser().equals(getFullName());
+    }
+
 }

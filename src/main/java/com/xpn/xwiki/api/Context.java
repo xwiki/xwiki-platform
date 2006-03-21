@@ -144,6 +144,14 @@ public class Context extends Api {
     }
 
     /**
+     *
+     * @return the local username of the current user which made the request
+     */
+    public String getLocalUser() {
+        return context.getLocalUser();
+    }
+
+    /**
      * set the document if you have the programming right
      * @param doc
      */

@@ -500,6 +500,20 @@ public class XWiki extends Api {
             return false;
     }
 
+    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force) throws XWikiException {
+        if (checkProgrammingRights())
+            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, context);
+        else
+            return false;
+    }
+
+    public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean) throws XWikiException {
+        if (checkProgrammingRights())
+            return xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, context);
+        else
+            return -1;
+    }
+
     public String includeTopic(String topic) throws XWikiException {
         return includeTopic(topic, true);
     }
@@ -700,6 +714,30 @@ public class XWiki extends Api {
             return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, context);
         } catch (Exception e) {
             return xwiki.getUserName(user, format, context);
+        }
+    }
+
+    public String getUserName(String user, boolean link) {
+        return xwiki.getUserName(user, null, link, context);
+    }
+
+    public String getUserName(String user, String format, boolean link) {
+        return xwiki.getUserName(user, format, link, context);
+    }
+
+    public String getLocalUserName(String user, boolean link) {
+        try {
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), null, link, context);
+        } catch (Exception e) {
+            return xwiki.getUserName(user, null, link, context);
+        }
+    }
+
+    public String getLocalUserName(String user, String format, boolean link) {
+        try {
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, link, context);
+        } catch (Exception e) {
+            return xwiki.getUserName(user, format, link, context);
         }
     }
 

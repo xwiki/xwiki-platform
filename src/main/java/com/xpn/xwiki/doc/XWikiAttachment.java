@@ -500,6 +500,7 @@ public class XWikiAttachment {
             XWikiAttachment revattach = new XWikiAttachment();
             revattach.fromXML(scontent);
             revattach.setDoc(getDoc());
+            revattach.setVersion(rev);
             return revattach;
         }    catch (Exception e) {
             Object[] args = { getFilename() };
@@ -507,6 +508,6 @@ public class XWikiAttachment {
                     "Exception while manipulating the archive for file {0}", e, args);
         }
     }
-    
+
 }
 

@@ -104,13 +104,13 @@ public class XWikiAttachmentArchive {
 
     public void updateArchive(byte[] data, XWikiContext context) throws XWikiException {
         try {
+            attachment.incrementVersion();
+            attachment.setDate(new Date());
             String sdata = attachment.toStringXML(true, false, context);
             Lines lines = new Lines(sdata);
 
             if (archive!=null) {
                 archive.addRevision(lines.toArray(),"");
-                attachment.incrementVersion();
-                attachment.setDate(new Date());
             }
             else
                 archive = new Archive(lines.toArray(),getAttachment().getFilename(),getAttachment().getVersion());

@@ -1,0 +1,139 @@
+<html>
+<head>
+<title>{$lang_insert_attachment_title}</title>
+<script language="javascript" src="../../tiny_mce_popup.js"></script>
+<script language="javascript">
+var baseurl = tinyMCE.getParam("wiki_attach_path");
+</script>
+<script language="javascript">
+	function init() {
+		//document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
+		editor_id = tinyMCE.getWindowArg('editor_id');
+	}
+
+	function insertLink() {
+		if (window.opener) {
+			var href = document.forms[0].href.value;
+            window.opener.wikiEditor.insertAttachment(editor_id, href);
+			tinyMCE.closeDialog();
+		}
+	}
+
+	function cancelAction() {
+		tinyMCE.closeDialog();
+	}
+
+    //------------------
+    // threadsafe asynchronous XMLHTTPRequest code
+    function executeCommand(url, callback) {
+        // we use a javascript feature here called "inner functions"
+        // using these means the local variables retain their values after the outer function
+        // has returned. this is useful for thread safety, so
+        // reassigning the onreadystatechange function doesn't stomp over earlier requests.
+        function ajaxBindCallback() {
+            if (ajaxRequest.readyState == 4) {
+                if (ajaxRequest.status == 200) {
+                    if (ajaxCallback) {
+                        ajaxCallback(ajaxRequest.responseText);
+                    } else {
+                        alert('no callback defined');
+                    }
+                } else {
+                    alert("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t" + ajaxRequest.statusText + "\n" + ajaxRequest.responseText);
+                }
+            }
+        }
+
+        // addMessage(url);
+        // use a local variable to hold our request and callback until the inner function is called...
+        var ajaxRequest = null;
+        var ajaxCallback = callback;
+
+        // bind our callback then hit the server...
+        if (window.XMLHttpRequest) {
+            // moz et al
+            ajaxRequest = new XMLHttpRequest();
+            ajaxRequest.onreadystatechange = ajaxBindCallback;
+            ajaxRequest.open("GET", url, true);
+            ajaxRequest.send(null);
+        } else if (window.ActiveXObject) {
+            // ie
+            ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+            if (ajaxRequest) {
+                ajaxRequest.onreadystatechange = ajaxBindCallback;
+                ajaxRequest.open("GET", url, true);
+                ajaxRequest.send();
+            }
+            else{
+                alert("your browser does not support xmlhttprequest" )
+            }
+        }
+        else{
+            alert("your browser does not support xmlhttprequest" )
+        }
+    }
+
+    function loadAttachmentList(baseurl) {
+        var url = baseurl + "?xpage=attachwysiwyg";
+        executeCommand(url, loadAttachmentListCallback);
+    }
+
+    function loadAttachmentListCallback(e) {
+      var attachEl = document.getElementById("attachments");
+      attachEl.innerHTML = e;
+    }
+
+    function updateAttachName(form) {
+      form.xredirect.value=location;
+
+      var fname = form.filepath.value;
+      if (fname=="") {
+        return false;
+      }
+
+      var i = fname.lastIndexOf('\\');
+      if (i==-1)
+       i = fname.lastIndexOf('/');
+
+      fname = fname.substring(i+1);
+      if (form.filename.value==fname)
+       return true;
+
+      if (form.filename.value=="")
+       form.filename.value = fname;
+      return true;
+    }
+
+</script>
+</head>
+<body onload="init();">
+<form id="attachmentform" onsubmit="insertLink();return false;">
+  <table border="0" cellpadding="4" cellspacing="0">
+    <tr>
+      <td colspan="2" class="title" nowrap="nowrap">{$lang_insert_attachment_title}</td>
+    </tr>
+    <tr>
+      <td nowrap="nowrap">{$lang_insert_attachment_name}:</td>
+      <td>
+        <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td><input name="href" type="text" id="href" value="" style="width: 200px"></td>
+            <td id="browser"></td>
+          </tr>
+      </table></td>
+    </tr>
+    <tr>
+      <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onClick="insertLink();">
+      </td>
+      <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onClick="cancelAction();"></td>
+    </tr>
+  </table>
+</form>
+<hr />
+<div id="attachments">
+</div>
+<script type="text/javascript">
+    loadAttachmentList(baseurl);
+</script>
+</body>
+</html>

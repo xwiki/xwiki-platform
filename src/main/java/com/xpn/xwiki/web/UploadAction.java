@@ -31,8 +31,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 public class UploadAction extends XWikiAction {
-    
-	public boolean action(XWikiContext context) throws XWikiException {
+
+    public boolean action(XWikiContext context) throws XWikiException {
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
@@ -41,13 +41,17 @@ public class UploadAction extends XWikiAction {
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
 
         String filename = fileupload.getFileItem("filename", context);
+        if(filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1){
+             context.put("message","notsupportcharacters");
+             return true ;
+        }
         byte[] data = fileupload.getFileItemData("filepath", context);
 
         if (filename==null) {
             String fname = fileupload.getFileName("filepath", context);
             int i = fname.indexOf("\\");
             if (i==-1)
-                i = fname.indexOf("/");
+                i = fname.indexOf ("/");
             filename = fname.substring(i+1);
         }
         filename = filename.replaceAll("\\+"," ");
@@ -76,5 +80,8 @@ public class UploadAction extends XWikiAction {
             redirect = context.getDoc().getURL("attach", true, context);
         sendRedirect(response, redirect);
         return false;
+    }
+    public String render(XWikiContext context) throws XWikiException {
+        return "exception";
     }
 }

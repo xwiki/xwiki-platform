@@ -14,7 +14,7 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 		<tr><td class="mceToolbar" align="center" height="1">';
 		
 	str += this.getTextToolbar() + this.TOOLBAR_SPACER + this.getListToolbar() + this.TOOLBAR_SPACER + this.getTabToolbar() + this.TOOLBAR_SPACER + this.getUndoToolbar();
-	str += this.TOOLBAR_SPACER + this.getTitleToolbar() + this.TOOLBAR_SPACER + this.getLinkToolbar();
+	str += this.TOOLBAR_SPACER + this.getTitleToolbar() + this.TOOLBAR_SPACER + this.getLinkToolbar()+ this.TOOLBAR_SPACER + this.getTableToolbar() + this.TOOLBAR_SPACER + this.getTableRowToolbar() + this.TOOLBAR_SPACER + this.getTableColToolbar();
     if (this.isPluginLoaded("attachments")) {
      str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
 	}

@@ -289,19 +289,21 @@ TinyMCE.prototype.updateContent = function(form_element_name) {
 	// Find MCE instance linked to given form element and copy it's value
 	var formElement = document.getElementById(form_element_name);
 	for (var n in tinyMCE.instances) {
-		var inst = tinyMCE.instances[n];
+       var inst = tinyMCE.instances[n];
 
-		inst.switchSettings();
+       if (inst.switchSettings) {
+        inst.switchSettings();
 
-		if (inst.formElement == formElement) {
+		 if (inst.formElement == formElement) {
 			var doc = inst.getDoc();
 
 			tinyMCE._setHTML(doc, inst.formElement.value);
 
 			if (!tinyMCE.isMSIE)
 				doc.body.innerHTML = tinyMCE._cleanupHTML(doc, this.settings, doc.body, inst.visualAid);
-		}
-	}
+		 }
+        }
+       }
 };
 
 TinyMCE.prototype.addMCEControl = function(replace_element, form_element_name, target_document) {
@@ -317,8 +319,9 @@ TinyMCE.prototype.addMCEControl = function(replace_element, form_element_name, t
 TinyMCE.prototype.triggerSave = function(skip_cleanup, skip_callback) {
 	// Cleanup and set all form fields
 	for (var n in tinyMCE.instances) {
-		var inst = tinyMCE.instances[n];
+	   var inst = tinyMCE.instances[n];
 
+       if (inst.switchSettings) {
 		inst.switchSettings();
 
 		tinyMCE.settings['preformatted'] = false;
@@ -356,7 +359,8 @@ TinyMCE.prototype.triggerSave = function(skip_cleanup, skip_callback) {
 
 		if (inst.formElement)
 			inst.formElement.value = htm;
-	}
+	  }
+    }
 };
 
 TinyMCE.prototype._convertOnClick = function(node) {
@@ -380,8 +384,9 @@ TinyMCE.prototype.resetForm = function(form_index) {
 	var formObj = document.forms[form_index];
 
 	for (var n in tinyMCE.instances) {
-		var inst = tinyMCE.instances[n];
+	   var inst = tinyMCE.instances[n];
 
+       if (inst.switchSettings) {
 		inst.switchSettings();
 
 		for (var i=0; i<formObj.elements.length; i++) {
@@ -390,7 +395,8 @@ TinyMCE.prototype.resetForm = function(form_index) {
 				return;
 			}
 		}
-	}
+       }
+    }
 };
 
 TinyMCE.prototype.execInstanceCommand = function(editor_id, command, user_interface, value, focus) {

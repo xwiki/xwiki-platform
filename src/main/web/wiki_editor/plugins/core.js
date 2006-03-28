@@ -1,29 +1,29 @@
 /*
             Syntax Core Plugin
-		   
+
 	     XWiki WYSIWYG Syntax Editor
-	Created by Pedro Ornelas for XWiki.org 
+	Created by Pedro Ornelas for XWiki.org
 	under the Google Summer of Code 2005 program.
 */
 
 WikiEditor.prototype.initCorePlugin = function() {
-	
+
 	// External/Internal conversion setup
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
 	this.addInternalProcessor((/\s*<h3\s*([^>]*)>(.*?)<\/h3>/i), 'convertHeadingInternal');
-	
+
 	this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
-	
+
 	//this.addExternalProcessor((/^\s*----\s*$/gim), '$1<hr class="line" \/>$2');
 	//this.addInternalProcessor(, );
-	
+
 	// Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
-	
+
 	this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
-	
+
 	this.addExternalProcessor((/\[(.*?)(>(.*?))?\]/i), 'convertLinkExternal');
 	this.addInternalProcessor((/<a\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
@@ -32,15 +32,15 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
 	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '__$1__');
-	
+
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
 	this.addInternalProcessor((/<em[^>]*>(.*?)<\/em>/gi), '~~$1~~');
-	
+
 	this.addExternalProcessor((/--(.+?)--/gi),  '<strike class="strike">$1<\/strike>');
 	this.addInternalProcessor((/<strike[^>]*>(.*?)<\/strike>/gi), '--$1--');
-	
+
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
-	
+
 	this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
     // Remove &nbsp;'s
@@ -75,7 +75,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     }
 
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
-	
+
 	// Toolbar handlers
 	this.addToolbarHandler('handleTextButtons');
 	this.addToolbarHandler('handleListButtons');
@@ -87,7 +87,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Add Comands and Fix Commands(workarounds)
 	this.addCommand('Title', 'titleCommand');
 	this.addFixCommand('Title', 'fixTitle');
-	
+
 	this.addFixCommand("InsertUnorderedList", 'fixInsertUnorderedList');
 	this.addFixCommand("Indent", 'fixInsertUnorderedList');
 }
@@ -252,20 +252,20 @@ WikiEditor.prototype._cleanNode = function(editor_id, node) {
 				if(node.parentNode && node.parentNode.nodeName.toLowerCase() == "body") {
 					this._cleanBR(node);
 				}
-				
+
 			break;
 		}
 	} while ((node = node.parentNode));
 }
 
 WikiEditor.prototype._removeBlankParagraphs = function(node) {
-	
+
 	do {
 		if (node.nodeName.toLowerCase() == "body") {
 			break;
 		}
 	} while ((node = node.parentNode));
-	
+
 	this.__removeBlankParagraphs(node);
 }
 
@@ -291,7 +291,7 @@ WikiEditor.prototype._cleanBR = function(node) {
 		node.parentNode.removeChild(node);
 		return;
 	}
-	
+
 	for(var i=0; node.childNodes[i]; i++) {
 		this._cleanBR(node.childNodes[i]);
 	}
@@ -301,10 +301,10 @@ WikiEditor.prototype.handleLinkButtons = function(editor_id, node, undo_index, u
 	// Reset
 	tinyMCE.switchClassSticky(editor_id + '_link', 'mceButtonDisabled', true);
 	tinyMCE.switchClassSticky(editor_id + '_unlink', 'mceButtonDisabled', true);
-	
+
 	// Get link
 	var anchorLink = tinyMCE.getParentElement(node, "a", "href");
-	
+
 	if (anchorLink || any_selection)
 	{
 		tinyMCE.switchClassSticky(editor_id + '_link', anchorLink ? 'mceButtonSelected' : 'mceButtonNormal', false);
@@ -358,7 +358,7 @@ WikiEditor.prototype.handleListButtons = function(editor_id, node, undo_index, u
 	tinyMCE.switchClassSticky(editor_id + '_numlist', 'mceButtonNormal');
 	tinyMCE.switchClassSticky(editor_id + '_outdent', 'mceButtonDisabled', true);
 	tinyMCE.switchClassSticky(editor_id + '_indent', 'mceButtonDisabled', true);
-	
+
 	do {
 		switch (node.nodeName.toLowerCase()) {
 			case "ul":
@@ -396,7 +396,7 @@ WikiEditor.prototype.handleTextButtons = function(editor_id, node, undo_index, u
 	this.core.switchClassSticky(editor_id + '_bold', 'mceButtonNormal');
 	this.core.switchClassSticky(editor_id + '_italic', 'mceButtonNormal');
 	this.core.switchClassSticky(editor_id + '_strikethrough', 'mceButtonNormal');
-	
+
 	// Handle elements
 	do
 	{
@@ -545,7 +545,7 @@ WikiEditor.prototype.getListToolbar = function() {
 
 WikiEditor.prototype.getListControls = function(button_name) {
 	var str="";
-	
+
 	switch(button_name) {
 		case 'bullist':
 			str = this.createButtonHTML('bullist', 'bullist.gif', '{$lang_bullist_desc}', 'InsertUnorderedList');
@@ -554,7 +554,7 @@ WikiEditor.prototype.getListControls = function(button_name) {
 			str = this.createButtonHTML('numlist', 'numlist.gif', '{$lang_numlist_desc}', 'InsertOrderedList');
 			break;
 	}
-	
+
 	return str;
 }
 
@@ -587,11 +587,11 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 	var line = "";
 	var insideP = false;
 	var firstLine = false;
-	
+
 	if(lines == null || lines.length == 0) {
 		return "";
 	}
-	
+
 	for(var i=0; i < lines.length; i++) {
 		//alert("line(" + i + "): " + lines[i]);
 		// Consume blank spaces
@@ -604,7 +604,7 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 				str += '<p class="' + this.PARAGRAPH_CLASS_NAME + '" >\r\n';
 			}
 			str += line + "\r\n";
-			
+
 			firstLine = false;
 			continue;
 		} else if(insideP) {
@@ -624,7 +624,7 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 
 WikiEditor.prototype._getLines = function(content) {
 	var s;
-	
+
 	if(this.core.isMSIE) {
 		//var t = /(.*)\n/g;
 		//content = content.replace(t, "$1&newline;");
@@ -634,7 +634,7 @@ WikiEditor.prototype._getLines = function(content) {
 	} else {
 		s = '\n';
 	}
-	
+
 	return content.split(s);
 }
 
@@ -671,9 +671,9 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 		_content = _content.substring(r[0].length, _content.length);
 		RegExp.lastIndex = 0;
 	}
-	
+
 	str += "<\/" + tagname + ">\r\n" + _content;
-	
+
 	return str;
 }
 
@@ -689,14 +689,14 @@ WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, d
 	for(var i=0; i < Math.abs(currdepth-depth);i++) {
 		str += tag + "\r\n";
 	}
-	
+
 	if(currdepth > 0) {
 		str += "<li>" + this.trimString(r[3]) + "<\/li>\r\n";
 		str += this._convertRecursiveListExternal(regexp, subContent, currdepth);
 	} else {
 		str += content;
 	}
-	
+
 	return str;
 }
 
@@ -763,18 +763,18 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 
 /*
 	Will return a string containing the list in Wiki Syntax
-	
+
 	TODO: can be optimized with String.match() function
 */
 WikiEditor.prototype._convertListInternal = function(content) {
 	var list_regexp = /<\s*li\s*([^>]*)>(.*?)<\/\s*li\s*>/gi;
 	var result;
 	var str = "";
-	
+
 	while( (result = list_regexp.exec(content)) ) {
 		var attributes = this.readAttributes(result[1]);
 		RegExp.lastIndex = result["index"];  // Reset position so it will find the same tag when replacing
-		
+
 		var tstr = result[2];
 
 		if(attributes && attributes["wikieditorlisttype"] && attributes["wikieditorlistdepth"]) { // Must have at least 2 wikieditor attributes + the string
@@ -796,6 +796,6 @@ WikiEditor.prototype._convertListInternal = function(content) {
 			// This construct is not valid, get rid of it.
 		}
 	}
-	
+
 	return str;
 }

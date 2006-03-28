@@ -482,7 +482,7 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 				}
 
 				// Create new table
-				html += '<table border="' + border + '" ';
+				/*html += '<table border="' + border + '" ';
 
 				if (cellpadding != -1)
 					html += 'cellpadding="' + cellpadding + '" ';
@@ -509,6 +509,8 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 					html += 'class="' + tinyMCE.getVisualAidClass(className, border == 0) + '" ';
 
 				html += '>';
+                */
+                html += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\">";
 
                 for (var y=0; y<rows; y++) {
                     if (y == 0 ) {

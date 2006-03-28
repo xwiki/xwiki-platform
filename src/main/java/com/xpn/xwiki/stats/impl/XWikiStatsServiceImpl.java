@@ -207,7 +207,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 // because the ID info have changed
                 VisitStats oldObject  = vobject.getOldObject();
                 if (oldObject!=null) {
-                    store.deleteXWikiCollection(oldObject, context, true, true);
+                    // Catch exception to not fail here
+                    try {
+                     store.deleteXWikiCollection(oldObject, context, true, true);
+                    } catch (Exception e) {};
                 }
 
                 store.saveXWikiCollection(vobject, context, true);
@@ -311,7 +314,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 // Let's log a message here
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
-                if (log.isWarnEnabled())
+                if (log.isDebugEnabled())
                   log.warn("Found visit with cookie " + vobject.getCookie() + " in session "
                            + session.getId() + " for request with cookie " + cookie.getValue());
                 // And forget about this session

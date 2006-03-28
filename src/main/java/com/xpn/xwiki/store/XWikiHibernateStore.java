@@ -894,11 +894,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 cobject.setId(object.getId());
                 if (evict)
                     session.evict(cobject);
-                session.delete(cobject);
+                if (session.contains(cobject))
+                    session.delete(cobject);
             } else {
                 if (evict)
                     session.evict(object);
-                session.delete(object);
+                if (session.contains(object))
+                    session.delete(object);
             }
 
             if (bTransaction) {
@@ -1974,13 +1976,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (context.getWiki().hasDynamicCustomMappings()==false)
            return getSessionFactory();
 
-        List list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null",
+        List list;
+        if (useClassesTable(true, context))
+          list = searchDocuments(", BaseClass as bclass where bclass.name=doc.fullName and bclass.customMapping is not null",
+                                    true, false, false, 0, 0, context);
+          list = searchDocuments("",
                                     true, false, false, 0, 0, context);
         boolean result = false;
 
         for (int i=0;i<list.size();i++) {
             XWikiDocument doc = (XWikiDocument)list.get(i);
-            result |= injectCustomMapping(doc.getxWikiClass(), context);
+            if (doc.getxWikiClass().getFieldList().size()>0 )
+             result |= injectCustomMapping(doc.getxWikiClass(), context);
         }
 
         if (result==false)

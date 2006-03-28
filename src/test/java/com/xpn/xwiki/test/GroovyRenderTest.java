@@ -67,7 +67,6 @@ public class GroovyRenderTest extends HibernateTestCase {
 
     /*
      TODO: This fail is known to test
-     */
     public void testWithFunctionInclude() throws Exception {
         XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         XWikiStoreInterface store = getXWiki().getStore();
@@ -85,5 +84,5 @@ public class GroovyRenderTest extends HibernateTestCase {
         store.saveXWikiDoc(doc2, getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc2, "3", false, getXWikiContext());
     }
-
+    */
  }

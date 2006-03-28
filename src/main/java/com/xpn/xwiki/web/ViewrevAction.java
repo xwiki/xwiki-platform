@@ -31,7 +31,7 @@ public class ViewrevAction extends XWikiAction {
         } catch (XWikiException e) {
             if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
                 context.put("message", "revisiondoesnotexist");
-                return "notexist";
+                return "exception";
 
             } else
                 throw e;

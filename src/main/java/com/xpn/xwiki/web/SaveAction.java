@@ -58,7 +58,16 @@ public class SaveAction extends XWikiAction {
             }
 
             XWikiDocument olddoc = (XWikiDocument) tdoc.clone();
-            tdoc.readFromTemplate(((EditForm)form).getTemplate(), context);
+            try {
+                tdoc.readFromTemplate(((EditForm)form).getTemplate(), context);
+            } catch (XWikiException e) {
+                if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
+                    context.put("exception", e);
+                    return true;
+                }
+            }
+
+
             tdoc.readFromForm((EditForm)form, context);
 
             // TODO: handle Author
@@ -77,5 +86,13 @@ public class SaveAction extends XWikiAction {
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);
         return false;
+    }
+
+    public String render(XWikiContext context) throws XWikiException {
+        XWikiException e = (XWikiException) context.get("exception");
+        if ((e!=null)&&(e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
+            return "docalreadyexists";
+        } else
+            return "exception";
     }
 }

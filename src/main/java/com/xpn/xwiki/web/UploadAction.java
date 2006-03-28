@@ -41,9 +41,11 @@ public class UploadAction extends XWikiAction {
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
 
         String filename = fileupload.getFileItem("filename", context);
-        if(filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1){
+        if (filename!=null) {
+         if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1){
              context.put("message","notsupportcharacters");
              return true ;
+         }
         }
         byte[] data = fileupload.getFileItemData("filepath", context);
 

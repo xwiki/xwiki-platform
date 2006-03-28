@@ -2195,7 +2195,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, XWikiContext context) throws XWikiException {
-        return copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, false, context);
+        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, true, false, context);
     }
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException {
         String db = context.getDatabase();

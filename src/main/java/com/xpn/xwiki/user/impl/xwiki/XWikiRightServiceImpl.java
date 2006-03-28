@@ -468,24 +468,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             }
         } finally {
             // The next rights are checked in the virtual wiki
-            context.setDatabase(database);
-        }
-
-// Verify XWiki register right
-        if (accessLevel.equals("register")) {
-            try {
-                allow = checkRight(name, xwikimasterdoc, "register", user, true, true, context);
-                if (allow) {
-                    logAllow(name, resourceKey, accessLevel, "register level");
-                    return true;
-                } else {
-                    logDeny(name, resourceKey, accessLevel, "register level");
-                    return false;
-                }
-            } catch (XWikiRightNotFoundException e) {
-            }
-            logDeny(name, resourceKey, accessLevel, "register level (no right found)");
-            return false;
+               context.setDatabase(database);
         }
 
         try {
@@ -503,6 +486,23 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                 xwikidoc = xwikimasterdoc;
             else
                 xwikidoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+
+            // Verify XWiki register right
+            if (accessLevel.equals("register")) {
+                try {
+                    allow = checkRight(name, xwikidoc, "register", user, true, true, context);
+                    if (allow) {
+                        logAllow(name, resourceKey, accessLevel, "register level");
+                        return true;
+                    } else {
+                        logDeny(name, resourceKey, accessLevel, "register level");
+                        return false;
+                    }
+                } catch (XWikiRightNotFoundException e) {
+                }
+                logDeny(name, resourceKey, accessLevel, "register level (no right found)");
+                return false;
+            }
 
             // Verify XWiki super user
             try {
@@ -604,8 +604,13 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 // and that all users that were not denied
 // should be allowed.
             if (!allow_found) {
-                logAllow(name, resourceKey, accessLevel, "global level (no restricting right)");
-                return true;
+                if (accessLevel.equals("register")) {
+                    logDeny(name, resourceKey, accessLevel, "global level (register right must be explicit)");
+                    return false;
+                } else {
+                    logAllow(name, resourceKey, accessLevel, "global level (no restricting right)");
+                    return true;
+                }
             } else {
                 logDeny(name, resourceKey, accessLevel, "global level (restricting right was found)");
                 return false;

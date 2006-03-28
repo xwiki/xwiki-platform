@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class TextAreaClass extends StringClass {
@@ -70,6 +71,8 @@ public class TextAreaClass extends StringClass {
         if (editor!=null) {
                 if (editor.equals("text"))
                     return false;
+                if (editor.equals("puretext"))
+                    return false;
                 if (editor.equals("wysiwyg"))
                     return true;
             }
@@ -78,6 +81,8 @@ public class TextAreaClass extends StringClass {
 
         if (editor!=null) {
             if (editor.equals("text"))
+                return false;
+            if (editor.equals("puretext"))
                 return false;
             if (editor.equals("wysiwyg"))
                 return true;
@@ -88,6 +93,8 @@ public class TextAreaClass extends StringClass {
 
         if (editor!=null) {
             if (editor.equals("text"))
+                return false;
+            if (editor.equals("puretext"))
                 return false;
             if (editor.equals("wysiwyg"))
                 return true;
@@ -129,4 +136,17 @@ public class TextAreaClass extends StringClass {
         }
         buffer.append(textarea.toString());
     }
+
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        String editor = getEditor();
+
+        if ((editor!=null)&&(context.getDoc()!=null)&&((editor.equals("text"))||isWysiwyg(context))) {
+            StringBuffer sbuf = new StringBuffer();
+            super.displayView(sbuf, name, prefix, object, context);
+            buffer.append(context.getDoc().getRenderedContent(sbuf.toString(), context));
+        }
+        else
+            super.displayView(buffer, name, prefix, object, context);
+    }
+
 }

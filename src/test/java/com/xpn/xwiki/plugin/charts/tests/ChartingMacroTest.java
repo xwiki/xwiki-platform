@@ -74,7 +74,8 @@ public class ChartingMacroTest extends TestCase {
 
 		XWikiConfig config = new XWikiConfig();
 		config.setProperty("xwiki.store.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
-		XWiki wiki = new XWiki(config, xcontext);		
+        config.setProperty("xwiki.store.attachment.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
+		XWiki wiki = new XWiki(config, xcontext);
 		
 		XWikiPluginManager pluginManager = new XWikiPluginManager();
 		pluginManager.addPlugin("svg", "com.xpn.xwiki.plugin.charts.mocks.MockSVGPlugin", xcontext);

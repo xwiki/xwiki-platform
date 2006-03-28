@@ -116,7 +116,8 @@ public class HibernateTestCase extends TestCase {
             Statement st = connection.createStatement();
             st.execute(sql);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e.getMessage().indexOf("xwikiextlistclasses")==-1)
+             e.printStackTrace();
         }
     }
 
@@ -210,6 +211,6 @@ public class HibernateTestCase extends TestCase {
         hibstore.endTransaction(context, true);
 
         if (bFullCleanup&&bSchemaUpdate)
-            hibstore.updateSchema(context);
+            hibstore.updateSchema(context, true);
     }
 }

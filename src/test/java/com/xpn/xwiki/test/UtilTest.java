@@ -122,17 +122,17 @@ public class UtilTest extends HibernateClassesTest {
         getXWikiContext().setURLFactory(factory);
 
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/Main/Toto"),
-                     factory.createURL("Main", "Toto", getXWikiContext()));
+                     "http://www.xwiki.org/xwiki/bin/view/Main/Toto",
+                     factory.createURL("Main", "Toto", getXWikiContext()).toString());
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/XWiki/Toto"),
-                     factory.createURL("XWiki", "Toto", getXWikiContext()));
+                     "http://www.xwiki.org/xwiki/bin/view/XWiki/Toto",
+                     factory.createURL("XWiki", "Toto", getXWikiContext()).toString());
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto"),
-                     factory.createURL("XWiki", "Toto", "edit", getXWikiContext()));
+                     "http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto",
+                     factory.createURL("XWiki", "Toto", "edit", getXWikiContext()).toString());
         assertEquals("URL is incorrect",
-                     new URL("http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto?raw=1"),
-                     factory.createURL("XWiki", "Toto", "edit", "raw=1", null, getXWikiContext()));
+                     "http://www.xwiki.org/xwiki/bin/edit/XWiki/Toto?raw=1",
+                     factory.createURL("XWiki", "Toto", "edit", "raw=1", null, getXWikiContext()).toString());
     }
     
     public void testTOCGeneration() {

@@ -89,13 +89,15 @@ public class RenamePageTest extends HibernateTestCase {
         }
     }
 
+    /*
+     TODO: test should be redone
     public void testObjectsRenamedDoc() throws XWikiException {
         XWikiDocument doc = new XWikiDocument("Test", "BacklinksTarget");
         doc.setContent("Bonjour Monde : This is a test " +
                 "with links [Test.AAA] [Test.BBBB] [Test.BacklinksInput]");
 
+        // This code is wrong
         List attachmentList = new ArrayList();
-
         Object object0 = new Object();
         Object object1 = new Object();
         Object object2 = new Object();
@@ -104,9 +106,10 @@ public class RenamePageTest extends HibernateTestCase {
         attachmentList.add(0, object0);
         attachmentList.add(1, object1);
         attachmentList.add(2, object2);
-  //      attachmentList.set(1, Utils.prepareObject(doc));
-  //      attachmentList.set(2, Utils.prepareObject(doc));
+        attachmentList.set(1, Utils.prepareObject(doc));
+        attachmentList.set(2, Utils.prepareObject(doc));
         doc.setAttachmentList(attachmentList);
+
         getXWiki().getStore().saveXWikiDoc(doc, getXWikiContext());
 
         XWikiDocument newdoc = getXWiki().renamePage(doc, getXWikiContext(), "Test.NewName");
@@ -115,4 +118,5 @@ public class RenamePageTest extends HibernateTestCase {
         assertTrue("Old doc still exists", !getXWiki().getStore().exists(getXWiki().getDocument("Test.BackLinksTarget", getXWikiContext()), getXWikiContext()) );
         assertTrue("Attachment List size is wrong", newdoc.getAttachmentList().size() == attachmentList.size());
     }
+    */
 }

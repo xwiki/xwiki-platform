@@ -65,6 +65,9 @@ public class GroovyRenderTest extends HibernateTestCase {
         AbstractRenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, getXWikiContext());
     }
 
+    /*
+     TODO: This fail is known to test
+     */
     public void testWithFunctionInclude() throws Exception {
         XWikiRenderingEngine wikiengine = getXWiki().getRenderingEngine();
         XWikiStoreInterface store = getXWiki().getStore();

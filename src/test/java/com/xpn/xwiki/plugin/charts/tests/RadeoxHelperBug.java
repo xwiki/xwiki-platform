@@ -41,6 +41,7 @@ public class RadeoxHelperBug extends TestCase {
 	protected void setUp() throws Exception {
         this.config = new XWikiConfig();
         this.config.put("xwiki.store.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
+        this.config.put("xwiki.store.attachment.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
 
         this.context = new XWikiContext();
         

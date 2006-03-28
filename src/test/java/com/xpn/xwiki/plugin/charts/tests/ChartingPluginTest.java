@@ -59,6 +59,7 @@ public class ChartingPluginTest extends TestCase {
 	protected void setUp() throws Exception {
         this.config = new XWikiConfig();
         this.config.put("xwiki.store.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
+        this.config.put("xwiki.store.attachment.class", "com.xpn.xwiki.plugin.charts.mocks.MockStore");
         this.xcontext = new XWikiContext();
         this.xwiki = new XWiki(this.config, this.xcontext);
         this.xcontext.setWiki(this.xwiki);

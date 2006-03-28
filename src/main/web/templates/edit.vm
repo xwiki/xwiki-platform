@@ -18,23 +18,6 @@
 #else
 #set($colsclass = "hide-both")
 #end
-        
-<script type="text/javascript">
-   function callLockAction(){
-        if($doc.getURL("save")) {
-            var surl = "$doc.getExternalURL("lockaction")";
-            var myAjax = new Ajax.Request(
-                 surl,
-                 {
-                     method: 'get',
-                     parameters: "",
-                     asynchronous: false
-                 });
-
-        }
-   }
-
-</script>
 <div id="xwikieditcontent" class="large">
        <div id="columns">
         <div class="cols-wrapper">

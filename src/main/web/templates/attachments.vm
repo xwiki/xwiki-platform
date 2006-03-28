@@ -34,8 +34,7 @@
                 <a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")">$msg.get("history")</ a>
             </td>
             <td>
-                <a href="$doc.getAttachmentURL("${attach.filename}", "delattachment")" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</
-                   a></td>
+                <a href="$doc.getAttachmentURL("${attach.filename}", "delattachment")" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</a></td>
         </tr>
         #set( $counter = $counter + 1)
         #end
@@ -63,8 +62,7 @@
                 if (form.filename.value == "")
                     form.filename.value = fname;
                 else {
-                    if (confirm("$msg.get("doyouwanttoreplace
-                    ") '" + fname + "' ?"
+                    if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?"
                 ))
                     form.filename.value = fname;
                 }

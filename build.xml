@@ -295,6 +295,13 @@
                     <exclude name="**/Abstract*.java"/>
                     <!-- Excluded because hibernate store is the one used -->
                     <exclude name="**/StoreRCSFileTest.java"/>
+                    <exclude name="**/StoreObjectRCSFileTest.java"/>
+                    <!-- Excluded because Rename is not yet ready -->
+                    <exclude name="**/RenamePageTest.java"/>
+                    <!-- Excluded because LDAP setup is needed -->
+                    <exclude name="**/LDAPTest.java"/>
+                    <!-- Excluded because there are not tests -->
+                    <exclude name="**/XWikiHelperTest.java"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -313,7 +320,7 @@
         <exclude name="**/xwiki-*.cfg" />
         <exclude name="**/hibernate.cfg.xml" />
         <lib refid="libs.main.fileset" />
-        <lib refid="libs.xwiki.fileset" />
+        <lib refid="libs.xwiki.fileset" exclude="**/hibernate-3.0.3.jar" />
         <lib refid="libs.tests.fileset" />
         <lib refid="libs.exo.fileset" />
       </war>

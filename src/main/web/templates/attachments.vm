@@ -17,7 +17,7 @@
     </div>
 
     <div id="xwikiattachmentscontent" class="xwikidatacontent"#if($showattachments!="open") style="display:none" #end>
-            < table>
+        <table>
         <tr><th></th><th><b>$msg.get("filename")</b></th><th><b>$msg.get("version")</b></th>
             <th><b>$msg.get("author")</b></th><th><b>$msg.get("size")</b></th><th><b>$msg.get("history")</b></th><th><b>$msg.get("delete")</b>
         </th></tr>

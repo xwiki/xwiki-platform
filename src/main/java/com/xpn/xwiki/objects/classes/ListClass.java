@@ -120,7 +120,7 @@ public abstract class ListClass extends PropertyClass {
             lprop = new StringProperty();
 
         if (isMultiSelect() && getDisplayType().equals("input")) {
-            ((ListProperty)lprop).setFormStringSeparator(" ");
+            ((ListProperty)lprop).setFormStringSeparator("|");
         }
 
 

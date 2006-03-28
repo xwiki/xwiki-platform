@@ -1,0 +1,392 @@
+@import "elements.css";
+@import "ie.css";
+
+#xwikibody {
+ text-align: center;
+ margin: auto;
+ background-color: #ffffff;
+}
+
+#xwikibodycontent {
+ width: 100%;
+ margin: auto;
+ text-align: left;
+ background-color: #ffffff;
+}
+
+#xwikimenu {
+ float: left;
+ clear: left;
+ margin-left: 15px;
+}
+
+#xwikitoolbar {
+ float: right;
+ clear: right;
+ width: 13em;
+}
+
+#xwikicontent {
+ margin-left: 13em;
+ margin-top: 5px;
+ margin-bottom: 15px;
+}
+
+#xwikieditcontent {
+ margin-right: 14em;
+}
+
+#xwikimenu {
+ clear: left;
+ width: 12em;
+}
+
+#xwikiheader {
+ padding: 5px;
+}
+
+#xwikifooter {
+ clear: both;
+ padding: 5px;
+ height: 5em;
+}
+
+#xwikiwebusermenu {
+ display: none;
+}
+
+#xwikititle {
+ float: left;
+}
+
+#xwikiad {
+    float: right;
+    margin-right: 30px;
+}
+
+#xwikilogin {
+    float: right;
+}
+
+#xwikinav_header {
+    display: block;
+    clear: both;
+    width: 100%;
+    height: 4.3em;
+    right: 0px;
+    border-width: 2px 0px 1px 0px;
+    border-style: solid;
+    background-repeat: repeat;
+}
+
+#xwikinav_header.xwiki0b {
+    height: 2.2em;
+    border-width: 2px 0px 0px 0px;
+}
+
+#xwikinav_header.xwiki1a {
+    display: block;
+}
+
+.xwikiactions, #xwikiwebusermenu, #xwikilanguagemenu, #xwikieditmenu {
+    display: block;
+    float: left;
+    margin: 0px;
+    padding: 0px;
+}
+
+.xwikiactions a, #xwikiwebusermenu a, #xwikilanguagemenu a, #xwikieditmenu a, #xwikieditmenu img {
+    display: block;
+    float: left;
+    list-style-type: none;
+    margin: 0.1em;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    padding: 0.1em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    text-decoration: none;
+    text-align: center;
+}
+
+#xwikiwebusermenu span, .xwikiactions span {
+    display: none;
+}
+
+#xwikiwebusermenu {
+    height: auto;
+    width: 100%;
+}
+
+#xwikilanguagemenu, #xwikieditmenu {
+    margin: 0px;
+    padding-left: 10px;
+    height: auto;
+}
+
+#xwikireadonly {
+    color: red;
+}
+
+#xwikilanguagemenu {
+    float: right;
+    right: 0px;
+}
+
+#xwikieditmenu {
+    left: 0px;
+}
+
+#xwikieditmenu a, #xwikieditmenu a:visited, #xwikieditmenu img,
+#xwikilanguagemenu a, #xwikilanguagemenu a:visited,
+#xwikilanguagemenu span.xwikisep2expl {
+    display: block;
+    float: left;
+    list-style-type: none;
+    margin: 0em;
+    margin-left: 0em;
+    margin-top: 0.2em;
+    margin-right: 0.2em;
+    padding: 0.2em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    text-decoration: none;
+    text-align: center;
+    font-size: 10pt;
+}
+
+#xwikieditmenu img {
+    margin: 0em;
+    padding: 0em;
+    margin-right: 2px;
+    margin-top: 1px;
+    vertical-align : middle;
+    border: 0px;
+}
+
+#xwikimoreactions {
+    padding: 0;
+    margin: 0;
+    z-index: 20;
+}
+
+#xwikimoreactionsitems a, #xwikimoreactionsitems a:hover, #xwikimoreactionsitems a:visited {
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+    margin-right: 5px;
+    font-size: 11px;
+    line-height: 16px;
+}
+
+#xwikimoreactions div a {
+    display: block;
+}
+
+#xwikimoreactionstitle a, #xwikimoreactionstitle a:hover, #xwikimoreactionstitle a:visited {
+    margin-top: 0.2em;
+    padding-top: 0.2em;
+}
+
+#xwikimoreactions, .xwikimoreactionitem {
+    float: left;
+    position: relative;
+    width: auto;
+    text-align: center;
+    cursor: default;
+}
+
+#xwikimoreactionsitems {
+   display: none;
+   position: absolute;
+   width: 12em;
+   top: 2em;
+   left: 1em;
+   padding: 0;
+   border: 1px solid;
+   padding: 5px;
+   background-color: #fff;
+}
+
+#xwikimoreactionsitems a:hover {
+   text-decoration: none;
+   color: #222222;
+}
+
+#xwikimoreactions>#xwikimoreactionsitems {
+   top: 1.8em;
+   left: 0;
+}
+
+#xwikimoreactionsitems .xwikimoreactionitem {
+   display: block;
+   float: none;
+   background-color: white solid;
+   border: 0;
+}
+
+#xwikimoreactions:hover div, #xwikimoreactions.over div {
+   display: block;
+}
+
+#xwikimoreactions:hover #xwikimoreactionsitems {
+   padding: 5px;
+}
+
+.xwikimoreactionitem {
+   clear: both;
+   width: 100%;
+   padding: 0;
+   padding-left: 10px;
+   margin: 0;
+   width: 12em;
+}
+
+#xwikieditmenu a:hover, #xwikilanguagemenu a:hover {
+   text-decoration: underline;
+}
+
+.xwikisep, .xwikisep2 {
+   display: none;
+}
+
+#xwikidocinfo, #xwikidocinfoname, #xwikidocinfocreated, #xwikidocinfoupdated, #xwikidocinfolang {
+   float: left;
+}
+#xwikidocinfocreated, #xwikidocinfoupdated {
+   clear: left;
+}
+#xwikicopyright, #xwikiicons {
+   float: right; 
+   clear: right; 
+}
+#xwikisearch {
+   float: right;
+   clear: right;
+}
+
+#xwikisearch {
+   float: right;
+   padding: 3px;
+   margin-top: 15px;
+}
+
+.xwikicomment {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px 5px 5px 5px;
+  color: inherit;
+  border: 1px dotted;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#xwikidata {
+ margin-top: 10px;
+ margin-bottom: 10px;
+}
+
+.xwikidata {
+ float: left;
+ clear: both;
+ margin-left: 10px;
+ margin-top: 5px;
+ margin-bottom: 5px;
+ padding: 0px;
+ width: 80%;
+}
+
+.xwikidatacontent {
+ padding-left: 10px;
+ float: left;
+ color: #666;
+}
+
+.xwikidatatitle {
+ float: left;
+ padding: 2px;
+ color: #fff;
+}
+
+.xwikidatatitle a {
+ color: #fff;
+}
+
+.xwikidatatitle1, .xwikidatafooter1 {
+ float: left;
+ width: 10px;
+ background: url(box_top.gif) no-repeat top left;
+}
+
+.xwikidatatitle2, .xwikidatafooter2 {
+ float: left;
+ width: 100%;
+ border-bottom: 1px solid #fff;
+ background: url(box_top2.gif) no-repeat top right;
+}
+
+.xwikidatafooter {
+ float: left;
+ padding-left: 10px;
+ padding-right: 10px;
+ color: #fff;
+}
+
+.xwikidatafooter1 {
+ background: url(box_bottom.gif) no-repeat bottom left;
+}
+
+.xwikidatafooter2 {
+ background: url(box_bottom2.gif) no-repeat bottom right;
+}
+
+#xwikiattachmentscontent {
+ text-align: center;
+}
+
+#xwikiattachmentscontent table {
+  border: 1px dotted;
+  width: 80%;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#xwikiattachmentsform {
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+
+#xwikimessage {
+  float: left;
+  clear: left;
+  width: 100%;
+  margin: auto;
+  padding: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+}
+
+.article_title {
+ font-size: 120%;
+ border-bottom: 1px;
+}
+
+.article_content {
+ padding: 10px;
+}
+
+.article_date {
+ font-size: 120%;
+ border-bottom: 1px solid;
+}
+
+.article_footer {
+ border-top: 1px dotted; 
+ font-size: 75%; 
+ font-weight: bold; 
+ color: gray;
+}
+

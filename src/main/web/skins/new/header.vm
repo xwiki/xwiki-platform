@@ -1,0 +1,27 @@
+<div id="xwikibody">
+ <div id="xwikibodycontent">
+#if($context.getMode()==0)
+  <div id="xwikiheader">
+   <div id="xwikilogin">
+#set( $logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
+#if ($context.getUser().equals("XWiki.XWikiGuest"))
+<a href="$xwiki.getURL("XWiki.XWikiLogin","login", "xredirect=$logredir")">$msg.get("login")</a> 
+#else
+#set($docuser = $xwiki.getDocument($context.user))
+#set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
+$msg.get("hello") 
+<a href="$docuser.getURL("view")">$docuser.display("first_name", "view", $objuser)</a> | 
+<a href="$xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir")">$msg.get("logout")</a>
+#end
+   </div>
+   <div id="xwikititle">
+$xwiki.parseContent($xwiki.getWebPreference("title"))
+   </div>
+   <div id="xwikisearch">
+#set($searchdoc = $xwiki.getDocument("Main.WebSearch"))
+#if($searchdoc)
+<form action="$searchdoc.getURL("view")" style="margin:0">$msg.get("search"): <input type="text" name="text" value="" size="10"/></form>
+#end
+   </div>
+  </div>
+#end

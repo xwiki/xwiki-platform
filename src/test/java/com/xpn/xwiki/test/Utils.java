@@ -110,8 +110,8 @@ public class Utils {
         name = "WebHome";
         name2 = "Globals";
         web = "Main";
-        content1 = "Hello 1\nTexte avec des accents: àéçôù\nHello 3\n";
-        content3 = "Hello 1\nAutre texte àçèé\nHello 2\nHello 3\n";
+        content1 = "Hello 1\nTexte avec des accents: ï¿½ï¿½ï¿½ï¿½ï¿½\nHello 3\n";
+        content3 = "Hello 1\nAutre texte ï¿½ï¿½ï¿½ï¿½\nHello 2\nHello 3\n";
         //try {
         // content1 = content1.getBytes("UTF-8").toString();
         // content3 = content3.getBytes("UTF-8").toString();
@@ -125,17 +125,17 @@ public class Utils {
     }
 
     public static void setStandardIsoData() {
-        name = "Août2002";
+        name = "Aoï¿½t2002";
         name2 = "Globals";
         web = "Main";
-        content1 = "Hello 1\nAoût\nHello 3\n";
+        content1 = "Hello 1\nAoï¿½t\nHello 3\n";
         content3 = "Hello 1\nIntermediary line\nHello 2\nHello 3\n";
-        author = "XWiki.HelêneDupont";
+        author = "XWiki.Helï¿½neDupont";
         author2 = "XWiki.JulesVerne";
         parent = "Main.WebHome";
         version = "1.1";
         version2 = "1.2";
-        afilename = "août.txt";
+        afilename = "aoï¿½t.txt";
     }
 
     public static void setMediumData() {
@@ -188,7 +188,7 @@ public class Utils {
         return createDoc(store,web, name, content1, null, null, null, context);
     }
 
-    public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name, String content, XWikiContext context) throws XWikiException {
+    public static XWikiDocument createDoc(XWikiStoreInterface store, String web, String name, String content, BaseObject bobject, BaseClass bclass, XWikiContext context) throws XWikiException {
         return createDoc(store,web, name, content, null, null, null, context);
     }
 

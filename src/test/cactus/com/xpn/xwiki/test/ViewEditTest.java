@@ -434,46 +434,6 @@ public class ViewEditTest extends ServletTest {
         }
     }
 
-    public void testSaveWithTemplateOk() throws Throwable {
-        launchTest();
-    }
-
-
-    public void beginSaveWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        StoreHibernateTest.cleanUp(hibstore, context);
-        clientSetUp(hibstore);
-        XWikiDocument doc = new XWikiDocument();
-        Utils.prepareObject(doc, "Main.SaveOkTestTemplate");
-        BaseClass bclass = doc.getxWikiClass();
-        BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        String content = Utils.content1;
-       // Utils.content1 = "Template content";
-        Utils.createDoc(xwiki.getStore(), "Main", "SaveOkTestTemplate", bobject, bclass, context);
-        Utils.content1 = content;
-        setUrl(webRequest, "save", "SaveOkWithTestTemplate");
-        webRequest.addParameter("template", "Main.SaveOkTestTemplate");
-        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
-        webRequest.addParameter("content", "Template content");
-    }
-
-    public void endSaveWithTemplateOk(WebResponse webResponse) throws HibernateException, XWikiException {
-        try {
-            String result = webResponse.getText();
-            // Verify return
-            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
-
-            // Flush cache to make sure we read from db
-            xwiki.flushCache();
-
-            XWikiDocument doc2 = xwiki.getDocument("Main.SaveOkWithTestTemplate", context);
-            String content2 = doc2.getContent();
-            assertEquals("Content is not identical", "Template content", content2);
-            assertEquals("Parent is not identical", "XWiki.TestParentComesFromTemplate", doc2.getParent());
-        } finally {
-            clientTearDown();
-        }
-    }
 
     public void beginViewLatestRevOk(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -2159,7 +2119,7 @@ public class ViewEditTest extends ServletTest {
         attachment1.setContent(attachcontent2.getBytes());
 
         doc1.saveAttachmentContent(attachment1, context);
-        doc1.getAttachmentList().add(attachment1);
+        //doc1.getAttachmentList().add(attachment1);
         xwiki.saveDocument(doc1, context);
         setUrl(webRequest, "downloadrev", "Test", "AttachDownloadRevTest/" + Utils.filename, "");
         webRequest.addParameter("rev","1.1");
@@ -2184,5 +2144,129 @@ public class ViewEditTest extends ServletTest {
             clientTearDown();
         }
     }
-}
 
+    public void beginViewRevAttach(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        XWikiDocument doc = new XWikiDocument("Test", "ViewRevAttachTest");
+        doc.setContent(Utils.content1);
+        doc.setAuthor(Utils.author);
+        doc.setParent(Utils.parent);
+        xwiki.saveDocument(doc, context);
+
+        XWikiAttachment attachment1 = new XWikiAttachment(doc, Utils.filename);
+        String attachcontent1 = "rev 1";
+        attachment1.setContent(attachcontent1.getBytes());
+        doc.getAttachmentList().add(attachment1);
+        doc.saveAttachmentContent(attachment1,context);
+        // xwiki.saveDocument(doc, context);
+
+        String attachcontent2 ="rev 2";
+        attachment1.setContent(attachcontent2.getBytes());
+        doc.saveAttachmentContent(attachment1,context);
+//        doc.getAttachmentList().add(attachment1);
+//        xwiki.saveDocument(doc,context);
+
+        setUrl(webRequest, "viewattachrev", "Test","ViewRevAttachTest/" + Utils.filename, "");
+        }
+
+    public void endViewRevAttach(WebResponse webResponse) throws HibernateException,XWikiException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Page does not contain 1.1", result.indexOf("1.1")!=-1);
+            assertTrue("Page does not contain 1.2", result.indexOf("1.2")!=-1);
+
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testViewRevAttach() throws Throwable {
+        launchTest();
+    }
+
+     public void testSaveWithTemplateOk() throws Throwable {
+        launchTest();
+    }
+
+    public void beginSaveWithTemplateOk(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.SaveOkTestTemplate");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+        String content = Utils.content1;
+       // Utils.content1 = "Template content";
+        Utils.createDoc(xwiki.getStore(), "Main", "SaveOkTestTemplate", bobject, bclass, context);
+        Utils.content1 = content;
+        setUrl(webRequest, "save", "SaveOkWithTestTemplate");
+        webRequest.addParameter("template", "Main.SaveOkTestTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+        webRequest.addParameter("content", "Template content");
+    }
+
+    public void endSaveWithTemplateOk(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            String result = webResponse.getText();
+            // Verify return
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
+
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveOkWithTestTemplate", context);
+            String content2 = doc2.getContent();
+            assertEquals("Content is not identical", "Template content", content2);
+            assertEquals("Parent is not identical", "XWiki.TestParentComesFromTemplate", doc2.getParent());
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testSaveWithTemplateLong() throws Throwable {
+        launchTest();
+    }
+
+    public void beginSaveWithTemplateLong(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.SaveErrorLongTemplate");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 1);
+        String content  =  "template content" ;
+        Utils.createDoc(xwiki.getStore(),"Main","SaveErrorLongtemplate",content,bobject,bclass,context);
+
+        setUrl(webRequest, "save", "SaveWithLongTemplate");
+        webRequest.addParameter("template", "Main.SaveErrorLongTemplate");
+        webRequest.addParameter("parent", "XWiki.TestParentComesFromTemplate");
+
+
+    }
+
+    public void endSaveWithTemplateLong(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            String result = webResponse.getText();
+            // Verify return
+            assertFalse("Saving not returned exception: " + result, result.indexOf("Exception") == -1);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc2 = xwiki.getDocument("Main.SaveWithLongTemplate",context);
+            String content2 = doc2.getContent() ;
+            String parent = doc2.getParent();
+            assertEquals("Content is identical", false, content2.equals("template content"));
+            assertEquals("Parent is  identical", false, parent.equals("XWiki.TestParentComesFromTemplate"));
+
+        } finally {
+            clientTearDown();
+        }
+    }
+
+
+}

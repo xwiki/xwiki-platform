@@ -1,9 +1,11 @@
 <script type="text/javascript">
     function checkDocumentContent() {
-       var content = document.forms.edit.content.value;
-       if (content == null || content == "") {
+       if (document.forms.edit.content) {
+        var content = document.forms.edit.content.value;
+        if (content == null || content == "") {
            alert("$msg.get('wikicontentcannotbeempty')");
            return false ;
+        }
        }
        return true;
    }

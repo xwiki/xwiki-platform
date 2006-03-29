@@ -77,7 +77,7 @@ public class ObjectsTest extends TestCase {
 		XWikiDocument doc2 = TestHelper.createDocument("XWikiTest.Doc2", "", context);
 		XWikiDocument doc3 = TestHelper.createDocument("XWikiTest.Doc3", "", context);
 
-		list = xwiki.getStore().searchDocumentsNames("doc.fullName LIKE 'XWikiTest.%'", context);
+		list = xwiki.getStore().searchDocumentsNames("doc.fullName like 'XWikiTest.%'", context);
 		Assert.assertEquals(3, list.size());
 		Assert.assertTrue(list.contains(doc1));
 		Assert.assertTrue(list.contains(doc2));

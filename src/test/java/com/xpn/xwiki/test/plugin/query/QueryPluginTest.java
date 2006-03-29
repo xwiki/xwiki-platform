@@ -71,7 +71,12 @@ public class QueryPluginTest extends HibernateTestCase {
 				}
 			} else {
 				if (exp==obj) continue; // XXX: bugs with proxy objects?
-				assertEquals("Objects #"+i+" not equals", obj, exp);
+                if (exp instanceof XWikiDocument)
+                 assertEquals("Objects #"+i+" not equals",
+                         ((XWikiDocument)obj).toFullXML(context),
+                         ((XWikiDocument)exp).toFullXML(context));
+                else
+                 assertEquals("Objects #"+i+" not equals", obj, exp);
 			}
 		}
 	}
@@ -113,7 +118,8 @@ public class QueryPluginTest extends HibernateTestCase {
         doc1.setContent("no content");
         doc1.setAuthor("Artem Melentev");
         doc1.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc1, getXWikiContext());
+        xwiki.saveDocument(doc1, getXWikiContext());
+        doc1 = xwiki.getDocument(doc1.getFullName(), getXWikiContext());
 
         testSearchXP1("//*/*", doc1);
         checkEquals(qf.getDocs("*/*", null, null).list(), new Object[]{doc1});
@@ -129,13 +135,18 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getChildDocs("Main/WebHome", null, null).list(), new Object[]{doc1});
         testSearchXP("//Main/*[@parent!='Main.WebHome']", NOTHING);
         checkEquals(qf.getDocs("Main/*[@parent!='Main.WebHome']", null, null).list(), NOTHING);
-        
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+
         XWikiDocument doc2 = new XWikiDocument("Main", "WebHome2");
         doc2.setContent("no content");
         doc2.setAuthor("Someone");
         doc2.setParent("Main.WebHome");
-        hibstore.saveXWikiDoc(doc2, getXWikiContext());
-        
+        xwiki.saveDocument(doc2, getXWikiContext());
+        doc2 = xwiki.getDocument(doc2.getFullName(), getXWikiContext());
+
         testSearchXP("//*/*",					new Object[]{doc1, doc2});
         checkEquals(qf.getDocs("*/*", null, null).list(), new Object[]{doc1, doc2});
         testSearchXP("//*/* order by @creationDate descending",	new Object[]{doc2, doc1});
@@ -153,22 +164,32 @@ public class QueryPluginTest extends HibernateTestCase {
         //testSearchXP("//*",					new Object[]{"Main"});        
         testSearchXP("//Main/*[jcr:like(@name, '%2')]",		new Object[]{doc2});
         checkEquals(qf.getDocs("Main/*[jcr:like(@name, '%2')]", null, null).list(), new Object[]{doc2});
-        
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+
         XWikiDocument doc3 = new XWikiDocument("Main", "WebHome3");
         doc3.setContent("no content");
         doc3.setAuthor("Artem Melentev");
         doc3.setParent("Main.WebHome2");
-        hibstore.saveXWikiDoc(doc3, getXWikiContext());
-        
+        xwiki.saveDocument(doc3, getXWikiContext());
+        doc3 = xwiki.getDocument(doc3.getFullName(), getXWikiContext());
+
         testSearchXP("//*/*[@parent='Main.WebHome2']",				new Object[]{doc3});
         checkEquals(qf.getChildDocs("Main/WebHome2", null, null).list(), new Object[]{doc3});
-        
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+
         XWikiDocument doc4 = new XWikiDocument("Test", "WebHome4");
         doc4.setContent("no content");
         doc4.setAuthor("Someone");
         doc4.setParent("Main.WebHome2");
-        hibstore.saveXWikiDoc(doc4, getXWikiContext());
-        
+        xwiki.saveDocument(doc4, getXWikiContext());
+        doc4 = xwiki.getDocument(doc4.getFullName(), getXWikiContext());
+
         testSearchXP("//*/*[@parent='Main.WebHome2']",				new Object[]{doc3, doc4});
         checkEquals(qf.getChildDocs("Main/WebHome2", null, null).list(), new Object[]{doc3, doc4});
         testSearchXP("//*/*[@author='Someone']",					new Object[]{doc2, doc4});
@@ -184,12 +205,18 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getDocs("*/*[@author!='Someone' and not(jcr:like(@name, '%3'))]", null, null).list(), new Object[]{doc1});
         testSearchXP("//*/*[@author='Someone' or @author='Artem Melentev']",	new Object[]{doc1,doc2,doc3,doc4});
         checkEquals(qf.getDocs("*/*[@author='Someone' or @author='Artem Melentev']", null, null).list(), new Object[]{doc1,doc2,doc3,doc4});
-        
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+
         XWikiDocument doc5 = new XWikiDocument("Test", "WebHome5");
         doc5.setContent("is content");
         doc5.setAuthor("Someone");
         doc5.setParent("Main.WebHome2");
-        hibstore.saveXWikiDoc(doc5, getXWikiContext());
+        xwiki.saveDocument(doc5, getXWikiContext());
+        doc5 = xwiki.getDocument(doc5.getFullName(), getXWikiContext());
+
         testSearchXP("//*/*[@parent='Main.WebHome2']",	new Object[]{doc3,doc4,doc5});
         checkEquals(qf.getChildDocs("Main.WebHome2", null, null).list(), new Object[]{doc3,doc4,doc5});
         testSearchXP("//*/*[@parent='Main.WebHome2']/@name",	new Object[]{doc3.getName(),doc4.getName(),doc5.getName()});

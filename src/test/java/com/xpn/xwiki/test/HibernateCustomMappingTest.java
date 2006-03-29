@@ -134,7 +134,7 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
         try {
             hibstore.beginTransaction(getXWikiContext());
-            runSQL(hibstore, "delete from xwikicustom_test_hcmclass", getXWikiContext());
+            runSQL(hibstore, "delete from xwikicustom_Test_HCMClass", getXWikiContext());
         } finally {
             hibstore.endTransaction(getXWikiContext(), true);
         }
@@ -204,9 +204,9 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
 
         try {
             getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
-            Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_test_hcmclass", getXWikiContext());
+            Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_Test_HCMClass", getXWikiContext());
             assertEquals("Table does not exist", 0, ((Number)result).intValue());
-            List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_test_hcmclass", getXWikiContext());
+            List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_Test_HCMClass", getXWikiContext());
             assertNotNull("Table items incorrect does not exist", list);
         } finally {
             getXWiki().getHibernateStore().endTransaction(getXWikiContext(), false);
@@ -258,9 +258,9 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
 
         try {
             getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
-            Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_test_hcmclass", getXWikiContext());
+            Object result = runSQLuniqueResult(getXWiki().getHibernateStore(),"select count(*) from xwikicustom_Test_HCMClass", getXWikiContext());
             assertEquals("Table does not exist", 1, ((Number)result).intValue());
-            List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_test_hcmclass", getXWikiContext());
+            List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_Test_HCMClass", getXWikiContext());
             assertNotNull("Table items incorrect does not exist", list);
             assertEquals("Result size incorrect", 1, list.size());
             Map item = (Map)list.get(0);
@@ -331,7 +331,7 @@ public class HibernateCustomMappingTest extends HibernateTestCase {
         try {
             getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
         // We should have nothing in the custom mapped table
-        List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_test_hcmclass", getXWikiContext());
+        List list = runSQLwithReturn(getXWiki().getHibernateStore(),"select xwo_first_name, xwo_last_name, xwo_comment, xwo_age, xwo_password from xwikicustom_Test_HCMClass", getXWikiContext());
         assertNotNull("Table items incorrect does not exist", list);
         assertEquals("Result size incorrect", 0, list.size());
         } finally {

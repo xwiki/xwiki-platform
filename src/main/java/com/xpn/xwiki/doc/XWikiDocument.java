@@ -199,7 +199,11 @@ public class XWikiDocument {
             this.name = name.substring(i1 + 1);
         }
         this.updateDate = new Date();
+        updateDate.setTime((updateDate.getTime()/1000) * 1000);
+        this.contentUpdateDate = new Date();
+        contentUpdateDate.setTime((contentUpdateDate.getTime()/1000) * 1000);
         this.creationDate = new Date();
+        creationDate.setTime((creationDate.getTime()/1000) * 1000);
         this.parent = "";
         this.content = "\n";
         this.format = "";
@@ -389,6 +393,8 @@ public class XWikiDocument {
         if ((date != null) && (!date.equals(this.updateDate))) {
             setMetaDataDirty(true);
         }
+        // Make sure we drop milliseconds for consistency with the database
+        date.setTime((date.getTime()/1000) * 1000);
         this.updateDate = date;
     }
 
@@ -403,6 +409,9 @@ public class XWikiDocument {
         if ((date != null) && (!creationDate.equals(this.creationDate))) {
             setMetaDataDirty(true);
         }
+
+        // Make sure we drop milliseconds for consistency with the database
+        date.setTime((date.getTime()/1000) * 1000);
         this.creationDate = date;
     }
 
@@ -417,6 +426,9 @@ public class XWikiDocument {
         if ((date != null) && (!date.equals(this.contentUpdateDate))) {
             setMetaDataDirty(true);
         }
+
+        // Make sure we drop milliseconds for consistency with the database
+        date.setTime((date.getTime()/1000) * 1000);
         this.contentUpdateDate = date;
     }
 
@@ -826,7 +838,10 @@ public class XWikiDocument {
     }
 
     public String getTemplate() {
-        return template;
+        if (template==null)
+         return "";
+        else
+         return template;
     }
 
     public void setTemplate(String template) {
@@ -1261,6 +1276,9 @@ public class XWikiDocument {
         if (!getVersion().equals(doc.getVersion()))
             return false;
 
+        if (!getTemplate().equals(doc.getTemplate()))
+            return false;
+
         try {
             if (!getArchive().equals(doc.getArchive()))
                 return false;
@@ -1394,6 +1412,10 @@ public class XWikiDocument {
         el.addText(getAuthor());
         docel.add(el);
 
+        el = new DOMElement("contentAuthor");
+        el.addText(getContentAuthor());
+        docel.add(el);
+
         long d = getCreationDate().getTime();
         el = new DOMElement("creationDate");
         el.addText("" + d);
@@ -1404,8 +1426,17 @@ public class XWikiDocument {
         el.addText("" + d);
         docel.add(el);
 
+        d = getContentUpdateDate().getTime();
+        el = new DOMElement("contentUpdateDate");
+        el.addText("" + d);
+        docel.add(el);
+
         el = new DOMElement("version");
         el.addText(getVersion());
+        docel.add(el);
+
+        el = new DOMElement("template");
+        el.addText(getTemplate());
         docel.add(el);
 
         List alist = getAttachmentList();

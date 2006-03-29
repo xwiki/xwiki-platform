@@ -251,27 +251,46 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
         Vector vobj = doc.getObjects(className);
         if (vobj != null) {
+            if (log.isDebugEnabled())
+                log.debug("Checking objects " + vobj.size());
             for (int i = 0; i < vobj.size(); i++) {
+                if (log.isDebugEnabled())
+                    log.debug("Checking object " + i);
+
                 BaseObject bobj = (BaseObject) vobj.get(i);
-                if (bobj == null)
+
+                if (bobj == null) {
+                    if (log.isDebugEnabled())
+                        log.debug("Bypass object " + i);
                     continue;
+                }
                 String users = bobj.getStringValue(fieldName);
                 String levels = bobj.getStringValue("levels");
                 boolean allowdeny = (bobj.getIntValue("allow") == 1);
 
                 if (allowdeny == allow) {
+                    if (log.isDebugEnabled())
+                        log.debug("Checking match: " + accessLevel + " in " + levels);
+
                     String[] levelsarray = StringUtils.split(levels, " ,|");
                     if (ArrayUtils.contains(levelsarray, accessLevel)) {
                         if (log.isDebugEnabled())
                             log.debug("Found a right for " + allow);
                         found = true;
+
+                        if (log.isDebugEnabled())
+                            log.debug("Checking match: " + name + " in " + users);
+
                         String[] userarray = StringUtils.split(users, " ,|");
 
-                        for (int ii = 0; i < userarray.length; i++) {
+                        for (int ii = 0; ii < userarray.length; ii++) {
                             String value = userarray[ii];
                             if (value.indexOf("XWiki.") == -1)
                                 userarray[ii] = "XWiki." + value;
                         }
+
+                        if (log.isDebugEnabled())
+                            log.debug("Checking match: " + name + " in " + StringUtils.join(userarray, ","));
 
                         // In the case where the document database and the user database is the same
                         // then we allow the usage of the short name, otherwise the fully qualified name is requested
@@ -296,7 +315,13 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                                 log.debug("Found matching right in " + users + " for " + name);
                             return true;
                         }
+
+                        if (log.isDebugEnabled())
+                            log.debug("Failed match: " + name + " in " + users);
                     }
+                } else {
+                    if (log.isDebugEnabled())
+                        log.debug("Bypass object because wrong allow/deny" + i);
                 }
             }
         }

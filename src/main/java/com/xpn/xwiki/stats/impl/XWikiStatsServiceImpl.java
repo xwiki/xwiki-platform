@@ -315,7 +315,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
                 if (log.isDebugEnabled())
-                  log.warn("Found visit with cookie " + vobject.getCookie() + " in session "
+                  log.debug("Found visit with cookie " + vobject.getCookie() + " in session "
                            + session.getId() + " for request with cookie " + cookie.getValue());
                 // And forget about this session
                 vobject = null;
@@ -474,8 +474,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             cookie.setDomain(cookieDomain);
     }
 
-    if (log.isWarnEnabled()) {
-        log.warn("Setting cookie " + cookie.getValue() + " for name " + cookie.getName()
+    if (log.isDebugEnabled()) {
+        log.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName()
                 + " with domain " + cookie.getDomain() + " and path " + cookie.getPath()
                 + " and maxage " + cookie.getMaxAge());
     }

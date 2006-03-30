@@ -113,15 +113,14 @@ public class MockStore implements XWikiStoreInterface, XWikiAttachmentStoreInter
                 list.add(docMap.get(docName));
             }
             return list;
-        } else if (wheresql.matches("doc.fullName LIKE '.*'")) {
+        } else if (wheresql.matches("doc.fullName like '.*'")) {
             List list = new LinkedList();
-            String like = wheresql.substring("doc.fullName LIKE '".length(), wheresql.length()-1);
+            String like = wheresql.substring("doc.fullName like'".length() + 1, wheresql.length()-1);
             like = like.replaceAll("%", ".*");
-            Pattern pattern = Pattern.compile(like);
             Iterator it = docMap.keySet().iterator();
             while (it.hasNext()) {
                 String docName = (String)it.next();
-                if (pattern.matcher(docName).matches()) {
+                if (docName.matches(like)) {
                     list.add(docMap.get(docName));
                 }
             }

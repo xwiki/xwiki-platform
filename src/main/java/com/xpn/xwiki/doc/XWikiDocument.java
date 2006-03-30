@@ -394,7 +394,8 @@ public class XWikiDocument {
             setMetaDataDirty(true);
         }
         // Make sure we drop milliseconds for consistency with the database
-        date.setTime((date.getTime()/1000) * 1000);
+        if (date!=null)
+         date.setTime((date.getTime()/1000) * 1000);
         this.updateDate = date;
     }
 
@@ -411,7 +412,8 @@ public class XWikiDocument {
         }
 
         // Make sure we drop milliseconds for consistency with the database
-        date.setTime((date.getTime()/1000) * 1000);
+        if (date!=null)
+         date.setTime((date.getTime()/1000) * 1000);
         this.creationDate = date;
     }
 
@@ -428,7 +430,8 @@ public class XWikiDocument {
         }
 
         // Make sure we drop milliseconds for consistency with the database
-        date.setTime((date.getTime()/1000) * 1000);
+        if (date!=null)
+         date.setTime((date.getTime()/1000) * 1000);
         this.contentUpdateDate = date;
     }
 

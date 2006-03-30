@@ -34,7 +34,10 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
         String result = super.processPath(httpServletRequest, httpServletResponse);
         if (StringUtils.countMatches(result, "/")<=2) {
-          return "/view/";
+            if (result.startsWith("/xmlrpc/"))
+                return "/xmlrpc/";
+            else
+                return "/view/";
         }
         else
           return result.substring(0,result.indexOf("/",1)+1);

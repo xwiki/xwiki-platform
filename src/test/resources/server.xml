@@ -1,6 +1,6 @@
 <Server port="9005" shutdown="SHUTDOWN" debug="0">
   <Service name="Tomcat-Standalone">
-      <Connector port="18080" minProcessors="5" maxProcessors="75"
+      <Connector port="9080" minProcessors="5" maxProcessors="75"
                  acceptCount="10" debug="0"/>
 	 <Engine name="Standalone" defaultHost="localhost" debug="0">
             <Realm className="org.apache.catalina.realm.MemoryRealm" />

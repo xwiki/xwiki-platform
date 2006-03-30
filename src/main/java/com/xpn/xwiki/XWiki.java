@@ -259,7 +259,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
             ;
 
-            if (host.equals(""))
+            if (host.equals("")||host.equals("localhost")||host.equals("127.0.0.1"))
                 return xwiki;
 
             String appname = findWikiServer(host, context);

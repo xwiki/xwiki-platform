@@ -257,10 +257,11 @@ public class MyFormAuthentication extends AbstractAuthentication
                 int equalsChar = nameValue.indexOf("=");
                 String name = nameValue.substring(0, equalsChar);
                 String value = nameValue.substring(equalsChar + 1);
+                String host = theConnection.getURL().getHost();
+                System.out.println("Found cookie: name=" + name + " value=" + value + " for host " + host);
                 if (name.equalsIgnoreCase(theTarget))
                 {
-                    String host = theConnection.getURL().getHost();
-                    System.out.println("Found cookie: name=" + name + " value=" + value + " for host " + host);
+                    System.out.println("Found matching cookie: name=" + name + " value=" + value + " for host " + host);
                     Cookie cookie = new Cookie(host, name, value);
                     cookie.setPath("/");
                     return cookie;

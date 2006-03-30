@@ -55,7 +55,10 @@ WikiEditor.prototype.initCorePlugin = function() {
                   "è|é|ê|ë|ì|í|" +
                   "î|ï|ñ|ò|ó|ô|" +
                   "?|õ|ö|ø|ù|ú|" +
-                  "û|ü|ÿ";
+                  "û|ü|ÿ|" +
+                  // Commercial symbols:
+                  "?|©|®|¢|?|¥|" +
+                  "£|¤";
     var characterEntityStr = "&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Auml;|&Aring;|" +
                              "&AElig;|&Ccedil;|&Egrave;|&Eacute;|&Ecirc;|&Euml;|" +
                              "&Igrave;|&Iacute;|&Icirc;|&Iuml;|&Ntilde;|&Ograve;|" +
@@ -65,13 +68,16 @@ WikiEditor.prototype.initCorePlugin = function() {
                              "&egrave;|&eacute;|&ecirc;|&euml;|&igrave;|&iacute;|" +
                              "&icirc;|&iuml;|&ntilde;|&ograve;|&oacute;|&ocirc;|" +
                              "&oelig;|&otilde;|&ouml;|&oslash;|&ugrave;|&uacute;|" +
-                             "&ucirc;|&uuml;|&yuml;";
+                             "&ucirc;|&uuml;|&yuml;|" +
+                             // Commercial symbols:
+                             "&trade;|&copy;|&reg;|&cent;|&euro;|&yen;|" +
+                             "&pound;|&curren;";
 
     var characterEntitys = characterEntityStr.split("|");
     var chars = charStr.split("|");
     for (var i= 0; i< characterEntitys.length; i++) {
-        var myRegExp = new RegExp(characterEntitys[i],'g');
-        this.addInternalProcessor((myRegExp), chars[i]);
+        var regExp = new RegExp(characterEntitys[i],'g');
+        this.addInternalProcessor((regExp), chars[i]);
     }
 
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
@@ -147,7 +153,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
 WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
     var text = this.trimString(result[2]);
     var str = "";
-    str += "{table}\n"
+    str += "{table}\n";
     var rows = text.split("<\/tr>");
     for(var i=0; i< rows.length; i++) {
         rows[i] = rows[i].replace("<tr>","")
@@ -155,17 +161,26 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         var cols = rows[i].split("<\/td>");
         for(var j=0; j< cols.length-1; j++) {
             if (cols[j] != null && cols[j] != "") {
-                cols[j] = cols[j].replace("<td>","")
+                var r = /<td\s*([^>]*)>/g;
+                cols[j] = cols[j].replace(r,"");
                 cols[j] = this.trimString(cols[j]);
-                if (j != cols.length-2)
+                var r1 = /\r\n\r|\r(?!\\\\)\n&nbsp;\r\n/g;
+                cols[j] = cols[j].replace(r1,'\\\\');
+                var r2 = /\r(?!\\\\)/g;
+                cols[j] = cols[j].replace(r2,'\\\\');
+                var r3 = /\\\\\\\\/g;
+                cols[j] = cols[j].replace(r3,'\\\\');
+                if (j != cols.length-2) {
                     str += cols[j] + "|" ;
-                else str += cols[j] +"\n";
+                } else {
+                    str += cols[j] +"\n";
+                }
             }
         }
 
     }
-    str += "{table}"
-   return content.replace(regexp, str);
+    str += "{table}";
+    return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) {
@@ -723,18 +738,31 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     str += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\">"
     for (var i=0; i<rows.length; i++) {
         rows[i] = this.trimString(rows[i]);
+        var k = 0;
         if (rows[i] != null && rows[i] != "") {
+            while (this.trimString(rows[i]).lastIndexOf("\\\\") == (this.trimString(rows[i]).length-2)) {
+                rows[i] = rows[i].substring(0,rows[i].lastIndexOf("\\\\"));
+                k++;
+                if ("\\\\" == this.trimString(rows[i+k]))
+                    rows[i] = rows[i] + "<p>&nbsp;" + rows[i+k];
+                 else
+                    rows[i] = rows[i] + "<p>" + rows[i+k];
+            }
+            var regExp = new RegExp('\\\\','g');
+            rows[i] = rows[i].replace(regExp,"<p>");
             var cols = rows[i].split("|");
             str += "<tr>";
             for (var j=0; j<cols.length; j++) {
                 if (i == 0) {
-                    str += "<td>" + this.trimString(cols[j]) + "&nbsp<\/td>"
+                    str += "<td>" + this.trimString(cols[j]) + "&nbsp;<\/td>"
                 }
                 else
-                    str += "<td>" + this.trimString(cols[j]) + "&nbsp<\/td>" ;
+                    str += "<td>" + this.trimString(cols[j]) + "&nbsp;<\/td>" ;
             }
             str += "<\/tr>" ;
+
         }
+        i += k;
     }
     str += "<\/table>";
     return content.replace(regexp, str) ;

@@ -20,6 +20,6 @@ org.radeox.macro.MailToMacro
 org.radeox.macro.MacroListMacro
 org.radeox.macro.QuoteMacro
 org.radeox.macro.RfcMacro
-org.radeox.macro.TableMacro
+com.xpn.xwiki.render.macro.TableMacro
 org.radeox.macro.InterWikiMacro
 org.radeox.macro.XrefMacro

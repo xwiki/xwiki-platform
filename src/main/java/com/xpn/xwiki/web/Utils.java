@@ -38,7 +38,9 @@ import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -426,16 +428,8 @@ public class Utils {
                 }
             }
         }
-        catch (XWikiException e) {
-           if(e.getCode() ==XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE){
-           /* Check Exception is ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE = true
-              then put Exception so UploadAction can catching and return messenge
-                                                                                    */
-                context.put("exception",e);
-           }else {
-               e.printStackTrace();
-           }
-
+        catch (Exception e) {
+            e.printStackTrace();
         }
         return fileupload;
     }

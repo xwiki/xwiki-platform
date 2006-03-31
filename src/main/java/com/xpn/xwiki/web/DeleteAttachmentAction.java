@@ -31,8 +31,8 @@ public class DeleteAttachmentAction extends XWikiAction {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-        XWikiAttachment attachment =null;
-        String filename = null;
+        XWikiAttachment attachment = null;
+        String filename;
         String path = request.getPathInfo();
         if (context.getMode() == XWikiContext.MODE_PORTLET)
             filename = request.getParameter("filename");
@@ -42,37 +42,14 @@ public class DeleteAttachmentAction extends XWikiAction {
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-            doc.deleteAttachment(attachment, context);
         } else {
-
-            try{
-                attachment = doc.getAttachment(filename);
-            }catch(Exception e){
-                if(attachment != null){
-                    return false ;
-                }
-            }
-            try{
-                doc.deleteAttachment(attachment, context);
-            }catch(XWikiException e){
-                if(e.getCode()==XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE){
-                    context.put("message","javaheapspace");
-                    return true;
-                }else{
-                    e.printStackTrace();
-                }
-            }
-
-
-
+            attachment = doc.getAttachment(filename);
         }
 
+        doc.deleteAttachment(attachment, context);
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);
         return false;
-    }
-    public String render(XWikiContext context) throws XWikiException {
-        return "exception";
     }
 }

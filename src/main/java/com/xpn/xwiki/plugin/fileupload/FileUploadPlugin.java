@@ -29,7 +29,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,7 +72,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
         return new FileUploadPluginApi((FileUploadPlugin) plugin, context);
     }
-
+    
     /**
      *  endRendering to make sure we don't leave files in temp directories
      * @param context Context of the request
@@ -124,9 +127,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         fileupload.setSizeMax(uploadMaxSize);
         fileupload.setSizeThreshold(uploadSizeThreashold);
         context.put("fileupload", fileupload);
-        XWikiRequest request = context.getRequest() ;
 
-        if (tempdir != null) {
+        if (tempdir!=null) {
             fileupload.setRepositoryPath(tempdir);
             (new File(tempdir)).mkdirs();
         }
@@ -135,14 +137,11 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         }
 
         try {
+            XWikiRequest request = context.getRequest();
             List list = fileupload.parseRequest(request.getHttpServletRequest());
-            // We store the file list in the context, throw Exception ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE
+            // We store the file list in the context
             context.put("fileuploadlist", list);
-        }catch (FileUploadBase.SizeLimitExceededException  e) {
-              throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE,
-                    "Exception uploaded file");
-        }catch(FileUploadException e){
+        } catch (FileUploadException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION,
                     "Exception while parsing uploaded file", e);
@@ -186,35 +185,16 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         if (fileitem==null)
             return null;
 
-        byte[] data = null ;
-        if(fileitem.getSize() > Integer.MAX_VALUE){
-            data = new byte[Integer.MAX_VALUE] ;
-        }else{
-            try{
-                data = new byte[(int)fileitem.getSize()];
-            }catch(Exception e ){
-                XWikiException exp = new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,"Java Heap Space, Out of memory exception");
-
-            }
-
-        }
+        byte[] data = new byte[(int)fileitem.getSize()];
+        InputStream fileis = null;
         try {
-            InputStream fileis = fileitem.getInputStream();
-            if(fileis != null){
-              fileis.read(data);
-              fileis.close();
-            }
-
+            fileis = fileitem.getInputStream();
+            fileis.read(data);
+            fileis.close();
         } catch (IOException e) {
-            XWikiException exp = new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                   XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,"Java Heap Space, Out of memory exception");
-
-            /*
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
                     "Exception while reading uploaded parsed file", e);
-            */
         }
         return data;
     }

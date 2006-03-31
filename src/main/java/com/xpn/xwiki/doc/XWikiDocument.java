@@ -39,7 +39,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.PrepareEditForm;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
@@ -491,7 +494,7 @@ public class XWikiDocument {
         URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, querystring, context);
         return context.getURLFactory().getURL(url, context);
     }
-    
+
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context) {
         URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, null, context);
         return context.getURLFactory().getURL(url, context);
@@ -1654,17 +1657,9 @@ public class XWikiDocument {
             // get the translated content
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
-           /* File Upload  is big can throws Exception ERROR_XWIKI_APP_JAVA_HEAP_SPACE
-             when saveAttachmentContent */            
-           context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context,true);
-        }catch(java.lang.OutOfMemoryError e){
-            context.getWiki().getAttachmentStore().cleanUp(context);
-            context.getWiki().flushCache();
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
-                    "Out Of Memory Exception");
-        }
-        finally {
+
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context, true);
+        } finally {
             if (database != null)
                 context.setDatabase(database);
         }
@@ -1692,15 +1687,8 @@ public class XWikiDocument {
             // get the translated content
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
-            try{
-               context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
-            }catch(java.lang.OutOfMemoryError e){
-                context.getWiki().getAttachmentStore().cleanUp(context);
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
-                    "Out Of Memory Exception"); 
-            }
 
+            context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
         } finally {
             if (database != null)
                 context.setDatabase(database);

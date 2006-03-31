@@ -168,6 +168,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
          if (context.getRequest().getRequestURL().indexOf("/testbin/")!=-1) {
              xwikiname = "xwikitest";
              context.setDatabase("xwikitest");
+             context.setOriginalDatabase("xwikitest");
          }
         } catch (Exception e) {}
 
@@ -2494,9 +2495,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         + database.substring(0, 1).toUpperCase()
                         + database.substring(1), context);
                 BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass", 0);
-                String server = serverobject.getStringValue("server");
-                int mode = serverobject.getIntValue("secure");
+                String server = (serverobject!=null) ? serverobject.getStringValue("server") : null;
                 if (server != null) {
+                    int mode = serverobject.getIntValue("secure");
                     serverurl = ((mode == 1) ? "https://" : "http://")
                             + server + "/";
                 }
@@ -2507,7 +2508,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
 
-        return new URL(serverurl);
+        if (serverurl!=null)
+         return new URL(serverurl);
+        else
+         return null;
     }
 
     public String getURL(String fullname, String action, XWikiContext context) throws XWikiException {

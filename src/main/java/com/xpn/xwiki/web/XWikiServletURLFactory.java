@@ -109,7 +109,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         if (xwikidb.equals(context.getOriginalDatabase()))
             return serverURL;
         else {
-            return context.getWiki().getServerURL(xwikidb, context);
+            URL url = context.getWiki().getServerURL(xwikidb, context);
+            if (url==null)
+             return serverURL;
+            else
+             return url; 
         }
     }
 

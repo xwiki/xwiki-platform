@@ -256,4 +256,11 @@ public class XWikiContext extends Hashtable {
         this.cacheDuration = cacheDuration;
     }
 
+    public String getMainXWiki() {
+        return (String ) get("mainxwiki");
+    }
+
+    public void setMainXWiki(String str) {
+        put("mainxwiki", str);
+    }
 }

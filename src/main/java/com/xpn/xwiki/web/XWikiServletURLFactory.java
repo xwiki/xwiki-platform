@@ -72,8 +72,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
                 actionPath = "bin/";
             }
             else if (context.getRequest().getServletPath().startsWith ("/testbin")) {
-                context.setDatabase("xwikitest");
-                context.setOriginalDatabase("xwikitest");
                 actionPath = "testbin/";
             } else {
                 actionPath = context.getWiki().Param("xwiki.defaultactionpath", "xwiki/");;

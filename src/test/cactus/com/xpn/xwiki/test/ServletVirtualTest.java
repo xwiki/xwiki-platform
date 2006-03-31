@@ -87,7 +87,7 @@ public class ServletVirtualTest extends ServletTest {
 
         // Setup database xwikitest2
         context.setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(hibstore, true, true, context);
+        StoreHibernateTest.cleanUp(hibstore, false, true, context);
         Utils.createDoc(hibstore, "Main", "VirtualViewOkTest2", context);
 
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualViewOkTest2", "");
@@ -96,7 +96,7 @@ public class ServletVirtualTest extends ServletTest {
     public void endVirtualView2(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find WebHome Content: " + result, result.indexOf("Hello 1")!=-1);
+            assertTrue("Could not find VirtualViewOkTest2 Content: " + result, result.indexOf("Hello 1")!=-1);
         } finally {
             clientTearDown();
         }

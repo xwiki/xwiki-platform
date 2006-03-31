@@ -92,6 +92,7 @@
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
 
+    <!--
     <error-page>
       <error-code>500</error-code>
       <location>/error.jsp</location>
@@ -100,6 +101,7 @@
       <error-code>404</error-code>
       <location>/error.jsp</location>
     </error-page>
+    -->
 
     <!-- Example Application Tag Library Descriptor
 <taglib>

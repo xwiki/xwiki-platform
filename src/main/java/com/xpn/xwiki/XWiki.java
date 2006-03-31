@@ -165,6 +165,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiEngineContext econtext = context.getEngineContext();
 
         try {
+         if (context.getRequest().getRequestURL().indexOf("/testbin/")!=-1) {
+             xwikiname = "xwikitest";
+             context.setDatabase("xwikitest");
+         }
+        } catch (Exception e) {}
+
+        context.setMainXWiki(xwikiname);
+
+        try {
             xwikicfg = getConfigPath();
             xwiki = (XWiki) econtext.getAttribute(xwikiname);
             if (xwiki == null) {
@@ -259,7 +268,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
             ;
 
-            if (host.equals("")||host.equals("localhost")||host.equals("127.0.0.1"))
+            if (host.equals(""))
                 return xwiki;
 
             String appname = findWikiServer(host, context);
@@ -272,7 +281,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 XWikiURLFactory urlf = context.getURLFactory();
                 if ((urlf != null) && (urlf instanceof XWikiServletURLFactory)
                         && ("".equals(((XWikiServletURLFactory) urlf).getServletPath())))
-                    appname = "xwiki";
+                    appname = context.getMainXWiki();
                 else
                     appname = uri.substring(1, uri.indexOf("/", 2));
 
@@ -280,7 +289,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     appname = servername;
                 } else {
                     if ((servername.equals("www"))
-                            || (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))) {
+                            || (host.equals("localhost")
+                            || (context.getUtil().match("m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {
                         if (appname.equals("xwiki"))
                             return xwiki;
                     } else {
@@ -338,7 +348,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (wikiserver != null)
             return wikiserver;
 
-        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=" + context.getWiki().getFullNameSQL()
+        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
                 + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
                 + "and prop.id.name = 'server' and prop.value='" + host + "'";
         try {

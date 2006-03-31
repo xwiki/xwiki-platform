@@ -111,6 +111,7 @@
         <url-pattern>/xwiki/*</url-pattern>
     </servlet-mapping>
 
+    <!--
     <error-page>
       <error-code>500</error-code>
       <location>/error.jsp</location>
@@ -119,6 +120,7 @@
       <error-code>404</error-code>
       <location>/error.jsp</location>
     </error-page>
+    -->
 
     <!-- The Usual Welcome File List -->
     <welcome-file-list>

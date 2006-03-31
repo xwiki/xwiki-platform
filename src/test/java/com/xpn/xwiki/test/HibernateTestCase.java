@@ -116,8 +116,8 @@ public class HibernateTestCase extends TestCase {
             Statement st = connection.createStatement();
             st.execute(sql);
         } catch (Exception e) {
-            if (e.getMessage().indexOf("xwikiextlistclasses")==-1)
-             e.printStackTrace();
+            if ((e.getMessage().indexOf("doesn't exist")==-1)||(sql.indexOf("delete")==-1))
+                e.printStackTrace();
         }
     }
 
@@ -172,10 +172,9 @@ public class HibernateTestCase extends TestCase {
         String database = context.getDatabase();
         if (database==null)
             context.setDatabase("xwikitest");
+        try {
         if (bFullCleanup) {
-            try {
-                runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
-            } catch (Exception e) {}
+            runSQL(hibstore, "drop database if exists " + context.getDatabase(), context);
             runSQL(hibstore, "create database " + context.getDatabase(), context);
         } else {
             runSQL(hibstore, "delete from xwikibooleanclasses", context);
@@ -209,8 +208,11 @@ public class HibernateTestCase extends TestCase {
             runSQL(hibstore, "delete from xwikilinks", context);
         }
         hibstore.endTransaction(context, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        if (bFullCleanup&&bSchemaUpdate)
+        if (bSchemaUpdate)
             hibstore.updateSchema(context, true);
     }
 }

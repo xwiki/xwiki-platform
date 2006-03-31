@@ -2240,7 +2240,7 @@ public class ViewEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 1);
         String content  =  "template content" ;
-        Utils.createDoc(xwiki.getStore(),"Main","SaveErrorLongtemplate",content,bobject,bclass,context);
+        Utils.createDoc(xwiki.getStore(),"Main","SaveErrorLongTemplate",content,bobject,bclass,context);
 
         setUrl(webRequest, "save", "SaveWithLongTemplate");
         webRequest.addParameter("template", "Main.SaveErrorLongTemplate");
@@ -2253,15 +2253,15 @@ public class ViewEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             // Verify return
-            assertFalse("Saving not returned exception: " + result, result.indexOf("Exception") == -1);
+            assertTrue("Saving not returned exception: " + result, result.indexOf("Exception") == -1);
             // Flush cache to make sure we read from db
             xwiki.flushCache();
 
             XWikiDocument doc2 = xwiki.getDocument("Main.SaveWithLongTemplate",context);
             String content2 = doc2.getContent() ;
             String parent = doc2.getParent();
-            assertEquals("Content is identical", false, content2.equals("template content"));
-            assertEquals("Parent is  identical", false, parent.equals("XWiki.TestParentComesFromTemplate"));
+            assertEquals("Content is identical", content2, "template content");
+            assertEquals("Parent is  identical", parent, "XWiki.TestParentComesFromTemplate");
 
         } finally {
             clientTearDown();

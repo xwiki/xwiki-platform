@@ -894,13 +894,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 cobject.setId(object.getId());
                 if (evict)
                     session.evict(cobject);
-                if (session.contains(cobject))
-                    session.delete(cobject);
+                session.delete(cobject);
             } else {
                 if (evict)
                     session.evict(object);
-                if (session.contains(object))
-                    session.delete(object);
+                session.delete(object);
             }
 
             if (bTransaction) {

@@ -56,8 +56,18 @@ function updateName(form) {
   if (form.filename.value=="")
    form.filename.value = fname;
   else {
-   if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?"))
+   if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?")){
      form.filename.value = fname;
+   }else{
+
+     fname = form.filename.value;
+     if(fname.indexOf('\\') != -1 || fname.indexOf('/') != -1
+             || fname.indexOf(':') != -1 || fname.indexOf(';') != -1 ){
+         alert("filename cannot contain any of the following characters \n '\\' '/' ':' ';'");
+         return false ;
+     }
+     return true ;
+   }
   }
   return true;
 }

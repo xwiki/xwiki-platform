@@ -317,7 +317,7 @@ public class Document extends Api {
 
     public Object getFirstObject(String fieldname) {
         try {
-            BaseObject obj = doc.getFirstObject(fieldname);
+            BaseObject obj = doc.getFirstObject(fieldname, context);
             if (obj==null)
                 return null;
             else
@@ -742,7 +742,7 @@ public class Document extends Api {
     public java.lang.Object get(String classOrFieldName) {
         if (currentObj!=null)
             return doc.display(classOrFieldName, currentObj.getBaseObject(), context);
-        BaseObject object = doc.getFirstObject(classOrFieldName);
+        BaseObject object = doc.getFirstObject(classOrFieldName, context);
         if (object!=null) {
             return doc.display(classOrFieldName, object, context);
         }

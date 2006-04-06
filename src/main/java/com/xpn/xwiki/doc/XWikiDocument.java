@@ -903,7 +903,7 @@ public class XWikiDocument {
         try {
             BaseObject object = getxWikiObject();
             if (object == null)
-                object = getFirstObject(fieldname);
+                object = getFirstObject(fieldname, context);
             return display(fieldname, object, context);
         } catch (Exception e) {
             return "";
@@ -914,7 +914,7 @@ public class XWikiDocument {
         try {
             BaseObject object = getxWikiObject();
             if (object == null)
-                object = getFirstObject(fieldname);
+                object = getFirstObject(fieldname, context);
             if (object == null)
                 return "";
             else
@@ -1872,6 +1872,13 @@ public class XWikiDocument {
     }
 
     public BaseObject getFirstObject(String fieldname) {
+        // Keeping this function with context null for compatibilit reasons
+        // It should not be used, since it would miss properties which are only defined in the class
+        // and not present in the object because the object was not updated
+        return getFirstObject(fieldname, null);
+    }
+
+    public BaseObject getFirstObject(String fieldname, XWikiContext context) {
         Collection objectscoll = getxWikiObjects().values();
         if (objectscoll == null)
             return null;
@@ -1881,6 +1888,12 @@ public class XWikiDocument {
             for (Iterator itobjs2 = objects.iterator(); itobjs2.hasNext();) {
                 BaseObject obj = (BaseObject) itobjs2.next();
                 if (obj != null) {
+                    BaseClass bclass = obj.getxWikiClass(context);
+                    if (bclass!=null) {
+                        Set set = bclass.getPropertyList();
+                        if ((set != null) && set.contains(fieldname))
+                            return obj;
+                    }
                     Set set = obj.getPropertyList();
                     if ((set != null) && set.contains(fieldname))
                         return obj;
@@ -1916,7 +1929,7 @@ public class XWikiDocument {
     }
 
     public int getIntValue(String fieldName) {
-        BaseObject object = getFirstObject(fieldName);
+        BaseObject object = getFirstObject(fieldName, null);
         if (object == null)
             return 0;
         else
@@ -1924,7 +1937,7 @@ public class XWikiDocument {
     }
 
     public long getLongValue(String fieldName) {
-        BaseObject object = getFirstObject(fieldName);
+        BaseObject object = getFirstObject(fieldName, null);
         if (object == null)
             return 0;
         else
@@ -1932,7 +1945,7 @@ public class XWikiDocument {
     }
 
     public String getStringValue(String fieldName) {
-        BaseObject object = getFirstObject(fieldName);
+        BaseObject object = getFirstObject(fieldName, null);
         if (object == null)
             return "";
 

@@ -32,6 +32,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
@@ -44,6 +45,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.lang.*;
+import java.lang.Object;
+
+import groovy.lang.GroovyClassLoader;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -989,6 +994,21 @@ public class XWiki extends Api {
 
     public String getEditorPreference() {
         return xwiki.getEditorPreference(context);
+    }
+
+    public Object parseGroovyFromString(String script) throws XWikiException {
+        if (checkProgrammingRights())
+          return xwiki.parseGroovyFromString(script, context);
+        else
+          return null;
+    }
+
+    public Object parseGroovyFromPage(String fullname) throws XWikiException {
+        XWikiDocument doc = xwiki.getDocument(fullname, context);
+        if (xwiki.getRightService().hasProgrammingRights(doc, context))
+         return parseGroovyFromString(doc.getContent());
+        else
+         return null;
     }
 }
 

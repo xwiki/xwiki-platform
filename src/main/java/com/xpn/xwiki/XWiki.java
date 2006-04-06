@@ -34,6 +34,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,6 +50,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
@@ -84,6 +86,7 @@ import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.PortalContainer;
+import org.codehaus.groovy.control.CompilationFailedException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -102,6 +105,8 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
+
+import groovy.lang.GroovyClassLoader;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface {
     private static final Log log = LogFactory.getLog(XWiki.class);
@@ -3393,5 +3398,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             pref = Param("xwiki.editor", "");
         return pref.toLowerCase();
     }
+
+    public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException {
+        return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy")).parseGroovyFromString(script, context);
+    }
+
+    public Object parseGroovyFromPage(String fullname, XWikiContext context) throws XWikiException {
+        return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(), context);
+    }
+
 }
 

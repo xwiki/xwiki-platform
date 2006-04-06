@@ -26,6 +26,7 @@ package com.xpn.xwiki.render.groovy;
 
 import groovy.text.Template;
 import groovy.lang.Writable;
+import groovy.lang.GroovyClassLoader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +53,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 public class XWikiGroovyRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);
     private XWikiCache cache;
+    private XWikiCache classCache;
+    private final GroovyClassLoader gcl = new GroovyClassLoader();
 
     public XWikiGroovyRenderer() {
     }
@@ -59,34 +62,43 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
 
     public void flushCache() {
         if (cache!=null)
-         cache.flushAll();
+            cache.flushAll();
+        if (classCache!=null)
+            classCache.flushAll();
     }
 
     public Map prepareContext(XWikiContext context) {
-            if (cache==null) {
-                 cache = context.getWiki().getCacheService().newCache(100);
-            }
+        prepareCache(context);
 
-            Map gcontext = (Map) context.get("gcontext");
-            if (gcontext==null) {
-                gcontext = new HashMap();
-                gcontext.put("xwiki", new XWiki(context.getWiki(), context));
-                gcontext.put("request", context.getRequest());
-                gcontext.put("response", context.getResponse());
-                gcontext.put("context", new Context(context));
+        Map gcontext = (Map) context.get("gcontext");
+        if (gcontext==null) {
+            gcontext = new HashMap();
+            gcontext.put("xwiki", new XWiki(context.getWiki(), context));
+            gcontext.put("request", context.getRequest());
+            gcontext.put("response", context.getResponse());
+            gcontext.put("context", new Context(context));
 
 
-                // Put the Grrovy Context in the context
-                // so that includes can use it..
-                context.put("gcontext", gcontext);
-                //add XWikiMessageTool to the context
-                if (context.get("msg") != null)
-                	gcontext.put("msg", context.get("msg"));
-                else
-                	context.getWiki().prepareResources(context);                
-            }
-            return gcontext;
+            // Put the Grrovy Context in the context
+            // so that includes can use it..
+            context.put("gcontext", gcontext);
+            //add XWikiMessageTool to the context
+            if (context.get("msg") != null)
+                gcontext.put("msg", context.get("msg"));
+            else
+                context.getWiki().prepareResources(context);
         }
+        return gcontext;
+    }
+
+    private void prepareCache(XWikiContext context) {
+        if (cache==null) {
+            cache = context.getWiki().getCacheService().newCache(100);
+        }
+        if (classCache==null) {
+            classCache = context.getWiki().getCacheService().newCache(100);
+        }
+    }
 
     public String evaluate(String content, String name, Map gcontext) {
         GroovyTemplateEngine engine = new GroovyTemplateEngine();
@@ -122,7 +134,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             String text;
 
             XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION,
-                                                        "Error while parsing groovy page {0}", e, args);
+                    "Error while parsing groovy page {0}", e, args);
             title = xe.getMessage();
             text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
 
@@ -137,7 +149,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             return content;
 
         if (!context.getWiki().getRightService().hasProgrammingRights(contentdoc, context))
-             return content;
+            return content;
 
         Map gcontext = null;
         try {
@@ -153,7 +165,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 if (previousdoc!=null)
                     gcontext.put("doc", previousdoc);
                 if (previouswriter!=null)
-                    gcontext.put("out", previouswriter);    
+                    gcontext.put("out", previouswriter);
             }
 
         } finally {
@@ -166,11 +178,11 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         if ((param!=null)&&(!param.trim().equals(""))) {
             String[] params = StringUtils.split(param, "|");
             for (int i=0;i<params.length;i++) {
-              String[] rparam = StringUtils.split(params[i], "=");
-              if (rparam.length==1)
-                  unnamedparams.add(params[i]);
-              else
-                  namedparams.put(rparam[0], rparam[1]);
+                String[] rparam = StringUtils.split(params[i], "=");
+                if (rparam.length==1)
+                    unnamedparams.add(params[i]);
+                else
+                    namedparams.put(rparam[0], rparam[1]);
             }
         }
 
@@ -192,7 +204,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 }
             }
             if (i>0)
-             result.append(",");
+                result.append(",");
             result.append("\"");
             result.append(value.replaceAll("\"","\\\\\""));
             result.append("\"");
@@ -210,14 +222,14 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     private void addGroovyMacros(StringBuffer result, XWikiContext context) {
         Object macroAdded = context.get("groovyMacrosAdded");
         if (macroAdded==null) {
-          context.put("groovyMacrosAdded", "1");
-          String inclDocName = context.getWiki().getXWikiPreference("macros_groovy", context);
+            context.put("groovyMacrosAdded", "1");
+            String inclDocName = context.getWiki().getXWikiPreference("macros_groovy", context);
             try {
                 XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
                 result.append(doc.getContent());
             } catch (XWikiException e) {
                 if (log.isErrorEnabled())
-                log.error("Impossible to load groovy macros doc " + inclDocName);
+                    log.error("Impossible to load groovy macros doc " + inclDocName);
             }
         }
     }
@@ -236,4 +248,25 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         return result.toString();
     }
 
+    public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException {
+        prepareCache(context);
+        try {
+            Class gc;
+            try {
+                gc = (Class) classCache.getFromCache(script);
+            }
+            catch (XWikiCacheNeedsRefreshException e) {
+                gc = gcl.parseClass(script);
+                classCache.putInCache(script, gc);
+            } finally {
+                classCache.cancelUpdate(script);
+            }
+
+            return gc.newInstance();
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_GROOVY,
+                    XWikiException.ERROR_XWIKI_GROOVY_COMPILE_FAILED,
+                    "Failed compiling groovy script", e);
+        }
+    }
 }

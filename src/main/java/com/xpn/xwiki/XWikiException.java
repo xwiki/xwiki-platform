@@ -64,6 +64,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_APP = 11;
     public static final int MODULE_XWIKI_EXPORT = 12;
     public static final int MODULE_XWIKI_DIFF = 13;
+    public static final int MODULE_GROOVY = 14;
 
     public static final int MODULE_PLUGIN_LASZLO = 21;
 
@@ -186,6 +187,8 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LINKS = 13013;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS = 13014;
 
+    public static final int ERROR_XWIKI_GROOVY_COMPILE_FAILED = 14001;
+    
     public static final int ERROR_LASZLO_INVALID_XML = 21001;
     public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
 

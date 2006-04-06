@@ -145,7 +145,6 @@ public abstract class XWikiAction extends Action {
                         Utils.parseTemplate(page, context);
                     } else {
                         String page = Utils.getPage(request, renderResult);
-                        String url = context.getRequest().getRequestURI() ;
                         Utils.parseTemplate(page, !page.equals("direct"), context);
                     }
 
@@ -153,10 +152,11 @@ public abstract class XWikiAction extends Action {
                 return null;
             } catch (Throwable e) {
                 if (!(e instanceof XWikiException)) {
-                   e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
                             "Uncaught exception", e);
                 }
 
+                vcontext.put("exp", e);
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
@@ -167,13 +167,8 @@ public abstract class XWikiAction extends Action {
                         String page = Utils.getPage(request, "userinactive");
                         Utils.parseTemplate(page, context);
                         return null;
-                    }else if(xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND){
-                        String page = Utils.getPage(request, "exception");
-                        context.put("message","attachmentdoesnotexist");
-                        Utils.parseTemplate(page, context);
-                        return null;
                     }
-                    vcontext.put("exp", e);
+
                     Log log = LogFactory.getLog(XWikiAction.class);
                     if (log.isWarnEnabled()) {
                         log.warn("Uncaught exception: " + e.getMessage(), e);
@@ -206,7 +201,7 @@ public abstract class XWikiAction extends Action {
                     xwiki.getNotificationManager().verify(context.getDoc(), mapping.getName(), context);
                 } catch (Throwable e) {
                     e.printStackTrace();
-                    }
+                }
 
                 if (monitor != null)
                     monitor.endTimer("notify");

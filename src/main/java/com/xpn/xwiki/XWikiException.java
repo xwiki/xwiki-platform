@@ -167,9 +167,6 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_APP_REDIRECT_EXCEPTION = 11010;
     public static final int ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION = 11011;
     public static final int ERROR_XWIKI_APP_SERVICE_NOT_FOUND = 11012;
-    public static final int ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE =11013;
-    public static final int ERROR_XWIKI_APP_JAVA_HEAP_SPACE =11014;
-
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;
     public static final int ERROR_XWIKI_EXPORT_PDF_FOP_FAILED = 12002;
     public static final int ERROR_XWIKI_EXPORT_XSL_FAILED = 12003;

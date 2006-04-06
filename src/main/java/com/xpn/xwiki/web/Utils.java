@@ -428,14 +428,8 @@ public class Utils {
                 }
             }
         }
-        catch (XWikiException e) {
-            if(e.getCode() ==XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE){
-
-                context.put("exception",e);
-            }else {
-                e.printStackTrace();
-            }
-
+        catch (Exception e) {
+            e.printStackTrace();
         }
         return fileupload;
     }

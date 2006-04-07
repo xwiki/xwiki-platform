@@ -145,7 +145,16 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 // set response status and forward to error page
                 if (log.isInfoEnabled()) log.info("User " + username + " login has failed");
 
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
+                int rCode = HttpServletResponse.SC_UNAUTHORIZED;
+                if ((returnCode!=null)&&(!returnCode.equals(""))) {
+                    try {
+                        rCode = Integer.parseInt(returnCode);
+                    } catch (Exception e) {
+                        rCode = HttpServletResponse.SC_UNAUTHORIZED;
+                    }
+                }
+                response.setStatus(rCode);
                 request.getRequestDispatcher(errorPage).forward(request, response);
             }
             return true;

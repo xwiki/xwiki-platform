@@ -69,6 +69,7 @@ public class Package {
     private List    customMappingFiles = null;
     private boolean backupPack = false;
     private boolean withVersions = true;
+    private List    documentFilters = new ArrayList();
 
     public static final int OK = 0;
     public static final int Right = 1;
@@ -139,6 +140,13 @@ public class Package {
         this.withVersions = withVersions;
     }
 
+    public void addDocumentFilter(Object filter) throws PackageException {
+        if (filter instanceof DocumentFilter)
+            this.documentFilters.add(filter);
+        else
+            throw new PackageException(PackageException.ERROR_PACKAGE_INVALID_FILTER, "Invalid Document Filter");
+    }
+
     public Package()
     {
         files = new ArrayList();
@@ -160,13 +168,23 @@ public class Package {
                 return true;
             }
         }
-        DocumentInfo docinfo = new DocumentInfo(doc);
-        docinfo.setAction(defaultAction);
-        files.add(docinfo);
-        BaseClass bclass =  doc.getxWikiClass();
-        if (bclass.getCustomMapping()!=null)
-         customMappingFiles.add(docinfo);
-        return true;
+
+        doc = (XWikiDocument) doc.clone();
+
+        try {
+            filter(doc, context);
+
+            DocumentInfo docinfo = new DocumentInfo(doc);
+            docinfo.setAction(defaultAction);
+            files.add(docinfo);
+            BaseClass bclass =  doc.getxWikiClass();
+            if (bclass.getCustomMapping()!=null)
+                customMappingFiles.add(docinfo);
+            return true;
+        } catch (ExcludeDocumentException e) {
+            log.info("Skip the document " + doc.getFullName());
+            return false;
+        }
     }
 
     public boolean add(XWikiDocument doc, XWikiContext context) throws XWikiException {
@@ -209,6 +227,11 @@ public class Package {
         return add(docFullName, language, DocumentInfo.ACTION_NOT_DEFINED, context);
     }
 
+    public void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException {
+        for (int i = 0; i < documentFilters.size(); i++)
+            ((DocumentFilter)documentFilters.get(i)).filter(doc, context);
+    }
+
     public String export(OutputStream os, XWikiContext context) throws IOException, XWikiException {
         if (files.size() == 0)
         {
@@ -219,7 +242,8 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             DocumentInfo docinfo = (DocumentInfo) files.get(i);
-            addToZip(docinfo.getDoc(), zos, withVersions, context);
+            XWikiDocument doc = docinfo.getDoc();
+            addToZip(doc, zos, withVersions, context);
         }
         addInfosToZip(zos);
         zos.finish();
@@ -239,7 +263,8 @@ public class Package {
         for (int i = 0; i < files.size(); i++)
         {
             DocumentInfo docinfo = (DocumentInfo) files.get(i);
-            addToDir(docinfo.getDoc(), dir, withVersions, context);
+            XWikiDocument doc = docinfo.getDoc();
+            addToDir(doc, dir, withVersions, context);
         }
         addInfosToDir(dir);
         return "";
@@ -264,10 +289,15 @@ public class Package {
                     continue;
                 else {
                     XWikiDocument doc = readFromXML(readFromInputStream(zis));
-                    if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description))
-                        this.add(doc, context);
-                    else
-                        throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "document does not exist in package definition");
+                    try {
+                        filter(doc, context);
+                        if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description))
+                            this.add(doc, context);
+                        else
+                            throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "document " + doc.getFullName() + " does not exist in package definition");
+                    } catch (ExcludeDocumentException e) {
+                        log.info("Skip the document '" + doc.getFullName() + "'");
+                    }
                 }
             }
             updateFileInfos(description);
@@ -632,9 +662,15 @@ public class Package {
         authorName = getElementText(infosEl, "author");
         version = getElementText(infosEl, "version");
         backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
+
+
         return domdoc;
     }
 
+    protected void readDependencies()
+    {
+
+    }
 
     public void addAllWikiDocuments(XWikiContext context) throws XWikiException {
         XWiki wiki = context.getWiki();

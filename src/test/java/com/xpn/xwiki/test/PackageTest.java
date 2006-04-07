@@ -34,9 +34,10 @@ import java.util.List;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
+import com.xpn.xwiki.plugin.packaging.*;
 import com.xpn.xwiki.plugin.packaging.Package;
 
 
@@ -143,6 +144,29 @@ public class PackageTest extends HibernateTestCase {
         testOverwrite(myOtherPackage);
     }
 
+    public void testFilter() throws XWikiException, IOException {
+        Package myPackage = new Package();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+        try {
+            myPackage.addDocumentFilter(new testFilter());
+        } catch (PackageException e) {
+            fail("the filter should be added without exception");
+        }
+        myPackage.add("Test.first", getXWikiContext());
+        myPackage.add("Test.third", getXWikiContext());
+        myPackage.export(os, getXWikiContext());
+
+        //check if the filter does not impact the wiki
+        XWikiDocument doc = getXWikiContext().getWiki().getDocument("Test.first_filtered", getXWikiContext());
+        assertTrue(doc.isNew());
+
+        Package myOtherPackage = new Package();
+        myOtherPackage.Import(os.toByteArray(), getXWikiContext());
+        testDocName("Test.first_filtered", myOtherPackage.getFiles());
+        testDocName("Test.third_filtered", myOtherPackage.getFiles());
+    }
+
     public void testImportPackage(Package pack) throws XWikiException {
         // Setup database xwikitest2
         getXWikiContext().setDatabase("xwikitest2");
@@ -158,7 +182,6 @@ public class PackageTest extends HibernateTestCase {
 
         doc = getXWikiContext().getWiki().getDocument("Test.third", getXWikiContext());
         assertFalse(doc.isNew());
-
     }
 
     public void testOverwrite(Package pack) throws XWikiException {
@@ -472,5 +495,17 @@ public class PackageTest extends HibernateTestCase {
         testDocName("Test.first", "fr", myPackage.getFiles());
         assertEquals(myPackage.isBackupPack(), true);
     }
+
+
+
+
+
+    private class testFilter implements DocumentFilter {
+
+        public void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException {
+            doc.setName(doc.getName() + "_filtered");
+        }
+    }
+
 
 }

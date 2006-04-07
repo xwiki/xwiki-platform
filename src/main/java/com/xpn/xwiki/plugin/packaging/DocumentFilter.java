@@ -17,35 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
  * @author jeremi
- * @author sdumitriu
  */
+
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.plugin.PluginException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.XWikiContext;
 
+public interface DocumentFilter {
 
-public class PackageException extends PluginException {
-    static String plugName = "Package";
-    public static final int ERROR_PACKAGE_UNKNOWN = 1;
-    public static final int ERROR_PACKAGE_NODESCRIPTION = 2;
-    public static final int ERROR_PACKAGE_INVALID_FILTER = 3;
-
-    public PackageException(int code, String message, Throwable e, Object[] args)
-    {
-        super(plugName, code, message, e, args);
-    }
-
-    public PackageException(int code, String message, Throwable e){
-        super(plugName, code, message, e);
-    }
-
-    public PackageException(int code, String message){
-        super(plugName, code, message);
-    }
-
-    public PackageException(){
-        super();
-    }
+    /**
+     * Do actions at the import or export on a document. For example, remove
+     * comments or attachments, do some security check.
+     *
+     * @param doc document you want to filter
+     * @param context xwiki context
+     */
+    public void filter(XWikiDocument doc, XWikiContext context) throws ExcludeDocumentException;
 }

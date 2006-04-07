@@ -111,6 +111,10 @@ public class PackageAPI   extends Api {
          plugin.setWithVersions(withVersions);
      }
 
+    public void addDocumentFilter(Object filter) throws PackageException {
+        plugin.addDocumentFilter(filter);
+    }
+
     public List getFiles() {
         List files =  plugin.getFiles();
         ArrayList APIfiles = new ArrayList(files.size());

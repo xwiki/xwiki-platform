@@ -28,6 +28,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import java.lang.*;
+
 public class Object extends Collection {
 
     public Object(BaseObject obj, XWikiContext context) {
@@ -66,8 +68,12 @@ public class Object extends Collection {
     }
 
     public boolean equals(java.lang.Object arg0) {
-    	if (!(arg0 instanceof Object)) return false;
-    	Object o = (Object) arg0;
-    	return o.context.equals(context) && element.equals(o.element);    	
+        if (!(arg0 instanceof Object)) return false;
+        Object o = (Object) arg0;
+        return o.context.equals(context) && element.equals(o.element);
+    }
+
+    public void set(String fieldname, java.lang.Object value) {
+        getBaseObject().set(fieldname, value, context);
     }
 }

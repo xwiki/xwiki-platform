@@ -181,4 +181,21 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public com.xpn.xwiki.api.Object newObjectApi(BaseObject obj, XWikiContext context) {
         return new com.xpn.xwiki.api.Object(obj, context);
     }
+
+    public void set(String fieldname, java.lang.Object value, XWikiContext context) {
+        BaseClass bclass = getxWikiClass(context);
+        PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
+        BaseProperty prop = (BaseProperty) safeget(fieldname);
+        if ((value instanceof String)&&(pclass!=null))
+         prop = pclass.fromString((String) value);
+        else {
+            if ((prop==null)&&(pclass!=null))
+             prop = pclass.newProperty();
+            if (prop!=null)
+             prop.setValue(value);
+        }
+
+        if (prop!=null)
+         safeput(fieldname, prop);
+    }
 }

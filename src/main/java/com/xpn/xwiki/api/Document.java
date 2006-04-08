@@ -53,12 +53,14 @@ import com.xpn.xwiki.util.Util;
 
 
 public class Document extends Api {
+    private XWikiDocument olddoc;
     private XWikiDocument doc;
     private Object currentObj;
 
     public Document(XWikiDocument doc, XWikiContext context) {
         super(context);
-        this.doc = doc;
+        this.olddoc = doc;
+        this.doc = (XWikiDocument) doc.clone();
     }
 
     public XWikiDocument getDocument() {
@@ -271,9 +273,13 @@ public class Document extends Api {
         return result;
     }
 
-    public void createNewObject(String classname) throws XWikiException {
-        if (checkProgrammingRights())
-            doc.createNewObject(classname, context);
+    public int createNewObject(String classname) throws XWikiException {
+       return doc.createNewObject(classname, context);
+    }
+
+    public Object newObject(String classname) throws XWikiException {
+       int nb = createNewObject(classname);
+       return getObject(classname, nb);
     }
 
     public boolean isFromCache() {
@@ -352,8 +358,17 @@ public class Document extends Api {
     }
 
     public Object getObject(String classname) {
+        return getObject(classname, false);
+    }
+
+    public Object getObject(String classname, boolean create) {
         try {
             BaseObject obj = doc.getObject(classname);
+
+            if ((obj==null)&&create) {
+              return newObject(classname);
+            }
+
             if (obj==null)
                 return null;
             else
@@ -826,4 +841,41 @@ public class Document extends Api {
         return doc.isCreator(username);
     }
 
+    public void set(String fieldname, java.lang.Object value) {
+        Object obj;
+        if (currentObj!=null)
+         obj = currentObj;
+        else
+         obj = getFirstObject(fieldname);
+        if (obj==null)
+         return;
+
+        obj.set(fieldname, value);
+    }
+
+    public void setTitle(String title) {
+        doc.setTitle(title);
+    }
+
+    public void setParent(String parent) {
+        doc.setParent(parent);
+    }
+
+    public void setContent(String content) {
+        doc.setContent(content);
+    }
+
+    public void setDefaultTemplate(String dtemplate) {
+        doc.setDefaultTemplate(dtemplate);
+    }
+
+    public void save() throws XWikiException {
+        if (hasAccessLevel("edit"))
+         context.getWiki().saveDocument(doc, olddoc, context);
+        else {
+            java.lang.Object[] args = { doc.getFullName() };
+         throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                                  "Access denied in edit mode on document {0}", null, args);
+        }
+    }
 }

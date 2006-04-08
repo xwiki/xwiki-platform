@@ -6,9 +6,11 @@ $message
 </div>
 #end
 #set($xredirect=$!request.getParameter("xredirect"))
+#set($xnotification=$!request.getParameter("xnotification"))
 <form id="edit" method="post" action="$doc.getURL("preview")">
 <p>
 <input type="hidden" name="xredirect" value="$!xredirect" />
+<input type="hidden" name="xnotification" value="$!xnotification" />
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="language" value="$!doc.language" />
 #set($force = $!request.get("force"))

@@ -54,7 +54,6 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);
     private XWikiCache cache;
     private XWikiCache classCache;
-    private final GroovyClassLoader gcl = new GroovyClassLoader();
 
     public XWikiGroovyRenderer() {
     }
@@ -256,6 +255,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 gc = (Class) classCache.getFromCache(script);
             }
             catch (XWikiCacheNeedsRefreshException e) {
+                GroovyClassLoader gcl = new GroovyClassLoader();
                 gc = gcl.parseClass(script);
                 classCache.putInCache(script, gc);
             } finally {
@@ -264,7 +264,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
 
             return gc.newInstance();
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_GROOVY,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,
                     XWikiException.ERROR_XWIKI_GROOVY_COMPILE_FAILED,
                     "Failed compiling groovy script", e);
         }

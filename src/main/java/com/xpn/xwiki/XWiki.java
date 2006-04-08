@@ -38,10 +38,7 @@ import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.PropertyChangedRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.notify.*;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.*;
@@ -499,10 +496,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             getStatsService(context);
         }
 
+        // Add a notification rule if the preference property plugin is modified
+        getNotificationManager().addGeneralRule(
+                new XWikiActionRule(new XWikiPageNotification()));
+
+
         String ro = Param("xwiki.readonly", "no");
-
         isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
-
     }
 
     public void resetRenderingEngine(XWikiContext context) throws XWikiException {
@@ -1494,6 +1494,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
         needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
+        needsUpdate |= bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
         needsUpdate |= bclass.addBooleanField("backlinks", "Backlinks", "yesno");
 
         needsUpdate |= bclass.addTextField("skin", "Skin", 30);
@@ -1526,8 +1527,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
         needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
         needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
-        needsUpdate |= bclass.addTextField("macros_wiki2", "Macros for new Wiki Parser", 60);
+        needsUpdate |= bclass.addTextField("macros_wiki", "Macros for the Wiki Parser", 60);
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
+
+        needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {

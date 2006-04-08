@@ -148,7 +148,6 @@
     </target>
 
     <!-- Define the Cactus tasks -->
-<!--
     <taskdef resource="cactus.tasks">
         <classpath>
             <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
@@ -159,7 +158,6 @@
             <pathelement location="${lib.dir}/aspectjrt-1.2.1.jar"/>
         </classpath>
     </taskdef>
--->
 
     <target name="prepare">
         <propertyfile file="src/main/web/WEB-INF/version.properties" >
@@ -205,11 +203,11 @@
 
     <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
-            <fileset dir="${resources.main.src.dir}"/>
+            <fileset dir="${resources.main.src.dir}" />
         </copy>
 
         <copy todir="${build.dir}/web">
-            <fileset includes="**"
+            <fileset includes="**" excludes="JSTrim*.*,**/*_src.js"
                 dir="${web.main.src.dir}" />
         </copy>
 
@@ -387,7 +385,7 @@
         </junitreport>
     </target>
 
-    <target name="javadoc" depends="xwiki">
+    <target name="javadoc" depends="">
         <mkdir dir="${javadoc.dir}" />
         <javadoc packagenames="com.xpn.xwiki.*"
             sourcepath="${java.main.src.dir}"
@@ -459,7 +457,7 @@
         </tar>
     </target>
 
-    <target name="src.dist" depends="release, test, javadoc">
+    <target name="src.dist" depends="javadoc">
         <mkdir dir="${dist.dir}" />
         <property name="src.tarfile" value="${dist.dir}/xwiki-${version}-src.tar.gz" />
         <delete file="${src.tarfile}" />

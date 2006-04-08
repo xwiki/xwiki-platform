@@ -600,6 +600,9 @@
         <property name="authenticate_view" type="integer">
             <column name="XWP_AUTHENTICATE_VIEW" />
         </property>
+        <property name="auth_active_check" type="integer">
+            <column name="XWP_AUTH_ACTIVE_CHECK" />
+        </property>
         <property name="backlinks" type="integer">
             <column name="XWP_BACKLINKS" />
         </property>
@@ -666,6 +669,37 @@
         <property name="macros_mapping" type="string">
             <column name="XWP_MACROS_MAPPING" length="60000" />
         </property>
+        <property name="notification_pages" type="string">
+            <column name="XWP_NOTIFICATION_PAGES" length="255" />
+        </property>
     </class>
+
+    <!-- XWikiPreferences custom mapping -->
+    <!--
+    <class entity-name="XWiki.XWikiUsers" table="xwikiusers">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWU_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="first_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_FIRST_NAME" length="255" not-null="false" />
+          </property>
+        <property name="last_name" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_LAST_NAME" length="255" not-null="false" />
+        </property>
+        <property name="email" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_EMAIL" length="50" />
+        </property>
+        <property name="company" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_COMPANY" length="255" />
+        </property>
+        <property name="password" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_PASSWORD" length="255" />
+        </property>
+        <property name="validationKey" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
+          <column name="XWU_VALIDATION_KEY" />
+        </property>
+    </class>
+    -->
 </hibernate-mapping>
 

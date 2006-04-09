@@ -31,7 +31,7 @@ document.forms.objectadd.submit();
 #set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
 #set($sectionitemsmap = $xwiki.hashMap)
 #set($sectionitemsmap.params = ["multilingual", "language" , "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
-#set($sectionitemsmap.skin = ["skin", "baseskin", "stylesheet", "stylesheets"])
+#set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
 #set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages" ])
@@ -53,6 +53,13 @@ document.forms.objectadd.submit();
 <td>
 #if($prop)
 $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
+#if($item=="skin")
+#set($skin = $xwiki.skin)
+#if($skin.indexOf(".")!=-1)
+#set($skindoc = $xwiki.getDocument($skin))
+<a href="$skindoc.getURL()">Customize</a>
+#end
+#end
 #end
 </td></tr>
 #end

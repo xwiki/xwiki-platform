@@ -1072,6 +1072,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } catch (Exception e) {
             skin = "default";
         }
+        try {
+            if (skin.indexOf(".")!=-1) {
+                if (!checkAccess("view", getDocument(skin, context), context))
+                    skin = Param("xwiki.defaultskin", "default");
+            }
+        } catch (XWikiException e) {
+            // if it fails here, let's just ignore it
+        }
+
         context.put("skin", skin);
         return skin;
     }
@@ -2598,7 +2607,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public int checkActive(XWikiContext context) throws XWikiException {
+        return checkActive(context.getUser(), context);
+    }
+
+    public int checkActive(String user, XWikiContext context) throws XWikiException {
         int active = 1;
+
+        // These users are necessarly active
+        if (user.equals("XWiki.XWikiGuest")||(user.equals("XWiki.superadmin")))
+            return active;
+
         String checkactivefield = getXWikiPreference("auth_active_check", context);
         if (checkactivefield.equals("1")) {
             String username = context.getUser();

@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
+import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
@@ -82,25 +83,30 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
             }
         }
 
+        // Let's check of cookie should be a session cookie
+        boolean sessionCookie = !("true".equals(request.getParameter("j_rememberme")));
         String cookieDomain = getCookieDomain(request);
 
         // create client cookie to store username and password
         Cookie usernameCookie = new Cookie(COOKIE_USERNAME, username);
-        usernameCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+        if (!sessionCookie)
+         usernameCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
         usernameCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             usernameCookie.setDomain(cookieDomain);
 
         addCookie(response, usernameCookie);
         Cookie passwdCookie = new Cookie(COOKIE_PASSWORD, password);
-        passwdCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+        if (!sessionCookie)
+         passwdCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
         passwdCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             passwdCookie.setDomain(cookieDomain);
 
         addCookie(response, passwdCookie);
         Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, "true");
-        rememberCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+        if (!sessionCookie)
+         rememberCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
         rememberCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             rememberCookie.setDomain(cookieDomain);
@@ -109,7 +115,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
             String validationHash = getValidationHash(username, password, request.getRemoteAddr());
             if (validationHash != null) {
                 Cookie validationCookie = new Cookie(COOKIE_VALIDATION, validationHash);
-                validationCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+                if (!sessionCookie)
+                 validationCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
                 validationCookie.setPath(cookiePath);
                 if (cookieDomain!=null)
                     validationCookie.setDomain(cookieDomain);

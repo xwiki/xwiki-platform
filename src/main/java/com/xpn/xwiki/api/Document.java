@@ -878,4 +878,15 @@ public class Document extends Api {
                                   "Access denied in edit mode on document {0}", null, args);
         }
     }
+
+    public void saveWithProgrammingRights() throws XWikiException {
+        if (checkProgrammingRights())
+         context.getWiki().saveDocument(doc, olddoc, context);
+        else {
+            java.lang.Object[] args = { doc.getFullName() };
+         throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                                  "Access denied with no programming rights document {0}", null, args);
+        }
+    }
+
 }

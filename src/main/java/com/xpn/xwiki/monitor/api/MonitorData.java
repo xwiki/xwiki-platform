@@ -133,7 +133,7 @@ public class MonitorData {
     }
 
     public void startTimer(String timername) {
-        startTimer(timername, null);
+        startTimer(timername, "");
     }
 
     public void setTimerDetails(String timername, String details) {

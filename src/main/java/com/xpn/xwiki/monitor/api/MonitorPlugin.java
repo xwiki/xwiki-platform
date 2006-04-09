@@ -51,11 +51,19 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
 
     public void init(XWikiContext context) {
         super.init(context);
+        reset(context);
+        long iActive = context.getWiki().ParamAsLong("xwiki.monitor", 1);
+        setActive((iActive>0));
+    }
+
+    public void reset(XWikiContext context) {
+        timerSummaries = new HashMap();
+        activeTimerDataList = new HashMap();
+        duration = 0;
+        nbrequests = 0;
         long size = context.getWiki().ParamAsLong("xwiki.monitor.lastlistsize", 20);
         lastTimerDataList = new CircularFifoBuffer((int)size);
         lastUnfinishedTimerDataList = new CircularFifoBuffer((int)size);
-        long iActive = context.getWiki().ParamAsLong("xwiki.monitor", 1);
-        setActive((iActive>0));
     }
 
     public String getName() {

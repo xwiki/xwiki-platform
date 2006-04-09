@@ -41,7 +41,7 @@ public class XWikiRenderingEngine {
 
     private List renderers = new ArrayList();
     private HashMap renderermap = new LinkedHashMap();
-    private XWikiCache cache = new OSCacheCache();
+    private XWikiCache cache = new OSCacheCache(100);
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
         if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
@@ -112,85 +112,110 @@ public class XWikiRenderingEngine {
         return renderText(text, includingdoc, includingdoc, context);
     }
 
+    public void addToCached(String key, XWikiContext context) {
+        List cached = (ArrayList) context.get("render_cached");
+        if (cached==null) {
+            cached = new ArrayList();
+            context.put("render_cached", cached);
+        }
+        cached.add(key);
+    }
+
+    public void addToRefreshed(String key, XWikiContext context) {
+        List cached = (ArrayList) context.get("render_refreshed");
+        if (cached==null) {
+            cached = new ArrayList();
+            context.put("render_refreshed", cached);
+        }
+        cached.add(key);
+    }
+
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
         String key = getKey(text, contentdoc, includingdoc, context);
-        try {
-            XWikiRenderingCache cacheObject = null;
+        synchronized (key) {
             try {
-                cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
-            } catch (XWikiCacheNeedsRefreshException e2) {
-                cache.cancelUpdate(key);
+                XWikiRenderingCache cacheObject = null;
+                try {
+                    cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
+                } catch (XWikiCacheNeedsRefreshException e2) {
+                    cache.cancelUpdate(key);
+                }
+                if (cacheObject!=null) {
+                    XWikiRequest request = context.getRequest();
+                    boolean refresh = (request!=null) && ("1".equals(request.get("refresh")));
+                    if ((cacheObject.isValid()&&(!refresh))) {
+                        addToCached(key, context);
+                        return cacheObject.getContent();
+                    } else {
+                        addToRefreshed(key, context);
+                    }
+                }
+            } catch (Exception e) {
             }
-            if ((cacheObject!=null)&&cacheObject.isValid()) {
-                XWikiRequest request = context.getRequest();
-                boolean refresh = "1".equals((request!=null) ? request.get("refresh") : "");
-                if (!refresh)
-                 return cacheObject.getContent();
+
+            MonitorPlugin monitor  = Util.getMonitorPlugin(context);
+            try {
+                // Start monitoring timer
+                if (monitor!=null)
+                    monitor.startTimer("rendering");
+
+                XWikiDocument doc = context.getDoc();
+                XWikiDocument cdoc = context.getDoc();
+
+                // Let's call the beginRendering loop
+                context.getWiki().getPluginManager().beginRendering(context);
+
+                String content = text;
+
+                // Which is the current idoc and sdoc
+                XWikiDocument idoc = (XWikiDocument) context.get("idoc");
+                XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+                // We put the including and security doc in the context
+                // It will be needed to verify programming rights
+                context.put("idoc", includingdoc);
+                context.put("sdoc", contentdoc);
+
+                try {
+
+                    for (int i=0;i<renderers.size();i++)
+                        content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
+                } finally {
+                    // Remove including doc or set the previous one
+                    if (idoc==null)
+                        context.remove("idoc");
+                    else
+                        context.put("idoc", idoc);
+
+                    // Remove security doc or set the previous one
+                    if (sdoc==null)
+                        context.remove("sdoc");
+                    else
+                        context.put("sdoc", sdoc);
+
+                    // Let's call the endRendering loop
+                    context.getWiki().getPluginManager().endRendering(context);
+                }
+
+                try {
+                    int cacheDuration = context.getCacheDuration();
+                    if (cacheDuration>0) {
+                        XWikiRenderingCache cacheObject = new XWikiRenderingCache(key, content, cacheDuration, new Date());
+                        cache.putInCache(key, (Object)cacheObject);
+                    }
+                } catch (Exception e) {}
+                return content;
             }
-        } catch (Exception e) {
-        }
-
-        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
-        try {
-            // Start monitoring timer
-            if (monitor!=null)
-             monitor.startTimer("rendering");
-
-        XWikiDocument doc = context.getDoc();
-        XWikiDocument cdoc = context.getDoc();
-
-        // Let's call the beginRendering loop
-        context.getWiki().getPluginManager().beginRendering(context);
-
-        String content = text;
-
-        // Which is the current idoc and sdoc
-        XWikiDocument idoc = (XWikiDocument) context.get("idoc");
-        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
-        // We put the including and security doc in the context
-        // It will be needed to verify programming rights
-        context.put("idoc", includingdoc);
-        context.put("sdoc", contentdoc);
-
-        try {
-
-            for (int i=0;i<renderers.size();i++)
-                content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
-        } finally {
-            // Remove including doc or set the previous one
-            if (idoc==null)
-             context.remove("idoc");
-            else
-             context.put("idoc", idoc);
-
-            // Remove security doc or set the previous one
-            if (sdoc==null)
-             context.remove("sdoc");
-            else
-             context.put("sdoc", sdoc);
-
-            // Let's call the endRendering loop
-            context.getWiki().getPluginManager().endRendering(context);
-        }
-
-         try {
-          int cacheDuration = context.getCacheDuration();
-          if (cacheDuration>0) {
-             XWikiRenderingCache cacheObject = new XWikiRenderingCache(key, content, cacheDuration, new Date());
-             cache.putInCache(key, (Object)cacheObject);
-           }
-         } catch (Exception e) {}
-         return content;
-        }
-        finally {
-               if (monitor!=null)
-                   monitor.endTimer("rendering");
+            finally {
+                if (monitor!=null)
+                    monitor.endTimer("rendering");
+            }
         }
     }
 
     private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
         return context.getDatabase() + "-" + contentdoc.getDatabase() + ":" + contentdoc.getFullName() + "-"
-                + includingdoc.getDatabase() + ":" + includingdoc.getFullName() + "-" + text.hashCode();
+                + includingdoc.getDatabase() + ":" + includingdoc.getFullName() + "-" + context.getRequest().getQueryString()
+                + "-" + text.hashCode();
     }
 
     public void flushCache() {

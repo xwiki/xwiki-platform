@@ -108,7 +108,7 @@ public class MonitorTest extends HibernateTestCase  {
         Date time1 = new Date();
         monitordata.startRequest(page, new URL(surl));
         try { Thread.sleep(110);} catch (InterruptedException e) {}
-        monitordata.startTimer("sql");
+        monitordata.startTimer("sql", null);
         try { Thread.sleep(1100);} catch (InterruptedException e) {}
         monitordata.endTimer("sql");
         try { Thread.sleep(100);} catch (InterruptedException e) {}

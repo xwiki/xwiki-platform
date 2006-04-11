@@ -166,10 +166,30 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             Session session = getSession(context);
 
             // Delete the three attachement entries
-            loadAttachmentContent(attachment, context, false);
-            session.delete(attachment.getAttachment_content());
-            loadAttachmentArchive(attachment, context, false);
-            session.delete(attachment.getAttachment_archive());
+            try{
+                loadAttachmentContent(attachment, context, false);
+            }catch(XWikiException e){
+                context.put("exception",e);
+            }
+            if(context.get("exception") != null){
+                XWikiException e1 = (XWikiException) context.get("exception");
+                if(e1.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT ){
+                    session.delete(attachment.getAttachment_content());
+                }
+            }else session.delete(attachment.getAttachment_content());
+
+            try{
+                loadAttachmentArchive(attachment, context, false);
+            }catch(XWikiException e){
+                context.put("exception",e);
+            }
+            if(context.get("exception") != null){
+                XWikiException e1 = (XWikiException) context.get("exception");
+                if(e1.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT ){
+                    session.delete(attachment.getAttachment_archive());
+                }
+            }else session.delete(attachment.getAttachment_archive());
+
             session.delete(attachment);
 
             if (parentUpdate) {

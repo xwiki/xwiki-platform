@@ -74,6 +74,13 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         VelocityContext vcontext = null;
         try {
             String name = doc.getFullName();
+
+            int index1 = content.lastIndexOf("\n");
+            int index2 = content.lastIndexOf("##");
+            if(index1<index2){
+                content = content + "\n";
+            }
+            
             content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
             vcontext = prepareContext(context);
 

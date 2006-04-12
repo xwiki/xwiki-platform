@@ -77,6 +77,14 @@ public class XWikiNotificationManager {
             for (int i=0;i<vnamedrules.size();i++)
                ((XWikiNotificationRule)vnamedrules.get(i)).verify(newdoc, olddoc, context);
         }
+
+        name = context.getDatabase() + ":" + newdoc.getFullName();
+        vnamedrules = getNamedRules(name);
+        if (vnamedrules!=null) {
+            for (int i=0;i<vnamedrules.size();i++)
+               ((XWikiNotificationRule)vnamedrules.get(i)).verify(newdoc, olddoc, context);
+        }
+
         for (int i=0;i<generalrules.size();i++)
             ((XWikiNotificationRule)generalrules.get(i)).verify(newdoc, olddoc, context);
     }

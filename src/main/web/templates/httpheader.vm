@@ -47,9 +47,9 @@ $!xwiki.getWebPreference("meta")
  function lockEdit(){
     if (lockEditFlag==false) {
 #if($context.action=="inline")
-      var surl = "$doc.getExternalURL("lock")?action=inline&language=${request.language}";
+      var surl = "$doc.getExternalURL("lock")?action=inline&language=$!{request.language}";
 #else
-      var surl = "$doc.getExternalURL("lock")?language=${request.language}";
+      var surl = "$doc.getExternalURL("lock")?language=$!{request.language}";
 #end
       var myAjax = new Ajax.Request(
                 surl,

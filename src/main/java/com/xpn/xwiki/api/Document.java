@@ -60,7 +60,7 @@ public class Document extends Api {
     public Document(XWikiDocument doc, XWikiContext context) {
         super(context);
         this.olddoc = doc;
-        this.doc = (XWikiDocument) doc.clone();
+        this.doc = doc;
     }
 
     public XWikiDocument getDocument() {
@@ -71,6 +71,8 @@ public class Document extends Api {
     }
 
     protected XWikiDocument getDoc() {
+        if (doc==olddoc)
+          doc = (XWikiDocument) doc.clone();
         return doc;
     }
 
@@ -255,7 +257,7 @@ public class Document extends Api {
     }
 
     public Class getxWikiClass() {
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = getDoc().getxWikiClass();
         if (bclass==null)
             return null;
         else
@@ -264,7 +266,7 @@ public class Document extends Api {
 
 
     public Class[] getxWikiClasses() {
-        List list = doc.getxWikiClasses(context);
+        List list = getDoc().getxWikiClasses(context);
         if (list==null)
             return null;
         Class[] result = new Class[list.size()];
@@ -274,7 +276,7 @@ public class Document extends Api {
     }
 
     public int createNewObject(String classname) throws XWikiException {
-       return doc.createNewObject(classname, context);
+       return getDoc().createNewObject(classname, context);
     }
 
     public Object newObject(String classname) throws XWikiException {
@@ -287,12 +289,12 @@ public class Document extends Api {
     }
 
     public int getObjectNumbers(String classname) {
-        return doc.getObjectNumbers(classname);
+        return getDoc().getObjectNumbers(classname);
     }
 
 
     public Map getxWikiObjects() {
-        Map map = doc.getxWikiObjects();
+        Map map = getDoc().getxWikiObjects();
         Map resultmap = new HashMap();
         for (Iterator it = map.keySet().iterator();it.hasNext();) {
             String name = (String) it.next();
@@ -317,13 +319,13 @@ public class Document extends Api {
     }
 
     public Vector getObjects(String classname) {
-        Vector objects = doc.getObjects(classname);
+        Vector objects = getDoc().getObjects(classname);
         return getObjects(objects);
     }
 
     public Object getFirstObject(String fieldname) {
         try {
-            BaseObject obj = doc.getFirstObject(fieldname, context);
+            BaseObject obj = getDoc().getFirstObject(fieldname, context);
             if (obj==null)
                 return null;
             else
@@ -335,7 +337,7 @@ public class Document extends Api {
 
     public Object getObject(String classname, String key, String value, boolean failover) {
         try {
-            BaseObject obj = doc.getObject(classname, key, value, failover);
+            BaseObject obj = getDoc().getObject(classname, key, value, failover);
             if (obj==null)
                 return null;
             else
@@ -347,7 +349,7 @@ public class Document extends Api {
 
     public Object getObject(String classname, String key, String value) {
         try {
-            BaseObject obj = doc.getObject(classname, key, value);
+            BaseObject obj = getDoc().getObject(classname, key, value);
             if (obj==null)
                 return null;
             else
@@ -363,7 +365,7 @@ public class Document extends Api {
 
     public Object getObject(String classname, boolean create) {
         try {
-            BaseObject obj = doc.getObject(classname);
+            BaseObject obj = getDoc().getObject(classname);
 
             if ((obj==null)&&create) {
               return newObject(classname);
@@ -380,7 +382,7 @@ public class Document extends Api {
 
     public Object getObject(String classname, int nb) {
         try {
-            BaseObject obj = doc.getObject(classname, nb);
+            BaseObject obj = getDoc().getObject(classname, nb);
             if (obj==null)
                 return null;
             else
@@ -425,7 +427,7 @@ public class Document extends Api {
     }
 
     public List getAttachmentList() {
-        List list = doc.getAttachmentList();
+        List list = getDoc().getAttachmentList();
         List list2 = new ArrayList();
         for (int i=0;i<list.size();i++) {
             list2.add(new Attachment(this, (XWikiAttachment)list.get(i), context));
@@ -545,7 +547,7 @@ public class Document extends Api {
     }
 
     public Attachment getAttachment(String filename) {
-        XWikiAttachment attach = doc.getAttachment(filename);
+        XWikiAttachment attach = getDoc().getAttachment(filename);
         if (attach==null)
             return null;
         else
@@ -641,11 +643,11 @@ public class Document extends Api {
             if ((origdoc==null)&&(newdoc==null))
                 return new ArrayList();
             if (origdoc==null)
-                return doc.getObjectDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return getDoc().getObjectDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc==null)
-                return doc.getObjectDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return getDoc().getObjectDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
 
-            return doc.getObjectDiff(origdoc.getDoc(), newdoc.getDoc(), context);
+            return getDoc().getObjectDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
             java.lang.Object[] args = { origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion() };
             List list = new ArrayList();
@@ -696,7 +698,7 @@ public class Document extends Api {
 
     public boolean checkAccess(String right) {
         try {
-            return context.getWiki().checkAccess(right, doc, context);
+            return context.getWiki().checkAccess(right, getDoc(), context);
         } catch (XWikiException e) {
             return false;
         }
@@ -704,7 +706,7 @@ public class Document extends Api {
 
     public boolean hasAccessLevel(String level) {
         try {
-            return context.getWiki().getRightService().hasAccessLevel(level, context.getUser(), doc.getFullName(), context);
+            return context.getWiki().getRightService().hasAccessLevel(level, context.getUser(), getDoc().getFullName(), context);
         } catch (Exception e) {
             return false;
         }
@@ -756,12 +758,12 @@ public class Document extends Api {
 
     public java.lang.Object get(String classOrFieldName) {
         if (currentObj!=null)
-            return doc.display(classOrFieldName, currentObj.getBaseObject(), context);
-        BaseObject object = doc.getFirstObject(classOrFieldName, context);
+            return getDoc().display(classOrFieldName, currentObj.getBaseObject(), context);
+        BaseObject object = getDoc().getFirstObject(classOrFieldName, context);
         if (object!=null) {
-            return doc.display(classOrFieldName, object, context);
+            return getDoc().display(classOrFieldName, object, context);
         }
-        return doc.getObject(classOrFieldName);
+        return getDoc().getObject(classOrFieldName);
     }
 
 
@@ -782,21 +784,16 @@ public class Document extends Api {
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, context);
     }
 
-    public void saveDocument() throws XWikiException {
-        if (hasAccessLevel("edit"))
-            context.getWiki().saveDocument(doc, context);
-    }
-
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {
         if (hasAccessLevel("edit"))
-            return new com.xpn.xwiki.api.Object(doc.addObjectFromRequest(context), context);
+            return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(context), context);
         else
             return null;
     }
 
     public void insertText(String text, String marker) throws XWikiException {
         if (hasAccessLevel("edit"))
-            doc.insertText(text, marker, context);
+            getDoc().insertText(text, marker, context);
     }
 
     public boolean equals(java.lang.Object arg0) {
@@ -854,26 +851,26 @@ public class Document extends Api {
     }
 
     public void setTitle(String title) {
-        doc.setTitle(title);
+        getDoc().setTitle(title);
     }
 
     public void setParent(String parent) {
-        doc.setParent(parent);
+        getDoc().setParent(parent);
     }
 
     public void setContent(String content) {
-        doc.setContent(content);
+        getDoc().setContent(content);
     }
 
     public void setDefaultTemplate(String dtemplate) {
-        doc.setDefaultTemplate(dtemplate);
+        getDoc().setDefaultTemplate(dtemplate);
     }
 
     public void save() throws XWikiException {
         if (hasAccessLevel("edit"))
-         context.getWiki().saveDocument(doc, olddoc, context);
+         context.getWiki().saveDocument(getDoc(), olddoc, context);
         else {
-            java.lang.Object[] args = { doc.getFullName() };
+            java.lang.Object[] args = { getDoc().getFullName() };
          throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                                   "Access denied in edit mode on document {0}", null, args);
         }
@@ -881,9 +878,9 @@ public class Document extends Api {
 
     public void saveWithProgrammingRights() throws XWikiException {
         if (checkProgrammingRights())
-         context.getWiki().saveDocument(doc, olddoc, context);
+         context.getWiki().saveDocument(getDoc(), olddoc, context);
         else {
-            java.lang.Object[] args = { doc.getFullName() };
+            java.lang.Object[] args = { getDoc().getFullName() };
          throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                                   "Access denied with no programming rights document {0}", null, args);
         }

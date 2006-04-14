@@ -42,7 +42,7 @@
     <br/>
 
     <form action="$doc.getURL(" upload")" enctype="multipart/form-data" method="post">
-            < p>
+            <p>
         <script type="text/javascript">
             function updateAttachName(form) {
                 var fname = form.filepath.value;
@@ -76,7 +76,7 @@
         <input type="file" name="filepath" value="" size="40"/>
         <br/><br/>
         <input type="submit" value="$msg.get(" attachthisfile")" onclick="return updateAttachName(this.form)" />
-                </ p>
+                </p>
     </form>
 </div>
 <div class="xwikidatafooter2">

@@ -9,6 +9,8 @@ import com.xpn.xwiki.XWiki;
 import org.hibernate.Session;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface {
+    private static final Log log = LogFactory.getLog(XWikiHibernateAttachmentStore.class);
 
     /**
      * THis allows to initialize our storage engine.
@@ -166,43 +169,56 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             Session session = getSession(context);
 
             // Delete the three attachement entries
-            try{
+            try {
                 loadAttachmentContent(attachment, context, false);
-            }catch(XWikiException e){
-                context.put("exception",e);
+            } catch (Exception e) {
+                if (log.isWarnEnabled())
+                    log.warn("Error loading attachment content when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
             }
-            if(context.get("exception") != null){
-                XWikiException e1 = (XWikiException) context.get("exception");
-                if(e1.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT ){
-                    session.delete(attachment.getAttachment_content());
-                }
-            }else session.delete(attachment.getAttachment_content());
-
-            try{
-                loadAttachmentArchive(attachment, context, false);
-            }catch(XWikiException e){
-                context.put("exception",e);
+            try {
+                session.delete(attachment.getAttachment_content());
+            } catch (Exception e) {
+                if (log.isWarnEnabled())
+                    log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
             }
-            if(context.get("exception") != null){
-                XWikiException e1 = (XWikiException) context.get("exception");
-                if(e1.getCode() != XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT ){
-                    session.delete(attachment.getAttachment_archive());
-                }
-            }else session.delete(attachment.getAttachment_archive());
+            try {
+                loadAttachmentContent(attachment, context, false);
+            } catch(XWikiException e){
+                if (log.isWarnEnabled())
+                    log.warn("Error loading attachment archive when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+            }
 
-            session.delete(attachment);
+            try {
+                session.delete(attachment.getAttachment_archive());
+            } catch (Exception e) {
+                if (log.isWarnEnabled())
+                    log.warn("Error deleting attachment archive " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+            }
 
-            if (parentUpdate) {
-                List list = attachment.getDoc().getAttachmentList();
-                for (int i=0;i<list.size();i++) {
-                    XWikiAttachment attach = (XWikiAttachment) list.get(i);
-                    if (attachment.getFilename().equals(attach.getFilename())) {
-                        list.remove(i);
-                        break;
+            try {
+                session.delete(attachment);
+            } catch (Exception e) {
+                if (log.isWarnEnabled())
+                    log.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+            }
+
+            try {
+                if (parentUpdate) {
+                    List list = attachment.getDoc().getAttachmentList();
+                    for (int i=0;i<list.size();i++) {
+                        XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                        if (attachment.getFilename().equals(attach.getFilename())) {
+                            list.remove(i);
+                            break;
+                        }
                     }
+                    context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
                 }
-                context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, false);
+            } catch (Exception e) {
+                if (log.isWarnEnabled())
+                    log.warn("Error updating document when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
             }
+
             if (bTransaction) {
                 endTransaction(context, true);
             }

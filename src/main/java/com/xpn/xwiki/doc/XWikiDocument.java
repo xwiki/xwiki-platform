@@ -1182,6 +1182,7 @@ public class XWikiDocument {
         doc.setContentAuthor(getContentAuthor());
         doc.setContent(getContent());
         doc.setContentDirty(isContentDirty());
+        doc.setCreationDate(getCreationDate());
         doc.setDate(getDate());
         doc.setContentUpdateDate(getContentUpdateDate());
         doc.setTitle(getTitle());
@@ -1409,6 +1410,10 @@ public class XWikiDocument {
 
         el = new DOMElement("parent");
         el.addText(getParent());
+        docel.add(el);
+
+        el = new DOMElement("creator");
+        el.addText(getCreator());
         docel.add(el);
 
         el = new DOMElement("author");

@@ -90,7 +90,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
         // create client cookie to store username and password
         Cookie usernameCookie = new Cookie(COOKIE_USERNAME, username);
         if (!sessionCookie)
-         usernameCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+         setMaxAge(usernameCookie);
         usernameCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             usernameCookie.setDomain(cookieDomain);
@@ -98,7 +98,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
         addCookie(response, usernameCookie);
         Cookie passwdCookie = new Cookie(COOKIE_PASSWORD, password);
         if (!sessionCookie)
-         passwdCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+            setMaxAge(passwdCookie);
         passwdCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             passwdCookie.setDomain(cookieDomain);
@@ -106,7 +106,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
         addCookie(response, passwdCookie);
         Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, "true");
         if (!sessionCookie)
-         rememberCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+            setMaxAge(rememberCookie);
         rememberCookie.setPath(cookiePath);
         if (cookieDomain!=null)
             rememberCookie.setDomain(cookieDomain);
@@ -116,7 +116,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
             if (validationHash != null) {
                 Cookie validationCookie = new Cookie(COOKIE_VALIDATION, validationHash);
                 if (!sessionCookie)
-                 validationCookie.setMaxAge(60 * 60 * 24 * Integer.parseInt(cookieLife));
+                    setMaxAge(validationCookie);
                 validationCookie.setPath(cookiePath);
                 if (cookieDomain!=null)
                     validationCookie.setDomain(cookieDomain);
@@ -131,6 +131,15 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
             }
         }
         return;
+    }
+
+    private void setMaxAge(Cookie cookie) {
+        try {
+           cookie.setMaxAge(Math.round(60 * 60 * 24 * Float.parseFloat(cookieLife)));
+        } catch (Exception e) {
+            if (log.isErrorEnabled())
+                log.error("Failed setting cookie Max age with duration " + cookieLife);
+        }
     }
 
     private void addCookie(HttpServletResponse response, Cookie cookie) {

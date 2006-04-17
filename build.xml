@@ -100,7 +100,7 @@
     	ldap.jar,
      	rome-0.7.jar,rome-fetcher-0.7.jar,jdom-1.0.jar,
      	axis-1.2RC2.jar,jaxrpc-1.1.jar,saaj-1.2.jar,wsdl4j-1.5.jar,commons-discovery-0.2.jar,googleapi.jar,googleadwords.jar,alexa.jar,terraservice.jar,ipresolver.jar,flipper.jar,
-     	mail-1.3.2.jar,ical4j-0.9.12.jar,flickrapi-1.0a7.jar,
+     	mail-1.3.2.jar,ical4j-0.9.19M.jar,flickrapi-1.0a7.jar,
 		jackrabbit-1.0-SNAPSHOT.jar,jackrabbit-api-1.0-SNAPSHOT.jar,jackrabbit-commons-1.0-SNAPSHOT.jar,jackrabbit-core-1.0-SNAPSHOT.jar,jcr-1.0.jar,
 		org.apache.commons.jrcs.diff.jar,
         ant-1.6.2.jar,

@@ -148,9 +148,9 @@ public class CalendarPluginApi extends Api {
             if (component instanceof VEvent) {
                 VEvent event = (VEvent) component;
                 Calendar sdate = Calendar.getInstance();
-                sdate.setTime(event.getStartDate().getTime());
+                sdate.setTime(event.getStartDate().getDate());
                 Calendar edate = Calendar.getInstance();
-                edate.setTime(event.getEndDate().getTime());
+                edate.setTime(event.getEndDate().getDate());
                 PropertyList prop = event.getProperties();
                 Property summary = prop.getProperty("SUMMARY");
                 StringBuffer newsummary = new StringBuffer((summary!=null) ? summary.getValue() : "");
@@ -161,7 +161,9 @@ public class CalendarPluginApi extends Api {
                            newsummary.append(sformat.format(sdate.getTime()));
                            newsummary.append("-");
                            newsummary.append(sformat.format(edate.getTime()));
-                        }
+                        } else {
+                    edate.add(Calendar.HOUR, -24);
+                }
 
                 CalendarEvent cevent = new CalendarEvent(sdate, edate, user, newsummary.toString());
                 data.addCalendarData(cevent);
@@ -186,8 +188,8 @@ public class CalendarPluginApi extends Api {
               RRule rule = new RRule(new Recur("DAILY", Math.round(duration)));
               vevent.getProperties().add(rule);
             }
-            DtStart dtstart = new DtStart(cevent.getDateStart().getTime());
-            DtEnd dtend = new DtEnd(cevent.getDateEnd().getTime());
+            DtStart dtstart = new DtStart(new net.fortuna.ical4j.model.Date(cevent.getDateStart().getTime()));
+            DtEnd dtend = new DtEnd(new net.fortuna.ical4j.model.Date(cevent.getDateEnd().getTime()));
             dtstart.getParameters().add(Value.DATE);
             dtend.getParameters().add(Value.DATE);
             vevent.getProperties().add(dtstart);

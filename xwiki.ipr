@@ -440,13 +440,10 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-discovery-0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/axis-1.2RC2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jaxrpc-1.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/ical4j-0.9.12.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ical4j-0.9.19M.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/java/webservices/alexa/com" />
-        <root url="file://C:/dev/java/webservices/google/com" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="JCR">
       <CLASSES>

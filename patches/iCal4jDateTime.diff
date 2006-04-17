@@ -1,0 +1,68 @@
+--- ical4j-0.9.19M/source/net/fortuna/ical4j/model/DateTime.java	2006-04-17 16:02:58.391531200 +0200
++++ ical4j-0.9.19/source/net/fortuna/ical4j/model/DateTime.java	2006-03-19 18:02:44.000000000 +0100
+@@ -52,7 +52,6 @@
+     private static final long serialVersionUID = -6407231357919440387L;
+ 
+     private static final String DEFAULT_PATTERN = "yyyyMMdd'T'HHmmss";
+-    private static final String DEFAULT_PATTERN_GOOGLE = "yyyyMMdd";
+ 
+     private static final String UTC_PATTERN = "yyyyMMdd'T'HHmmss'Z'";
+     
+@@ -68,7 +67,6 @@
+      * Used for parsing times in a local date-time representation.
+      */
+     private static final DateFormat DEFAULT_FORMAT = new SimpleDateFormat(DEFAULT_PATTERN);
+-    private static final DateFormat DEFAULT_FORMAT_GOOGLE = new SimpleDateFormat(DEFAULT_PATTERN_GOOGLE);
+     
+     private Time time;
+     
+@@ -131,18 +129,10 @@
+             setUtc(true);
+         }
+         catch (ParseException pe) {
+-	   try {	
+             synchronized (DEFAULT_FORMAT) {
+                 DEFAULT_FORMAT.setTimeZone(getFormat().getTimeZone());
+                 time = DEFAULT_FORMAT.parse(value).getTime();
+             }
+-           }
+-           catch (ParseException pe2) {
+-            synchronized (DEFAULT_FORMAT_GOOGLE) {
+-                DEFAULT_FORMAT_GOOGLE.setTimeZone(getFormat().getTimeZone());
+-                time = DEFAULT_FORMAT_GOOGLE.parse(value).getTime();
+-            }
+-           }
+             this.time = new Time(time, getFormat().getTimeZone());
+         }
+         setTime(time);
+@@ -161,8 +151,7 @@
+             setUtc(true);
+         }
+         catch (ParseException pe) {
+-          try {
+-               synchronized (DEFAULT_FORMAT) {
++            synchronized (DEFAULT_FORMAT) {
+                 if (timezone != null) {
+                     DEFAULT_FORMAT.setTimeZone(timezone);
+                 }
+@@ -171,19 +160,7 @@
+                 }
+                 setTime(DEFAULT_FORMAT.parse(value).getTime());
+             }
+-           }
+-           catch (ParseException pe2) {
+-            synchronized (DEFAULT_FORMAT_GOOGLE) {
+-                if (timezone != null) {
+-                    DEFAULT_FORMAT_GOOGLE.setTimeZone(timezone);
+-                }
+-                else {
+-                    DEFAULT_FORMAT_GOOGLE.setTimeZone(getFormat().getTimeZone());
+-                }
+-                setTime(DEFAULT_FORMAT_GOOGLE.parse(value).getTime());
+-            }
+-           }
+-           setTimeZone(timezone);
++            setTimeZone(timezone);
+         }
+     }
+     

@@ -35,46 +35,66 @@ public class UploadAction extends XWikiAction {
     public boolean action(XWikiContext context) throws XWikiException {
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-
         String username = context.getUser();
-
+        Object exception = context.get("exception");
+        // check Exception File upload is large
+        if(exception != null){
+            if(exception instanceof XWikiException){
+                XWikiException exp = (XWikiException) exception ;
+                if(exp.getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE) {
+                    context.put("message","fileuploadislarge");
+                    return true ;
+                }
+            }
+        }
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
+        String filename =fileupload.getFileItem("filename", context);
 
-        String filename = fileupload.getFileItem("filename", context);
         if (filename!=null) {
          if (filename.indexOf("/") != -1 || filename.indexOf("\\") != -1 || filename.indexOf(";") != -1){
              context.put("message","notsupportcharacters");
              return true ;
          }
         }
-        byte[] data = fileupload.getFileItemData("filepath", context);
 
+        byte[] data = fileupload.getFileItemData("filepath", context);
         if (filename==null) {
             String fname = fileupload.getFileName("filepath", context);
             int i = fname.indexOf("\\");
             if (i==-1)
-                i = fname.indexOf ("/");
+                i = fname.indexOf("/");
             filename = fname.substring(i+1);
         }
         filename = filename.replaceAll("\\+"," ");
+
+        XWikiDocument olddoc = (XWikiDocument) doc.clone();
         // Read XWikiAttachment
-        XWikiAttachment attachment = doc.getAttachment(filename);
+        XWikiAttachment attachment = olddoc.getAttachment(filename);
 
         if (attachment==null) {
             attachment = new XWikiAttachment();
-            doc.getAttachmentList().add(attachment);
+            olddoc.getAttachmentList().add(attachment);
         }
         attachment.setContent(data);
         attachment.setFilename(filename);
-
         // TODO: handle Author
         attachment.setAuthor(username);
 
         // Add the attachment to the document
-        attachment.setDoc(doc);
+        attachment.setDoc(olddoc);
 
         // Save the content and the archive
-        doc.saveAttachmentContent(attachment, context);
+        try{
+             olddoc.saveAttachmentContent(attachment, context);
+        }catch(XWikiException e){
+            // check Exception is ERROR_XWIKI_APP_JAVA_HEAP_SPACE when saving Attachment
+            if(e.getCode() == XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE){
+                context.put("message","javaheapspace");
+                return true ;
+            }else{
+                throw e;
+            }
+        }
 
         // forward to attach page
         String redirect = fileupload.getFileItem("xredirect", context);

@@ -1459,7 +1459,7 @@ public class XWikiDocument {
             if (bclass.getFieldList().size() > 0) {
                 docel.add(bclass.toXML(null));
             }
-
+            
             // Add Objects
             Iterator it = getxWikiObjects().values().iterator();
             while (it.hasNext()) {
@@ -1663,8 +1663,13 @@ public class XWikiDocument {
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
 
-            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context, true);
-        } finally {
+           context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context,true);
+        }catch(java.lang.OutOfMemoryError e){
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+                    "Out Of Memory Exception");
+        }
+        finally {
             if (database != null)
                 context.setDatabase(database);
         }
@@ -1692,8 +1697,14 @@ public class XWikiDocument {
             // get the translated content
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
+            try{
+               context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
+            }catch(java.lang.OutOfMemoryError e){                
+                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+                    "Out Of Memory Exception");
+            }
 
-            context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
         } finally {
             if (database != null)
                 context.setDatabase(database);

@@ -1,11 +1,14 @@
 #template("xwiki.vm")
 #template("httpheader.vm")
 #template("header.vm")
-#template("baseheader.vm")
+#template("viewheader.vm")
 <div id="xwikicontent">
     #set($message = $xwiki.parseMessage())
     #if($message)
-    $message
+    <center>
+        <h2>$message</h2>
+        <br/><br/>
+    </center>
     #else
     $msg.get("problemoccured")
     #end

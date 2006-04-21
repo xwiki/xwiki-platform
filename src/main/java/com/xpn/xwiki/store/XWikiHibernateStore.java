@@ -211,6 +211,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bTransaction = beginTransaction(sfactory, context);
             }
             Session session = getSession(context);
+            session.setFlushMode(FlushMode.COMMIT);
 
             // These informations will allow to not look for attachments and objects on loading
             doc.setElement(XWikiDocument.HAS_ATTACHMENTS, (doc.getAttachmentList().size()!=0));
@@ -256,7 +257,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
                 for (int i=0;i<doc.getObjectsToRemove().size();i++) {
-                    deleteXWikiObject((BaseObject)doc.getObjectsToRemove().get(i), context, false);
+                    BaseObject bobj = (BaseObject)doc.getObjectsToRemove().get(i);
+                    if (bobj!=null)
+                     deleteXWikiObject(bobj, context, false);
                 }
                 doc.setObjectsToRemove(new ArrayList());
             }
@@ -328,6 +331,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
             bTransaction = bTransaction && beginTransaction(sfactory, false, context);
             Session session = getSession(context);
+            session.setFlushMode(FlushMode.NEVER);
 
             try {
                 session.load(doc, new Long(doc.getId()));
@@ -557,7 +561,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
                 for (int i=0;i<doc.getObjectsToRemove().size();i++) {
-                    deleteXWikiObject((BaseObject)doc.getObjectsToRemove().get(i), context, false);
+                    BaseObject bobj = (BaseObject)doc.getObjectsToRemove().get(i);
+                    if (bobj!=null)
+                     deleteXWikiObject(bobj, context, false);
                 }
                 doc.setObjectsToRemove(new ArrayList());
             }
@@ -655,7 +661,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 else
                  session.update((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
             }
-
+/*
+            if (stats)
+             session.saveOrUpdate(object);
+            else
+             session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+*/
             BaseClass bclass = object.getxWikiClass(context);
             List handledProps = new ArrayList();
             if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
@@ -669,6 +680,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     dynamicSession.save((String) bclass.getName(), objmap);
                 else
                     dynamicSession.update((String) bclass.getName(), objmap);
+
+                // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
             }
 
             if (!object.getClassName().equals("internal")) {
@@ -778,7 +791,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 HashMap map = new HashMap();
                 Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id");
                 query.setInteger("id", object.getId());
-                Iterator it = query.list().iterator();
+                List list = query.list();
+                Iterator it = list.iterator();
                 while (it.hasNext()) {
                     Object obj = it.next();
                     Object[] result = (Object[]) obj;

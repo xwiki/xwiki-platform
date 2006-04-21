@@ -1,9 +1,6 @@
 package com.xpn.xwiki.store;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.hibernate.impl.SessionFactoryImpl;
@@ -136,6 +133,9 @@ public class XWikiHibernateBaseStore {
      */
     public Session getSession(XWikiContext context) {
         Session session = (Session) context.get("hibsession");
+        // Make sure we are in this mode
+        if (session!=null)
+         session.setFlushMode(FlushMode.COMMIT);
         return session;
     }
 

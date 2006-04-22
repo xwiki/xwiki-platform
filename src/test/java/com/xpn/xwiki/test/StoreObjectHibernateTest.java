@@ -362,4 +362,42 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         assertTrue("Read delay is way too long (over 5s): " + delay, (delay < 1000));
         assertEquals("Could not find members", nb, doc.getObjects("XWiki.XWikiGroups").size());
     }
+
+
+    public void testCommentReadPerf() throws XWikiException {
+        testCommentReadPerf(100, false);
+    }
+
+    public void testCommentReadPerfMultipleVersions() throws XWikiException {
+        testCommentReadPerf(100, true);
+    }
+
+    public void testCommentReadPerf(int nb, boolean multipleVersions) throws XWikiException {
+        // Start monitoring timer
+        MonitorPlugin monitor = (MonitorPlugin) getXWiki().getPlugin("monitor", getXWikiContext());
+        if (monitor!=null)
+          monitor.startRequest("", "test", null);
+
+        Date starttime = new Date();
+        Utils.addManyComments(getXWiki(), getXWikiContext(), "Test.Comments", nb, multipleVersions);
+        Date endtime = new Date();
+        long delay = endtime.getTime() - starttime.getTime();
+        System.out.println("Writing " + nb + " comments took " + delay + "ms");
+
+        getXWiki().flushCache();
+
+
+        starttime = new Date();
+        XWikiDocument doc = getXWiki().getDocument("Test.Comments", getXWikiContext());
+        endtime = new Date();
+        delay = endtime.getTime() - starttime.getTime();
+
+        if (monitor!=null)
+          monitor.endRequest();
+
+        System.out.println("Reading " + nb + " comments took " + delay + "ms");
+        assertTrue("Read delay is way too long (over 5s): " + delay, (delay < 5000));
+        assertEquals("Could not find comments", nb, doc.getComments().size());
+    }
+
 }

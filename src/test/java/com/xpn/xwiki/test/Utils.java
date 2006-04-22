@@ -728,4 +728,21 @@ public class Utils {
         dir.delete();
     }
 
+    public static void addManyComments(XWiki xwiki, XWikiContext context, String page, int nb, boolean multipleVersions) throws XWikiException {
+        XWikiDocument doc = xwiki.getDocument(page, context);
+        BaseClass bclass = xwiki.getCommentsClass(context);
+        doc.setContent("This is a document with a lot of comments");
+        for (int i=0;i<nb;i++) {
+            BaseObject bobj = new BaseObject();
+            bobj.setName(page);
+            bobj.setClassName(bclass.getName());
+            bobj.setStringValue("author", "XWiki.XWikiGuest");
+            bobj.setStringValue("comment", "Hello this is a comment");
+            doc.addObject(bclass.getName(), bobj);
+            if (multipleVersions)
+                xwiki.saveDocument(doc, context);
+        }
+        if (!multipleVersions)
+         xwiki.saveDocument(doc, context);
+    }
 }

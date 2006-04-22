@@ -990,7 +990,17 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
+            Query query = session.createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
+            query.setInteger("id", property.getId());
+            query.setString("name", property.getName());
+            if (query.uniqueResult()==null) {
+                session.save(property);
+            }
+            else {
+                session.update(property);
+            }
 
+/*
 // I'm using a local transaction
 // There might be implications to this for a wider transaction
             Transaction ltransaction = session.beginTransaction();
@@ -1049,10 +1059,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 transaction2.commit();
                 session2.close();
             }
-
+*/
             if (bTransaction)
                 endTransaction(context, true);
-
         }
         catch (Exception e) {
             BaseCollection obj = property.getObject();

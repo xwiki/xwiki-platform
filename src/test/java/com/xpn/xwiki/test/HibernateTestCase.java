@@ -206,6 +206,8 @@ public class HibernateTestCase extends TestCase {
             runSQL(hibstore, "delete from xwikistatsreferer", context);
             runSQL(hibstore, "delete from xwikistatsvisit", context);
             runSQL(hibstore, "delete from xwikilinks", context);
+            runSQL(hibstore, "delete from xwikipreferences", context);
+            runSQL(hibstore, "delete from xwikicomments", context);
         }
         hibstore.endTransaction(context, true);
         } catch (Exception e) {

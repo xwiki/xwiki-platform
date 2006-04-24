@@ -28,9 +28,18 @@ package com.xpn.xwiki.web;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.io.IOException;
+import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.velocity.VelocityContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     protected URL serverURL;
@@ -96,11 +105,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     private URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException {
         if (context.getRequest()!=null){      // necessary to the tests
             final String host = context.getRequest().getHeader("x-forwarded-host"); // apache modproxy host
-            if (host!=null) {            	
-            	int comaind = host.indexOf(',');
-            	final String host1 = comaind>0 ? host.substring(0, comaind) : host;
-            	if (!host1.equals(""))
-            		return new URL("http://"+host1);
+            if (host!=null) {
+                int comaind = host.indexOf(',');
+                final String host1 = comaind>0 ? host.substring(0, comaind) : host;
+                if (!host1.equals(""))
+                    return new URL("http://"+host1);
             }
         }
         if (xwikidb==null)
@@ -113,7 +122,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
             if (url==null)
              return serverURL;
             else
-             return url; 
+             return url;
         }
     }
 
@@ -237,15 +246,42 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
+        XWikiAttachment attachment = null;
+        XWikiAttachment attLastVer = null;
+        String revdoc =null;
+        String lastver = null;
+
         if ((querystring!=null)&&(!querystring.equals(""))) {
             newpath.append("?");
             newpath.append(querystring);
         }
 
-        try {
+        if(context.getAction().equals("viewrev")){
+            revdoc = context.get("rev").toString();
+            Log log = LogFactory.getLog(XWikiServletURLFactory.class);
+            try{
+                lastver = context.getWiki().getDocument(context.getDoc().getFullName(),context).getVersion();
+                attLastVer = context.getWiki().getDocument(context.getDoc().getFullName(),context).getAttachment(filename) ;
+                attachment = findAttachmentForDocRevision(context.getDoc(),revdoc,filename,context);
+            }catch(XWikiException e){
+                if(log.isErrorEnabled()) log.error("Exception while trying to get attachment version !",e);
+            }
+        }
+
+        try{
+           if(attLastVer != null){
+                if(revdoc != null && !revdoc.equals(lastver)){
+                    String veratt = attachment.getVersion();
+                    String lastveratt = attLastVer.getVersion();
+                    if( !veratt.equals(lastveratt) ){
+                        return createAttachmentRevisionURL(filename,web,name,veratt,querystring,xwikidb,context);
+                    }
+                }
+            }
+
             return new URL(getServerURL(xwikidb, context), newpath.toString());
-        } catch (MalformedURLException e) {
-            // This should not happen
+        }
+        catch(Exception e){
             return null;
         }
     }
@@ -305,15 +341,26 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
             return "";
         }
     }
-    public URL getRequestURL(XWikiContext context) {    	
-    	final URL url = super.getRequestURL(context);
-		try {
-			final URL servurl = getServerURL(context); // if use apache mod_proxy we needed to know external host address
-			return new URL(url.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
-		} catch (MalformedURLException e) {
-			// This should not happen
-			e.printStackTrace();
-			return url;
-		}
+    public URL getRequestURL(XWikiContext context) {
+        final URL url = super.getRequestURL(context);
+        try {
+            final URL servurl = getServerURL(context); // if use apache mod_proxy we needed to know external host address
+            return new URL(url.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
+        } catch (MalformedURLException e) {
+            // This should not happen
+            e.printStackTrace();
+            return url;
+        }
+    }
+    public XWikiAttachment findAttachmentForDocRevision(XWikiDocument doc, String revdoc ,String filename,XWikiContext context ) throws XWikiException{
+        XWikiAttachment attachment = null;
+        XWikiDocument rdoc = context.getWiki().getDocument(doc,revdoc,context);
+        if(filename != null){
+            attachment = rdoc.getAttachment(filename);
+        }else{
+            return  null;
+        }
+
+        return attachment ;
     }
 }

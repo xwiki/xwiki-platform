@@ -25,11 +25,17 @@ public class DownloadRevAction extends XWikiAction {
         else {
             attachment = doc.getAttachment(filename);
         }
+        if (attachment==null) {
+            Object[] args = { filename };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                    "Attachment {0} not found", null, args);
+        }
 
         synchronized (attachment) {
             try {
                 attachment = attachment.getAttachmentRevision(rev, context);
-            } catch(Exception e){
+            } catch(XWikiException e){
                 String url = context.getDoc().getURL("viewattachrev", true, context);
                 try {
                     context.getResponse().sendRedirect(url+"/" + filename);
@@ -39,15 +45,8 @@ public class DownloadRevAction extends XWikiAction {
             }
         }
 
-        if (attachment==null) {
-            Object[] args = { filename };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                    "Attachment {0} not found", null, args);
-        }
-
-	XWikiPluginManager plugins = context.getWiki().getPluginManager();
-	attachment = plugins.downloadAttachment(attachment, context);
+        XWikiPluginManager plugins = context.getWiki().getPluginManager();
+        attachment = plugins.downloadAttachment(attachment, context);
 
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);

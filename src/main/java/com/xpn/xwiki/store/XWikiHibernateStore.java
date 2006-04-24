@@ -704,8 +704,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
                                 "Field {0} in object {1} has an invalid name", null, args);
                     }
-                    if (!handledProps.contains(prop.getName()))
-                        saveXWikiProperty(prop, context, false);
+
+                    String pname = prop.getName() ;
+                    if(pname != null && !pname.trim().equals("") && !handledProps.contains(pname) ){
+                       saveXWikiProperty(prop, context, false);
+                    }
                 }
             }
 
@@ -1107,7 +1110,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Iterator it = coll.iterator();
             while (it.hasNext()) {
                 PropertyClass prop = (PropertyClass) it.next();
-                saveXWikiClassProperty(prop, context, false);
+                String pname = prop.getName();
+                if(pname != null && !pname.trim().equals("") ) {
+                    saveXWikiClassProperty(prop, context, false);
+                }
             }
 
             if (bTransaction) {

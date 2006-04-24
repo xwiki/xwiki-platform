@@ -41,6 +41,12 @@ public class PropAddAction extends XWikiAction {
 
         XWikiDocument olddoc = (XWikiDocument) doc.clone();
         String propName = ((PropAddForm) form).getPropName();
+
+        if(propName ==null || propName.equals("") || !propName.matches("\\w+") ){
+            context.put("message","propertynamenotcorrect");
+            return true;
+        }
+
         String propType = ((PropAddForm) form).getPropType();
         BaseClass bclass = doc.getxWikiClass();
         bclass.setName(doc.getFullName());
@@ -63,4 +69,8 @@ public class PropAddAction extends XWikiAction {
         sendRedirect(response, redirect);
         return false;
 	}
+
+     public String render(XWikiContext context) throws XWikiException{
+         return "exception";
+     }
 }

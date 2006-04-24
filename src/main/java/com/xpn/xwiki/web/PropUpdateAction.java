@@ -60,6 +60,12 @@ public class PropUpdateAction extends XWikiAction {
             Map map = ((EditForm)form).getObject(name);
             property.getxWikiClass(context).fromMap(map, property);
             String newname = property.getName();
+            
+            if(newname == null || newname.equals("") || !newname.matches("\\w+")){
+                context.put("message","propertynamenotcorrect");
+                return true;
+            }
+
             if (newname.indexOf(" ")!=-1) {
                 newname = newname.replaceAll(" ","");
                 property.setName(newname);
@@ -91,4 +97,8 @@ public class PropUpdateAction extends XWikiAction {
         sendRedirect(response, redirect);
         return false;
 	}
+
+    public String render(XWikiContext context) throws XWikiException {
+        return "exception";
+    }
 }

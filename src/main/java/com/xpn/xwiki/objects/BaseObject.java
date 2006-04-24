@@ -149,8 +149,12 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         while (it.hasNext()) {
             Element pel = new DOMElement("property");
             PropertyInterface bprop = (PropertyInterface)it.next();
-            pel.add(bprop.toXML());
-            oel.add(pel);
+
+            String pname = bprop.getName();
+            if(pname != null && !pname.trim().equals("") ) {
+                pel.add(bprop.toXML());
+                oel.add(pel);
+            }            
         }
         return oel;
     }

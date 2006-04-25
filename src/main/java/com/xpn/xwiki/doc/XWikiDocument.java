@@ -840,6 +840,26 @@ public class XWikiDocument {
         }
     }
 
+    public void clonexWikiObjects(XWikiDocument templatedoc) {
+        // TODO: look for each object if it already exist and add it if it doesn't
+        Iterator itobjects = templatedoc.getxWikiObjects().keySet().iterator();
+        while (itobjects.hasNext()) {
+            String name = (String) itobjects.next();
+            Vector tobjects = (Vector) templatedoc.getObjects(name);
+            Vector objects = new Vector();
+            objects.setSize(tobjects.size());
+            for (int i = 0; i < tobjects.size(); i++) {
+                BaseObject bobj1 = (BaseObject) tobjects.get(i);
+                if (bobj1 != null) {
+                    BaseObject bobj = (BaseObject) bobj1.clone();
+                    objects.set(i, bobj);
+                }
+            }
+            getxWikiObjects().put(name, objects);
+        }
+    }
+
+
     public String getTemplate() {
         if (template==null)
          return "";
@@ -1206,7 +1226,7 @@ public class XWikiDocument {
         doc.setTranslation(getTranslation());
         doc.setxWikiClass((BaseClass) getxWikiClass().clone());
         doc.setxWikiClassXML(getxWikiClassXML());
-        doc.mergexWikiObjects(this);
+        doc.clonexWikiObjects(this);
         doc.copyAttachments(this);
         return doc;
     }

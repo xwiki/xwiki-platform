@@ -33,10 +33,12 @@ public class LockAction extends XWikiAction {
 
         String username = context.getUser();
         XWikiLock lock = tdoc.getLock(context);
-        if ("inline".equals(request.get("action")))
-            doc.setLock(username, context);
-        else
-            tdoc.setLock(username, context);
+        if ((lock==null)||(username.equals(lock.getUserName()))) {
+            if ("inline".equals(request.get("action")))
+                doc.setLock(username, context);
+            else
+                tdoc.setLock(username, context);
+        }
 
         // forward to view
         String redirect = Utils.getRedirect("view", context);

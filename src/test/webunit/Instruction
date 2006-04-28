@@ -1,0 +1,27 @@
+Instruction to run web unit test:
+	1. 	Locate webunit-webui in tomcat.
+			Example: /home/exo/java/xwiki-tomcat/webapps/webunit-webui
+	2.	Build project and run tomcat
+	3. 	Then type this path: http://localhost:8080/webunit-webui/controller
+			in browse to run web unit test
+	4. 	Click on 'Config Test' button (2 people icon) and set:
+				Mark 3 checked boxes.
+				Interval: 0
+				URL: path lead to main page of Xwiki. Example: http://127.0.0.1:8080/xwiki/bin/view/Main/
+				Test Categories class: suites.xwiki.control.XwikiTestCategories
+				Groovy Script Location: directory contain test code. Example: /home/exo/java/projects/xwiki/src/test/webunit
+			Then click on 'Save'
+	5.	Click on 'Reload current page' button on browse to refesh 
+	6.	Click 'Select Suite' button (last blue icon) on test control so that test suites appear on the right screen
+	7.	Click on 'Select' link to choose a  suite then units of the suite will be listed on left screen
+	8. 	Click on 'Next Unit' button to run test one unit a time then see result of each step in the right
+			or click on 'Run' button to run all units then click on 'Suite Summary' button (lamp icon) to check results: a runnable 				unit is red and in Summary its status is OK and req=1
+
+
+Other:
+	1. Each test in a category (Account Suite, User Check Link Suite, Admin Check Link Suite, Edit Page Suite) can run alone.
+	2. User Check Link Suites calls other suites in User Check Link Suite and Admin Check Link Suites calls suites in Admin 
+		 Check Link Suite. My objective is to make these suites run automatic.
+	3. In left screen, the unit is marked '!!!' - it's only a comment, it's not an unit. After running, its status is TODO
+		 Because the unit cannot run well in webunit test. In the file, you will see the unit is commented out and there's a 	
+		 COMMENT above

@@ -162,7 +162,7 @@ public abstract class ListClass extends PropertyClass {
         BaseProperty lprop = (BaseProperty)newProperty();
 
 
-        if (isMultiSelect()) {
+        if (lprop instanceof ListProperty) {
             List llist = ((ListProperty)lprop).getList();
             for (int i=0;i<elist.size();i++) {
                 Element el = (Element) elist.get(i);

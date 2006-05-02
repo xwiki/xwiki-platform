@@ -43,60 +43,64 @@ import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ImagePlugin extends XWikiDefaultPlugin {
-	private static final int TYPE_JPG = 1;
+    private static final Log log = LogFactory.getLog(ImagePlugin.class);
+    private static final int TYPE_JPG = 1;
 
-	private static final int TYPE_PNG = 2;
+    private static final int TYPE_PNG = 2;
 
-	private static final int TYPE_BMP = 3;
+    private static final int TYPE_BMP = 3;
 
-	private static String name = "image";
+    private static String name = "image";
 
-	private XWikiCache imageCache;
+    private XWikiCache imageCache;
 
-	private int capacity = 50;
+    private int capacity = 50;
 
-	public ImagePlugin(String name, String className, XWikiContext context) {
-		super(name, className, context);
-		init(context);
+    public ImagePlugin(String name, String className, XWikiContext context) {
+        super(name, className, context);
+        init(context);
 
-	}
+    }
 
-	/**
-	 * Allow to get the plugin name
-	 * 
-	 * @return plugin name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * Allow to get the plugin name
+     *
+     * @return plugin name
+     */
+    public String getName() {
+        return name;
+    }
 
-	public void init(XWikiContext context) {
-		super.init(context);
-		try {
-			String capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-			capacity = Integer.parseInt(capacityParam);
-		} catch (NumberFormatException e) {
-			throw e;
-		} finally {
-			imageCache = new OSCacheCache(capacity, true, "temp/imageCache");
-		}
+    public void init(XWikiContext context) {
+        super.init(context);
+        String capacityParam = "";
+        try {
+            capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
+            if ((capacityParam!=null)&&(!capacityParam.equals("")))
+            capacity = Integer.parseInt(capacityParam);
+        } catch (NumberFormatException e) {
+            if (log.isErrorEnabled())
+             log.error("Error in ImagePlugin reading capacity: " + capacityParam, e);
+        } 
+        imageCache = new OSCacheCache(capacity, true, "temp/imageCache");
+    }
 
-	}
+    public void flushCache() {
+        if (imageCache != null)
+            imageCache.flushAll();
+    }
 
-	public void flushCache() {
-		if (imageCache != null)
-			imageCache.flushAll();
-	}
+    public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
 
-	public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
-
-		int height = 0;
+        int height = 0;
         int width = 0;
-		XWikiAttachment attachmentClone = null;
-		try {
-			String sheight = context.getRequest().getParameter("height");
+        XWikiAttachment attachmentClone = null;
+        try {
+            String sheight = context.getRequest().getParameter("height");
             String swidth = context.getRequest().getParameter("width");
 
             if (sheight!=null)
@@ -104,57 +108,57 @@ public class ImagePlugin extends XWikiDefaultPlugin {
             if (swidth!=null)
             width = Integer.parseInt(swidth);
 
-			attachmentClone = (XWikiAttachment) attachment.clone();
-			String key = attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + TYPE_PNG + "-" + width + "-" + height;
-			
-			if (imageCache != null) {
-				try {
-					attachmentClone.setContent((byte []) imageCache.getFromCache(key));
-				} catch (XWikiCacheNeedsRefreshException e) {
-					try {
+            attachmentClone = (XWikiAttachment) attachment.clone();
+            String key = attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + TYPE_PNG + "-" + width + "-" + height;
+
+            if (imageCache != null) {
+                try {
+                    attachmentClone.setContent((byte []) imageCache.getFromCache(key));
+                } catch (XWikiCacheNeedsRefreshException e) {
+                    try {
                         if (width==0)
-						 attachmentClone = this.getImageByHeight(attachmentClone, height, context);
-						else if (height==0)
+                         attachmentClone = this.getImageByHeight(attachmentClone, height, context);
+                        else if (height==0)
                             attachmentClone = this.getImageByWidth(attachmentClone, width, context);
                         else
                             attachmentClone = this.getImage(attachmentClone, width, height, context);
 
                         imageCache.putInCache(key, attachmentClone.getContent(context));
-					} catch (Exception e2) {
-						imageCache.cancelUpdate(key);
-						throw e2;
-					}
-				}
-			} else {
-				attachmentClone = this.getImageByHeight(attachmentClone, height, context);
-			}
-		} catch (Exception e) {
-			attachmentClone = attachment;
-		} finally {
-			return attachmentClone;
-		}
-	}
+                    } catch (Exception e2) {
+                        imageCache.cancelUpdate(key);
+                        throw e2;
+                    }
+                }
+            } else {
+                attachmentClone = this.getImageByHeight(attachmentClone, height, context);
+            }
+        } catch (Exception e) {
+            attachmentClone = attachment;
+        } finally {
+            return attachmentClone;
+        }
+    }
 
-	public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context) throws Exception {
-		
-		if (getType(attachment.getMimeType(context)) == 0)
-			throw new PluginException(name,  PluginException.ERROR_XWIKI_NOT_IMPLEMENTED,
-					"Only JPG, PNG or BMP images are supported.");
+    public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context) throws Exception {
+
+        if (getType(attachment.getMimeType(context)) == 0)
+            throw new PluginException(name,  PluginException.ERROR_XWIKI_NOT_IMPLEMENTED,
+                    "Only JPG, PNG or BMP images are supported.");
 
         Image imgOri = getImage(attachment, context);
 
         int imgOriWidth = imgOri.getWidth(null);
-		int imgOriHeight = imgOri.getHeight(null);
+        int imgOriHeight = imgOri.getHeight(null);
 
-		if (thumbnailHeight >= imgOriHeight)
-			throw new PluginException(name, PluginException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-					"Thumbnail image not created: the height is higher than the original one.");
+        if (thumbnailHeight >= imgOriHeight)
+            throw new PluginException(name, PluginException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+                    "Thumbnail image not created: the height is higher than the original one.");
 
-		double imageRatio = (double) imgOriWidth / (double) imgOriHeight;
-		int thumbnailWidth = (int) (thumbnailHeight * imageRatio);
+        double imageRatio = (double) imgOriWidth / (double) imgOriHeight;
+        int thumbnailWidth = (int) (thumbnailHeight * imageRatio);
         createThumbnail(thumbnailWidth, thumbnailHeight, imgOri, attachment);
         return attachment;
-	}
+    }
 
     public XWikiAttachment getImage(XWikiAttachment attachment, int thumbnailWidth, int thumbnailHeight, XWikiContext context) throws Exception {
 

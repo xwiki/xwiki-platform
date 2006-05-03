@@ -5,10 +5,12 @@
 <script language="javascript" type="text/javascript">
 	wikiEditor.init({
 		elements : "$editors",
+	    language: "en",
 		mode: "exact",
 		content_css: "$xwiki.getSkinFile("style.css")",
 		debug : false,
 		remove_linebreaks : false,
+		plugins: 'table, contextmenu, paste, searchreplace',
 		wiki_plugins: 'core'
 	});
 </script>

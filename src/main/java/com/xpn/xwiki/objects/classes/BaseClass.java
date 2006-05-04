@@ -50,6 +50,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     private static final Log log = LogFactory.getLog(BaseClass.class);
     private String customMapping;
     private String customClass;
+    private String defaultWeb;
+    private String defaultViewSheet;
+    private String defaultEditSheet;
+    private String nameField;
 
     // This insures natural ordering between properties
     public void addField(String name, PropertyInterface element) {
@@ -130,6 +134,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         BaseClass bclass = (BaseClass) super.clone();
         bclass.setCustomClass(getCustomClass());
         bclass.setCustomMapping(getCustomMapping());
+        bclass.setDefaultWeb(getDefaultWeb());
+        bclass.setDefaultViewSheet(getDefaultViewSheet());
+        bclass.setDefaultEditSheet(getDefaultEditSheet());
+        bclass.setNameField(getNameField());
         return bclass;
     }
 
@@ -143,6 +151,18 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             return false;
 
         if (!getCustomMapping().equals(bclass.getCustomMapping()))
+            return false;
+
+        if (!getDefaultViewSheet().equals(bclass.getDefaultViewSheet()))
+            return false;
+
+        if (!getDefaultEditSheet().equals(bclass.getDefaultEditSheet()))
+            return false;
+
+        if (!getDefaultWeb().equals(bclass.getDefaultWeb()))
+            return false;
+
+        if (!getNameField().equals(bclass.getNameField()))
             return false;
 
         return true;
@@ -170,6 +190,22 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         el.addText((getCustomMapping()==null) ? "" : getCustomMapping());
         cel.add(el);
 
+        el = new DOMElement("defaultViewSheet");
+        el.addText((getDefaultViewSheet()==null) ? "" : getDefaultViewSheet());
+        cel.add(el);
+
+        el = new DOMElement("defaultEditSheet");
+        el.addText((getDefaultEditSheet()==null) ? "" : getDefaultEditSheet());
+        cel.add(el);
+
+        el = new DOMElement("defaultWeb");
+        el.addText((getDefaultWeb()==null) ? "" : getDefaultWeb());
+        cel.add(el);
+
+        el = new DOMElement("nameField");
+        el.addText((getNameField()==null) ? "" : getNameField());
+        cel.add(el);
+
         Iterator it = getFieldList().iterator();
         while (it.hasNext()) {
             PropertyClass bprop = (PropertyClass)it.next();
@@ -188,8 +224,28 @@ public class BaseClass extends BaseCollection implements ClassInterface {
                 j++;
             }
             Element cmapel = cel.element("customMapping");
-            if (cclel!=null) {
+            if (cmapel!=null) {
                 setCustomMapping(cmapel.getText());
+                j++;
+            }
+            Element cdvsel = cel.element("defaultViewSheet");
+            if (cdvsel!=null) {
+                setDefaultViewSheet(cdvsel.getText());
+                j++;
+            }
+            Element cdesel = cel.element("defaultEditSheet");
+            if (cdesel!=null) {
+                setDefaultViewSheet(cdesel.getText());
+                j++;
+            }
+            Element cdwel = cel.element("defaultWeb");
+            if (cdwel!=null) {
+                setDefaultWeb(cdwel.getText());
+                j++;
+            }
+            Element cnfel = cel.element("nameField");
+            if (cnfel!=null) {
+                setNameField(cnfel.getText());
                 j++;
             }
 
@@ -213,11 +269,15 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         SAXReader reader = new SAXReader();
         Document domdoc;
 
+        if ((xml==null)||(xml.trim().equals("")))
+         return;
+
         try {
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
+            Object[] args = { xml };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml {0}", e, args);
         }
 
         Element docel = domdoc.getRootElement();
@@ -468,5 +528,37 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
         return object;
     }
+    }
+
+    public String getDefaultWeb() {
+        return defaultWeb;
+    }
+
+    public void setDefaultWeb(String defaultWeb) {
+        this.defaultWeb = defaultWeb;
+    }
+
+    public String getDefaultViewSheet() {
+        return defaultViewSheet;
+    }
+
+    public void setDefaultViewSheet(String defaultViewSheet) {
+        this.defaultViewSheet = defaultViewSheet;
+    }
+
+    public String getDefaultEditSheet() {
+        return defaultEditSheet;
+    }
+
+    public void setDefaultEditSheet(String defaultEditSheet) {
+        this.defaultEditSheet = defaultEditSheet;
+    }
+
+    public String getNameField() {
+        return nameField;
+    }
+
+    public void setNameField(String nameField) {
+        this.nameField = nameField;
     }
 }

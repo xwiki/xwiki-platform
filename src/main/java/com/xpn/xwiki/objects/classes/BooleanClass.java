@@ -84,8 +84,11 @@ public class BooleanClass extends PropertyClass {
         if (prop==null)
             return;
 
-        int value = ((Integer)prop.getValue()).intValue();
-        buffer.append(getDisplayValue(context, value));
+        Integer iValue = (Integer)prop.getValue();
+        if (iValue!=null) {
+            int value = iValue.intValue();
+            buffer.append(getDisplayValue(context, value));
+        }
     }
 
 

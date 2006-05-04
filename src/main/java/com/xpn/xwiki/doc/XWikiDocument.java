@@ -41,7 +41,6 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.web.PrepareEditForm;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
@@ -701,14 +700,20 @@ public class XWikiDocument {
     }
 
     public Vector getObjects(String classname) {
+        if (classname.indexOf(".")==-1)
+         classname = "XWiki." + classname;
         return (Vector) getxWikiObjects().get(classname);
     }
 
     public void setObjects(String classname, Vector objects) {
+        if (classname.indexOf(".")==-1)
+         classname = "XWiki." + classname;
         getxWikiObjects().put(classname, objects);
     }
 
     public BaseObject getObject(String classname) {
+        if (classname.indexOf(".")==-1)
+         classname = "XWiki." + classname;
         Vector objects = (Vector) getxWikiObjects().get(classname);
         if (objects == null)
             return null;
@@ -722,6 +727,8 @@ public class XWikiDocument {
 
     public BaseObject getObject(String classname, int nb) {
         try {
+            if (classname.indexOf(".")==-1)
+             classname = "XWiki." + classname;
             return (BaseObject) ((Vector) getxWikiObjects().get(classname)).get(nb);
         } catch (Exception e) {
             return null;
@@ -733,6 +740,8 @@ public class XWikiDocument {
     }
 
     public BaseObject getObject(String classname, String key, String value, boolean failover) {
+        if (classname.indexOf(".")==-1)
+         classname = "XWiki." + classname;
         try {
             if (value == null) {
                 if (failover)
@@ -1134,7 +1143,7 @@ public class XWikiDocument {
     }
     */
 
-    public void readFromTemplate(PrepareEditForm eform, XWikiContext context) throws XWikiException {
+    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException {
         String template = eform.getTemplate();
         readFromTemplate(template, context);
     }

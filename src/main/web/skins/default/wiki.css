@@ -96,18 +96,26 @@
   margin: auto;
   empty-cells: show;
   width: 80%;
-  border-left: 1px solid #5b5b5b;
-  border-right: 1px solid #5b5b5b;
-  border-bottom: 1px solid #5b5b5b;
+  font-size:100%;
+  text-align:left;
+  border: 1px solid #5b5b5b;
+  border-width: 1px;
+  border-style: outset;
+  border-collapse: collapse;
 }
 
 .wiki-table td {
-  border-top: 1px solid #5b5b5b;
+  border: 1px solid #5b5b5b;
+  border-width: 1px;
+  border-style: inset;
   padding: 2px;
+  text-align:left;
 }
 
 .wiki-table th {
-  border-top: 1px solid #5b5b5b;
+  border: 1px solid #5b5b5b;
+  border-width: 1px;
+  border-style: inset;
   text-align: left;
   color: inherit;
   font-weight: bold;

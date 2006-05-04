@@ -46,6 +46,7 @@ public class EditForm extends XWikiForm
     private String defaultTemplate;
     private String title;
     private String comment;
+    private boolean lockForce;
 
     public void readRequest() {
         XWikiRequest request = getRequest();
@@ -60,6 +61,7 @@ public class EditForm extends XWikiForm
         setTitle(request.getParameter("title"));
         setComment(request.getParameter("comment"));
         setDefaultLanguage(request.getParameter("default_language"));
+        setLockForce("1".equals(request.getParameter("force")));
     }
 
 
@@ -172,7 +174,12 @@ public class EditForm extends XWikiForm
         this.comment = comment;
     }
 
+    public boolean isLockForce() {
+        return lockForce;
+    }
 
-
+    public void setLockForce(boolean lockForce) {
+        this.lockForce = lockForce;
+    }
 }
 

@@ -100,6 +100,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
 
@@ -733,6 +734,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
 
     public XWikiDocument getDocumentFromPath(String path, XWikiContext context) throws XWikiException {
+        String fullname = getDocumentNameFromPath(path, context);
+        return getDocument(fullname, context);
+    }
+
+    public String getDocumentNameFromPath(String path, XWikiContext context) {
         String web, name;
         int i1 = 0;
         int i2;
@@ -756,7 +762,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         web = Utils.decode(web, context);
         name = Utils.decode(name, context);
-        return getDocument(web + "." + name, context);
+        String fullname = web + "." + name;
+        return fullname;
     }
 
     public XWikiRenderingEngine getRenderingEngine() {
@@ -1668,7 +1675,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return bclass;
 
         bclass.setName("XWiki.XWikiComments");
-
+/*        if (!"internal".equals(bclass.getCustomMapping())) {
+            needsUpdate = true;
+            bclass.setCustomMapping("internal");
+        }
+*/
         needsUpdate |= bclass.addTextField("author", "Author", 30);
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
         needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
@@ -2626,28 +2637,51 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return active;
     }
 
-    public boolean prepareDocuments(XWikiRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException {
-        // From there we will try to catch any exceptions and show a nice page
-        XWikiDocument doc = null;
-
+    public String getDocumentName(XWikiRequest request, XWikiContext context) {
+        String docname;
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             if (request.getParameter("topic") != null)
-                doc = getDocument(request.getParameter("topic"), context);
+                docname = request.getParameter("topic");
             else
-                doc = getDocument("Main.WebHome", context);
+                docname = "Main.WebHome";
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
-            doc = context.getDoc();
+                docname = context.getDoc().getFullName();
         } else {
             String action = context.getAction();
             if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline")))
-                doc = getDocument(request.getParameter("topic"), context);
+                docname = request.getParameter("topic");
             else
-                doc = getDocumentFromPath(request.getPathInfo(), context);
+                docname = getDocumentNameFromPath(request.getPathInfo(), context);
         }
+        return docname;
+    }
 
-        context.put("doc", doc);
-        vcontext.put("doc", new Document(doc, context));
-        vcontext.put("cdoc", vcontext.get("doc"));
+    public boolean prepareDocuments(XWikiRequest request, XWikiContext context, VelocityContext vcontext) throws XWikiException {
+        XWikiDocument doc;
+        try {
+            doc = getDocument(getDocumentName(request, context), context);
+            context.put("doc", doc);
+            vcontext.put("doc", new Document(doc, context));
+            vcontext.put("cdoc", vcontext.get("doc"));
+        } catch (XWikiException e) {
+            doc = context.getDoc();
+            if (context.getAction().equals("delete")) {
+                if (doc==null) {
+                    doc = new XWikiDocument();
+                    doc.setFullName(getDocumentName(request, context));
+                    doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
+                    doc.setStore(getStore());
+                    context.put("doc", doc);
+                    vcontext.put("doc", new Document(doc, context));
+                    vcontext.put("cdoc", vcontext.get("doc"));
+                }
+                if (!checkAccess("admin", doc, context)) {
+                   throw e;
+                }
+            } else {
+                throw e;
+            }
+        }
 
         // We need to check rights before we look for translations
         // Otherwise we don't have the user language

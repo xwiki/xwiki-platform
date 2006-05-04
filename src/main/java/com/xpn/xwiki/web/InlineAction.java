@@ -44,7 +44,7 @@ public class InlineAction extends XWikiAction {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
             Document vdoc = (Document) vcontext.get("doc");
             Document vcdoc = (Document) vcontext.get("cdoc");
-            PrepareEditForm peform = (PrepareEditForm) form;
+            EditForm peform = (EditForm) form;
 
             XWikiDocument doc2 = (XWikiDocument) doc.clone();
             Document vdoc2 = new Document(doc2, context);
@@ -78,6 +78,8 @@ public class InlineAction extends XWikiAction {
                 vcontext.put("cdoc", new Document(cdoc2, context));
                 cdoc2.readFromTemplate(peform, context);
             }
+
+            doc2.readFromForm((EditForm)form, context);
 
             /* Setup a lock */
             try {

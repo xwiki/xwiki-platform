@@ -674,6 +674,29 @@
         </property>
     </class>
 
+    <!-- XWikiComments custom mapping -->
+    <class entity-name="XWiki.XWikiComments" table="xwikicomments">
+        <id name="id" type="integer" unsaved-value="any">
+            <column name="XWC_ID" not-null="true" />
+            <generator class="assigned" />
+        </id>
+        <property name="author" type="string">
+            <column name="XWC_AUTHOR" length="255"/>
+        </property>
+        <property name="highlight" type="string">
+            <column name="XWC_HIGHLIGHT" length="60000" />
+        </property>
+        <property name="comment" type="string">
+            <column name="XWC_COMMENT" length="60000" />
+        </property>
+        <property name="replyto" type="integer">
+            <column name="XWP_REPLYTO" />
+        </property>
+        <property name="date" type="timestamp">
+            <column name="XWP_DATE" />
+        </property>
+    </class>
+    
     <!-- XWikiPreferences custom mapping -->
     <!--
     <class entity-name="XWiki.XWikiUsers" table="xwikiusers">

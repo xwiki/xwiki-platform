@@ -34,9 +34,9 @@
 #set($force = $!request.get("force"))
 #if (($tdoc.getLocked()==true)&&(!$force))
 <p>
-$msg.get("doclockedby"): $xwiki.getLocalUserName($doc.getLockingUser()).
+$msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 <br />
-<a href="$doc.getURL("edit", "template=$!request.template&xredirect=$!xredirect&language=$!tdoc.language&force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL("edit", "$!request.getQueryString()&force=1")">$msg.get("forcelock")</a>
 </p>
 #else
 #set( $pages = $tdoc.includedPages)

@@ -61,7 +61,7 @@ public class PropUpdateAction extends XWikiAction {
             property.getxWikiClass(context).fromMap(map, property);
             String newname = property.getName();
             
-            if(newname == null || newname.equals("") || !newname.matches("\\w+")){
+            if(newname == null || newname.equals("") || !newname.matches("[\\w\\.\\-\\_]+")){
                 context.put("message","propertynamenotcorrect");
                 return true;
             }

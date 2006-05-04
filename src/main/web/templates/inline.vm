@@ -16,9 +16,9 @@ $message
 #set($force = $!request.get("force"))
 #if (($doc.getLocked()==true)&&(!$force))
 <p>
-$msg.get("doclockedby"): $xwiki.getLocalUserName($doc.getLockingUser()).
+$msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 <br />
-<a href="$doc.getURL("inline", "template=$!request.template&xredirect=$!xredirect&language=$!doc.language&force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL("inline", "$!request.getQueryString()&force=1")">$msg.get("forcelock")</a>
 </p>
 #else
 #foreach($class in $doc.xWikiClasses)

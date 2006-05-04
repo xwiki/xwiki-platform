@@ -42,7 +42,7 @@ public class PropAddAction extends XWikiAction {
         XWikiDocument olddoc = (XWikiDocument) doc.clone();
         String propName = ((PropAddForm) form).getPropName();
 
-        if(propName ==null || propName.equals("") || !propName.matches("\\w+") ){
+        if(propName ==null || propName.equals("") || !propName.matches("[\\w\\.\\-\\_]+") ){
             context.put("message","propertynamenotcorrect");
             return true;
         }

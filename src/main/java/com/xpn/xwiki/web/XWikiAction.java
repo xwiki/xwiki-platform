@@ -78,7 +78,7 @@ public abstract class XWikiAction extends Action {
                                  HttpServletRequest req,
                                  HttpServletResponse resp)
             throws Exception, ServletException {
-//        String action = mapping.getName();
+        String action = mapping.getName();
 
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;

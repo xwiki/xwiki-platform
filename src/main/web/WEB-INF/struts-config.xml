@@ -27,9 +27,9 @@
     <form-beans>
         <!-- XWiki Struts Application -->
         <form-bean name="edit"
-                   type="com.xpn.xwiki.web.PrepareEditForm"/>
+                   type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="inline"
-                   type="com.xpn.xwiki.web.PrepareEditForm"/>
+                   type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="lock"
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="preview"

@@ -44,7 +44,7 @@ public class EditAction extends XWikiAction {
 
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-            PrepareEditForm peform = (PrepareEditForm) form;
+            EditForm peform = (EditForm) form;
             String parent = peform.getParent();
             if (parent!=null)
                 doc.setParent(parent);

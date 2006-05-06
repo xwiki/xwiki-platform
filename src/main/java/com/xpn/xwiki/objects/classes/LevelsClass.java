@@ -35,6 +35,7 @@ public class LevelsClass extends ListClass {
             list = new ArrayList();
 
         }
+
         if (!"1".equals(context.getRequest().get("global"))) {
             list.remove("admin");
             list.remove("programming");
@@ -100,6 +101,9 @@ public class LevelsClass extends ListClass {
             String value = it.next().toString();
             option option = new option(value, value);
             option.addElement(getText(value, context));
+            // If we don't have this option in the list then add it
+            if (!list.contains(value))
+                    list.add(value);
             if (selectlist.contains(value))
                 option.setSelected(true);
             select.addElement(option);

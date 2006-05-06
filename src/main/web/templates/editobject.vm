@@ -12,6 +12,43 @@ function show(fieldname) {
   document.getElementById(fieldname).style.display="block";
   currentfield = fieldname;
 }
+function addUser(form, prefix) {
+    var username = form[prefix + "newuser"].value;
+    var select =  form[prefix + "users"][0];
+    if (username != null && username != "") {
+        length = select.options.length ;
+        dusername = username;
+        if (username.indexOf('.')==-1) {
+          xusername = "XWiki." + username;
+        }
+        else {
+          if (username.indexOf(":")==-1) {
+           dusername = username.substring(username.lastIndexOf(".")+1);
+          }
+          xusername = username
+        }
+        select.options[length] = new Option(dusername, xusername, true);
+    }
+}
+
+function addGroup(form, prefix) {
+    var groupname = form[prefix + "newgroup"].value;
+    var select =  form[prefix + "groups"][0];
+    if (groupname != null && groupname != "") {
+        length = select.options.length ;
+        dgroupname = groupname;
+        if (groupname.indexOf('.')==-1) {
+          xgroupname = "XWiki." + groupname;
+        }
+        else {
+          if (groupname.indexOf(":")==-1)
+           dgroupname = groupname.substring(groupname.lastIndexOf(".")+1);
+          xgroupname = groupname
+        }
+        select.options[length] = new Option(dgroupname, xgroupname, true);
+    }
+}
+
 // -->
 </script>
        <div id="columns">

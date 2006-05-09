@@ -198,6 +198,9 @@ public class XWikiAttachment {
     }
 
     public void setDate(Date date) {
+        // Make sure we drop milliseconds for consistency with the database
+        if (date!=null)
+         date.setTime((date.getTime()/1000) * 1000);
         this.date = date;
     }
 

@@ -65,7 +65,8 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
     {
         return getXWikiContext().getWiki();
     }
-    
+
+    /*
     public void testStringBadDatabase1() throws XWikiException, HibernateException {
         XWikiHibernateStore store = getXWiki().getHibernateStore();
         string(store);
@@ -102,7 +103,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         store.endTransaction(getXWikiContext(), true);
         number(store);
     }
-
+    */
     public void number(XWikiHibernateStore store) throws XWikiException {
         IntegerProperty prop = Utils.prepareIntegerProperty();
         store.saveXWikiProperty(prop, getXWikiContext(), true);

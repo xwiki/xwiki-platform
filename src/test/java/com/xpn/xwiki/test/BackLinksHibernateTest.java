@@ -50,6 +50,7 @@ public class BackLinksHibernateTest extends HibernateTestCase {
         String SQLStatement = new String("insert into xwikilinks  " +
                 "values ('" + testDoc1.getId() +  "', 'Test.A', '" + testDoc1.getFullName() + "')");
         StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), SQLStatement, getXWikiContext() );
+        store.endTransaction(getXWikiContext(), true, true);
 
         // creation of the list to give to the method
         List expected_list = new ArrayList();
@@ -69,6 +70,7 @@ public class BackLinksHibernateTest extends HibernateTestCase {
         String SQLStatement = new String("insert into xwikilinks  " +
                 "values ('" + testDoc1.getId() +  "', 'Test.A', '" + testDoc1.getFullName() + "')");
         StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), SQLStatement, getXWikiContext() );
+        store.endTransaction(getXWikiContext(), true, true);
 
         // creation of the list to give to the method
         List expected_list = new ArrayList();

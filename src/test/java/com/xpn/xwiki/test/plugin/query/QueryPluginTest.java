@@ -42,6 +42,7 @@ import com.xpn.xwiki.plugin.query.IQueryFactory;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.test.Utils;
 
@@ -75,6 +76,11 @@ public class QueryPluginTest extends HibernateTestCase {
                  assertEquals("Objects #"+i+" not equals",
                          ((XWikiDocument)obj).toFullXML(context),
                          ((XWikiDocument)exp).toFullXML(context));
+                else
+                if (exp instanceof XWikiAttachment)
+                 assertEquals("Objects #"+i+" not equals",
+                         ((XWikiAttachment)obj).toStringXML(false, false, context),
+                         ((XWikiAttachment)exp).toStringXML(false, false, context));
                 else
                  assertEquals("Objects #"+i+" not equals", obj, exp);
 			}
@@ -236,9 +242,9 @@ public class QueryPluginTest extends HibernateTestCase {
 	// XXX: Attachments don`t store it`s document!!!
 	public void testAttachments() throws XWikiException, IOException, InvalidQueryException {
 		XWikiHibernateStore hb = getXWiki().getHibernateStore();
-		hb.beginTransaction(getXWikiContext());
-		
-		XWikiDocument doc1 = new XWikiDocument("Test", "TestAttach1");		
+        // hb.beginTransaction(getXWikiContext());
+
+        XWikiDocument doc1 = new XWikiDocument("Test", "TestAttach1");
         doc1.setContent("no content");
         doc1.setAuthor("Someone");
         doc1.setParent("Test.WebHome");
@@ -252,7 +258,7 @@ public class QueryPluginTest extends HibernateTestCase {
         doc1.getAttachmentList().add(attachment1);        
         hb.saveXWikiDoc(doc1, getXWikiContext());
                 
-        attachment1 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment1.getId()));
+        // attachment1 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment1.getId()));
                 
         testSearchXP("//*/*/attach/*", new Object[]{attachment1});
         testSearchXPnQl1("//element(*, xwiki:attachment)", "select * from xwiki:attachment", attachment1);
@@ -279,7 +285,7 @@ public class QueryPluginTest extends HibernateTestCase {
         doc1.saveAttachmentContent(attachment2, getXWikiContext());
         doc1.getAttachmentList().add(attachment2);
         hb.saveXWikiDoc(doc1, getXWikiContext());
-        attachment2 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment2.getId()));
+        // attachment2 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment2.getId()));
         
         testSearchXP("//*/*/attach/*",				new Object[]{attachment1, attachment2});
         testSearchXPnQl("/element(*,xwiki:attachment)", "select * from xwiki:attachment", new Object[]{attachment1, attachment2});
@@ -305,7 +311,7 @@ public class QueryPluginTest extends HibernateTestCase {
         doc2.saveAttachmentContent(attachment3, getXWikiContext());
         doc2.getAttachmentList().add(attachment3);
         hb.saveXWikiDoc(doc2, getXWikiContext());
-        
+
         testSearchXP("//*/*/attach/*",				new Object[]{attachment1, attachment2, attachment3});
         checkEquals(qf.getAttachment("*/*", "*", null).list(), new Object[]{attachment1,attachment2,attachment3});
         testSearchXP("//Test/TestAttach2/attach/*",	new Object[]{attachment3});
@@ -316,8 +322,8 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getAttachment("*.*", "testfile1", null).list(), new Object[]{attachment1, attachment3});
         testSearchXP("//Test/*[@author='Someone']/attach/*[@comment!='']",	new Object[]{attachment2});
         checkEquals(qf.getAttachment("Test.*[@author='Someone']", "*[@comment!='']", null).list(), new Object[]{attachment2});
-        
-        hb.endTransaction(getXWikiContext(), false);
+        // hb.endTransaction(getXWikiContext(), false);
+
 	}
 	
 	public void testObjects() throws HibernateException, XWikiException, InvalidQueryException {		

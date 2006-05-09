@@ -531,6 +531,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getDefaultWeb() {
+        if (defaultWeb==null)
+          return "";
         return defaultWeb;
     }
 
@@ -539,6 +541,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getDefaultViewSheet() {
+        if (defaultViewSheet==null)
+          return "";
         return defaultViewSheet;
     }
 
@@ -547,6 +551,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getDefaultEditSheet() {
+        if (defaultEditSheet==null)
+          return "";
         return defaultEditSheet;
     }
 
@@ -555,6 +561,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getNameField() {
+        if (nameField==null)
+          return "";
         return nameField;
     }
 

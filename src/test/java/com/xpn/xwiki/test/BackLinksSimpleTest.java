@@ -96,10 +96,10 @@ public class BackLinksSimpleTest extends HibernateTestCase {
         XWikiDocument testDoc = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiHibernateStore store = getXWiki().getHibernateStore();
         store.beginTransaction(getXWikiContext());
-   //     StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), "insert into xwikilinks values ('0','Test.A','SaveBackLinks')", getXWikiContext() );
         String SQLStatement = new String("insert into xwikilinks  " +
         "values ('" + testDoc.getId() +  "', 'Test.A', '" + testDoc.getFullName() + "')");
         StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), SQLStatement, getXWikiContext() );
+        store.endTransaction(getXWikiContext(), true, true);
         List expected_list = new ArrayList();
         expected_list.add("Test.A");
         testSimpleBackLinksHibStoreDelete(expected_list);

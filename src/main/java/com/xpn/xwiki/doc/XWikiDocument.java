@@ -319,10 +319,10 @@ public class XWikiDocument {
     public void setTitle(String title) {
         if (title == null)
             title = "";
-        this.title = title;
         if (!title.equals(this.title)) {
-            setMetaDataDirty(true);
+            setContentDirty(true);
         }
+        this.title = title;
     }
 
     public String getFormat() {
@@ -1471,6 +1471,10 @@ public class XWikiDocument {
         el = new DOMElement("version");
         el.addText(getVersion());
         docel.add(el);
+        
+        el = new DOMElement("title");
+        el.addText(getTitle());
+        docel.add(el);
 
         el = new DOMElement("template");
         el.addText(getTemplate());
@@ -1620,6 +1624,7 @@ public class XWikiDocument {
         setContent(getElement(docel, "content"));
         setLanguage(getElement(docel, "language"));
         setDefaultLanguage(getElement(docel, "defaultLanguage"));
+        setTitle(getElement(docel,"title"));
 
         String strans = getElement(docel, "translation");
         if ((strans == null) || strans.equals(""))

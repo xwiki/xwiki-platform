@@ -46,6 +46,13 @@ public class ViewAction extends XWikiAction {
     }
 
     public String render(XWikiContext context) throws XWikiException {
-        return "view";
+        handleRevision(context);
+        XWikiDocument doc = (XWikiDocument) context.get("doc");
+        String defaultTemplate = doc.getDefaultTemplate();
+        if ((defaultTemplate !=null) && (!defaultTemplate.equals(""))) {
+        	return defaultTemplate;
+        }
+        else
+        	return "view";
     }
 }

@@ -107,7 +107,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public void init(XWikiContext context) {
         super.init(context);
-        feedCache = new OSCacheCache();
+        feedCache = context.getWiki().getCacheService().newLocalCache();
         refreshPeriod = (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.cacherefresh", 3600);
     }
 

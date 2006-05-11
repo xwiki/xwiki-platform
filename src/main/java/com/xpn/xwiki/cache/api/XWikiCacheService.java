@@ -21,7 +21,32 @@
 
 package com.xpn.xwiki.cache.api;
 
-public interface XWikiCacheService {
-   public XWikiCache newCache();
-   public XWikiCache newCache(int capacity);
+import com.xpn.xwiki.XWiki;
+
+public interface XWikiCacheService
+{
+    /**
+     * Initializes the service
+     */
+    public void init(XWiki context);
+    
+    /*
+     * Returns a local only (never clustered) cache
+     */
+    public XWikiCache newLocalCache();
+
+    /*
+     * Returns a local only (never clustered) cache with given capacity
+     */
+    public XWikiCache newLocalCache(int capacity);
+
+    /*
+     * Returns a cache that could be configured to be clustered
+     */
+    public XWikiCache newCache();
+
+    /*
+     * Returns a cache that could be configured to be clustered with the given capacity
+     */
+    public XWikiCache newCache(int capacity);
 }

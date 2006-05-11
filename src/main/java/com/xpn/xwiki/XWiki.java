@@ -20,6 +20,7 @@
  * @author ludovic
  * @author namphunghai
  * @author wr0ngway
+ * @author markj
  * @author erwan
  * @author vmassol
  * @author jeremi
@@ -36,6 +37,7 @@ import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheService;
+import com.xpn.xwiki.cache.impl.XWikiCacheListener;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.*;
@@ -485,6 +487,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
                 new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
 
+        // HACK: can anyone think of a better way to do this?
+        XWikiCacheListener.setXWiki(this);
+        
         // Make sure these classes exists
         if (noupdate) {
             getPrefsClass(context);
@@ -3179,6 +3184,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             try {
                 cacheService = (XWikiCacheService) Class.forName(cacheClass).newInstance();
+                cacheService.init(this);
             } catch (Exception e) {
                 e.printStackTrace();
                 cacheService = new OSCacheService();
@@ -3186,7 +3192,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         return cacheService;
     }
-
+    
     public String getURLContent(String surl) throws IOException {
         HttpClient client = new HttpClient();
 

@@ -32,9 +32,13 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
+import com.opensymphony.oscache.base.Cache;
+import com.opensymphony.oscache.base.Config;
+import com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
@@ -86,7 +90,17 @@ public class ImagePlugin extends XWikiDefaultPlugin {
             if (log.isErrorEnabled())
              log.error("Error in ImagePlugin reading capacity: " + capacityParam, e);
         } 
-        imageCache = new OSCacheCache(capacity, true, "temp/imageCache");
+        
+        Properties props = new Properties();
+        props.put("cache.memory", "true");
+        props.put("cache.unlimited.disk", "true");
+        props.put("cache.persistence.overflow.only", "false");
+        props.put("cache.blocking", "false");
+
+        props.put("cache.persistence.class", "com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener");
+        props.put("cache.path", "temp/imageCache");
+        
+        imageCache = new OSCacheCache(props, capacity);
     }
 
     public void flushCache() {

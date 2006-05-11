@@ -31,7 +31,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -41,7 +40,7 @@ public class XWikiRenderingEngine {
 
     private List renderers = new ArrayList();
     private HashMap renderermap = new LinkedHashMap();
-    private XWikiCache cache = new OSCacheCache(100);
+    private XWikiCache cache = null;
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
         if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
@@ -69,10 +68,15 @@ public class XWikiRenderingEngine {
         }
 
         try {
-        String capacity = xwiki.Param("xwiki.render.cache.capacity");
-        if (capacity != null)
-            cache.setCapacity(Integer.parseInt(capacity));
-        } catch (Exception e) {}
+        	String capacity = xwiki.Param("xwiki.render.cache.capacity");
+			if (capacity != null) {
+				cache = xwiki.getCacheService().newCache(Integer.parseInt(capacity));
+			} else {
+				cache = xwiki.getCacheService().newCache();
+			}
+        } catch (Exception e) {
+			e.printStackTrace();        
+        }
     }
 
     public void addRenderer(String name, XWikiRenderer renderer) {

@@ -108,6 +108,6 @@
 	<classpathentry kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/rome-0.7.jar"/>
 	<classpathentry kind="lib" path="lib/rome-fetcher-0.7.jar"/>
-	<classpathentry kind="lib" path="lib/groovy-all-1.0-jsr-04.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.0-jsr-05.jar"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

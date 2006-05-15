@@ -282,17 +282,12 @@
         <root url="jar://$PROJECT_DIR$/lib/c3p0-0.8.4.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-tools-2.1.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/oscache-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.7.3.jar!/" />
       </CLASSES>
-      <JAVADOC>
-        <root url="file://C:/dev/java/hibernate/hibernate-3.0/doc/api" />
-      </JAVADOC>
-      <SOURCES>
-        <root url="file://C:/dev/java/hibernate/hibernate-3.0/src" />
-      </SOURCES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="Velocity">
       <CLASSES>
@@ -368,7 +363,7 @@
     </library>
     <library name="Groovy">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-04.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-05.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -470,6 +465,15 @@
         <root url="jar://$PROJECT_DIR$/lib/xml-apis-2.0.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xalan-2.6.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xerces-2.4.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="cache">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oscache-2.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/concurrent.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

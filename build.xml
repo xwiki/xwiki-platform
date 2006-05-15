@@ -94,7 +94,7 @@
      	radeox.jar,
      	portlet.jar,
      	xmlrpc-1.2.jar,
-     	groovy-all-1.0-jsr-04.jar,
+     	groovy-all-1.0-jsr-05.jar,
      	xalan-2.6.0.jar,xerces.jar-2.4.0,xml-apis-2.0.2,jimi.jar,avalon-framework-4.1.5.jar,fop-0.20.5.jar,jtidy.jar,
     	batik-all-1.6.jar,
     	ldap.jar,
@@ -113,7 +113,7 @@
 
      <fileset id="libs.exo.fileset" dir="${lib.dir}"
 	includes="picocontainer-1.0.jar,exo-platform.commons.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.sercurity.api-2.0.jar,exo-platform.service.sercurity.impl-2.0.jar" />
- 
+
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
         includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />
@@ -308,11 +308,11 @@
 
     <target name="test.server.prepare" depends="release,prepare-tests">
       <!-- Cactify the web-app archive -->
-      <copy file="${resources.test.src.dir}/xwiki.cfg" 
+      <copy file="${resources.test.src.dir}/xwiki.cfg"
 		tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-      <copy file="${resources.test.src.dir}/hibernate-test.cfg.xml" 
+      <copy file="${resources.test.src.dir}/hibernate-test.cfg.xml"
 		tofile="${build.dir}/web/WEB-INF/hibernate-test.cfg.xml" overwrite="true" />
-      <war warfile="${test.warfile}" basedir="${build.dir}/web" 
+      <war warfile="${test.warfile}" basedir="${build.dir}/web"
 		webxml="${main.src.dir}/web-test.xml" >
         <classes dir="${tests.build.dir}"/>
         <exclude name="**/web*.xml" />
@@ -470,11 +470,11 @@
             <tarfileset dir="${basedir}" includes="license.txt,lgpl.txt" />
         </tar>
     </target>
-    
+
     <target name="standalone" depends="release">
     	<!-- unzip jetty archive into standalone release dir -->
 	<!-- exclude some jetty provided jar files in order to avoid clashes -->
-	<!-- these jars are provided by xwiki -->    	
+	<!-- these jars are provided by xwiki -->
 
     	<unzip src="${standalone.jetty.archive}" dest="${release.dir}">
     		<patternset>
@@ -486,26 +486,26 @@
     	<move todir="${standalone.release.dir}">
 	    <fileset dir="${release.dir}/${standalone.jetty.archive.dir}"/>
   	</move>
-    	
+
     	<!-- remove example webapps -->
     	<delete file="${standalone.release.dir}/webapps/javadoc.war"/>
     	<delete dir="${standalone.release.dir}/webapps/template"/>
-    
+
     	<!-- explode xwiki war file into jetty/webapps -->
     	<mkdir dir="${standalone.release.dir}/webapps/xwiki"/>
     	<unwar src="${release.warfile}" dest="${standalone.release.dir}/webapps/xwiki"/>
-    	
+
     	<!-- replace configuration files with standalone version -->
     	<copy todir="${standalone.release.dir}/webapps/xwiki/WEB-INF" overwrite="true">
     		<fileset refid="standalone.config"/>
     	</copy>
-    	
+
     	<!-- install db bootstrap -->
     	<mkdir dir="${standalone.release.dir}/db"/>
     	<copy todir="${standalone.release.dir}/db">
 	        <fileset refid="standalone.db.bootstrap" />
 	</copy>
-	
+
 	<!-- install start/stop scripts -->
 	<copy todir="${standalone.release.dir}">
 		<fileset refid="standalone.scripts"/>
@@ -513,5 +513,21 @@
     </target>
 
     <target name="all"  depends="release, test, doc, src.dist" />
+    <!-- groovy setup for import/export -->
+    <!-- copy commons-collection-3.1.jar, log4j-1.2.8.jar to the ant lib directory -->
+    <!-- uncomment this block to activate import/export -->
+        <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"
+                 classpath="${libs};./release/xwiki.jar" />
+    <!-- end of groovy settings -->
+
+    <target name="exportdb">
+        <groovy src="export.groovy" />
+    </target>
+
+    <target name="importdb">
+        <groovy src="import.groovy" />
+    </target>
+
+
 
 </project>

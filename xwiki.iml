@@ -44,6 +44,7 @@
     <orderEntry type="library" name="JCR" level="project" />
     <orderEntry type="library" name="XML" level="project" />
     <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
+    <orderEntry type="library" name="cache" level="project" />
     <orderEntryProperties />
   </component>
   <component name="VcsManagerConfiguration">

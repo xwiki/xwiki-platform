@@ -30,8 +30,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/{table}([\s\S]+?){table}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
-    this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
-	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '__$1__');
+    this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
+	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
 	this.addInternalProcessor((/<em[^>]*>(.*?)<\/em>/gi), '~~$1~~');

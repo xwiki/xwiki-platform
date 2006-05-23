@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>WebRssCode</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107690421000</creationDate>
+<date>1107690421000</date>
+<contentUpdateDate>1147857674000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<content>{pre}
+$response.setContentType("text/xml")
+&lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" &gt;
+&lt;channel rdf:about="$baseurl"&gt;
+&lt;title&gt;$request.serverName&lt;/title&gt;
+&lt;link&gt;$baseurl&lt;/link&gt;
+&lt;description&gt;
+$request.serverName
+&lt;/description&gt;
+&lt;image rdf:resource="${baseurl}/xwiki/skins/default/logo.gif" /&gt;
+&lt;dc:language&gt;$doc.defaultLanguage&lt;/dc:language&gt;
+&lt;dc:rights&gt;$xwiki.webCopyright&lt;/dc:rights&gt;
+&lt;dc:publisher&gt;$doc.author&lt;/dc:publisher&gt;
+&lt;dc:creator&gt;$doc.author&lt;/dc:creator&gt;
+&lt;items&gt;
+&lt;rdf:Seq&gt;
+#foreach ($item in $list)
+#if($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+#set ($currentdoc = $xwiki.getDocument($item))
+&lt;rdf:li rdf:resource="${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}" /&gt;
+#end
+#end
+&lt;/rdf:Seq&gt;
+&lt;/items&gt;
+&lt;/channel&gt;
+&lt;image rdf:about="${baseurl}/xwiki/skins/default/logo.gif"&gt;
+  &lt;title&gt;XWiki Logo&lt;/title&gt;
+  &lt;link&gt;${baseurl}&lt;/link&gt;
+  &lt;url&gt;${baseurl}/xwiki/skins/default/logo.gif&lt;/url&gt;
+&lt;/image&gt;
+#foreach ($item in $list)
+#if($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+#set ($currentdoc = $xwiki.getDocument($item))
+#set ($url = "${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}")
+#if ($currentdoc.content.length() &lt; 255)
+#set ($length = $currentdoc.content.length())
+#else
+#set ($length = 255)
+#end
+&lt;item rdf:about="$url"&gt;
+&lt;title&gt;${currentdoc.web}.${currentdoc.name}&lt;/title&gt;
+&lt;link&gt;$url&lt;/link&gt;
+&lt;description&gt;
+#set($i = $currentdoc.author.indexOf(".")+1)
+Version $currentdoc.version edited by $currentdoc.author.substring($i) on $currentdoc.date
+&lt;/description&gt;
+&lt;dc:date&gt;$currentdoc.date&lt;/dc:date&gt;
+&lt;dc:contributor&gt;
+&lt;rdf:Description link=""&gt;
+&lt;rdf:value&gt;$currentdoc.author&lt;/rdf:value&gt;
+&lt;/rdf:Description&gt;
+&lt;/dc:contributor&gt;
+&lt;/item&gt;
+#end
+#end
+&lt;/rdf:RDF&gt;
+{/pre}</content>
+</xwikidoc>

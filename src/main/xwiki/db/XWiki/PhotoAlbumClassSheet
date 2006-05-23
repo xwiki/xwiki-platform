@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>PhotoAlbumClassSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.PhotoAlbumClass</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107690421000</creationDate>
+<date>1107704914000</date>
+<contentUpdateDate>1147857674000</contentUpdateDate>
+<version>1.5</version>
+<title></title>
+<template></template>
+<content>#set($obj = $doc.getObject("XWiki.PhotoAlbumClass", 0))
+#if($context.action=="inline")
+Before adding photos to your album, please choose a title and a decription for this album.
+
+Title: $doc.display("title", $obj)
+
+Description:
+
+$doc.display("description", $obj) 
+
+#set($newtitle = $request.title)
+#if($newtitle)
+#set($newtitle = $newtitle.replace('"',"'"))
+&lt;script type="text/javascript"&gt;
+var title = "${newtitle}";
+{pre}
+document.forms.edit["XWiki.PhotoAlbumClass_0_title"].value = title;
+{/pre}
+&lt;/script&gt;
+#end
+#else
+&lt;br /&gt;
+1 $doc.display("title", $obj)
+
+$doc.display("description", $obj)
+
+#set($diapo = $request.get("diapo"))
+#if(!$diapo)
+#set($diapo="all")
+#end
+#if($diapo=="all")
+#macro(photosAlbum2 $height)
+#set($current = 0)
+#foreach ($attach in $doc.attachmentList)
+#set($current = $current + 1)
+&lt;a href="$doc.getURL("view","diapo=$current")" &gt;
+&lt;img src="$doc.getAttachmentURL($attach.filename,"download")"  height="${height}" /&gt;&lt;/a&gt;
+#end
+#end
+#set($size = $!doc.display("height", "view",$obj))
+#if($size == "")
+#set($size = 150)
+#end
+#photosAlbum2($size)
+#else
+#set($current = 0)
+#set($size = $!doc.display("height2", "view",$obj))
+#foreach ($attach in $doc.attachmentList)
+#set($current = $current + 1)
+#set($scurrent = "$current")
+#if("$diapo" == "$current")
+#set($prev = ($current - 1))
+#set($next = ($current + 1))
+&lt;a href="$doc.getAttachmentURL($attach.filename,"download")" &gt;
+&lt;img src="$doc.getAttachmentURL($attach.filename,"download")"  #if($size!="") height="${size}" #end /&gt;&lt;/a&gt;
+#end
+#end
+#if($prev==0)
+#set($prev = $doc.attachmentList.size())
+#end
+#if($next==$doc.attachmentList.size()+1)
+#set($next = 1)
+#end
+
+#if(!$prev)
+#set($prev = 1)
+#set($next = 1)
+#end
+&lt;br /&gt;
+~~[Previous Photo&gt;${doc.name}?diapo=$prev] [Next Photo&gt;${doc.name}?diapo=$next]~~
+#end
+
+&lt;br /&gt;
+~~&lt;a href="$doc.getURL("attach")"&gt;Add Photos&lt;/a&gt; &lt;a href="$doc.getURL("inline")"&gt;Modify the Album&lt;/a&gt; [All Photos&gt;${doc.name}?diapo=all] [Diaporama&gt;${doc.name}?diapo=1]~~
+#end
+#set($showattachments = 0)</content>
+</xwikidoc>

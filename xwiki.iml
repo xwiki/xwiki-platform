@@ -55,7 +55,7 @@
     <setting name="EXPLODED_URL" value="file://$MODULE_DIR$/release/xwiki/web" />
     <setting name="EXPLODED_ENABLED" value="true" />
     <setting name="JAR_URL" value="file://$MODULE_DIR$/release/xwiki.war" />
-    <setting name="JAR_ENABLED" value="false" />
+    <setting name="JAR_ENABLED" value="true" />
     <setting name="SYNC_EXPLODED_DIR" value="true" />
     <setting name="BUILD_ON_FRAME_DEACTIVATION" value="false" />
     <setting name="RUN_JASPER_VALIDATION" value="false" />
@@ -73,6 +73,10 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/classes" />
       <url>file://$MODULE_DIR$/build/xwikibase_test</url>
+    </containerElement>
+    <containerElement type="library" level="project" name="cache">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="Chart">
       <attribute name="method" value="1" />

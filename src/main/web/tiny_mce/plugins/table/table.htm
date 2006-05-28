@@ -6,8 +6,8 @@
 function insertTable() {
 	if (window.opener) {
 		var args = new Array();
-
-		args["cols"] = document.forms[0].cols.value;
+		
+        args["cols"] = document.forms[0].cols.value;
 		args["rows"] = document.forms[0].rows.value;
 		args["border"] = 0;
 		args["cellspacing"] = -2;
@@ -17,7 +17,6 @@ function insertTable() {
 		args["action"] = tinyMCE.getWindowArg('action');
 
         window.opener.tinyMCE.execCommand("mceInsertTable", false, args);
-
 		// Close the dialog
 		tinyMCE.closeDialog();
 	}
@@ -47,7 +46,6 @@ function init() {
 	formObj.bgcolor.value = tinyMCE.getWindowArg('bgcolor');
 	formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true);
 }
-
 function cancelAction() {
 	tinyMCE.closeDialog();
 }

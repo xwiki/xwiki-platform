@@ -55,6 +55,8 @@ $msg.get("youareediting"): $tdoc.language
 #end
 $msg.get("titlefield"):&nbsp;<input type="text" name="title" value="$!tdoc.title" size="60" />
 <br /><br />
+Switch to &nbsp; <span style="color: blue; cursor:pointer;" onclick="document.forms.edit.action='$doc.getURL("edit","xpage=wysiwyg")'; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit();if (checkDocumentContent()) document.forms.edit.submit(); return false;"><u>$msg.get("wysiwygeditor")</u></span>
+<br />
 #includeHelp("EditWikiToolbar")
 $xwiki.getTextArea($tdoc.content)
 <br/>

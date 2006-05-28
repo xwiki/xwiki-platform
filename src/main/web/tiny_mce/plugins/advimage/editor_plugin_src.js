@@ -6,10 +6,9 @@ tinyMCE.importPluginLanguagePack('advimage', 'en,de,sv,zh_cn,cs,fa,fr_ca,fr,pl,p
  */
 function TinyMCE_advimage_getInsertImageTemplate() {
     var template = new Array();
-
     template['file']   = '../../plugins/advimage/image.htm';
-    template['width']  = 430;
-    template['height'] = 380; 
+    template['width']  = 500;
+    template['height'] = 350;
 
     // Language specific width and height addons
     template['width']  += tinyMCE.getLang('lang_insert_image_delta_width', 0);

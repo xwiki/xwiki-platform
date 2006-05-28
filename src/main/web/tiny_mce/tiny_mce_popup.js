@@ -31,9 +31,8 @@ if (tinyMCELang['lang_dir'])
 	document.dir = tinyMCELang['lang_dir'];
 
 function TinyMCEPlugin_onLoad() {
-	if (tinyMCE.getWindowArg('mce_replacevariables', true))
+    if (tinyMCE.getWindowArg('mce_replacevariables', true))
 		document.body.innerHTML = tinyMCE.applyTemplate(document.body.innerHTML, tinyMCE.windowArgs);
-
 	// Auto resize window
 	if (tinyMCE.getWindowArg('mce_windowresize', true))
 		TinyMCEPopup_autoResize();
@@ -54,7 +53,7 @@ function TinyMCEPopup_autoResize() {
 		return;
 
 	if (isMSIE) {
-		try { window.resizeTo(10, 10); } catch (e) {}
+        try { window.resizeTo(10, 10); } catch (e) {}
 
 		var elm = document.body;
 		var width = elm.offsetWidth;

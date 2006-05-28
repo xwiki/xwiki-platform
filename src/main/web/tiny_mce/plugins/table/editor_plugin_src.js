@@ -26,7 +26,7 @@ function TinyMCE_table_mouseDownHandler(e) {
  */
 function TinyMCE_table_getControlHTML(control_name) {
 	var controls = new Array(
-		['table', 'table.gif', '{$lang_table_desc}', 'mceInsertTable', true],
+        ['table', 'table.gif', '{$lang_table_desc}', 'mceInsertTable', true],
 		['delete_col', 'table_delete_col.gif', '{$lang_table_delete_col_desc}', 'mceTableDeleteCol'],
 		['delete_row', 'table_delete_row.gif', '{$lang_table_delete_row_desc}', 'mceTableDeleteRow'],
 		['col_after', 'table_insert_col_after.gif', '{$lang_table_insert_col_after_desc}', 'mceTableInsertColAfter'],
@@ -378,7 +378,7 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 			tinyMCE.triggerNodeChange();
 			return true;
 
-		case "mceInsertTable":
+        case "mceInsertTable":
 			if (user_interface) {
 				var cols = 2, rows = 2, border = 0, cellpadding = "", cellspacing = "", align = "", width = "", height = "", bordercolor = "", bgcolor = "", action = "insert", className = "";
 
@@ -480,51 +480,21 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 					tinyMCE.triggerNodeChange();
 					return true;
 				}
-
-				// Create new table
-				/*html += '<table border="' + border + '" ';
-
-				if (cellpadding != -1)
-					html += 'cellpadding="' + cellpadding + '" ';
-
-				if (cellspacing != -1)
-					html += 'cellspacing="' + cellspacing + '" ';
-
-				if (width != 0 && width != "")
-					html += 'width="' + width + '" ';
-
-				if (height != 0 && height != "")
-					html += 'height="' + height + '" ';
-
-				if (bordercolor != 0 && bordercolor != "")
-					html += 'bordercolor="' + bordercolor + '" ';
-
-				if (bgcolor != 0 && bgcolor != "")
-					html += 'bgcolor="' + bgcolor + '" ';
-
-				if (align)
-					html += 'align="' + align + '" ';
-
-				if (className)
-					html += 'class="' + tinyMCE.getVisualAidClass(className, border == 0) + '" ';
-
-				html += '>';
-                */
-                html += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\">";
+                html += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">";
 
                 for (var y=0; y<rows; y++) {
                     if (y == 0 ) {
                         html += "<tr>";
 
                         for (var x=0; x<cols; x++)
-                            html += '<td>&nbsp;</td>';
+                            html += '<td style=\"background:#b6c5f2;font-weight:bold;\">&nbsp;</td>';
 
                         html += "</tr>";
                     } else {
                         html += "<tr>";
 
                         for (var x=0; x<cols; x++)
-                            html += '<td>&nbsp;</td>';
+                            html += '<td  style=\"background:#FFFFFF\">&nbsp;</td>';
 
                         html += "</tr>";
                     }
@@ -565,10 +535,11 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 					case "mceTableInsertRowBefore":
 						if (!trElm || !tdElm)
 							return true;
-
+                        trElm.bgColor = "#b6c5f2";
 						var grid = getTableGrid(tableElm);
 						var cpos = getCellPos(grid, tdElm);
-						var newTR = doc.createElement("tr");
+
+                        var newTR = doc.createElement("tr");
 						var lastTDElm = null;
 
 						cpos.rowindex--;
@@ -585,15 +556,15 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 
 									newTD.innerHTML = "&nbsp;";
 									newTD.colSpan = tdElm.colSpan;
-
-									newTR.appendChild(newTD);
+                                    newTD.bgColor = "#b6c5f2";
+									newTD.style.cssText="font-weight:bold;";
+                                    newTR.appendChild(newTD);
 								} else
 									tdElm.rowSpan = sd['rowspan'] + 1;
 
 								lastTDElm = tdElm;
 							}
 						}
-
 						trElm.parentNode.insertBefore(newTR, trElm);
 					break;
 
@@ -659,7 +630,7 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 									var newTD = doc.createElement("td");
 
 									newTD.innerHTML = "&nbsp;";
-									newTD.colSpan = tdElm.colSpan;
+                                    newTD.colSpan = tdElm.colSpan;
 
 									newTR.appendChild(newTD);
 								} else
@@ -755,8 +726,11 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 
 									newTD.innerHTML = "&nbsp;";
 									newTD.rowSpan = tdElm.rowSpan;
-
-									tdElm.parentNode.insertBefore(newTD, tdElm);
+                                    if (y==0) {
+                                        newTD.bgColor = "#b6c5f2";
+                                        newTD.style.cssText="font-weight:bold;";
+                                    }
+                                   tdElm.parentNode.insertBefore(newTD, tdElm);
 								} else
 									tdElm.colSpan++;
 
@@ -782,8 +756,11 @@ function TinyMCE_table_execCommand(editor_id, element, command, user_interface, 
 
 									newTD.innerHTML = "&nbsp;";
 									newTD.rowSpan = tdElm.rowSpan;
-
-									var nextTD = nextElm(tdElm, "TD");
+                                     if (y==0) {
+                                        newTD.bgColor = "#b6c5f2";
+                                        newTD.style.cssText="font-weight:bold;";
+                                    }
+                                    var nextTD = nextElm(tdElm, "TD");
 									if (nextTD == null)
 										tdElm.parentNode.appendChild(newTD);
 									else

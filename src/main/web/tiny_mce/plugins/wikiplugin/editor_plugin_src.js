@@ -38,8 +38,7 @@ function TinyMCE_wikiplugin_cleanup(type, content) {
 			//alert("[TO not modified] Value HTML string: " + content);
 			content = wikiEditor.convertExternal(content);
 
-
-			break;
+            break;
 	}
 
 	return content;

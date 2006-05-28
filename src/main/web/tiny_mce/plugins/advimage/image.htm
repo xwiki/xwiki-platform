@@ -65,7 +65,7 @@ if (url != null) {
         formObj.width.value  = tinyMCE.getWindowArg('width');
         formObj.height.value = tinyMCE.getWindowArg('height');
 
-		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true); 
+		formObj.insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true);
 
         strOnOver            = tinyMCE.getWindowArg('onmouseover');
         strOnOut             = tinyMCE.getWindowArg('onmouseout');
@@ -99,15 +99,15 @@ if (url != null) {
 		selectByValue(formObj, "image_list3", strOnOut);
 
 		// Handle preview
-        var htmlprev = ''; 
+        var htmlprev = '';
 
 		var src = tinyMCE.convertRelativeToAbsoluteURL(tinyMCE.settings['base_href'], document.forms[0].src.value);
 		if (src == "")
 			src = "about:blank";
 
-        htmlprev += ' <iframe id="preview" name="preview" scrolling="auto" ' 
-        htmlprev += ' marginwidth="0" marginheight="0" frameborder="0" src="' + src + '"' 
-        htmlprev += ' style="margin:0px;border: 1px solid black;width:135px;height:135px"></iframe>'; 
+        htmlprev += ' <iframe id="preview" name="preview" scrolling="auto" '
+        htmlprev += ' marginwidth="0" marginheight="0" frameborder="0" src="' + src + '"'
+        htmlprev += ' style="margin:0px;border: 1px solid black;width:135px;height:135px"></iframe>';
 
         document.getElementById('prev').innerHTML = htmlprev;
 
@@ -168,7 +168,7 @@ if (url != null) {
 
 	function resetImageData() {
 		var formObj = document.forms[0];
-		formObj.width.value = formObj.height.value = "";	
+		formObj.width.value = formObj.height.value = "";
 	}
 
 	function updateImageData() {
@@ -198,7 +198,7 @@ if (url != null) {
 		if (src == "")
 			src = "about:blank";
 
-		self.preview.location = src; 
+		self.preview.location = src;
 	}
 
     function changeHeight() {
@@ -223,149 +223,149 @@ if (url != null) {
 //-->
 </script>
 </head>
-<body onload="init();"> 
-    <form onsubmit="insertImage();return false;"> 
-        <table border="0" cellpadding="0" cellspacing="0" width="300"> 
-            <tr> 
-                <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0"> 
-                    <tr> 
-                        <td colspan="3" class="title">{$lang_insert_image_title}</td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_src}:</td> 
-                      <td colspan="2"><table border="0" cellspacing="0" cellpadding="0"> 
-                            <tr> 
-                              <td><input name="src" type="text" id="src" value="" style="width: 280px" onchange="resetImageData();getImageData();" /></td> 
-                              <td id="browser1"></td> 
-                            </tr> 
-                          </table></td> 
-                    </tr> 
-                 <!-- Image list --> 
-                 <script language="javascript"> 
-                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) { 
-                     var html = ""; 
+<body onload="init();">
+    <form onsubmit="insertImage();return false;">
+        <table border="0" cellpadding="0" cellspacing="0" width="300">
+            <tr>
+                <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0">
+                    <tr>
+                        <td colspan="3" class="title">{$lang_insert_image_title}</td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_src}:</td>
+                      <td colspan="2"><table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td><input name="src" type="text" id="src" value="" style="width: 280px" onchange="resetImageData();getImageData();" /></td>
+                              <td id="browser1"></td>
+                            </tr>
+                          </table></td>
+                    </tr>
+                 <!-- Image list -->
+                 <script language="javascript">
+                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) {
+                     var html = "";
                      html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</td>'; 
-                     html += '<td colspan="2"><select name="image_list" style="width: 280px" onchange="this.form.alt.value=this.options[this.selectedIndex].text;this.form.title.value=this.options[this.selectedIndex].text;this.form.src.value=this.options[this.selectedIndex].value;resetImageData();getImageData();">'; 
-                     html += '<option value="">---</option>'; 
+                     html += '<td colspan="2"><select name="image_list" style="width: 280px" onchange="this.form.alt.value=this.options[this.selectedIndex].text;this.form.title.value=this.options[this.selectedIndex].text;this.form.src.value=this.options[this.selectedIndex].value;resetImageData();getImageData();">';
+                     html += '<option value="">---</option>';
 
-                     for (var i=0; i<tinyMCEImageList.length; i++) 
-                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>'; 
+                     for (var i=0; i<tinyMCEImageList.length; i++)
+                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>';
 
-                     html += '</select></td></tr>'; 
+                     html += '</select></td></tr>';
 
-                     document.write(html); 
-                  } 
-                 </script> 
-                 <!-- /Image list --> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_alt}:</td> 
-                        <td colspan="2"><input name="alt" type="text" id="alt" value="" style="width: 280px" onblur="if(document.forms[0].title.value==''){ document.forms[0].title.value=this.value; }" onfocus="if(document.forms[0].title.value==''){ document.forms[0].title.value=this.value; }" /></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_alt2}:</td> 
-                        <td colspan="2"><input name="title" type="text" id="title" value="" style="width: 280px" /></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_dimensions}:</td> 
-                        <td nowrap="nowrap"> 
-                            <input name="width" type="text" id="width" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeHeight();" /> x 
-                            <input name="height" type="text" id="height" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeWidth();" /> px 
+                     document.write(html);
+                  }
+                 </script>
+                 <!-- /Image list -->
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_alt}:</td>
+                        <td colspan="2"><input name="alt" type="text" id="alt" value="" style="width: 280px" onblur="if(document.forms[0].title.value==''){ document.forms[0].title.value=this.value; }" onfocus="if(document.forms[0].title.value==''){ document.forms[0].title.value=this.value; }" /></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_alt2}:</td>
+                        <td colspan="2"><input name="title" type="text" id="title" value="" style="width: 280px" /></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_dimensions}:</td>
+                        <td nowrap="nowrap">
+                            <input name="width" type="text" id="width" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeHeight();" /> x
+                            <input name="height" type="text" id="height" value="" size="5" maxlength="5" style="vertical-align: middle; width: 50px; text-align: center;" onChange="changeWidth();" /> px
                         </td>
-			<td rowspan="6" valign="top"><div id="prev" name="prev" style="margin:0px;border:none;width:135px;height:135px"></div></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_border}:</td> 
-                        <td colspan="2"><input name="border" type="text" id="border" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_align}:</td> 
-                        <td><select name="align" style="width: 100px"> 
-                                <option value="">{$lang_insert_image_align_default}</option> 
-                                <option value="baseline">{$lang_insert_image_align_baseline}</option> 
-                                <option value="top">{$lang_insert_image_align_top}</option> 
-                                <option value="middle">{$lang_insert_image_align_middle}</option> 
-                                <option value="bottom">{$lang_insert_image_align_bottom}</option> 
-                                <option value="texttop">{$lang_insert_image_align_texttop}</option> 
-                                <option value="absmiddle">{$lang_insert_image_align_absmiddle}</option> 
-                                <option value="absbottom">{$lang_insert_image_align_absbottom}</option> 
-                                <option value="left">{$lang_insert_image_align_left}</option> 
-                                <option value="right">{$lang_insert_image_align_right}</option> 
-                            </select> 
-                        </td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_vspace}:</td> 
-                        <td><input name="vspace" type="text" id="vspace" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap">{$lang_insert_image_hspace}:</td> 
-                        <td><input name="hspace" type="text" id="hspace" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td> 
-                    </tr> 
-                    <tr> 
-                        <td colspan="2" nowrap="nowrap"><input type="checkbox" name="onmousemove" id="onmousemove" style="border: 1px none #000000; background-color: transparent; vertical-align: middle;" onclick="if(this.checked==true){ setOnMouseInput('enabled'); }else{ setOnMouseInput('enable'); }" /><label for="onmousemove"><b>{$lang_insert_image_onmousemove}</b>:</label></td> 
-                    </tr> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap" id="showInput1">{$lang_insert_image_mouseover}:</td> 
-                        <td colspan="2"><table border="0" cellspacing="0" cellpadding="0"> 
-                            <tr> 
-                              <td><input name="onmouseover" type="text" id="onmouseover" value=""  style="width: 280px" /></td> 
-                              <td id="browser2"></td> 
-                            </tr> 
-                          </table></td> 
-                    </tr> 
-                 <!-- Image list --> 
-                 <script language="javascript"> 
-                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) { 
-                     var html = ""; 
+			<td rowspan="6" valign="top"><div id="prev" name="prev" style="margin:0px;border:none;width:135px;height:135px"></div></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_border}:</td>
+                        <td colspan="2"><input name="border" type="text" id="border" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_align}:</td>
+                        <td><select name="align" style="width: 100px">
+                                <option value="">{$lang_insert_image_align_default}</option>
+                                <option value="baseline">{$lang_insert_image_align_baseline}</option>
+                                <option value="top">{$lang_insert_image_align_top}</option>
+                                <option value="middle">{$lang_insert_image_align_middle}</option>
+                                <option value="bottom">{$lang_insert_image_align_bottom}</option>
+                                <option value="texttop">{$lang_insert_image_align_texttop}</option>
+                                <option value="absmiddle">{$lang_insert_image_align_absmiddle}</option>
+                                <option value="absbottom">{$lang_insert_image_align_absbottom}</option>
+                                <option value="left">{$lang_insert_image_align_left}</option>
+                                <option value="right">{$lang_insert_image_align_right}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_vspace}:</td>
+                        <td><input name="vspace" type="text" id="vspace" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap">{$lang_insert_image_hspace}:</td>
+                        <td><input name="hspace" type="text" id="hspace" value="" size="3" maxlength="3" style="vertical-align: middle; width: 30px; text-align: center;" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" nowrap="nowrap"><input type="checkbox" name="onmousemove" id="onmousemove" style="border: 1px none #000000; background-color: transparent; vertical-align: middle;" onclick="if(this.checked==true){ setOnMouseInput('enabled'); }else{ setOnMouseInput('enable'); }" /><label for="onmousemove"><b>{$lang_insert_image_onmousemove}</b>:</label></td>
+                    </tr>
+                    <tr>
+                        <td align="right" nowrap="nowrap" id="showInput1">{$lang_insert_image_mouseover}:</td>
+                        <td colspan="2"><table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td><input name="onmouseover" type="text" id="onmouseover" value=""  style="width: 280px" /></td>
+                              <td id="browser2"></td>
+                            </tr>
+                          </table></td>
+                    </tr>
+                 <!-- Image list -->
+                 <script language="javascript">
+                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) {
+                     var html = "";
 
-                     html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</td>'; 
-                     html += '<td colspan="2"><select name="image_list2" style="width: 280px" onchange="this.form.onmouseover.value=this.options[this.selectedIndex].value;">'; 
-                     html += '<option value="">---</option>'; 
+                     html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</tcd>';
+                     html += '<td colspan="2"><select name="image_list2" style="width: 280px" onchange="this.form.onmouseover.value=this.options[this.selectedIndex].value;">';
+                     html += '<option value="">---</option>';
 
-                     for (var i=0; i<tinyMCEImageList.length; i++) 
-                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>'; 
+                     for (var i=0; i<tinyMCEImageList.length; i++)
+                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>';
 
-                     html += '</select></td></tr>'; 
+                     html += '</select></td></tr>';
 
-                     document.write(html); 
-                  } 
-                 </script> 
-                 <!-- /Image list --> 
-                    <tr> 
-                        <td align="right" nowrap="nowrap" id="showInput2">{$lang_insert_image_mouseout}:</td> 
-                        <td colspan="2"><table border="0" cellspacing="0" cellpadding="0"> 
-                            <tr> 
-                              <td><input name="onmouseout" type="text" id="onmouseout" value=""  style="width: 280px" /></td> 
-                              <td id="browser3"></td> 
-                            </tr> 
-                          </table></td> 
-                    </tr> 
-                 <!-- Image list --> 
-                 <script language="javascript"> 
-                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) { 
-                     var html = ""; 
+                     document.write(html);
+                  }
+                 </script>
+                 <!-- /Image list -->
+                    <tr>
+                        <td align="right" nowrap="nowrap" id="showInput2">{$lang_insert_image_mouseout}:</td>
+                        <td colspan="2"><table border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td><input name="onmouseout" type="text" id="onmouseout" value=""  style="width: 280px" /></td>
+                              <td id="browser3"></td>
+                            </tr>
+                          </table></td>
+                    </tr>
+                 <!-- Image list -->
+                 <script language="javascript">
+                  if (typeof(tinyMCEImageList) != "undefined" && tinyMCEImageList.length > 0) {
+                     var html = "";
 
-                     html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</td>'; 
-                     html += '<td colspan="2"><select name="image_list3" style="width: 280px" onchange="this.form.onmouseout.value=this.options[this.selectedIndex].value;">'; 
-                     html += '<option value="">---</option>'; 
+                     html += '<tr><td align="right" nowrap="nowrap">{$lang_image_list}:</td>';
+                     html += '<td colspan="2"><select name="image_list3" style="width: 280px" onchange="this.form.onmouseout.value=this.options[this.selectedIndex].value;">';
+                     html += '<option value="">---</option>';
 
-                     for (var i=0; i<tinyMCEImageList.length; i++) 
-                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>'; 
+                     for (var i=0; i<tinyMCEImageList.length; i++)
+                        html += '<option value="' + tinyMCEImageList[i][1] + '">' + tinyMCEImageList[i][0] + '</option>';
 
-                     html += '</select></td></tr>'; 
+                     html += '</select></td></tr>';
 
-                     document.write(html); 
-                  } 
-                 </script> 
-                 <!-- /Image list --> 
-                    <tr> 
-                        <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertImage();" id="insert" /></td> 
-                        <td>&nbsp;</td> 
-                        <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();" id="cancel" /></td> 
-                    </tr> 
-                </table></td> 
-            </tr> 
-        </table> 
+                     document.write(html);
+                  }
+                 </script>
+                 <!-- /Image list -->
+                    <tr>
+                        <td><input type="button" name="insert" value="{$lang_insert}" onclick="insertImage();" id="insert" /></td>
+                        <td>&nbsp;</td>
+                        <td align="right"><input type="button" name="cancel" value="{$lang_cancel}" onclick="cancelAction();" id="cancel" /></td>
+                    </tr>
+                </table></td>
+            </tr>
+        </table>
     </form>
-</body> 
-</html> 
+</body>
+</html>

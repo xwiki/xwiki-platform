@@ -51,7 +51,6 @@ function TinyMCE_template_execCommand(editor_id, element, command, user_interfac
 				template['height'] = 180;
 
 				tinyMCE.openWindow(template, {editor_id : editor_id, some_custom_arg : "somecustomdata"});
-
 				// Let TinyMCE know that something was modified
 				tinyMCE.triggerNodeChange(false);
 			} else {

@@ -21,16 +21,17 @@ WikiEditor.prototype.initCorePlugin = function() {
 	// Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
-	this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
+    this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
 
-	this.addExternalProcessor((/\[(.*?)(>(.*?))?\]/i), 'convertLinkExternal');
-	this.addInternalProcessor((/<a\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
+    this.addExternalProcessor((/\[(.*?)(>(.*?))?\]/i), 'convertLinkExternal');
+	this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
     this.addExternalProcessor((/{table}([\s\S]+?){table}/i), 'convertTableExternal');
-    this.addInternalProcessor((/<table\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
+    this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
+	this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
 	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
@@ -41,10 +42,10 @@ WikiEditor.prototype.initCorePlugin = function() {
 
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
 
-	this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
+    this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
     // Remove &nbsp;'s
-    this.addInternalProcessor((/&nbsp;/gi), "");
+    this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
 
     var charStr = "À|Á|Â|Ã|Ä|Å|" +
                   "Æ|Ç|È|É|Ê|Ë|" +
@@ -81,8 +82,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     }
 
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
-
-	// Toolbar handlers
+    this.setHtmlTagRemover('removeHtmlTags_Paragraph');
+    // Toolbar handlers
 	this.addToolbarHandler('handleTextButtons');
 	this.addToolbarHandler('handleListButtons');
 	this.addToolbarHandler('handleUndoButtons');
@@ -102,8 +103,14 @@ wikiEditor.initCorePlugin();
 
 // This function will not strip groovy tags
 WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
-	var remove_html_tags_regexp = /<[^%][^>]*>/g;
-	return str.replace(remove_html_tags_regexp, "");
+	var remove_html_tags_regexp = /<[^%][^>]*>/i;
+    return str.replace(remove_html_tags_regexp, "");
+}
+
+WikiEditor.prototype.removeHtmlTags_Paragraph = function(str) {
+	var remove_html_tags_regexp = /<p class="paragraph">|<\/p>|<p>|<br \/>/g;
+    str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
+    return str.replace(remove_html_tags_regexp, "");
 }
 
 WikiEditor.prototype.convertVelocityScriptsInternal = function(regexp, result, content) {
@@ -133,27 +140,30 @@ WikiEditor.prototype.insertTable = function() {
 }
 
 WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
-	var txt;
-	var str="";
-	var href;
-	if( (txt = this.trimString(result[2])) != "") {
-		var att = this.readAttributes(result[1]);
-		if(att && att["href"]) {
-			href = this.trimString(att["href"]);
+    var txt;
+    var str="";
+    var href;
+    if( (txt = this.trimString(result[4])) != "") {
+        var att = this.readAttributes(result[1] + " " + result[3]);
+        if(att && att["href"]) {
+            href = this.trimString(att["href"]);
+            var r = /%20/g;
+            href = href.replace(r," ");
             if(href.toLowerCase() == txt.toLowerCase()) {
-				str = "[" + txt + "]";
-			} else {
-				str = "[" + txt + ">" + href + "]";
+                str = "[" + txt + "]";
+            } else {
+                str = "[" + txt + ">" + href + "]";
             }
-		}
-	}
-	return content.replace(regexp, str);
+        }
+    }
+    return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
-    var text = this.trimString(result[2]);
+    var text = this.trimString(result[3]);
     var str = "";
-    str += "{table}\n";
+    if (browser.isIE) str += "\r\n";
+    str += "{table}\r\n";
     var rows = text.split("<\/tr>");
     for(var i=0; i< rows.length; i++) {
         rows[i] = rows[i].replace("<tr>","")
@@ -173,13 +183,13 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
                 if (j != cols.length-2) {
                     str += cols[j] + "|" ;
                 } else {
-                    str += cols[j] +"\n";
+                    str += cols[j] +"\r\n";
                 }
             }
         }
-
     }
     str += "{table}";
+    if (browser.isIE) str += "\r\n";
     return content.replace(regexp, str);
 }
 
@@ -191,7 +201,7 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 		var att = this.readAttributes(result[1]);
 		if(att && att["class"]) {
 			var r = headr.exec(att["class"]);
-			if(r) {
+            if(r) {
 				var n = r[1].split("-").length-1;
 				str = "\r\n1";
 				str += this.buildString(".1", n-1);
@@ -549,8 +559,6 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
             <option value="0">{$lang_wiki_title_menu}</option>\
             <option value="1">{$lang_wiki_title_1}</option>\
             <option value="2">{$lang_wiki_title_2}</option>\
-            <option value="3">{$lang_wiki_title_3}</option>\
-            <option value="4">{$lang_wiki_title_4}</option>\
           </select>';
 }
 
@@ -566,7 +574,7 @@ WikiEditor.prototype.getListControls = function(button_name) {
 			str = this.createButtonHTML('bullist', 'bullist.gif', '{$lang_bullist_desc}', 'InsertUnorderedList');
 			break;
 		case 'numlist':
-			str = this.createButtonHTML('numlist', 'numlist.gif', '{$lang_numlist_desc}', 'InsertOrderedList');
+            str = this.createButtonHTML('numlist', 'numlist.gif', '{$lang_numlist_desc}', 'InsertOrderedList');
 			break;
 	}
 
@@ -733,9 +741,9 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimString(result[1]);
-    var rows = text.split("\n");
+    var rows = text.split("\r\n");
     var str = "";
-    str += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\">"
+    str += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
     for (var i=0; i<rows.length; i++) {
         rows[i] = this.trimString(rows[i]);
         var k = 0;
@@ -754,10 +762,10 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
             str += "<tr>";
             for (var j=0; j<cols.length; j++) {
                 if (i == 0) {
-                    str += "<td>" + this.trimString(cols[j]) + "&nbsp;<\/td>"
+                    str += "<td style=\"background:#b6c5f2;font-weight:bold;\">" + this.trimString(cols[j]) + "&nbsp;<\/td>"
                 }
                 else
-                    str += "<td>" + this.trimString(cols[j]) + "&nbsp;<\/td>" ;
+                    str += "<td style=\"background:#FFFFFF\">" + this.trimString(cols[j]) + "&nbsp;<\/td>" ;
             }
             str += "<\/tr>" ;
 

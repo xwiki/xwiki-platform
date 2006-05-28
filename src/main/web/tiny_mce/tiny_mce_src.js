@@ -313,7 +313,7 @@ TinyMCE.prototype.addMCEControl = function(replace_element, form_element_name, t
 	inst.editorId = id;
 	this.instances[id] = inst;
 
-	inst.onAdd(replace_element, form_element_name, target_document);
+    inst.onAdd(replace_element, form_element_name, target_document);
 };
 
 TinyMCE.prototype.triggerSave = function(skip_cleanup, skip_callback) {
@@ -1041,18 +1041,18 @@ TinyMCE.prototype.handleEvent = function(e) {
 				var inst = tinyMCE.instances[instanceName];
 
 				// Reset design mode if lost (on everything just in case)
-				inst.autoResetDesignMode();
+//				inst.autoResetDesignMode();
 
-				if (inst.getBody() == targetBody) {
-					tinyMCE.selectedInstance = inst;
-					tinyMCE.selectedElement = e.target;
-					tinyMCE.linkElement = tinyMCE.getParentElement(tinyMCE.selectedElement, "a");
-					tinyMCE.imgElement = tinyMCE.getParentElement(tinyMCE.selectedElement, "img");
-
-					// Reset typing
-					tinyMCE.selectedInstance.typing = false;
-					break;
-				}
+//				if (inst.getBody() == targetBody) {
+//					tinyMCE.selectedInstance = inst;
+//					tinyMCE.selectedElement = e.target;
+//					tinyMCE.linkElement = tinyMCE.getParentElement(tinyMCE.selectedElement, "a");
+//					tinyMCE.imgElement = tinyMCE.getParentElement(tinyMCE.selectedElement, "img");
+//
+//					// Reset typing
+//					tinyMCE.selectedInstance.typing = false;
+//					break;
+//				}
 			}
 
 			if (tinyMCE.isSafari) {
@@ -2166,7 +2166,7 @@ TinyMCE.prototype.insertLink = function(href, target, title, onclick, style_clas
 		tinyMCE.setAttrib(linkElement, 'target', target);
 		tinyMCE.setAttrib(linkElement, 'title', title);
         tinyMCE.setAttrib(linkElement, 'mce_onclick', onclick);
-		tinyMCE.setAttrib(linkElement, 'class', style_class);
+		tinyMCE.setAttrib(linkElement, 'class', "wikilink");
 
 		if (newLink) {
 			linkElement.appendChild(this.selectedElement.cloneNode(true));
@@ -2192,7 +2192,7 @@ TinyMCE.prototype.insertLink = function(href, target, title, onclick, style_clas
 			tinyMCE.setAttrib(elementArray[i], 'target', target);
 			tinyMCE.setAttrib(elementArray[i], 'title', title);
             tinyMCE.setAttrib(elementArray[i], 'mce_onclick', onclick);
-			tinyMCE.setAttrib(elementArray[i], 'class', style_class);
+			tinyMCE.setAttrib(elementArray[i], 'class', "wikilink");
 		}
         tinyMCE.linkElement = elementArray[0];
 	}
@@ -2203,7 +2203,7 @@ TinyMCE.prototype.insertLink = function(href, target, title, onclick, style_clas
 		tinyMCE.setAttrib(this.linkElement, 'target', target);
 		tinyMCE.setAttrib(this.linkElement, 'title', title);
         tinyMCE.setAttrib(this.linkElement, 'mce_onclick', onclick);
-		tinyMCE.setAttrib(this.linkElement, 'class', style_class);
+		tinyMCE.setAttrib(this.linkElement, 'class', "wikilink");
     }
 };
 
@@ -2216,17 +2216,16 @@ TinyMCE.prototype.insertImage = function(src, alt, border, hspace, vspace, width
 	if (!this.imgElement && tinyMCE.isSafari) {
 		var html = "";
 
-		html += '<img src="' + src + '" alt="' + alt + '"';
+		html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
 		html += ' border="' + border + '" hspace="' + hspace + '"';
 		html += ' vspace="' + vspace + '" width="' + width + '"';
 		html += ' height="' + height + '" align="' + align + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout + '" />';
-
 		tinyMCE.execCommand("mceInsertContent", false, html);
 	} else {
-		if (!this.imgElement && this.selectedInstance) {
-			if (tinyMCE.isSafari)
-				tinyMCE.execCommand("mceInsertContent", false, '<img src="#mce_temp_url#" />');
-			else
+        if (!this.imgElement && this.selectedInstance) {
+			if (tinyMCE.isSafari) {
+                tinyMCE.execCommand("mceInsertContent", false, '<img src="#mce_temp_url#" />');
+			}else
 				this.selectedInstance.contentDocument.execCommand("insertimage", false, "#mce_temp_url#");
 
 			tinyMCE.imgElement = this.getElementByAttributeValue(this.selectedInstance.contentDocument.body, "img", "src", "#mce_temp_url#");
@@ -2252,7 +2251,8 @@ TinyMCE.prototype.insertImage = function(src, alt, border, hspace, vspace, width
 			needsRepaint = true;
 
 		tinyMCE.setAttrib(this.imgElement, 'src', src);
-		tinyMCE.setAttrib(this.imgElement, 'mce_real_src', src);
+        tinyMCE.setAttrib(this.imgElement, 'class', "wikiimage");
+        tinyMCE.setAttrib(this.imgElement, 'mce_real_src', src);
 		tinyMCE.setAttrib(this.imgElement, 'alt', alt);
 		tinyMCE.setAttrib(this.imgElement, 'title', title);
 		tinyMCE.setAttrib(this.imgElement, 'align', align);
@@ -2777,15 +2777,13 @@ TinyMCE.prototype.applyTemplate = function(html, args) {
 };
 
 TinyMCE.prototype.openWindow = function(template, args) {
-	var html, width, height, x, y, resizable, scrollbars, url;
-
+    var html, width, height, x, y, resizable, scrollbars, url;
 	args['mce_template_file'] = template['file'];
 	tinyMCE.windowArgs = args;
 
 	html = template['html'];
 	if (!(width = template['width']))
-		width = 320;
-
+        width = 320;
 	if (!(height = template['height']))
 		height = 200;
 
@@ -2807,11 +2805,9 @@ TinyMCE.prototype.openWindow = function(template, args) {
 	// Replace all args as variables in URL
 	for (var name in args)
 		url = tinyMCE.replaceVar(url, name, escape(args[name]));
-
 	if (html) {
-		html = tinyMCE.replaceVar(html, "css", this.settings['popups_css']);
+        html = tinyMCE.replaceVar(html, "css", this.settings['popups_css']);
 		html = tinyMCE.applyTemplate(html, args);
-
 		var win = window.open("", "mcePopup", "top=" + y + ",left=" + x + ",scrollbars=" + scrollbars + ",dialog=yes,minimizable=" + resizable + ",modal=yes,width=" + width + ",height=" + height + ",resizable=" + resizable);
 		if (win == null) {
 			alert(tinyMCELang['lang_popup_blocked']);
@@ -2820,10 +2816,10 @@ TinyMCE.prototype.openWindow = function(template, args) {
 
 		win.document.write(html);
 		win.document.close();
-		win.resizeTo(width, height);
+        win.resizeTo(width, height);
 		win.focus();
 	} else {
-		if (tinyMCE.isMSIE && resizable != 'yes' && tinyMCE.settings["dialog_type"] == "modal") {
+        if (tinyMCE.isMSIE && resizable != 'yes' && tinyMCE.settings["dialog_type"] == "modal") {
             var features = "resizable:" + resizable
                 + ";scroll:"
                 + scrollbars + ";status:yes;center:yes;help:no;dialogWidth:"
@@ -2832,21 +2828,22 @@ TinyMCE.prototype.openWindow = function(template, args) {
 			window.showModalDialog(url, window, features);
 		} else {
 			if (tinyMCE.settings["dialog_type"] == "window" || tinyMCE.settings["dialog_type"] == "modal") {
-				var modal = (resizable == "yes") ? "no" : "yes";
+                var modal = (resizable == "yes") ? "no" : "yes";
 
 				if (tinyMCE.isGecko && tinyMCE.isMac)
 					modal = "no";
 
-				var win = window.open(url, "mcePopup", "top=" + y + ",left=" + x + ",scrollbars=" + scrollbars + ",dialog=" + modal + ",minimizable=" + resizable + ",modal=" + modal + ",width=" + width + ",height=" + height + ",resizable=" + resizable);
-				if (win == null) {
+                var win = window.open(url, "mcePopup", "top=" + y + ",left=" + x + ",scrollbars=" + scrollbars + ",dialog=" + modal + ",minimizable=" + resizable + ",modal=yes,width=" + width + ",height=" + height + ",resizable=" + resizable);
+                if (win == null) {
 					alert(tinyMCELang['lang_popup_blocked']);
 					return;
 				}
 
-				eval('try { win.resizeTo(width, height); } catch(e) { }');
-				win.focus();
+//				eval('try { win.resizeTo(width, height); } catch(e) { }');
+
+                win.focus();
 			} else {
-				var div = document.createElement("div");
+                var div = document.createElement("div");
 				var id = "mceDialog" + (tinyMCE.dialogCounter++);
 
 				height += 30;
@@ -2855,7 +2852,6 @@ TinyMCE.prototype.openWindow = function(template, args) {
 				div.className = "mceDialog";
 				div.style.width = width + "px";
 				div.style.height = height + "px";
-
 				var html = '<div class="mceDialogHeader"><div class="mceDialogTitle"></div><div class="mceDialogClose"><a href="javascript:tinyMCE.closeDialog();"></a></div></div>';
 				html += '<div id="' + id + 'IFrameWrapper" class="mceDialogIFrameWrapper"><iframe border="0" marginwidth="0" marginheight="0" frameborder="0" hspace="0" vspace="0" src="' + url + '" width="' + width + '" height="' + height + '"></iframe></div>';
 
@@ -2923,17 +2919,14 @@ TinyMCE.prototype.handleVisualAid = function(element, deep, state) {
 			var oldH = element.style.height;
 
 			element.style.width = oldW;
-			element.style.height = oldH;
+            element.style.height = oldH;
             for (var y=0; y<element.rows.length; y++) {
-				for (var x=0; x<element.rows[y].cells.length; x++) {
-                   // var className = tinyMCE.getVisualAidClass(element.rows[y].cells[x].className, state && element.getAttribute("border") == 0);
-                    if (y == 0) {
-                        element.rows[y].cells[x].bgColor = "#b6c5f2";
-                        element.rows[y].cells[x].style.cssText="font-weight:bold;font-size:80%;";
-                    } else {
+                for (var x=0; x<element.rows[y].cells.length; x++) {
+                    if (y != 0) {
                         element.rows[y].cells[x].bgColor = "#FFFFFF";
-                        element.rows[y].cells[x].style.cssText="font-size:80%;";
+                        element.rows[y].cells[x].style.cssText="font-weight:none;"
                     }
+
                 }
 			}
 
@@ -3618,7 +3611,7 @@ TinyMCEControl.prototype.scrollToNode = function(node) {
 	var height = tinyMCE.isMSIE ? document.getElementById(this.editorId).style.pixelHeight : this.targetElement.clientHeight;
 
 	// Only scroll if out of visible area
-	if (!tinyMCE.settings['auto_resize'] && !(node.absTop > scrollY && node.absTop < (scrollY - 25 + height)))
+    if (!tinyMCE.settings['auto_resize'] && !(node.absTop > scrollY && node.absTop < (scrollY - 25 + height)))
 		this.contentWindow.scrollTo(pos.absLeft, pos.absTop - height + 25);
 };
 
@@ -4313,7 +4306,7 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 		break;
 
 		case "mceImage":
-			var src = "", alt = "", border = "", hspace = "", vspace = "", width = "", height = "", align = "";
+            var src = "", alt = "", border = "", hspace = "", vspace = "", width = "", height = "", align = "";
 			var title = "", onmouseover = "", onmouseout = "", action = "insert";
 			var img = tinyMCE.imgElement;
 
@@ -4385,8 +4378,8 @@ TinyMCEControl.prototype.execCommand = function(command, user_interface, value) 
 				if (returnVal && returnVal['src'])
 					tinyMCE.insertImage(returnVal['src'], returnVal['alt'], returnVal['border'], returnVal['hspace'], returnVal['vspace'], returnVal['width'], returnVal['height'], returnVal['align'], returnVal['title'], returnVal['onmouseover'], returnVal['onmouseout']);
 			} else
-				tinyMCE.openWindow(this.insertImageTemplate, {src : src, alt : alt, border : border, hspace : hspace, vspace : vspace, width : width, height : height, align : align, title : title, onmouseover : onmouseover, onmouseout : onmouseout, action : action});
-		break;
+                tinyMCE.openWindow(this.insertImageTemplate, {src : src, alt : alt, border : border, hspace : hspace, vspace : vspace, width : width, height : height, align : align, title : title, onmouseover : onmouseover, onmouseout : onmouseout, action : action});
+        break;
 
 		case "mceCleanupWord":
 			if (tinyMCE.isMSIE) {

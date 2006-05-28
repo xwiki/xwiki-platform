@@ -53,8 +53,8 @@ function TinyMCE_wikieditor_getInsertImageTemplate()
 	var template = new Array();
 
 	template['file'] = 'image.htm?src={$src}';
-	template['width'] = 340;
-	template['height'] = 280;
+	template['width'] = 530;
+	template['height'] = 350;
 
 	// Language specific width and height addons
 	template['width'] += tinyMCE.getLang('lang_insert_image_delta_width', 0);

@@ -13,8 +13,8 @@ WikiEditor.prototype.initAttachmentsPlugin = function() {
 	}
 	
 	this.addExternalProcessor((/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
-	this.addInternalProcessor((/<img\s*([^>]*)\/>/i), 'convertImageInternal');
-	
+	this.addInternalProcessor((/<img\s*([^>]*)(class=\"wikiimage\")\s*([^>]*)\/>/i), 'convertImageInternal');
+
 	this.addExternalProcessor((/{\s*attach\s*:\s*(.*?)}/i), 'convertAttachmentExternal');
 	this.addInternalProcessorBefore('convertLinkInternal', (/<a.*wikiattachment:-:(.*?)".*>.*?<\s*\/\s*a\s*>/i), '{attach:$1}');
 
@@ -35,22 +35,22 @@ WikiEditor.prototype.attachmentCommand = function(editor_id, element, command, u
 	var template = new Array();
 
     template['file'] = 'attachment.htm';
-	template['width'] = 210;
-	template['height'] = 400;
+	template['width'] = 520;
+	template['height'] = 330;
 
-	tinyMCE.openWindow(template, {editor_id : editor_id});
-	return this.dummyCommand();
+    tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes',  resizable : 'no', mce_windowresize: false});
+
+    return this.dummyCommand();
 }
 
 WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_interface, value) {
 	var template = new Array();
 
     template['file'] = 'image.htm';
-	template['width'] = 210;
-	template['height'] = 400;
-
-	tinyMCE.openWindow(template, {editor_id : editor_id});
-	return this.dummyCommand();
+    template['width'] = 520;
+	template['height'] = 330;
+    tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes', resizable : 'no', mce_windowresize: false});
+    return this.dummyCommand();
 }
 
 WikiEditor.prototype.insertImage = function(src, width, height) {
@@ -59,16 +59,21 @@ WikiEditor.prototype.insertImage = function(src, width, height) {
 
 WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
 	var str="";
-	var att = this.readAttributes(result[1]);
+    var attributes = this.trimString(result[1] + " " + result[3]);
+    var att = this.readAttributes(attributes);
 	var href;
-	if(att && (href = att["src"]) != null) {
-		href = this.trimString(href);
-		var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
-		var r = imgname_reg.exec(href);
-		if(r) {
-			var imgname = r[1];
+    
+    if(att && (href = att["src"]) != null) {
+        href = this.trimString(href);
+        if (window.navigator.appName.substring(0,9) == "Microsoft") {
+              href = "/xwiki/bin/" + href.substring(href.indexOf("/",3) + 1);
+        }
+        var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
+        var r = imgname_reg.exec(href);
+        if(r) {
+            var imgname = r[1];
 			str = "{image:" + imgname;
-			var width=att["width"]?this.trimString(att["width"]):"";
+            var width=att["width"]?this.trimString(att["width"]):"";
 			var height=att["height"]?this.trimString(att["height"]):"";
 			if(width != "" || height != "") {
 				str += "|" + (height?height:"") + "|" + (width?width:"");
@@ -79,7 +84,7 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
 	return content.replace(regexp, str);
 }
 
-WikiEditor.prototype.IMAGE_CLASS_NAME = "";
+WikiEditor.prototype.IMAGE_CLASS_NAME = "wikiimage";
 
 WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
 	var str = "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";

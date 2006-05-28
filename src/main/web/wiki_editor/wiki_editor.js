@@ -411,17 +411,16 @@ WikiEditor.prototype._getResultIndex = function(result) {
 WikiEditor.prototype.readAttributes = function(str) {
 	var attrib_regexp = /\s*\w+\s*=\s*"[^"]*"\s*/gi;
 	var attrib_local_regexp = /\s*(\w+)\s*=\s*"([^"]*)"\s*/i;
-	var result = str.match(attrib_regexp);
-	var attributes = new Array();
+    var result = str.match(attrib_regexp);
+    var attributes = new Array();
 	var n=0;
-	
-	for(var i=0; i < result.length; i++) {
-		var attrib = attrib_local_regexp.exec(result[i]);
-		n++;
-		attributes[attrib[1]] = attrib[2];
-	}
-	
-	return (n>0)?attributes:null;
+    for(var i=0; i < result.length; i++) {
+        var attrib = attrib_local_regexp.exec(result[i]);
+        n++;
+        attributes[attrib[1]] = attrib[2];
+    }
+
+    return (n>0)?attributes:null;
 }
 
 /*

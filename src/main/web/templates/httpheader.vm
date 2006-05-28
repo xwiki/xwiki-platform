@@ -18,6 +18,7 @@ $!xwiki.getWebPreference("meta")
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
 </head>
 #if(($context.action=="inline")||($context.action=="edit"))
 <script type="text/javascript">

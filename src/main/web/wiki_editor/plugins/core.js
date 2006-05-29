@@ -59,7 +59,9 @@ WikiEditor.prototype.initCorePlugin = function() {
                   "û|ü|ÿ|" +
                   // Commercial symbols:
                   "?|©|®|¢|?|¥|" +
-                  "£|¤";
+                  "£|¤|" +
+                  //Other characters
+                  ">|<";
     var characterEntityStr = "&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Auml;|&Aring;|" +
                              "&AElig;|&Ccedil;|&Egrave;|&Eacute;|&Ecirc;|&Euml;|" +
                              "&Igrave;|&Iacute;|&Icirc;|&Iuml;|&Ntilde;|&Ograve;|" +
@@ -72,7 +74,9 @@ WikiEditor.prototype.initCorePlugin = function() {
                              "&ucirc;|&uuml;|&yuml;|" +
                              // Commercial symbols:
                              "&trade;|&copy;|&reg;|&cent;|&euro;|&yen;|" +
-                             "&pound;|&curren;";
+                             "&pound;|&curren;|" +
+                             //Other characters
+                             "&gt;|&lt;"
 
     var characterEntitys = characterEntityStr.split("|");
     var chars = charStr.split("|");

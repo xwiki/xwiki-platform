@@ -38,6 +38,7 @@ public class EditAction extends XWikiAction {
 
 	public String render(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
+        String content = request.getParameter("content");
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -94,6 +95,8 @@ public class EditAction extends XWikiAction {
             }
 
             XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
+            if (content != null && !content.equals(""))
+                tdoc2.setContent(content);
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", new Document(tdoc2, context));
             tdoc2.readFromTemplate(peform, context);

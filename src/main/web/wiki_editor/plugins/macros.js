@@ -27,8 +27,8 @@ WikiEditor.prototype.macroCommand = function(editor_id, element, command, user_i
 	var template = new Array();
 
     template['file'] = 'macro.htm';
-	template['width'] = 390;
-	template['height'] = 230;
+	template['width'] = 420;
+	template['height'] = 290;
 
     tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes',  resizable : 'no', mce_windowresize: false});
 

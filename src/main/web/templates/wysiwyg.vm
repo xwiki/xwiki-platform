@@ -65,7 +65,7 @@ $msg.get("youareediting"): $tdoc.language
 #end
 $msg.get("titlefield"):&nbsp;<input type="text" name="title" value="$!tdoc.title" size="60" />
 <br /><br />
-   Switch to &nbsp; <span style="color: blue; cursor:pointer;" onclick="document.forms.edit.action='$doc.getURL("edit")'; document.forms.edit.onsubmit();if (checkDocumentContent()) document.forms.edit.submit(); return false;"><u>$msg.get("wikieditor")</u></span>
+   Switch to &nbsp; <span style="color: blue; cursor:pointer;" onclick="document.forms.edit.action='$doc.getURL("edit")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;"><u>$msg.get("wikieditor")</u></span>
 <br />
 $xwiki.getTextArea($tdoc.content)
 <br/>

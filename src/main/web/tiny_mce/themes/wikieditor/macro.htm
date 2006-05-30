@@ -108,7 +108,7 @@
             macroparams = macroparamstr.split(",");
             for(var i=0; i < macroparams.length; i++) {
                 macro += macroparams[i] + "=" + document.getElementById(macroparams[i]).value;
-                if (i != macroparams.length-1 )  macro += ",";
+                if (i != macroparams.length-1 )  macro += "|";
             }
             macro += "}";
             if ((macrocontent !=null && macrocontent !="")) {

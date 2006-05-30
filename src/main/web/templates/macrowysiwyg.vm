@@ -62,7 +62,7 @@
                                     #if($counter == 3)
                                         #if (!$infoMacro.equals(""))
                                             <tr>
-                                                <td nowrap='nowrap'>Content :</td>
+                                                <td nowrap='nowrap'>infoMacro :</td>
                                                 <td>
                                                     <textarea id="content" name="content" rows='' cols='' style='width:240px;'></textarea>
                                                 </td>

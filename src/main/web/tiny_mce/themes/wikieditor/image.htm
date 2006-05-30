@@ -12,7 +12,7 @@ var baseurl = tinyMCE.getParam("wiki_attach_path");
 			var width = document.forms[0].width.value;
 			var height = document.forms[0].height.value;
 
-			window.opener.wikiEditor.insertImage(src, "", "", "", "", width, height, "");
+			window.opener.wikiEditor.insertImage(src, width, height);
 			top.close();
 		}
 	}

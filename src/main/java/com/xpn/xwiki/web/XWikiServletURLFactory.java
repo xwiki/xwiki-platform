@@ -256,7 +256,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
             newpath.append(querystring);
         }
 
-        if(context.getAction().equals("viewrev")){
+        if ((context!=null)&&context.getAction().equals("viewrev")){
             revdoc = context.get("rev").toString();
             Log log = LogFactory.getLog(XWikiServletURLFactory.class);
             try{

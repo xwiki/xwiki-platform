@@ -1010,5 +1010,9 @@ public class XWiki extends Api {
         else
          return null;
     }
+
+    public String getMacroList() {
+        return xwiki.getMacroList(context);
+    }
 }
 

@@ -1,6 +1,8 @@
 package com.xpn.xwiki.cache.impl;
 
 import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,8 +53,9 @@ import com.xpn.xwiki.cache.api.XWikiCacheService;
 public class OSCacheService implements XWikiCacheService, Runnable
 {
     private static final Log    log                  = LogFactory.getLog(OSCacheService.class);
-    private static final String PROPS_FILENAME       = "/WEB-INF/oscache.properties";
-    private static final String LOCAL_PROPS_FILENAME = "/WEB-INF/oscache-local.properties";
+    private static final String PROPS_FILENAME       = "oscache.properties";
+    private static final String LOCAL_PROPS_FILENAME = "oscache-local.properties";
+    private static final String PROPS_PATH       = "/WEB-INF/";
 
     private XWiki               xwiki;
     private Properties          cacheProperties;
@@ -134,7 +137,11 @@ public class OSCacheService implements XWikiCacheService, Runnable
 
         try
         {
-            is = xwiki.getResourceAsStream(propertiesFilename);
+            File f = new File(propertiesFilename);
+            if (f.exists())
+                is = new FileInputStream(f);
+            else
+                is = xwiki.getResourceAsStream(PROPS_PATH + propertiesFilename);
             props.load(is);
             log.info("Properties loaded: " + propertiesFilename);
         }

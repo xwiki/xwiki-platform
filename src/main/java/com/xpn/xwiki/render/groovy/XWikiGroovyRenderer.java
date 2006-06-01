@@ -37,6 +37,7 @@ import java.io.Writer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.runtime.InvokerHelper;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -90,7 +91,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         return gcontext;
     }
 
-    private void prepareCache(XWikiContext context) {
+    public void initCache(XWikiContext context) {
+            cache = context.getWiki().getCacheService().newCache(100);
+            classCache = context.getWiki().getCacheService().newCache(100);
+    }
+
+    protected void prepareCache(XWikiContext context) {
         if (cache==null) {
             cache = context.getWiki().getCacheService().newCache(100);
         }
@@ -117,10 +123,10 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                     template = (Template) cache.getFromCache(content);
                 }
             } catch (XWikiCacheNeedsRefreshException e) {
+                cache.cancelUpdate(content);
                 template = engine.createTemplate(content);
                 cache.putInCache(content, template);
             } finally {
-                cache.cancelUpdate(content);
             }
             Writable writable = template.make(gcontext);
             String result = writable.toString();
@@ -250,18 +256,20 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException {
         prepareCache(context);
         try {
+            CachedGroovyClass cgc;
             Class gc;
             try {
-                gc = (Class) classCache.getFromCache(script);
+                cgc = (CachedGroovyClass) classCache.getFromCache(script);
+                gc = cgc.getGroovyClass();
             }
             catch (XWikiCacheNeedsRefreshException e) {
                 GroovyClassLoader gcl = new GroovyClassLoader();
                 gc = gcl.parseClass(script);
-                classCache.putInCache(script, gc);
+                cgc = new CachedGroovyClass(gc);
+                classCache.putInCache(script, cgc);
             } finally {
                 classCache.cancelUpdate(script);
             }
-
             return gc.newInstance();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_GROOVY,
@@ -269,4 +277,21 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                     "Failed compiling groovy script", e);
         }
     }
+
+    private class CachedGroovyClass {
+        protected Class cl;
+
+        public CachedGroovyClass(Class cl) {
+            this.cl = cl;
+        }
+
+        public Class getGroovyClass()  {
+            return cl;
+        }
+
+        public void finalize() {
+            if (cl!=null)
+                InvokerHelper.removeClass(cl);
+        }
+    }    
 }

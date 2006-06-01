@@ -366,7 +366,9 @@
         <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-05.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://D:/dev/java/groovy/groovy-1.0-jsr-04/src/main" />
+      </SOURCES>
     </library>
     <library name="fop">
       <CLASSES>

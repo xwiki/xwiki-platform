@@ -50,6 +50,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.runtime.InvokerHelper;
@@ -68,11 +69,11 @@ import org.codehaus.groovy.runtime.InvokerHelper;
     * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
     */
    public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException, IOException {
-       com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template = new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
-       GroovyShell shell = new GroovyShell();
-       String script = template.parse(reader);
-       template.script = shell.parse(script);
-       return template;
+           com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template = new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
+           GroovyShell shell = new GroovyShell();
+           String script = template.parse(reader);
+           template.script = shell.parse(script);
+           return template;
    }
 
    private static class SimpleTemplate implements Template {
@@ -80,6 +81,13 @@ import org.codehaus.groovy.runtime.InvokerHelper;
        private Script script;
        private Binding binding;
        private Map map;
+
+
+       public void finalize()
+       {
+           if (script!=null)
+               InvokerHelper.removeClass(script.getClass());
+       }
 
        /**
         * Set the binding for the template.  Keys will be converted to Strings.

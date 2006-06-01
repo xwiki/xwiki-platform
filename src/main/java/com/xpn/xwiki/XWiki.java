@@ -35,7 +35,6 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -85,7 +84,6 @@ import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.exoplatform.container.RootContainer;
 import org.exoplatform.container.PortalContainer;
-import org.codehaus.groovy.control.CompilationFailedException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -102,11 +100,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.text.NumberFormat;
 import java.util.*;
 import java.util.zip.ZipOutputStream;
 
-import groovy.lang.GroovyClassLoader;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface {
     private static final Log log = LogFactory.getLog(XWiki.class);

@@ -23,11 +23,16 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import groovy.lang.MetaClassRegistry;
+
+import java.util.Map;
 
 public class GroovyRenderTest extends HibernateTestCase {
 
@@ -63,6 +68,77 @@ public class GroovyRenderTest extends HibernateTestCase {
         doc2.setContent("#includeMacros(\"Test.WebHome\")<% println testvar %>");
         store.saveXWikiDoc(doc2, getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, doc2, "IncludeTest", false, getXWikiContext());
+    }
+
+    public void cleanMem() {
+        Runtime rt = Runtime.getRuntime();
+        for (int i=0;i<5;i++) {
+            rt.gc();
+            rt.runFinalization();
+            rt.gc();
+        }
+}
+    public void testMemory() throws Exception {
+        XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
+        getXWiki().setRightService(new GroovyTestRightService());
+        ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
+        int nbrenders = 500;
+        int nbtotal = 20;
+        String function = "def add(int a, int b) { c=0;\n";
+        for (int i=0;i<nbtotal;i++) {
+         function += "c = a+b+c;\n";
+        }
+        function += "return c }\n";
+
+        Runtime rt = Runtime.getRuntime();
+
+        // Make sure we load all stuff in memory
+        for (int i=0;i<10;i++) {
+            AbstractRenderTest.renderTest(wikiengine, "<%  " + function  + "println add(1,1)\n %>",
+                "" + (nbtotal*2), false, getXWikiContext());
+        }
+
+        ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
+        cleanMem();
+
+        long totalmem = rt.totalMemory();
+        long freemem = rt.freeMemory();
+        long overhead1 = totalmem - freemem;
+
+        System.out.println("Total: " + totalmem + " Free: " + freemem + " Overhead: " + overhead1);
+
+        for (int i=0;i<nbrenders;i++) {
+            AbstractRenderTest.renderTest(wikiengine, "<%  " + function + "println add(1,1)\n %>",
+                    "" + (nbtotal*2), false, getXWikiContext());
+        }
+
+        ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
+        cleanMem();
+
+        totalmem = rt.totalMemory();
+        freemem = rt.freeMemory();
+        long overhead2 = totalmem - freemem;
+
+        System.out.println("Total: " + totalmem + " Free: " + freemem + " Overhead: " + overhead2);
+        assertTrue("Memory consuption is too high: " + (overhead2-overhead1), (overhead2-overhead1) < 2000000);
+
+        for (int i=0;i<nbrenders;i++) {
+            AbstractRenderTest.renderTest(wikiengine, "<%  " + function + "println add(" + i + ",1)\n %>",
+                    "" + (nbtotal*(i+1)), false, getXWikiContext());
+            MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
+            Map map = (Map) XWiki.getPrivateField(mcr, "metaClasses");
+            System.out.println("Map size: " + map.size());
+        }
+
+        ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
+        cleanMem();
+
+        totalmem = rt.totalMemory();
+        freemem = rt.freeMemory();
+        long overhead3 = totalmem - freemem;
+
+        System.out.println("Total: " + totalmem + " Free: " + freemem + " Overhead: " + overhead3);
+        assertTrue("Memory consuption is too high: " + (overhead3-overhead2), (overhead3-overhead2) < 2000000);
     }
 
     /*

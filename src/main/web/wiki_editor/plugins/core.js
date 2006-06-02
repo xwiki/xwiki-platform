@@ -10,7 +10,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
 	// External/Internal conversion setup
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
-	this.addInternalProcessor((/\s*<h3\s*([^>]*)>(.*?)<\/h3>/i), 'convertHeadingInternal');
+	this.addInternalProcessor((/\s*<h3\s*([^>]*)>([\s\S]+?)<\/h3>/i), 'convertHeadingInternal');
 
 	this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
@@ -563,7 +563,10 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
             <option value="0">{$lang_wiki_title_menu}</option>\
             <option value="1">{$lang_wiki_title_1}</option>\
             <option value="2">{$lang_wiki_title_2}</option>\
-          </select>';
+            <option value="3">{$lang_wiki_title_3}</option>\
+            <option value="4">{$lang_wiki_title_4}</option>\
+            <option value="5">{$lang_wiki_title_5}</option>\
+           </select>';
 }
 
 WikiEditor.prototype.getListToolbar = function() {
@@ -826,6 +829,7 @@ WikiEditor.prototype._convertListInternal = function(content) {
 				case 'ul':
 					// Normal list
 					str += this.buildString("*", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
+                    str.replace(/<div>([\s\S]+?)<\/div>/g,'$1');
 					break;
 				case 'ol':
 					// Numeric list

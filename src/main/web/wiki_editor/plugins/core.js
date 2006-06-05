@@ -27,6 +27,9 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/\[(.*?)(>(.*?))?\]/i), 'convertLinkExternal');
 	this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
+    // Must convert external images inside table before convert the table
+    this.addExternalProcessor((/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
+
     this.addExternalProcessor((/{table}([\s\S]+?){table}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 

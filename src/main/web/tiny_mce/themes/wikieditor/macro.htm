@@ -4,6 +4,7 @@
 <script language="javascript" src="../../tiny_mce_popup.js"></script>
 <script language="javascript">
     var baseurl = tinyMCE.getParam("wiki_macro_path");
+    var strMacro = "";
 </script>
 <script language="javascript">
     function init() {
@@ -11,8 +12,8 @@
     }
     function insertMacro() {
         if (window.opener) {
-            var href = document.getElementById("macro").value;
-            window.opener.wikiEditor.insertMacro(editor_id, href);
+            var macro = strMacro.toString();
+            window.opener.wikiEditor.insertMacro(editor_id, macro);
             tinyMCE.closeDialog();
         }
     }
@@ -89,8 +90,9 @@
         if (macroparamstr != null && macroparamstr != "") {
             macroparams = macroparamstr.split(",");
             for(var i=0; i < macroparams.length; i++) {
-                var value = document.getElementById(macroparams[i]).value;
-                if (value == null || value == "" ) {
+                var elementID = macroparams[i].toString().replace(/\r\n|&nbsp;/g,"");
+                values = document.getElementById(elementID).value;
+                if (values == null || values == "" ) {
                     alert("You must choose at least a macro and fill all the fields !");
                     return false;
                 }
@@ -107,7 +109,8 @@
             macro = "{" + macroname + ":";
             macroparams = macroparamstr.split(",");
             for(var i=0; i < macroparams.length; i++) {
-                macro += macroparams[i] + "=" + document.getElementById(macroparams[i]).value;
+                var elementID = macroparams[i].toString().replace(/\r\n|&nbsp;/g,"");
+                macro += elementID.toString() + "=" + document.getElementById(elementID).value;
                 if (i != macroparams.length-1 )  macro += "|";
             }
             macro += "}";
@@ -115,7 +118,8 @@
                 macro +=  macrocontent + "{" +macroname+ "}";
             }
         } else  macro = "{" + macroname +"}";
-        document.write("<input type='text' id='macro' name='macro' value='" + macro + "'/>");
+
+        strMacro = macro;
     }
 </script>
 </head>

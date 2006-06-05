@@ -52,10 +52,11 @@
                                     #if ($counter == 2)
                                         #set($params = $infoMacro.split(","))
                                         #foreach ($param in $params)
+                                            #set($param = $param.trim())
                                             <tr>
-                                                <td nowrap="nowrap" width="25%">$param :</td>
+                                                <td nowrap="nowrap" width="25%">$param.substring(0,1).toUpperCase()$param.substring(1) :</td>
                                                 <td>
-                                                     <input type="text" id="$param" name="$param" style="width:240px;"/>
+                                                     <input type="text" id="$param" name="$param" style="width:240px;" value=""/>
                                                 </td>
                                             </tr>
                                         #end
@@ -63,7 +64,7 @@
                                     #if($counter == 3)
                                         #if (!$infoMacro.equals(""))
                                             <tr>
-                                                <td nowrap='nowrap'>$infoMacro :</td>
+                                                <td nowrap='nowrap'>$infoMacro.substring(0,1).toUpperCase()$infoMacro.substring(1) :</td>
                                                 <td>
                                                     <textarea id="content" name="content" rows='' cols='4' style='width:240px;'></textarea>
                                                 </td>

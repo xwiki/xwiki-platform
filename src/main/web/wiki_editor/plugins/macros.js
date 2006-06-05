@@ -36,13 +36,13 @@ WikiEditor.prototype.macroCommand = function(editor_id, element, command, user_i
 }
 
 WikiEditor.prototype.handleMacrosButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
-   tinyMCE.switchClassSticky(editor_id + '_image', 'mceButtonNormal');
+   tinyMCE.switchClassSticky(editor_id + '_macro', 'mceButtonNormal');
 	do
 	{
 		switch (node.nodeName.toLowerCase())
 		{
 			case "macro":
-					tinyMCE.switchClassSticky(editor_id + '_image', 'mceButtonSelected');
+					tinyMCE.switchClassSticky(editor_id + '_macro', 'mceButtonSelected');
 				break;
 		}
 	} while ((node = node.parentNode));

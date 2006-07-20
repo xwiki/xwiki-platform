@@ -41,7 +41,7 @@
     </table>
     <br/>
 
-    <form action="$doc.getURL(" upload")" enctype="multipart/form-data" method="post">
+    <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
             <p>
         <script type="text/javascript">
             function updateAttachName(form) {

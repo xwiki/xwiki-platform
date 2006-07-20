@@ -66,7 +66,7 @@ public class LevelsClass extends ListClass {
     }
 
     public String getText(String value, XWikiContext context) {
-        return context.getWiki().getUserName(value, null, false, context);
+        return value;
     }
 
     public static List getListFromString(String value) {

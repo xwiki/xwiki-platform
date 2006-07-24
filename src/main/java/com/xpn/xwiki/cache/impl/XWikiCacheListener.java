@@ -1,7 +1,5 @@
 package com.xpn.xwiki.cache.impl;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -13,7 +11,6 @@ import com.opensymphony.oscache.base.events.CachewideEvent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiServletRequest;
 
 /*
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated

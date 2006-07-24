@@ -46,6 +46,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
@@ -56,15 +57,37 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     private XWikiCache cache;
     private XWikiCache classCache;
 
+
+    private class XWikiRenderingEngineClassLoader extends ClassLoader {
+        private Map classMap = new HashMap();
+
+        public XWikiRenderingEngineClassLoader(ClassLoader parent) {
+            super(parent);
+        }
+        protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            Object cached = classMap.get(name);
+            if (cached!=null) return (Class) cached;
+            ClassLoader parent = getParent();
+            if (parent!=null) return parent.loadClass(name);
+            return super.loadClass(name,resolve);
+        }
+    }
+
     public XWikiGroovyRenderer() {
     }
 
 
     public void flushCache() {
-        if (cache!=null)
+        if (cache!=null) {
             cache.flushAll();
+        }
         if (classCache!=null)
             classCache.flushAll();
+
+        GroovyTemplateEngine.flushCache();
+
+        cache = null;
+        classCache = null;
     }
 
     public Map prepareContext(XWikiContext context) {
@@ -92,16 +115,16 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     }
 
     public void initCache(XWikiContext context) {
-            cache = context.getWiki().getCacheService().newCache(100);
-            classCache = context.getWiki().getCacheService().newCache(100);
+            cache = context.getWiki().getCacheService().newLocalCache(100);
+            classCache = context.getWiki().getCacheService().newLocalCache(100);
     }
 
     protected void prepareCache(XWikiContext context) {
         if (cache==null) {
-            cache = context.getWiki().getCacheService().newCache(100);
+            cache = context.getWiki().getCacheService().newLocalCache(100);
         }
         if (classCache==null) {
-            classCache = context.getWiki().getCacheService().newCache(100);
+            classCache = context.getWiki().getCacheService().newLocalCache(100);
         }
     }
 
@@ -278,7 +301,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         }
     }
 
-    private class CachedGroovyClass {
+    public class CachedGroovyClass implements XWikiCachedObject {
         protected Class cl;
 
         public CachedGroovyClass(Class cl) {
@@ -289,9 +312,16 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             return cl;
         }
 
-        public void finalize() {
-            if (cl!=null)
-                InvokerHelper.removeClass(cl);
+        public void finalize() throws Throwable  {
+            try {
+                System.out.println("Finalizing: " + cl.toString());
+                if (cl!=null) {
+                    InvokerHelper.removeClass(cl);
+                    GroovyTemplateEngine.removeClass(cl);
+                }
+            } finally {
+                super.finalize();
+            }
         }
-    }    
+    }
 }

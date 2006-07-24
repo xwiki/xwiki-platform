@@ -15,7 +15,6 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.opensymphony.oscache.base.AbstractCacheAdministrator;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;

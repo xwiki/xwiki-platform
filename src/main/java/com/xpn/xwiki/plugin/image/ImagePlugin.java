@@ -36,9 +36,6 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
-import com.opensymphony.oscache.base.Cache;
-import com.opensymphony.oscache.base.Config;
-import com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;

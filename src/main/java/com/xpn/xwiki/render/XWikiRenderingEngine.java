@@ -31,6 +31,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -40,16 +41,18 @@ public class XWikiRenderingEngine {
 
     private List renderers = new ArrayList();
     private HashMap renderermap = new LinkedHashMap();
-    private XWikiCache cache = null;
+    private XWikiCache cache;
 
     public XWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
+
         if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
             addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
         // addRenderer(new XWikiJSPRenderer());
         if (xwiki.Param("xwiki.render.velocity", "1").equals("1"))
             addRenderer("velocity", new XWikiVelocityRenderer());
-        if (xwiki.Param("xwiki.render.groovy", "1").equals("1"))
+        if (xwiki.Param("xwiki.render.groovy", "1").equals("1")) {
             addRenderer("groovy", new XWikiGroovyRenderer());
+        }
         if (xwiki.Param("xwiki.render.plugin", "1").equals("1"))
             addRenderer("plugin", new XWikiPluginRenderer());
 
@@ -67,23 +70,33 @@ public class XWikiRenderingEngine {
             addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
         }
 
+        initCache(context);
+    }
+
+    public void initCache(XWikiContext context) {
+        int iCapacity = 100;
         try {
-        	String capacity = xwiki.Param("xwiki.render.cache.capacity");
-			if (capacity != null) {
-				cache = xwiki.getCacheService().newCache(Integer.parseInt(capacity));
-			} else {
-				cache = xwiki.getCacheService().newCache();
-			}
-        } catch (Exception e) {
-			e.printStackTrace();        
-        }
+        String capacity = context.getWiki().Param("xwiki.render.cache.capacity");
+        if (capacity != null)
+            iCapacity = Integer.parseInt(capacity);
+        } catch (Exception e) {}
+        initCache(iCapacity, context);
+    }
+
+    public void initCache(int iCapacity, XWikiContext context) {
+        XWikiCacheService cacheService = context.getWiki().getCacheService();
+        cache = cacheService.newCache(iCapacity);
+    }
+
+    public XWikiCache getCache() {
+        return cache;
     }
 
     public void addRenderer(String name, XWikiRenderer renderer) {
         renderers.add(renderer);
         renderermap.put(name, renderer);
     }
-    
+
     public XWikiRenderer getRenderer(String name) {
 		return (XWikiRenderer) renderermap.get(name);
 	}
@@ -95,7 +108,7 @@ public class XWikiRenderingEngine {
 	public List getRendererNames() {
 		return new LinkedList(renderermap.keySet());
 	}
-	
+
 	protected XWikiRenderer removeRenderer(String name) {
 		XWikiRenderer result = (XWikiRenderer) renderermap.remove(name);
 		if (result != null) {
@@ -103,7 +116,7 @@ public class XWikiRenderingEngine {
 		}
 		return result;
 	}
-	
+
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
            return renderText(doc.getTranslatedContent(context), doc, context);
     }

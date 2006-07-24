@@ -1,7 +1,9 @@
 package com.xpn.xwiki.cache.impl;
 
-import java.util.Date;
 import java.util.Properties;
+import java.util.Map;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -9,9 +11,11 @@ import org.apache.commons.logging.LogFactory;
 import com.opensymphony.oscache.base.Cache;
 import com.opensymphony.oscache.base.EntryRefreshPolicy;
 import com.opensymphony.oscache.base.NeedsRefreshException;
+import com.opensymphony.oscache.base.CacheEntry;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.XWiki;
 
 /**
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated by
@@ -44,50 +48,50 @@ public class OSCacheCache implements XWikiCache
 {
     private static final Log          log = LogFactory.getLog(OSCacheCache.class);
 
-    private GeneralCacheAdministrator cache;
+    private GeneralCacheAdministrator cacheAdmin;
     private String                    name;
     private int                       capacity;
 
     public OSCacheCache(Properties props)
     {
-        cache = new GeneralCacheAdministrator(props);
+        cacheAdmin = new GeneralCacheAdministrator(props);
     }
 
     public OSCacheCache(Properties props, int capacity)
     {
         this(props);
-        cache.setCacheCapacity(capacity);
+        cacheAdmin.setCacheCapacity(capacity);
         this.capacity = capacity;
     }
 
     /**
      * Provide package-private access to the underlying m_cache
      */
-    Cache getCache()
+    Cache getCacheAdmin()
     {
-        return cache.getCache();
+        return cacheAdmin.getCache();
     }
 
     public void setCapacity(int capacity)
     {
-        cache.setCacheCapacity(capacity);
+        cacheAdmin.setCacheCapacity(capacity);
         this.capacity = capacity;
     }
 
     public void flushEntry(String key)
     {
-        cache.flushEntry(key);
+        cacheAdmin.flushEntry(key);
     }
 
     public void putInCache(String key, Object obj)
     {
-        cache.putInCache(key, obj);
+        cacheAdmin.putInCache(key, obj);
         logCacheAdd(key, obj);
     }
 
     public void putInCache(String key, Object obj, EntryRefreshPolicy expiry)
     {
-        cache.putInCache(key, obj, expiry);
+        cacheAdmin.putInCache(key, obj, expiry);
         logCacheAdd(key, obj);
     }
 
@@ -95,7 +99,7 @@ public class OSCacheCache implements XWikiCache
     {
         try
         {
-            return cache.getFromCache(key);
+            return cacheAdmin.getFromCache(key);
         }
         catch (NeedsRefreshException e)
         {
@@ -107,7 +111,7 @@ public class OSCacheCache implements XWikiCache
     {
         try
         {
-            return cache.getFromCache(key, refeshPeriod);
+            return cacheAdmin.getFromCache(key, refeshPeriod);
         }
         catch (NeedsRefreshException e)
         {
@@ -117,12 +121,28 @@ public class OSCacheCache implements XWikiCache
 
     public void cancelUpdate(String key)
     {
-        cache.cancelUpdate(key);
+        cacheAdmin.cancelUpdate(key);
     }
 
     public void flushAll()
     {
-        cache.flushAll(new Date());
+        cacheAdmin.flushAll();
+        Cache cache = cacheAdmin.getCache();
+
+        // Make sure we clean-up and finalize cached objects
+        Map map = (Map) XWiki.getPrivateField(cache, "cacheMap");
+        Iterator it = map.values().iterator();
+        while (it.hasNext()) {
+            try {
+                CacheEntry centry = (CacheEntry)it.next();
+                Object obj = centry.getContent();
+                if (obj instanceof XWikiCachedObject) {
+                    ((XWikiCachedObject)obj).finalize();
+                }
+            } catch (Throwable throwable) {
+            }
+        }
+        XWiki.callPrivateMethod(cache, "clear");
     }
 
     /**
@@ -131,7 +151,7 @@ public class OSCacheCache implements XWikiCache
      */
     public int getNumberEntries()
     {
-        return cache.getCache().getNbEntries();
+        return cacheAdmin.getCache().getNbEntries();
     }
 
     public void setName(String name)

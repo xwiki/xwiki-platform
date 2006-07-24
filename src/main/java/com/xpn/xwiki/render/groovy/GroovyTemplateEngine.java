@@ -65,15 +65,38 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 */
    public class GroovyTemplateEngine extends TemplateEngine {
 
+       private class GTEClassLoader extends ClassLoader {
+           private HashMap classMap = new HashMap();
+
+           public GTEClassLoader(ClassLoader parent) {
+               super(parent);
+           }
+           protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+               Object cached = classMap.get(name);
+               if (cached!=null) return (Class) cached;
+               ClassLoader parent = getParent();
+               if (parent!=null) return parent.loadClass(name);
+               return super.loadClass(name,resolve);
+           }
+       }
+
+
    /* (non-Javadoc)
     * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
     */
    public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException, IOException {
+       ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+
+       try {
+           Thread.currentThread().setContextClassLoader(new GTEClassLoader(oldClassLoader));
            com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template = new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
            GroovyShell shell = new GroovyShell();
            String script = template.parse(reader);
            template.script = shell.parse(script);
            return template;
+       } finally {
+           Thread.currentThread().setContextClassLoader(oldClassLoader);
+       }
    }
 
    private static class SimpleTemplate implements Template {
@@ -81,13 +104,6 @@ import org.codehaus.groovy.runtime.InvokerHelper;
        private Script script;
        private Binding binding;
        private Map map;
-
-
-       public void finalize()
-       {
-           if (script!=null)
-               InvokerHelper.removeClass(script.getClass());
-       }
 
        /**
         * Set the binding for the template.  Keys will be converted to Strings.

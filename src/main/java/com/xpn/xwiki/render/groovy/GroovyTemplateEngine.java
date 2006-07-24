@@ -36,10 +36,7 @@
 
 package com.xpn.xwiki.render.groovy;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-import groovy.lang.Writable;
+import groovy.lang.*;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 
@@ -51,242 +48,311 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.HashMap;
+import java.beans.Introspector;
 
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
+import org.codehaus.groovy.runtime.DefaultGroovyStaticMethods;
+import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 
 
-
-
-   /**
+/**
 * This simple template engine uses JSP <% %> script and <%= %> expression syntax.  It also lets you use normal groovy expressions in
 * the template text much like the new JSP EL functionality.  The variable 'out' is bound to the writer that the template is being written to.
 *
 */
-   public class GroovyTemplateEngine extends TemplateEngine {
+public class GroovyTemplateEngine extends TemplateEngine {
 
-       private class GTEClassLoader extends ClassLoader {
-           private HashMap classMap = new HashMap();
+    private class GTEClassLoader extends ClassLoader {
+        private HashMap classMap = new HashMap();
 
-           public GTEClassLoader(ClassLoader parent) {
-               super(parent);
-           }
-           protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-               Object cached = classMap.get(name);
-               if (cached!=null) return (Class) cached;
-               ClassLoader parent = getParent();
-               if (parent!=null) return parent.loadClass(name);
-               return super.loadClass(name,resolve);
-           }
-       }
+        public GTEClassLoader(ClassLoader parent) {
+            super(parent);
+        }
+        protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            Object cached = classMap.get(name);
+            if (cached!=null) return (Class) cached;
+            ClassLoader parent = getParent();
+            if (parent!=null) return parent.loadClass(name);
+            return super.loadClass(name,resolve);
+        }
+    }
 
 
-   /* (non-Javadoc)
-    * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
-    */
-   public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException, IOException {
-       ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+/* (non-Javadoc)
+* @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
+*/
+public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException, IOException {
+        com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template = new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
+        GroovyShell shell = new GroovyShell();
+        String script = template.parse(reader);
+        template.script = shell.parse(script);
+        return template;
+}
 
-       try {
-           Thread.currentThread().setContextClassLoader(new GTEClassLoader(oldClassLoader));
-           com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template = new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
-           GroovyShell shell = new GroovyShell();
-           String script = template.parse(reader);
-           template.script = shell.parse(script);
-           return template;
-       } finally {
-           Thread.currentThread().setContextClassLoader(oldClassLoader);
-       }
-   }
+private static class SimpleTemplate implements Template, XWikiCachedObject {
 
-   private static class SimpleTemplate implements Template {
+    private Script script;
+    private Binding binding;
+    private Map map;
 
-       private Script script;
-       private Binding binding;
-       private Map map;
 
-       /**
-        * Set the binding for the template.  Keys will be converted to Strings.
-        *
-        * @see groovy.text.Template#setBinding(java.util.Map)
-        */
-       public void setBinding(final Map map) {
-           this.map = map;
-           binding = new Binding(map);
-       }
+    public void finalize() throws Throwable
+    {
+        try {
+            if (script!=null) {
+                InvokerHelper.removeClass(script.getClass());
+                removeClass(script.getClass());
+            }
+        } finally {
+            super.finalize();
+        }
+    }
 
-       /**
-        * Write the template document with the set binding applied to the writer.
-        *
-        * @see groovy.lang.Writable#writeTo(java.io.Writer)
-        */
-       public Writer writeTo(Writer writer) throws IOException {
-           if (binding == null) binding = new Binding();
-           Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
-           PrintWriter pw = new PrintWriter(writer);
-           scriptObject.setProperty("out", pw);
-           scriptObject.run();
-           pw.flush();
-           return writer;
-       }
+    /**
+     * Set the binding for the template.  Keys will be converted to Strings.
+     *
+     * @see groovy.text.Template#setBinding(java.util.Map)
+     */
+    public void setBinding(final Map map) {
+        this.map = map;
+        binding = new Binding(map);
+    }
 
-       /**
-        * Convert the template and binding into a result String.
-        *
-        * @see java.lang.Object#toString()
-        */
-       public String toString() {
-           try {
-               StringWriter sw = new StringWriter();
-               writeTo(sw);
-               return sw.toString();
-           } catch (Exception e) {
-               return e.toString();
-           }
-       }
+    /**
+     * Write the template document with the set binding applied to the writer.
+     *
+     * @see groovy.lang.Writable#writeTo(java.io.Writer)
+     */
+    public Writer writeTo(Writer writer) throws IOException {
+        if (binding == null) binding = new Binding();
+        Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
+        PrintWriter pw = new PrintWriter(writer);
+        scriptObject.setProperty("out", pw);
+        scriptObject.run();
+        pw.flush();
+        return writer;
+    }
 
-       /**
-        * Parse the text document looking for <% or <%= and then call out to the appropriate handler, otherwise copy the text directly
-        * into the script while escaping quotes.
-        *
-        * @param reader
-        * @return
-        * @throws IOException
-        */
-       private String parse(Reader reader) throws IOException {
-           if (!reader.markSupported()) {
-               reader = new BufferedReader(reader);
-           }
-           StringWriter sw = new StringWriter();
-           startScript(sw);
-           boolean start = false;
-           int c;
-           while((c = reader.read()) != -1) {
-               if (c == '<') {
-                   c = reader.read();
-                   if (c != '%') {
-                       sw.write('<');
-                   } else {
-                       reader.mark(1);
-                       c = reader.read();
-                       if (c == '=') {
-                           groovyExpression(reader, sw);
-                       } else {
-                           reader.reset();
-                           groovySection(reader, sw);
-                       }
-                       continue;
-                   }
-               }
-               if (c == '\"') {
-                   sw.write('\\');
-               }
-               if ((c!='\r')&&(c!='\n'))
-                 sw.write(c);
-               else if (c=='\n') {
-                 sw.write("\");out.println();out.print(\"");
-               }
-           }
-           endScript(sw);
-           String result = sw.toString();
-           //System.out.println( "source text:\n" + result );
-           return result;
-       }
+    /**
+     * Convert the template and binding into a result String.
+     *
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        try {
+            StringWriter sw = new StringWriter();
+            writeTo(sw);
+            return sw.toString();
+        } catch (Exception e) {
+            return e.toString();
+        }
+    }
 
-       private void startScript(StringWriter sw) {
-           sw.write("/* Generated by GroovyTemplateEngine */ ");
-           sw.write("out.print(\"");
-       }
+    /**
+     * Parse the text document looking for <% or <%= and then call out to the appropriate handler, otherwise copy the text directly
+     * into the script while escaping quotes.
+     *
+     * @param reader
+     * @return
+     * @throws IOException
+     */
+    private String parse(Reader reader) throws IOException {
+        if (!reader.markSupported()) {
+            reader = new BufferedReader(reader);
+        }
+        StringWriter sw = new StringWriter();
+        startScript(sw);
+        boolean start = false;
+        int c;
+        while((c = reader.read()) != -1) {
+            if (c == '<') {
+                c = reader.read();
+                if (c != '%') {
+                    sw.write('<');
+                } else {
+                    reader.mark(1);
+                    c = reader.read();
+                    if (c == '=') {
+                        groovyExpression(reader, sw);
+                    } else {
+                        reader.reset();
+                        groovySection(reader, sw);
+                    }
+                    continue;
+                }
+            }
+            if (c == '\"') {
+                sw.write('\\');
+            }
+            if ((c!='\r')&&(c!='\n'))
+              sw.write(c);
+            else if (c=='\n') {
+              sw.write("\");out.println();out.print(\"");
+            }
+        }
+        endScript(sw);
+        String result = sw.toString();
+        //System.out.println( "source text:\n" + result );
+        return result;
+    }
 
-       private void endScript(StringWriter sw) {
-           sw.write("\");");
-       }
+    private void startScript(StringWriter sw) {
+        sw.write("/* Generated by GroovyTemplateEngine */ ");
+        sw.write("out.print(\"");
+    }
 
-       /**
-        * Closes the currently open write and writes out the following text as a GString expression until it reaches an end %>.
-        *
-        * @param reader
-        * @param sw
-        * @throws IOException
-        */
-       private void groovyExpression(Reader reader, StringWriter sw) throws IOException {
-           sw.write("\");out.print(\"${");
-           int c;
-           while((c = reader.read()) != -1) {
-               if (c == '%') {
-                   c = reader.read();
-                   if (c != '>') {
-                       sw.write('%');
-                   } else {
-                       break;
-                   }
-               }
-               sw.write(c);
-           }
-           sw.write("}\");out.print(\"");
-       }
+    private void endScript(StringWriter sw) {
+        sw.write("\");");
+    }
 
-       /**
-        * Closes the currently open write and writes the following text as normal Groovy script code until it reaches an end %>.
-        *
-        * @param reader
-        * @param sw
-        * @throws IOException
-        */
-       private void groovySection(Reader reader, StringWriter sw) throws IOException {
-           sw.write("\");");
-           int c;
-           while((c = reader.read()) != -1) {
-               if (c == '%') {
-                   c = reader.read();
-                   if (c != '>') {
-                       sw.write('%');
-                   } else {
-                       break;
-                   }
-               }
-               sw.write(c);
-           }
-           sw.write(";out.print(\"");
-       }
+    /**
+     * Closes the currently open write and writes out the following text as a GString expression until it reaches an end %>.
+     *
+     * @param reader
+     * @param sw
+     * @throws IOException
+     */
+    private void groovyExpression(Reader reader, StringWriter sw) throws IOException {
+        sw.write("\");out.print(\"${");
+        int c;
+        while((c = reader.read()) != -1) {
+            if (c == '%') {
+                c = reader.read();
+                if (c != '>') {
+                    sw.write('%');
+                } else {
+                    break;
+                }
+            }
+            sw.write(c);
+        }
+        sw.write("}\");out.print(\"");
+    }
 
-       public Writable make() {
-           return make(null);
-       }
+    /**
+     * Closes the currently open write and writes the following text as normal Groovy script code until it reaches an end %>.
+     *
+     * @param reader
+     * @param sw
+     * @throws IOException
+     */
+    private void groovySection(Reader reader, StringWriter sw) throws IOException {
+        sw.write("\");");
+        int c;
+        while((c = reader.read()) != -1) {
+            if (c == '%') {
+                c = reader.read();
+                if (c != '>') {
+                    sw.write('%');
+                } else {
+                    break;
+                }
+            }
+            sw.write(c);
+        }
+        sw.write(";out.print(\"");
+    }
 
-       public Writable make(final Map map) {
-           return new Writable() {
-               /**
-                * Write the template document with the set binding applied to the writer.
-                *
-                * @see groovy.lang.Writable#writeTo(java.io.Writer)
-                */
-               public Writer writeTo(Writer writer) throws IOException {
-                   Binding binding;
-                   if (map == null) binding = new Binding(); else binding = new Binding(map);
-                   Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
-                   PrintWriter pw = new PrintWriter(writer);
-                   scriptObject.setProperty("out", pw);
-                   scriptObject.run();
-                   pw.flush();
-                   return writer;
-               }
+    public Writable make() {
+        return make(null);
+    }
 
-               /**
-                * Convert the template and binding into a result String.
-                *
-                * @see java.lang.Object#toString()
-                */
-               public String toString() {
-                   try {
-                       StringWriter sw = new StringWriter();
-                       writeTo(sw);
-                       return sw.toString();
-                   } catch (Exception e) {
-                       return e.toString();
-                   }
-               }
-           };
-       }
-   }
-   }
+    public Writable make(final Map map) {
+        return new Writable() {
+            /**
+             * Write the template document with the set binding applied to the writer.
+             *
+             * @see groovy.lang.Writable#writeTo(java.io.Writer)
+             */
+            public Writer writeTo(Writer writer) throws IOException {
+                Binding binding;
+                if (map == null) binding = new Binding(); else binding = new Binding(map);
+                Script scriptObject = InvokerHelper.createScript(script.getClass(), binding);
+                PrintWriter pw = new PrintWriter(writer);
+                scriptObject.setProperty("out", pw);
+                scriptObject.run();
+                pw.flush();
+                return writer;
+            }
+
+            /**
+             * Convert the template and binding into a result String.
+             *
+             * @see java.lang.Object#toString()
+             */
+            public String toString() {
+                try {
+                    StringWriter sw = new StringWriter();
+                    writeTo(sw);
+                    return sw.toString();
+                } catch (Exception e) {
+                    return e.toString();
+                }
+            }
+        };
+    }
+}
+    protected static void clearMetaClassRegistry(MetaClassRegistry mcr) {
+        Map map = (Map) com.xpn.xwiki.XWiki.getPrivateField(mcr, "metaClasses");
+        map.clear();
+        Map map2 = (Map) com.xpn.xwiki.XWiki.getPrivateField(mcr, "loaderMap");
+        map2.clear();
+
+        Class[] classes;
+        Object[] objects;
+
+        classes = new Class[1];
+        classes[0] = DefaultGroovyMethods.class.getClass();
+        objects = new Object[1];
+        objects[0] = DefaultGroovyMethods.class;
+        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "lookup", classes, objects);
+
+        classes = new Class[2];
+        classes[0] = DefaultGroovyMethods.class.getClass();
+        classes[1] = boolean.class;
+        objects = new Object[2];
+        objects[0] = DefaultGroovyMethods.class;
+        objects[1] = true;
+        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
+
+        classes = new Class[1];
+        classes[0] = DefaultGroovyStaticMethods.class.getClass();
+        objects = new Object[1];
+        objects[0] = DefaultGroovyStaticMethods.class;
+        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "lookup", classes, objects);
+
+        classes = new Class[2];
+        classes[0] = DefaultGroovyStaticMethods.class.getClass();
+        classes[1] = boolean.class;
+        objects = new Object[2];
+        objects[0] = DefaultGroovyStaticMethods.class;
+        objects[1] = false;
+        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
+
+        com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "checkInitialised");
+    }
+
+    public static void flushCache() {
+        // Clear up groovy registry
+        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
+        clearMetaClassRegistry(mcr);
+        mcr = MetaClassRegistry.getIntance(1);
+        clearMetaClassRegistry(mcr);
+        mcr = InvokerHelper.getInstance().getMetaRegistry();
+        clearMetaClassRegistry(mcr);
+        Introspector.flushCaches();
+    }
+
+    public static void removeClass(Class clazz) {
+        // Clear up groovy registry
+        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
+        mcr.removeMetaClass(clazz);
+        mcr = MetaClassRegistry.getIntance(1);
+        mcr.removeMetaClass(clazz);
+        mcr = InvokerHelper.getInstance().getMetaRegistry();
+        mcr.removeMetaClass(clazz);
+    }
+
+}

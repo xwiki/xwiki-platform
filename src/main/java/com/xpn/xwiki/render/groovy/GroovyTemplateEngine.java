@@ -314,7 +314,7 @@ private static class SimpleTemplate implements Template, XWikiCachedObject {
         classes[1] = boolean.class;
         objects = new Object[2];
         objects[0] = DefaultGroovyMethods.class;
-        objects[1] = true;
+        objects[1] = Boolean.TRUE;
         com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
 
         classes = new Class[1];
@@ -328,7 +328,7 @@ private static class SimpleTemplate implements Template, XWikiCachedObject {
         classes[1] = boolean.class;
         objects = new Object[2];
         objects[0] = DefaultGroovyStaticMethods.class;
-        objects[1] = false;
+        objects[1] = Boolean.FALSE;
         com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "registerMethods", classes, objects);
 
         com.xpn.xwiki.XWiki.callPrivateMethod(mcr, "checkInitialised");

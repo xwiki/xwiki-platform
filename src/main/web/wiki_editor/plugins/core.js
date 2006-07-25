@@ -30,7 +30,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Must convert external images inside table before convert the table
     this.addExternalProcessor((/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
 
-    this.addExternalProcessor((/{table}([\s\S]+?){table}/i), 'convertTableExternal');
+    this.addExternalProcessor((/\{table\}([\s\S]+?)\{table\}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');

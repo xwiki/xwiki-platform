@@ -1185,16 +1185,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             XWikiDocument doc = getDocument(currentdoc.getWeb() + ".WebPreferences", context);
 
             // First we try to get a translated preference object
-            BaseObject object = doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage());
+            BaseObject object = doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage(), true);
             String result = "";
             try {
                 result = object.getStringValue(prefname);
-                // If empty we take it from the default pref object
             } catch (Exception e) {
             }
-
-            if (result.equals(""))
-                result = doc.getxWikiObject().getStringValue(prefname);
 
             if (!result.equals(""))
                 return result;

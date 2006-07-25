@@ -67,7 +67,7 @@ public class HibernateTestCase extends TestCase {
 
         this.context.setWiki(this.xwiki);
 
-        cleanUp(this.xwiki.getHibernateStore(), this.context);
+        cleanUp(this.xwiki.getHibernateStore(), false, true, this.context);
         iCount = this.xwiki.getHibernateStore().getBatcherStats().getPreparedSQLCounter();
 
         this.xwiki.flushCache();
@@ -116,7 +116,7 @@ public class HibernateTestCase extends TestCase {
             Statement st = connection.createStatement();
             st.execute(sql);
         } catch (Exception e) {
-            if ((e.getMessage().indexOf("doesn't exist")==-1)||(sql.indexOf("delete")==-1))
+            if (((e.getMessage().indexOf("doesn't exist")==-1)&&(e.getMessage().indexOf("Table not found"))==-1)||(sql.indexOf("delete")==-1))
                 e.printStackTrace();
         }
     }

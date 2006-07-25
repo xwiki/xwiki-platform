@@ -2,6 +2,7 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -36,7 +37,9 @@ public class LevelsClass extends ListClass {
 
         }
 
-        if (!"1".equals(context.getRequest().get("global"))) {
+        XWikiRequest req = context.getRequest();
+        if (("editrights".equals(req.get("xpage")))
+		&&(!"1".equals(req.get("global")))) {
             list.remove("admin");
             list.remove("programming");
             list.remove("delete");

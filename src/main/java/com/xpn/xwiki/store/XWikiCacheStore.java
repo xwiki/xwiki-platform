@@ -47,21 +47,18 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     private XWikiStoreInterface store;
     private XWikiCache cache;
     private XWikiCache pageExistCache;
-    private XWikiCache prefsCache;
     private int cacheCapacity = 100;
-    private int prefsCacheCapacity = 1000;
     private int pageExistCacheCapacity = 10000;
 
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException {
         setStore(store);
-        initCache(cacheCapacity, pageExistCacheCapacity, getPrefsCacheCapacity(), context);
+        initCache(cacheCapacity, pageExistCacheCapacity, context);
     }
 
-    public void initCache(int capacity, int pageExistCacheCapacity, int prefsCacheCapacity, XWikiContext context) throws XWikiException {
+    public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
         setCache(cacheService.newCache("xwiki.store.pagecache", capacity));
         setPageExistCache(cacheService.newCache("xwiki.store.pageexistcache",pageExistCacheCapacity));
-        setPrefsCache(cacheService.newCache("xwiki.store.prefscache", prefsCacheCapacity));
     }
 
     public void setCacheCapacity(int capacity) {
@@ -101,9 +98,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     }
 
     public void flushCache() {
-        getCache().flushAll();
-        getPageExistCache().flushAll();
-        getPrefsCache().flushAll();
+        if (cache!=null) {
+          cache.flushAll();
+          cache = null;
+        }
+        if (pageExistCache!=null) {
+          pageExistCache.flushAll();
+          pageExistCache = null;
+        }
     }
 
     public String getKey(XWikiDocument doc, XWikiContext context) {
@@ -326,22 +328,5 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
         store.injectUpdatedCustomMappings(context);
-    }
-
-    public XWikiCache getPrefsCache() {
-        return prefsCache;
-    }
-
-    public void setPrefsCache(XWikiCache prefsCache) {
-        this.prefsCache = prefsCache;
-    }
-
-    public int getPrefsCacheCapacity() {
-        return prefsCacheCapacity;
-    }
-
-    public void setPrefsCacheCapacity(int prefsCacheCapacity) {
-        this.prefsCacheCapacity = prefsCacheCapacity;
-        getPrefsCache().setCapacity(prefsCacheCapacity);
     }
 }

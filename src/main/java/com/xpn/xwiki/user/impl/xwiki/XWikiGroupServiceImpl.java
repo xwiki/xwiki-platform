@@ -68,8 +68,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     }
 
     public void flushCache() {
-        groupCache.flushAll();
-        groupCache = null;
+        if (groupCache!=null) {
+            groupCache.flushAll();
+            groupCache = null;
+        }
     }
 
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException {

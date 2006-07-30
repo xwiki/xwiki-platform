@@ -1411,8 +1411,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // We need to flush the virtual wiki list
         virtualWikiList = new ArrayList();
         // We need to flush the server Cache
-        virtualWikiMap.flushAll();
-        virtualWikiMap = null;
+        if (virtualWikiMap!=null) {
+            virtualWikiMap.flushAll();
+            virtualWikiMap = null;
+        }
 
         // We need to flush the group service cache
         if (groupService != null)

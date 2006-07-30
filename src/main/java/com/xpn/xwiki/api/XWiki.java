@@ -557,7 +557,7 @@ public class XWiki extends Api {
         }
     }
 
-    public String renderText(String text, Document doc) {
+    public String renderText(String text, Document doc) throws XWikiException {
         return xwiki.getRenderingEngine().renderText(text, doc.getDoc(), context);
     }
 

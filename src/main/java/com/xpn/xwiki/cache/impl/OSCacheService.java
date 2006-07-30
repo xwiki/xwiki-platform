@@ -6,16 +6,13 @@ import java.io.FileInputStream;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 
@@ -79,33 +76,66 @@ public class OSCacheService implements XWikiCacheService, Runnable
         log.info("Initialized OSCacheService");
     }
     
-    public XWikiCache newLocalCache()
+    public XWikiCache newLocalCache() throws XWikiException
     {
         return new OSCacheCache(localCacheProperties);
     }
 
-    public XWikiCache newLocalCache(int capacity)
+    public XWikiCache newLocalCache(int capacity) throws XWikiException
     {
         return new OSCacheCache(localCacheProperties, capacity);
     }
 
-    public XWikiCache newCache(Properties props)
+    public XWikiCache newCache(String cacheName, Properties props) throws XWikiException
     {
-        OSCacheCache cc = new OSCacheCache(props);
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties));
+        cc.setName(cacheName);
         initCache(cc);
         return cc;
     }
 
-    public XWikiCache newCache()
+    public XWikiCache newLocalCache(Properties props) throws XWikiException
     {
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties));
+        initCache(cc);
+        return cc;
+    }
+
+    public XWikiCache newCache(String cacheName, Properties props, int capacity) throws XWikiException {
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties), capacity);
+        cc.setName(cacheName);
+        initCache(cc);
+        return cc;
+    }
+
+    public XWikiCache newLocalCache(Properties props, int capacity) throws XWikiException {
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties), capacity);
+        initCache(cc);
+        return cc;
+    }
+
+    private Properties mergeProperties(Properties props, Properties sourceProps) {
+        Properties targetProps = (Properties) sourceProps.clone();
+        Enumeration en = props.keys();
+        while (en.hasMoreElements()) {
+            Object key = en.nextElement();
+            Object value = props.get(key);
+            targetProps.put(key, value);
+        }
+        return targetProps;
+    }
+
+
+    public XWikiCache newCache(String cacheName) throws XWikiException {
         OSCacheCache cc = new OSCacheCache(cacheProperties);
+        cc.setName(cacheName);
         initCache(cc);
         return cc;
     }
 
-    public XWikiCache newCache(int capacity)
-    {
+    public XWikiCache newCache(String cacheName, int capacity) throws XWikiException {
         OSCacheCache cc = new OSCacheCache(cacheProperties, capacity);
+        cc.setName(cacheName);
         initCache(cc);
         return cc;
     }

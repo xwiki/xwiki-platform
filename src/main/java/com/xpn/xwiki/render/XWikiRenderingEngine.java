@@ -73,7 +73,7 @@ public class XWikiRenderingEngine {
         initCache(context);
     }
 
-    public void initCache(XWikiContext context) {
+    public void initCache(XWikiContext context) throws XWikiException {
         int iCapacity = 100;
         try {
         String capacity = context.getWiki().Param("xwiki.render.cache.capacity");
@@ -83,9 +83,9 @@ public class XWikiRenderingEngine {
         initCache(iCapacity, context);
     }
 
-    public void initCache(int iCapacity, XWikiContext context) {
+    public void initCache(int iCapacity, XWikiContext context) throws XWikiException {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
-        cache = cacheService.newCache(iCapacity);
+        cache = cacheService.newCache("xwiki.rendering.cache", iCapacity);
     }
 
     public XWikiCache getCache() {
@@ -149,11 +149,17 @@ public class XWikiRenderingEngine {
 
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
         String key = getKey(text, contentdoc, includingdoc, context);
+
+        try {
+            if (cache==null)
+                initCache(context);
+        } catch (XWikiException e) {}
+
         synchronized (key) {
             try {
                 XWikiRenderingCache cacheObject = null;
                 try {
-                    cacheObject = (XWikiRenderingCache) cache.getFromCache(key);
+                    cacheObject = (cache!=null) ? (XWikiRenderingCache) cache.getFromCache(key) : null;
                 } catch (XWikiCacheNeedsRefreshException e2) {
                     cache.cancelUpdate(key);
                 }
@@ -241,6 +247,7 @@ public class XWikiRenderingEngine {
         for (int i=0;i<renderers.size();i++)
            ((XWikiRenderer)renderers.get(i)).flushCache();
         cache.flushAll();
+        cache = null;
     }
 
     public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {

@@ -231,7 +231,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
     }
 
     public boolean checkRight(String name, XWikiDocument doc, String accessLevel,
-                              boolean user, boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException {
+                              boolean user, boolean allow, boolean global, XWikiContext context) throws XWikiRightNotFoundException, XWikiException {
         String className = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";
         String fieldName = user ? "users" : "groups";
         boolean found = false;
@@ -337,7 +337,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         }
 
         Collection grouplist = new ArrayList();
-        XWikiGroupService groupService = context.getWiki().getGroupService();
+        XWikiGroupService groupService = context.getWiki().getGroupService(context);
         String key = context.getDatabase() + ":" + name;
         Collection grouplist1 = (Collection) grouplistcache.get(key);
 

@@ -42,6 +42,7 @@
     <orderEntry type="library" name="JCR" level="project" />
     <orderEntry type="library" name="Chart" level="project" />
     <orderEntry type="library" name="cache" level="project" />
+    <orderEntry type="library" name="XMPP" level="project" />
     <orderEntryProperties />
   </component>
 </module>

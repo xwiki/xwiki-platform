@@ -32,6 +32,7 @@ import org.apache.jackrabbit.core.query.QueryParser;
 import org.apache.jackrabbit.core.query.QueryRootNode;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -43,11 +44,11 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
 	private static final Log log = LogFactory.getLog(QueryPlugin.class);
 	XWikiCache		cache;
 	XWikiContext	context;
-	public QueryPlugin(String name, String className, XWikiContext context) {
-		super(name, className, context);
-		this.context = context;
-		this.cache = this.context.getWiki().getCacheService().newCache();		
-	}
+	public QueryPlugin(String name, String className, XWikiContext context) throws XWikiException {
+        super(name, className, context);
+        this.context = context;
+        this.cache = this.context.getWiki().getCacheService().newCache("xwiki.plugin.query.cache", 100);
+    }
 	
 	public String getName() { return "query"; }
 

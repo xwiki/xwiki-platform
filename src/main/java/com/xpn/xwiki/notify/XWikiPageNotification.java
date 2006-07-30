@@ -27,7 +27,7 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface {
                     notifyPage(notifpages2[i], rule, doc, action, context);
                 }
             }
-            String xnotif = context.getRequest().getParameter("xnotification");
+            String xnotif = (context.getRequest()!=null) ? context.getRequest().getParameter("xnotification") : null;
             if ((xnotif!=null)&&(!xnotif.equals(""))) {
               notifyPage(xnotif, rule, doc, action, context);
             }

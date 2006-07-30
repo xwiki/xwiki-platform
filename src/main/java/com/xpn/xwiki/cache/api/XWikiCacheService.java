@@ -22,6 +22,9 @@
 package com.xpn.xwiki.cache.api;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
+
+import java.util.Properties;
 
 public interface XWikiCacheService
 {
@@ -29,24 +32,46 @@ public interface XWikiCacheService
      * Initializes the service
      */
     public void init(XWiki context);
-    
+
     /*
-     * Returns a local only (never clustered) cache
-     */
-    public XWikiCache newLocalCache();
+    * Returns a local only (never clustered) cache
+    */
+    public XWikiCache newLocalCache() throws XWikiException;
 
     /*
      * Returns a local only (never clustered) cache with given capacity
      */
-    public XWikiCache newLocalCache(int capacity);
+    public XWikiCache newLocalCache(int capacity) throws XWikiException;
 
     /*
      * Returns a cache that could be configured to be clustered
      */
-    public XWikiCache newCache();
+    public XWikiCache newCache(String cacheName) throws XWikiException;
 
     /*
      * Returns a cache that could be configured to be clustered with the given capacity
      */
-    public XWikiCache newCache(int capacity);
+    public XWikiCache newCache(String cacheName, int capacity) throws XWikiException;
+
+
+    /*
+     * Returns a custom cache
+     */
+    public XWikiCache newCache(String cacheName, Properties props) throws XWikiException;
+
+    /*
+     * Returns a custom local cache
+     */
+    public XWikiCache newLocalCache(Properties props) throws XWikiException;
+
+    /*
+     * Returns a custom cache with capacity
+     */
+    public XWikiCache newCache(String cacheName, Properties props, int capacity) throws XWikiException;
+
+    /*
+     * Returns a custom local cache with capacity
+     */
+    public XWikiCache newLocalCache(Properties props, int capacity) throws XWikiException;
+
 }

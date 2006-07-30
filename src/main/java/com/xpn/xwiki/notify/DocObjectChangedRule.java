@@ -54,10 +54,12 @@ public class DocObjectChangedRule extends DocChangeRule {
         if (vobj1.size()!=vobj2.size())
             return false;
         for (int i=0;i<vobj1.size();i++) {
-            if ((vobj1.get(i)==null)&&(vobj2.get(i)!=null))
-                return false;
-            if (!vobj1.get(i).equals(vobj2.get(i)))
-                return false;
+            if (!((vobj1.get(i)==null)&&(vobj2.get(i)==null))) {
+                if ((vobj1.get(i)==null)||(vobj2.get(i)==null))
+                    return false;
+                if (!vobj1.get(i).equals(vobj2.get(i)))
+                    return false;
+            }
         }
         return true;
     }

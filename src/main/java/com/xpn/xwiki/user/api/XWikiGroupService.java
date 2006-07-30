@@ -30,16 +30,13 @@ import java.util.Collection;
 import java.util.List;
 
 public interface XWikiGroupService {
-    public void init(XWiki xwiki);
-
+    public void init(XWiki xwiki, XWikiContext context) throws XWikiException;
+    public void initCache(XWikiContext context) throws XWikiException;
+    public void initCache(int iCapacity, XWikiContext context) throws XWikiException;
     public void flushCache();
-
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException;
-
-    public void addUserToGroup(String user, String database, String group) throws XWikiException;
-
+    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
     public List listMemberForGroup(String s, XWikiContext context) throws XWikiException;
-
     public List listAllGroups(XWikiContext context) throws XWikiException;
 
 }

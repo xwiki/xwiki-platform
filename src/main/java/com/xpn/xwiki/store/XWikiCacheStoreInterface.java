@@ -23,6 +23,7 @@
 package com.xpn.xwiki.store;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 public interface XWikiCacheStoreInterface extends XWikiStoreInterface {
     public XWikiStoreInterface getStore();
@@ -32,5 +33,5 @@ public interface XWikiCacheStoreInterface extends XWikiStoreInterface {
     public void setPageExistCacheCapacity(int capacity);
     public void setPrefsCacheCapacity(int capacity);
     public void initCache(int capacity, int pageExistCapacity,
-                          int prefsCacheCapacity, XWikiContext context);
+                          int prefsCacheCapacity, XWikiContext context) throws XWikiException;
 }

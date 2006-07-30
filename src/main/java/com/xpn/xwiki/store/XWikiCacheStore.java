@@ -29,7 +29,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -48,22 +47,21 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     private XWikiStoreInterface store;
     private XWikiCache cache;
     private XWikiCache pageExistCache;
-    private XWikiCache classCache;
     private XWikiCache prefsCache;
     private int cacheCapacity = 100;
     private int prefsCacheCapacity = 1000;
     private int pageExistCacheCapacity = 10000;
 
-    public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) {
+    public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException {
         setStore(store);
         initCache(cacheCapacity, pageExistCacheCapacity, getPrefsCacheCapacity(), context);
     }
 
-    public void initCache(int capacity, int pageExistCacheCapacity, int prefsCacheCapacity, XWikiContext context) {
+    public void initCache(int capacity, int pageExistCacheCapacity, int prefsCacheCapacity, XWikiContext context) throws XWikiException {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
-        setCache(cacheService.newCache(capacity));
-        setPageExistCache(cacheService.newCache(pageExistCacheCapacity));
-        setPrefsCache(cacheService.newCache(prefsCacheCapacity));
+        setCache(cacheService.newCache("xwiki.store.pagecache", capacity));
+        setPageExistCache(cacheService.newCache("xwiki.store.pageexistcache",pageExistCacheCapacity));
+        setPrefsCache(cacheService.newCache("xwiki.store.prefscache", prefsCacheCapacity));
     }
 
     public void setCacheCapacity(int capacity) {

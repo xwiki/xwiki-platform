@@ -66,6 +66,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_DIFF = 13;
     public static final int MODULE_XWIKI_GROOVY = 14;
     public static final int MODULE_XWIKI_NOTIFICATION = 15;
+    public static final int MODULE_XWIKI_CACHE = 16;
 
     public static final int MODULE_PLUGIN_LASZLO = 21;
 
@@ -196,6 +197,8 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_XWIKI_NOTIFICATION = 15001;
 
+    public static final int ERROR_CACHE_INITIALIZING = 16001;
+
     public static final int ERROR_LASZLO_INVALID_XML = 21001;
     public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
 
@@ -315,14 +318,14 @@ public class XWikiException extends Exception {
         super.printStackTrace(s);
         if (exception != null) {
             s.write("\n\nWrapped Exception:\n\n");
-            if (exception instanceof org.hibernate.JDBCException) {
+            if (exception.getCause()!=null)
+                exception.getCause().printStackTrace(s);
+            else if (exception instanceof org.hibernate.JDBCException) {
                 (((JDBCException) exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
                 (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
             } else if (exception instanceof ServletException) {
                 (((ServletException) exception).getRootCause()).printStackTrace(s);
-            } else if (exception instanceof TransformerException) {
-                (((TransformerException) exception).getCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }
@@ -333,14 +336,14 @@ public class XWikiException extends Exception {
         super.printStackTrace(s);
         if (exception != null) {
             s.print("\n\nWrapped Exception:\n\n");
-            if (exception instanceof org.hibernate.JDBCException) {
+            if (exception.getCause()!=null)
+                exception.getCause().printStackTrace(s);
+            else if (exception instanceof org.hibernate.JDBCException) {
                 (((JDBCException) exception).getSQLException()).printStackTrace(s);
             } else if (exception instanceof MethodInvocationException) {
                 (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
             } else if (exception instanceof ServletException) {
                 (((ServletException) exception).getRootCause()).printStackTrace(s);
-            } else if (exception instanceof TransformerException) {
-                (((TransformerException) exception).getCause()).printStackTrace(s);
             } else {
                 exception.printStackTrace(s);
             }

@@ -188,7 +188,7 @@ public class Document extends Api {
         return doc.getRenderedContent(context);
     }
 
-    public String getRenderedContent(String text) {
+    public String getRenderedContent(String text) throws XWikiException {
         return doc.getRenderedContent(text, context);
     }
 
@@ -504,7 +504,7 @@ public class Document extends Api {
         return doc.displayForm(className, context);
     }
 
-    public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
+    public String displayRendered(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) throws XWikiException {
         if ((pclass==null)||(object==null))
             return "";
         return doc.displayRendered(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);

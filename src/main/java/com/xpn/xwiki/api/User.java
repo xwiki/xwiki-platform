@@ -46,7 +46,7 @@ public class User extends Api {
     }
     
     public boolean isUserInGroup(String groupName) throws XWikiException {
-    	XWikiGroupService groupService = context.getWiki().getGroupService();
+    	XWikiGroupService groupService = context.getWiki().getGroupService(context);
     	Collection groups = groupService.listGroupsForUser(user.getUser(), context);
     	return groups.contains(groupName);
     }

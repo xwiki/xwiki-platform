@@ -45,16 +45,31 @@ import java.util.List;
 import java.util.Vector;
 
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
-    private XWikiCache groupCache;
+    protected XWikiCache groupCache;
 
-    public void init(XWiki xwiki) {
-        XWikiCacheService cacheService = xwiki.getCacheService();
-        groupCache = cacheService.newCache();
+    public void init(XWiki xwiki, XWikiContext context) throws XWikiException {
+        initCache(context);
         xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(this));
+    }
+
+    public void initCache(XWikiContext context) throws XWikiException {
+        int iCapacity = 100;
+        try {
+            String capacity = context.getWiki().Param("xwiki.authentication.group.cache.capacity");
+            if (capacity != null)
+                iCapacity = Integer.parseInt(capacity);
+        } catch (Exception e) {}
+        initCache(iCapacity, context);
+    }
+
+    public void initCache(int iCapacity, XWikiContext context) throws XWikiException {
+        XWikiCacheService cacheService = context.getWiki().getCacheService();
+        groupCache = cacheService.newCache("xwiki.authentication.group.cache", iCapacity);
     }
 
     public void flushCache() {
         groupCache.flushAll();
+        groupCache = null;
     }
 
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException {
@@ -64,6 +79,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             String shortname = Util.getName(username);
             String veryshortname = shortname.substring(shortname.indexOf(".") + 1);
             String key = database + ":" + shortname;
+            if (groupCache==null)
+                initCache(context);
             try {
                 list = (List) groupCache.getFromCache(key);
             } catch (XWikiCacheNeedsRefreshException e) {
@@ -84,10 +101,12 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     /*
        Adding the user to the group cache
     */
-    public void addUserToGroup(String username, String database, String group) {
+    public void addUserToGroup(String username, String database, String group, XWikiContext context) throws XWikiException {
         String shortname = Util.getName(username);
         List list = null;
         String key = database + ":" + shortname;
+        if (groupCache==null)
+            initCache(context);
         try {
             list = (List) groupCache.getFromCache(key);
         } catch (XWikiCacheNeedsRefreshException e) {
@@ -157,7 +176,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                     flushCache = true;
 
                 if (flushCache)
-                    groupCache.flushAll();
+                    flushCache();
             }
         } catch (Exception e) {
             e.printStackTrace();

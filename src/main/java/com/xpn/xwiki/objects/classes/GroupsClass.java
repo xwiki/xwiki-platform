@@ -31,7 +31,7 @@ public class GroupsClass extends ListClass {
     public List getList(XWikiContext context) {
         List list;
         try {
-            list = context.getWiki().getGroupService().listAllGroups(context);
+            list = context.getWiki().getGroupService(context).listAllGroups(context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList();

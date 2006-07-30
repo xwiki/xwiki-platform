@@ -58,21 +58,6 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
     private XWikiCache classCache;
 
 
-    private class XWikiRenderingEngineClassLoader extends ClassLoader {
-        private Map classMap = new HashMap();
-
-        public XWikiRenderingEngineClassLoader(ClassLoader parent) {
-            super(parent);
-        }
-        protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-            Object cached = classMap.get(name);
-            if (cached!=null) return (Class) cached;
-            ClassLoader parent = getParent();
-            if (parent!=null) return parent.loadClass(name);
-            return super.loadClass(name,resolve);
-        }
-    }
-
     public XWikiGroovyRenderer() {
     }
 
@@ -114,17 +99,35 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         return gcontext;
     }
 
-    public void initCache(XWikiContext context) {
-            cache = context.getWiki().getCacheService().newLocalCache(100);
-            classCache = context.getWiki().getCacheService().newLocalCache(100);
+    public void initCache(XWikiContext context) throws XWikiException {
+        int iCapacity = 100;
+        try {
+            String capacity = context.getWiki().Param("xwiki.render.groovy.cache.capacity");
+            if (capacity != null)
+                iCapacity = Integer.parseInt(capacity);
+        } catch (Exception e) {}
+
+        int iClassCapacity = 100;
+        try {
+            String capacity = context.getWiki().Param("xwiki.render.groovy.classcache.capacity");
+            if (capacity != null)
+                iCapacity = Integer.parseInt(capacity);
+        } catch (Exception e) {}
+
+
+        initCache(iCapacity, iClassCapacity, context);
+    }
+
+    public void initCache(int iCapacity, int iClassCapacity, XWikiContext context) throws XWikiException {
+            cache = context.getWiki().getCacheService().newLocalCache(iCapacity);
+            classCache = context.getWiki().getCacheService().newLocalCache(iClassCapacity);
     }
 
     protected void prepareCache(XWikiContext context) {
-        if (cache==null) {
-            cache = context.getWiki().getCacheService().newLocalCache(100);
-        }
-        if (classCache==null) {
-            classCache = context.getWiki().getCacheService().newLocalCache(100);
+        try {
+            if ((cache==null)||(classCache==null))
+                initCache(context);
+        } catch (Exception e) {
         }
     }
 
@@ -132,6 +135,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
         GroovyTemplateEngine engine = new GroovyTemplateEngine();
         Template template = null;
         boolean refresh = false;
+        
         try {
             XWikiRequest request = (XWikiRequest) gcontext.get("request");
             refresh = "1".equals(request.get("refresh"));
@@ -178,6 +182,8 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
 
         if (!context.getWiki().getRightService().hasProgrammingRights(contentdoc, context))
             return content;
+
+        prepareCache(context);
 
         Map gcontext = null;
         try {
@@ -286,12 +292,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 gc = cgc.getGroovyClass();
             }
             catch (XWikiCacheNeedsRefreshException e) {
+                classCache.cancelUpdate(script);
                 GroovyClassLoader gcl = new GroovyClassLoader();
                 gc = gcl.parseClass(script);
                 cgc = new CachedGroovyClass(gc);
                 classCache.putInCache(script, cgc);
             } finally {
-                classCache.cancelUpdate(script);
             }
             return gc.newInstance();
         } catch (Exception e) {
@@ -314,7 +320,6 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
 
         public void finalize() throws Throwable  {
             try {
-                System.out.println("Finalizing: " + cl.toString());
                 if (cl!=null) {
                     InvokerHelper.removeClass(cl);
                     GroovyTemplateEngine.removeClass(cl);

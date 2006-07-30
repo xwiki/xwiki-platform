@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4" relativePaths="true" type="J2EE_WEB_MODULE" j2ee-integration="Tomcat Server">
+  <component name="AppServerSpecificValidatorsManager" />
   <component name="ModuleRootManager" />
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/build/xwiki" />
@@ -39,12 +40,13 @@
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="JMock" level="project" />
     <orderEntry type="library" name="WebServices" level="project" />
-    <orderEntry type="library" name="Tomcat 5.0" level="application" />
     <orderEntry type="library" name="Chart" level="project" />
     <orderEntry type="library" name="JCR" level="project" />
     <orderEntry type="library" name="XML" level="project" />
-    <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntry type="library" name="cache" level="project" />
+    <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
+    <orderEntry type="library" name="XMPP" level="project" />
+    <orderEntry type="library" name="Tomcat 5.0" level="application" />
     <orderEntryProperties />
   </component>
   <component name="VcsManagerConfiguration">
@@ -155,6 +157,10 @@
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
     <containerElement type="library" level="project" name="XMLRPC">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="XMPP">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>

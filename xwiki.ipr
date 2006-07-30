@@ -10,13 +10,22 @@
       <properties />
     </buildFile>
   </component>
+  <component name="BuildJarProjectSettings">
+    <option name="BUILD_JARS_ON_MAKE" value="false" />
+  </component>
+  <component name="CodeStyleProjectProfileManger">
+    <option name="PROJECT_PROFILE" />
+    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
+    <scopes />
+    <profiles />
+  </component>
   <component name="CodeStyleSettingsManager">
     <option name="PER_PROJECT_SETTINGS" />
     <option name="USE_PER_PROJECT_SETTINGS" value="false" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
-    <option name="CLEAR_OUTPUT_DIRECTORY" value="true" />
+    <option name="CLEAR_OUTPUT_DIRECTORY" value="false" />
     <option name="DEPLOY_AFTER_MAKE" value="2" />
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld|cfg|txt.1|txt.2|sxw|doc|vm|xsl)" />
@@ -54,6 +63,20 @@
     <option name="myForwardDirection" value="false" />
   </component>
   <component name="DependencyValidationManager" />
+  <component name="EclipseCompilerSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+  </component>
+  <component name="EclipseEmbeddedCompilerSettings">
+    <option name="DEBUGGING_INFO" value="true" />
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="false" />
+    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+  </component>
   <component name="EntryPointsManager">
     <entry_points />
   </component>
@@ -63,6 +86,7 @@
     <option name="OUTPUT_DIRECTORY" />
   </component>
   <component name="GUI Designer component loader factory" />
+  <component name="IdProvider" IDEtalkID="8CA5FF5B0D5DF7DE366CFA9ED4BB41A7" />
   <component name="ImportConfiguration">
     <option name="VENDOR" value="XPERTNET" />
     <option name="RELEASE_TAG" value="XPERTNET_0_1" />
@@ -70,6 +94,35 @@
     <option name="CHECKOUT_AFTER_IMPORT" value="true" />
     <option name="KEYWORD_SUBSTITUTION_WRAPPERS" value="aj kv;bat kv;cfg kv;cgi kv;class b;cmd kv;conf kv;css kv;dtd kv;ear b;form kv;hs kv;htm kv;html kv;idl kv;iml kv;ipr kv;iws kv;jar b;java kv;jhm kv;jnlp kv;js kv;jsf kv;jsp kv;jspf kv;log kv;mf kv;pl kv;pm kv;policy kv;properties kv;sh kv;sht kv;shtm kv;shtml kv;sql kv;tld kv;txt kv;vm kv;war b;wsdl kv;xhtml kv;xml kv;xsd kv;xsl kv;zip b;" />
     <option name="MAKE_NEW_FILES_READ_ONLY" value="false" />
+  </component>
+  <component name="InspectionProjectProfileManager">
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
+    <scopes />
+    <profiles>
+      <profile version="1.0">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <used_levels>
+          <error>
+            <option name="myName" value="ERROR" />
+            <option name="myVal" value="400" />
+          </error>
+          <warning>
+            <option name="myName" value="WARNING" />
+            <option name="myVal" value="300" />
+          </warning>
+          <information>
+            <option name="myName" value="INFO" />
+            <option name="myVal" value="200" />
+          </information>
+          <server>
+            <option name="myName" value="SERVER PROBLEM" />
+            <option name="myVal" value="100" />
+          </server>
+        </used_levels>
+      </profile>
+    </profiles>
   </component>
   <component name="J2EEManager" />
   <component name="JavacSettings">
@@ -102,6 +155,12 @@
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="IS_EMACS_ERRORS_MODE" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="LogConsolePreferences">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="CUSTOM_FILTER" />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -205,6 +264,23 @@
       <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.png" removable="false">
         <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
       </item>
+      <item class="javax.swing.JSeparator" icon="/com/intellij/uiDesigner/icons/separator.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JProgressBar" icon="/com/intellij/uiDesigner/icons/progressbar.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JToolBar" icon="/com/intellij/uiDesigner/icons/toolbar.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1">
+          <preferred-size width="-1" height="20" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JToolBar$Separator" icon="/com/intellij/uiDesigner/icons/toolbarSeparator.png" removable="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JScrollBar" icon="/com/intellij/uiDesigner/icons/scrollbar.png" removable="false">
+        <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
+      </item>
     </group>
   </component>
   <component name="ProjectModuleManager">
@@ -214,6 +290,7 @@
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="false" project-jdk-name="1.5" />
+  <component name="ProjectRunConfigurationManager" />
   <component name="RegexPlugin">
     <option name="pos1" value="92" />
     <option name="pos2" value="100" />
@@ -228,7 +305,9 @@
     <option name="GENERATE_IIOP_STUBS" value="false" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
+  <component name="StarteamVcsAdapter" />
   <component name="UI designer component loader factory" />
+  <component name="VssVcs" />
   <component name="WebManager">
     <option enabled="true" />
   </component>
@@ -282,9 +361,9 @@
         <root url="jar://$PROJECT_DIR$/lib/c3p0-0.8.4.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hibernate-tools-2.1.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.7.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.8.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -363,12 +442,10 @@
     </library>
     <library name="Groovy">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-05.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/groovy-all-1.0-jsr-06.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://D:/dev/java/groovy/groovy-1.0-jsr-04/src/main" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="fop">
       <CLASSES>
@@ -474,8 +551,18 @@
     <library name="cache">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/oscache-2.2.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/concurrent.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2M.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://C:/dev/java/oscache/src/java" />
+      </SOURCES>
+    </library>
+    <library name="XMPP">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/smack.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/smackx.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

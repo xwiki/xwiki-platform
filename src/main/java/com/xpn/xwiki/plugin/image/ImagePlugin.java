@@ -50,15 +50,10 @@ import org.apache.commons.logging.LogFactory;
 public class ImagePlugin extends XWikiDefaultPlugin {
     private static final Log log = LogFactory.getLog(ImagePlugin.class);
     private static final int TYPE_JPG = 1;
-
     private static final int TYPE_PNG = 2;
-
     private static final int TYPE_BMP = 3;
-
     private static String name = "image";
-
     private XWikiCache imageCache;
-
     private int capacity = 50;
 
     public ImagePlugin(String name, String className, XWikiContext context) {
@@ -78,6 +73,10 @@ public class ImagePlugin extends XWikiDefaultPlugin {
 
     public void init(XWikiContext context) {
         super.init(context);
+        initCache(context);
+    }
+
+    public void initCache(XWikiContext context) {
         String capacityParam = "";
         try {
             capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
@@ -96,13 +95,17 @@ public class ImagePlugin extends XWikiDefaultPlugin {
 
         props.put("cache.persistence.class", "com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener");
         props.put("cache.path", "temp/imageCache");
-        
-        imageCache = new OSCacheCache(props, capacity);
+
+        try {
+            imageCache = context.getWiki().getCacheService().newLocalCache(props, capacity);
+        } catch (XWikiException e) {
+        }
     }
 
     public void flushCache() {
         if (imageCache != null)
             imageCache.flushAll();
+        imageCache = null;
     }
 
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
@@ -110,6 +113,10 @@ public class ImagePlugin extends XWikiDefaultPlugin {
         int height = 0;
         int width = 0;
         XWikiAttachment attachmentClone = null;
+
+        if (imageCache==null)
+            initCache(context);
+
         try {
             String sheight = context.getRequest().getParameter("height");
             String swidth = context.getRequest().getParameter("width");

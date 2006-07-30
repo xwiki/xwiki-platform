@@ -32,8 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.sun.syndication.feed.synd.*;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 import com.sun.syndication.fetcher.FeedFetcher;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +41,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
@@ -103,12 +100,37 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public void flushCache() {
         if (feedCache!=null)
             feedCache.flushAll();
+        feedCache = null;
     }
 
     public void init(XWikiContext context) {
         super.init(context);
-        feedCache = context.getWiki().getCacheService().newLocalCache();
+        prepareCache(context);
         refreshPeriod = (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.cacherefresh", 3600);
+    }
+
+
+    public void initCache(XWikiContext context) throws XWikiException {
+        int iCapacity = 100;
+        try {
+            String capacity = context.getWiki().Param("xwiki.plugins.feed.cache.capacity");
+            if (capacity != null)
+                iCapacity = Integer.parseInt(capacity);
+        } catch (Exception e) {}
+
+        initCache(iCapacity, context);
+    }
+
+    public void initCache(int iCapacity, XWikiContext context) throws XWikiException {
+            feedCache = context.getWiki().getCacheService().newLocalCache(iCapacity);
+    }
+
+    protected void prepareCache(XWikiContext context) {
+        try {
+            if (feedCache==null)
+                initCache(context);
+        } catch (XWikiException e) {
+        }
     }
 
     public SyndFeed getFeeds(String sfeeds, XWikiContext context) throws IOException {
@@ -161,13 +183,15 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force, XWikiContext context) throws IOException {
         SyndFeed feed = null;
-        if (!force)
-        try {
-          feed = (SyndFeed) feedCache.getFromCache(sfeed, refreshPeriod);
+        prepareCache(context);
+        if (!force) {
+            try {
+                feed = (SyndFeed) feedCache.getFromCache(sfeed, refreshPeriod);
 
-        } catch (XWikiCacheNeedsRefreshException e) {
-            feedCache.cancelUpdate(sfeed);
-        } catch (Exception e) {
+            } catch (XWikiCacheNeedsRefreshException e) {
+                feedCache.cancelUpdate(sfeed);
+            } catch (Exception e) {
+            }
         }
 
         if (feed==null)

@@ -23,6 +23,7 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface XWikiRenderer {

@@ -279,7 +279,7 @@ public interface XWikiInterface {
 
     void setRightService(XWikiRightService rightService);
 
-    XWikiGroupService getGroupService();
+    XWikiGroupService getGroupService(XWikiContext context) throws XWikiException;
 
     void setGroupService(XWikiGroupService groupService);
 

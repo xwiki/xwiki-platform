@@ -35,6 +35,8 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -117,8 +119,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiRightService rightService;
     private XWikiGroupService groupService;
     private XWikiStatsService statsService;
-    private XWikiCacheService cacheService;
     private XWikiURLFactoryService urlFactoryService;
+    private static XWikiCacheService cacheService;
 
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
@@ -131,7 +133,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     // These are caches in order to improve finding virtual wikis
     private List virtualWikiList = new ArrayList();
-    private static Map virtualWikiMap = new HashMap();
+    private XWikiCache virtualWikiMap;
     private static Map threadMap = new HashMap();
 
     private boolean isReadOnly = false;
@@ -258,6 +260,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return virtualWikiList;
     }
 
+    public XWikiCache getVirtualWikiMap() {
+        return virtualWikiMap;
+    }
+
     public synchronized static XWiki getXWiki(XWikiContext context) throws XWikiException {
         XWiki xwiki = getMainXWiki(context);
 
@@ -274,9 +280,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             if (host.equals(""))
                 return xwiki;
 
-            String appname = findWikiServer(host, context);
+            String appname = xwiki.findWikiServer(host, context);
 
-            if (appname == null) {
+            if (appname.equals("")) {
                 String uri = request.getRequestURI();
                 int i1 = host.indexOf(".");
                 String servername = (i1 != -1) ? host.substring(0, i1) : host;
@@ -346,26 +352,43 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    private static String findWikiServer(String host, XWikiContext context) {
-        String wikiserver = (String) virtualWikiMap.get(host);
-        if (wikiserver != null)
-            return wikiserver;
-
-        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
-                + "and prop.id.name = 'server' and prop.value='" + host + "'";
-        try {
-            List list = context.getWiki().getStore().searchDocumentsNames(hql, context);
-            if ((list == null) || (list.size() == 0))
-                return null;
-            String docname = (String) list.get(0);
-            if (!docname.startsWith("XWiki.XWikiServer"))
-                return null;
-            wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
-            virtualWikiMap.put(host, wikiserver);
-            return wikiserver;
-        } catch (XWikiException e) {
-            return null;
+    private String findWikiServer(String host, XWikiContext context) throws XWikiException {
+        synchronized (this) {
+            if (virtualWikiMap==null) {
+                int iCapacity = 1000;
+                try {
+                    String capacity = Param("xwiki.virtual.cache.capacity");
+                    if (capacity != null)
+                        iCapacity = Integer.parseInt(capacity);
+                } catch (Exception e) {
+                }
+                virtualWikiMap = getCacheService().newCache("xwiki.virtual.cache", iCapacity);
+            }
+        }
+        synchronized (host) {
+            String wikiserver = "";
+            try {
+                wikiserver = (String) virtualWikiMap.getFromCache(host);
+                return wikiserver;
+            } catch (XWikiCacheNeedsRefreshException e) {
+                virtualWikiMap.cancelUpdate(host);
+                String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                        + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
+                        + "and prop.id.name = 'server' and prop.value='" + host + "'";
+                try {
+                    List list = context.getWiki().getStore().searchDocumentsNames(hql, context);
+                    if ((list != null) && (list.size() > 0))
+                    {
+                        String docname = (String) list.get(0);
+                        if (docname.startsWith("XWiki.XWikiServer"))
+                            wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
+                    }
+                    virtualWikiMap.putInCache(host, wikiserver);
+                    return wikiserver;
+                } catch (XWikiException e2) {
+                    return null;
+                }
+            }
         }
     }
 
@@ -499,10 +522,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             getStatsService(context);
         }
 
-        // Add a notification rule if the preference property plugin is modified
+        // Add a notification for notifications
         getNotificationManager().addGeneralRule(
                 new XWikiActionRule(new XWikiPageNotification()));
 
+        // Add rule to get informed of new servers
+        getNotificationManager().addGeneralRule(new DocObjectChangedRule(this, "XWiki.XWikiServerClass"));
 
         String ro = Param("xwiki.readonly", "no");
         isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
@@ -1386,7 +1411,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // We need to flush the virtual wiki list
         virtualWikiList = new ArrayList();
         // We need to flush the server Cache
-        virtualWikiMap = new HashMap();
+        virtualWikiMap.flushAll();
+        virtualWikiMap = null;
 
         // We need to flush the group service cache
         if (groupService != null)
@@ -1444,6 +1470,30 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (!isVirtual()) {
             if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
                 preparePlugins(context);
+            }
+        }
+
+        flushVirtualWikis(olddoc);
+        flushVirtualWikis(newdoc);
+    }
+
+    private void flushVirtualWikis(XWikiDocument doc) {
+        List bobjects = doc.getObjects("XWiki.XWikiServerClass");
+        if (bobjects!=null) {
+            Iterator it = bobjects.iterator();
+            while (it.hasNext()) {
+                BaseObject bobj = (BaseObject) it.next();
+                if (bobj!=null) {
+                    String host = bobj.getStringValue("server");
+                    if ((host!=null)&&(!"".equals(host))) {
+                        try {
+                            if (virtualWikiMap.getFromCache(host)!=null)
+                                virtualWikiMap.flushEntry(host);
+                        } catch (XWikiCacheNeedsRefreshException e) {
+                            virtualWikiMap.cancelUpdate(host);
+                        }
+                    }
+                }
             }
         }
     }
@@ -1969,8 +2019,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
 
         try {
-            XWikiGroupService gservice = (XWikiGroupService) getGroupService();
-            gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup");
+            XWikiGroupService gservice = (XWikiGroupService) getGroupService(context);
+            gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup", context);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2146,6 +2196,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void deleteDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
         getStore().deleteXWikiDoc(doc, context);
+        getNotificationManager().verify(doc, new XWikiDocument(doc.getWeb(), doc.getName()), XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
     public String getDatabase() {
@@ -2434,6 +2485,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             // Verify is server page already exist
             XWikiDocument serverdoc = getDocument("XWiki", wikiServerPage, context);
             if (serverdoc.isNew()) {
+                // clear entry in virtual wiki cache
+                virtualWikiMap.flushEntry(wikiUrl);
+                
                 // Create Wiki Server page
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
                 serverdoc.setLargeStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
@@ -2723,7 +2777,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         this.rightService = rightService;
     }
 
-    public XWikiGroupService getGroupService() {
+    public XWikiGroupService getGroupService(XWikiContext context) throws XWikiException {
         if (groupService == null) {
             String groupClass;
             if (isExo())
@@ -2733,7 +2787,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             try {
                 groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
-                groupService.init(this);
             } catch (Exception e) {
                 e.printStackTrace();
                 if (isExo())
@@ -2742,6 +2795,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     groupService = new XWikiGroupServiceImpl();
             }
         }
+        groupService.init(this, context);
         return groupService;
     }
 

@@ -16,6 +16,7 @@ import com.opensymphony.oscache.general.GeneralCacheAdministrator;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated by
@@ -52,12 +53,16 @@ public class OSCacheCache implements XWikiCache
     private String                    name;
     private int                       capacity;
 
-    public OSCacheCache(Properties props)
+    public OSCacheCache(Properties props)  throws XWikiException
     {
-        cacheAdmin = new GeneralCacheAdministrator(props);
+        try {
+          cacheAdmin = new GeneralCacheAdministrator(props);
+        } catch (Throwable e) {
+          throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING, "Exception while initializing cache", e);  
+        }
     }
 
-    public OSCacheCache(Properties props, int capacity)
+    public OSCacheCache(Properties props, int capacity) throws XWikiException
     {
         this(props);
         cacheAdmin.setCacheCapacity(capacity);
@@ -151,7 +156,7 @@ public class OSCacheCache implements XWikiCache
      */
     public int getNumberEntries()
     {
-        return cacheAdmin.getCache().getNbEntries();
+        return cacheAdmin.getCache().getSize();
     }
 
     public void setName(String name)

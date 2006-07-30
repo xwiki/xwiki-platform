@@ -1883,7 +1883,7 @@ public class XWikiDocument {
         }
     }
 
-    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
+    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) throws XWikiException {
         String result = pclass.displayView(pclass.getName(), prefix, object, context);
         return getRenderedContent(result, context);
     }

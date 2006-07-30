@@ -64,22 +64,6 @@ import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 */
 public class GroovyTemplateEngine extends TemplateEngine {
 
-    private class GTEClassLoader extends ClassLoader {
-        private HashMap classMap = new HashMap();
-
-        public GTEClassLoader(ClassLoader parent) {
-            super(parent);
-        }
-        protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
-            Object cached = classMap.get(name);
-            if (cached!=null) return (Class) cached;
-            ClassLoader parent = getParent();
-            if (parent!=null) return parent.loadClass(name);
-            return super.loadClass(name,resolve);
-        }
-    }
-
-
 /* (non-Javadoc)
 * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
 */

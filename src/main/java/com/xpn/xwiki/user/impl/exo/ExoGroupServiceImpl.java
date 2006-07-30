@@ -28,6 +28,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import org.exoplatform.commons.utils.PageList;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.services.organization.*;
@@ -37,9 +38,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExoGroupServiceImpl implements XWikiGroupService {
+public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiGroupService {
     private static OrganizationService organizationService;
-    private XWikiCache groupCache;
+
+    public void init(XWiki xwiki, XWikiContext context) throws XWikiException {
+        super.init(xwiki, context);
+    }
 
     protected GroupHandler getGroupHandler() {
         if (organizationService == null) {
@@ -77,14 +81,6 @@ public class ExoGroupServiceImpl implements XWikiGroupService {
         return organizationService.getMembershipTypeHandler();
     }
 
-    public void init(XWiki xwiki) {
-        XWikiCacheService cacheService = xwiki.getCacheService();
-        groupCache = cacheService.newCache();
-    }
-
-    public void flushCache() {
-        groupCache.flushAll();
-    }
 
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException {
         GroupHandler groupHandler = getGroupHandler();
@@ -112,9 +108,8 @@ public class ExoGroupServiceImpl implements XWikiGroupService {
         }
     }
 
-    public void addUserToGroup(String user, String database, String group) throws XWikiException {
+    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException {
         // TODO: test this code
-
         MembershipHandler membershipHandler = getMembershipHandler();
         MembershipTypeHandler memberShipTypeHandler = getMembershipTypeHandler();
         boolean broadcast = false;
@@ -135,6 +130,7 @@ public class ExoGroupServiceImpl implements XWikiGroupService {
             User username = getUserHandler().findUserByName(user);
             Group groupname = getGroupHandler().findGroupById(group);
             membershipHandler.linkMembership(username, groupname, mst, broadcast);
+            super.addUserToGroup(user, database, group, context);
         } catch (Exception e) {
             Object[] args = {user, group};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_ADDING_USERS,

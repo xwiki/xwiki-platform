@@ -52,23 +52,31 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException {
         setStore(store);
-        initCache(cacheCapacity, pageExistCacheCapacity, context);
+        initCache(context);
+    }
+
+    public synchronized void initCache(XWikiContext context) throws XWikiException {
+        if ((cache==null)||(pageExistCache==null))  {
+            try {
+                String capacity = context.getWiki().Param("xwiki.store.cache.capacity");
+                if (capacity != null)
+                    cacheCapacity = Integer.parseInt(capacity);
+            } catch (Exception e) {
+            }
+            try {
+                String capacity = context.getWiki().Param("xwiki.store.cache.pageexistcapacity");
+                if (capacity != null)
+                    pageExistCacheCapacity = Integer.parseInt(capacity);
+            } catch (Exception e) {
+            }
+            initCache(cacheCapacity, pageExistCacheCapacity, context);
+        }
     }
 
     public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
         setCache(cacheService.newCache("xwiki.store.pagecache", capacity));
         setPageExistCache(cacheService.newCache("xwiki.store.pageexistcache",pageExistCacheCapacity));
-    }
-
-    public void setCacheCapacity(int capacity) {
-        cacheCapacity = capacity;
-        getCache().setCapacity(capacity);
-    }
-
-    public void setPageExistCacheCapacity(int capacity) {
-        pageExistCacheCapacity = capacity;
-        getPageExistCache().setCapacity(capacity);
     }
 
     public XWikiStoreInterface getStore() {
@@ -88,6 +96,9 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         synchronized(key) {
             store.saveXWikiDoc(doc, context, bTransaction);
             doc.setStore(store);
+            // Make sure cache is initialized
+            initCache(context);
+
             // We need to flush so that caches
             // on the cluster are informed about the change
             getCache().flushEntry(key);
@@ -127,6 +138,9 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         String key = getKey(doc, context);
         if (log.isDebugEnabled())
          log.debug("Cache: begin for doc " + key + " in cache");
+
+        // Make sure cache is initialized
+        initCache(context);
 
         synchronized (key) {
             try {
@@ -172,6 +186,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         String key = getKey(doc, context);
         synchronized(key) {
             store.deleteXWikiDoc(doc, context);
+
+            // Make sure cache is initialized
+            initCache(context);
+
             getCache().flushEntry(key);
             getPageExistCache().flushEntry(key);
             getPageExistCache().putInCache(key, new Boolean(false));

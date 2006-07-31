@@ -465,18 +465,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
             XWikiCacheStoreInterface cachestore = new XWikiCacheStore(basestore, context);
-            try {
-                String capacity = Param("xwiki.store.cache.capacity");
-                if (capacity != null)
-                    cachestore.setCacheCapacity(Integer.parseInt(capacity));
-            } catch (Exception e) {
-            }
-            try {
-                String capacity = Param("xwiki.store.cache.pageexistcapacity");
-                if (capacity != null)
-                    cachestore.setPageExistCacheCapacity(Integer.parseInt(capacity));
-            } catch (Exception e) {
-            }
             setStore(cachestore);
         } else
             setStore(basestore);

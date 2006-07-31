@@ -134,10 +134,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     public SyndFeed getFeeds(String sfeeds, XWikiContext context) throws IOException {
-            return getFeeds(sfeeds, true, context);
+            return getFeeds(sfeeds, false, true, context);
     }
 
-    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, XWikiContext context) throws IOException {
+    public SyndFeed getFeeds(String sfeeds, boolean force, XWikiContext context) throws IOException {
+            return getFeeds(sfeeds, false, force, context);
+    }
+
+    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force, XWikiContext context) throws IOException {
         String[] feeds;
         if (sfeeds.indexOf("\n") != -1)
             feeds = sfeeds.split("\n");
@@ -163,7 +167,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         outputFeed.setEntries(entries);
         for (int i = 0; i < feeds.length; i++)
         {
-            SyndFeed feed = getFeed(feeds[i], ignoreInvalidFeeds, context);
+            SyndFeed feed = getFeed(feeds[i], ignoreInvalidFeeds, force, context);
             if (feed != null)
                 entries.addAll(feed.getEntries());
         }

@@ -49,6 +49,14 @@ public class FeedPluginApi extends Api {
         return plugin.getFeeds(sfeeds, context);
     }
 
+    public SyndFeed getFeeds(String sfeeds, boolean force) throws IOException {
+        return plugin.getFeeds(sfeeds, force, context);
+    }
+
+    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force) throws IOException {
+        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, context);
+    }
+
     public SyndFeed getFeed(String sfeed) throws IOException {
         return plugin.getFeed(sfeed, false, context);
     }

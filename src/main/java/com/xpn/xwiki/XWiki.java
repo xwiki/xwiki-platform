@@ -162,7 +162,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return configPath;
     }
 
-    public synchronized static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
+    public static XWiki getMainXWiki(XWikiContext context) throws XWikiException {
         String xwikicfg = null;
         String xwikiname = "xwiki";
         XWiki xwiki = null;
@@ -180,20 +180,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         try {
             xwikicfg = getConfigPath();
-            xwiki = (XWiki) econtext.getAttribute(xwikiname);
-            if (xwiki == null) {
-                InputStream xwikicfgis = null;
+            synchronized (XWiki.class) {
+                xwiki = (XWiki) econtext.getAttribute(xwikiname);
+                if (xwiki == null) {
+                    InputStream xwikicfgis = null;
 
-                // first try to load the file pointed by the given path
-                // if it does not exist, look for it relative to the classpath
-                File f = new File(xwikicfg);
-                if (f.exists()) {
-                    xwikicfgis = new FileInputStream(f);
-                } else {
-                    xwikicfgis = econtext.getResourceAsStream(xwikicfg);
+                    // first try to load the file pointed by the given path
+                    // if it does not exist, look for it relative to the classpath
+                    File f = new File(xwikicfg);
+                    if (f.exists()) {
+                        xwikicfgis = new FileInputStream(f);
+                    } else {
+                        xwikicfgis = econtext.getResourceAsStream(xwikicfg);
+                    }
+                    xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
+                    econtext.setAttribute(xwikiname, xwiki);
                 }
-                xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
-                econtext.setAttribute(xwikiname, xwiki);
             }
             context.setWiki(xwiki);
             xwiki.setDatabase(context.getDatabase());
@@ -264,7 +266,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return virtualWikiMap;
     }
 
-    public synchronized static XWiki getXWiki(XWikiContext context) throws XWikiException {
+    public static XWiki getXWiki(XWikiContext context) throws XWikiException {
         XWiki xwiki = getMainXWiki(context);
 
         if (xwiki.isVirtual()) {
@@ -308,30 +310,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
             }
 
-            // Check if this appname exists in the Database
-            String serverwikipage = getServerWikiPage(appname);
-            XWikiDocument doc = xwiki.getDocument(serverwikipage, context);
-            if (doc.isNew()) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI,
-                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + appname + " does not exist");
-            }
+            synchronized (appname) {
+                // Check if this appname exists in the Database
+                String serverwikipage = getServerWikiPage(appname);
+                XWikiDocument doc = xwiki.getDocument(serverwikipage, context);
+                if (doc.isNew()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI,
+                            XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                            "The wiki " + appname + " does not exist");
+                }
 
-            // Set the wiki owner
-            String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
-            if (wikiOwner.indexOf(":") == -1)
-                wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
-            context.setWikiOwner(wikiOwner);
-            context.setWikiServer(doc);
-            context.setVirtual(true);
-            context.setDatabase(appname);
-            context.setOriginalDatabase(appname);
-            try {
-                // Let's make sure the virtaul wikis are upgraded to the latest database version
-                xwiki.updateDatabase(appname, false, context);
-            } catch (HibernateException e) {
-                // Just to report it
-                e.printStackTrace();
+                // Set the wiki owner
+                String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+                if (wikiOwner.indexOf(":") == -1)
+                    wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
+                context.setWikiOwner(wikiOwner);
+                context.setWikiServer(doc);
+                context.setVirtual(true);
+                context.setDatabase(appname);
+                context.setOriginalDatabase(appname);
+                try {
+                    // Let's make sure the virtaul wikis are upgraded to the latest database version
+                    xwiki.updateDatabase(appname, false, context);
+                } catch (HibernateException e) {
+                    // Just to report it
+                    e.printStackTrace();
+                }
             }
         }
         return xwiki;

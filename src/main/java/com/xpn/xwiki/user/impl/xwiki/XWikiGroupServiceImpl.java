@@ -81,18 +81,21 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             String shortname = Util.getName(username);
             String veryshortname = shortname.substring(shortname.indexOf(".") + 1);
             String key = database + ":" + shortname;
-            if (groupCache==null)
-                initCache(context);
-            try {
-                list = (List) groupCache.getFromCache(key);
-            } catch (XWikiCacheNeedsRefreshException e) {
-                list = context.getWiki().getStore().searchDocumentsNames(", BaseObject as obj, StringProperty as prop "
-                        + "where obj.name=" + context.getWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiGroups' "
-                        + "and obj.id = prop.id.id and prop.id.name='member' "
-                        + "and (prop.value='" + Utils.SQLFilter(username)
-                        + "' or prop.value='" + Utils.SQLFilter(shortname) + "' or prop.value='"
-                        + Utils.SQLFilter(veryshortname) + "')", context);
-                groupCache.putInCache(key, list);
+            synchronized (key) {
+                if (groupCache==null)
+                    initCache(context);
+                try {
+                    list = (List) groupCache.getFromCache(key);
+                } catch (XWikiCacheNeedsRefreshException e) {
+                    groupCache.cancelUpdate(key);
+                    list = context.getWiki().getStore().searchDocumentsNames(", BaseObject as obj, StringProperty as prop "
+                            + "where obj.name=" + context.getWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiGroups' "
+                            + "and obj.id = prop.id.id and prop.id.name='member' "
+                            + "and (prop.value='" + Utils.SQLFilter(username)
+                            + "' or prop.value='" + Utils.SQLFilter(shortname) + "' or prop.value='"
+                            + Utils.SQLFilter(veryshortname) + "')", context);
+                    groupCache.putInCache(key, list);
+                }
             }
             return list;
         } finally {
@@ -109,12 +112,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         String key = database + ":" + shortname;
         if (groupCache==null)
             initCache(context);
-        try {
-            list = (List) groupCache.getFromCache(key);
-        } catch (XWikiCacheNeedsRefreshException e) {
-            list = new ArrayList();
-            groupCache.putInCache(key, list);
-            groupCache.cancelUpdate(key);
+        synchronized (key) {
+            try {
+                list = (List) groupCache.getFromCache(key);
+            } catch (XWikiCacheNeedsRefreshException e) {
+                groupCache.cancelUpdate(key);
+                list = new ArrayList();
+                groupCache.putInCache(key, list);
+            }
         }
         list.add(group);
     }

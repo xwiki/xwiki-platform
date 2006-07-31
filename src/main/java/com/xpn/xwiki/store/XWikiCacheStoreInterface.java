@@ -31,7 +31,5 @@ public interface XWikiCacheStoreInterface extends XWikiStoreInterface {
     public void flushCache();
     public void setCacheCapacity(int capacity);
     public void setPageExistCacheCapacity(int capacity);
-    public void setPrefsCacheCapacity(int capacity);
-    public void initCache(int capacity, int pageExistCapacity,
-                          int prefsCacheCapacity, XWikiContext context) throws XWikiException;
+    public void initCache(int capacity, int pageExistCapacity, XWikiContext context) throws XWikiException;
 }

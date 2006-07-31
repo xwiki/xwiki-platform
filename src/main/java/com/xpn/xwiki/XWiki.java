@@ -3487,6 +3487,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException {
+        // Used to avoid recursive loading of documents if there are recursives usage of classes
+        BaseClass bclass = context.getBaseClass(fullName);
+        if (bclass!=null)
+            return bclass;
         return getDocument(fullName, context).getxWikiClass();
     }
 

@@ -26,6 +26,8 @@ package com.xpn.xwiki;
 
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.xmlrpc.XmlRpcServer;
 
@@ -37,6 +39,7 @@ import com.xpn.xwiki.web.XWikiForm;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class XWikiContext extends Hashtable {
 
@@ -66,7 +69,10 @@ public class XWikiContext extends Hashtable {
    private XWikiDocument wikiServer;
    private int cacheDuration = 0;
 
-    public XWikiContext() {
+   // Used to avoid recursive loading of documents if there are recursives usage of classes
+   private Map classCache = new HashMap();
+
+   public XWikiContext() {
    }
 
    public XWiki getWiki() {
@@ -171,7 +177,7 @@ public class XWikiContext extends Hashtable {
         String username = getUser();
         return username.substring(username.indexOf(":") + 1);
     }
-    
+
     public XWikiUser getXWikiUser() {
         return user;
     }
@@ -263,4 +269,15 @@ public class XWikiContext extends Hashtable {
     public void setMainXWiki(String str) {
         put("mainxwiki", str);
     }
+
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    public void addBaseClass(BaseClass bclass) {
+        classCache.put(bclass.getName(), bclass);
+    }
+
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    public BaseClass getBaseClass(String name) {
+        return (BaseClass) classCache.get(name);
+    }
+
 }

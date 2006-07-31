@@ -359,6 +359,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.setxWikiClass(bclass);
             }
 
+            // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
+            context.addBaseClass(bclass);
+
+
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
                 Query query;
                 query = session.createQuery("from BaseObject as bobject where bobject.name = :name order by bobject.number");

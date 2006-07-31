@@ -304,6 +304,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc,context);
+        initCache(context);
         synchronized(key) {
             try {
                 try {

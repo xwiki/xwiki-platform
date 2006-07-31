@@ -156,6 +156,12 @@ public class OSCacheCache implements XWikiCache
      */
     public int getNumberEntries()
     {
+       int ret = cacheAdmin.getCache().getSize();
+       return ret;
+    }
+
+    public int getSize()
+    {
         return cacheAdmin.getCache().getSize();
     }
 

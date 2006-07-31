@@ -2771,7 +2771,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         this.rightService = rightService;
     }
 
-    public XWikiGroupService getGroupService(XWikiContext context) throws XWikiException {
+    public synchronized XWikiGroupService getGroupService(XWikiContext context) throws XWikiException {
         if (groupService == null) {
             String groupClass;
             if (isExo())
@@ -2788,8 +2788,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 else
                     groupService = new XWikiGroupServiceImpl();
             }
+            groupService.init(this, context);
         }
-        groupService.init(this, context);
         return groupService;
     }
 
@@ -2798,7 +2798,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     // added some log statements to make debugging easier - LBlaze 2005.06.02
-    public XWikiAuthService getAuthService() {
+    public synchronized XWikiAuthService getAuthService() {
         if (authService == null) {
 
             log.info("Initializing AuthService...");
@@ -2849,7 +2849,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     // added some log statements to make debugging easier - LBlaze 2005.06.02
-    public XWikiRightService getRightService() {
+    public synchronized XWikiRightService getRightService() {
         if (rightService == null) {
 
             log.info("Initializing RightService...");
@@ -2884,7 +2884,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return rightService;
     }
 
-    public XWikiStatsService getStatsService(XWikiContext context) {
+    public synchronized XWikiStatsService getStatsService(XWikiContext context) {
         if (statsService == null) {
             if ("1".equals(Param("xwiki.stats", "1"))) {
                 String storeClass = Param("xwiki.stats.class", "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
@@ -2900,7 +2900,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return statsService;
     }
 
-    public XWikiURLFactoryService getURLFactoryService() {
+    public synchronized XWikiURLFactoryService getURLFactoryService() {
         if (urlFactoryService == null) {
 
             log.info("Initializing URLFactory Service...");

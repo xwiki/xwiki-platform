@@ -45,8 +45,8 @@ public class DocObjectChangedRule extends DocChangeRule {
     }
 
     public boolean hasEqualsObjectsFromClass(XWikiDocument newdoc, XWikiDocument olddoc, String classname) {
-        Vector vobj1 = newdoc.getObjects(classname);
-        Vector vobj2 = olddoc.getObjects(classname);
+        Vector vobj1 = (newdoc==null) ? null : newdoc.getObjects(classname);
+        Vector vobj2 = (olddoc==null) ? null : olddoc.getObjects(classname);
         if ((vobj1==null)&&(vobj2==null))
             return true;
         if ((vobj1==null)||(vobj2==null))

@@ -71,8 +71,12 @@ public class GroovyRenderTest extends HibernateTestCase {
     }
 
     public void cleanMem() {
+        // Make sure we get rid of all the caches
+        xwiki.flushCache();
+
+        // Make sure we clean the java memory
         Runtime rt = Runtime.getRuntime();
-        for (int i=0;i<5;i++) {
+        for (int i=0;i<10;i++) {
             rt.gc();
             rt.runFinalization();
             rt.gc();
@@ -81,6 +85,7 @@ public class GroovyRenderTest extends HibernateTestCase {
     public void testMemory() throws Exception {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
         getXWiki().setRightService(new GroovyTestRightService());
+        wikiengine.getRenderer("groovy").flushCache();
         ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
         int nbrenders = 500;
         int nbtotal = 20;
@@ -98,6 +103,7 @@ public class GroovyRenderTest extends HibernateTestCase {
                 "" + (nbtotal*2), false, getXWikiContext());
         }
 
+        wikiengine.getRenderer("groovy").flushCache();
         ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
         cleanMem();
 
@@ -112,6 +118,7 @@ public class GroovyRenderTest extends HibernateTestCase {
                     "" + (nbtotal*2), false, getXWikiContext());
         }
 
+        wikiengine.getRenderer("groovy").flushCache();
         ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
         cleanMem();
 
@@ -127,9 +134,10 @@ public class GroovyRenderTest extends HibernateTestCase {
                     "" + (nbtotal*(i+1)), false, getXWikiContext());
             MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
             Map map = (Map) XWiki.getPrivateField(mcr, "metaClasses");
-            System.out.println("Map size: " + map.size());
+            // System.out.println("Map size: " + map.size());
         }
 
+        wikiengine.getRenderer("groovy").flushCache();
         ((XWikiGroovyRenderer)wikiengine.getRenderer("groovy")).initCache(context);
         cleanMem();
 

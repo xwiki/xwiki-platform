@@ -470,8 +470,8 @@
     </library>
     <library name="RSS">
       <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/rome-0.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/rome-fetcher-0.7.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/rome-0.7.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

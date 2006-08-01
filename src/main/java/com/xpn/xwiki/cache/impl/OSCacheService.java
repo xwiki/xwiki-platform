@@ -88,7 +88,7 @@ public class OSCacheService implements XWikiCacheService, Runnable
 
     public XWikiCache newCache(String cacheName, Properties props) throws XWikiException
     {
-        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties));
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties));
         cc.setName(cacheName);
         initCache(cc);
         return cc;
@@ -96,27 +96,34 @@ public class OSCacheService implements XWikiCacheService, Runnable
 
     public XWikiCache newLocalCache(Properties props) throws XWikiException
     {
-        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties));
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties));
         initCache(cc);
         return cc;
     }
 
     public XWikiCache newCache(String cacheName, Properties props, int capacity) throws XWikiException {
-        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties), capacity);
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties), capacity);
         cc.setName(cacheName);
         initCache(cc);
         return cc;
     }
 
     public XWikiCache newLocalCache(Properties props, int capacity) throws XWikiException {
-        OSCacheCache cc = new OSCacheCache(mergeProperties(props, cacheProperties), capacity);
+        OSCacheCache cc = new OSCacheCache(mergeProperties(props, localCacheProperties), capacity);
         initCache(cc);
         return cc;
     }
 
     private Properties mergeProperties(Properties props, Properties sourceProps) {
-        Properties targetProps = (Properties) sourceProps.clone();
-        Enumeration en = props.keys();
+        Properties targetProps = new Properties();
+
+        Enumeration en = sourceProps.keys();
+                while (en.hasMoreElements()) {
+                    Object key = en.nextElement();
+                    Object value = sourceProps.get(key);
+                    targetProps.put(key, value);
+                }
+        en = props.keys();
         while (en.hasMoreElements()) {
             Object key = en.nextElement();
             Object value = props.get(key);

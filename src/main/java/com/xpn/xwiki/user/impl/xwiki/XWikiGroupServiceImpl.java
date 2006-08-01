@@ -47,12 +47,12 @@ import java.util.Vector;
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
     protected XWikiCache groupCache;
 
-    public void init(XWiki xwiki, XWikiContext context) throws XWikiException {
+    public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException {
         initCache(context);
         xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(this));
     }
 
-    public void initCache(XWikiContext context) throws XWikiException {
+    public synchronized void initCache(XWikiContext context) throws XWikiException {
         int iCapacity = 100;
         try {
             String capacity = context.getWiki().Param("xwiki.authentication.group.cache.capacity");
@@ -62,7 +62,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         initCache(iCapacity, context);
     }
 
-    public void initCache(int iCapacity, XWikiContext context) throws XWikiException {
+    public synchronized void initCache(int iCapacity, XWikiContext context) throws XWikiException {
         XWikiCacheService cacheService = context.getWiki().getCacheService();
         groupCache = cacheService.newCache("xwiki.authentication.group.cache", iCapacity);
     }

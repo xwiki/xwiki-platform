@@ -272,6 +272,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         if ((xml==null)||(xml.trim().equals("")))
          return;
 
+        xml = xml.replaceAll("<>", "<unknown>");
+        xml = xml.replaceAll("</>", "</unknown>");
+
         try {
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);

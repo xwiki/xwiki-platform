@@ -122,6 +122,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiURLFactoryService urlFactoryService;
     private static XWikiCacheService cacheService;
 
+    private final Object AUTH_SERVICE_LOCK = new Object();
+    private final Object RIGHT_SERVICE_LOCK = new Object();
+    private final Object GROUP_SERVICE_LOCK = new Object();
+    private final Object STATS_SERVICE_LOCK = new Object();
+    private final Object URLFACTORY_SERVICE_LOCK = new Object();
+    private static final Object CACHE_SERVICE_LOCK = new Object();
+
     private MetaClass metaclass = MetaClass.getMetaClass();
     private boolean test = false;
     private String version = null;
@@ -222,40 +229,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return null;
     }
 
-    public synchronized void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException {
+    public void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException {
         updateDatabase(appname, false, context);
     }
 
-    public synchronized void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException, XWikiException {
-        String database = context.getDatabase();
+    public void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException, XWikiException {
+        synchronized (appname) {
+            String database = context.getDatabase();
 
-        try {
-            List wikilist = getVirtualWikiList();
-            context.setDatabase(appname);
-            if (!wikilist.contains(appname)) {
-                wikilist.add(appname);
-                XWikiHibernateStore store = getHibernateStore();
-                if (store != null)
-                    store.updateSchema(context, force);
+            try {
+                List wikilist = getVirtualWikiList();
+                context.setDatabase(appname);
+                if (!wikilist.contains(appname)) {
+                    wikilist.add(appname);
+                    XWikiHibernateStore store = getHibernateStore();
+                    if (store != null)
+                        store.updateSchema(context, force);
+                }
+
+                // Make sure these classes exists
+                getPrefsClass(context);
+                getUserClass(context);
+                getGroupClass(context);
+                getRightsClass(context);
+                getCommentsClass(context);
+                getSkinClass(context);
+                getGlobalRightsClass(context);
+                getPluginManager().virtualInit(context);
+
+                // Add initdone which will allow to
+                // bypass some initializations
+                context.put("initdone", "1");
+            } finally {
+                context.setDatabase(database);
             }
-
-            // Make sure these classes exists
-            getPrefsClass(context);
-            getUserClass(context);
-            getGroupClass(context);
-            getRightsClass(context);
-            getCommentsClass(context);
-            getSkinClass(context);
-            getGlobalRightsClass(context);
-            getPluginManager().virtualInit(context);
-
-            // Add initdone which will allow to
-            // bypass some initializations
-            context.put("initdone", "1");
-        } finally {
-            context.setDatabase(database);
         }
-
     }
 
     public List getVirtualWikiList() {
@@ -1492,7 +1500,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public synchronized BaseClass getUserClass(XWikiContext context) throws XWikiException {
+    public BaseClass getUserClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1531,7 +1539,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
 
-    public synchronized BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
+    public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1609,7 +1617,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public synchronized BaseClass getGroupClass(XWikiContext context) throws XWikiException {
+    public BaseClass getGroupClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1638,7 +1646,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
 
-    public synchronized BaseClass getRightsClass(String pagename, XWikiContext context) throws XWikiException {
+    public BaseClass getRightsClass(String pagename, XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1698,15 +1706,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public synchronized BaseClass getRightsClass(XWikiContext context) throws XWikiException {
+    public BaseClass getRightsClass(XWikiContext context) throws XWikiException {
         return getRightsClass("XWikiRights", context);
     }
 
-    public synchronized BaseClass getGlobalRightsClass(XWikiContext context) throws XWikiException {
+    public BaseClass getGlobalRightsClass(XWikiContext context) throws XWikiException {
         return getRightsClass("XWikiGlobalRights", context);
     }
 
-    public synchronized BaseClass getCommentsClass(XWikiContext context) throws XWikiException {
+    public BaseClass getCommentsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -1739,7 +1747,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-    public synchronized BaseClass getSkinClass(XWikiContext context) throws XWikiException {
+    public BaseClass getSkinClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -2771,26 +2779,28 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         this.rightService = rightService;
     }
 
-    public synchronized XWikiGroupService getGroupService(XWikiContext context) throws XWikiException {
-        if (groupService == null) {
-            String groupClass;
-            if (isExo())
-                groupClass = Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl");
-            else
-                groupClass = Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
-
-            try {
-                groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
+    public XWikiGroupService getGroupService(XWikiContext context) throws XWikiException {
+        synchronized (GROUP_SERVICE_LOCK) {
+            if (groupService == null) {
+                String groupClass;
                 if (isExo())
-                    groupService = new ExoGroupServiceImpl();
+                    groupClass = Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl");
                 else
-                    groupService = new XWikiGroupServiceImpl();
+                    groupClass = Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
+
+                try {
+                    groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (isExo())
+                        groupService = new ExoGroupServiceImpl();
+                    else
+                        groupService = new XWikiGroupServiceImpl();
+                }
+                groupService.init(this, context);
             }
-            groupService.init(this, context);
+            return groupService;
         }
-        return groupService;
     }
 
     public void setGroupService(XWikiGroupService groupService) {
@@ -2798,136 +2808,145 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     // added some log statements to make debugging easier - LBlaze 2005.06.02
-    public synchronized XWikiAuthService getAuthService() {
-        if (authService == null) {
+    public XWikiAuthService getAuthService() {
+        synchronized (AUTH_SERVICE_LOCK) {
+            if (authService == null) {
 
-            log.info("Initializing AuthService...");
+                log.info("Initializing AuthService...");
 
-            String authClass = Param("xwiki.authentication.authclass");
-            if (authClass != null) {
-                if (log.isDebugEnabled()) log.debug("Using custom AuthClass " + authClass + ".");
-            } else {
+                String authClass = Param("xwiki.authentication.authclass");
+                if (authClass != null) {
+                    if (log.isDebugEnabled()) log.debug("Using custom AuthClass " + authClass + ".");
+                } else {
 
-                if (isExo())
-                    authClass = "com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl";
-                else if (isLDAP())
-                    authClass = "com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl";
-                else
-                    authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
+                    if (isExo())
+                        authClass = "com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl";
+                    else if (isLDAP())
+                        authClass = "com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl";
+                    else
+                        authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
 
-                if (log.isDebugEnabled()) log.debug("Using default AuthClass " + authClass + ".");
+                    if (log.isDebugEnabled()) log.debug("Using default AuthClass " + authClass + ".");
 
+                }
+
+                try {
+
+                    authService = (XWikiAuthService) Class.forName(authClass).newInstance();
+
+                    log.debug("Initialized AuthService using Relfection.");
+
+                } catch (Exception e) {
+
+                    log.warn("Failed to initialize AuthService " + authClass + " using Reflection, trying default implementations using 'new'.", e);
+
+                    // e.printStackTrace(); - not needed? -LBlaze
+
+                    // LDAP support wasn't here before, I assume it should be? -LBlaze
+
+                    if (isExo())
+                        authService = new ExoAuthServiceImpl();
+                    else if (isLDAP())
+                        authService = new LDAPAuthServiceImpl();
+                    else
+                        authService = new XWikiAuthServiceImpl();
+
+                    if (log.isDebugEnabled())
+                        log.debug("Initialized AuthService " + authService.getClass().getName() + " using 'new'.");
+
+                }
             }
-
-            try {
-
-                authService = (XWikiAuthService) Class.forName(authClass).newInstance();
-
-                log.debug("Initialized AuthService using Relfection.");
-
-            } catch (Exception e) {
-
-                log.warn("Failed to initialize AuthService " + authClass + " using Reflection, trying default implementations using 'new'.", e);
-
-                // e.printStackTrace(); - not needed? -LBlaze
-
-                // LDAP support wasn't here before, I assume it should be? -LBlaze
-
-                if (isExo())
-                    authService = new ExoAuthServiceImpl();
-                else if (isLDAP())
-                    authService = new LDAPAuthServiceImpl();
-                else
-                    authService = new XWikiAuthServiceImpl();
-
-                if (log.isDebugEnabled())
-                    log.debug("Initialized AuthService " + authService.getClass().getName() + " using 'new'.");
-
-            }
+            return authService;
         }
-        return authService;
     }
 
     // added some log statements to make debugging easier - LBlaze 2005.06.02
-    public synchronized XWikiRightService getRightService() {
-        if (rightService == null) {
+    public XWikiRightService getRightService() {
+        synchronized (RIGHT_SERVICE_LOCK) {
 
-            log.info("Initializing RightService...");
+            if (rightService == null) {
 
-            String rightsClass = Param("xwiki.authentication.rightsclass");
-            if (rightsClass != null) {
-                if (log.isDebugEnabled()) log.debug("Using custom RightsClass " + rightsClass + ".");
-            } else {
-                rightsClass = "com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl";
-                if (log.isDebugEnabled()) log.debug("Using default RightsClass " + rightsClass + ".");
-            }
+                log.info("Initializing RightService...");
+
+                String rightsClass = Param("xwiki.authentication.rightsclass");
+                if (rightsClass != null) {
+                    if (log.isDebugEnabled()) log.debug("Using custom RightsClass " + rightsClass + ".");
+                } else {
+                    rightsClass = "com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl";
+                    if (log.isDebugEnabled()) log.debug("Using default RightsClass " + rightsClass + ".");
+                }
 
 
-            try {
-
-                rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
-                log.debug("Initialized RightService using Reflection.");
-
-            } catch (Exception e) {
-
-                log.warn("Failed to initialize RightService " + rightsClass + " using Reflection, trying default implementation using 'new'.", e);
-
-                //e.printStackTrace(); - not needed? -LBlaze
-
-                rightService = new XWikiRightServiceImpl();
-
-                if (log.isDebugEnabled())
-                    log.debug("Initialized RightService " + authService.getClass().getName() + " using 'new'.");
-
-            }
-        }
-        return rightService;
-    }
-
-    public synchronized XWikiStatsService getStatsService(XWikiContext context) {
-        if (statsService == null) {
-            if ("1".equals(Param("xwiki.stats", "1"))) {
-                String storeClass = Param("xwiki.stats.class", "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
                 try {
-                    statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
+
+                    rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
+                    log.debug("Initialized RightService using Reflection.");
+
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    statsService = new XWikiStatsServiceImpl();
+
+                    log.warn("Failed to initialize RightService " + rightsClass + " using Reflection, trying default implementation using 'new'.", e);
+
+                    //e.printStackTrace(); - not needed? -LBlaze
+
+                    rightService = new XWikiRightServiceImpl();
+
+                    if (log.isDebugEnabled())
+                        log.debug("Initialized RightService " + authService.getClass().getName() + " using 'new'.");
+
                 }
-                statsService.init(context);
             }
+            return rightService;
         }
-        return statsService;
     }
 
-    public synchronized XWikiURLFactoryService getURLFactoryService() {
-        if (urlFactoryService == null) {
-
-            log.info("Initializing URLFactory Service...");
-
-            String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
-
-            if (urlFactoryServiceClass != null) {
-                try {
-                    if (log.isDebugEnabled())
-                        log.debug("Using custom URLFactory Service Class " + urlFactoryServiceClass + ".");
-                    urlFactoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass).newInstance();
-                    urlFactoryService.init(this);
-                    log.debug("Initialized URLFactory Service using Reflection.");
-                }
-                catch (Exception e) {
-                    urlFactoryService = null;
-                    log.warn("Failed to initialize URLFactory Service  " + urlFactoryServiceClass + " using Reflection, trying default implementation using 'new'.", e);
+    public XWikiStatsService getStatsService(XWikiContext context) {
+        synchronized (STATS_SERVICE_LOCK) {
+            if (statsService == null) {
+                if ("1".equals(Param("xwiki.stats", "1"))) {
+                    String storeClass = Param("xwiki.stats.class", "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
+                    try {
+                        statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        statsService = new XWikiStatsServiceImpl();
+                    }
+                    statsService.init(context);
                 }
             }
-            if (urlFactoryService == null) {
-                if (log.isDebugEnabled())
-                    log.debug("Using default URLFactory Service Class " + urlFactoryServiceClass + ".");
-                urlFactoryService = new XWikiURLFactoryServiceImpl();
-                urlFactoryService.init(this);
-            }
+            return statsService;
         }
-        return urlFactoryService;
+    }
+
+    public XWikiURLFactoryService getURLFactoryService() {
+        synchronized (URLFACTORY_SERVICE_LOCK) {
+            if (urlFactoryService == null) {
+
+                log.info("Initializing URLFactory Service...");
+
+                String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
+
+                if (urlFactoryServiceClass != null) {
+                    try {
+                        if (log.isDebugEnabled())
+                            log.debug("Using custom URLFactory Service Class " + urlFactoryServiceClass + ".");
+                        urlFactoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass).newInstance();
+                        urlFactoryService.init(this);
+                        log.debug("Initialized URLFactory Service using Reflection.");
+                    }
+                    catch (Exception e) {
+                        urlFactoryService = null;
+                        log.warn("Failed to initialize URLFactory Service  " + urlFactoryServiceClass + " using Reflection, trying default implementation using 'new'.", e);
+                    }
+                }
+                if (urlFactoryService == null) {
+                    if (log.isDebugEnabled())
+                        log.debug("Using default URLFactory Service Class " + urlFactoryServiceClass + ".");
+                    urlFactoryService = new XWikiURLFactoryServiceImpl();
+                    urlFactoryService.init(this);
+                }
+            }
+            return urlFactoryService;
+        }
     }
 
     public Object getService(String className) throws XWikiException {
@@ -3219,19 +3238,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     */
 
     public XWikiCacheService getCacheService() {
-        if (cacheService == null) {
-            String cacheClass;
-            cacheClass = Param("xwiki.cache.cacheclass", "com.xpn.xwiki.cache.impl.OSCacheService");
+        synchronized (CACHE_SERVICE_LOCK) {
+            if (cacheService == null) {
+                String cacheClass;
+                cacheClass = Param("xwiki.cache.cacheclass", "com.xpn.xwiki.cache.impl.OSCacheService");
 
-            try {
-                cacheService = (XWikiCacheService) Class.forName(cacheClass).newInstance();
-                cacheService.init(this);
-            } catch (Exception e) {
-                e.printStackTrace();
-                cacheService = new OSCacheService();
+                try {
+                    cacheService = (XWikiCacheService) Class.forName(cacheClass).newInstance();
+                    cacheService.init(this);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    cacheService = new OSCacheService();
+                }
             }
+            return cacheService;
         }
-        return cacheService;
     }
     
     public String getURLContent(String surl) throws IOException {

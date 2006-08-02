@@ -196,12 +196,8 @@ public class Document extends Api {
         return doc.getEscapedContent(context);
     }
 
-    public Archive getRCSArchive() {
-        return doc.getRCSArchive();
-    }
-
     public String getArchive() throws XWikiException {
-        return doc.getArchive();
+        return doc.getArchive(context);
     }
 
     public boolean isNew() {

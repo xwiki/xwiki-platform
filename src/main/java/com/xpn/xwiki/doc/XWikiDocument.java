@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
@@ -45,9 +47,8 @@ import com.xpn.xwiki.web.Utils;
 import org.apache.commons.jrcs.diff.Diff;
 import org.apache.commons.jrcs.diff.DifferentiationFailedException;
 import org.apache.commons.jrcs.diff.Revision;
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Lines;
 import org.apache.commons.jrcs.rcs.Version;
+import org.apache.commons.jrcs.rcs.Archive;
 import org.apache.commons.jrcs.util.ToString;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -88,7 +89,6 @@ public class XWikiDocument {
     private String creator;
     private String author;
     private String contentAuthor;
-    private Archive archive;
     private Date contentUpdateDate;
     private Date updateDate;
     private Date creationDate;
@@ -103,9 +103,9 @@ public class XWikiDocument {
     private String database;
 
     // Used to make sure the MetaData String is regenerated
-    private boolean isContentDirty = false;
+    private boolean isContentDirty = true;
     // Used to make sure the MetaData String is regenerated
-    private boolean isMetaDataDirty = false;
+    private boolean isMetaDataDirty = true;
 
     public static final int HAS_ATTACHMENTS = 1;
     public static final int HAS_OBJECTS = 2;
@@ -131,6 +131,19 @@ public class XWikiDocument {
     private Object wikiNode;
 
     private XWikiStoreInterface store;
+
+    public XWikiStoreInterface getStore(XWikiContext context) {
+        return context.getWiki().getStore();
+    }
+
+    public XWikiAttachmentStoreInterface getAttachmentStore(XWikiContext context) {
+        return context.getWiki().getAttachmentStore();
+    }
+
+    public XWikiVersioningStoreInterface getVersioningStore(XWikiContext context) {
+        return context.getWiki().getVersioningStore();
+    }
+
 
     public XWikiStoreInterface getStore() {
         return store;
@@ -209,7 +222,6 @@ public class XWikiDocument {
         this.author = "";
         this.language = "";
         this.defaultLanguage = "";
-        this.archive = null;
         this.attachmentList = new ArrayList();
     }
 
@@ -545,13 +557,22 @@ public class XWikiDocument {
         return context.getURLFactory().getURL(url, context);
     }
 
+    public Archive getRCSArchive(XWikiContext context) throws XWikiException {
+        return getVersioningStore(context).getXWikiDocRCSArchive(this, context);
+    }
+
+    public String getArchive(XWikiContext context) throws XWikiException {
+        return getVersioningStore(context).getXWikiDocArchive(this, context);
+    }
+
+
     public Version[] getRevisions(XWikiContext context) throws XWikiException {
-        return getStore().getXWikiDocVersions(this, context);
+        return getVersioningStore(context).getXWikiDocVersions(this, context);
     }
 
     public String[] getRecentRevisions(int nb, XWikiContext context) throws XWikiException {
         try {
-            Version[] revisions = getStore().getXWikiDocVersions(this, context);
+            Version[] revisions = getVersioningStore(context).getXWikiDocVersions(this, context);
             int length = nb;
 
             // 0 means all revisions
@@ -568,59 +589,6 @@ public class XWikiDocument {
             return recentrevs;
         } catch (Exception e) {
             return new String[0];
-        }
-    }
-
-    public Archive getRCSArchive() {
-        return archive;
-    }
-
-    public void setRCSArchive(Archive archive) {
-        this.archive = archive;
-    }
-
-    public String getArchive() throws XWikiException {
-        return getArchive(null);
-    }
-
-    public String getArchive(XWikiContext context) throws XWikiException {
-        if ((content == null) || (content.equals("")))
-            setContent("\n");
-        if (archive == null)
-            updateArchive(toXML(context));
-        if (archive == null)
-            return "";
-        else {
-            StringBuffer buffer = new StringBuffer();
-            archive.toString(buffer);
-            return buffer.toString();
-        }
-    }
-
-    public void setArchive(String text) throws XWikiException {
-        try {
-            StringInputStream is = new StringInputStream(text);
-            archive = new Archive(getFullName(), is);
-        }
-        catch (Exception e) {
-            Object[] args = {getFullName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for doc {0}", e, args);
-        }
-    }
-
-    public void updateArchive(String text) throws XWikiException {
-        try {
-            Lines lines = new Lines(text);
-            if (archive != null)
-                archive.addRevision(lines.toArray(), "");
-            else
-                archive = new Archive(lines.toArray(), getFullName(), getVersion());
-        }
-        catch (Exception e) {
-            Object[] args = {getFullName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for doc {0}", e, args);
         }
     }
 
@@ -1205,7 +1173,6 @@ public class XWikiDocument {
             // This should not happen
         }
 
-        doc.setRCSArchive(getRCSArchive());
         doc.setRCSVersion(getRCSVersion());
         doc.setAuthor(getAuthor());
         doc.setContentAuthor(getContentAuthor());
@@ -1311,13 +1278,6 @@ public class XWikiDocument {
 
         if (!getTemplate().equals(doc.getTemplate()))
             return false;
-
-        try {
-            if (!getArchive().equals(doc.getArchive()))
-                return false;
-        } catch (XWikiException e) {
-            return false;
-        }
 
         if (!getxWikiClass().equals(doc.getxWikiClass()))
             return false;
@@ -1534,7 +1494,7 @@ public class XWikiDocument {
         if (bWithVersions) {
             el = new DOMElement("versions");
             try {
-                el.addText(getArchive());
+                el.addText(getArchive(context));
             } catch (XWikiException e) {
                 return null;
             }
@@ -1632,11 +1592,13 @@ public class XWikiDocument {
         else
             setTranslation(Integer.parseInt(strans));
 
+/*
+  TODO: set archive from XML
         String archive = getElement(docel, "versions");
         if (withArchive && archive != null && archive.length() > 0) {
             setArchive(archive);
         }
-
+*/
 
         String sdate = getElement(docel, "date");
         if (!sdate.equals("")) {
@@ -1746,11 +1708,11 @@ public class XWikiDocument {
     }
 
     public List getBacklinks(XWikiContext context) throws XWikiException {
-        return getStore().loadBacklinks(getFullName(), context, true);
+        return getStore(context).loadBacklinks(getFullName(), context, true);
     }
 
     public List getLinks(XWikiContext context) throws XWikiException {
-        return getStore().loadLinks(getId(), context, true);
+        return getStore(context).loadLinks(getId(), context, true);
     }
 
     public void renameProperties(String className, Map fieldsToRename) {
@@ -2142,7 +2104,7 @@ public class XWikiDocument {
                 if (getDatabase() != null)
                     context.setDatabase(getDatabase());
 
-                tdoc = context.getWiki().getStore().loadXWikiDoc(tdoc, context);
+                tdoc = getStore(context).loadXWikiDoc(tdoc, context);
 
                 if (tdoc.isNew())
                     tdoc = this;
@@ -2351,11 +2313,11 @@ public class XWikiDocument {
     }
 
     public XWikiLock getLock(XWikiContext context) throws XWikiException {
-        XWikiLock theLock = getStore().loadLock(getId(), context, true);
+        XWikiLock theLock = getStore(context).loadLock(getId(), context, true);
         if (theLock != null) {
             int timeout = context.getWiki().getXWikiPreferenceAsInt("lock_Timeout", 30 * 60, context);
             if (theLock.getDate().getTime() + timeout * 1000 < new Date().getTime()) {
-                getStore().deleteLock(theLock, context, true);
+                getStore(context).deleteLock(theLock, context, true);
                 theLock = null;
             }
         }
@@ -2364,13 +2326,13 @@ public class XWikiDocument {
 
     public void setLock(String userName, XWikiContext context) throws XWikiException {
         XWikiLock lock = new XWikiLock(getId(), userName);
-        getStore().saveLock(lock, context, true);
+        getStore(context).saveLock(lock, context, true);
     }
 
     public void removeLock(XWikiContext context) throws XWikiException {
-        XWikiLock lock = getStore().loadLock(getId(), context, true);
+        XWikiLock lock = getStore(context).loadLock(getId(), context, true);
         if (lock != null) {
-            getStore().deleteLock(lock, context, true);
+            getStore(context).deleteLock(lock, context, true);
         }
     }
 
@@ -2520,6 +2482,10 @@ public class XWikiDocument {
         if (username.equals("XWiki.XWikiGuest"))
          return false;
         return context.getUser().equals(getFullName());
+    }
+
+    public void resetArchive(XWikiContext context) throws XWikiException {
+        getVersioningStore(context).resetRCSArchive(this, true, context);
     }
 
 }

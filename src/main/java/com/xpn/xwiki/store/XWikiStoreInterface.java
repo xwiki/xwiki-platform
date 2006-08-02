@@ -31,7 +31,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import org.apache.commons.jrcs.rcs.Version;
 
 import java.util.List;
 
@@ -40,9 +39,7 @@ public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
-    public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public List getClassList(XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;

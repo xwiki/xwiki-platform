@@ -66,7 +66,6 @@ public class AllTests {
         suite.addTestSuite(VelocityRenderTest.class);
         suite.addTestSuite(GroovyRenderTest.class);
         suite.addTestSuite(StatsTest.class);
-        suite.addTestSuite(StoreRCSFileTest.class);
         suite.addTestSuite(StoreHibernateTest.class);
         suite.addTestSuite(StoreHibernateCacheTest.class);
         suite.addTestSuite(StoreObjectRCSFileTest.class);

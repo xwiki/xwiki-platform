@@ -176,12 +176,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return doc;
     }
 
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException {
-        XWikiDocument doc2 = store.loadXWikiDoc(doc, version, context);
-        doc2.setStore(store);
-        return doc2;
-    }
-
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc, context);
         synchronized(key) {
@@ -194,10 +188,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
             getPageExistCache().flushEntry(key);
             getPageExistCache().putInCache(key, new Boolean(false));
         }
-    }
-
-    public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        return store.getXWikiDocVersions(doc, context);
     }
 
     public List getClassList(XWikiContext context) throws XWikiException {

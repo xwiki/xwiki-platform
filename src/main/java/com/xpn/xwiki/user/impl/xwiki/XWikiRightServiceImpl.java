@@ -89,6 +89,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             actionMap.put("svg", "view");
             actionMap.put("pdf", "view");
             actionMap.put("delete", "delete");
+            actionMap.put("reset", "delete");
             actionMap.put("commentadd", "comment");
             actionMap.put("register", "register");
         }

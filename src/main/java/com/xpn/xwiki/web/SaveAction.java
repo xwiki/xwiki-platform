@@ -49,7 +49,7 @@ public class SaveAction extends XWikiAction {
                 tdoc = doc;
             } else {
                 tdoc = doc.getTranslatedDocument(language, context);
-                if (tdoc == doc) {
+                if ((tdoc == doc)&&xwiki.isMultiLingual(context)) {
                     tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
                     tdoc.setLanguage(language);
                     tdoc.setStore(doc.getStore());

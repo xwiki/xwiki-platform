@@ -1,0 +1,18 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+<br />
+$msg.get("resetversionsdone")
+<br />
+<br />
+<br />
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

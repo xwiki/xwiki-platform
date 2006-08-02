@@ -155,6 +155,14 @@
             <forward name="deleted" path="/templates/deleted.vm"/>
         </action>
 
+        <action path="/reset/"
+                type="com.xpn.xwiki.web.ResetVersionsAction"
+                name="reset"
+                scope="request">
+            <forward name="delete" path="/templates/reset.vm"/>
+            <forward name="deleted" path="/templates/reset.vm"/>
+        </action>
+
         <action path="/register/"
                 type="com.xpn.xwiki.web.RegisterAction"
                 name="register"

@@ -83,7 +83,7 @@ public class EditAction extends XWikiAction {
             } else {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
-                if ((tdoc==doc)) {
+                if ((tdoc==doc)&&context.getWiki().isMultiLingual(context)) {
                     tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());

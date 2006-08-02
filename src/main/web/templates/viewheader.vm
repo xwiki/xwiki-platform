@@ -116,6 +116,7 @@
             #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
           #end
           #if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)
+            #xwikiitem($doc.getURL("reset") "resetversions")
             #xwikiitem($doc.getURL("delete") "delete")
           #end
           #if (!$isReadOnly)

@@ -1,0 +1,6 @@
+<div class="xwiki${xwikimode}b" id="xwikinav_footer">
+<div class="xwikiactions">
+<a href="$doc.getURL("view")">$msg.get("view")</a><span> | </span>
+<a href="" onclick="if (confirm('$msg.get("confirmresetversions2")')==false) { return false; } else { location='$doc.getURL("reset", "confirm=1")'; return false; }">$msg.get("resetversions")</a>
+</div>
+</div>

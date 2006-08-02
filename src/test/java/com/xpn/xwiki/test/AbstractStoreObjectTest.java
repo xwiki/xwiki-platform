@@ -37,6 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 public abstract class AbstractStoreObjectTest extends TestCase {
 
@@ -215,7 +216,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         readClassInDoc(store, bclass);
     }
 
-    public void versionedObject(XWikiStoreInterface store, BaseObject object, BaseClass bclass) throws  XWikiException {
+    public void versionedObject(XWikiStoreInterface store, XWikiVersioningStoreInterface versioningStore, BaseObject object, BaseClass bclass) throws  XWikiException {
        Utils.createDoc(store, "Test", "TestVersion", object, bclass, null, getXWikiContext());
        XWikiDocument doc1 = new XWikiDocument("Test", "TestVersion");
        doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
@@ -229,7 +230,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
        BaseObject bobject2 = doc2.getxWikiObject();
        BaseProperty bprop2 = ((BaseProperty)bobject2.safeget("age"));
        assertEquals("Age should be 5", new Integer(5), bprop2.getValue());
-       XWikiDocument doc3 = store.loadXWikiDoc(doc2, "1.1", getXWikiContext());
+       XWikiDocument doc3 = versioningStore.loadXWikiDoc(doc2, "1.1", getXWikiContext());
        BaseObject bobject3 = doc3.getxWikiObject();
        BaseProperty bprop3 = ((BaseProperty)bobject3.safeget("age"));
        assertEquals("Age should be 33", new Integer(33), bprop3.getValue());
@@ -237,20 +238,22 @@ public abstract class AbstractStoreObjectTest extends TestCase {
 
     public void testVersionedObject() throws XWikiException {
          XWikiStoreInterface store = getXWiki().getStore();
+         XWikiVersioningStoreInterface versioningStore = getXWiki().getVersioningStore();
          XWikiDocument doc = new XWikiDocument();
          Utils.prepareObject(doc, "Test.TestVersion");
          BaseClass bclass = doc.getxWikiClass();
          BaseObject bobject = doc.getObject(bclass.getName(), 0);
-         versionedObject(store, bobject, bclass);
+         versionedObject(store, versioningStore,  bobject, bclass);
      }
 
     public void testVersionedAdvancedObject() throws XWikiException {
-         XWikiStoreInterface store = getXWiki().getStore();
+        XWikiStoreInterface store = getXWiki().getStore();
+        XWikiVersioningStoreInterface versioningStore = getXWiki().getVersioningStore();
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc, "Test.TestVersion");
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
-        versionedObject(store, bobject, bclass);
+        versionedObject(store, versioningStore, bobject, bclass);
      }
 
     public void xml(XWikiStoreInterface store, BaseObject bobject, BaseClass bclass) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {

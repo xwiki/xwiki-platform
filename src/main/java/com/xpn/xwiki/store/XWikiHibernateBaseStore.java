@@ -53,8 +53,8 @@ public class XWikiHibernateBaseStore {
      * @param context
      */
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context) {
-        String path = xwiki.Param("xwiki.store.hibernate.path");
-        if (new File(path).exists() || context.getEngineContext() == null){
+        String path = xwiki.Param("xwiki.store.hibernate.path", "hibernate.cfg.xml");
+        if ((path!=null)&&((new File(path).exists() || context.getEngineContext() == null))) {
             setPath (path);
         } else {
             try {

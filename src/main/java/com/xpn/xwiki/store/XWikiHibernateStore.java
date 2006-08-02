@@ -235,7 +235,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setContentAuthor(doc.getAuthor());
                 }
                 doc.incrementVersion();
-                doc.updateArchive(doc.toXML(context));
+                //  TODO: versioning change this
+                context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
             } else {
                 // Make sure the getArchive call has been made once
                 // with a valid context
@@ -455,77 +456,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
-        XWikiDocument doc = new XWikiDocument(basedoc.getWeb(), basedoc.getName());
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
-        try {
-            // Start monitoring timer
-            if (monitor!=null)
-                monitor.startTimer("hibernate");
-            doc.setStore(this);
-            Archive archive = basedoc.getRCSArchive();
-            doc.setRCSArchive(archive);
-
-            if (archive == null) {
-                doc.updateArchive(doc.toXML(context));
-                archive = basedoc.getRCSArchive();
-            }
-
-            Version v = null;
-            try {
-              v = archive.getRevisionVersion(version);
-            } catch (Exception e) {}
-
-            if (v==null) {
-                Object[] args = { doc.getFullName(), version.toString() };
-                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
-                        "Version {1} does not exist while reading document {0}", null,args);                
-            }
-
-            if (!version.equals(v.toString())) {
-                doc.setVersion(version);
-                return doc;
-            }
-            Object[] text = (Object[]) archive.getRevision(version);
-            if (text[0].toString().startsWith("<")) {
-                StringBuffer content = new StringBuffer();
-                for (int i=0;i<text.length;i++) {
-                    String line = text[i].toString();
-                    content.append(line);
-                    content.append("\n");
-                }
-                doc.fromXML(content.toString());
-            } else {
-                StringBuffer content = new StringBuffer();
-                boolean bMetaDataDone = false;
-                for (int i=0;i<text.length;i++) {
-                    String line = text[i].toString();
-                    if (bMetaDataDone||(XWikiRCSFileStore.parseMetaData(doc,line)==false)) {
-                        content.append(line);
-                        content.append("\n");
-                    }
-                    doc.setContent(content.toString());
-                }
-            }
-            // Make sure the document has the same name
-            // as the new document (in case there was a name change
-            doc.setName(basedoc.getName());
-            doc.setWeb(basedoc.getWeb());
-        } catch (XWikiException e) {
-            throw e;
-        } catch (Exception e) {
-            Object[] args = { doc.getFullName(), version.toString() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION,
-                    "Exception while reading document {0} version {1}", e, args);
-        } finally {
-            // End monitoring timer
-            if (monitor!=null)
-                monitor.endTimer("hibernate");
-        }
-        return doc;
-    }
-
-
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
@@ -600,33 +530,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
         }
     }
-
-    public Version[] getXWikiDocVersions(XWikiDocument doc) throws XWikiException {
-        return getXWikiDocVersions(doc, null);
-    }
-
-    public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        try {
-            if (doc.getStore()==null) {
-                doc = loadXWikiDoc(doc, context);
-            }
-
-            if (doc.getRCSArchive()==null)
-                return new Version[0];
-
-            Node[] nodes = doc.getRCSArchive().changeLog();
-            Version[] versions = new Version[nodes.length];
-            for (int i=0;i<nodes.length;i++) {
-                versions[i] = nodes[i].getVersion();
-            }
-            return versions;
-        } catch (Exception e) {
-            Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
-                    "Exception while reading document {0} revisions", e, args);
-        }
-    }
-
 
     public void saveXWikiObject(BaseObject object, XWikiContext context, boolean bTransaction) throws XWikiException {
         saveXWikiCollection(object, context, bTransaction);
@@ -794,6 +697,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             } catch (Exception e) {}
+
+            // Load strings, integers, dates all at once
+
 
             if (!className.equals("internal")) {
                 HashMap map = new HashMap();
@@ -2165,5 +2071,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
         return searchDocuments(wheresql,  distinctbyname, customMapping, true, nb, start, context);
     }
+
+  /*
+    public void updateArchive(String text) throws XWikiException {
+        try {
+            Lines lines = new Lines(text);
+            if (archive != null)
+                archive.addRevision(lines.toArray(), "");
+            else
+                archive = new Archive(lines.toArray(), getFullName(), getVersion());
+        }
+        catch (Exception e) {
+            Object[] args = {getFullName()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
+                    "Exception while manipulating the archive for doc {0}", e, args);
+        }
+    }
+  */
 }
 

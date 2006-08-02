@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -97,15 +98,15 @@ public class StoreTest extends HibernateTestCase {
            assertEquals("toto", content1);
          }
 
-    public void versionedReadWrite(XWikiStoreInterface store,String web, String name) throws XWikiException {
+    public void versionedReadWrite(XWikiStoreInterface store, XWikiVersioningStoreInterface versioningStore, String web, String name) throws XWikiException {
         XWikiDocument doc3 = new XWikiDocument(web, name);
         doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
-        XWikiDocument doc4 = store.loadXWikiDoc(doc3,Utils.version, getXWikiContext());
+        XWikiDocument doc4 = versioningStore.loadXWikiDoc(doc3,Utils.version, getXWikiContext());
         String content4 = doc4.getContent();
         assertEquals(Utils.content1,content4);
         assertEquals(doc4.getVersion(),Utils.version);
         assertEquals(doc4.getAuthor(), Utils.author);
-        Version[] versions = store.getXWikiDocVersions(doc4, getXWikiContext());
+        Version[] versions = versioningStore.getXWikiDocVersions(doc4, getXWikiContext());
         assertTrue(versions.length==2);
     }
 
@@ -156,25 +157,25 @@ public class StoreTest extends HibernateTestCase {
     public void testVersionedReadWrite() throws XWikiException {
         Utils.setStandardData();
         standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name, getXWikiContext());
-        versionedReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(), Utils.web, Utils.name);
     }
 
     public void testVersionedReadWriteWithAccents() throws XWikiException {
         Utils.setStandardAccentData();
         standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name, getXWikiContext());
-        versionedReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(),Utils.web, Utils.name);
     }
 
     public void testMediumReadWrite() throws XWikiException {
         Utils.setMediumData();
         standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name, getXWikiContext());
-        versionedReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(), Utils.web, Utils.name);
     }
 
     public void testBigVersionedReadWrite() throws XWikiException, IOException {
         Utils.setBigData();
         standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name2, getXWikiContext());
-        versionedReadWrite(getXWiki().getStore(), Utils.web, Utils.name2);
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(), Utils.web, Utils.name2);
     }
 
     public void attachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {

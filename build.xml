@@ -82,10 +82,10 @@
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
     <fileset id="libs.hib.fileset" dir="${lib.dir}"
-      includes="hibernate-3.0.3.jar" />
+      includes="hibernate-3.1.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
-      includes="c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,hsqldb-1.7.3.jar,odmg-3.0.jar,oscache-2.3.2M.jar,concurrent.jar,jgroups-2.2.9.1.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
+      includes="c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,hsqldb-1.8.0.jar,odmg-3.0.jar,oscache-2.3.2M.jar,concurrent.jar,jgroups-2.2.9.1.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
      	commons-beanutils-1.7.0.jar,commons-codec-1.3.jar,commons-collections-3.1.jar,commons-dbcp-1.2.1.jar,commons-digester-1.6.jar,commons-fileupload-1.0.jar,commons-lang-2.1.jar,commons-logging-1.0.4.jar,commons-pool-1.1.jar,commons-net-1.1.0.jar,commons-httpclient-2.0.2.jar,ecs-1.4.2.jar,oro-2.0.8.jar,log4j-1.2.8.jar,
      	org.apache.commons.jrcs.rcs.jar,
      	struts-1.2.4.jar,

@@ -112,6 +112,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiConfig config;
     private XWikiStoreInterface store;
     private XWikiAttachmentStoreInterface attachmentStore;
+    private XWikiVersioningStoreInterface versioningStore;
     private XWikiRenderingEngine renderingEngine;
     private XWikiPluginManager pluginManager;
     private XWikiNotificationManager notificationManager;
@@ -487,15 +488,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             Object[] args = new Object[]{this, context};
             setAttachmentStore( (XWikiAttachmentStoreInterface) Class.forName(attachmentStoreclass).getConstructor(classes).newInstance(args));
         } catch (InvocationTargetException e) {
-            Object[] args = {storeclass};
+            Object[] args = {attachmentStoreclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                    "Cannot load store class {0}", e.getTargetException(), args);
+                    "Cannot load attachment store class {0}", e.getTargetException(), args);
         } catch (Exception e) {
-            Object[] args = {storeclass};
+            Object[] args = {attachmentStoreclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                    "Cannot load store class {0}", e, args);
+                    "Cannot load attachment store class {0}", e, args);
+        }
+
+        String versioningStoreclass = Param("xwiki.store.versioning.class", "com.xpn.xwiki.store.XWikiHibernateVersioningStore");
+        try {
+            Class[] classes = new Class[]{this.getClass(), context.getClass()};
+            Object[] args = new Object[]{this, context};
+            setVersioningStore( (XWikiVersioningStoreInterface) Class.forName(versioningStoreclass).getConstructor(classes).newInstance(args));
+        } catch (InvocationTargetException e) {
+            Object[] args = {versioningStoreclass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load versioning store class {0}", e.getTargetException(), args);
+        } catch (Exception e) {
+            Object[] args = {versioningStoreclass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                    "Cannot load versioning store class {0}", e, args);
         }
 
         resetRenderingEngine(context);
@@ -692,6 +710,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return attachmentStore;
     }
 
+    public XWikiVersioningStoreInterface getVersioningStore() {
+        return versioningStore;
+    }
+
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
         getStore().saveXWikiDoc(doc, context);
     }
@@ -713,7 +735,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             } else if (revision.equals(doc.getVersion())) {
                 newdoc = doc;
             } else {
-                newdoc = getStore().loadXWikiDoc(doc, revision, context);
+                newdoc = getVersioningStore().loadXWikiDoc(doc, revision, context);
             }
         } catch (XWikiException e) {
             if (revision.equals("1.1") || revision.equals("1.0"))
@@ -1454,6 +1476,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void setAttachmentStore(XWikiAttachmentStoreInterface attachmentStore) {
           this.attachmentStore = attachmentStore;
+    }
+
+    public void setVersioningStore(XWikiVersioningStoreInterface versioningStore) {
+          this.versioningStore = versioningStore;
     }
 
     public void setVersion(String version) {
@@ -2320,7 +2346,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
-                        tdoc.setRCSArchive(null);
+                        //  TODO: versioning change this
+                        //  tdoc.setRCSArchive(null);
                     }
                     saveDocument(tdoc, context);
 
@@ -2361,7 +2388,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         // forget past versions
                         if (reset) {
                             ttdoc.setVersion("1.1");
-                            ttdoc.setRCSArchive(null);
+                            //  TODO: versioning change this
+                            // ttdoc.setRCSArchive(null);
                         }
                         saveDocument(ttdoc, context);
                     }
@@ -2386,7 +2414,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
-                        tdoc.setRCSArchive(null);
+                        //  TODO: versioning change this
+                        // tdoc.setRCSArchive(null);
                     }
                     saveDocument(tdoc, context);
                     List attachlist = tdoc.getAttachmentList();
@@ -3545,5 +3574,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         macrosmapping += "\r\n" + xwiki.getXWikiPreference("macros_mapping", "", context);
         return macrosmapping;
     }
+
 }
 

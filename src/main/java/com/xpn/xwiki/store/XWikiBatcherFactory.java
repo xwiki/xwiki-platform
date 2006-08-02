@@ -21,10 +21,8 @@
  */
 package com.xpn.xwiki.store;
 
-import org.hibernate.jdbc.BatchingBatcherFactory;
-import org.hibernate.jdbc.Batcher;
-import org.hibernate.jdbc.JDBCContext;
-import org.hibernate.jdbc.BatchingBatcher;
+import org.hibernate.jdbc.*;
+import org.hibernate.Interceptor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +32,8 @@ import org.hibernate.jdbc.BatchingBatcher;
  * To change this template use File | Settings | File Templates.
  */
 public class XWikiBatcherFactory extends BatchingBatcherFactory {
-    public Batcher createBatcher(JDBCContext jdbcContext) {
-        return new XWikiBatcher( jdbcContext );
+
+    public Batcher createBatcher(ConnectionManager cmgr, Interceptor interceptor) {
+        return new XWikiBatcher( cmgr, interceptor );
     }
 }

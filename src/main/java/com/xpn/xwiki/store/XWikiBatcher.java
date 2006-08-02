@@ -23,8 +23,10 @@ package com.xpn.xwiki.store;
 
 import org.hibernate.jdbc.BatchingBatcher;
 import org.hibernate.jdbc.JDBCContext;
+import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.HibernateException;
 import org.hibernate.ScrollMode;
+import org.hibernate.Interceptor;
 import org.hibernate.dialect.Dialect;
 
 import java.sql.SQLException;
@@ -56,8 +58,8 @@ public class XWikiBatcher extends BatchingBatcher {
         super.addToBatch(expectedRowCount);
     }
 
-    public XWikiBatcher(JDBCContext jdbcContext) {
-        super(jdbcContext);
+    public XWikiBatcher(ConnectionManager cmgr, Interceptor interceptor) {
+        super(cmgr, interceptor);
     }
 
     public void abortBatch(SQLException sqle) {
@@ -75,9 +77,9 @@ public class XWikiBatcher extends BatchingBatcher {
         getSQLStats().incrementPreparedSQLCounter();
     }
 
-    public PreparedStatement prepareStatement(String sql, boolean getGeneratedKeys) throws SQLException, HibernateException {
+    public PreparedStatement prepareStatement(String sql, boolean getGeneratedKeys, String[] param) throws SQLException, HibernateException {
         addToPreparedSql(sql);
-        return super.prepareStatement(sql, getGeneratedKeys);
+        return super.prepareStatement(sql, getGeneratedKeys, param);
     }
 
     public PreparedStatement prepareSelectStatement(String sql) throws SQLException, HibernateException {

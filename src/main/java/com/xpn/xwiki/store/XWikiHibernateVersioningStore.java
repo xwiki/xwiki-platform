@@ -180,6 +180,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             doc.setName(basedoc.getName());
             doc.setWeb(basedoc.getWeb());
         } catch (Exception e) {
+            if (e instanceof XWikiException)
+             throw (XWikiException) e;
             Object[] args = { doc.getFullName(), version.toString() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_VERSION,
                     "Exception while reading document {0} version {1}", e, args);

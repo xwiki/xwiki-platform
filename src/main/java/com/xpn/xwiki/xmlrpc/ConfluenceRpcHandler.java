@@ -28,7 +28,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.commons.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.Version;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;

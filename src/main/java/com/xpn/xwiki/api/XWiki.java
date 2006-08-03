@@ -39,7 +39,7 @@ import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
-import org.apache.commons.jrcs.diff.Chunk;
+import org.suigeneris.jrcs.diff.Chunk;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

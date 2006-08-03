@@ -9,12 +9,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import org.apache.commons.jrcs.rcs.Version;
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Node;
+import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Node;
 import org.hibernate.Session;
 import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
 
 /**
  * Created by IntelliJ IDEA.
@@ -68,8 +67,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public String getXWikiDocArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
-            XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
-            loadXWikiDocArchive(archivedoc, true, context);
+            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
             return archivedoc.getArchive();
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -80,13 +78,32 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public Archive getXWikiDocRCSArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
-            XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
-            loadXWikiDocArchive(archivedoc, true, context);
+            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
             return archivedoc.getRCSArchive();
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
                     "Exception while reading document {0} revisions", e, args);
+        }
+    }
+
+    private XWikiDocumentArchive getDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
+        synchronized (key) {
+         XWikiDocumentArchive archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
+         if (archivedoc==null) {
+             String db = context.getDatabase();
+             try {
+                 if (doc.getDatabase()!=null)
+                     context.setDatabase(doc.getDatabase());
+                 archivedoc = new XWikiDocumentArchive(doc.getId());
+                 loadXWikiDocArchive(archivedoc, true, context);
+             } finally {
+                 context.setDatabase(db);
+             }
+          context.addDocumentArchive(key, archivedoc);
+         }
+            return archivedoc;
         }
     }
 
@@ -201,8 +218,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
-            loadXWikiDocArchive(archivedoc, bTransaction, context);
+            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
             archivedoc.resetArchive(doc.getFullName(), doc.getContent(), doc.getVersion());
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {
@@ -228,8 +244,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
-            loadXWikiDocArchive(archivedoc, bTransaction, context);
+            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
             archivedoc.updateArchive(doc.getFullName(), text);
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {

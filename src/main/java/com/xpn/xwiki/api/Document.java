@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.jrcs.diff.DifferentiationFailedException;
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Version;
+import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

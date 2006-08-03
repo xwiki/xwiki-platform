@@ -25,8 +25,8 @@ package com.xpn.xwiki.doc;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Lines;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.util.ToString;
 import org.apache.commons.codec.binary.Base64;
 
 import com.xpn.xwiki.XWikiContext;
@@ -107,13 +107,13 @@ public class XWikiAttachmentArchive {
             attachment.incrementVersion();
             attachment.setDate(new Date());
             String sdata = attachment.toStringXML(true, false, context);
-            Lines lines = new Lines(sdata);
+            Object[] lines = ToString.stringToArray(sdata);
 
             if (archive!=null) {
-                archive.addRevision(lines.toArray(),"");
+                archive.addRevision(lines,"");
             }
             else
-                archive = new Archive(lines.toArray(),getAttachment().getFilename(),getAttachment().getVersion());
+                archive = new Archive(lines,getAttachment().getFilename(),getAttachment().getVersion());
         }
         catch (Exception e) {
             Object[] args = { getAttachment().getFilename() };

@@ -321,8 +321,6 @@
         <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-fileupload-1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.rcs.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/org.apache.commons.jrcs.diff.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-net-1.1.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/oro-2.0.8.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/commons-logging-api-1.0.4.jar!/" />
@@ -553,6 +551,14 @@
         <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/concurrent.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2M.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="Jrcs">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.rcs-0.3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

@@ -32,6 +32,7 @@ import java.util.HashMap;
 import org.apache.xmlrpc.XmlRpcServer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiEngineContext;
@@ -71,6 +72,8 @@ public class XWikiContext extends Hashtable {
 
    // Used to avoid recursive loading of documents if there are recursives usage of classes
    private Map classCache = new HashMap();
+   // Used to avoir reloading archives in the same request
+   private Map archiveCache = new HashMap();
 
    public XWikiContext() {
    }
@@ -278,6 +281,16 @@ public class XWikiContext extends Hashtable {
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public BaseClass getBaseClass(String name) {
         return (BaseClass) classCache.get(name);
+    }
+
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    public void addDocumentArchive(String  key, Object obj) {
+        classCache.put(key, obj);
+    }
+
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    public Object getDocumentArchive(String key) {
+        return classCache.get(key);
     }
 
 }

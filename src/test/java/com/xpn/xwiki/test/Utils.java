@@ -40,9 +40,9 @@ import java.util.Vector;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-import org.apache.commons.jrcs.diff.Diff;
-import org.apache.commons.jrcs.diff.Revision;
-import org.apache.commons.jrcs.util.ToString;
+import org.suigeneris.jrcs.diff.Diff;
+import org.suigeneris.jrcs.diff.Revision;
+import org.suigeneris.jrcs.util.ToString;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 

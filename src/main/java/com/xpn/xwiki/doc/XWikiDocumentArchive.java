@@ -4,9 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
 import com.xpn.xwiki.XWikiException;
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Version;
-import org.apache.commons.jrcs.rcs.Lines;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.util.ToString;
 
 public class XWikiDocumentArchive {
     private static final Log log = LogFactory.getLog(XWikiDocumentArchive.class);
@@ -53,8 +53,8 @@ public class XWikiDocumentArchive {
                 StringInputStream is = new StringInputStream(text);
                 archive = new Archive("", is);
             } else {
-                Lines lines = new Lines("");
-                archive = new Archive(lines.toArray(), "", "1.0");
+                Object[] lines = ToString.stringToArray(text);
+                archive = new Archive(lines, "", "1.0");
             }
         }
         catch (Exception e) {
@@ -66,11 +66,11 @@ public class XWikiDocumentArchive {
 
     public void updateArchive(String docname, String text) throws XWikiException {
         try {
-            Lines lines = new Lines(text);
+            Object[] lines = ToString.stringToArray(text);
             if (archive != null)
-                archive.addRevision(lines.toArray(), "");
+                archive.addRevision(lines, "");
             else
-                archive = new Archive(lines.toArray(), docname, "1.0");
+                archive = new Archive(lines, docname, "1.0");
         }
         catch (Exception e) {
             Object[] args = { docname };
@@ -109,7 +109,7 @@ public class XWikiDocumentArchive {
     }
 
     public void resetArchive(String docname, String text, String version) throws XWikiException {
-        Lines lines = new Lines(text);
-        archive = new Archive(lines.toArray(), docname, version);
+        Object[] lines = ToString.stringToArray(text);
+        archive = new Archive(lines, docname, version);
     }
 }

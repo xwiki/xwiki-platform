@@ -32,9 +32,9 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.jrcs.rcs.Archive;
-import org.apache.commons.jrcs.rcs.Node;
-import org.apache.commons.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Node;
+import org.suigeneris.jrcs.rcs.Version;
 import org.dom4j.Element;
 import org.dom4j.Document ;
 import org.dom4j.DocumentException;

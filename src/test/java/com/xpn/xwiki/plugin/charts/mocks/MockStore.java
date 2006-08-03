@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.commons.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

@@ -887,7 +887,7 @@
       <file leaf-file-name="XWiki.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.72727275">
+            <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.74725276">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -898,7 +898,7 @@
       <file leaf-file-name="XWikiDocument.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.43137255">
+            <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.44322345">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -929,7 +929,7 @@
       <file leaf-file-name="XWikiHibernateAttachmentStore.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateAttachmentStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.33333334">
+            <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.34249085">
               <folding />
             </state>
           </provider>
@@ -949,7 +949,7 @@
       <file leaf-file-name="XWikiCacheStore.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiCacheStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="131" column="19" selection-start="4765" selection-end="4765" vertical-scroll-proportion="0.030303031">
+            <state line="131" column="19" selection-start="4765" selection-end="4765" vertical-scroll-proportion="0.031135531">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -1096,7 +1096,7 @@
   </component>
   <component name="ModuleEditorState">
     <option name="LAST_EDITED_MODULE_NAME" value="xwikibase" />
-    <option name="LAST_EDITED_TAB_NAME" value="Paths" />
+    <option name="LAST_EDITED_TAB_NAME" value="Libraries (Classpath)" />
   </component>
   <component name="NamedScopeManager" />
   <component name="PackagesPane">
@@ -2776,11 +2776,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1688" height="1020" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.30877742" order="6" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.3394608" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="true" weight="0.3394608" order="0" x="-87" y="100" width="469" height="491" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39545456" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22168285" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.41136363" order="9" />
@@ -2978,7 +2978,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiCacheStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="131" column="19" selection-start="4765" selection-end="4765" vertical-scroll-proportion="0.030303031">
+        <state line="131" column="19" selection-start="4765" selection-end="4765" vertical-scroll-proportion="0.031135531">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3024,7 +3024,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.43137255">
+        <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.44322345">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3042,7 +3042,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateAttachmentStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.33333334">
+        <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.34249085">
           <folding />
         </state>
       </provider>
@@ -3058,7 +3058,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.72727275">
+        <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.74725276">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

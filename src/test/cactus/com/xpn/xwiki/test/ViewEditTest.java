@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.store.XWikiBatcher;
+// import com.xpn.xwiki.store.XWikiBatcher;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import org.apache.cactus.WebRequest;
@@ -1939,12 +1939,12 @@ public class ViewEditTest extends ServletTest {
     }
 
     public void testViewCountQueries() throws IOException, Throwable {
-        XWikiBatcher.getSQLStats().resetStats();
+   //     XWikiBatcher.getSQLStats().resetStats();
         launchTest();
-        XWikiBatcher.getSQLStats().printSQLList(System.out);
-        XWikiBatcher.getSQLStats().resetStats();
+   //      XWikiBatcher.getSQLStats().printSQLList(System.out);
+   //     XWikiBatcher.getSQLStats().resetStats();
         launchTest();
-        XWikiBatcher.getSQLStats().printSQLList(System.out);
+   //     XWikiBatcher.getSQLStats().printSQLList(System.out);
     }
 
 

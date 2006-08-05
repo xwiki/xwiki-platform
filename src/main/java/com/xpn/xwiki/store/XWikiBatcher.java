@@ -21,6 +21,7 @@
  */
 package com.xpn.xwiki.store;
 
+/*
 import org.hibernate.jdbc.BatchingBatcher;
 import org.hibernate.jdbc.JDBCContext;
 import org.hibernate.jdbc.ConnectionManager;
@@ -33,6 +34,7 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.CallableStatement;
+*/
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,6 +43,7 @@ import java.sql.CallableStatement;
  * Time: 10:56:45
  * To change this template use File | Settings | File Templates.
  */
+/*
 public class XWikiBatcher extends BatchingBatcher {
 
     private static ThreadLocal sqlStats = new ThreadLocal() {
@@ -123,3 +126,4 @@ public class XWikiBatcher extends BatchingBatcher {
         getSQLStats().resetOnNextSQL();
     }
 }
+*/

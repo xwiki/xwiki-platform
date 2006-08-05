@@ -31,9 +31,11 @@ import org.hibernate.Interceptor;
  * Time: 12:02:10
  * To change this template use File | Settings | File Templates.
  */
+/*
 public class XWikiBatcherFactory extends BatchingBatcherFactory {
 
     public Batcher createBatcher(ConnectionManager cmgr, Interceptor interceptor) {
         return new XWikiBatcher( cmgr, interceptor );
     }
 }
+*/

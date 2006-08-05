@@ -884,10 +884,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="XWiki.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="XWiki.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.74725276">
+            <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.8908297">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -895,10 +895,48 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="XWikiBatcherFactory.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcherFactory.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="34" column="0" selection-start="1165" selection-end="1165" vertical-scroll-proportion="0.48253274">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="XWikiBatcher.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcher.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="37" column="0" selection-start="1345" selection-end="1345" vertical-scroll-proportion="0.6310044">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ViewEditTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1946" column="0" selection-start="87556" selection-end="87556" vertical-scroll-proportion="0.33187774">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BufferedResponse.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/includeservletasstring/BufferedResponse.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="40" column="0" selection-start="1248" selection-end="1248" vertical-scroll-proportion="0.33187774">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="XWikiDocument.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.44322345">
+            <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.52838427">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -909,19 +947,8 @@
       <file leaf-file-name="Page.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/xmlrpc/Page.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="54" column="27" selection-start="1975" selection-end="1975" vertical-scroll-proportion="0.18181819">
+            <state line="54" column="27" selection-start="1975" selection-end="1975" vertical-scroll-proportion="0.22270742">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiAttachment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiAttachment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="435" column="57" selection-start="13157" selection-end="13157" vertical-scroll-proportion="0.32976827">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -929,7 +956,7 @@
       <file leaf-file-name="XWikiHibernateAttachmentStore.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateAttachmentStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.34249085">
+            <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.40829694">
               <folding />
             </state>
           </provider>
@@ -938,18 +965,7 @@
       <file leaf-file-name="XWikiHibernateStore.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="118" column="58" selection-start="4310" selection-end="4310" vertical-scroll-proportion="0.23626374">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiCacheStore.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiCacheStore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="131" column="19" selection-start="4765" selection-end="4765" vertical-scroll-proportion="0.031135531">
+            <state line="118" column="58" selection-start="4310" selection-end="4310" vertical-scroll-proportion="0.29119638">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -960,28 +976,10 @@
       <file leaf-file-name="XWikiHibernateVersioningStore.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateVersioningStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="89" column="43" selection-start="3541" selection-end="3541" vertical-scroll-proportion="0.4848485">
+            <state line="89" column="43" selection-start="3541" selection-end="3541" vertical-scroll-proportion="0.59388644">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiGroupServiceImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/user/impl/xwiki/XWikiGroupServiceImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="66" column="0" selection-start="2667" selection-end="2667" vertical-scroll-proportion="0.030303031">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiContext.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWikiContext.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="291" column="47" selection-start="7378" selection-end="7378" vertical-scroll-proportion="1.1836007">
-              <folding />
             </state>
           </provider>
         </entry>
@@ -2776,21 +2774,21 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1688" height="1020" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.30877742" order="6" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="true" weight="0.3394608" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.3394608" order="0" x="-87" y="100" width="469" height="491" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39545456" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22168285" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.41136363" order="9" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.41136363" order="9" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Profile" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.46596858" order="8" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="8" />
       <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27931595" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.29431817" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.29431817" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.15110683" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.48977274" order="3" />
@@ -2942,31 +2940,6 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/web/WEB-INF/xwiki.cfg">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="29" selection-start="1072" selection-end="1072" vertical-scroll-proportion="0.48128343">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Attachment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="7" selection-start="994" selection-end="994" vertical-scroll-proportion="0.037444934">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocumentArchive.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="0" selection-start="1854" selection-end="1854" vertical-scroll-proportion="0.037444934">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiAttachmentArchive.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="28" column="0" selection-start="1040" selection-end="1040" vertical-scroll-proportion="0.03024911">
@@ -2987,28 +2960,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/user/impl/xwiki/XWikiGroupServiceImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="0" selection-start="2667" selection-end="2667" vertical-scroll-proportion="0.030303031">
+        <state line="66" column="0" selection-start="2667" selection-end="2667" vertical-scroll-proportion="0.037117902">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWikiContext.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="291" column="47" selection-start="7378" selection-end="7378" vertical-scroll-proportion="1.1836007">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/includeservletasstring/BufferedResponse.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="0" selection-start="1248" selection-end="1248" vertical-scroll-proportion="0.037444934">
+        <state line="291" column="47" selection-start="7378" selection-end="7378" vertical-scroll-proportion="1.4497817">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiAttachment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="435" column="57" selection-start="13157" selection-end="13157" vertical-scroll-proportion="0.32976827">
+        <state line="435" column="57" selection-start="13157" selection-end="13157" vertical-scroll-proportion="0.40393013">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3017,14 +2983,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/xmlrpc/Page.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="27" selection-start="1975" selection-end="1975" vertical-scroll-proportion="0.18181819">
+        <state line="54" column="27" selection-start="1975" selection-end="1975" vertical-scroll-proportion="0.22270742">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.44322345">
+        <state line="824" column="71" selection-start="25609" selection-end="25609" vertical-scroll-proportion="0.52838427">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3033,7 +2999,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="58" selection-start="4310" selection-end="4310" vertical-scroll-proportion="0.23626374">
+        <state line="118" column="58" selection-start="4310" selection-end="4310" vertical-scroll-proportion="0.29119638">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3042,14 +3008,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateAttachmentStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.34249085">
+        <state line="62" column="93" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.40829694">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateVersioningStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="89" column="43" selection-start="3541" selection-end="3541" vertical-scroll-proportion="0.4848485">
+        <state line="89" column="43" selection-start="3541" selection-end="3541" vertical-scroll-proportion="0.59388644">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3058,7 +3024,37 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.74725276">
+        <state line="260" column="83" selection-start="10590" selection-end="10590" vertical-scroll-proportion="0.8908297">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/includeservletasstring/BufferedResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="0" selection-start="1248" selection-end="1248" vertical-scroll-proportion="0.33187774">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcherFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="0" selection-start="1165" selection-end="1165" vertical-scroll-proportion="0.48253274">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiBatcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="0" selection-start="1345" selection-end="1345" vertical-scroll-proportion="0.6310044">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1946" column="0" selection-start="87556" selection-end="87556" vertical-scroll-proportion="0.33187774">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

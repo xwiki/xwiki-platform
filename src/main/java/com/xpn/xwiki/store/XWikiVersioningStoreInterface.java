@@ -16,4 +16,6 @@ public interface XWikiVersioningStoreInterface {
     public String getXWikiDocArchive(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, String version, XWikiContext context) throws XWikiException;
     public void resetRCSArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException;
+
+    XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException;
 }

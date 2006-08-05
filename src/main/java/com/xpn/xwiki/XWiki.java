@@ -41,6 +41,7 @@ import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.notify.*;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -235,6 +236,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException, XWikiException {
+             updateDatabase(appname, force, true, context);
+    }
+
+    public void updateDatabase(String appname, boolean force, boolean initClasses, XWikiContext context) throws HibernateException, XWikiException {
         synchronized (appname) {
             String database = context.getDatabase();
 
@@ -249,14 +254,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
 
                 // Make sure these classes exists
-                getPrefsClass(context);
-                getUserClass(context);
-                getGroupClass(context);
-                getRightsClass(context);
-                getCommentsClass(context);
-                getSkinClass(context);
-                getGlobalRightsClass(context);
-                getPluginManager().virtualInit(context);
+                if (initClasses) {
+                    getPrefsClass(context);
+                    getUserClass(context);
+                    getGroupClass(context);
+                    getRightsClass(context);
+                    getCommentsClass(context);
+                    getSkinClass(context);
+                    getGlobalRightsClass(context);
+                    getPluginManager().virtualInit(context);
+                }
 
                 // Add initdone which will allow to
                 // bypass some initializations
@@ -2299,11 +2306,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean copyDocument(String docname, String targetdocname, XWikiContext context) throws XWikiException {
-        return copyDocument(docname, targetdocname, null, null, null, false, context);
+        return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
 
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage, XWikiContext context) throws XWikiException {
-        return copyDocument(docname, targetdocname, null, null, wikilanguage, false, context);
+        return copyDocument(docname, targetdocname, null, null, wikilanguage, true, context);
     }
 
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage, XWikiContext context) throws XWikiException {
@@ -2346,10 +2353,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
-                        //  TODO: versioning change this
-                        //  tdoc.setRCSArchive(null);
                     }
                     saveDocument(tdoc, context);
+
+                    if (!reset) {
+                        if (sourceWiki != null)
+                            context.setDatabase(sourceWiki);
+                        XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
+                        if (targetWiki != null)
+                            context.setDatabase(targetWiki);
+                        txda.setId(tdoc.getId());
+                        getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                    }
 
                     List attachlist = tdoc.getAttachmentList();
                     if (attachlist.size() > 0) {
@@ -2388,10 +2403,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         // forget past versions
                         if (reset) {
                             ttdoc.setVersion("1.1");
-                            //  TODO: versioning change this
-                            // ttdoc.setRCSArchive(null);
                         }
                         saveDocument(ttdoc, context);
+
+                        if (!reset) {
+                            if (sourceWiki != null)
+                                context.setDatabase(sourceWiki);
+                            XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
+                            if (targetWiki != null)
+                                context.setDatabase(targetWiki);
+                            txda.setId(ttdoc.getId());
+                            getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                        }
+
                     }
                 } else {
                     // We want only one language in the end
@@ -2414,10 +2438,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
-                        //  TODO: versioning change this
-                        // tdoc.setRCSArchive(null);
                     }
+
                     saveDocument(tdoc, context);
+
+                    if (!reset) {
+                        if (sourceWiki != null)
+                            context.setDatabase(sourceWiki);
+                        XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
+                        if (targetWiki != null)
+                            context.setDatabase(targetWiki);
+                        txda.setId(tdoc.getId());
+                        getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                    }
+
                     List attachlist = tdoc.getAttachmentList();
                     if (attachlist.size() > 0) {
                         for (int i = 0; i < attachlist.size(); i++) {
@@ -2559,7 +2593,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             try {
-                updateDatabase(wikiName, true, context);
+                updateDatabase(wikiName, true, false, context);
             } catch (Exception e) {
                 log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki database shema update threw exception", e);
                 return -6;
@@ -2577,11 +2611,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // Modify rights in user wiki
             context.setDatabase(wikiName);
-            XWikiDocument wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
+            /*XWikiDocument wikiprefdoc = getDocument("XWiki.XWikiPreferences", context);
             wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "users", wikiAdmin);
             wikiprefdoc.setStringValue("XWiki.XWikiGlobalRights", "levels", "admin, edit");
             wikiprefdoc.setIntValue("XWiki.XWikiGlobalRights", "allow", 1);
             saveDocument(wikiprefdoc, context);
+            */
             return 1;
         } catch (Exception e) {
             log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin + ") failed: " + "wiki creation threw exception", e);

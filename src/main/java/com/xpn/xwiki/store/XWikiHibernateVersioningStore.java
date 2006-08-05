@@ -16,7 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.ObjectNotFoundException;
 
 /**
- * Created by IntelliJ IDEA.
+ * Created by IntelliJ IDEA.                                                   
  * User: ludovic
  * Date: 6 juin 2006
  * Time: 21:32:07
@@ -67,7 +67,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public String getXWikiDocArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
-            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
+            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
             return archivedoc.getArchive();
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -78,7 +78,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public Archive getXWikiDocRCSArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
-            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
+            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
             return archivedoc.getRCSArchive();
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -87,7 +87,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    private XWikiDocumentArchive getDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
         synchronized (key) {
          XWikiDocumentArchive archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
@@ -218,7 +218,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
+            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
             archivedoc.resetArchive(doc.getFullName(), doc.getContent(), doc.getVersion());
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {
@@ -244,7 +244,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            XWikiDocumentArchive archivedoc = getDocumentArchive(doc, context);
+            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
             archivedoc.updateArchive(doc.getFullName(), text);
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {

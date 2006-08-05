@@ -1440,9 +1440,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             context.remove("links");
 
             // call to RenderEngine and converting the list of links into a list of backlinks
-            XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
-            renderer.render(doc.getContent(), doc, doc, context);
-
+            try {
+                XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
+                renderer.render(doc.getContent(), doc, doc, context);
+            } catch (Exception e) {
+                // If the rendering fails lets forget backlinks without errors
+            }
+                
             List links = (List)context.get("links");
 
             if (links != null){

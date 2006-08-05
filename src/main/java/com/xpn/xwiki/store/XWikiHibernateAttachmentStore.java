@@ -3,6 +3,7 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
@@ -62,23 +63,33 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
+            String db = context.getDatabase();
+            String attachdb = (attachment.getDoc()==null) ? null : attachment.getDoc().getDatabase();
+            try {
+                if (attachdb!=null)
+                    context.setDatabase(attachdb);
 
-            Query query = session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
-            query.setLong("id", content.getId());
-            if (query.uniqueResult()==null)
-                session.save(content);
-            else
-                session.update(content);
+                Query query = session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
+                query.setLong("id", content.getId());
+                if (query.uniqueResult()==null)
+                    session.save(content);
+                else
+                    session.update(content);
 
-            query = session.createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
-            query.setLong("id", archive.getId());
-            if (query.uniqueResult()==null)
-                session.save(archive);
-            else
-                session.update(archive);
+                query = session.createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
+                query.setLong("id", archive.getId());
+                if (query.uniqueResult()==null)
+                    session.save(archive);
+                else
+                    session.update(archive);
 
-            if (parentUpdate)
-                context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
+                if (parentUpdate)
+                    context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
+
+            } finally {
+                context.setDatabase(db);
+            }
+
             if (bTransaction) {
                 endTransaction(context, true);
             }
@@ -104,11 +115,17 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-
-            XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
-            attachment.setAttachment_content(content);
-
-            session.load(content, new Long(content.getId()));
+            String db = context.getDatabase();
+            String attachdb = (attachment.getDoc()==null) ? null : attachment.getDoc().getDatabase();
+            try {
+                if (attachdb!=null)
+                    context.setDatabase(attachdb);
+                XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
+                attachment.setAttachment_content(content);
+                session.load(content, new Long(content.getId()));
+            } finally {
+                context.setDatabase(db);
+            }
 
             if (bTransaction)
                 endTransaction(context, false, false);
@@ -134,11 +151,19 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             Session session = getSession(context);
 
 
-            XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
-            archive.setAttachment(attachment);
-            attachment.setAttachment_archive(archive);
+            String db = context.getDatabase();
+            String attachdb = (attachment.getDoc()==null) ? null : attachment.getDoc().getDatabase();
+            try {
+                if (attachdb!=null)
+                    context.setDatabase(attachdb);
 
-            session.load(archive, new Long(archive.getId()));
+                XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
+                archive.setAttachment(attachment);
+                attachment.setAttachment_archive(archive);
+                session.load(archive, new Long(archive.getId()));
+            } finally {
+                context.setDatabase(db);
+            }
 
             if (bTransaction)
                 endTransaction(context, false, false);
@@ -168,38 +193,49 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             Session session = getSession(context);
 
-            // Delete the three attachement entries
-            try {
-                loadAttachmentContent(attachment, context, false);
-            } catch (Exception e) {
-                if (log.isWarnEnabled())
-                    log.warn("Error loading attachment content when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-            }
-            try {
-                session.delete(attachment.getAttachment_content());
-            } catch (Exception e) {
-                if (log.isWarnEnabled())
-                    log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-            }
-            try {
-                loadAttachmentContent(attachment, context, false);
-            } catch(XWikiException e){
-                if (log.isWarnEnabled())
-                    log.warn("Error loading attachment archive when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-            }
 
+            String db = context.getDatabase();
+            String attachdb = (attachment.getDoc()==null) ? null : attachment.getDoc().getDatabase();
             try {
-                session.delete(attachment.getAttachment_archive());
-            } catch (Exception e) {
-                if (log.isWarnEnabled())
-                    log.warn("Error deleting attachment archive " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-            }
+                if (attachdb!=null)
+                    context.setDatabase(attachdb);
 
-            try {
-                session.delete(attachment);
-            } catch (Exception e) {
-                if (log.isWarnEnabled())
-                    log.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                // Delete the three attachement entries
+                try {
+                    loadAttachmentContent(attachment, context, false);
+                } catch (Exception e) {
+                    if (log.isWarnEnabled())
+                        log.warn("Error loading attachment content when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                }
+                try {
+                    session.delete(attachment.getAttachment_content());
+                } catch (Exception e) {
+                    if (log.isWarnEnabled())
+                        log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                }
+                try {
+                    loadAttachmentContent(attachment, context, false);
+                } catch(XWikiException e){
+                    if (log.isWarnEnabled())
+                        log.warn("Error loading attachment archive when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                }
+
+                try {
+                    session.delete(attachment.getAttachment_archive());
+                } catch (Exception e) {
+                    if (log.isWarnEnabled())
+                        log.warn("Error deleting attachment archive " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                }
+
+                try {
+                    session.delete(attachment);
+                } catch (Exception e) {
+                    if (log.isWarnEnabled())
+                        log.warn("Error deleting attachment meta data " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                }
+
+            } finally {
+                context.setDatabase(db);
             }
 
             try {

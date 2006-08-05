@@ -25,7 +25,8 @@
 
 package com.xpn.xwiki;
 
-import com.xpn.xwiki.store.XWikiBatcher;
+
+// import com.xpn.xwiki.store.XWikiBatcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -303,6 +304,7 @@ public class XWikiException extends Exception {
         buffer.append("\n");
         buffer.append(getStackTraceAsString());
         buffer.append("\n");
+        /*
         List list = XWikiBatcher.getSQLStats().getRecentSqlList();
         if (list.size() > 0) {
             buffer.append("Recent SQL:\n");
@@ -311,6 +313,7 @@ public class XWikiException extends Exception {
                 buffer.append("\n");
             }
         }
+        */
         return buffer.toString();
     }
 

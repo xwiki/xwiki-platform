@@ -68,7 +68,7 @@ public class HibernateTestCase extends TestCase {
         this.context.setWiki(this.xwiki);
 
         cleanUp(this.xwiki.getHibernateStore(), false, true, this.context);
-        iCount = this.xwiki.getHibernateStore().getBatcherStats().getPreparedSQLCounter();
+        // iCount = this.xwiki.getHibernateStore().getBatcherStats().getPreparedSQLCounter();
 
         this.xwiki.flushCache();
 

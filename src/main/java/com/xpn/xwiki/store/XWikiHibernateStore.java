@@ -1446,7 +1446,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 // If the rendering fails lets forget backlinks without errors
             }
-                
+
             List links = (List)context.get("links");
 
             if (links != null){
@@ -2036,13 +2036,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return ArrayUtils.contains(validtypes, name);
     }
 
+
     public XWikiBatcherStats getBatcherStats() {
-        return XWikiBatcher.getSQLStats();
+        return null; // XWikiBatcher.getSQLStats();
     }
 
     public void resetBatcherStats() {
-        XWikiBatcher.getSQLStats().resetStats();
+        // XWikiBatcher.getSQLStats().resetStats();
     }
+
 
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException {
         return searchDocumentsNames(wheresql, 0, 0, "", context);

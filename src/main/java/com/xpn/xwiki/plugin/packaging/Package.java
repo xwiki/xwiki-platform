@@ -56,7 +56,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 
-
 public class Package {
     private static final Log log = LogFactory.getLog(Package.class);
 
@@ -194,7 +193,7 @@ public class Package {
     public boolean updateDoc(String docFullName, int action, XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(docFullName, context);
-        return add(doc, action, context);           
+        return add(doc, action, context);
     }
 
     public boolean add(String docFullName, int DefaultAction, XWikiContext context) throws XWikiException {
@@ -449,6 +448,7 @@ public class Package {
                 // So we need to cancel the dirty status
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
+
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
             } catch (XWikiException e) {

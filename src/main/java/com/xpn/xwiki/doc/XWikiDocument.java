@@ -48,13 +48,11 @@ import org.suigeneris.jrcs.diff.Diff;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.util.ToString;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.filter.CharacterFilter;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
 import org.dom4j.Document;
@@ -74,6 +72,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.lang.ref.SoftReference;
 
 
 public class XWikiDocument {
@@ -129,6 +128,10 @@ public class XWikiDocument {
     private String defaultTemplate;
 
     private Object wikiNode;
+
+    // We are using a SoftReference which will allow the archive to be
+    // discarded by the Garbage collector as long as the context is closed (usually during the request)
+    private SoftReference archive;
 
     private XWikiStoreInterface store;
 
@@ -557,14 +560,37 @@ public class XWikiDocument {
         return context.getURLFactory().getURL(url, context);
     }
 
-    public Archive getRCSArchive(XWikiContext context) throws XWikiException {
-        return getVersioningStore(context).getXWikiDocRCSArchive(this, context);
+    public XWikiDocumentArchive getDocumentArchive(XWikiContext context) throws XWikiException {
+        loadArchive(context);
+        return getDocumentArchive();
     }
 
-    public String getArchive(XWikiContext context) throws XWikiException {
-        return getVersioningStore(context).getXWikiDocArchive(this, context);
+    public void loadArchive(XWikiContext context) throws XWikiException {
+        if (archive==null) {
+            XWikiDocumentArchive arch = getVersioningStore(context).getXWikiDocumentArchive(this, context);
+            // We are using a SoftReference which will allow the archive to be
+            // discarded by the Garbage collector as long as the context is closed (usually during the request)
+            archive = new SoftReference(arch);
+        }
     }
 
+    public XWikiDocumentArchive getDocumentArchive() {
+        // We are using a SoftReference which will allow the archive to be
+        // discarded by the Garbage collector as long as the context is closed (usually during the request)
+        return (XWikiDocumentArchive) archive.get();
+    }
+
+    public void setDocumentArchive(XWikiDocumentArchive arch) {
+        // We are using a SoftReference which will allow the archive to be
+        // discarded by the Garbage collector as long as the context is closed (usually during the request)
+        this.archive = new SoftReference(arch);
+    }
+
+    public void setDocumentArchive(String sarch) throws XWikiException {
+        XWikiDocumentArchive xda = new XWikiDocumentArchive(getId());
+        xda.setArchiveFromString(sarch);
+        setDocumentArchive(xda);
+    }
 
     public Version[] getRevisions(XWikiContext context) throws XWikiException {
         return getVersioningStore(context).getXWikiDocVersions(this, context);
@@ -1174,6 +1200,7 @@ public class XWikiDocument {
         }
 
         doc.setRCSVersion(getRCSVersion());
+        doc.setDocumentArchive(getDocumentArchive());
         doc.setAuthor(getAuthor());
         doc.setContentAuthor(getContentAuthor());
         doc.setContent(getContent());
@@ -1431,7 +1458,7 @@ public class XWikiDocument {
         el = new DOMElement("version");
         el.addText(getVersion());
         docel.add(el);
-        
+
         el = new DOMElement("title");
         el.addText(getTitle());
         docel.add(el);
@@ -1452,7 +1479,7 @@ public class XWikiDocument {
             if (bclass.getFieldList().size() > 0) {
                 docel.add(bclass.toXML(null));
             }
-            
+
             // Add Objects
             Iterator it = getxWikiObjects().values().iterator();
             while (it.hasNext()) {
@@ -1494,7 +1521,7 @@ public class XWikiDocument {
         if (bWithVersions) {
             el = new DOMElement("versions");
             try {
-                el.addText(getArchive(context));
+                el.addText(getDocumentArchive(context).getArchiveAsString());
             } catch (XWikiException e) {
                 return null;
             }
@@ -1592,13 +1619,10 @@ public class XWikiDocument {
         else
             setTranslation(Integer.parseInt(strans));
 
-/*
-  TODO: set archive from XML
         String archive = getElement(docel, "versions");
         if (withArchive && archive != null && archive.length() > 0) {
-            setArchive(archive);
+            setDocumentArchive(archive);
         }
-*/
 
         String sdate = getElement(docel, "date");
         if (!sdate.equals("")) {
@@ -1635,6 +1659,10 @@ public class XWikiDocument {
             bobject.fromXML(objel);
             addObject(bobject.getClassName(), bobject);
         }
+
+        // We have been reading from XML so the document does not need a new version when saved
+        setMetaDataDirty(false);
+        setContentDirty(false);
     }
 
     public void setAttachmentList(List list) {
@@ -1695,7 +1723,7 @@ public class XWikiDocument {
                 context.setDatabase(getDatabase());
             try{
                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
-            }catch(java.lang.OutOfMemoryError e){                
+            }catch(java.lang.OutOfMemoryError e){
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                     "Out Of Memory Exception");

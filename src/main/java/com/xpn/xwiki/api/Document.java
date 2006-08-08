@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
-import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +44,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.stats.impl.DocumentStats;
@@ -197,7 +197,11 @@ public class Document extends Api {
     }
 
     public String getArchive() throws XWikiException {
-        return doc.getArchive(context);
+        return doc.getDocumentArchive(context).getArchiveAsString();
+    }
+
+    public XWikiDocumentArchive getDocumentArchive() throws XWikiException {
+        return doc.getDocumentArchive(context);
     }
 
     public boolean isNew() {

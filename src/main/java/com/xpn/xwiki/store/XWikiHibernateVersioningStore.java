@@ -48,7 +48,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
-            Archive archive = getXWikiDocRCSArchive(doc, context);
+            Archive archive = getXWikiDocumentArchive(doc, context).getRCSArchive();
             if (archive==null)
                 return new Version[0];
 
@@ -65,17 +65,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    public String getXWikiDocArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        try {
-            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
-            return archivedoc.getArchive();
-        } catch (Exception e) {
-            Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
-                    "Exception while reading document {0} revisions", e, args);
-        }
-    }
-
+    /*
     public Archive getXWikiDocRCSArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         try {
             XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
@@ -86,23 +76,26 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                     "Exception while reading document {0} revisions", e, args);
         }
     }
+    */
 
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
         synchronized (key) {
-         XWikiDocumentArchive archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
-         if (archivedoc==null) {
-             String db = context.getDatabase();
-             try {
-                 if (doc.getDatabase()!=null)
-                     context.setDatabase(doc.getDatabase());
-                 archivedoc = new XWikiDocumentArchive(doc.getId());
-                 loadXWikiDocArchive(archivedoc, true, context);
-             } finally {
-                 context.setDatabase(db);
-             }
-          context.addDocumentArchive(key, archivedoc);
-         }
+            XWikiDocumentArchive archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
+            if (archivedoc==null) {
+                String db = context.getDatabase();
+                try {
+                    if (doc.getDatabase()!=null)
+                        context.setDatabase(doc.getDatabase());
+                    archivedoc = new XWikiDocumentArchive(doc.getId());
+                    loadXWikiDocArchive(archivedoc, true, context);
+                } finally {
+                    context.setDatabase(db);
+                }
+                // This will also make sure that the Archive has a strong reference
+                // and will not be discarded as long as the context exists.
+                context.addDocumentArchive(key, archivedoc);
+            }
             return archivedoc;
         }
     }
@@ -168,7 +161,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 monitor.startTimer("hibernate");
             doc.setStore(basedoc.getStore());
 
-            Archive archive = getXWikiDocRCSArchive(doc, context);
+            Archive archive = getXWikiDocumentArchive(doc, context).getRCSArchive();
             Version v = null;
             try {
                 v = archive.getRevisionVersion(version);

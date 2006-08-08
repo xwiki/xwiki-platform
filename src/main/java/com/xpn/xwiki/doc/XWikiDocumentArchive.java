@@ -37,7 +37,7 @@ public class XWikiDocumentArchive {
         this.archive = archive;
     }
 
-    public String getArchive() throws XWikiException {
+    public String getArchiveAsString() throws XWikiException {
         if (archive == null)
             return "";
         else {
@@ -47,7 +47,7 @@ public class XWikiDocumentArchive {
         }
     }
 
-    public void setArchive(String text) throws XWikiException {
+    public void setArchiveFromString(String text) throws XWikiException {
         try {
             if ((text!=null)&&(!text.trim().equals(""))) {
                 StringInputStream is = new StringInputStream(text);
@@ -99,7 +99,7 @@ public class XWikiDocumentArchive {
             return false;
 
         try {
-            if (!getArchive().equals(doc.getArchive()))
+            if (!getArchiveAsString().equals(doc.getArchiveAsString()))
                 return false;
         } catch (XWikiException e) {
             return false;

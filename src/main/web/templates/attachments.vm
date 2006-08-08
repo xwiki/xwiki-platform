@@ -75,7 +75,7 @@
         $msg.get("choosefiletoupload"):
         <input type="file" name="filepath" value="" size="40"/>
         <br/><br/>
-        <input type="submit" value="$msg.get(" attachthisfile")" onclick="return updateAttachName(this.form)" />
+        <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form)" />
                 </p>
     </form>
 </div>

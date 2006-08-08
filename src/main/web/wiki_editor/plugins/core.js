@@ -115,9 +115,11 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 }
 
 WikiEditor.prototype.removeHtmlTags_Paragraph = function(str) {
-	var remove_html_tags_regexp = /<p class="paragraph">|<\/p>|<p>|<br \/>/g;
-    str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
-    return str.replace(remove_html_tags_regexp, "");
+    str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
+    str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
+    str = str.replace(/<p>([\s\S]+?)<\/p>/g,'$1');
+    str = str.replace(/<br \/>/g, '\r\n')
+    return str;
 }
 
 WikiEditor.prototype.convertVelocityScriptsInternal = function(regexp, result, content) {
@@ -187,6 +189,8 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
                 cols[j] = cols[j].replace(r2,'\\\\');
                 var r3 = /\\\\\\\\/g;
                 cols[j] = cols[j].replace(r3,'\\\\');
+                var r4 = /<br \/>/g;
+                cols[j] = cols[j].replace(r4,'\\\\\r\n');
                 if (j != cols.length-2) {
                     str += cols[j] + "|" ;
                 } else {
@@ -216,6 +220,7 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 			}
 		}
 	}
+    str += "\r\n";
 	return content.replace(regexp, str);
 }
 
@@ -282,7 +287,7 @@ WikiEditor.prototype._cleanNode = function(editor_id, node) {
 			//case "ul":
 			//case "ol":
 				if(node.parentNode && node.parentNode.nodeName.toLowerCase() == "body") {
-					this._cleanBR(node);
+					//this._cleanBR(node);
 				}
 
 			break;
@@ -751,6 +756,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimString(result[1]);
+    text = text.replace(/<br \/>/g, '\r\n');
     var rows = text.split("\r\n");
     var str = "";
     str += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
@@ -762,12 +768,12 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
                 rows[i] = rows[i].substring(0,rows[i].lastIndexOf("\\\\"));
                 k++;
                 if ("\\\\" == this.trimString(rows[i+k]))
-                    rows[i] = rows[i] + "<p>&nbsp;" + rows[i+k];
+                    rows[i] = rows[i] + "<br \/>&nbsp;" + rows[i+k];
                  else
-                    rows[i] = rows[i] + "<p>" + rows[i+k];
+                    rows[i] = rows[i] + "<br \/>" + rows[i+k];
             }
             var regExp = new RegExp('\\\\','g');
-            rows[i] = rows[i].replace(regExp,"<p>");
+            rows[i] = rows[i].replace(regExp,"<br \/>");
             var cols = rows[i].split("|");
             str += "<tr>";
             for (var j=0; j<cols.length; j++) {

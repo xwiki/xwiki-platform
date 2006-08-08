@@ -577,13 +577,17 @@ public class XWikiDocument {
     public XWikiDocumentArchive getDocumentArchive() {
         // We are using a SoftReference which will allow the archive to be
         // discarded by the Garbage collector as long as the context is closed (usually during the request)
-        return (XWikiDocumentArchive) archive.get();
+        if (archive==null)
+         return null;
+        else
+         return (XWikiDocumentArchive) archive.get();
     }
 
     public void setDocumentArchive(XWikiDocumentArchive arch) {
         // We are using a SoftReference which will allow the archive to be
         // discarded by the Garbage collector as long as the context is closed (usually during the request)
-        this.archive = new SoftReference(arch);
+        if (arch!=null)
+         this.archive = new SoftReference(arch);
     }
 
     public void setDocumentArchive(String sarch) throws XWikiException {

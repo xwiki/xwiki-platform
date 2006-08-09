@@ -1,0 +1,19 @@
+#set($tocreate=$request.getParameter("tocreate"))
+#set($title = $request.getParameter("title"))
+#if($tocreate=="page")
+#set($docname=$title.replace("/", "."))
+#elseif($tocreate=="space")
+#set($docname="${title}.WebHome")
+#elseif($tocreate=="post")
+#set($docname="Blog.${title.replace(' ', '')}")
+#end
+#set($newdoc=$xwiki.getDocument($docname))
+#if($newdoc.isNew())
+#if($tocreate == "post")
+$response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$title"))
+#else
+$response.sendRedirect($newdoc.getURL("edit"))
+#end
+#else
+$response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
+#end

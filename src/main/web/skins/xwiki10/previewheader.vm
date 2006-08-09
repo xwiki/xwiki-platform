@@ -1,0 +1,19 @@
+<div class="layoutsubsection">
+  <a href="$doc.getURL("cancel")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("cancel")</a>
+  <span> | </span>
+  #if($doc.content.indexOf("includeForm(")!=-1)
+      #set($editaction = "inline")
+      #set($editparams="")
+  #else
+      #set($editaction = "edit")
+  ## Check WYSISYG editing option
+      #if($xwiki.getUserPreference("editor")=="Wysiwyg")
+          #set($editparams="xpage=wysiwyg")
+      #else
+          #set($editparams="")
+      #end
+  #end
+  <a href="$doc.getURL($editaction,$editparams)"  onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;"> $msg.get("backtoedit")</a>
+  <span> | </span>
+  <a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+</div>

@@ -1,0 +1,625 @@
+#macro( template $tname )
+$xwiki.parseTemplate($tname)
+#end
+
+#macro( includeTopic $topic )
+$xwiki.includeTopic($topic)
+#end
+
+#macro( includeMacros $topic )
+$xwiki.includeForm($topic)
+#end
+
+#macro( includeForm $topic )
+$xwiki.includeForm($topic)
+#end
+
+#macro( includeServlet $url)
+<!-- including $url -->
+$xwiki.invokeServletAndReturnAsString($url)
+<!-- included $url -->
+#end 
+
+#macro(editactions)
+<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
+<span> | </span>
+<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+#end
+
+#macro( versions )
+#foreach( $rev in $tdoc.getRecentRevisions(4) )
+<a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
+#end
+#if ($tdoc.realLanguage!="")
+<a href="$doc.getURL("view", "xpage=diff&language=${tdoc.realLanguage}")">$msg.get("diff")</a><span class="xwikisep"> | </span>
+#else
+<a href="$doc.getURL("view", "xpage=diff")">$msg.get("history")</a><span class="xwikisep"> | </span>
+#end
+#end
+
+## Display all queued Struts errors
+#macro (errorMarkup)
+    #if ($errors.exist() )
+        <ul>
+        #foreach ($e in $errors.all )
+            $e
+        #end
+        </ul>
+    #end
+#end
+
+## Display all queued Struts errors for a particular property
+#macro (errorMarkupForProperty $property)
+    #if ($errors.exist($property) )
+        <ul>
+        #foreach ($er in $errors.get($property))
+            $er
+        #end
+        </ul>
+    #end
+#end
+
+#macro(jabber $id)
+<img src="http://edgar.netflint.net/status.php?jid=${id}&amp;type=image&amp;iconset=phpbb" alt="jabber $id" />
+#end
+
+#macro(skype $id)
+<a href="callto://${id}"><img width="70" height="20" src="http://jyvepresence1.com/qzoxy/${id}.png" border="0"></a>
+#end
+
+#macro(yahoo $id)
+<img border="0" src="http://opi.yahoo.com/online?u=${id}&amp;m=g&amp;t=1" alt="yahoo $id" />
+#end
+
+#macro(aim $id)
+#set($onurl = "http://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
+#set($offurl = "http://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
+<img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&off_url=${offurl}" alt="Online detector"></a>
+#end
+
+#macro(msn $id)
+#set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
+#set($offurl = "${request.serverName}${xwiki.getSkinFile('msnoffline.gif')}")
+<img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${id}/onurl=${onurl}/offurl=${offurl}/unknownurl=${offurl}" />
+#end
+
+#macro(im $user)
+#set($userdoc = $xwiki.getDocument($user))
+#set($userobj = $userdoc.getObject("XWiki.XWikiUsers"))
+#set($imtype = $userdoc.display("imtype","view",$userobj))
+#set($imaccount = $userdoc.display("imaccount","view",$userobj))
+#if($imtype=="Yahoo")
+#yahoo("$imaccount")
+#end
+#if($imtype=="AIM")
+#aim("$imaccount")
+#end
+#if($imtype=="MSN")
+#msn("$imaccount")
+#end
+#if($imtype=="Jabber")
+#jabber("$imaccount")
+#end
+#if($imtype=="Skype")
+#skype("$imaccount")
+#end
+#end
+
+#macro(sign $username)
+#if($username.indexOf(".")==-1)
+#set($username = "XWiki.${username}")
+#end
+#if($xwiki.exists("$username"))
+$xwiki.getUserName("$username")
+#else
+$xwiki.getUserName("xwiki:${username}")
+#end
+#end
+
+#macro(includeHelp $pagename)
+  #if($xwiki.exists("xwiki:XWiki.${pagename}"))
+    $xwiki.includeForm("xwiki:XWiki.${pagename}",false)
+  #elseif($xwiki.exists("XWiki.${pagename}"))
+    $xwiki.includeForm("XWiki.${pagename}",false)
+  #elseif($xwiki.exists("${pagename}"))
+    $xwiki.includeForm("${pagename}",false)
+  #end
+#end
+
+#macro(flickr $rss)
+{rss:feed=${rss}|full=1}
+#end
+
+#macro(flickrtag $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?tags=${tag}&format=rss_200")
+#end
+
+#macro(flickruser $id)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=${id}&format=rss_200")
+#end
+
+#macro(flickrusertag $id $tag)
+#flickr("http://www.flickr.com/services/feeds/photos_public.gne?id=${id}&tags=${tag}&format=rss_200")
+#end
+
+#macro(map $address $cp $linktext)
+<a href="http://www.viamichelin.com/viamichelin/fra/dyn/controller/mapPerformPage?strAddress=${address}&strLocation=&strCP=${cp}&strCountry=1424&x=30&y=9">${linktext}</a>
+#end
+
+#macro(mindmap $mindmap $width $height)
+#if(!$width)
+#set($width="100%")
+#end
+#if(!$height)
+#set($height="600")
+#end
+#if(!$mindmap)
+#set($mindmap = "")
+#set($mmurl = "")
+#else
+#if($mindmap.startsWith("http"))
+#set($mmurl = $mindmap)
+#else
+#set($mmurl1 = $doc.getAttachmentURL($mindmap,"download"))
+#set($mmurl = "http://${request.serverName}${mmurl1}")
+#end
+#end
+<applet code="freemind.main.FreeMindApplet.class" archive="/xwiki/freemind/freemind.jar" width="${width}" height="${height}">
+<param name="type" value="application/x-java-applet;version=1.4" />
+<param name="scriptable" value="false" />
+<param name="modes" value="freemind.modes.browsemode.BrowseMode" />
+<param name="browsemode_initial_map" value="$mmurl" />
+<param name="initial_mode" value="Browse" />
+<param name="selection_method" value="selection_method_direct" />
+</applet>
+#end
+
+#macro (toc $init $max $numbered)
+ #set ($int = 0)
+ #set ($boolean = false)
+ #if ($init == "")
+  #set ($init = 2)
+ #else
+  #set ($init = $int.valueOf($init))
+ #end
+ #if ($max == "")
+  #set ($max = 6)
+ #else
+  #set ($max = $int.valueOf($max))
+ #end
+ #if ($numbered == "")
+  #set ($numbered = false) 
+ #else
+  #set ($numbered = $boolean.valueOf($numbered))
+  #set ($context.context.tocNumbered = $numbered)
+ #end
+ #set ($tocData = ${tdoc.getTOC($init, $max, $numbered)})
+ #set ($context.context.tocData = $tocData)
+ #set ($lastLevel = $init - 1)
+ #set ($depth = 0)
+ #foreach ($tocEntry in $tocData.entrySet())
+  #set ($level = $tocEntry.value.level)
+  #if ($level > $lastLevel)
+   #set ($to = $lastLevel + 1)
+   #set ($iter = [$level .. $to])
+   #foreach ($n in $iter)
+<ul>
+    #set ($depth = $depth + 1)
+   #end
+  #elseif ($level < $lastLevel)
+   #set ($to = $level + 1)
+   #set ($iter = [$lastLevel .. $to])
+   #foreach ($n in $iter)
+</ul>
+    #set ($depth = $depth - 1)
+   #end
+  #end
+ <li><a href="#$tocEntry.key">$!tocEntry.value.numbering $tocEntry.value.text</a> 
+  #set ($lastLevel = $level)
+ #end
+ #if ($depth > 0)
+  #set ($levels = [1 .. $depth])
+  #foreach($level in $levels)
+</ul>#end
+ #end
+#end
+
+
+#macro (exportPackage)
+#set($export = $request.get("export"))
+#if ($export == "1")
+  #set($dateFormat = "dd MMM yyyy ? HH:mm")
+  #set($diff = $request.get("diff"))
+  #set($SpaceName = $request.get("SpaceName"))
+
+  1.1 Space : $SpaceName
+
+  <form method="POST" action="$doc.getName()?export=2">
+
+
+
+#set($docs = $xwiki.getSpaceDocsName($SpaceName))
+  <table border="1" style="text-align:center;">
+  <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+  <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+  #foreach ($doc in $docs)
+    #if ($xwiki.hasAccessLevel("view", "${context.database}:${SpaceName}.${doc}"))
+
+    <tr><td>[${doc}>${SpaceName}.${doc}]</td><td><input type="checkbox" name="ToExport" value="${SpaceName}.${doc}" /></td><td><input type="radio" name="${SpaceName}.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="merge" /></td> <td><input type="radio" name="${SpaceName}.${doc}_default" value="skip" /></td> </tr>
+
+    #end
+  #end
+  </table>
+
+  #if($SpaceName != "XWiki")
+
+
+    1.1 Space : XWiki
+
+    #set($docs = $xwiki.getSpaceDocsName("XWiki"))
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>Export</td><td colspan="3">Default Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+    #foreach ($doc in $docs)
+      #if ($xwiki.hasAccessLevel("view", "${context.database}:XWiki.${doc}"))
+
+      <tr><td>[${doc}>XWiki.${doc}]</td><td><input type="checkbox" name="ToExport" value="XWiki.${doc}" /></td><td><input type="radio" name="XWiki.${doc}_default" value="overwrite" checked="true" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="merge" /></td> <td><input type="radio" name="XWiki.${doc}_default" value="skip" /></td> </tr>
+
+      #end
+    #end
+    </table>
+  #end
+
+  <input type="submit" name="submitted" value="Valider">
+  </form>
+
+
+
+#elseif ($export == "2")
+  #set($ToExport = $request.getParameterValues("ToExport"))
+  $response.setContentType("application/zip")
+  #set($export = $xwiki.export)
+  #foreach ($itemexp in $ToExport)
+    #set($defaultAction = $request.get("${itemexp}_default"))
+    $export.add($itemexp, $defaultAction)
+  #end
+  $export.export()
+#else
+  <form method="POST" action="$doc.getName()?export=1">
+  Select the space you want to export : <br />
+  #set($spaces = $xwiki.getSpaces())
+  <select name="SpaceName">
+  #foreach ($space in $spaces)
+    <option value="$space">$space</option>
+  #end
+
+  </select>
+  <input type="submit" name="submitted" value="Valider">
+  </form>
+#end
+#end
+
+
+#macro (importPackage)
+#set($toexport = $request.get("export"))
+#if($toexport == "1")
+  #set($appName = $request.get("App"))
+  #set($alist = $doc.getAttachmentList())
+  #foreach ($oAttach in $alist)
+    #if ($oAttach.getFilename() == $appName)
+      #set($import = $xwiki.import)
+      $import.importPackage($oAttach.getContent())
+
+      #set($docs = $import.getDocuments())
+
+      #foreach($docInfo in $docs)
+        #set($right = "")
+        #set($right = $request.get("$docInfo.getFullName()_default"))
+        #if($right)
+          $import.setDocumentAction($docInfo.getFullName(), $right)
+        #end
+      #end
+
+
+      #set($ret = $import.install())
+      $import.getTestInstallToString($ret)
+    #end
+  #end
+
+
+#else
+  #set($alist = $doc.getAttachmentList())
+  #if ($alist.size() == 0)
+    Add the package in attachment
+  #end
+  #foreach ($oAttach in $alist)
+    #set($import = $xwiki.import)
+
+    1.1 $oAttach.getFilename()
+
+    $import.importPackage($oAttach.getContent())
+
+    1.1.1 Infos
+
+    Author : $import.getAuthor() <br />
+    Name : $import.getName() <br />
+    Description : $import.getDescription() <br />
+    Licence : $import.getLicence() <br />
+    Version : $import.getVersion() <br />
+
+    #set($canInstall = $import.testInstall())
+    install : $import.getTestInstallToString($canInstall)
+
+    1.1.1 Status of each Files
+    #set($docs = $import.getDocuments())
+
+    <form method="POST" action="$request.getRequestURL()?export=1">
+    <input type="hidden" name="App" value="$oAttach.getFilename()" />
+    <table border="1" style="text-align:center;">
+    <tr><td>Name</td><td>infos</td><td colspan="3">Action</td></tr>
+    <tr><td colspan="2"></td><td>overwrite</td><td>merge objects</td><td>skip</td></tr>
+
+
+    #foreach($docInfo in $docs)
+
+
+      <tr><td>[$docInfo.getFullName()>$docInfo.getFullName()]</td> <td>__$import.getTestInstallToString($docInfo.isInstallable())__</td>
+#if($import.getTestInstallToString($docInfo.isInstallable()) == "Already exist")
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "overwrite")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" checked="true" /></td>
+  #else
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="overwrite" /></td>
+  #end
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "merge")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" checked="true" /></td>
+  #else
+   <td><input type="radio" name="$docInfo.getFullName()_default" value="merge" /></td>
+  #end
+  #if ($import.getActionToString($docInfo.getDefaultAction()) == "skip")
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" checked="true" /></td> </tr>
+  #else
+    <td><input type="radio" name="$docInfo.getFullName()_default" value="skip" /></td> </tr>
+  #end
+#else
+  <td colspan="3"></td>
+#end
+
+
+    #end
+    </table>
+    #if ($canInstall != 0)
+      1.1.1 You can install this applications
+      <input type="submit" name="submitted" value="Valider">
+    #else
+      1.1.1 You can't install this application.
+    #end
+    </form>
+  #end
+#end
+
+#end
+
+###
+###    Separator
+###
+### Insert a span containing a |
+###
+#macro (sep)
+<span class="separator"> | </span>
+#end
+
+###
+###    useravatar
+###
+### Display the avatar of a user, or a standard image if the user has no avatar
+###
+### @param username The name of the user whose avatar will be displayed
+###
+#macro(useravatar $username)
+  #if(!$picturelist)
+    #set($picturelist = $xwiki.hashMap)
+  #end
+  #if(!$picturelist.containsKey($username))
+    #set($picture = "<img src='")
+    #set($picture = $picture.concat($xwiki.getSkinFile("noavatar.png")))
+    #set($picture = $picture.concat("' alt='$username' title='$username'/>"))
+    #set($profiledoc = $xwiki.getDocument($username))
+    #if(!$profiledoc.isNew())
+      #set($profileobj = $profiledoc.getObject("XWikiUsers", 0))
+      #if($profiledoc.attachmentList.size() != 0)
+        #set($hasavatar = 0)
+        #if($profileobj.avatar && $profileobj.avatar != "")
+          #foreach ($attach in $profiledoc.attachmentList)
+            #if($attach.filename == $profileobj.avatar)
+              #set($hasavatar = 1)
+            #end
+          #end
+        #end
+        #if($hasavatar == 1)
+          #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
+          #set($picture = "<img src='")
+          #set($picture = $picture.concat($pictureurl))
+          #set($picture = $picture.concat("' alt='"))
+          #set($picture = $picture.concat($username))
+          #set($picture = $picture.concat("' title='"))
+          #set($picture = $picture.concat($username))
+          #set($picture = $picture.concat("'/>"))
+        #end
+      #end
+    #end
+    $!picturelist.put($username, $picture)
+  #end
+  $picturelist.get($username)
+#end
+
+###
+###    mimetypeimg
+###
+### Display an icon according to the mimetype
+###
+### @param mime The reported mimetype of the file
+### @param fname The name of the file
+###
+#macro(mimetypeimg $mime $fname)
+#set($idx = $fname.lastIndexOf("."))
+#set($idx = $idx + 1)
+#if(($idx != 0) && ($idx != -1))
+#set($ext = $fname.substring($idx))
+#else
+#set($ext = "")
+#end
+#####    images
+#if($mime.equals("image/svg"))
+<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.equals("application/svg+xml"))
+<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.startsWith("image/"))
+<img src="$xwiki.getSkinFile("mimetypes/jpg.png")" alt="[img]" title="[img]"/>#####    text based
+#elseif($mime.equals("text/plain"))
+<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#elseif($mime.equals("text/html"))
+<img src="$xwiki.getSkinFile("mimetypes/html.png")" alt="[html]" title="[html]"/>#elseif($mime.equals("text/css"))
+<img src="$xwiki.getSkinFile("mimetypes/url.png")" alt="[css]" title="[css]"/>#elseif($mime.startsWith("text/"))
+<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#####    documents
+#elseif($mime.equals("application/xml"))
+<img src="$xwiki.getSkinFile("mimetypes/xml.png")" alt="[xml]" title="[xml]"/>#elseif($mime.equals("application/pdf"))
+<img src="$xwiki.getSkinFile("mimetypes/pdf.png")" alt="[pdf]" title="[pdf]"/>#elseif($mime.equals("application/postscript"))
+<img src="$xwiki.getSkinFile("mimetypes/ps.png")" alt="[ps]" title="[ps]"/>#elseif($mime.equals("application/msword"))
+<img src="$xwiki.getSkinFile("mimetypes/word.png")" alt="[doc]" title="[doc]"/>#elseif($mime.equals("application/powerpoint"))
+<img src="$xwiki.getSkinFile("mimetypes/ppt.png")" alt="[ppt]" title="[ppt]"/>#elseif($mime.equals("application/x-shockwave-flash"))
+<img src="$xwiki.getSkinFile("mimetypes/swf.png")" alt="[swf]" title="[swf]"/>#####    archives
+#elseif($mime.equals("application/x-tar"))
+<img src="$xwiki.getSkinFile("mimetypes/tar.png")" alt="[tar]" title="[tar]"/>#elseif($mime.equals("application/zip"))
+<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[zip]" title="[zip]"/>#elseif($mime.equals("application/x-gzip"))
+<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($mime.equals("application/java-archive"))
+<img src="$xwiki.getSkinFile("mimetypes/jar.png")" alt="[jar]" title="[jar]"/>#####    media
+#elseif($mime.startsWith("audio/"))
+<img src="$xwiki.getSkinFile("mimetypes/wav.png")" alt="[audio]" title="[audio]"/>#elseif($mime.startsWith("video/"))
+<img src="$xwiki.getSkinFile("mimetypes/video.png")" alt="[video]" title="[video]"/>#####    octet-streams extensions
+#elseif($mime.equals("application/octet-stream"))
+#if($ext.equals("xls"))
+<img src="$xwiki.getSkinFile("mimetypes/excel.png")" alt="[xls]" title="[xls]"/>#elseif($ext.equals("bz") || $ext.equals("bz2") || $ext.equals("tbz"))
+<img src="$xwiki.getSkinFile("mimetypes/tar_bz.png")" alt="[bz]" title="[bz]"/>#elseif($ext.equals("tgz"))
+<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($ext.equals("rar"))
+<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[rar]" title="[rar]"/>#elseif($ext.equals("odp") || $ext.equals("odt") || $ext.equals("odf") || $ext.equals("sxw") || $ext.equals("stw"))
+<img src="$xwiki.getSkinFile("mimetypes/openoffice.png")" alt="[odf]" title="[odf]"/>#else
+<img src="$xwiki.getSkinFile("mimetypes/bin.png")" alt="[bin]" title="[bin]"/>#end
+#elseif($mime.startsWith("application/"))
+<img src="$xwiki.getSkinFile("mimetypes/exec.png")" alt="[app]" title="[app]"/>#end
+#end
+
+###
+###    packName
+###
+### Display a shorter version of a string
+###
+### @param name The processed string
+###
+#macro(packName $name)
+#if(!$maxnamelength)
+#set($maxnamelength = 25)
+#end
+#set($idx = $name.lastIndexOf("."))
+#if(($idx != 0) && ($idx != -1))
+#set($ext = $name.substring($idx))
+#else
+#set($ext = "")
+#set($idx = $name.length())
+#end
+#set($fname = $name.substring(0, $idx))
+#if($fname.length() > $maxnamelength)$fname.substring(0, $maxnamelength)~$ext#else$name#end
+#end
+
+###
+###    Panel header
+###
+### Generate the starting html code for a panel
+###
+### @param title The panel caption title
+###
+#macro(panelheader $title)
+<div class="panel expanded">
+<h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>##<span class="xwikipanelarrow" onclick="alert(5);">&nbsp;</span>
+<div class="xwikipanelcontents">
+#end
+#macro(largepanelheader $title)
+<div class="large panel expanded">
+<h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>##<span class="xwikipanelarrow" onclick="alert(5);">&nbsp;</span>
+<div class="xwikipanelcontents">
+#end
+
+###
+###    Panel footer
+###
+### Generate the ending html code for a panel
+###
+#macro(panelfooter)
+</div>
+</div>
+#end
+
+###
+###    Toplevel Menu entry with subitems
+###
+### Generate a menu entry and start the subitem section
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentrystart $actionurl $linktext)
+<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);"><a href="$actionurl"><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
+#end
+
+###
+###    Toplevel Menu entry without subitems
+###
+### Generate a menu entry withut subitems
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentry $actionurl $linktext)
+<div class="topmenuentry"><a href="$actionurl"><strong>$linktext</strong></a></div>
+#end
+
+###
+###    Menu subitem entry
+###
+### Generate a submenu entry
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(submenuitem $actionurl $linktext) 
+<span class="submenuitem"><a href="$actionurl">$linktext</a></span>
+#end
+
+###
+###    Toplevel Menu entry end
+###
+### End the subitem section
+###
+#macro(xwikitopmenuentryend)
+</span></div>
+#end
+
+#macro(xwikimessageboxstart $title $message)
+    <div class="centered">
+    <fieldset class="xwikimessage">
+      <legend>$title</legend>
+      <p class="xwikimessage">$message</p>
+#end
+#macro(xwikimessageboxend)
+    </fieldset>
+    </div>
+#end
+
+#macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
+#xwikimessageboxstart($title $message)
+      <div class="buttons"><a href="$urlyes"><input type="button" class="button" value="$msgyes"/></a><a href="$urlno"><input type="button" class="button" value="$msgno"/></a></div>
+#xwikimessageboxend()
+#end
+
+#macro(csscolorproperty $csspropname $fieldname)
+#set($objcolor = $colors.get($fieldname))
+#if($objcolor && $objcolor != "")
+  $csspropname: $objcolor;
+#end
+#end

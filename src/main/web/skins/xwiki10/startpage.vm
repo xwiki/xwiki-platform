@@ -1,0 +1,12 @@
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+#if($!hidecolumns == 1)
+  <div id="contentcolumn" class="contenthidelefthideright">
+#else
+#template("leftpanels.vm")
+#template("rightpanels.vm")
+  <div id="contentcolumn" class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
+#end

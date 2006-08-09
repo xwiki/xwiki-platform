@@ -1,0 +1,69 @@
+<div id="chwColorPicker">
+  <img src="$xwiki.getSkinFile("chwempty.png")" id="chwColorPickerScreen"/>
+  <fieldset id="chwColorPickerFieldset" class="chwLargeFieldset">
+    <legend id="chwColorPickerLegend" class="chwLargeLegend">Color picker</legend>
+    <table summary="Color picker maps layout" id="chwColorpickerTable">
+      <tbody>
+        <tr>
+          <td class="chwColorpickerHSTd">
+            <div class="chwColorpickerHSDiv">
+            <img src="$xwiki.getSkinFile("chwcolormap.png")" title="" alt="" class="chwColorpickerHSImg" id="chwColorpickerHSMap"
+            onclick="window.colorPicker.hsChanged(event, this)"
+            onmousedown="return window.colorPicker.mouseDown(event, this)"
+            onmouseup="return window.colorPicker.mouseUp(event, this)"
+            onmousemove="window.colorPicker.mouseMove(event, this);"/>
+            </div>
+          </td>
+          <td>
+            <div class="chwColorpickerLDiv">
+            <img src="$xwiki.getSkinFile("chwluminancemoz.png")" title="" alt="" class="chwColorpickerLImg" id="chwColorpickerLMap"
+            onclick="window.colorPicker.lChanged(event, this)"
+            onmousedown="window.colorPicker.mouseDown(event, this)"
+            onmouseup="window.colorPicker.mouseUp(event, this)"
+            onmousemove="window.colorPicker.mouseMove(event, this)"/>
+            </div>
+          </td>
+          <td class="chwColorpickerLPointerContainer" id="chwColorpickerLPointerContainer" style="background-image: url($xwiki.getSkinFile("chwpointer.png"));">
+            <img src="$xwiki.getSkinFile("chwempty.png")" title="" alt="" class="chwColorpickerLPointerImg" id="chwColorpickerLPointer"
+            onclick="window.colorPicker.lChanged(event, this)"
+            onmousedown="window.colorPicker.mouseDown(event, this)"
+            onmouseup="window.colorPicker.mouseUp(event, this)"
+            onmousemove="window.colorPicker.mouseMove(event, this)"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table summary="Color picker output controls layout" id="chwColorpickerControlsTable">
+      <tbody>
+        <tr>
+          <td class="chwColorpickerComponents" id="chwColorpickerShowContainer">
+            <div class="chwColorpickerShow" id="chwColorPickerShow"></div>
+            <input type="text" value="#5252ad" id="chwColorCodeDisplay" onkeyup="window.colorPicker.htmlCodeChanged();" class="chwColorpickerHtmlCode"/>
+          </td>
+          <td class="chwColorpickerComponents">
+            <label for="chwColorpickerRed">R</label>
+            <input type="text" id="chwColorpickerRed" class="chwColorInput" value="82" onkeyup="window.colorPicker.rgbCodeChanged();"/><br/>
+            <label for="chwColorpickerGreen">G</label>
+            <input type="text" id="chwColorpickerGreen" class="chwColorInput" value="82" onkeyup="window.colorPicker.rgbCodeChanged();"/><br/>
+            <label for="chwColorpickerBlue">B</label>
+            <input type="text" id="chwColorpickerBlue" class="chwColorInput" value="173" onkeyup="window.colorPicker.rgbCodeChanged();"/><br/>
+          </td>
+          <td class="chwColorpickerComponents">
+            <label for="chwColorpickerHue">H</label>
+            <input type="text" id="chwColorpickerHue" class="chwColorInput" value="160" onkeyup="window.colorPicker.hslCodeChanged();"/><br/>
+            <label for="chwColorpickerSaturation">S</label>
+            <input type="text" id="chwColorpickerSaturation" class="chwColorInput" value="85" onkeyup="window.colorPicker.hslCodeChanged();"/><br/>
+            <label for="chwColorpickerLighness">L</label>
+            <input type="text" id="chwColorpickerLightness" class="chwColorInput" value="120" onkeyup="window.colorPicker.hslCodeChanged();"/><br/>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="3" class="chwColorpickerButton">
+            <a href="#" onclick="window.colorPicker.OK(event); return false;" title="Use this color" class="chwButton">&nbsp;&nbsp;&nbsp;OK&nbsp;&nbsp;&nbsp;</a>
+            <a href="#" onclick="window.colorPicker.Cancel(event); return false;" title="Cancel" class="chwButton">Cancel</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+</div>

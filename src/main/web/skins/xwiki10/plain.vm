@@ -1,0 +1,8 @@
+#template("xwikivars.vm")
+#if ($request.getParameter("raw").equals("1"))
+<pre>
+$cdoc.getEscapedContent()
+</pre>
+#else
+$cdoc.getRenderedContent()
+#end

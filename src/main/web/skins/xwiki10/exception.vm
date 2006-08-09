@@ -1,0 +1,20 @@
+#template("startpage.vm")
+<div id="xwikicontent">
+    #set($message = $xwiki.parseMessage())
+    #if($message)
+    <center>
+        <h2>$message</h2>
+        <br/><br/>
+    </center>
+    #else
+    $msg.get("problemoccured")
+    #end
+    <br/><br/>
+    #if($exp)
+    $msg.get("detailedinformation"):<br/>
+    <pre>
+        $exp.getFullMessage()
+    </pre>
+    #end
+</div>
+#template("endpage.vm")

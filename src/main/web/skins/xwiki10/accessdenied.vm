@@ -1,0 +1,13 @@
+###
+### Access denied messge
+###
+###
+#template("startpage.vm")
+#if ($xwiki.isReadOnly())
+#xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#end
+$!exception
+#xwikimessageboxend()
+#template("endpage.vm")

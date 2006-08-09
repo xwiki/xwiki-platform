@@ -1,0 +1,84 @@
+###
+### Main "admin" template
+###
+### General wrapper for administration actions
+###
+#template("xwikivars.vm")
+#set($global = $request.getParameter("global"))
+##
+## Determine what editor to show
+##
+#if((!$editor) || ($editor == ""))
+#set($editor = $request.getParameter("editor"))
+#if((!$editor) || ($editor == ""))
+#if($doc.fullName == "XWiki.XWikiPreferences")
+#set($editor = "prefs")
+#elseif($doc.name == "WebPreferences")
+#set($editor = "spacerights")
+#elseif($doc.fullName == "XWiki.XWikiGroups")
+#set($editor = "groups")
+#elseif($doc.fullName == "XWiki.XWikiUsers")
+#set($editor = "users")
+#elseif($doc.name == $xwiki.getXWikiPreference("skin"))
+#set($editor = "skin")
+#else
+#set($editor = "spacerights")
+#end
+#end
+#end
+#set($redirecturl = "")
+#if($editor == "prefs" && ($doc.fullName != "XWiki.XWikiPreferences" || $global != 1))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&global=1"))
+#elseif($editor == "globalrights" && (($doc.fullName != "XWiki.XWikiPreferences") || $global != 1))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&global=1"))
+#elseif($editor == "spacerights" && $doc.name != "WebPreferences")
+#set($redirecturl = $xwiki.getDocument("${doc.web}.WebPreferences").getURL("admin", "editor=spacerights"))
+#elseif($editor == "groups" && $doc.fullName != "XWiki.XWikiGroups")
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups"))
+#elseif($editor == "users" && $doc.fullName != "XWiki.XWikiUsers")
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users"))
+#elseif($editor == "skin" && $doc.fullName != $xwiki.getXWikiPreference("skin"))
+#set($redirecturl = $xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin"))
+#end
+#if($redirecturl != "")
+$response.sendRedirect($redirecturl)
+#end
+##
+## Header
+##
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+##
+## Content
+##
+#set($force = $!request.get("force"))
+#if(!$hasadmin)
+#xwikimessageboxstart($msg.get("error") $msg.get('notallowed'))
+#xwikimessageboxend()
+#elseif (($tdoc.getLocked()==true)&&(!$force))
+#xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
+<a href="$doc.getURL("edit", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+#xwikimessageboxend()
+#else
+<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
+#template("adminmodes.vm")
+</div>
+<div id="xwikieditor" class="layoutsection">
+<div id="editcolumn" class="editor">
+##<div>#template("adminactions.vm")</div>
+#set($formname = "update")
+#set($saveaction = "save")
+#template("admin${editor}.vm")
+<div>#template("adminactions.vm")</div>
+</div>
+#template("adminpanels.vm")
+<div class="clearfloats"></div>
+##
+## Footer
+##
+#end
+</div>
+#template("footer.vm")
+#template("htmlfooter.vm")

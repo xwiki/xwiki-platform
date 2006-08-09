@@ -1,0 +1,53 @@
+###
+### Global header
+###
+### The uppermost area of each page
+### Contains the company logo, links to global actions and the search facility
+###
+#if($context.getMode()==0) ## Visible only in a page
+<div id="headerglobal" class="layoutsection">
+  <div id="companylogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
+#set($logo = $!prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.gif"))
+      <img src="$logourl" alt="XWiki" width="150" height="40"/>
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+      <img src="$logourl" alt="XWiki"/>
+#end
+    </a>
+  </div>
+  <div id="globaldoctitle">
+    <h1>$!headertitle</h1>
+  </div>
+  <div id="globallinks">
+    <div id="globalmenu">
+#if (!$isguest)
+      <a href="$xwiki.getURL($context.user, "view")">$xwiki.parseMessage("myhomepage")</a> #sep()
+#end
+#if($hasadmin)
+      <a href="$xwiki.getURL("XWiki.WebHome","view")">$msg.get("admin")</a> #sep()
+#end
+#if ($isguest)
+#set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))
+      <a href="$loginurl">$msg.get("login")</a>#sep()
+#else
+#set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
+      <a href="$logouturl">$msg.get("logout")</a>#sep()
+#end
+#set($regurl = $xwiki.getURL("XWiki.RegisterNewUser"))
+      <a href="$regurl">$msg.get("register")</a>#sep()
+      <a href="$xwiki.getURL("Doc.WebHome","view")">$msg.get("doc")</a>
+    </div>
+#if($searchdoc.isNew()==false)
+    <div id="globalsearch">
+      <form action="$searchdoc.getURL("view")">
+        <p><input type="text" name="text" value="" size="15"/>&nbsp;<input type="submit" class="button" value="Search"/></p>
+      </form>
+    </div>
+  </div>
+#end
+</div>
+#end
+### TODO: Format the header for pdf output

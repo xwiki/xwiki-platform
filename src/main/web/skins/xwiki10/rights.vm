@@ -1,0 +1,16 @@
+<div id="xwikirights" class="xwikidata">
+<div class="xwikidatatitle2">
+<div class="xwikidatatitle1">&nbsp;</div>
+<div class="xwikidatatitle">
+<a href="" onclick="showhide('xwikirightscontent'); return false">$msg.get("Rights")</a>:
+Rights display not implemented yet.
+</div>
+</div>
+<div id="xwikirightscontent" class="xwikidatacontent" style="display:none">
+$doc.getRenderedContent("{form:XWiki.XWikiRights}")
+</div>
+<div class="xwikidatafooter2">
+<div class="xwikidatafooter1">&nbsp;</div>
+<div class="xwikidatafooter">&nbsp;</div>
+</div>
+</div>

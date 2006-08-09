@@ -1,0 +1,24 @@
+###
+### @deprecated
+###
+###
+<script type="text/javascript">
+function checkDocumentContent() {
+  if (document.forms.${formname}.content) {
+    var content = document.forms.${formname}.content.value;
+    if (content == null || content == "") {
+      alert("$msg.get('wikicontentcannotbeempty')");
+      return false ;
+}
+}
+  return true;
+}
+</script>
+<div class="layoutsubsection editactions">
+##<button type="submit" name="actionbtn" value="
+  <a href="$doc.getURL("cancel")" onclick="document.forms.${formname}.action=this.href; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit(); document.forms.${formname}.submit(); return false;" >$msg.get("cancel")</a>
+  <span> | </span>
+  <a style="cursor:pointer;" onclick="document.forms.${formname}.action='$doc.getURL("preview")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;" >$msg.get("preview")</a>
+  <span> | </span>
+  <a href="$doc.getURL("${saveaction}")" onclick="document.forms.${formname}.action=this.href; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;" >$msg.get("save")</a>
+</div>

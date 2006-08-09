@@ -1,0 +1,7 @@
+###
+### Edit mode tabs
+###
+###
+<ul class="xwikitabbar">
+<li id="xwikieditwiki"#if($editor == "wiki") class="active"#end><a href="$doc.getURL("edit", "editor=wiki")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wiki&amp;$languageparams")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editwiki")</a></li><li id="xwikieditwysiwyg"#if($editor == "wysiwyg") class="active"#end><a href="$doc.getURL("edit", "editor=wysiwyg")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wysiwyg&amp;$languageparams")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editvisual")</a></li><li id="xwikieditobject"#if($editor == "object") class="active"#end><a href="$doc.getURL("edit", "editor=object")">$msg.get("editobject")</a></li><li id="xwikieditclass"#if($editor == "class") class="active"#end><a href="$doc.getURL("edit", "editor=class")">$msg.get("editclass")</a></li><li id="xwikieditrights"#if($editor == "rights") class="active"#end><a href="$doc.getURL("edit", "editor=rights")">$msg.get("editrights")</a></li>
+</ul>

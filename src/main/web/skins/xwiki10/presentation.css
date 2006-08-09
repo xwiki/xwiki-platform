@@ -1,0 +1,230 @@
+#template("skinvariables.vm")
+/* Presentation stylesheet */
+
+/* classes */
+.box,
+.main-content {
+  margin: 0.5em;
+}
+
+/* dom-tree */
+.dom-tree {
+  padding: 0 0 0 1.5em;
+  color: #999;
+}
+.dom-tree code {
+  font-weight: bold;
+}
+.dom-tree ul ul ul  {
+  list-style: disc;
+}
+.dom-tree ul ul ul ul  {
+  list-style: circle;
+}
+.dom-tree ul ul ul ul ul {
+  list-style: square;
+}
+.dom-tree dl,
+.dom-tree dt,
+.dom-tree dd {
+  color: black;
+  margin: 0;
+  padding: 0;
+  display: inline; /* IE 5.x doesn't like this */
+}
+.dom-tree dd {
+  font-style: italic;
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
+---------------------------------------
+Global header
+---------------------------------------
+*/
+#companylogo img {
+  text-decoration: none;
+  border: none;
+  background-repeat: no-repeat;
+  width: 136px;
+  height: 91px;
+}
+
+.breadcrumbspace{
+  font-weight: bold;
+  font-variant: small-caps;
+}
+
+input[type=submit], input[type=reset], input[type=button]{
+  background-color: #EEE;
+  font-family: Helvetica;
+  font-weight: bold;
+  padding: 1px 16px;
+  width: auto;
+  overflow: visible;
+}
+input.button{
+  background-color: #EEE;
+  font-family: Helvetica;
+  font-weight: bold;
+  padding: 1px 16px;
+  width: auto;
+  overflow: visible;
+}
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, input.button:hover{
+  background-color: #FFD;
+  cursor: pointer;
+}
+input.button:hover{
+  background-color: #FFD;
+  cursor: pointer;
+}
+.xwikiintra li:hover, .xwikitabbar li:hover, .xwikiintracontent legend:hover, .xwikiintracontent fieldset.collapsed legend:hover{
+  background-color: #FFD;
+}
+.xwikiintracontent h4{
+  font-size: 110%;
+  text-align: left;
+  text-transform: none;
+  margin: 0px;
+}
+#xwikihistorylist li{
+  list-style-type: none;
+}
+table.xwikidatatable th{
+  text-align: center;
+  border: 1px solid;
+}
+table.xwikidatatable td{
+  padding: 2px 8px;
+  vertical-align: middle;
+}
+
+/*
+---------------------------------------
+Menu
+---------------------------------------
+*/
+.rightmenu a{
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 110%;
+}
+.leftmenu{
+  padding-right: 2em;
+}
+
+
+/*
+---------------------------------------
+Panels
+---------------------------------------
+*/
+.panel{
+  border: 1px solid;
+}
+.xwikipaneltitle{
+  padding: 0px ${padding}px;;
+  margin: 0px;
+  font-size: 0.9em;
+  background: url("collapse.png") no-repeat right center;
+  cursor: pointer;
+}
+
+.collapsed .xwikipaneltitle{
+  background-image: url("expand.png") 
+}
+.xwikipaneltitle:hover{
+  cursor: pointer;
+  background-image: url("collapseh.png") 
+}
+.collapsed .xwikipaneltitle:hover{
+  background-image: url("expandh.png") 
+}
+.xwikipanelcontents{
+  padding: ${padding}px;
+}
+
+.xwikilogintable{
+  margin: auto;
+}
+.xwikilogintable th{
+  text-align: right;
+  background-color: transparent;
+}
+.xwikilogintable td{
+  text-align: left;
+}
+
+
+.xwikitabbar li.active{
+  border: 1px solid;
+  border-bottom: 3px solid;
+}
+
+#xwikirightstable{
+  width: ${editwidthcontent}px;
+  margin: ${spacing}px 0px;
+  border: 1px solid;
+}
+#xwikirightstable th{
+  text-align: center;
+  border: 1px solid;
+}
+#xwikirightstable td, #xwikirightstable tr{
+  border: 1px solid;
+  text-align: center;
+}
+.panel input.panelinput, .panel select{
+  width: 135px;
+}
+#xwikiincludeddocuments .xwikibuttonlink a{
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+
+/*
+---------------------------------------
+Articles
+---------------------------------------
+*/
+.article_title {
+ font-size: 120%;
+ border-bottom: 1px;
+}
+
+.article_content {
+ padding: 10px;
+}
+
+.article_date {
+ font-size: 120%;
+ border-bottom: 1px solid;
+}
+
+.article_footer {
+ border-top: 1px solid;
+ font-size: 75%; 
+ font-weight: bold; 
+}
+
+/*
+---------------------------------------
+Misc
+---------------------------------------
+*/
+.currentspace a{
+  color: #000 !important;
+  text-decoration: none !important;
+  background-color: #CDF;
+  padding: 2px;
+}

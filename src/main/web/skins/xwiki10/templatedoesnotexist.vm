@@ -1,0 +1,9 @@
+#template("startpage.vm")
+#if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("thistemplatedoesnotexist"))
+$!exception
+#xwikimessageboxend()
+#end
+#template("endpage.vm")

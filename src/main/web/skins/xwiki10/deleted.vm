@@ -1,0 +1,11 @@
+###
+### Document deleted messge
+###
+###
+#template("startpage.vm")
+#if($message)
+<div id="xwikimessage">$message</div>
+#end
+#xwikimessageboxstart($msg.get("delete") $msg.get("deleted"))
+#xwikimessageboxend()
+#template("endpage.vm")

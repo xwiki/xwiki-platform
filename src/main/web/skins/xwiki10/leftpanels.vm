@@ -1,0 +1,7 @@
+#if($showLeftPanels == "1")
+<div id="leftPanels" class="panels left">
+#foreach($panel in $leftPanels)
+$xwiki.includeForm("$panel",false)
+#end
+</div>
+#end

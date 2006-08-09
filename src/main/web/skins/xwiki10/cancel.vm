@@ -1,0 +1,7 @@
+###
+### Cancel action
+###
+### This should NOT be displayed
+###
+#set($message=$msg.get("changescanceled"))
+#template("view.vm")

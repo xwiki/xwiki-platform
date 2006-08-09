@@ -1,0 +1,20 @@
+###
+### Change a user's avatar
+###
+### Set the "avatar" property of the XWikiUsers object to the most recent attachment and forward to "view"
+### TODO: Check dimensions
+### TODO: Document version to return to? (rev and language)
+###
+#if($doc.getObject("XWikiUsers", 0) && ($context.user == $doc.fullName || $hasadmin))
+#set($date = $doc.attachmentList.get(0).date)
+#set($name = $doc.attachmentList.get(0).filename)
+#foreach($attachment in $doc.attachmentList)
+#if($date.getTime().longValue().compareTo($attachment.date.getTime().longValue()) == -1)
+#set($date = $attachment.date)
+#set($name = $attachment.filename)
+#end
+#end
+$response.sendRedirect($doc.getURL("save", "XWiki.XWikiUsers_0_avatar=$name"))
+#else
+$response.sendRedirect($doc.getURL("view"))
+#end

@@ -1,0 +1,26 @@
+#set($formname = "propupdate")
+#set($saveaction = "propupdate")
+#set( $class = $doc.getxWikiClass())
+#set( $redirect = $xwiki.getRequestURL())
+<form id="$formname" method="post" action="$doc.getURL("propupdate")" onsubmit="cancelCancelEdit()">
+<div id="intro">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+</div>
+<div id="xwikiclassproperties">
+#foreach ($field in $class.properties)
+<div id="field_$field.name">
+<div id="field_${field.name}_title" class="accordionTabTitleBar"><h6>#*$msg.get("editfield") *#<tt>$field.prettyName</tt></h6></div>
+<div id="field_${field.name}_content" class="accordionTabContentBox"><div>
+<table>
+#foreach ($classprop in $field.xWikiClass.propertyNames)
+<tr><td class="label"><label for="${field.name}_$classprop">$field.xWikiClass.get("$classprop").getPrettyName():</label></td>
+<td>$doc.displayEdit($field.xWikiClass.get("$classprop"), "${field.name}_" , $field)</td>
+</tr>
+#end
+</table>
+</div></div>
+</div>
+#end
+</div>
+</form>
+<script type="text/javascript">new Rico.Accordion( 'xwikiclassproperties', {panelHeight:'max'} );</script>

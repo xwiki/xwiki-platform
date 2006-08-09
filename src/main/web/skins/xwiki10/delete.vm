@@ -1,0 +1,10 @@
+###
+### Delete page confirm messge
+###
+###
+#template("startpage.vm")
+#if($message)
+<div id="xwikimessage">$message</div>
+#end
+#xwikimessagebox($msg.get("delete") $msg.get("confirmdelete") $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+#template("endpage.vm")

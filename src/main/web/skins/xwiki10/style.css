@@ -1,0 +1,418 @@
+#template("skinVariables.vm")
+@import "elements.css";
+@import "chwSkin.css";
+@import "xwiki.css";
+@import "wiki.css";
+@import "page.css";
+@import "rss.css";
+@import "screenlayout.css";
+@import "presentation.css";
+@import "colors.css";
+@import "temp.css";
+
+/* Default is a Blue StyleSheet */
+/* Light Blue */
+#xwikinav_footer, #xwikinav_header, .heading-1, .heading-1-1 {
+ border-color: #B6C5F2;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: #B6C5F2;
+}
+
+/* Dark Blue */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #5368A6;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #5368A6;
+}
+
+.heading-1, .heading-1-1 {
+ border-color: #5368A6;
+ color: #5368A6;
+}
+
+
+
+/* Comments colors */
+.xwikidata, .xwikidatafooter, .xwikidatafooter1, .xwikidatefooter2 {
+  background-color: #B6C5F2;
+}
+
+.xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
+ background-color: #5368A6;
+}
+
+/* Logo 
+#companylogo img {
+ background-image: url("logobleu.jpg");
+}*/
+/*
+#companylogo img {
+ background-image: url("xwlogoblack.png");
+  background-repeat: no-repeat;
+ height: 91px;
+ width: 136px;
+}
+*/
+.article_title {
+ font-size: 120%;
+ border-bottom: 1px;
+}
+
+.article_content {
+ padding: 10px;
+}
+
+.article_date {
+ font-size: 120%;
+ border-bottom: 1px solid;
+}
+
+.article_footer {
+ border-top: 1px dotted; 
+ font-size: 75%; 
+ font-weight: bold; 
+ color: gray
+}
+
+
+
+
+
+
+
+
+
+.heading-1, .heading-1-1 {
+ border: none;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: transparent;
+}
+
+/* Dark Blue */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #BBB;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #DDD;
+}
+
+.heading-1, .heading-1-1 {
+ border: none;
+ color: #000;
+}
+
+.submenu{
+  display: block;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-top: 1px solid white;
+  position: absolute;
+  padding: 4px 5px 8px;
+  margin-top: -1px;
+  margin-left: 5px;
+}
+.submenu .submenuitem{
+  display: block;
+}
+.submenu.hidden{
+  display: none;
+}
+
+input[type=submit], input[type=reset]{
+  background-color: #EEE;
+  font-family: Helvetica;
+  font-weight: bold;
+  padding: 1px 16px;
+}
+input[type=submit]:hover, input[type=reset]:hover{
+  background-color: #FFD;
+  cursor: pointer;
+}
+.xwikiintra li:hover, .xwikitabbar li:hover, .xwikiintracontent legend:hover, .xwikiintracontent fieldset.collapsed legend:hover{
+  background-color: #FFD;
+}
+
+
+/*-------------------------------------------------------------------------------*/
+
+/* Dark Blue */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #369;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #369;
+}
+
+.heading-1, .heading-1-1 {
+ border: none;
+ color: #369;
+}
+
+.submenu{
+  display: block;
+  background-color: white;
+/*   border: 1px solid #369; */
+  border-top: 1px solid white;
+  position: absolute;
+  padding: 4px 5px 8px;
+  margin-top: -1px;
+  margin-left: 5px;
+}
+.submenu .submenuitem{
+  display: block;
+}
+.submenu.hidden{
+  display: none;
+}
+
+input[type=submit], input[type=reset], input[type=button], input.button{
+  background-color: #EEE;
+  font-family: Helvetica;
+  font-weight: bold;
+  padding: 1px 16px;
+}
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, input.button:hover{
+  background-color: #FFD;
+  cursor: pointer;
+}
+.xwikiintra li:hover, .xwikiintracontent legend:hover, .xwikiintracontent fieldset.collapsed legend:hover{
+  background-color: #FFD;
+}
+/*___________________
+From elements.css
+_________________________*/
+
+.extern{
+  background: #369 url("corner.png") no-repeat right top;
+}
+a:link{
+  color: #369;
+}
+a:visited{
+  color: #777;
+}
+
+#companylogo img {
+  background-image: url("xwlogoblue.png");
+  background-repeat: no-repeat;
+  height: 91px;
+  width: 136px;
+}
+
+table{
+  border-spacing: 0px;
+  border-collapse: collapse;
+}
+
+/*---------------------------
+colors.css
+-----------------------------*/
+.panel{
+  border: 1px solid #ACD;
+}
+.xwikipaneltitle{
+  background-color: #CDF;
+  cursor: pointer;
+}
+.xwikipanelarrow{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 50px;
+  height: 10px;
+  visibility: hidden;
+}
+
+tr.row.odd{
+  background-color: #CDF;
+}
+tr.row.even{
+  background-color: #FFF;
+}
+tr th{
+  background-color: #CDF;
+}
+
+#xwikiincludeddocuments .xwikibuttonlink a{
+  background-image: url("corner.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+  padding: 2px 8px;
+  margin-left: 8px;
+}
+
+/*---------------------------------
+ From scrennlayout.css
+-----------------------------------
+*/
+
+/*
+---------------------------------------
+Intra
+---------------------------------------
+*/
+.xwikiintra li, .xwikitabbar li{
+  background-color: #cdf;
+  border-color: #ACF;
+  border-bottom-color: #CCC;
+  border-left-color: #DDF;
+  border-top-color: #DDF;
+}
+
+.xwikibuttonlink a{
+  background-color: #369;
+  color: #fff;
+}
+
+.xwikibuttonlink a:hover{
+  background-color: #ffd;
+  color: #369;
+}
+
+
+table.xwikidatatable th{
+  border: 1px solid #369;
+  background-color: #369;
+  color: #cdf;
+  text-align: center;
+}
+
+table.xwikidatatable td{
+  padding: 2px 8px;
+}
+.xwikiintracontent{
+  margin: 8px;
+}
+
+.xwikilogintable{
+  margin: 8px auto;
+}
+.xwikilogintable th{
+  text-align: right;
+  background-color: transparent;
+}
+/*
+.xwikiintracontent legend{
+  border: 1px solid #369;
+}
+.xwikiintracontent fieldset{
+  border-color: #369;
+}
+*/
+
+/*
+---------------------------------------------
+"Message Boxes"
+---------------------------------------------
+*/
+fieldset.xwikimessage{
+  border-color:#658BB2;
+}
+
+fieldset.xwikimessage legend{
+  background-color: #658BB2;
+  color: #FFF;
+}
+
+/*
+---------------------------------------------
+History
+---------------------------------------------
+*/
+
+
+#xwikihistorylist li{
+  list-style-type: none;
+}
+
+.xwikiintracontent h4{
+  font-size: 110%;
+  text-align: left;
+  text-transform: none;
+  margin: 0px;
+}
+
+.xwikitabbar li.active{
+  border: 1px solid #DDD;
+  border-bottom: 3px solid #FFF;
+}
+
+#xwikirightstable{
+  width: 624px;
+  margin: 0px;
+  border: 1px solid #DDD;
+}
+#xwikirightstable th{
+  text-align: center;
+  border: 1px solid #ACF;
+  border-bottom-color: #CCC;
+  border-left-color: #DDF;
+  border-top-color: #DDF;
+}
+#xwikirightstable td, #xwikirightstable tr{
+  border: 1px solid #DDD;
+  text-align: center;
+}
+
+#editcolumn{
+  float: left;
+  margin: 0px;
+  width: 634px;
+}
+
+/*
+----------------------------------------
+Color Picker
+----------------------------------------
+*/
+.chwColorPickerInvoker{
+  color: #FFF;
+  background-color: #369;
+}
+
+html > body #chwColorPickerScreen{
+  opacity: 0.6;
+  background-color: #FFF;
+}
+
+#chwColorPickerFieldset{
+  border: 2px solid #369;
+  border-top: 8px solid #369;
+}
+
+#chwColorPickerFieldset legend{
+  background-color: #369;
+  color: #FFF;
+}
+
+a.chwButton{
+  background-color: #369;
+  color: #FFF;
+}
+
+#chwColorPickerShow, #chwColorCodeDisplay{
+  width: 64px;
+}
+
+pre{
+  overflow: auto;
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  padding: 4px;
+}
+
+#set($size = "135px")
+.panel input.panelinput{
+  width: 135px;
+  width: $size;
+}

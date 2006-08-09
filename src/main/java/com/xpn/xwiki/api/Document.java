@@ -197,7 +197,7 @@ public class Document extends Api {
     }
 
     public String getArchive() throws XWikiException {
-        return doc.getDocumentArchive(context).getArchiveAsString();
+        return doc.getDocumentArchive(context).getArchive();
     }
 
     public XWikiDocumentArchive getDocumentArchive() throws XWikiException {

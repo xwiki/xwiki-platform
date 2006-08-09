@@ -592,7 +592,7 @@ public class XWikiDocument {
 
     public void setDocumentArchive(String sarch) throws XWikiException {
         XWikiDocumentArchive xda = new XWikiDocumentArchive(getId());
-        xda.setArchiveFromString(sarch);
+        xda.setArchive(sarch);
         setDocumentArchive(xda);
     }
 
@@ -1525,7 +1525,7 @@ public class XWikiDocument {
         if (bWithVersions) {
             el = new DOMElement("versions");
             try {
-                el.addText(getDocumentArchive(context).getArchiveAsString());
+                el.addText(getDocumentArchive(context).getArchive());
             } catch (XWikiException e) {
                 return null;
             }

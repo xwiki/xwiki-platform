@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
 import com.xpn.xwiki.XWikiException;
 import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 
 public class XWikiDocumentArchive {
@@ -37,7 +36,7 @@ public class XWikiDocumentArchive {
         this.archive = archive;
     }
 
-    public String getArchiveAsString() throws XWikiException {
+    public String getArchive() throws XWikiException {
         if (archive == null)
             return "";
         else {
@@ -47,7 +46,7 @@ public class XWikiDocumentArchive {
         }
     }
 
-    public void setArchiveFromString(String text) throws XWikiException {
+    public void setArchive(String text) throws XWikiException {
         try {
             if ((text!=null)&&(!text.trim().equals(""))) {
                 StringInputStream is = new StringInputStream(text);
@@ -99,7 +98,7 @@ public class XWikiDocumentArchive {
             return false;
 
         try {
-            if (!getArchiveAsString().equals(doc.getArchiveAsString()))
+            if (!getArchive().equals(doc.getArchive()))
                 return false;
         } catch (XWikiException e) {
             return false;

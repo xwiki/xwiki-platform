@@ -6,7 +6,7 @@
 <div id="intro">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 </div>
-<div id="xwikiobjects">
+<div id="xwikiobjects" class="accordion">
 #foreach($class in $classes)
 #set($props = $class.getProperties())
 #foreach($prop in $props)

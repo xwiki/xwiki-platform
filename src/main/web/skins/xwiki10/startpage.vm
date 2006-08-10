@@ -2,7 +2,7 @@
 #template("layoutvars.vm")
 #template("htmlheader.vm")
 #template("header.vm")
-<div class="layoutsection">
+<div class="layoutsection" id="contentcontainer">
 #if($!hidecolumns == 1)
   <div id="contentcolumn" class="contenthidelefthideright">
 #else

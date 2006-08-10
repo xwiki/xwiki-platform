@@ -1,4 +1,5 @@
-#template("skinvariables.vm")
+#template("skinVariables.vm")
+@import "elements.css";
 @import "classes.css";
 @import "chwSkin.css";
 @import "xwiki.css";
@@ -9,7 +10,6 @@
 @import "screenlayout.css";
 @import "presentation.css";
 @import "colors.css";
-@import "temp.css";
+@import "customlayout.css";
+@import "customcolors.css";
 @import "ie.css";
-
-

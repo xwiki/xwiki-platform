@@ -106,14 +106,11 @@
 }
 
 .wiki-table th {
-  border: 1px solid #5b5b5b;
+  border: 1px solid;
   border-width: 1px;
   border-style: inset;
   text-align: left;
-  color: inherit;
   font-weight: bold;
-  background-color: #CDF;
-  color: #000000;
   padding: 2px;
 }
 

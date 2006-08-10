@@ -8,14 +8,14 @@ for @media screen displays
 
 body#body{
   position: relative;
-  width: ${contentwidth}px;
+  width: 944px;
   margin: 0px auto;
   text-align: center;
   font-size: 85%;
 }
 
 #xwikimaincontainer{
-  width: ${contentwidth}px;
+  width: 944px;
   margin: auto;
   text-align: left;
 }
@@ -67,10 +67,6 @@ Global header
   padding: 0px;
 }
 
-#globalmenu a {
-  text-decoration: none;
-}
-
 #globalsearch {
   text-align: right;
   margin: 5px 5px 0px 0px;
@@ -86,30 +82,29 @@ Space header, footer
   margin: 0px 0px;
 }
 html > body #headerspace, html > body #footerglobal{
-  margin: 0px 0px ${dspacing}px;
+  margin: 10px 0px;
 }
 
 #headerspace hr, #footerglobal hr{
   margin: 0px;
   padding: 0px;
   clear: both;
-  background-color: #000;
   height: 1px;
   border: none;
 }
 #breadcrumbs{
-  margin: 0px ${spacing}px;
+  margin: 0px 5px;
 }
 
 #xwikilicence {
   float: right;
   clear: right;
-  margin-right: ${spacing}px;
+  margin-right: 5px;
 }
 
 #xwikidocinfo {
   float: left;
-  margin-left: ${spacing}px;
+  margin-left: 5px;
 }
 
 /*
@@ -118,28 +113,28 @@ Content
 ---------------------------------------
 */
 .content{
-  margin: ${dspacing}px ${contentmargin}px 0px;
+  margin: 10px 178px 0px;
 }
 
 .contenthideleft{
-  margin: ${dspacing}px ${contentmargin}px 0px 0px;
+  margin: 10px 178px 0px 0px;
 }
 .contenthideright{
-  margin: ${dspacing}px 0px 0px ${contentmargin}px;
+  margin: 10px 0px 0px 178px;
 }
 .contenthidelefthideright{
-  margin: ${dspacing}px 0px 0px;
+  margin: 10px 0px 0px;
 }
 #xwikieditor.layoutsection{
-  border: 1px solid #DDD;
+  border: 1px solid;
   margin: 0px;
-  padding: 16px ${padding}px ${padding}px;
+  padding: 10px 4px 4px;
 }
 #editcolumn{
   margin: 0px;
   float: left;
-  width: ${editwidth}px;
-  overflow: hidden;
+  width: 634px;
+  overflow: auto;
 }
 
 #actionmenu{
@@ -147,26 +142,27 @@ Content
   left: 0px;
 }
 #xwikidoccontent textarea{
-  width: ${edittextareaie}px;
+  width: 634px;
 }
 html > body #xwikidoccontent textarea{
-  width: ${edittextarea}px;
+  width: 630px;
 }
 .layoutsubsection{
   border: 1px solid #DDD;
-  margin: 0px 0px ${spacing}px;
-  padding: 0px ${padding}px;
+  margin: 0px 0px 5px;
+  padding: 0px 4px;
 }
 
 .layoutsubsection.main{
-  padding-top: ${padding}px;
+  padding-top: 4px;
 }
 
 .layoutsubsection.about{
   border: none;
   text-align: right;
   font-style: italic;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
   font-size: 85%;
 }
 .rightmenu{
@@ -183,7 +179,7 @@ Zone for Comments, attachments, History...
   border: none;
 }
 #xwikidatacontents{
-  padding: 0px ${padding}px;
+  padding: 0px 4px;
   border: 1px solid;
 }
 .xwikiintratitle{
@@ -228,7 +224,7 @@ fieldset.xwikimessage .buttons a{
   margin: 8px;
 }
 
-input.button{
+.button{
   font-family: Helvetica, sans-serif;
   font-weight: bold;
   text-align: center;
@@ -244,13 +240,16 @@ Comments
   padding: 5px 5px 5px 5px;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
 }
 .commentavatar{
-  float: left;
+  position: absolute;
+  left: 0px;
+  top: 0px;
   width: 54px;
 }
 .commentavatar img{
-  width: 48px;
+  width: 3.5em;
   display: block;
   margin: auto;
 }
@@ -304,7 +303,6 @@ html > body .xwikiintracontent legend{
   border: none;
 }
 .xwikiintracontent fieldset.collapsed legend{
-  background-color: #EEE;
   margin-left: 2px;
 }
 .xwikiintracontent fieldset.collapsed div{
@@ -355,17 +353,15 @@ Tabs
 ---------------------------------------
 */
 ul.xwikitabbar{
-  padding: ${padding}px 0px;
+  padding: 4px 0px;
   margin: 0px;
 }
 .xwikitabbar li{
   display: inline;
   padding: 0px;
   list-style-type: none;
-  border: 1px solid #AAA;
-  border-bottom: 1px solid #CCC;
-  border-left-color: #CCC;
-  border-top-color: #CCC;
+  border: 1px solid;
+  border-bottom: none;
 }
 html > body .xwikitabbar li{
   padding: 5px 0px;
@@ -375,16 +371,13 @@ html > body .xwikitabbar li{
   font-weight: bold;
   text-decoration: none;
 }
-.xwikitabbar li.active a{
-  color: #000;
-}
 .xwikitabbar li a:hover{
   text-decoration: none;
 }
 
 .xwikitabbar li.active{
-  border: 1px solid #DDD;
-  border-bottom: 3px solid #FFF;
+  border: 1px solid;
+  border-bottom: 3px solid;
 }
 
 .xwikitabbar li.active a:hover{
@@ -394,7 +387,7 @@ html > body .xwikitabbar li{
 --
 */
 #xwikicontentedit{
-  border: 1px solid #ddd;
+  border: 1px solid;
 }
 
 /*
@@ -404,8 +397,8 @@ Panels
 */
 .panels{
   display: inline;
-  width: ${panelwidth}px;
-  margin: ${dspacing}px ${spacing}px;
+  width: 168px;
+  margin: 10px 5px;
   padding: 0px;
 }
 html > body .panels{
@@ -422,9 +415,9 @@ html > body .panels{
   margin-right: 0px;
 }
 .panel, .fakepanel{
-  width: ${panelwidth}px;
+  width: 168px;
   display: block;
-  margin: 0px 0px ${spacing}px;
+  margin: 0px 0px 5px;
   padding: 0px;
   border: 1px solid;
 }
@@ -434,12 +427,12 @@ html > body .panels{
 }
 
 #editPanels.panels{
-  width: ${editpanelwidth}px;
+  width: 290px;
   float: right;
   margin-right: 0px;
 }
 #editPanels .panel{
-  width: ${editpanelwidth}px;
+  width: 290px;
 }
 .collapsed .xwikipanelcontents{
   display: none;
@@ -533,25 +526,9 @@ td.label{
   margin: -2px 1px 0px;
 }
 
-.editactions span{
-  display: none;
-}
-
-.editactions a{
-  text-decoration: none;
-  padding: 1px 16px;
-  font-weight: bold;
-  border: 2px outset #DCDCDC;
-}
-
-.editactions a:hover{
-  background-color: #FFD;
-  cursor: pointer;
-}
-
 .editactions{
   border: none !important;
-  margin-top: 8px;
+  margin-top: 10px;
   padding: 0px;
 }
 #historycontent td{

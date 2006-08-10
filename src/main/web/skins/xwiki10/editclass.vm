@@ -6,7 +6,7 @@
 <div id="intro">
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 </div>
-<div id="xwikiclassproperties">
+<div id="xwikiclassproperties" class="accordion">
 #foreach ($field in $class.properties)
 <div id="field_$field.name">
 <div id="field_${field.name}_title" class="accordionTabTitleBar"><h6>#*$msg.get("editfield") *#<tt>$field.prettyName</tt></h6></div>

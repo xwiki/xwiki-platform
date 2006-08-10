@@ -19,8 +19,11 @@
 #set($editcontentmargin = $editpanelwidth + $dspacing)
 #set($editwidth = $contentwidth - $editcontentmargin - $dspacing)
 #set($editwidthcontent = $editwidth - $dspacing)
+#set($editpanelwidthcontent = $editpanelwidth - $dspacing)
 #set($edittextareaie = $editwidth)
 #set($edittextarea = $edittextareaie - 4)
+#set($messageboxwidth = 480)
+#set($blogwidth = 200)
 ##
 ##
 #set($showLeftPanels = $xwiki.getUserPreferenceFromCookie("showLeftPanels"))

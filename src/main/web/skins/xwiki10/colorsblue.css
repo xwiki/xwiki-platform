@@ -1,14 +1,10 @@
-body#body{
-  background-color: #FFF;
-  color: #000;
-}
-
 .heading-1, .heading-1-1, .heading-1-1-1, .heading-1-1-1-1 {
-  color: #000;
+  color: #369;
 }
 
 #companylogo img {
- background-image: url("xwlogoblack.png");
+ background-image: url("xwlogoblue.png");
+ background-repeat: no-repeat;
  height: 91px;
  width: 136px;
 }
@@ -36,21 +32,45 @@ Content
 Zone for Comments, attachments, History... 
 ---------------------------------------
 */
+ul.xwikiintra{
+  border-bottom-color: #DDD;
+  background-color: #EEE;
+}
+
+.xwikiintra li{
+  background-color: #BBB;
+  border-color: #CCC;
+  border-right-color: #AAA;
+}
+
+.xwikiintra li a, .xwikiintra li.active a{
+  color: #000;
+}
+
+.xwikiintra li.active{
+  background-color: #FFF !important;
+  border-bottom-color: #FFF;
+  border-top-color: #DDD;
+}
+.xwikibuttonlink a{
+  background-color: #BBB;
+}
+
 table.xwikidatatable, table.xwikidatatable th{
   border-color: #DDD;
 }
 table.xwikidatatable th{
-  color: #000;
-  background-color: #CCC;
-  border-color: #DDD;
+  color: #CDF;
+  background-color: #369;
+  border-color: #369;
 }
 
 .xwikiintracontent legend, .xwikiintracontent fieldset{
-  border-color: #DDD;
+  border-color: #ddd;
 }
 
 .xwikiintracontent fieldset.collapsed legend{
-  background-color: #CCC;
+  background-color: #EEE;
 }
 
 /*
@@ -59,9 +79,9 @@ Menu
 ---------------------------------------
 */
 .submenu{
-  background-color: #FFF;
-  border-color: #DDD;
-  border-top-color: #FFF;
+  background-color: white;
+  border-color: #ddd;
+  border-top-color: white;
 }
 
 /*
@@ -70,13 +90,17 @@ Menu
 ---------------------------------------------
 */
 fieldset.xwikimessage{
-  border-color: #000;
-  background-color: #EEE;
+  border-color: #BBB;
+  background-color: #F5F5F5;
 }
 
 fieldset.xwikimessage legend{
-  background-color: #000;
+  background-color: #BBB;
   color: #FFF;
+}
+
+input.button{
+  background-color: #EEE;
 }
 
 /*
@@ -84,29 +108,33 @@ fieldset.xwikimessage legend{
 Editors
 ---------------------------------------
 */
-#xwikicontentedit{
-  border-color: #DDD;
-}
 
-/*
----------------------------------------
-Tabs
----------------------------------------
-*/
 .xwikitabbar li{
-  background-color: #CCC;
-  border-right-color: #BBB;
-  border-left-color: #DDD;
-  border-top-color: #DDD;
+  background-color: #CDF;
+  border-color: #ACF;
+  border-bottom-color: #CCC;
+  border-left-color: #DDF;
+  border-top-color: #DDF;
 }
 
 .xwikitabbar li a{
   color: #000 !important;
 }
+.xwikitabbar li.active a{
+  color: #000 !important;
+}
+
 .xwikitabbar li.active{
   background-color: #FFF !important;
   border-color: #DDD;
   border-bottom-color: #FFF;
+}
+
+/*
+--
+*/
+#xwikicontentedit{
+  border-color: #ddd;
 }
 
 /*
@@ -116,24 +144,22 @@ Panels
 */
 .fakepanel{
   background-color: #EEE;
-  border-color: #DDD;
+  border-color: #E5E5E5;
 }
 
 .panel{
   border-color: #DDD;
 }
 .xwikipaneltitle{
-  background-color: #CCC;
+  background-color: #CDF;
 }
+
 
 /*
 ----------------------------------
 Rico Acordeon -- Sintax Help Panel
 ----------------------------------
 */
-.accordion{
-  border-color: #DDD !important;
-}
 .accordionTabContentBox table th{
   background-color: #FFF;
   border-bottom-color: #DDD;
@@ -152,9 +178,42 @@ Misc
 ----------------------------------
 */
 
+td.label{
+  color: #777;
+}
+
+#xwikiclassproperties, #xwikiobjects{
+  border-color: #DDD !important;
+}
+
 #xwikihelpsyntax{
   border-top-color: #DDD;
 }
+
+.editactions a{
+  background-color: #EEE;
+  color: #000;
+  border-color: #DCDCDC;
+}
+
+.editactions a:hover{
+  background-color: #FFD;
+}
+/*
+---------------------------------------------
+"Message Boxes"
+---------------------------------------------
+*/
+fieldset.xwikimessage{
+  border-color:#658BB2;
+}
+
+fieldset.xwikimessage legend{
+  background-color: #658BB2;
+  color: #FFF;
+}
+
+
 
 tr.row.odd{
   background-color: #EEE;
@@ -165,28 +224,57 @@ tr.row.even{
 tr th{
   background-color: #EEE;
 }
+body#body{
+#csscolorproperty("background" "backgroundcolor")
+#csscolorproperty("color" "textcolor")
+}
+
 a:link{
-  color: #000;
+  color: #369;
 }
 a:visited{
-  color: #000;
+  color: #777;
 }
 
-.button, .xwikibuttonlink a{
-  background-color: #CCC;
-  color: #000;
+tr.row.odd{
+  background-color: #CDF;
 }
-.button:hover, .xwikibuttonlink a:hover{
-  background-color: #FFD;
+tr.row.even{
+  background-color: #FFF;
+}
+th{
+  background-color: #CDF;
 }
 
-#xwikirightstable, #xwikirightstable th, #xwikirightstable td, #xwikirightstable tr{
+.xwikibuttonlink a{
+  background-color: #369;
+  color: #fff;
+}
+.xwikibuttonlink a:hover{
+  background-color: #ffd;
+  color: #369;
+}
+.xwikitabbar li.active{
+  border-color: #DDD;
+  border-bottom-color: #FFF;
+}
+
+#xwikirightstable{
+  border-color: #DDD;
+}
+#xwikirightstable th{
+  border-top-color: #DDF;
+  border-right-color: #ACF;
+  border-bottom-color: #CCC;
+  border-left-color: #DDF;
+}
+#xwikirightstable td, #xwikirightstable tr{
   border-color: #DDD;
 }
 
 .article_footer {
-  color: #000;
-  border-color: #000;
+  color: #777;
+  border-color: 777;
 }
 
 .xwikiuserblog .rssfeed {
@@ -197,8 +285,4 @@ a:visited{
 }
 .rsschanneltitle{
   background-color: transparent;
-}
-.currentspace a{
-  color: #000 !important;
-  background-color: #CCC;
 }

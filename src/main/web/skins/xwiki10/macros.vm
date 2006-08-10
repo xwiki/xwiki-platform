@@ -222,3 +222,11 @@
   $csspropname: $objcolor;
 #end
 #end
+
+#macro(csscolorpropertyimportant $csspropname $fieldname)
+#set($objcolor = $colors.get($fieldname))
+#if($objcolor && $objcolor != "")
+  $csspropname: $objcolor !important;
+#end
+#end
+#end

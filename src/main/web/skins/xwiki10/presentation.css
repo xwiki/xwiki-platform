@@ -51,6 +51,10 @@
 Global header
 ---------------------------------------
 */
+#globalmenu a {
+  text-decoration: none;
+}
+
 #companylogo img {
   text-decoration: none;
   border: none;
@@ -65,27 +69,23 @@ Global header
 }
 
 input[type=submit], input[type=reset], input[type=button]{
-  background-color: #EEE;
   font-family: Helvetica;
   font-weight: bold;
   padding: 1px 16px;
   width: auto;
   overflow: visible;
 }
-input.button{
-  background-color: #EEE;
+.button{
   font-family: Helvetica;
   font-weight: bold;
   padding: 1px 16px;
   width: auto;
   overflow: visible;
 }
-input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, input.button:hover{
-  background-color: #FFD;
+input[type=submit]:hover, input[type=reset]:hover, input[type=button]:hover, .button:hover{
   cursor: pointer;
 }
-input.button:hover{
-  background-color: #FFD;
+.button:hover{
   cursor: pointer;
 }
 .xwikiintra li:hover, .xwikitabbar li:hover, .xwikiintracontent legend:hover, .xwikiintracontent fieldset.collapsed legend:hover{
@@ -223,8 +223,6 @@ Misc
 ---------------------------------------
 */
 .currentspace a{
-  color: #000 !important;
   text-decoration: none !important;
-  background-color: #CDF;
   padding: 2px;
 }

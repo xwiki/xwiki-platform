@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
@@ -60,6 +61,8 @@ public class DownloadAction extends XWikiAction {
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
 
+        String ofilename = XWiki.getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
+        response.addHeader("Content-disposition", "attachment; filename=\"" +  ofilename + "\"");
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Sending the content of the attachment
         byte[] data = attachment.getContent(context);

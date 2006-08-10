@@ -272,6 +272,7 @@ public class XWikiTest extends HibernateTestCase {
         AbstractRenderTest.renderTest(wikiengine, doc1, "$context.context.database", false, getXWikiContext());
     }
 
+    /*
     public void testXWikiPrefs() throws XWikiException {
         XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
         System.out.println("JDBC Calls for init");
@@ -294,7 +295,9 @@ public class XWikiTest extends HibernateTestCase {
         System.out.println("JDBC Calls for second getPrefsClass");
         hibstore.getBatcherStats().printSQLList(System.out);
     }
+    */
 
+    /*
     public void testXWikiInit() throws XWikiException {
 
         XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
@@ -329,6 +332,7 @@ public class XWikiTest extends HibernateTestCase {
         System.out.println("JDBC Calls for getDocument");
         hibstore.getBatcherStats().printSQLList(System.out);
     }
+    */
 
     public void testXWikiDocElements() throws XWikiException {
         XWikiDocument doc = new XWikiDocument();

@@ -388,7 +388,7 @@ $xwiki.getUserName("xwiki:${username}")
     #end
     </table>
     #if ($canInstall != 0)
-      1.1.1 You are can install this applications
+      1.1.1 You can install this application
       <input type="submit" name="submitted" value="Valider">
     #else
       1.1.1 You can't install this application.

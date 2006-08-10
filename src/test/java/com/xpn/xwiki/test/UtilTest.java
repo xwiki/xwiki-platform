@@ -140,42 +140,42 @@ public class UtilTest extends HibernateClassesTest {
 
       // test init level 1
       Map result = TOCGenerator.generateTOC(content, 1, 6, true, getXWikiContext());
-      assertEquals (((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.1");
-      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
-      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
-      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
-      assertEquals (((Map) result.get("a-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
-      assertEquals (((Map) result.get("f")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.1");
-      assertEquals (((Map) result.get("g")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.2");
-      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.2");
-      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3");
-      assertEquals ((((Map) result.get("j")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3.1.1.1.1");
+      assertEquals (((Map) result.get("Ha")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.1");
+      assertEquals (((Map) result.get("Hb")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
+      assertEquals (((Map) result.get("Hc")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
+      assertEquals (((Map) result.get("Hd")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
+      assertEquals (((Map) result.get("Ha-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertEquals (((Map) result.get("Hf")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.1");
+      assertEquals (((Map) result.get("Hg")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1.1.2");
+      assertEquals (((Map) result.get("Hh")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.2");
+      assertEquals ((((Map) result.get("Hi")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3");
+      assertEquals ((((Map) result.get("Hj")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.3.1.1.1.1");
       
       // test init level 2
       result = TOCGenerator.generateTOC(content, 2, 6, true, getXWikiContext());
-      assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1");
-      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
-      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
-      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "3");
-      assertNull(result.get("a-1")); 
-      assertEquals (((Map) result.get("f")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.1");
-      assertEquals (((Map) result.get("g")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.2");
-      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "4");
-      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5");
-      assertEquals ((((Map) result.get("j")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5.1.1.1.1");
+      assertEquals ((((Map) result.get("Ha")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1");
+      assertEquals (((Map) result.get("Hb")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertEquals (((Map) result.get("Hc")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
+      assertEquals (((Map) result.get("Hd")).get(TOCGenerator.TOC_DATA_NUMBERING), "3");
+      assertNull(result.get("Ha-1"));
+      assertEquals (((Map) result.get("Hf")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.1");
+      assertEquals (((Map) result.get("Hg")).get(TOCGenerator.TOC_DATA_NUMBERING), "3.1.2");
+      assertEquals (((Map) result.get("Hh")).get(TOCGenerator.TOC_DATA_NUMBERING), "4");
+      assertEquals ((((Map) result.get("Hi")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5");
+      assertEquals ((((Map) result.get("Hj")).get(TOCGenerator.TOC_DATA_NUMBERING)), "5.1.1.1.1");
       
       // test max level 3
       result = TOCGenerator.generateTOC(content, 1, 3, true, getXWikiContext());
-      assertEquals ((((Map) result.get("a")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1.1");
-      assertEquals (((Map) result.get("b")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
-      assertEquals (((Map) result.get("c")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
-      assertEquals (((Map) result.get("d")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
-      assertEquals (((Map) result.get("a-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
-      assertNull(result.get("f"));
-      assertNull(result.get("g"));
-      assertEquals (((Map) result.get("h")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
-      assertEquals ((((Map) result.get("i")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.2");
-      assertNull(result.get("j"));
+      assertEquals ((((Map) result.get("Ha")).get(TOCGenerator.TOC_DATA_NUMBERING)), "1.1");
+      assertEquals (((Map) result.get("Hb")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2");
+      assertEquals (((Map) result.get("Hc")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.2.1");
+      assertEquals (((Map) result.get("Hd")).get(TOCGenerator.TOC_DATA_NUMBERING), "1.3");
+      assertEquals (((Map) result.get("Ha-1")).get(TOCGenerator.TOC_DATA_NUMBERING), "2");
+      assertNull(result.get("Hf"));
+      assertNull(result.get("Hg"));
+      assertEquals (((Map) result.get("Hh")).get(TOCGenerator.TOC_DATA_NUMBERING), "2.1");
+      assertEquals ((((Map) result.get("Hi")).get(TOCGenerator.TOC_DATA_NUMBERING)), "2.2");
+      assertNull(result.get("Hj"));
     }
 
 

@@ -1049,16 +1049,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
 
     public String getSkinFile(String filename, XWikiContext context) {
+        return getSkinFile(filename, false, context);
+    }
+
+    public String getSkinFile(String filename, boolean forceSkinAction, XWikiContext context) {
         XWikiURLFactory urlf = context.getURLFactory();
 
         try {
             String skin = getSkin(context);
-            String result = getSkinFile(filename, skin, context);
+            String result = getSkinFile(filename, skin, forceSkinAction, context);
             if (result != null)
                 return result;
             String baseskin = getBaseSkin(context);
             if (!skin.equals(baseskin)) {
-                result = getSkinFile(filename, baseskin, context);
+                result = getSkinFile(filename, baseskin, forceSkinAction, context);
                 if (result != null)
                     return result;
             }
@@ -1071,11 +1075,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getSkinFile(String filename, String skin, XWikiContext context) {
+        return getSkinFile(filename, false, context);
+    }
+
+    public String getSkinFile(String filename, String skin, boolean forceSkinAction, XWikiContext context) {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
             String path = "skins/" + skin + "/" + filename;
             if (resourceExists(path)) {
-                URL url = urlf.createSkinURL(filename, skin, context);
+                URL url;
+
+                if (forceSkinAction)
+                 url = urlf.createSkinURL(filename, "skins", skin, context);
+                else
+                 url = urlf.createSkinURL(filename, skin, context);
                 return urlf.getURL(url, context);
             }
 

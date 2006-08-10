@@ -25,6 +25,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.net.URL;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -63,32 +64,27 @@ public class SkinAction extends XWikiAction {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
 
-        BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
-        String content = null;
-        if (object!=null) {
-            content = object.getStringValue(filename);
-        }
+        try {
+            BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
+            String content = null;
+            if (object!=null) {
+                content = object.getStringValue(filename);
+            }
 
-        if ((content!=null)&&(!content.equals(""))) {
-            // Choose the right content type
-        	String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-        	if(mimetype.equals("text/css")){
-        		content = context.getWiki().parseContent(content, context);
-        	}
-            response.setContentType(mimetype);
-            response.setDateHeader("Last-Modified", doc.getDate().getTime());
-            // Sending the content of the attachment
-            response.setContentLength(content.length());
-            try {
+            if ((content!=null)&&(!content.equals(""))) {
+                // Choose the right content type
+                String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                if(mimetype.equals("text/css")){
+                    content = context.getWiki().parseContent(content, context);
+                }
+                response.setContentType(mimetype);
+                response.setDateHeader("Last-Modified", doc.getDate().getTime());
+                // Sending the content of the attachment
+                response.setContentLength(content.length());
                 response.getWriter().write(content);
                 return true;
-            } catch (IOException e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                        "Exception while sending response", e);
             }
-        }
-        else {
+
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (attachment!=null) {
                 // Sending the content of the attachment
@@ -100,19 +96,42 @@ public class SkinAction extends XWikiAction {
                 response.setContentType(mimetype);
                 response.setDateHeader("Last-Modified", attachment.getDate().getTime());
                 response.setContentLength(data.length);
-                try {
+                response.getOutputStream().write(data);
+                return true;
+            }
+
+            if (doc.getWeb().equals("skins")) {
+                String path = "skins/" + doc.getName() + "/" + filename;
+                if (!context.getWiki().resourceExists(path))
+                    path = "skins/" + context.getWiki().getBaseSkin(context) + "/" + filename;
+
+                byte[] data = context.getWiki().getResourceContentAsBytes(path);
+                if ((data!=null)&&(data.length!=0)) {
+                    // Choose the right content type
+                    String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                    if(mimetype.equals("text/css")){
+                        data = context.getWiki().parseContent(new String(data), context).getBytes();
+                    }
+                    response.setContentType(mimetype);
+                    response.setDateHeader("Last-Modified", (new Date()).getTime());
+                    // Sending the content of the attachment
+                    response.setContentLength(data.length);
                     response.getOutputStream().write(data);
                     return true;
-                } catch (IOException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                            "Exception while sending response", e);
+                } else {
+
+
                 }
             }
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                    "Exception while sending response", e);
         }
+
         return false;
     }
-    
+
     private boolean renderSkin(String filename, String skin, XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();

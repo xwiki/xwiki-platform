@@ -322,6 +322,10 @@ public class XWiki extends Api {
         return xwiki.getSkinFile(filename, context);
     }
 
+    public String getSkinFile(String filename, boolean forceSkinAction) {
+        return xwiki.getSkinFile(filename, forceSkinAction, context);
+    }
+
     public String getSkin() {
         return xwiki.getSkin(context);
     }

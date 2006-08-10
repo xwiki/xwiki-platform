@@ -1066,12 +1066,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (result != null)
                     return result;
             }
-            URL url = urlf.createSkinURL(filename, "default", context);
+            URL url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
             return urlf.getURL(url, context);
         } catch (Exception e) {
         }
 
-        return "../../../skins/default/" + filename;
+        return "../../../skins/" + getDefaultBaseSkin(context) + "/" + filename;
     }
 
     public String getSkinFile(String filename, String skin, XWikiContext context) {
@@ -1143,15 +1143,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 skin = getUserPreference("skin", context);
             }
             if (skin.equals("")) {
-                skin = Param("xwiki.defaultskin", "default");
+                skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
             }
         } catch (Exception e) {
-            skin = "default";
+            skin = getDefaultBaseSkin(context);
         }
         try {
             if (skin.indexOf(".")!=-1) {
                 if (!checkAccess("view", getDocument(skin, context), context))
-                    skin = Param("xwiki.defaultskin", "default");
+                    skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
             }
         } catch (XWikiException e) {
             // if it fails here, let's just ignore it
@@ -1200,7 +1200,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 baseskin = getDefaultBaseSkin(context);
             }
         } catch (Exception e) {
-            baseskin = "default";
+            baseskin = getDefaultBaseSkin(context);
         }
         context.put("baseskin", baseskin);
         return baseskin;

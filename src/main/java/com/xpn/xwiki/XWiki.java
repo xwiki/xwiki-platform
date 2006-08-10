@@ -3422,8 +3422,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         if (adtype.equals(""))
             adtype = Param("xwiki.ad.type", "");
-        if (adtype.equals(""))
-            adtype = "google";
         return adtype;
     }
 

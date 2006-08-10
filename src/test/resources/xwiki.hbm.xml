@@ -678,6 +678,24 @@
         <property name="notification_pages" type="string">
             <column name="XWP_NOTIFICATION_PAGES" length="255" />
         </property>
+        <property name="leftPanels" type="string">
+            <column name="XWP_LEFT_PANELS" length="2000"/>
+        </property>
+        <property name="rightPanels" type="string">
+            <column name="XWP_RIGHT_PANELS" length="2000"/>
+        </property>
+        <property name="showLeftPanels" type="integer">
+            <column name="XWP_SHOW_LEFT_PANELS" />
+        </property>
+        <property name="showRightPanels" type="integer">
+            <column name="XWP_SHOW_RIGHT_PANELS" />
+        </property>
+        <property name="pageWidth" type="string">
+            <column name="XWP_PAGE_WIDTH" length="255" />
+        </property>
+        <property name="languages" type="string">
+            <column name="XWP_LANGUAGES" length="255" />
+        </property>
     </class>
 
     <!-- XWikiComments custom mapping -->
@@ -727,6 +745,27 @@
         </property>
         <property name="validationKey" type="string" unique="false" optimistic-lock="true" lazy="false" generated="never">
           <column name="XWU_VALIDATION_KEY" />
+        </property>
+        <property name="skin" type="string">
+            <column name="XWU_SKIN" length="255" />
+        </property>
+        <property name="leftPanels" type="string">
+            <column name="XWU_LEFT_PANELS" length="2000"/>
+        </property>
+        <property name="rightPanels" type="string">
+            <column name="XWU_RIGHT_PANELS" length="2000"/>
+        </property>
+        <property name="showLeftPanels" type="integer">
+            <column name="XWU_SHOW_LEFT_PANELS" />
+        </property>
+        <property name="showRightPanels" type="integer">
+            <column name="XWU_SHOW_RIGHT_PANELS" />
+        </property>
+        <property name="pageWidth" type="string">
+            <column name="XWU_PAGE_WIDTH" length="255" />
+        </property>
+        <property name="avatar" type="string">
+            <column name="XWU_AVATAR" length="255" />
         </property>
     </class>
     -->

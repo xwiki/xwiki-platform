@@ -6,7 +6,7 @@ document.writeln("<div class='rightmenu'><a href='$xwiki.getURL("Doc.SimpleEdito
 document.writeln("<div class='leftmenu'>");
 addButton('$xwiki.getSkinFile("ed_format_bold.gif")','$msg.get("bold")','__','__','$msg.get("boldtext")');
 addButton('$xwiki.getSkinFile("ed_format_italic.gif")','$msg.get("italics")','~~','~~','$msg.get("italicstext")');
-// addButton('$xwiki.getSkinFile("ed_title.gif")','$msg.get("title")','\n1.1 ','\n','$msg.get("titletext")');
+// addButton('$xwiki.getSkinFile("ed_title.gif")','$msg.get("secondleveltitle")','\n1.1 ','\n','$msg.get("titletext")');
 addButton('$xwiki.getSkinFile("ed_link.gif")','$msg.get("ilink")','[',']','$msg.get("ilinktext")');
 // addButton('$xwiki.getSkinFile("ed_extlink.gif")','$msg.get("elink")','[',']','$msg.get("elinktext")');
 addButton('$xwiki.getSkinFile("ed_hr.gif")','$msg.get("hr")','\n----\n','','$msg.get("hrtext")');

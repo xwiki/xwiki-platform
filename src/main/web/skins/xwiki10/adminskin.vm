@@ -10,8 +10,11 @@
 <input type="hidden" name="${class.name}_nb" value="$nb" />
 #set($obj = $doc.getObject(${class.name}, 0))
 #if(!$obj)
-$response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiSkin&xredirect=$redirect"))
-#end
+<br /><br />
+#xwikimessageboxstart($msg.get("skin") $msg.get("noskin"))
+#xwikimessageboxend()
+<br /><br />
+#else
 #set($class = $obj.xWikiClass)
 <table summary="">
 #foreach($prop in $class.properties)
@@ -33,6 +36,7 @@ document.write("<span class=\"chwColorPickerInvoker\" title=\"$msg.get("chwinvok
  </tr-->
 </table>
 </div>
+#end
 </form>
 #template("chw/colorpicker.vm")
 </div>

@@ -50,6 +50,8 @@
                    type="com.xpn.xwiki.web.ObjectAddForm"/>
         <form-bean name="objectremove"
                    type="com.xpn.xwiki.web.ObjectRemoveForm"/>
+        <form-bean name="admin"
+                   type="com.xpn.xwiki.web.EditForm"/>
     </form-beans>
 
     <!-- ========== Global Forward Definitions ============================== -->
@@ -330,13 +332,13 @@
 
         <action path="/redirect/"
                 type="com.xpn.xwiki.web.RedirectAction"
-                name="lock"
+                name="redirect"
                 scope="request">
         </action>
 
         <action path="/admin/"
                 type="com.xpn.xwiki.web.AdminAction"
-                name="lock"
+                name="admin"
                 scope="request">
             <forward name="admin" path="/templates/admin.vm"/>
         </action>

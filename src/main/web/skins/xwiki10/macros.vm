@@ -216,6 +216,23 @@
 #xwikimessageboxend()
 #end
 
+#macro(xwikimessageboxfield $fielddoc $fieldname $fieldtext $html)
+<label class="field">$fieldtext</label>
+<span class="field">
+#if($html!="")
+$html
+#else
+$fielddoc.display($fieldname, "edit")
+#end
+</span>
+#end
+
+#macro(xwikimessageboxsubmit $submittext)
+<div class="button">
+<input class="button" type="submit" value="$submittext" />
+</div>
+#end
+
 #macro(csscolorproperty $csspropname $fieldname)
 #set($objcolor = $colors.get($fieldname))
 #if($objcolor && $objcolor != "")

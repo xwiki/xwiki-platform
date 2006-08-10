@@ -1755,6 +1755,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("imaccount", "imaccount", 30);
         needsUpdate |= bclass.addStaticListField("editor", "Default Editor", "---|Text|Wysiwyg");
 
+        // New fields for the XWiki 1.0 skin
+        needsUpdate |= bclass.addTextField("skin", "skin", 30);
+        needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
+        needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
+        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "checkbox");
+        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "checkbox");
+        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
+
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
@@ -1825,6 +1834,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
+
+        // New fields for the XWiki 1.0 skin
+        needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
+        needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
+        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "checkbox");
+        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "checkbox");
+        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {

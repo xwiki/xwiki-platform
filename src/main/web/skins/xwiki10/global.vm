@@ -27,7 +27,7 @@
       <a href="$xwiki.getURL($context.user, "view")">$xwiki.parseMessage("myhomepage")</a> #sep()
 #end
 #if($hasadmin)
-      <a href="$xwiki.getURL("XWiki.WebHome","view")">$msg.get("admin")</a> #sep()
+      <a href="$xwiki.getURL("XWiki.XWikiPreferences","admin")">$msg.get("admin")</a> #sep()
 #end
 #if ($isguest)
 #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))

@@ -2,12 +2,8 @@
 #set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
 #if ($defaultstyle!="")
 <link href="$xwiki.getSkinFile($defaultstyle)" rel="stylesheet" type="text/css" title="default" />
-<link href="${xwiki.getDocument($defaultstyle).getURL("skin")}/customlayout.css" rel="stylesheet" type="text/css" title="default" />
-<link href="${xwiki.getDocument($defaultstyle).getURL("skin")}/customcolors.css" rel="stylesheet" type="text/css" title="default" />
 #else
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" title="default" />
-<link href="${xwiki.getDocument("XWiki.XWikiSkins").getURL("skin")}/customlayout.css" rel="stylesheet" type="text/css" title="default" />
-<link href="${xwiki.getDocument("XWiki.XWikiSkins").getURL("skin")}/customcolors.css" rel="stylesheet" type="text/css" title="default" />
 #end
 #if ($stylesheets != "")
 #set( $stylenb = 1)

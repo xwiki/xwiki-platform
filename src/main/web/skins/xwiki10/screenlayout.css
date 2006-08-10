@@ -194,6 +194,8 @@ Zone for Comments, attachments, History...
 ---------------------------------------------
 */
 fieldset.xwikimessage{
+  display: block;
+  float: none;
   width: 480px;
   margin: auto;
   border: 2px solid #BBB;
@@ -228,6 +230,21 @@ fieldset.xwikimessage .buttons a{
   font-weight: bold;
   text-align: center;
 }
+
+fieldset.xwikimessage label.field {
+    display: block;
+    float: left;
+    clear: left; width: 170px;
+    font-weight: bold ;
+    margin-left: 30px ;
+    margin-bottom: 10px;
+}
+
+fieldset.xwikimessage .field {
+    display: block;
+    float: left;
+    margin-bottom: 10px; }
+
 /*
 ----------------------------------------------
 Comments

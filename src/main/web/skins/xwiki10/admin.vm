@@ -37,7 +37,7 @@
 #set($redirecturl = $xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups"))
 #elseif($editor == "users" && $doc.fullName != "XWiki.XWikiUsers")
 #set($redirecturl = $xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users"))
-#elseif($editor == "skin" && $doc.fullName != $xwiki.getXWikiPreference("skin"))
+#elseif($editor == "skin" && ($doc.fullName != $xwiki.getXWikiPreference("skin")) && ($doc.name != $xwiki.getXWikiPreference("skin")))
 #set($redirecturl = $xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin"))
 #end
 #if($redirecturl != "")

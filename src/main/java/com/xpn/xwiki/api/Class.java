@@ -26,6 +26,8 @@
 package com.xpn.xwiki.api;
 
 import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,6 +57,7 @@ public class Class extends Collection {
         for (Iterator it = coll.iterator(); it.hasNext();i++) {
             properties[i] = new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) it.next(), context);
         }
+        Arrays.sort(properties, new PropertyComparator());
         return properties;
     }
 
@@ -89,5 +92,13 @@ public class Class extends Collection {
         BaseObject obj = (BaseObject)getBaseClass().newObject(context);
         return obj.newObjectApi(obj, context);
     }
-
+}
+class PropertyComparator implements Comparator {
+	public int compare(java.lang.Object o1, java.lang.Object o2) {
+		PropertyClass po1 = (PropertyClass)o1;
+		PropertyClass po2 = (PropertyClass)o2;
+		if(po1.getNumber() < po2.getNumber()) return -1;
+		if(po1.getNumber() > po2.getNumber()) return 1;
+		return 0;
+	}
 }

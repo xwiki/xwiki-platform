@@ -80,6 +80,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
             String name = result.group(1);
             if (name != null) {
 
+            	// TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
                 // trim the name and unescape it
                 name = Encoder.unescape(name.trim());
 

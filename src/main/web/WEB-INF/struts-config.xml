@@ -328,6 +328,19 @@
                 scope="request">
         </action>
 
+        <action path="/redirect/"
+                type="com.xpn.xwiki.web.RedirectAction"
+                name="lock"
+                scope="request">
+        </action>
+
+        <action path="/admin/"
+                type="com.xpn.xwiki.web.AdminAction"
+                name="lock"
+                scope="request">
+            <forward name="admin" path="/templates/admin.vm"/>
+        </action>
+
         <action path="/unknown/"
                 type="com.xpn.xwiki.web.UnknownAction"
                 name="unknown"

@@ -1297,6 +1297,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getLanguagePreference(XWikiContext context) {
+    	return getDocLanguagePreference(context);
+        /*
         // First we get the language from the request
         String language;
 
@@ -1378,6 +1380,186 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         context.setLanguage("");
         return "";
+        */
+    }
+
+    public String getDocLanguagePreference(XWikiContext context) {
+        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "", cookieLanguage = "", contextLanguage = "";
+        boolean setCookie = false;
+
+        if (!context.getWiki().isMultiLingual(context)) {
+            language = context.getWiki().getXWikiPreference("language", "", context);
+            context.setLanguage(language);
+            return language;
+        }
+
+        // Get request language
+        try{
+        	requestLanguage = context.getRequest().getParameter("language");
+        }
+        catch (Exception ex){
+        }
+
+        // Get context language
+       	contextLanguage = context.getLanguage();
+
+        // Get user preference
+        try {
+            String user = context.getUser();
+            XWikiDocument userdoc = getDocument(user, context);
+            if (userdoc != null) {
+                userPreferenceLanguage = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
+            }
+        } catch (XWikiException e) {
+        }
+
+        // Get navigator language setting
+        if (context.getRequest() != null) {
+            String accept = context.getRequest().getHeader("Accept-Language");
+            if ((accept != null) && (!accept.equals(""))) {
+	            String[] alist = StringUtils.split(accept, ",;-");
+	            if ((alist != null) && !(alist.length == 0)) {
+	                context.setLanguage(alist[0]);
+	                navigatorLanguage = alist[0];
+	            }
+            }
+        }
+
+        // Get language from cookie
+        try {
+            cookieLanguage = getUserPreferenceFromCookie("language", context);
+        } catch (Exception e) {
+        }
+
+        // Determine which language to use
+        // First we get the language from the request
+        if ((requestLanguage != null) && (!requestLanguage.equals(""))) {
+            if (requestLanguage.equals("default")) {
+                setCookie = true;
+            } else {
+                language = requestLanguage;
+                context.setLanguage(language);
+            	Cookie cookie = new Cookie("language", language);
+                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+                cookie.setPath("/");
+                context.getResponse().addCookie(cookie);
+                return language;
+            }
+        }
+        // Next we get the language from the context
+        if(contextLanguage != null && contextLanguage != ""){
+        	language = contextLanguage;
+        }
+        // Next we get the language from the cookie
+        else if(cookieLanguage != null && cookieLanguage != ""){
+        	language = cookieLanguage;
+        }
+        // Next from the default user preference
+        else if(userPreferenceLanguage != null && userPreferenceLanguage != ""){
+        	language = userPreferenceLanguage;
+        }
+        // Then from the navigator language setting
+        else if(navigatorLanguage != null && navigatorLanguage != ""){
+        	language = navigatorLanguage;
+        }
+        context.setLanguage(language);
+        if(setCookie){
+        	Cookie cookie = new Cookie("language", language);
+            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+            cookie.setPath("/");
+            context.getResponse().addCookie(cookie);
+        }
+        return language;
+    }
+
+    public String getInterfaceLanguagePreference(XWikiContext context) {
+        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "", cookieLanguage = "", contextLanguage = "";
+        boolean setCookie = false;
+
+        if (!context.getWiki().isMultiLingual(context)) {
+            language = context.getWiki().getXWikiPreference("language", "", context);
+            context.setInterfaceLanguage(language);
+            return language;
+        }
+
+        // Get request language
+        try{
+        	requestLanguage = context.getRequest().getParameter("interfacelanguage");
+        }
+        catch (Exception ex){
+        }
+
+        // Get context language
+       	contextLanguage = context.getInterfaceLanguage();
+
+        // Get user preference
+        try {
+            String user = context.getUser();
+            XWikiDocument userdoc = null;
+            userdoc = getDocument(user, context);
+            if (userdoc != null) {
+                userPreferenceLanguage = userdoc.getStringValue("XWiki.XWikiUsers", "default_interface_language");
+            }
+        } catch (XWikiException e) {
+        }
+
+        // Get navigator language setting
+        if (context.getRequest() != null) {
+            String accept = context.getRequest().getHeader("Accept-Language");
+            if ((accept != null) && (!accept.equals(""))) {
+	            String[] alist = StringUtils.split(accept, ",;-");
+	            if ((alist != null) && !(alist.length == 0)) {
+	                context.setLanguage(alist[0]);
+	                navigatorLanguage = alist[0];
+	            }
+            }
+        }
+
+        // Get language from cookie
+        try {
+            cookieLanguage = getUserPreferenceFromCookie("interfacelanguage", context);
+        } catch (Exception e) {
+        }
+
+        // Determine which language to use
+        // First we get the language from the request
+        if ((requestLanguage != null) && (!requestLanguage.equals(""))) {
+            if (requestLanguage.equals("default")) {
+                setCookie = true;
+            } else {
+                language = requestLanguage;
+                context.setLanguage(language);
+            	Cookie cookie = new Cookie("interfacelanguage", language);
+                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+                cookie.setPath("/");
+                context.getResponse().addCookie(cookie);
+                return language;
+            }
+        }
+        // Next we get the language from the context
+        if(contextLanguage != null && contextLanguage != ""){
+        	language = contextLanguage;
+        }
+        // Next we get the language from the cookie
+        else if(cookieLanguage != null && cookieLanguage != ""){
+        	language = cookieLanguage;
+        }
+        // Next from the default user preference
+       else if(userPreferenceLanguage != null && userPreferenceLanguage != ""){
+        	language = userPreferenceLanguage;
+       }
+        // Then from the navigator language setting
+        else if(navigatorLanguage != null && navigatorLanguage != ""){
+        	language = navigatorLanguage;
+        }
+        context.setLanguage(language);
+        if(setCookie){
+        	Cookie cookie = new Cookie("interfacelanguage", language);
+            cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
+            cookie.setPath("/");
+            context.getResponse().addCookie(cookie);
+        }
+        return language;
     }
 
     public long getXWikiPreferenceAsLong(String prefname, XWikiContext context) {
@@ -2089,7 +2271,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void prepareResources(XWikiContext context) {
         if (context.get("msg") == null) {
-            String language = getLanguagePreference(context);
+            String language = getInterfaceLanguagePreference(context);
             if (context.getResponse() != null)
                 context.getResponse().setLocale(new Locale(language));
             ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
@@ -2627,7 +2809,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getEncoding() {
-        return Param("xwiki.encoding", "ISO-8859-1");
+        return Param("xwiki.encoding", "UTF-8");
     }
 
 
@@ -3585,6 +3767,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getEditorPreference(XWikiContext context) {
         String pref = getUserPreference("editor", context);
+        if (pref.equals("---")){
+        	pref = getWebPreference("editor", context);
+        }
         if (pref.equals(""))
             pref = Param("xwiki.editor", "");
         return pref.toLowerCase();

@@ -116,6 +116,7 @@ public class LevelsClass extends ListClass {
         input in = new input();
         in.setType("hidden");
         in.setName(prefix + name);
+        in.setID(prefix + name);
         buffer.append(in.toString());
     }
 }

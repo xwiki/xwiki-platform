@@ -394,6 +394,14 @@ public class XWiki extends Api {
         return xwiki.getLanguagePreference(context);
     }
 
+    public String getDocLanguagePreference() {
+        return xwiki.getDocLanguagePreference(context);
+    }
+
+    public String getInterfaceLanguagePreference() {
+        return xwiki.getInterfaceLanguagePreference(context);
+    }
+
     public boolean isVirtual() {
         return xwiki.isVirtual();
     }
@@ -998,7 +1006,7 @@ public class XWiki extends Api {
 
     public Object parseGroovyFromString(String script) throws XWikiException {
         if (checkProgrammingRights())
-          return xwiki.parseGroovyFromString(script, context);
+          return (Object)xwiki.parseGroovyFromString(script, context);
         else
           return null;
     }

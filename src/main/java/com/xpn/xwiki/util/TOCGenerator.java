@@ -34,6 +34,7 @@ import org.apache.commons.collections.OrderedMap;
 import org.apache.commons.collections.map.ListOrderedMap;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.web.Utils;
 
 
@@ -115,6 +116,8 @@ public class TOCGenerator {
   public static String makeHeadingID (String text, int occurence, XWikiContext context) {
     // Encode to convert unsafe chars
     text = Utils.encode(text.trim(), context);
+    text = "H" + XWiki.getURLEncoded(text);
+    text = text.replaceAll("[\\+|%]", "");
         
     if (occurence > 0) {
       return text + "-" + occurence;

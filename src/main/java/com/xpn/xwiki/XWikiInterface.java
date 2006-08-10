@@ -144,6 +144,10 @@ public interface XWikiInterface {
 
     String getLanguagePreference(XWikiContext context);
 
+    String getDocLanguagePreference(XWikiContext context);
+
+    String getInterfaceLanguagePreference(XWikiContext context);
+
     long getXWikiPreferenceAsLong(String prefname, XWikiContext context);
 
     long getWebPreferenceAsLong(String prefname, XWikiContext context);

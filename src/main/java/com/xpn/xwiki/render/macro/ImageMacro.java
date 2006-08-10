@@ -56,10 +56,12 @@ public class ImageMacro  extends BaseLocaleMacro {
     str.append("<img src=\"");
     str.append(doc.getAttachmentURL(img, "download", xcontext));
     str.append("\" ");
-    if ((!"none".equals(height))&&(height!=null))
-     str.append("height=\"" + height + "\" ");
-    if ((!"none".equals(width))&&(width!=null))
-           str.append("width=\"" + width + "\" ");
+    if ((!"none".equals(height))&&(height!=null)&&(!"".equals(height.trim()))){
+        str.append("height=\"" + height.trim() + "\" ");
+    }
+    if ((!"none".equals(width))&&(width!=null)&&(!"".equals(width.trim()))){
+    	str.append("width=\"" + width.trim() + "\" ");
+    }
     str.append("alt=\"");
     str.append(img);
     str.append("\" />");

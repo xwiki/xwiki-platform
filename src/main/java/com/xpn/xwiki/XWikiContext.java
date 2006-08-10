@@ -62,6 +62,7 @@ public class XWikiContext extends Hashtable {
    private boolean virtual;
    private XWikiUser user;
    private String language;
+   private String interfaceLanguage;
    private int mode;
    private URL url;
    private XWikiURLFactory URLFactory;
@@ -191,6 +192,14 @@ public class XWikiContext extends Hashtable {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public String getInterfaceLanguage() {
+        return interfaceLanguage;
+    }
+
+    public void setInterfaceLanguage(String interfaceLanguage) {
+        this.interfaceLanguage = interfaceLanguage;
     }
 
     public int getMode() {

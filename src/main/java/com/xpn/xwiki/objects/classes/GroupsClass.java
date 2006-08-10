@@ -80,7 +80,7 @@ public class GroupsClass extends ListClass {
         if (value == null)
             return list;
 
-        String val = StringUtils.replace(value, "\\,", "%SEP%");
+        value = StringUtils.replace(value, "\\,", "%SEP%");
         String[] result = StringUtils.split(value, ", ");
         for (int i = 0; i < result.length; i++)
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
@@ -135,6 +135,7 @@ public class GroupsClass extends ListClass {
          if (!isUsesList()) {
             input in = new input();
             in.setName(prefix + "newgroup");
+            in.setID(prefix + "newgroup");
             in.setSize(15);
             buffer.append("<br />");
             buffer.append(in.toString());

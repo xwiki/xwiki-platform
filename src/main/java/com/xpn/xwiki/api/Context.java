@@ -115,6 +115,14 @@ public class Context extends Api {
 
     /**
      *
+     * @return the interface language preference of the current user
+     */
+    public String getInterfaceLanguage() {
+         return context.getInterfaceLanguage();
+    }
+
+    /**
+     *
      * @return the XWiki object if you have the programming right
      */
     public com.xpn.xwiki.XWiki getXWiki() {

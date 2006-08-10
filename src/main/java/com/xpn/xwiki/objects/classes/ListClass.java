@@ -186,6 +186,7 @@ public abstract class ListClass extends PropertyClass {
 
         input.setType("hidden");
         input.setName(prefix + name);
+        input.setID(prefix + name);
         buffer.append(input.toString());
     }
 
@@ -208,11 +209,51 @@ public abstract class ListClass extends PropertyClass {
             input.setType("text");
             input.setSize(60);
             input.setName(prefix + name);
+            input.setID(prefix + name);
             buffer.append(input.toString());
+        } else if (getDisplayType().equals("radio")) {
+        	displayRadioEdit(buffer, name, prefix, object, context);
+        }
+        else {
+        	displaySelectEdit(buffer, name, prefix, object, context);
+        }
+    }
+    
+    protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
+        List list = getList(context);
+        List selectlist;
+
+        BaseProperty prop =  (BaseProperty)object.safeget(name);
+        if (prop==null) {
+            selectlist = new ArrayList();
+        } else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
         } else {
+            selectlist = new ArrayList();
+            selectlist.add(prop.getValue());
+        }
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            input radio = new input(input.radio, prefix + name, value);
+
+            if (selectlist.contains(value))
+                radio.setChecked(true);
+            radio.addElement(value);
+            buffer.append(radio.toString());
+            if(it.hasNext()){
+            	buffer.append("<br/>");
+            }
+        }
+    }
+
+    protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
             select select = new select(prefix + name, 1);
             select.setMultiple(isMultiSelect());
             select.setSize(getSize());
+        select.setName(prefix + name);
+        select.setID(prefix + name);
 
             List list = getList(context);
             List selectlist;
@@ -239,9 +280,6 @@ public abstract class ListClass extends PropertyClass {
 
             buffer.append(select.toString());
         }
-    }
 
     public abstract List getList(XWikiContext context);
-
-
 }

@@ -152,9 +152,8 @@ public class ImagePlugin extends XWikiDefaultPlugin {
             }
         } catch (Exception e) {
             attachmentClone = attachment;
-        } finally {
-            return attachmentClone;
         }
+        return attachmentClone;
     }
 
     public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context) throws Exception {

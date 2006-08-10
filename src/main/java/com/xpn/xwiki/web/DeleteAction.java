@@ -57,10 +57,7 @@ public class DeleteAction extends XWikiAction {
 	}
 	
 	public String render(XWikiContext context) throws XWikiException {
-        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
-        XWikiResponse response = context.getResponse();
-        XWikiDocument doc = context.getDoc();
         String confirm = request.getParameter("confirm");
         if ((confirm!=null)&&(confirm.equals("1"))) {
             return "deleted";

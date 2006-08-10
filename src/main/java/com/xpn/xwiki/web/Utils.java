@@ -108,8 +108,10 @@ public class Utils {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Set the content length to the numnber of bytes, not the
                 // string length, so as to handle multi-byte encodings
-                response.setContentLength(content.getBytes().length);
+                try{
+                    response.setContentLength(content.getBytes("UTF-8").length);
             }
+                  catch(UnsupportedEncodingException ex){response.setContentLength(content.getBytes().length);}            }
 
             try {
                 if (write)

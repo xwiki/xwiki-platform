@@ -71,7 +71,11 @@ public class SkinAction extends XWikiAction {
 
         if ((content!=null)&&(!content.equals(""))) {
             // Choose the right content type
-            response.setContentType(xwiki.getEngineContext().getMimeType(filename.toLowerCase()));
+        	String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+        	if(mimetype.equals("text/css")){
+        		content = context.getWiki().parseContent(content, context);
+        	}
+            response.setContentType(mimetype);
             response.setDateHeader("Last-Modified", doc.getDate().getTime());
             // Sending the content of the attachment
             response.setContentLength(content.length());
@@ -89,7 +93,11 @@ public class SkinAction extends XWikiAction {
             if (attachment!=null) {
                 // Sending the content of the attachment
                 byte[] data = attachment.getContent(context);
-                response.setContentType(xwiki.getEngineContext().getMimeType(filename.toLowerCase()));
+                String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                if(mimetype.equals("text/css")){
+                    data = context.getWiki().parseContent(new String(data), context).getBytes();
+                }
+                response.setContentType(mimetype);
                 response.setDateHeader("Last-Modified", attachment.getDate().getTime());
                 response.setContentLength(data.length);
                 try {
@@ -119,15 +127,14 @@ public class SkinAction extends XWikiAction {
                 response.setContentType("application/octet-stream");
 
             // Sending the content of the file
-            InputStream is  = context.getWiki().getResourceAsStream(path);
-            if (is==null)
+            byte[] data = context.getWiki().getResourceContentAsBytes(path);
+            if (data == null || data.length == 0)
              return false;
 
-            int nRead = 0;
-            byte[] data = new byte[65535];
-            while ((nRead = is.read(data)) !=-1) {
-                response.getOutputStream().write(data,0,nRead);
+            if(mimetype.equals("text/css")){
+            	data = context.getWiki().parseContent(new String(data), context).getBytes();
             }
+            response.getOutputStream().write(data);
             return true;
         } catch (IOException e) {
             if (skin.equals(xwiki.getDefaultBaseSkin(context)))

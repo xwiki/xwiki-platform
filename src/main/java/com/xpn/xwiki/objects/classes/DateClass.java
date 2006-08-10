@@ -140,6 +140,7 @@ public class DateClass  extends PropertyClass {
 
         input.setType("text");
         input.setName(prefix + name);
+        input.setID(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());
     }

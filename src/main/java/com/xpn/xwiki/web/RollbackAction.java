@@ -34,9 +34,14 @@ public class RollbackAction extends XWikiAction {
         XWikiDocument doc = context.getDoc();
         RollbackForm form = (RollbackForm) context.getForm();
 
+        String confirm = form.getConfirm();
         String rev = form.getRev();
         String language = form.getLanguage();
         XWikiDocument tdoc;
+
+        if((confirm == null) || (!confirm.equals("1"))){
+            return true;
+        }
 
         if ((language==null)||(language.equals(""))||(language.equals("default"))||(language.equals(doc.getDefaultLanguage()))) {
             // Need to save parent and defaultLanguage if they have changed
@@ -63,4 +68,9 @@ public class RollbackAction extends XWikiAction {
         sendRedirect(response, redirect);
         return false;
 	}
+
+    public String render(XWikiContext context) throws XWikiException {
+        handleRevision(context);
+      	return "rollback";
+    }
 }

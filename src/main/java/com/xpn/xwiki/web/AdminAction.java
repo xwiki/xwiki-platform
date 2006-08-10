@@ -17,10 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author namphunghai
- * @author torcq
- * @author sdumitriu
+ * @author marta
  */
+
 package com.xpn.xwiki.web;
 
 import org.apache.velocity.VelocityContext;
@@ -33,8 +32,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
-public class EditAction extends XWikiAction {
-    private static final Log log = LogFactory.getLog(EditAction.class);
+public class AdminAction extends XWikiAction {
+    private static final Log log = LogFactory.getLog(AdminAction.class);
 
 	public String render(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
@@ -83,7 +82,7 @@ public class EditAction extends XWikiAction {
             } else {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
-                if ((tdoc==doc)&&context.getWiki().isMultiLingual(context)) {
+                if ((tdoc==doc)) {
                     tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
@@ -100,7 +99,7 @@ public class EditAction extends XWikiAction {
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", new Document(tdoc2, context));
             try{
-            tdoc2.readFromTemplate(peform, context);
+            	tdoc2.readFromTemplate(peform, context);
             }
             catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
@@ -122,6 +121,6 @@ public class EditAction extends XWikiAction {
             }
         }
 
-        return "edit";
+        return "admin";
 	}
 }

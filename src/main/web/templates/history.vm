@@ -21,7 +21,7 @@
 #set($nextversion = $version)
 #set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
 <li>
-$msg.get("version") <a href="" onclick="location='$tdoc.getURL("viewrev","rev=$nextversion")'; return false;">$nextversion</a> (<a href="" onclick="if (confirm('$msg.get("readytorollback") $nextversion')) location='$tdoc.getURL("rollback","rev=$nextversion$lang")'; return false;">$msg.get("rollback")</a>)
+$msg.get("version") <a href="" onclick="location='$tdoc.getURL("viewrev","rev=$nextversion")'; return false;">$nextversion</a> (<a href="" onclick="if (confirm('$msg.get("readytorollback") $nextversion')) location='$tdoc.getURL("rollback","confirm=1&rev=$nextversion$lang")'; return false;">$msg.get("rollback")</a>)
 <input type="radio" name="rev2" value="$nextversion" />
 <input type="radio" name="rev1" value="$nextversion" />
 #if($newdoc=="")

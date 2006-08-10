@@ -117,6 +117,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
        input.setType("hidden");
        input.setName(prefix + name);
+       input.setID(prefix + name);
        buffer.append(input.toString());
     }
 
@@ -127,6 +128,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         input.setType("text");
         input.setName(prefix + name);
+        input.setID(prefix + name);
         buffer.append(input.toString());
     }
 
@@ -142,6 +144,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
         input.setType("text");
         input.setName(prefix + name);
+        input.setID(prefix + name);
         buffer.append(input.toString());
     }
 

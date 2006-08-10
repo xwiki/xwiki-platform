@@ -17,43 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
+ * @author sdumitriu
  */
-
 package com.xpn.xwiki.web;
 
-public class RollbackForm extends XWikiForm {
-    private String rev;
-    private String language;
-    private String confirm;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
-    public void readRequest() {
-        XWikiRequest request = getRequest();
-        setRev(request.getParameter("rev"));
-        setLanguage(request.getParameter("language"));
-        setConfirm(request.getParameter("confirm"));
-    }
+public class RedirectAction extends XWikiAction {
+	public boolean action(XWikiContext context) throws XWikiException {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
 
-    public String getRev() {
-        return rev;
-    }
-
-    public void setRev(String rev) {
-        this.rev = rev;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-	public String getConfirm() {
-		return confirm;
-	}
-
-	public void setConfirm(String confirm) {
-		this.confirm = confirm;
+        String redirect;
+        redirect = context.getRequest().getParameter("xredirect");
+        if ((redirect == null)||(redirect.equals("")))
+            redirect = context.getURLFactory().createURL("Main", "WebHome", "view", context).toString();
+        sendRedirect(response, redirect);
+        return false;
 	}
 }

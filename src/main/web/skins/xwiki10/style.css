@@ -1,4 +1,3 @@
-#template("skinVariables.vm")
 @import "elements.css";
 @import "classes.css";
 @import "chwSkin.css";

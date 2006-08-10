@@ -95,6 +95,10 @@ html > body #xwikidoccontent textarea{
   margin-bottom: ${dspacing}px;
   padding-bottom: ${dspacing}px;
 }
+#xwikirightstable{
+  width: ${editwidthcontent}px;
+  margin: ${spacing}px 0px;
+}
 
 /*
 ---------------------------------------
@@ -155,6 +159,13 @@ Panels
 #editPanels .panel{
   width: ${editpanelwidth}px;
 }
+.xwikipaneltitle{
+  padding: 0px ${padding}px;
+}
+.xwikipanelcontents{
+  padding: ${padding}px;
+}
+
 /*
 ----------------------------------
 Rico Acordeon

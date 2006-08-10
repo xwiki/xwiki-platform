@@ -1,4 +1,3 @@
-#template("skinvariables.vm")
 /* Presentation stylesheet */
 
 /* classes */
@@ -133,7 +132,7 @@ Panels
   border: 1px solid;
 }
 .xwikipaneltitle{
-  padding: 0px ${padding}px;;
+  padding: 0px 4px;
   margin: 0px;
   font-size: 0.9em;
   background: url("collapse.png") no-repeat right center;
@@ -151,7 +150,7 @@ Panels
   background-image: url("expandh.png") 
 }
 .xwikipanelcontents{
-  padding: ${padding}px;
+  padding: 4px;
 }
 
 .xwikilogintable{
@@ -172,8 +171,8 @@ Panels
 }
 
 #xwikirightstable{
-  width: ${editwidthcontent}px;
-  margin: ${spacing}px 0px;
+  width: 624px;
+  margin: 5px 0px;
   border: 1px solid;
 }
 #xwikirightstable th{

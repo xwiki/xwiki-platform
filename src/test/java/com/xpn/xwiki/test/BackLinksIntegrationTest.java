@@ -23,22 +23,20 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLink;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLink;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
+
 /**
  * Created by IntelliJ IDEA.
  * User: HAL_2005
- * Date: 11 août 2005
+ * Date: 11 aoï¿½t 2005
  * Time: 12:30:26
  * To change this template use File | Settings | File Templates.
  */

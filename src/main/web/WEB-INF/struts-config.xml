@@ -140,6 +140,7 @@
                 name="rollback"
                 scope="request">
             <forward name="edit" path="/templates/rollback.vm"/>
+            <forward name="rollback" path="/templates/rollback.vm"/>
         </action>
 
         <action path="/cancel/"
@@ -218,14 +219,14 @@
                 type="com.xpn.xwiki.web.AttachAction"
                 name="attach"
                 scope="request">
-            <forward name="attach" path="/templates/attach.vm"/>
+            <forward name="attach" path="/templates/attachments.vm"/>
         </action>
 
         <action path="/upload/"
                 type="com.xpn.xwiki.web.UploadAction"
                 name="upload"
                 scope="request">
-            <forward name="upload" path="/templates/attach.vm"/>
+            <forward name="upload" path="/templates/attachments.vm"/>
         </action>
 
       <action path="/download/"

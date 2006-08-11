@@ -23,12 +23,16 @@
 
 package com.xpn.xwiki.render;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -36,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiRenderingEngine {
 
@@ -185,9 +190,6 @@ public class XWikiRenderingEngine {
                 XWikiDocument doc = context.getDoc();
                 XWikiDocument cdoc = context.getDoc();
 
-                // Let's call the beginRendering loop
-                context.getWiki().getPluginManager().beginRendering(context);
-
                 String content = text;
 
                 // Which is the current idoc and sdoc
@@ -198,8 +200,10 @@ public class XWikiRenderingEngine {
                 context.put("idoc", includingdoc);
                 context.put("sdoc", contentdoc);
 
-                try {
+                // Let's call the beginRendering loop
+                context.getWiki().getPluginManager().beginRendering(context);
 
+                try {
                     for (int i=0;i<renderers.size();i++)
                         content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
                 } finally {

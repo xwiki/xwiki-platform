@@ -25,6 +25,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 public class AttachAction extends XWikiAction {
+    public boolean action(XWikiContext context) throws XWikiException {
+        sendRedirect(context.getResponse(), context.getDoc().getURL("view", "viewer=attachments", context));
+    	return false;
+    }
 	public String render(XWikiContext context) throws XWikiException {
         
         return "attach";

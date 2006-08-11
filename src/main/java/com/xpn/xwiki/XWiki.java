@@ -3823,5 +3823,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return macrosmapping;
     }
 
+
+    // This functions adds an object from an new object creation form
+    public BaseObject getObjectFromRequest(String className, XWikiContext context) throws XWikiException {
+        Map map = Util.getObject(context.getRequest(), className);
+        BaseClass bclass = context.getWiki().getClass(className, context);
+        BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
+        return newobject;
+    }    
 }
 

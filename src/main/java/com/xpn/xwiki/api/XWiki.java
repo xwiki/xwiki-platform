@@ -32,9 +32,12 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
@@ -1025,6 +1028,14 @@ public class XWiki extends Api {
 
     public String getMacroList() {
         return xwiki.getMacroList(context);
+    }
+
+    public com.xpn.xwiki.api.Object getObjectFromRequest(String className) throws XWikiException {
+        return new com.xpn.xwiki.api.Object(xwiki.getObjectFromRequest(className, context), context);
+    }
+
+    public Document createDocument() {
+        return new Document(new XWikiDocument(), context);
     }
 }
 

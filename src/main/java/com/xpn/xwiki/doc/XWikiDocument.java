@@ -2368,26 +2368,6 @@ public class XWikiDocument {
         }
     }
 
-    // This functions adds an object from an new object creation form
-    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException {
-        // Read info in object
-        ObjectAddForm form = new ObjectAddForm();
-        form.setRequest((HttpServletRequest) context.getRequest());
-        form.readRequest();
-
-        XWikiDocument newdoc = (XWikiDocument) clone();
-        String className = form.getClassName();
-        int nb = newdoc.createNewObject(className, context);
-        BaseObject oldobject = newdoc.getObject(className, nb);
-        BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject = (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
-        newobject.setNumber(oldobject.getNumber());
-        newobject.setName(newdoc.getFullName());
-        newdoc.setObject(className, nb, newobject);
-        context.getWiki().saveDocument(newdoc, context);
-        return newobject;
-    }
-
     public void insertText(String text, String marker, XWikiContext context) throws XWikiException {
         setContent(StringUtils.replaceOnce(getContent(), marker, text + marker));
         context.getWiki().saveDocument(this, context);
@@ -2518,6 +2498,53 @@ public class XWikiDocument {
 
     public void resetArchive(XWikiContext context) throws XWikiException {
         getVersioningStore(context).resetRCSArchive(this, true, context);
+    }
+
+    // This functions adds an object from an new object creation form
+    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException {
+        // Read info in object
+        ObjectAddForm form = new ObjectAddForm();
+        form.setRequest((HttpServletRequest) context.getRequest());
+        form.readRequest();
+
+        String className = form.getClassName();
+        int nb = createNewObject(className, context);
+        BaseObject oldobject = getObject(className, nb);
+        BaseClass baseclass = oldobject.getxWikiClass(context);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
+        newobject.setNumber(oldobject.getNumber());
+        newobject.setName(getFullName());
+        setObject(className, nb, newobject);
+        return newobject;
+    }
+
+    // This functions adds an object from an new object creation form
+    public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException {
+        int nb = createNewObject(className, context);
+        BaseObject oldobject = getObject(className, nb);
+        BaseClass baseclass = oldobject.getxWikiClass(context);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_0"), oldobject);
+        newobject.setNumber(oldobject.getNumber());
+        newobject.setName(getFullName());
+        setObject(className, nb, newobject);
+        return newobject;
+    }
+
+    // This functions adds an object from an new object creation form
+    public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException {
+        int nb;
+        BaseObject oldobject = getObject(className);
+        if (oldobject==null) {
+            nb = createNewObject(className, context);
+            oldobject = getObject(className, nb);
+        } else
+           nb = oldobject.getNumber();
+        BaseClass baseclass = oldobject.getxWikiClass(context);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_" + nb), oldobject);
+        newobject.setNumber(oldobject.getNumber());
+        newobject.setName(getFullName());
+        setObject(className, nb, newobject);
+        return newobject;
     }
 
 }

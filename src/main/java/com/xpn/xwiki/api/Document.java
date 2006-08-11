@@ -784,13 +784,6 @@ public class Document extends Api {
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, context);
     }
 
-    public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {
-        if (hasAccessLevel("edit"))
-            return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(context), context);
-        else
-            return null;
-    }
-
     public void insertText(String text, String marker) throws XWikiException {
         if (hasAccessLevel("edit"))
             getDoc().insertText(text, marker, context);
@@ -886,4 +879,16 @@ public class Document extends Api {
         }
     }
 
+    public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {
+            // Call to getDoc() ensures that we are working on a clone()
+            return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(context), context);
+    }
+
+    public com.xpn.xwiki.api.Object addObjectFromRequest(String className) throws XWikiException {
+            return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, context), context);
+    }
+
+    public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException {
+            return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, context), context);
+    }
 }

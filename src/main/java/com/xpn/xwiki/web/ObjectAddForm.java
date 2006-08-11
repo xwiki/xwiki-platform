@@ -22,6 +22,8 @@
 
 package com.xpn.xwiki.web;
 
+import com.xpn.xwiki.util.Util;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,16 +46,6 @@ public class ObjectAddForm extends XWikiForm {
     }
 
     public Map getObject(String prefix) {
-        Map map = getRequest().getParameterMap();
-        HashMap map2 = new HashMap();
-        Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
-            if (name.startsWith(prefix + "_")) {
-                String newname = name.substring(prefix.length()+1);
-                map2.put(newname, map.get(name));
-            }
-        }
-        return map2;
+        return Util.getObject(getRequest(), prefix);
     }
 }

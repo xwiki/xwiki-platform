@@ -186,9 +186,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     }
 
     private void addFileName(StringBuffer newpath, String filename, XWikiContext context) {
-        newpath.append("/");
-        newpath.append(encode(filename, context));
+        addFileName(newpath, filename, true, context);
     }
+
+    private void addFileName(StringBuffer newpath, String filename, boolean encode, XWikiContext context) {
+        newpath.append("/");
+        if (encode)
+            newpath.append(encode(filename, context));
+        else
+            newpath.append(filename);
+     }
 
     private String encode(String name, XWikiContext context) {
         return Utils.encode(name, context);
@@ -202,7 +209,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append("skins/");
         newpath.append(skin);
-        addFileName(newpath, filename, context);
+        addFileName(newpath, filename, false, context);
         try {
             return new URL(getServerURL(context), newpath.toString());
         } catch (MalformedURLException e) {
@@ -217,7 +224,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         addAction(newpath, "skin", context);
         addSpace(newpath, web, "skin", context);
         addName(newpath, name, "skin", context);
-        addFileName(newpath, filename, context);
+        addFileName(newpath, filename, false, context);
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
         } catch (MalformedURLException e) {
@@ -230,7 +237,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     public URL createTemplateURL(String filename, XWikiContext context) {
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append("templates");
-        addFileName(newpath, filename, context);
+        addFileName(newpath, filename, false, context);
         try {
             return new URL(getServerURL(context), newpath.toString());
         } catch (MalformedURLException e) {

@@ -219,10 +219,11 @@
 #macro(xwikimessageboxfield $fielddoc $fieldname $fieldtext $html)
 <label class="field">$fieldtext</label>
 <span class="field">
+#if($fieldname!="")
+$fielddoc.display($fieldname, "edit")
+#end
 #if($html!="")
 $html
-#else
-$fielddoc.display($fieldname, "edit")
 #end
 </span>
 #end

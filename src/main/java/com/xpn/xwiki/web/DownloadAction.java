@@ -62,7 +62,7 @@ public class DownloadAction extends XWikiAction {
         response.setContentType(mimetype);
 
         String ofilename = XWiki.getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
-        response.addHeader("Content-disposition", "attachment; filename=\"" +  ofilename + "\"");
+        response.addHeader("Content-disposition", "inline; filename=\"" +  ofilename + "\"");
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Sending the content of the attachment
         byte[] data = attachment.getContent(context);

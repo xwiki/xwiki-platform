@@ -2767,9 +2767,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 
                 // Create Wiki Server page
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
-                serverdoc.setLargeStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
+                serverdoc.setStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
                 if (description != null)
-                    serverdoc.setStringValue("XWiki.XWikiServerClass", "description", description);
+                    serverdoc.setLargeStringValue("XWiki.XWikiServerClass", "description", description);
                 if (wikilanguage != null)
                     serverdoc.setStringValue("XWiki.XWikiServerClass", "language", wikilanguage);
                 serverdoc.setContent("#includeForm(\"XWiki.XWikiServerForm\")\n");

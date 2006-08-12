@@ -212,7 +212,7 @@
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
 #xwikimessageboxstart($title $message)
-      <div class="buttons"><a href="$urlyes"><input type="button" class="button" value="$msgyes"/></a><a href="$urlno"><input type="button" class="button" value="$msgno"/></a></div>
+      <div class="buttons"><a href="$urlyes"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a><a href="$urlno"><input type="button" class="button" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
 #xwikimessageboxend()
 #end
 

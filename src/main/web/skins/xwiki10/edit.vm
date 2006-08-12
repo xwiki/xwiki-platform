@@ -9,7 +9,7 @@
 #if((!$editor) || ($editor == ""))
 #set($editor = $request.getParameter("editor"))
 #if((!$editor) || ($editor == ""))
-#if($xwiki.getUserPreference("editor")=="Wysiwyg")
+#if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&(!$doc.isAdvancedContent()))
 #set($editor="wysiwyg")
 #else
 #set($editor="wiki")

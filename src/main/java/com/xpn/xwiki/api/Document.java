@@ -891,4 +891,8 @@ public class Document extends Api {
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException {
             return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, context), context);
     }
+
+    public boolean isAdvancedContent() {
+        return doc.isAdvancedContent();
+    }
 }

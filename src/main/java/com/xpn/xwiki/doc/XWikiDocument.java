@@ -2548,4 +2548,14 @@ public class XWikiDocument {
         return newobject;
     }
 
+    public boolean isAdvancedContent() {
+        String[] matches = { "<%" , "#set", "#include", "<form", "<input" };
+        String content2 = content.toLowerCase();
+        for (int i=0;i<matches.length;i++) {
+            if (content2.indexOf(matches[i])!=-1)
+                return true;
+        }
+
+        return false;
+    }
 }

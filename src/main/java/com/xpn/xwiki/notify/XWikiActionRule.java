@@ -27,12 +27,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class XWikiActionRule implements XWikiNotificationRule {
     private XWikiActionNotificationInterface target;
+    private boolean preverify = false;
+    private boolean postverify = true;
 
     public XWikiActionRule() {
     }
 
     public XWikiActionRule(XWikiActionNotificationInterface target) {
         setTarget(target);
+    }
+
+    public XWikiActionRule(XWikiActionNotificationInterface target, boolean pre, boolean post) {
+        setTarget(target);
+        setPreverify(pre);
+        setPostverify(post);
     }
 
     public XWikiActionNotificationInterface getTarget() {
@@ -47,6 +55,7 @@ public class XWikiActionRule implements XWikiNotificationRule {
     }
 
     public void verify(XWikiDocument doc, String action, XWikiContext context) {
+    	if(!isPostverify()) return;
         try {
             getTarget().notify(this, doc, action, context);
         } catch (Throwable e) {
@@ -55,5 +64,32 @@ public class XWikiActionRule implements XWikiNotificationRule {
             e.printStackTrace();
         }
     }
+
+    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
+    	if(!isPreverify()) return;
+        try {
+            getTarget().notify(this, doc, action, context);
+        } catch (Throwable e) {
+            // Notification should never fail
+            // Just report an error
+            e.printStackTrace();
+        }
+    }
+
+	public boolean isPostverify() {
+		return postverify;
+	}
+
+	public void setPostverify(boolean postnotify) {
+		this.postverify = postnotify;
+	}
+
+	public boolean isPreverify() {
+		return preverify;
+	}
+
+	public void setPreverify(boolean prenotify) {
+		this.preverify = prenotify;
+	}
 
 }

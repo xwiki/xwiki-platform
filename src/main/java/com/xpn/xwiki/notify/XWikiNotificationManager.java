@@ -126,6 +126,16 @@ public class XWikiNotificationManager {
             for (int i=0;i<vnamedrules.size();i++)
                ((XWikiNotificationRule)vnamedrules.get(i)).verify(doc, action, context);
         }
+        name = context.getDatabase() + ":" + doc.getFullName();
+        synchronized (namedrules) {
+            vnamedrules = getNamedRules(name);
+            if (vnamedrules!=null)
+             vnamedrules = (Vector) vnamedrules.clone();
+        }
+        if (vnamedrules!=null) {
+            for (int i=0;i<vnamedrules.size();i++)
+               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(doc, action, context);
+        }
         Vector grules;
         synchronized (generalrules) {
             grules = (Vector) generalrules.clone();
@@ -134,4 +144,24 @@ public class XWikiNotificationManager {
             ((XWikiNotificationRule)grules.get(i)).verify(doc, action, context);
     }
 
+    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
+        // Call rules explicitely for any actions of this document
+        Vector vnamedrules;
+        String name = doc.getFullName();
+        synchronized (namedrules) {
+            vnamedrules = getNamedRules(name);
+            if (vnamedrules!=null)
+             vnamedrules = (Vector) vnamedrules.clone();
+        }
+        if (vnamedrules!=null) {
+            for (int i=0;i<vnamedrules.size();i++)
+               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(doc, action, context);
+        }
+        Vector grules;
+        synchronized (generalrules) {
+            grules = (Vector) generalrules.clone();
+        }
+        for (int i=0;i<grules.size();i++)
+            ((XWikiNotificationRule)grules.get(i)).preverify(doc, action, context);
+    }
 }

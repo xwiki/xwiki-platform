@@ -130,6 +130,13 @@ public abstract class XWikiAction extends Action {
                 if (xwiki.prepareDocuments(request, context, vcontext) == false)
                     return null;
 
+                // Let's handle the notification and make sure it never fails
+                try {
+                    xwiki.getNotificationManager().preverify(context.getDoc(), mapping.getName(), context);
+                }
+                catch (Throwable e) {
+                    e.printStackTrace();
+                }
                 if (monitor != null)
                     monitor.setWikiPage(context.getDoc().getFullName());
 

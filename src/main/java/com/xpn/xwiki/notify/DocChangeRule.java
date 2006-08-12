@@ -48,4 +48,7 @@ public class DocChangeRule implements XWikiNotificationRule {
 
     public void verify(XWikiDocument doc, String action, XWikiContext context) {
     }
+
+    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
+    }
 }

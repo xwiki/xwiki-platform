@@ -672,10 +672,10 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                 return false;
 
             String docname;
-            if (context.getDatabase() != null) {
-                docname = context.getDatabase() + ":" + doc.getFullName();
+            if (doc.getDatabase() != null) {
+                docname = doc.getDatabase() + ":" + doc.getFullName();
                 if (username.indexOf(":") == -1)
-                    username = context.getDatabase() + ":" + username;
+                    username = doc.getDatabase() + ":" + username;
             } else
                 docname = doc.getFullName();
 

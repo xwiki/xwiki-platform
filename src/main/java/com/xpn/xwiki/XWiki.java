@@ -1102,7 +1102,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (object != null) {
                     String content = object.getStringValue(filename);
                     if ((content != null) && (!content.equals(""))) {
-                        URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), context);
+                        URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), doc.getDatabase(), context);
                         return urlf.getURL(url, context);
 
                     }
@@ -1115,7 +1115,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 attachment = doc.getAttachment(shortname);
 
                 if (attachment != null) {
-                    URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), context);
+                    URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), doc.getDatabase(), context);
                     return urlf.getURL(url, context);
                 }
             }
@@ -3830,6 +3830,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
         return newobject;
-    }    
+    }
 }
 

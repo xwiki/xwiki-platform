@@ -115,15 +115,21 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         if (xwikidb==null)
             return serverURL;
 
-        if (xwikidb.equals(context.getOriginalDatabase()))
+        if (xwikidb.equals(context.getOriginalDatabase())) {
             return serverURL;
-        else {
-            URL url = context.getWiki().getServerURL(xwikidb, context);
-            if (url==null)
-             return serverURL;
-            else
-             return url;
         }
+
+        if (xwikidb.equals("xwiki")) {
+            String surl = context.getWiki().Param("xwiki.home", "");
+            if (!surl.equals(""))
+                return new URL(surl);
+        }
+
+        URL url = context.getWiki().getServerURL(xwikidb, context);
+        if (url==null)
+            return serverURL;
+        else
+            return url;
     }
 
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context) {

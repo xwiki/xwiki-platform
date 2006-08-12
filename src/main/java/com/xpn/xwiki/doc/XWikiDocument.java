@@ -1203,6 +1203,7 @@ public class XWikiDocument {
             // This should not happen
         }
 
+        doc.setDatabase(getDatabase());
         doc.setRCSVersion(getRCSVersion());
         doc.setDocumentArchive(getDocumentArchive());
         doc.setAuthor(getAuthor());

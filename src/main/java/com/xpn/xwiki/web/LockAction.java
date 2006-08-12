@@ -41,8 +41,11 @@ public class LockAction extends XWikiAction {
         }
 
         // forward to view
-        String redirect = Utils.getRedirect("view", context);
-        sendRedirect(response, redirect);
+        String ajax = request.getParameter("ajax");
+        if(ajax == null || !ajax.equals("1")){
+        	String redirect = Utils.getRedirect("view", context);
+        	sendRedirect(response, redirect);
+        }
         return false;
 	}
 }

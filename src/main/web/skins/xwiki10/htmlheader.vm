@@ -34,7 +34,7 @@ $!xwiki.getWebPreference("meta")
 
  function cancelEdit(){
      if (cancelCancelEditFlag) {
-       var surl = "$doc.getExternalURL("cancel")";
+       var surl = "$doc.getExternalURL("cancel", "ajax=1")";
        var myAjax = new Ajax.Request(
                  surl,
                  {
@@ -51,9 +51,9 @@ $!xwiki.getWebPreference("meta")
  function lockEdit(){
     if (lockEditFlag==false) {
 #if($context.action=="inline")
-      var surl = "$doc.getExternalURL("lock")?action=inline&language=$!{request.language}";
+      var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replace("&amp;", "&")}";
 #else
-      var surl = "$doc.getExternalURL("lock")?language=$!{request.language}";
+      var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replace("&amp;", "&")}";
 #end
       var myAjax = new Ajax.Request(
                 surl,
@@ -77,7 +77,6 @@ $!xwiki.getWebPreference("meta")
 </script>
 </head>
 <body onunload="cancelEdit()" onload="prepareCancelEdit(); createColorPicker();" id="body">
-##<body id="body">
 <div id="xwikimaincontainer">
 #else
 </head>

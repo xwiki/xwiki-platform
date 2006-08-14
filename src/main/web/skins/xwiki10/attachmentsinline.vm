@@ -7,6 +7,7 @@
 ## #set($showattachments = $xwiki.getWebPreference("showattachments"))
 ## #end
 ## #if($showattachments!="no")
+#set($showactions = 0)
 #set($attachments = $doc.attachmentList)
 #set($counter = 0)
     <div id="attachmentscontent" class="xwikiintracontent">

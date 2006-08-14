@@ -1,13 +1,13 @@
 <style type="text/css">
 <!--
-  @import url($xwiki.getSkinFile("style.css"));
+  @import url($xwiki.getSkinFile("style.css", true));
 -->
 </style>
 #set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
 #if ($defaultstyle!="")
 <style type="text/css">
 <!--
-  @import url($xwiki.getSkinFile($defaultstyle));
+  @import url($xwiki.getSkinFile($defaultstyle, true));
 -->
 </style>
 #end

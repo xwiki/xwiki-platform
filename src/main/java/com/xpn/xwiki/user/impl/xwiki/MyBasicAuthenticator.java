@@ -58,13 +58,17 @@ public class MyBasicAuthenticator extends BasicAuthenticator  implements XWikiAu
                 return false;
     }
 
+    private static String convertUsername(String username, XWikiContext context) {
+        return context.getWiki().convertUsername(username, context);
+    }
+
     public static Principal checkLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
             // Always verify authentication
             String authorizationHeader = request.getHeader("Authorization");
             HttpSession session = request.getSession();
             if (authorizationHeader != null) {
                 String decoded = decodeBasicAuthorizationString(authorizationHeader);
-                String username = parseUsername(decoded);
+                String username = convertUsername(parseUsername(decoded), context);
                 String password = parsePassword(decoded);
 
                 Principal principal = authenticate(username, password, context);

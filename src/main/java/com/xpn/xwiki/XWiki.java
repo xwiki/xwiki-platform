@@ -2852,7 +2852,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 XWikiDocument doc = getDocument("XWiki.XWikiServer"
                         + database.substring(0, 1).toUpperCase()
                         + database.substring(1), context);
-                BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass", 0);
+                BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass");
                 String server = (serverobject!=null) ? serverobject.getStringValue("server") : null;
                 if (server != null) {
                     int mode = serverobject.getIntValue("secure");
@@ -3830,6 +3830,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
         return newobject;
+    }
+
+    public String convertUsername(String username, XWikiContext context) {
+        if (username==null)
+          return null;
+        if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("1"))
+          return username.replaceAll("[\\.\\@]", "_");
+        else
+          return username;
     }
 }
 

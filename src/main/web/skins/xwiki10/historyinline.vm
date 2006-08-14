@@ -1,4 +1,5 @@
-  <div id="historycontent" class="xwikiintracontent">
+#set($showactions = 0)
+<div id="historycontent" class="xwikiintracontent">
     <h4 class="xwikiintratitle">$msg.get("history")</h4>
     <form action="$doc.getURL("view")" method="post">
       <div>
@@ -46,7 +47,7 @@
         </tr>
 #end
 </table>
-      <div class="buttons"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/><input type="button" accesskey="a" value="$msg.get("allchanges")" onclick="location='$doc.getURL("view","xpage=changesall")'" class="button"/></div>
+      <div class="buttons"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
       </div>
     </div>
   </form>

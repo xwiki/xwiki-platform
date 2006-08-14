@@ -1023,17 +1023,17 @@ public class XWiki extends Api {
 
     public Object parseGroovyFromString(String script) throws XWikiException {
         if (checkProgrammingRights())
-          return (Object)xwiki.parseGroovyFromString(script, context);
+            return (Object)xwiki.parseGroovyFromString(script, context);
         else
-          return null;
+            return "groovy_missingrights";
     }
 
     public Object parseGroovyFromPage(String fullname) throws XWikiException {
         XWikiDocument doc = xwiki.getDocument(fullname, context);
         if (xwiki.getRightService().hasProgrammingRights(doc, context))
-         return parseGroovyFromString(doc.getContent());
+            return xwiki.parseGroovyFromString(doc.getContent(),context);
         else
-         return null;
+            return "groovy_missingrights";
     }
 
     public String getMacroList() {

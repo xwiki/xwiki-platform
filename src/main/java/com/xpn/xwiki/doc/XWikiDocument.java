@@ -2549,7 +2549,7 @@ public class XWikiDocument {
     }
 
     public boolean isAdvancedContent() {
-        String[] matches = { "<%" , "#set", "#include", "<form", "<input" };
+        String[] matches = { "<%" , "#set", "#include", "#if",  "<form", "<input", "<script", "<style", "public class",  "/* Advanced content */", "## Advanced content" };
         String content2 = content.toLowerCase();
         for (int i=0;i<matches.length;i++) {
             if (content2.indexOf(matches[i])!=-1)

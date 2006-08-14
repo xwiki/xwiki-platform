@@ -217,20 +217,20 @@
 #end
 
 #macro(xwikimessageboxfield $fielddoc $fieldname $fieldtext $html)
-<label class="field">$fieldtext</label>
-<span class="field">
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
 #if($fieldname!="")
 $fielddoc.display($fieldname, "edit")
 #end
 #if($html!="")
 $html
 #end
-</span>
+</div>
 #end
 
 #macro(xwikimessageboxsubmit $submittext)
-<div class="button">
-<input class="button" type="submit" value="$submittext" />
+<div class="xmbbutton">
+<input type="submit" value="$submittext" />
 </div>
 #end
 

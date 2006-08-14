@@ -260,6 +260,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             else
                 session.update(doc);
 
+            // Make sure the database name is stored
+            doc.setDatabase(context.getDatabase());
+
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
                 for (int i=0;i<doc.getObjectsToRemove().size();i++) {

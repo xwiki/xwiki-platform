@@ -2,6 +2,7 @@
 ### @deprecated
 ###
 ###
+#if((!$showactions)||($showactions==1))
 <script type="text/javascript">
 function checkDocumentContent() {
   if (document.forms.${formname}.content) {
@@ -20,3 +21,4 @@ function checkDocumentContent() {
   <button class="button" type="submit" value="preview" onclick="document.forms.${formname}.action='$doc.getURL("preview")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;">$msg.get("preview")</button>
   <button  class="button" type="submit" value="save" onclick="document.forms.${formname}.action='$doc.getURL("${saveaction}")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;" >$msg.get("save")</button>
 </div>
+#end

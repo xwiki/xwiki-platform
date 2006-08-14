@@ -1,21 +1,25 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("printheader.vm")
-<div id="xwikicontent">
-$cdoc.getRenderedContent()
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+<div id="headerglobal" class="layoutsection">
+  <div id="companylogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
+#set($logo = $!prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.gif"))
+      <img src="$logourl" alt="Netcipia" style="width: 215px;height: 74px;"/>
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+      <img src="$logourl" alt="XWiki"/>
+#end
+    </a>
+  </div>
 </div>
-#if ($request.get("comments")=="1")
-#template("comments2.vm")
-#end
-#if ($request.get("attachments")=="1")
-<div id="xwikiattachments">
-#foreach ($attach in $doc.attachmentList)
-#if ($attach.isImage())
-<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" />
-<br />
-#end
-#end
+<div id="xwikicontent-header">
+<div class="leftcorner"></div>
 </div>
-#end
-#template("basefooter.vm")
-#template("footer.vm")
+<div id="contentcontainer" class="layoutsection">
+  <div id="contentcolumn" class="contenthidelefthideright">
+#template("contentview.vm")
+<div class="clearfloats"></div>
+#template("endpage.vm")

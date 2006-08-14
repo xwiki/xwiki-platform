@@ -64,6 +64,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         return processLogin(request, response, null);
     }
 
+
+    private String convertUsername(String username, XWikiContext context) {
+        return context.getWiki().convertUsername(username, context);
+    }
+
     /**
      * Process any login information that was included in the request, if any.
      * Returns true if SecurityFilter should abort further processing after the method completes (for example, if a
@@ -94,7 +99,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 persistentLoginManager != null
                 && persistentLoginManager.rememberingLogin(request)
         ) {
-            String username = persistentLoginManager.getRememberedUsername(request, response);
+            String username = convertUsername(persistentLoginManager.getRememberedUsername(request, response), context);
             String password = persistentLoginManager.getRememberedPassword(request, response);
 
             Principal principal = authenticate(username, password, context);
@@ -111,7 +116,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
         // process login form submittal
         if (request.getMatchableURL().endsWith(loginSubmitPattern)) {
-            String username = request.getParameter(FORM_USERNAME);
+            String username = convertUsername(request.getParameter(FORM_USERNAME), context);
             String password = request.getParameter(FORM_PASSWORD);
             Principal principal = authenticate(username, password, context);
             if (principal != null) {

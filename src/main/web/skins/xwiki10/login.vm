@@ -3,6 +3,7 @@
 ###
 ###
 #template("startpage.vm")
+<div class="main layoutsubsection">
 <form id="loginForm" action="" method="post">
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 #xwikimessageboxstart($msg.get("login") "")
@@ -20,4 +21,5 @@
 <div class="buttons"><input type="submit" class="button" value="$msg.get("login")"/></div>
 #xwikimessageboxend()
 </form>
+</div>
 #template("endpage.vm")

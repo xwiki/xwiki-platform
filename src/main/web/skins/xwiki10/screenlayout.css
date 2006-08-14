@@ -132,7 +132,6 @@ Content
 #editcolumn{
   margin: 0px;
   float: left;
-  width: 634px;
   overflow: auto;
 }
 
@@ -140,8 +139,8 @@ Content
   position: relative;
   left: 0px;
 }
-#xwikidoccontent textarea{
-  width: 634px;
+#xwikidoccontent textarea {
+  width: 95%;
 }
 html > body #xwikidoccontent textarea{
   width: 630px;
@@ -206,7 +205,7 @@ html > body fieldset.xwikimessage{
   padding-top: 8px;
 }
 
-fieldset.xwikimessage legend{
+fieldset.xwikimessage legend {
   font-weight: bold;
   font-size: 110%;
   padding: 2px 8px;
@@ -217,10 +216,10 @@ fieldset.xwikimessage .xwikimessage{
   font-weight: bold;
   font-size: 110%;
 }
-fieldset.xwikimessage .buttons{
+fieldset.xwikimessage .buttons {
   text-align: center;
 }
-fieldset.xwikimessage .buttons a{
+fieldset.xwikimessage .buttons a {
   text-decoration: none;
   margin: 8px;
 }
@@ -230,20 +229,6 @@ fieldset.xwikimessage .buttons a{
   font-weight: bold;
   text-align: center;
 }
-
-fieldset.xwikimessage label.field {
-    display: block;
-    float: left;
-    clear: left; width: 170px;
-    font-weight: bold ;
-    margin-left: 30px ;
-    margin-bottom: 10px;
-}
-
-fieldset.xwikimessage .field {
-    display: block;
-    float: left;
-    margin-bottom: 10px; }
 
 /*
 ----------------------------------------------

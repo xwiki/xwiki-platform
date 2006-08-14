@@ -86,6 +86,17 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
             XWikiResponse response = context.getResponse();
             PortletURL purl;
 
+            // Action and Query String transformers
+            if ((action.equals("view"))&&(context.getLinksAction()!=null)) {
+                action = context.getLinksAction();
+            }
+            if (context.getLinksQueryString()!=null) {
+                if (querystring==null)
+                 querystring = context.getLinksQueryString();
+                else
+                 querystring = querystring + "&" + context.getLinksQueryString();
+            }
+
             if (action.equals("view") || action.equals("viewrev") || action.equals("attach") || action.equals("download") || action.equals("downloadrev") || action.equals("viewattachrev") || action.equals("skin") || action.equals("dot"))
                 purl = response.createRenderURL();
             else

@@ -257,7 +257,7 @@
   </component>
   <component name="DebuggerManager">
     <line_breakpoints>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="376" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreTest.java" line="113" class="com.xpn.xwiki.test.StoreTest" package="com.xpn.xwiki.test">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -270,7 +270,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="233" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreTest.java" line="488" class="com.xpn.xwiki.test.StoreTest" package="com.xpn.xwiki.test">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -283,7 +283,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="239" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Archive.java" line="256" class="org.suigeneris.jrcs.rcs.Archive" package="org.suigeneris.jrcs.rcs">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -296,7 +296,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/stats/impl/XWikiStatsServiceImpl.java" line="405" class="com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl" package="com.xpn.xwiki.stats.impl">
+      <breakpoint url="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Archive.java" line="823" class="org.suigeneris.jrcs.rcs.Archive" package="org.suigeneris.jrcs.rcs">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -309,293 +309,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/MyFormAuthentication.java" line="283" class="com.xpn.xwiki.test.MyFormAuthentication" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/xmlrpc/XWikiRpcHandler.java" line="58" class="com.xpn.xwiki.xmlrpc.XWikiRpcHandler" package="com.xpn.xwiki.xmlrpc">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ServletVirtualTest.java" line="98" class="com.xpn.xwiki.test.ServletVirtualTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java" line="1183" class="com.xpn.xwiki.doc.XWikiDocument" package="com.xpn.xwiki.doc">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java" line="414" class="com.xpn.xwiki.plugin.packaging.Package" package="com.xpn.xwiki.plugin.packaging">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/plugin/calendar/CalendarPlugin.java" line="356" class="com.xpn.xwiki.plugin.calendar.CalendarPlugin" package="com.xpn.xwiki.plugin.calendar">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/plugin/calendar/CalendarPluginApi.java" line="182" class="com.xpn.xwiki.plugin.calendar.CalendarPluginApi" package="com.xpn.xwiki.plugin.calendar">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/plugin/calendar/CalendarPluginApi.java" line="145" class="com.xpn.xwiki.plugin.calendar.CalendarPluginApi" package="com.xpn.xwiki.plugin.calendar">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/BackLinksSimpleTest.java" line="98" class="com.xpn.xwiki.test.BackLinksSimpleTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/plugin/query/QueryPluginTest.java" line="262" class="com.xpn.xwiki.test.plugin.query.QueryPluginTest" package="com.xpn.xwiki.test.plugin.query">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/plugin/query/QueryPluginTest.java" line="80" class="com.xpn.xwiki.test.plugin.query.QueryPluginTest" package="com.xpn.xwiki.test.plugin.query">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreTest.java" line="77" class="com.xpn.xwiki.test.StoreTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/user/impl/exo/ExoGroupServiceImpl.java" line="44" class="com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl" package="com.xpn.xwiki.user.impl.exo">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Document.java" line="790" class="com.xpn.xwiki.api.Document" package="com.xpn.xwiki.api">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/HibernateCustomMappingTest.java" line="355" class="com.xpn.xwiki.test.HibernateCustomMappingTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/cache/impl/OSCacheCache.java" line="159" class="com.xpn.xwiki.cache.impl.OSCacheCache" package="com.xpn.xwiki.cache.impl">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java" line="2840" class="com.xpn.xwiki.XWiki" package="com.xpn.xwiki">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/cache/impl/OSCacheService.java" line="90" class="com.xpn.xwiki.cache.impl.OSCacheService" package="com.xpn.xwiki.cache.impl">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java" line="2255" class="com.xpn.xwiki.test.ViewEditTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/cactus/com/xpn/xwiki/test/ViewEditTest.java" line="2005" class="com.xpn.xwiki.test.ViewEditTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/XWiki.java" line="325" class="com.xpn.xwiki.api.XWiki" package="com.xpn.xwiki.api">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/UtilTest.java" line="142" class="com.xpn.xwiki.test.UtilTest" package="com.xpn.xwiki.test">
-        <option name="ENABLED" value="true" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/XWiki.java" line="321" class="com.xpn.xwiki.api.XWiki" package="com.xpn.xwiki.api">
+      <breakpoint url="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Archive.java" line="842" class="org.suigeneris.jrcs.rcs.Archive" package="org.suigeneris.jrcs.rcs">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -923,91 +637,91 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="xwiki.hbm.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/xwiki.hbm.xml">
+      <file leaf-file-name="StoreHibernateTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreHibernateTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="767" column="41" selection-start="0" selection-end="29477" vertical-scroll-proportion="1.3102837">
+            <state line="27" column="46" selection-start="1058" selection-end="1058" vertical-scroll-proportion="0.17863397">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="xwiki.hbm.xml" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/test/resources/xwiki.hbm.xml">
+      <file leaf-file-name="StoreTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="773" column="0" selection-start="29461" selection-end="29461" vertical-scroll-proportion="0.93971634">
+            <state line="488" column="0" selection-start="23783" selection-end="23783" vertical-scroll-proportion="1.1138353">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="adminskin.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/adminskin.vm">
+      <file leaf-file-name="ToString.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/util/ToString.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="12" selection-start="670" selection-end="670" vertical-scroll-proportion="0.46448088">
+            <state line="154" column="0" selection-start="5247" selection-end="5247" vertical-scroll-proportion="1.2329247">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationResources.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources.properties">
+      <file leaf-file-name="Archive.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Archive.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="451" column="28" selection-start="15746" selection-end="15774" vertical-scroll-proportion="0.81914896">
+            <state line="850" column="67" selection-start="25004" selection-end="25004" vertical-scroll-proportion="0.44658494">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationResources_en.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_en.properties">
+      <file leaf-file-name="XWiki.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="452" column="28" selection-start="15775" selection-end="15775" vertical-scroll-proportion="0.8492908">
+            <state line="1752" column="85" selection-start="65088" selection-end="65088" vertical-scroll-proportion="0.26795095">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ApplicationResources_fr.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_fr.properties">
+      <file leaf-file-name="Phrases.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Phrases.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="298" column="35" selection-start="10757" selection-end="10757" vertical-scroll-proportion="0.8492908">
+            <state line="86" column="0" selection-start="3551" selection-end="3551" vertical-scroll-proportion="0.8931699">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="style.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/style.css">
+      <file leaf-file-name="Node.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Node.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="0" selection-start="232" selection-end="232" vertical-scroll-proportion="0.30141845">
+            <state line="742" column="0" selection-start="22808" selection-end="22808" vertical-scroll-proportion="0.18388791">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="header.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/header.vm">
+      <file leaf-file-name="Version.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Version.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+            <state line="165" column="0" selection-start="5277" selection-end="5277" vertical-scroll-proportion="0.30823117">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="global.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/global.vm">
+      <file leaf-file-name="Utils.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/Utils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="52" selection-start="946" selection-end="946" vertical-scroll-proportion="0.8741135">
+            <state line="112" column="4" selection-start="3940" selection-end="4041" vertical-scroll-proportion="0.48161122">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="admin.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/admin.vm">
+      <file leaf-file-name="Collection.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Collection.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="132" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.4822695">
+            <state line="86" column="0" selection-start="2605" selection-end="2605" vertical-scroll-proportion="1.3222417">
               <folding />
             </state>
           </provider>
@@ -1074,8 +788,8 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/objects/BaseCollection.java" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiStoreInterface.java" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiCacheStore.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiStoreInterface.java" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="InspectionManager">
     <option name="AUTOSCROLL_TO_SOURCE" value="false" />
@@ -1272,6 +986,36 @@
         <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src" />
         <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
       </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+    </PATH>
+    <PATH>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="xwiki.ipr" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="xwikibase" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
+      <PATH_ELEMENT>
+        <option name="myItemId" value="PsiDirectory:C:\dev\java\xwiki\src\main\resources" />
+        <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+      </PATH_ELEMENT>
     </PATH>
     <PATH>
       <PATH_ELEMENT>
@@ -1350,7 +1094,7 @@
     <property name="cvs_file_history_treeWidth4" value="141" />
     <property name="cvs_file_history_treeOrder3" value="3" />
     <property name="cvs_file_history_treeWidth6" value="140" />
-    <property name="last_opened_file_path" value="C:\dev\java\webservices\alexa\com\amazon\api\alexa" />
+    <property name="last_opened_file_path" value="C:\Documents and Settings\ldubost\Mes documents" />
     <property name="cvs_file_history_flatOrder5" value="5" />
     <property name="cvs_file_history_flatWidth5" value="92" />
     <property name="cvs_file_history_treeWidth3" value="141" />
@@ -1382,7 +1126,7 @@
   </component>
   <component name="RestoreUpdateTree" />
   <component name="RunManager">
-    <activeType name="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" />
+    <activeType name="JUnit" />
     <tempConfiguration selected="false" default="false" name="ChartingMacroTest" type="JUnit" factoryName="JUnit">
       <module name="xwiki" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -1413,46 +1157,6 @@
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
     </tempConfiguration>
-    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
-      <module name="xwiki" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-    </configuration>
-    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="false" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3384" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-    </configuration>
     <configuration selected="false" default="true" type="Applet" factoryName="Applet">
       <module name="" />
       <option name="MAIN_CLASS_NAME" />
@@ -1465,19 +1169,25 @@
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
     </configuration>
-    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
+    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.jsr45.JSR45ConfigurationFactory" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
-      <option name="PORT" value="7001" />
+      <option name="PORT" value="80" />
       <option name="LOCAL" value="true" />
       <option name="OPEN_IN_BROWSER" value="true" />
       <option name="OPEN_IN_BROWSER_URL" value="/" />
       <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="DOMAIN_PATH" value="" />
-      <option name="USER" value="weblogic" />
-      <option name="PASSWORD" value="weblogic" />
-      <option name="SERVER_NAME" value="myserver" />
-      <option name="DOMAIN_NAME" value="mydomain" />
+      <option name="JSP_PACKAGE" value="" />
+      <option name="VM_OPTS" value="" />
+      <option name="USE_WEBSPHERE51_LINEMAPPING_MODEL" value="false" />
+      <option name="LOCAL_PORT" value="80" />
+    </configuration>
+    <configuration selected="false" default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
     </configuration>
     <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
@@ -1529,6 +1239,39 @@
         </SHUTDOWN>
       </ConfigurationWrapper>
     </configuration>
+    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Remote">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="false" />
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3384" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+    </configuration>
+    <configuration selected="false" default="true" type="JUnit" factoryName="JUnit">
+      <module name="xwiki" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+    </configuration>
     <configuration selected="false" default="true" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -1538,20 +1281,210 @@
       <option name="ALTERNATIVE_JRE_PATH" />
       <module name="" />
     </configuration>
-    <configuration selected="false" default="true" type="#com.intellij.j2ee.web.jsr45.JSR45ConfigurationFactory" factoryName="Local">
+    <configuration selected="false" default="true" type="WebLogic Instance" factoryName="Local">
       <option name="WORKING_DIRECTORY" />
       <option name="HOST" value="localhost" />
-      <option name="PORT" value="80" />
+      <option name="PORT" value="7001" />
       <option name="LOCAL" value="true" />
       <option name="OPEN_IN_BROWSER" value="true" />
       <option name="OPEN_IN_BROWSER_URL" value="/" />
       <option name="COMMON_VM_ARGUMENTS" value="" />
-      <option name="JSP_PACKAGE" value="" />
-      <option name="VM_OPTS" value="" />
-      <option name="USE_WEBSPHERE51_LINEMAPPING_MODEL" value="false" />
-      <option name="LOCAL_PORT" value="80" />
+      <option name="DOMAIN_PATH" value="" />
+      <option name="USER" value="weblogic" />
+      <option name="PASSWORD" value="weblogic" />
+      <option name="SERVER_NAME" value="myserver" />
+      <option name="DOMAIN_NAME" value="mydomain" />
     </configuration>
-    <configuration selected="true" default="false" name="UtilTest" type="JUnit" factoryName="JUnit">
+    <configuration selected="true" default="false" name="Tomcat 5" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="false" />
+      <option name="OPEN_IN_BROWSER_URL" value="http://127.0.0.1:9080/" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx300m -Djava.net.preferIPv4Stack=true" />
+      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="exploded">
+        <option name="CONTEXT_PATH" value="/xwiki" />
+        <option name="MODULE_NAME" value="xwiki" />
+        <option name="DEPLOY" value="true" />
+      </J2EE_MODULE>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3515" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myStartupWithAllocations" value="false" />
+        <option name="myCPUStartup" value="" />
+        <option name="myUsedMemoryThreshold" value="0" />
+        <option name="myDontLaunchUI" value="false" />
+        <option name="myCaptureMemoryOnExit" value="false" />
+        <option name="myCaptureCPUOnExit" value="false" />
+        <option name="mySnapshotsDir" value="" />
+        <option name="myForceJVMTI" value="false" />
+        <option name="myDisableAlloc" value="false" />
+        <option name="myDisableCounts" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+        <EnvironmentVariables>
+          <option name="NAME" value="LANG" />
+          <option name="VALUE" value="fr_FR.ISO-8859-1" />
+          <option name="IS_PREDEFINED" value="false" />
+        </EnvironmentVariables>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile ">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+        <EnvironmentVariables>
+          <option name="NAME" value="LANG" />
+          <option name="VALUE" value="fr_FR.ISO-8859-1" />
+          <option name="IS_PREDEFINED" value="false" />
+        </EnvironmentVariables>
+      </ConfigurationWrapper>
+    </configuration>
+    <configuration selected="false" default="false" name="Tomcat 5.0 2" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat2">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="false" />
+      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:9080/xwiki//" />
+      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx300m" />
+      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="exploded">
+        <option name="CONTEXT_PATH" value="/xwiki" />
+        <option name="MODULE_NAME" value="xwiki" />
+        <option name="DEPLOY" value="true" />
+      </J2EE_MODULE>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3383" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myStartupWithAllocations" value="false" />
+        <option name="myCPUStartup" value="" />
+        <option name="myUsedMemoryThreshold" value="0" />
+        <option name="myDontLaunchUI" value="false" />
+        <option name="myCaptureMemoryOnExit" value="false" />
+        <option name="myCaptureCPUOnExit" value="false" />
+        <option name="mySnapshotsDir" value="" />
+        <option name="myForceJVMTI" value="false" />
+        <option name="myDisableAlloc" value="false" />
+        <option name="myDisableCounts" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile ">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" run" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value=" stop" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+    </configuration>
+    <configuration selected="true" default="false" name="XWiki.com" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="lanai.xpertnet.biz" />
+      <option name="PORT" value="5005" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1409" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myStartupWithAllocations" value="false" />
+        <option name="myCPUStartup" value="" />
+        <option name="myUsedMemoryThreshold" value="0" />
+        <option name="myDontLaunchUI" value="false" />
+        <option name="myCaptureMemoryOnExit" value="false" />
+        <option name="myCaptureCPUOnExit" value="false" />
+        <option name="mySnapshotsDir" value="" />
+        <option name="myForceJVMTI" value="false" />
+        <option name="myDisableAlloc" value="false" />
+        <option name="myDisableCounts" value="false" />
+      </RunnerSettings>
+      <ConfigurationWrapper RunnerId="Debug" />
+    </configuration>
+    <configuration selected="false" default="false" name="UtilTest" type="JUnit" factoryName="JUnit">
       <module name="xwikibase" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -1568,6 +1501,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1054" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1579,11 +1517,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1054" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1623,14 +1556,14 @@
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
     </configuration>
-    <configuration selected="false" default="false" name="StoreTest" type="JUnit" factoryName="JUnit">
+    <configuration selected="true" default="false" name="StoreTest" type="JUnit" factoryName="JUnit">
       <module name="xwikibase" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
       <option name="PACKAGE_NAME" value="com.xpn.xwiki.test" />
       <option name="MAIN_CLASS_NAME" value="com.xpn.xwiki.test.StoreTest" />
-      <option name="METHOD_NAME" value="testStandardDelete" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="METHOD_NAME" value="testBadContentVersioningNotOk" />
+      <option name="TEST_OBJECT" value="method" />
       <option name="VM_PARAMETERS" value="" />
       <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/build/xwikibase_test" />
@@ -1642,6 +1575,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1825" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1653,11 +1591,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1825" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1714,6 +1647,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1055" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1725,11 +1663,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1055" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1788,6 +1721,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3983" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1800,14 +1738,9 @@
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
       </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3983" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Profile " />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Profile " />
       <ConfigurationWrapper RunnerId="Run" />
     </configuration>
     <configuration selected="false" default="false" name="SearchTest" type="JUnit" factoryName="JUnit">
@@ -1829,6 +1762,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2647" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1840,11 +1778,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="2647" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1903,6 +1836,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1377" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1914,11 +1852,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1377" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1943,6 +1876,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1336" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -1954,11 +1892,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1336" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2015,6 +1948,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1069" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2026,11 +1964,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1069" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2055,6 +1988,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1826" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2066,11 +2004,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1826" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2095,6 +2028,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2019" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2106,11 +2044,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="2019" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2135,6 +2068,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2597" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2147,14 +2085,9 @@
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
       </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="2597" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Profile " />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Profile " />
       <ConfigurationWrapper RunnerId="Run" />
     </configuration>
     <configuration selected="false" default="false" name="ServletVirtualTest" type="JUnit" factoryName="JUnit">
@@ -2176,6 +2109,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="1056" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2187,11 +2125,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1056" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2318,6 +2251,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="2833" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2329,11 +2267,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="2833" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2384,6 +2317,11 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="wholeProject" />
       </option>
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="3790" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
         <option name="myStartupWithAllocations" value="false" />
         <option name="myCPUStartup" value="" />
@@ -2395,11 +2333,6 @@
         <option name="myForceJVMTI" value="false" />
         <option name="myDisableAlloc" value="false" />
         <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3790" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -2434,195 +2367,6 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
-    </configuration>
-    <configuration selected="true" default="false" name="Tomcat 5" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="false" />
-      <option name="OPEN_IN_BROWSER_URL" value="http://127.0.0.1:9080/" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx300m -Djava.net.preferIPv4Stack=true" />
-      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="exploded">
-        <option name="CONTEXT_PATH" value="/xwiki" />
-        <option name="MODULE_NAME" value="xwiki" />
-        <option name="DEPLOY" value="true" />
-      </J2EE_MODULE>
-      <RunnerSettings RunnerId="Profile ">
-        <option name="myStartupWithAllocations" value="false" />
-        <option name="myCPUStartup" value="" />
-        <option name="myUsedMemoryThreshold" value="0" />
-        <option name="myDontLaunchUI" value="false" />
-        <option name="myCaptureMemoryOnExit" value="false" />
-        <option name="myCaptureCPUOnExit" value="false" />
-        <option name="mySnapshotsDir" value="" />
-        <option name="myForceJVMTI" value="false" />
-        <option name="myDisableAlloc" value="false" />
-        <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3515" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile ">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-        <EnvironmentVariables>
-          <option name="NAME" value="LANG" />
-          <option name="VALUE" value="fr_FR.ISO-8859-1" />
-          <option name="IS_PREDEFINED" value="false" />
-        </EnvironmentVariables>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-        <EnvironmentVariables>
-          <option name="NAME" value="LANG" />
-          <option name="VALUE" value="fr_FR.ISO-8859-1" />
-          <option name="IS_PREDEFINED" value="false" />
-        </EnvironmentVariables>
-      </ConfigurationWrapper>
-    </configuration>
-    <configuration selected="false" default="false" name="Tomcat 5.0 2" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat2">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="false" />
-      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:9080/xwiki//" />
-      <option name="COMMON_VM_ARGUMENTS" value="-Dfile.encoding=iso-8859-1 -Xmx300m" />
-      <J2EE_MODULE DEPLOYMENT_SOURCE_NAME="exploded">
-        <option name="CONTEXT_PATH" value="/xwiki" />
-        <option name="MODULE_NAME" value="xwiki" />
-        <option name="DEPLOY" value="true" />
-      </J2EE_MODULE>
-      <RunnerSettings RunnerId="Profile ">
-        <option name="myStartupWithAllocations" value="false" />
-        <option name="myCPUStartup" value="" />
-        <option name="myUsedMemoryThreshold" value="0" />
-        <option name="myDontLaunchUI" value="false" />
-        <option name="myCaptureMemoryOnExit" value="false" />
-        <option name="myCaptureCPUOnExit" value="false" />
-        <option name="mySnapshotsDir" value="" />
-        <option name="myForceJVMTI" value="false" />
-        <option name="myDisableAlloc" value="false" />
-        <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="3383" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile ">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" run" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="C:\Program Files\Apache Software Foundation\Tomcat 5.0\bin\catalina.bat" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value=" stop" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-    </configuration>
-    <configuration selected="true" default="false" name="XWiki.com" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="lanai.xpertnet.biz" />
-      <option name="PORT" value="5005" />
-      <RunnerSettings RunnerId="Profile ">
-        <option name="myStartupWithAllocations" value="false" />
-        <option name="myCPUStartup" value="" />
-        <option name="myUsedMemoryThreshold" value="0" />
-        <option name="myDontLaunchUI" value="false" />
-        <option name="myCaptureMemoryOnExit" value="false" />
-        <option name="myCaptureCPUOnExit" value="false" />
-        <option name="mySnapshotsDir" value="" />
-        <option name="myForceJVMTI" value="false" />
-        <option name="myDisableAlloc" value="false" />
-        <option name="myDisableCounts" value="false" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="1409" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="false" />
-      </RunnerSettings>
-      <ConfigurationWrapper RunnerId="Debug" />
     </configuration>
     <configuration selected="true" default="false" name="Groovy Export" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="groovy.lang.GroovyShell" />
@@ -2759,20 +2503,20 @@
     <layout>
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3409091" order="18" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.30877742" order="6" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.3386308" order="0" x="-87" y="100" width="469" height="491" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.20449439" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="true" internal_type="docked" type="docked" visible="false" weight="0.33801955" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.3730337" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.22168285" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.41123596" order="15" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.41011235" order="15" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.4006462" order="5" />
       <window_info id="Profile" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.46596858" order="11" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="11" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="13" />
       <window_info id="Favorites" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.27931595" order="1" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.3213483" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="true" weight="0.31348315" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.15110683" order="2" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="10" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.39775282" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.6011236" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.40038684" order="0" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.33" order="10" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="docked" type="docked" visible="false" weight="0.5983471" order="16" />
@@ -2921,107 +2665,109 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/macros.vm">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="247" column="4" selection-start="9099" selection-end="9099" vertical-scroll-proportion="0.81914896">
+        <state line="1042" column="0" selection-start="33363" selection-end="33363" vertical-scroll-proportion="0.9791667">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/stylesheets.vm">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/store/XWikiHibernateVersioningStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="0" selection-start="348" selection-end="348" vertical-scroll-proportion="0.18085106">
+        <state line="159" column="0" selection-start="6482" selection-end="6482" vertical-scroll-proportion="0.9015151">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/doc/XWikiDocumentArchive.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="0" selection-start="962" selection-end="1054" vertical-scroll-proportion="0.37310606">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/web/AdminAction.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Document.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="13" selection-start="1877" selection-end="1877" vertical-scroll-proportion="0.30141845">
+        <state line="418" column="34" selection-start="11716" selection-end="11716" vertical-scroll-proportion="0.8162879">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/WEB-INF/struts-config.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Class.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="52" column="30" selection-start="2002" selection-end="2002" vertical-scroll-proportion="0.81914896">
+        <state line="36" column="31" selection-start="1251" selection-end="1251" vertical-scroll-proportion="0.2084063">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/htmlheader.vm">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/api/Collection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="0" selection-start="1196" selection-end="1196" vertical-scroll-proportion="0.42730495">
+        <state line="86" column="0" selection-start="2605" selection-end="2605" vertical-scroll-proportion="1.3222417">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/global.vm">
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/Utils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="52" selection-start="946" selection-end="946" vertical-scroll-proportion="0.8741135">
+        <state line="112" column="4" selection-start="3940" selection-end="4041" vertical-scroll-proportion="0.48161122">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/header.vm">
+    <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Version.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="165" column="0" selection-start="5277" selection-end="5277" vertical-scroll-proportion="0.30823117">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/style.css">
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreHibernateTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="0" selection-start="232" selection-end="232" vertical-scroll-proportion="0.30141845">
+        <state line="27" column="46" selection-start="1058" selection-end="1058" vertical-scroll-proportion="0.17863397">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources.properties">
+    <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Phrases.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="451" column="28" selection-start="15746" selection-end="15774" vertical-scroll-proportion="0.81914896">
+        <state line="86" column="0" selection-start="3551" selection-end="3551" vertical-scroll-proportion="0.8931699">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_en.properties">
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/xpn/xwiki/test/StoreTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="452" column="28" selection-start="15775" selection-end="15775" vertical-scroll-proportion="0.8492908">
+        <state line="488" column="0" selection-start="23783" selection-end="23783" vertical-scroll-proportion="1.1138353">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/ApplicationResources_fr.properties">
+    <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/util/ToString.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="298" column="35" selection-start="10757" selection-end="10757" vertical-scroll-proportion="0.8492908">
+        <state line="154" column="0" selection-start="5247" selection-end="5247" vertical-scroll-proportion="1.2329247">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/admin.vm">
+    <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Node.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="132" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.4822695">
+        <state line="742" column="0" selection-start="22808" selection-end="22808" vertical-scroll-proportion="0.18388791">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/web/skins/xwiki10/adminskin.vm">
+    <entry file="file://C:/dev/java/jrcs/src/java/org/suigeneris/jrcs/rcs/Archive.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="12" selection-start="670" selection-end="670" vertical-scroll-proportion="0.46448088">
+        <state line="850" column="67" selection-start="25004" selection-end="25004" vertical-scroll-proportion="0.44658494">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/xwiki.hbm.xml">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/xpn/xwiki/XWiki.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="767" column="41" selection-start="0" selection-end="29477" vertical-scroll-proportion="1.3102837">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/resources/xwiki.hbm.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="773" column="0" selection-start="29461" selection-end="29461" vertical-scroll-proportion="0.93971634">
+        <state line="1752" column="85" selection-start="65088" selection-end="65088" vertical-scroll-proportion="0.26795095">
           <folding />
         </state>
       </provider>

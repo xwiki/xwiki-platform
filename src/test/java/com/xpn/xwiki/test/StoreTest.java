@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.ParseException;
+import org.suigeneris.jrcs.util.ToString;
+import org.apache.tools.ant.filters.StringInputStream;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -107,7 +111,7 @@ public class StoreTest extends HibernateTestCase {
         assertEquals(doc4.getVersion(),Utils.version);
         assertEquals(doc4.getAuthor(), Utils.author);
         Version[] versions = versioningStore.getXWikiDocVersions(doc4, getXWikiContext());
-        assertTrue(versions.length==2);
+        assertTrue(versions.length==1);
     }
 
     public void testNotExist() throws XWikiException {
@@ -448,5 +452,44 @@ public class StoreTest extends HibernateTestCase {
         byte[] attachcontenta = Utils.getDataAsBytes(new File(Utils.filename));
         byte[] attachcontentb = Utils.getDataAsBytes(new File(Utils.filename2));
         testUpdateAttachmentArchiveReadWrite(store, attachcontenta, attachcontentb);
+    }
+
+    public void testBadContentVersionedReadWriteOk() throws XWikiException {
+        Utils.setBadData(34);
+        standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name, getXWikiContext());
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(), Utils.web, Utils.name);
+    }
+
+    public void testBadContentVersionedReadWriteNotOk() throws XWikiException {
+        Utils.setBadData(35);
+        standardReadWrite(getXWiki().getStore(), Utils.web, Utils.name, getXWikiContext());
+        versionedReadWrite(getXWiki().getStore(), getXWiki().getVersioningStore(), Utils.web, Utils.name);
+    }
+
+    public void testBadContentVersioningOk() throws XWikiException, ParseException {
+        int nb = 10;
+        String content = "";
+        for (int i=0;i<nb;i++)
+            content += "* ludovic@xwiki.com\n";
+
+        Object[] lines = ToString.stringToArray(content);
+        Archive archive = new Archive(lines, "", "1.1");
+        String txt = archive.toString();
+        StringInputStream is = new StringInputStream(txt);
+        archive = new Archive("", is);
+    }
+
+    public void testBadContentVersioningNotOk() throws XWikiException, ParseException {
+        int nb = 15;
+            String content = "";
+            for (int i=0;i<nb;i++)
+                content += "* ludovic@xwiki.com\n";
+
+            Object[] lines = ToString.stringToArray(content);
+        Archive archive = new Archive(lines, "", "1.1");
+
+        String txt = archive.toString();
+        StringInputStream is = new StringInputStream(txt);
+        archive = new Archive("", is);
     }
 }

@@ -214,4 +214,28 @@ public class Context extends Api {
     public void setCacheDuration(int duration) {
         context.setCacheDuration(duration);
     }
+
+    public void setLinksAction(String action) {
+        context.setLinksAction(action);
+    }
+
+    public void unsetLinksAction() {
+        context.unsetLinksAction();
+    }
+
+    public String getLinksAction() {
+        return context.getLinksAction();
+    }
+
+    public void setLinksQueryString(String value) {
+        context.setLinksQueryString(value);
+    }
+
+    public void unsetLinksQueryString() {
+        context.unsetLinksQueryString();
+    }
+
+    public String getLinksQueryString() {
+        return context.getLinksQueryString();
+    }
 }

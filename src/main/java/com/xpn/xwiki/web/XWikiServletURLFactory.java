@@ -138,11 +138,24 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
 
     public URL createURL(String web, String name, String action, String querystring, String anchor,
                          String xwikidb, XWikiContext context) {
+        // Action and Query String transformers
+        if ((action.equals("view"))&&(context.getLinksAction()!=null)) {
+            action = context.getLinksAction();
+        }
+        if (context.getLinksQueryString()!=null) {
+            if (querystring==null)
+             querystring = context.getLinksQueryString();
+            else
+             querystring = querystring + "&" + context.getLinksQueryString();
+        }
+    
         StringBuffer newpath = new StringBuffer(servletPath);
         newpath.append(actionPath);
+
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
+
 
         if ((querystring!=null)&&(!querystring.equals(""))) {
             newpath.append("?");

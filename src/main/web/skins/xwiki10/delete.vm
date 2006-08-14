@@ -3,8 +3,11 @@
 ###
 ###
 #template("startpage.vm")
+<div class="main layoutsubsection">
 #if($message)
 <div id="xwikimessage">$message</div>
 #end
 #xwikimessagebox($msg.get("delete") $msg.get("confirmdelete") $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+</div>
+<div class="clearfloats"></div>
 #template("endpage.vm")

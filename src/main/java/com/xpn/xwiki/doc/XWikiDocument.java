@@ -70,6 +70,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.lang.ref.SoftReference;
@@ -2557,5 +2558,16 @@ public class XWikiDocument {
         }
 
         return false;
+    }
+
+    public boolean removeObject(BaseObject bobj) {
+        Vector objects = getObjects(bobj.getClassName());
+        if (objects==null)
+         return false;
+        if (objects.elementAt(bobj.getNumber())==null)
+         return false;
+        objects.set(bobj.getNumber(), null);
+        addObjectsToRemove(bobj);
+        return true;
     }
 }

@@ -105,6 +105,13 @@ public class Utils {
         afilename = filename;
     }
 
+    public static void setBadData(int nb) {
+        setStandardData();
+        content1 = "";
+        for (int i=0;i<nb;i++)
+          content1 += "* ludovic@xwiki.com\n";
+    }
+
 
     public static void setStandardAccentData() {
         name = "WebHome";

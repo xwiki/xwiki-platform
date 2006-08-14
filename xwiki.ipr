@@ -561,7 +561,9 @@
         <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES />
+      <SOURCES>
+        <root url="file://C:/dev/java/jrcs/src/java" />
+      </SOURCES>
     </library>
   </component>
   <component name="uidesigner-configuration">

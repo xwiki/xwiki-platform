@@ -895,4 +895,28 @@ public class Document extends Api {
     public boolean isAdvancedContent() {
         return doc.isAdvancedContent();
     }
+
+    public boolean removeObject(Object obj) {
+        return getDoc().removeObject(obj.getBaseObject());
+    }
+
+    public void delete() throws XWikiException {
+        if (hasAccessLevel("delete"))
+            context.getWiki().deleteDocument(getDocument(), context);
+        else {
+            java.lang.Object[] args = { doc.getFullName() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access denied in edit mode on document {0}", null, args);
+        }
+    }
+
+    public void deleteWithProgrammingRights() throws XWikiException {
+        if (checkProgrammingRights())
+            context.getWiki().deleteDocument(getDocument(), context);
+        else {
+            java.lang.Object[] args = { doc.getFullName() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access denied with no programming rights document {0}", null, args);
+        }
+    }
 }

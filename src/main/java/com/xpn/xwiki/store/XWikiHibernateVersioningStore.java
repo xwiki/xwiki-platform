@@ -211,7 +211,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
+            XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
             archivedoc.resetArchive(doc.getFullName(), doc.getContent(), doc.getVersion());
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {
@@ -255,3 +255,4 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 }
+

@@ -301,4 +301,27 @@ public class XWikiContext extends Hashtable {
         return classCache.get(key);
     }
 
+    public void setLinksAction(String action) {
+        put("links_action", action);
+    }
+
+    public void unsetLinksAction() {
+        remove("links_action");
+    }
+
+    public String getLinksAction() {
+        return (String) get("links_action");
+    }
+
+    public void setLinksQueryString(String value) {
+        put("links_qs", value);
+    }
+
+    public void unsetLinksQueryString() {
+        remove("links_qs");
+    }
+
+    public String getLinksQueryString() {
+        return (String) get("links_qs");
+    }
 }

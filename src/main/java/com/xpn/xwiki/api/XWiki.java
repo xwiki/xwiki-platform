@@ -486,9 +486,14 @@ public class XWiki extends Api {
             xwiki.SetUserDefaultGroup(context, fullwikiname);
     }
 
+    public void sendConfirmationMail(String xwikiname, String password, String email, String add_message, String contentfield) throws XWikiException {
+        if (checkProgrammingRights())
+            xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, context);
+    }
+
     public void sendConfirmationMail(String xwikiname, String password, String email, String contentfield) throws XWikiException {
         if (checkProgrammingRights())
-            xwiki.sendValidationEmail(xwikiname, password, email, "", contentfield, context);
+            xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, context);
     }
 
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {

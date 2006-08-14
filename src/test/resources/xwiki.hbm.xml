@@ -660,6 +660,9 @@
         <property name="confirmation_email_content" type="string">
             <column name="XWP_CONFIRMATION_EMAIL_CONTENT" length="60000" />
         </property>
+        <property name="invitation_email_content" type="string">
+            <column name="XWP_INVITATION_EMAIL_CONTENT" length="60000" />
+        </property>
         <property name="macros_languages" type="string">
             <column name="XWP_MACROS_LANGUAGE" length="255" />
         </property>

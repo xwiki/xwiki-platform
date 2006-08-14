@@ -722,16 +722,56 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        getStore().saveXWikiDoc(doc, context);
+        String server = null, database = null;
+        try {
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+            getStore().saveXWikiDoc(doc, context);
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
     }
 
     public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context) throws XWikiException {
-        getStore().saveXWikiDoc(doc, context);
-        getNotificationManager().verify(doc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        String server = null, database = null;
+        try {
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+            getStore().saveXWikiDoc(doc, context);
+            getNotificationManager().verify(doc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
     }
 
     private XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        return getStore().loadXWikiDoc(doc, context);
+        String server = null, database = null;
+        try {
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            return getStore().loadXWikiDoc(doc, context);
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
     }
 
     public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException {
@@ -755,24 +795,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException {
-        String server = null, database = null;
-        try {
             XWikiDocument doc = new XWikiDocument();
             doc.setFullName(fullname, context);
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
-
-            doc = getDocument(doc, context);
-            return doc;
-        } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
-        }
+            return getDocument(doc, context);
     }
 
     public XWikiDocument getDocument(String web, String fullname, XWikiContext context) throws XWikiException {
@@ -1757,10 +1782,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
-        needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
-        needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "checkbox");
-        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "checkbox");
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
 
@@ -1825,7 +1846,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
         needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
         needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
-
+        needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
 
         needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
         needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
@@ -2117,7 +2138,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    public void sendConfirmationEmail(String xwikiname, String password, String email, String message, String contentfield, XWikiContext context) throws XWikiException {
+        sendValidationEmail(xwikiname, password, email, "message", message, contentfield, context);
+    }
+
+
     public void sendValidationEmail(String xwikiname, String password, String email, String validkey, String contentfield, XWikiContext context) throws XWikiException {
+        sendValidationEmail(xwikiname, password, email, "validkey", validkey, contentfield, context);
+    }
+
+    public void sendValidationEmail(String xwikiname, String password, String email, String addfieldname,  String addfieldvalue, String contentfield, XWikiContext context) throws XWikiException {
         String sender;
         String content;
 
@@ -2132,7 +2162,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         try {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put("validkey", validkey);
+            vcontext.put(addfieldname, addfieldvalue);
             vcontext.put("email", email);
             vcontext.put("password", password);
             vcontext.put("sender", sender);
@@ -2566,6 +2596,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (reset) {
                         tdoc.setVersion("1.1");
                     }
+                    tdoc.setDatabase(context.getDatabase());
                     saveDocument(tdoc, context);
 
                     if (!reset) {
@@ -2616,6 +2647,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (reset) {
                             ttdoc.setVersion("1.1");
                         }
+                        ttdoc.setDatabase(context.getDatabase());
                         saveDocument(ttdoc, context);
 
                         if (!reset) {

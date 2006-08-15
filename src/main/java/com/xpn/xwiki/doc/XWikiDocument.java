@@ -1844,8 +1844,7 @@ public class XWikiDocument {
                         continue;
 
                     // generate the link
-                    Util util = context.getUtil();
-                    String newname = StringUtils.replace(util.noaccents(name), " ", "");
+                    String newname = StringUtils.replace(Util.noaccents(name), " ", "");
 
                     // If it is a local link let's add the space
                     if (newname.indexOf(".") == -1) {

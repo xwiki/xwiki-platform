@@ -92,8 +92,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     }
 
     public String noaccents(String name) {
-        Util util = context.getUtil();
-        return StringUtils.replace( util.noaccents(name), " ", "");
+//        Util util = context.getUtil();
+        return StringUtils.replace( Util.noaccents(name), " ", "");
     }
 
     public boolean exists(String name) {

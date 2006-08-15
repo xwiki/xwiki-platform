@@ -556,8 +556,9 @@
 }
 
 #xwikimessage {
+/* - this causes the edits in xwikicontent to be hidden (login.vm)
   float: left;
-  clear: left;
+  clear: left; */
   width: 100%;
   margin: auto;
   padding: auto;

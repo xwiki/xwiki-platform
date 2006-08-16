@@ -2596,8 +2596,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (reset) {
                         tdoc.setVersion("1.1");
                     }
-                    tdoc.setDatabase(context.getDatabase());
-                    saveDocument(tdoc, context);
+                    if (targetWiki!=null)
+                      tdoc.setDatabase(targetWiki);
+                     saveDocument(tdoc, context);
 
                     if (!reset) {
                         if (sourceWiki != null)
@@ -2647,7 +2648,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (reset) {
                             ttdoc.setVersion("1.1");
                         }
-                        ttdoc.setDatabase(context.getDatabase());
+                        if (targetWiki!=null)
+                         ttdoc.setDatabase(targetWiki);
                         saveDocument(ttdoc, context);
 
                         if (!reset) {
@@ -2684,7 +2686,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         tdoc.setVersion("1.1");
                     }
 
-                    saveDocument(tdoc, context);
+                    if (targetWiki!=null)
+                      tdoc.setDatabase(targetWiki);
+                     saveDocument(tdoc, context);
 
                     if (!reset) {
                         if (sourceWiki != null)
@@ -2905,44 +2909,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getURL(String fullname, String action, XWikiContext context) throws XWikiException {
-        String database = context.getDatabase();
-        try {
-            fullname = Util.getName(fullname, context);
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(fullname, context);
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullname, context);
 
-            URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), action, context);
-            return context.getURLFactory().getURL(url, context);
-        } finally {
-            context.setDatabase(database);
-        }
+        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), action, null, null, doc.getDatabase(), context);
+        return context.getURLFactory().getURL(url, context);
     }
 
     public String getURL(String fullname, String action, String querystring, XWikiContext context) throws XWikiException {
-        String database = context.getDatabase();
-        try {
-            fullname = Util.getName(fullname, context);
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(fullname, context);
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullname, context);
 
-            URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(),
-                    action, querystring, null, context);
-            return context.getURLFactory().getURL(url, context);
-        } finally {
-            context.setDatabase(database);
-        }
+        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(),
+                action, querystring, null, doc.getDatabase(), context);
+        return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentURL(String fullname, String filename, XWikiContext context) throws XWikiException {
-        String database = context.getDatabase();
-        try {
-            fullname = Util.getName(fullname, context);
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(fullname, context);
-            return doc.getAttachmentURL(filename, "download", context);
-        } finally {
-            context.setDatabase(database);
-        }
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullname, context);
+        return doc.getAttachmentURL(filename, "download", context);
     }
 
     // Usefull date functions
@@ -3403,16 +3389,35 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+
+    public boolean hasCentralizedAuthentication(XWikiContext context) {
+        String bl = getXWikiPreference("authentication_centralized", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.authentication.centralized", "0"));
+    }
+
     public String getLocalUserName(String user, XWikiContext context) {
-        return getUserName(user.substring(user.indexOf(":") + 1), null, true, context);
+        if (hasCentralizedAuthentication(context))
+         return getUserName(user, null, true, context);
+        else
+         return getUserName(user.substring(user.indexOf(":") + 1), null, true, context);
     }
 
     public String getLocalUserName(String user, String format, XWikiContext context) {
-        return getUserName(user.substring(user.indexOf(":") + 1), format, true, context);
+        if (hasCentralizedAuthentication(context))
+         return getUserName(user, format, true, context);
+        else
+         return getUserName(user.substring(user.indexOf(":") + 1), format, true, context);
     }
 
     public String getLocalUserName(String user, String format, boolean link, XWikiContext context) {
-        return getUserName(user.substring(user.indexOf(":") + 1), format, link, context);
+        if (hasCentralizedAuthentication(context))
+         return getUserName(user, format, link, context);
+        else
+         return getUserName(user.substring(user.indexOf(":") + 1), format, link, context);
     }
 
     public String formatDate(Date date, String format, XWikiContext context) {
@@ -3867,7 +3872,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public String convertUsername(String username, XWikiContext context) {
         if (username==null)
           return null;
-        if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("1"))
+        if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("1")&&(username.indexOf("@")!=-1)) {
+            String id = "" + username.hashCode();
+            id = id.replaceAll("-", "");
+            if (username.length()>1) {
+                int i1 = username.indexOf('@');
+                id = "" + username.charAt(0) + username.substring(i1+1,i1+2) + username.charAt(username.length()-1) + id;
+            }
+            return id;
+        }
+        else if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("2"))
           return username.replaceAll("[\\.\\@]", "_");
         else
           return username;

@@ -164,17 +164,19 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             return;
 
         // Let's save in the session the last elements view, saved
-        if (!action.equals("download")) {
-            HttpSession session = context.getRequest().getSession();
-            Collection actions = (Collection) session.getAttribute("recent_" + action);
-            if (actions==null) {
-                actions = new CircularFifoBuffer(context.getWiki().getXWikiPreferenceAsInt("recent_visits_size", 20, context));
-                session.setAttribute("recent_" + action, actions);
+        synchronized (this) {
+            if (!action.equals("download")) {
+                HttpSession session = context.getRequest().getSession();
+                Collection actions = (Collection) session.getAttribute("recent_" + action);
+                if (actions==null) {
+                    actions = new CircularFifoBuffer(context.getWiki().getXWikiPreferenceAsInt("recent_visits_size", 20, context));
+                    session.setAttribute("recent_" + action, actions);
+                }
+                String element = context.getDatabase() + ":" + doc.getFullName();
+                if (actions.contains(element))
+                    actions.remove(element);
+                actions.add(element);
             }
-            String element = context.getDatabase() + ":" + doc.getFullName();
-            if (actions.contains(element))
-             actions.remove(element);
-            actions.add(element);
         }
 
         // Let's check if this wiki should have statistics disabled

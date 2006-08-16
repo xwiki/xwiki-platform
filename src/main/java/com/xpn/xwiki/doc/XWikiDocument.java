@@ -52,9 +52,11 @@ import org.suigeneris.jrcs.util.ToString;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.collections.ListUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
+import org.apache.oro.text.regex.MalformedPatternException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -501,27 +503,27 @@ public class XWikiDocument {
     }
 
     public String getAttachmentURL(String filename, String action, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, null, context);
+        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, querystring, context);
+        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, null, context);
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, querystring, context);
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context) {
-        URL url = context.getURLFactory().createURL(getWeb(), getName(), action, redirect, context);
+        URL url = context.getURLFactory().createURL(getWeb(), getName(), action, null, null, getDatabase(), context);
         if (redirect) {
             if (url == null)
                 return null;
@@ -537,19 +539,19 @@ public class XWikiDocument {
 
     public String getURL(String action, String querystring, XWikiContext context) {
         URL url = context.getURLFactory().createURL(getWeb(), getName(), action,
-                querystring, null, context);
+                querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalURL(String action, XWikiContext context) {
         URL url = context.getURLFactory().createExternalURL(getWeb(), getName(), action,
-                null, null, context);
+                null, null, getDatabase(), context);
         return url.toString();
     }
 
     public String getExternalURL(String action, String querystring, XWikiContext context) {
         URL url = context.getURLFactory().createExternalURL(getWeb(), getName(), action,
-                querystring, null, context);
+                querystring, null, getDatabase(), context);
         return url.toString();
     }
 
@@ -557,7 +559,7 @@ public class XWikiDocument {
     public String getParentURL(XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(getParent(), context);
-        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), context);
+        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), "view", null, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1785,7 +1787,7 @@ public class XWikiDocument {
 
     public List getIncludedPages(XWikiContext context) {
         try {
-            String pattern = "#include(Topic|Form|Macros)\\(\"(.*?)\"\\)";
+            String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
             List list = context.getUtil().getMatches(getContent(), pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 try {
@@ -2548,8 +2550,31 @@ public class XWikiDocument {
         return newobject;
     }
 
-    public boolean isAdvancedContent() {
-        String[] matches = { "<%" , "#set", "#include", "#if",  "<form", "<input", "<script", "<style", "public class",  "/* Advanced content */", "## Advanced content" };
+    public boolean isAdvancedContent() {                     
+        String[] matches = { "<%" , "#set", "#include", "#if",  "public class",  "/* Advanced content */", "## Advanced content", "/* Programmatic content */", "## Programmatic content" };
+        String content2 = content.toLowerCase();
+        for (int i=0;i<matches.length;i++) {
+            if (content2.indexOf(matches[i])!=-1)
+                return true;
+        }
+
+        String htmlregexp = "</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>";
+        try {
+         Util util = new Util();
+         List list = util.getMatches(content2, htmlregexp, 1);
+         if (list.size()>0)
+            return true;
+        } catch (MalformedPatternException e) {
+        }
+        return false;
+    }
+
+    public boolean isProgrammaticContent() {
+        String[] matches = { "<%" , "$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()", "$context.getContext()",
+                "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */", "## Programmatic content",
+                "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup", "$xwiki.sendMessage",
+                "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",
+                };
         String content2 = content.toLowerCase();
         for (int i=0;i<matches.length;i++) {
             if (content2.indexOf(matches[i])!=-1)

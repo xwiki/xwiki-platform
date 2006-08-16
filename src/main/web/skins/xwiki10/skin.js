@@ -126,3 +126,67 @@ var XWikiAjax = {
     this.status.innerHtml = 'updated';
   }
 };
+
+function checkAdvancedContent(message) {
+   result = false;
+   data = document.forms.edit.content.value;
+   myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig")
+   results = data.match(myRE)
+   if (results&&results.length>0) 
+     result = true;
+
+   myRE2 = new RegExp("(#set|#include|#if|#end|#for|## Advanced content|public class|/\* Advanced content \*/)", "ig")
+   results = data.match(myRE2)
+   if (results&&results.length>0) 
+     result = true;
+
+   if (result==true) 
+    return confirm(message);
+
+   return true;
+}
+
+var currentfield = "";
+function show(fieldname) {
+    if (currentfield!="")
+        document.getElementById(currentfield).style.display="none";
+    document.getElementById(fieldname).style.display="block";
+    currentfield = fieldname;
+}
+
+function addUser(form, prefix) {
+    var username = form[prefix + "newuser"].value;
+    var select =  form[prefix + "users"][0];
+    if (username != null && username != "") {
+        length = select.options.length ;
+        dusername = username;
+        if (username.indexOf('.')==-1) {
+          xusername = "XWiki." + username;
+        }
+        else {
+          if (username.indexOf(":")==-1) {
+           dusername = username.substring(username.lastIndexOf(".")+1);
+          }
+          xusername = username
+        }
+        select.options[length] = new Option(dusername, xusername, true);
+    }
+}
+
+function addGroup(form, prefix) {
+    var groupname = form[prefix + "newgroup"].value;
+    var select =  form[prefix + "groups"][0];
+    if (groupname != null && groupname != "") {
+        length = select.options.length ;
+        dgroupname = groupname;
+        if (groupname.indexOf('.')==-1) {
+          xgroupname = "XWiki." + groupname;
+        }
+        else {
+          if (groupname.indexOf(":")==-1)
+           dgroupname = groupname.substring(groupname.lastIndexOf(".")+1);
+          xgroupname = groupname
+        }
+        select.options[length] = new Option(dgroupname, xgroupname, true);
+    }
+}

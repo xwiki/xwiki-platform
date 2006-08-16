@@ -896,6 +896,10 @@ public class Document extends Api {
         return doc.isAdvancedContent();
     }
 
+    public boolean isProgrammaticContent() {
+        return doc.isProgrammaticContent();
+    }
+
     public boolean removeObject(Object obj) {
         return getDoc().removeObject(obj.getBaseObject());
     }

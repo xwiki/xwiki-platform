@@ -1052,5 +1052,9 @@ public class XWiki extends Api {
     public Document createDocument() {
         return new Document(new XWikiDocument(), context);
     }
+
+    public String convertUsername(String username) {
+        return xwiki.convertUsername(username, context);
+    }
 }
 

@@ -2554,7 +2554,7 @@ public class XWikiDocument {
         String[] matches = { "<%" , "#set", "#include", "#if",  "public class",  "/* Advanced content */", "## Advanced content", "/* Programmatic content */", "## Programmatic content" };
         String content2 = content.toLowerCase();
         for (int i=0;i<matches.length;i++) {
-            if (content2.indexOf(matches[i])!=-1)
+            if (content2.indexOf(matches[i].toLowerCase())!=-1)
                 return true;
         }
 
@@ -2570,14 +2570,14 @@ public class XWikiDocument {
     }
 
     public boolean isProgrammaticContent() {
-        String[] matches = { "<%" , "$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()", "$context.getContext()",
+        String[] matches = { "<%" , "\\$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()", "$context.getContext()",
                 "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */", "## Programmatic content",
                 "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup", "$xwiki.sendMessage",
                 "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",
                 };
         String content2 = content.toLowerCase();
         for (int i=0;i<matches.length;i++) {
-            if (content2.indexOf(matches[i])!=-1)
+            if (content2.indexOf(matches[i].toLowerCase())!=-1)
                 return true;
         }
 

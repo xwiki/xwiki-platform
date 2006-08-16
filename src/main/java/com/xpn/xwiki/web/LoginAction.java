@@ -21,10 +21,15 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 public class LoginAction extends XWikiAction {
+    private static final Log log = LogFactory.getLog(LoginAction.class);
+    
 	public String render(XWikiContext context) throws XWikiException {
         return "login";
 	}

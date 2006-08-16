@@ -26,12 +26,11 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.impl.xwiki.MyFormAuthenticator;
 
-public class LoginErrorAction extends XWikiAction {
-    private static final Log log = LogFactory.getLog(LoginErrorAction.class);
+public class LoginSubmitAction extends XWikiAction {
+    private static final Log log = LogFactory.getLog(LoginSubmitAction.class);
     
-	public String render(XWikiContext context) throws XWikiException {
+    public String render(XWikiContext context) throws XWikiException {
         return "login";
-	}
+    }
 }

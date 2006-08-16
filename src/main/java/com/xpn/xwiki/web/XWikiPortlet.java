@@ -300,6 +300,8 @@ public class XWikiPortlet extends GenericPortlet {
                 renderResult = (new AttachAction()).render(context);
             } else if (action.equals("login")) {
                 renderResult = (new LoginAction()).render(context);
+            } else if (action.equals("loginsubmit")) {
+                renderResult = (new LoginSubmitAction()).render(context);
             } else if (action.equals("loginerror")) {
                 renderResult = (new LoginErrorAction()).render(context);
             } else if (action.equals("register")) {

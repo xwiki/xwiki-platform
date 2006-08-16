@@ -50,7 +50,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException {
         if (authenticator != null)
             return authenticator;
-
+        
         try {
             XWiki xwiki = context.getWiki();
 
@@ -64,30 +64,35 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                     sconfig.setRealmName("XWiki");
                 authenticator.init(null, sconfig);
             } else {
-                authenticator = new MyFormAuthenticator();
+            	authenticator = new MyFormAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
+                
                 sconfig.setAuthMethod("FORM");
+                
                 if (xwiki.Param("xwiki.authentication.realname") != null)
                     sconfig.setRealmName(xwiki.Param("xwiki.authentication.realname"));
                 else
                     sconfig.setRealmName("XWiki");
+
                 if (xwiki.Param("xwiki.authentication.defaultpage") != null)
                     sconfig.setDefaultPage(xwiki.Param("xwiki.authentication.defaultpage"));
                 else
                     sconfig.setDefaultPage("/bin/view/Main/WebHome");
+
                 if (xwiki.Param("xwiki.authentication.loginpage") != null)
                     sconfig.setLoginPage(xwiki.Param("xwiki.authentication.loginpage"));
                 else
                     sconfig.setLoginPage("/bin/login/XWiki/XWikiLogin");
+
                 if (xwiki.Param("xwiki.authentication.logoutpage") != null)
                     sconfig.setLogoutPage(xwiki.Param("xwiki.authentication.logoutpage"));
                 else
                     sconfig.setLogoutPage("/bin/logout/XWiki/XWikiLogout");
+
                 if (xwiki.Param("xwiki.authentication.errorpage") != null)
                     sconfig.setErrorPage(xwiki.Param("xwiki.authentication.errorpage"));
                 else
                     sconfig.setErrorPage("/bin/loginerror/XWiki/XWikiLogin");
-
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
                 if (xwiki.Param("xwiki.authentication.cookiepath") != null)
@@ -96,29 +101,39 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                     String[] cdomains = StringUtils.split(xwiki.Param("xwiki.authentication.cookiedomains"), ",");
                     persistent.setCookieDomains(cdomains);
                 }
+                
                 if (xwiki.Param("xwiki.authentication.cookielife") != null)
                     persistent.setCookieLife(xwiki.Param("xwiki.authentication.cookielife"));
+
                 if (xwiki.Param("xwiki.authentication.protection") != null)
                     persistent.setProtection(xwiki.Param("xwiki.authentication.protection"));
+
                 if (xwiki.Param("xwiki.authentication.useip") != null)
                     persistent.setUseIP(xwiki.Param("xwiki.authentication.useip"));
+
                 if (xwiki.Param("xwiki.authentication.encryptionalgorithm") != null)
                     persistent.setEncryptionAlgorithm(xwiki.Param("xwiki.authentication.encryptionalgorithm"));
+
                 if (xwiki.Param("xwiki.authentication.encryptionmode") != null)
                     persistent.setEncryptionMode(xwiki.Param("xwiki.authentication.encryptionmode"));
+
                 if (xwiki.Param("xwiki.authentication.encryptionpadding") != null)
                     persistent.setEncryptionPadding(xwiki.Param("xwiki.authentication.encryptionpadding"));
+
                 if (xwiki.Param("xwiki.authentication.validationKey") != null)
                     persistent.setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
+
                 if (xwiki.Param("xwiki.authentication.encryptionKey") != null)
                     persistent.setEncryptionKey(xwiki.Param("xwiki.authentication.encryptionKey"));
+
                 sconfig.setPersistentLoginManager(persistent);
 
                 MyFilterConfig fconfig = new MyFilterConfig();
                 if (xwiki.Param("xwiki.authentication.loginsubmitpage") != null)
                     fconfig.setInitParameter("loginSubmitPattern", xwiki.Param("xwiki.authentication.loginsubmitpage"));
                 else
-                    fconfig.setInitParameter("loginSubmitPattern", "/login/XWiki/XWikiLogin");
+                    fconfig.setInitParameter("loginSubmitPattern", "/loginsubmit/XWiki/XWikiLogin");
+
                 authenticator.init(fconfig, sconfig);
             }
 
@@ -189,21 +204,31 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
     }
 
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
-        Principal principal = null;
-
-        if ((username == null) || (username.trim().equals("")))
+        /*
+         * This function was returning null on failure so I preserved
+         * that behaviour, while adding the exact error messages to the
+         * context given as argument. However, the right way to do this
+         * would probably be to throw XWikiException-s.
+         */
+        
+        if ((username == null) || (username.trim().equals(""))) {
+            context.put("message", "nousername");
             return null;
+        }
 
-        if ((password == null) || (password.trim().equals("")))
+        if ((password == null) || (password.trim().equals(""))) {
+            context.put("message", "nopassword");
             return null;
+        }
 
         String superadmin = "superadmin";
         if (username.equals(superadmin)) {
             String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
             if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-                principal = new SimplePrincipal("XWiki.superadmin");
+                Principal principal = new SimplePrincipal("XWiki.superadmin");
                 return principal;
             } else {
+                context.put("message", "wrongpassword");
                 return null;
             }
         }
@@ -221,33 +246,53 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
             try {
                 String user = findUser(susername, context);
                 if (user != null) {
-                    if (checkPassword(user, password, context))
-                        principal = new SimplePrincipal(user);
+                    if (checkPassword(user, password, context)) {
+                        return new SimplePrincipal(user);
+                    } else {
+                        context.put("message", "wrongpassword");
+                        return null;
+                    }
+                } else {
+                    context.put("message", "wronguser");
+                    return null;
                 }
             } catch (Exception e) {
+                // continue
             }
 
             if (context.isVirtual()) {
-                if (principal == null) {
-                    // Then we check in the main database
-                    String db = context.getDatabase();
+                // Then we check in the main database
+                String db = context.getDatabase();
+                try {
+                    context.setDatabase(context.getWiki().getDatabase());
                     try {
-                        context.setDatabase(context.getWiki().getDatabase());
-                        try {
-                            String user = findUser(susername, context);
-                            if (user == null)
+                        String user = findUser(susername, context);
+                        if (user != null) {
+                            if (checkPassword(user, password, context)) {
+                                return new SimplePrincipal(context.getDatabase() + ":" + user);
+                            } else {
+                                context.put("message", "wrongpassword");
                                 return null;
-                            if (checkPassword(user, password, context))
-                                principal = new SimplePrincipal(context.getDatabase() + ":" + user);
-                        } catch (Exception e) {
+                            }
+                        } else {
+                            context.put("message", "wronguser");
+                            return null;                            
                         }
-                    } finally {
-                        context.setDatabase(db);
+                    } catch (Exception e) {
+                        context.put("message", "loginfailed");
+                        return null;
                     }
+                } finally {
+                    context.setDatabase(db);
                 }
+            } else {
+                context.put("message", "loginfailed");
+                return null;
             }
+        } else {
+            context.put("message", "loginfailed");
+            return null;
         }
-        return principal;
     }
 
     protected String findUser(String susername2, XWikiContext context) throws XWikiException {
@@ -297,6 +342,4 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
             return false;
         }
     }
-
-
 }

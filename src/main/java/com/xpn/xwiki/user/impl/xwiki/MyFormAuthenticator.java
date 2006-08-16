@@ -79,7 +79,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      * @return true if the filter should return after this method ends, false otherwise
      */
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
-
         try {
             Principal principal = MyBasicAuthenticator.checkLogin(request, response, context);
             if (principal!=null) {
@@ -159,12 +158,10 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                         rCode = HttpServletResponse.SC_UNAUTHORIZED;
                     }
                 }
-                response.setStatus(rCode);
-                request.getRequestDispatcher(errorPage).forward(request, response);
+                response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
             }
             return true;
         }
-
         return false;
     }
 

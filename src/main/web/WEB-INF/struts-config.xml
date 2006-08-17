@@ -62,7 +62,7 @@
                 name="start"
                 path="/view/Main/WebHome"/>
 
-        <forward name="login" path="/templates/login.vm"/>
+        <forward name="login" path="/templates/login.vm"/> <!-- not enough -->
         <forward name="accessdenied" path="/templates/accessdenied.vm"/>
         <forward name="userinactive" path="/templates/userinactive.vm"/>
     </global-forwards>
@@ -266,6 +266,12 @@
         <action path="/login/"
                 type="com.xpn.xwiki.web.LoginAction"
                 name="login"
+                scope="request">
+        </action>
+
+        <action path="/loginsubmit/"
+                type="com.xpn.xwiki.web.LoginSubmitAction"
+                name="loginsubmit"
                 scope="request">
         </action>
 

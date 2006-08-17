@@ -2,14 +2,17 @@
 #template("httpheader.vm")
 #template("header.vm")
 #template("baseheader.vm")
-#set($message = $xwiki.parseMessage())
+
+#set($message = $msg.get($xwiki.parseMessage()))
 #if($message)
+<!-- previous login errors -->
 <div id="xwikimessage">
-$message
+Login Error: $message
 </div>
 #end
+
 <div id="xwikicontent">
-<form id="loginForm" action="" method="POST">
+<form id="loginForm" action="$doc.getURL("loginsubmit")" method="POST">
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <table border="0">
 <tr><td>$msg.get("username"):</td>
@@ -28,5 +31,6 @@ $message
 </table>
 </form>
 </div>
+
 #template("basefooter.vm")
 #template("footer.vm")

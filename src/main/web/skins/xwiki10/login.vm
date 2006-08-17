@@ -4,12 +4,16 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<form id="loginForm" action="" method="post">
+<form id="loginForm" action="$doc.getURL("loginsubmit")" method="post">
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 #xwikimessageboxstart($msg.get("login") "")
-## #if($message)
-## <div id="xwikimessage">$message</div>
-## #end
+#set($message = $msg.get($xwiki.parseMessage()))
+#if($message)
+<!-- previous login errors -->
+<div id="xwikimessage">
+Login Error: $message
+</div>
+#end
 <table class="xwikilogintable" summary="$msg.get("loginform")">
 <tr><th><label for="j_username">$msg.get("username"):</label></th>
 <td><input type="text" id="j_username" name="j_username" value=""/></td></tr>

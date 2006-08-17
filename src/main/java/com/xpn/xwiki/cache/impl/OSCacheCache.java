@@ -1,22 +1,21 @@
 package com.xpn.xwiki.cache.impl;
 
-import java.util.Properties;
-import java.util.Map;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.opensymphony.oscache.base.Cache;
+import com.opensymphony.oscache.base.CacheEntry;
 import com.opensymphony.oscache.base.EntryRefreshPolicy;
 import com.opensymphony.oscache.base.NeedsRefreshException;
-import com.opensymphony.oscache.base.CacheEntry;
 import com.opensymphony.oscache.general.GeneralCacheAdministrator;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 
 /**
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated by
@@ -108,7 +107,7 @@ public class OSCacheCache implements XWikiCache
         }
         catch (NeedsRefreshException e)
         {
-            throw new XWikiCacheNeedsRefreshException(e);
+            throw new XWikiCacheNeedsRefreshException(e, e.getCacheContent());
         }
     }
 
@@ -120,7 +119,7 @@ public class OSCacheCache implements XWikiCache
         }
         catch (NeedsRefreshException e)
         {
-            throw new XWikiCacheNeedsRefreshException(e);
+            throw new XWikiCacheNeedsRefreshException(e, e.getCacheContent());
         }
     }
 

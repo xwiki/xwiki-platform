@@ -1,5 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 source env.sh
 
-java groovy.lang.GroovyShell import.groovy
+if [ -z "$1" ]
+then
+	db="./db/"   # Default, if no directory specified.
+else
+	db=$1
+fi 
+
+java groovy.lang.GroovyShell import.groovy $db

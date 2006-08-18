@@ -17,9 +17,7 @@ println "Starting xwiki"
 xwiki = new XWiki(config, context)
 context.setWiki(xwiki);
 
-db = "xwiki"
-// Export a different database
-// db = "xwiki"
+db = "xwiki" // Change this to export a different database
 
 println("Export database " + db)
 context.setDatabase(db);
@@ -30,5 +28,7 @@ pack.setWithVersions(false)
 println "Adding documents"
 pack.addAllWikiDocuments(context)
 println "Exporting documents"
-pack.exportToDir(new File("./db/"), context)
+pack.exportToDir(new File(args[0]), context)
+
 println "Finished."
+System.exit(0)

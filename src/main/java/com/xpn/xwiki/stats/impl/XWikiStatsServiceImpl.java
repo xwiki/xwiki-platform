@@ -40,6 +40,8 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.portals.graffito.jcr.query.Filter;
+import org.apache.portals.graffito.jcr.query.QueryManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -50,6 +52,8 @@ import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -124,8 +128,13 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     }
 
     public List getRefMonthStats(String docname, Date month, XWikiContext context) throws XWikiException {
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
-        List solist = store.search("from RefererStats as obj where obj.name='" + Utils.SQLFilter(docname) + "'", 0, 0, context);
+    	XWikiStoreInterface store = context.getWiki().getNotCacheStore();
+    	List solist = new ArrayList();
+    	if (store instanceof XWikiHibernateStore) {
+    		solist = ((XWikiHibernateStore)store).search("from RefererStats as obj where obj.name='" + Utils.SQLFilter(docname) + "'", 0, 0, context);
+    	} else if (store instanceof XWikiJcrStore) {
+    		solist = ((XWikiJcrStore)store).getAllObjectsByClass(RefererStats.class, context);
+    	}
         return solist;
     }
 
@@ -188,8 +197,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         if (("".equals(statsactive))&&("0".equals(statsdefault)))
             return;
 
-
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
+        if (store == null) return;
 
         VisitStats vobject = findVisit(context);
             // We count page views in the sessions only for the "view" action
@@ -403,14 +412,33 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
 
     protected VisitStats findVisitByCookie(String cookie, XWikiContext context) throws XWikiException {
+    	Date cdate = new Date();
+        cdate = new Date(cdate.getTime() - 30 * 60 * 1000);
+    	if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+    		XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();    		
+    		try {
+    			QueryManager qm = store.getObjectQueryManager(context);
+				Filter filter = qm.createFilter(VisitStats.class)
+					.addEqualTo("coockie", cookie)
+					.addGreaterThan("endDate", cdate);
+				org.apache.portals.graffito.jcr.query.Query query = qm.createQuery(filter);
+				query.addOrderByDescending("endDate");
+				List solist = store.getObjects(query, context);
+				if (solist.size()>0)
+					return (VisitStats) solist.get(0);
+			    else
+			    	return null;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+    	}
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
         store.beginTransaction(context);
         Session session = store.getSession(context);
         Query query = session.createQuery("from VisitStats as obj where obj.cookie=:cookie and obj.endDate > :cdate order by obj.endDate desc");
         query.setString("cookie", cookie);
-        Date cdate = new Date();
-        cdate = new Date(cdate.getTime() - 30 * 60 * 1000);
         query.setDate("cdate", cdate);
 
         List solist = store.search(query, 0, 0, context);
@@ -429,14 +457,33 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     }
 
     protected VisitStats findVisitByIPUA(String ipua, XWikiContext context) throws XWikiException {
+    	Date cdate = new Date();
+        cdate = new Date(cdate.getTime() - 30 * 60 * 1000);
+    	if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+    		XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();    		
+    		try {
+    			QueryManager qm = store.getObjectQueryManager(context);
+				Filter filter = qm.createFilter(VisitStats.class)
+					.addEqualTo("uniqueID", ipua)
+					.addGreaterThan("endDate", cdate);
+				org.apache.portals.graffito.jcr.query.Query query = qm.createQuery(filter);
+				query.addOrderByDescending("endDate");
+				List solist = store.getObjects(query, context);
+				if (solist.size()>0)
+					return (VisitStats) solist.get(0);
+			    else
+			    	return null;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+    	}
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
         store.beginTransaction(context);
         Session session = store.getSession(context);
         Query query = session.createQuery("from VisitStats as obj where obj.uniqueID=:ipua and obj.endDate > :cdate order by obj.endDate desc");
         query.setString("ipua", ipua);
-        Date cdate = new Date();
-        cdate = new Date(cdate.getTime() - 30 * 60 * 1000);
         query.setDate("cdate", cdate);
 
         List solist = store.search(query, 0, 0, context);

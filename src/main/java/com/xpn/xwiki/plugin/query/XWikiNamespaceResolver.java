@@ -27,12 +27,12 @@ import java.util.Map;
 
 import javax.jcr.NamespaceException;
 
-import org.apache.jackrabbit.Constants;
 import org.apache.jackrabbit.core.SearchManager;
-import org.apache.jackrabbit.name.NamespaceResolver;
+import org.apache.jackrabbit.name.AbstractNamespaceResolver;
+import org.apache.jackrabbit.name.QName;
 
 /** XWiki NamespaceResolver for JackRabbits. Singleton */
-public class XWikiNamespaceResolver implements NamespaceResolver, Constants {
+public class XWikiNamespaceResolver extends AbstractNamespaceResolver {
     static Map prefixToURI = new HashMap();
     static Map uriToPrefix = new HashMap();
     public static final String
@@ -51,20 +51,20 @@ public class XWikiNamespaceResolver implements NamespaceResolver, Constants {
 
     static {
         // default namespace (if no prefix is specified)
-    	addnamespace(NS_EMPTY_PREFIX, NS_DEFAULT_URI);
+    	addnamespace(QName.NS_EMPTY_PREFIX, QName.NS_DEFAULT_URI);
         // declare the predefined mappings
         // rep:
-    	addnamespace(NS_REP_PREFIX, NS_REP_URI);
+    	addnamespace(QName.NS_REP_PREFIX, QName.NS_REP_URI);
         // jcr:
-    	addnamespace(NS_JCR_PREFIX, NS_JCR_URI);
+    	addnamespace(QName.NS_JCR_PREFIX, QName.NS_JCR_URI);
         // nt:
-        addnamespace(NS_NT_PREFIX, NS_NT_URI);
+        addnamespace(QName.NS_NT_PREFIX, QName.NS_NT_URI);
         // mix:
-        addnamespace(NS_MIX_PREFIX, NS_MIX_URI);
+        addnamespace(QName.NS_MIX_PREFIX, QName.NS_MIX_URI);
         // sv:
-        addnamespace(NS_SV_PREFIX, NS_SV_URI);
+        addnamespace(QName.NS_SV_PREFIX, QName.NS_SV_URI);
         // xml:
-        addnamespace(NS_XML_PREFIX, NS_XML_URI);
+        addnamespace(QName.NS_XML_PREFIX, QName.NS_XML_URI);
         // fn:
         addnamespace("fn", SearchManager.NS_FN_URI);
         // xs:

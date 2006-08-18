@@ -28,7 +28,6 @@ import org.apache.jackrabbit.core.query.QueryRootNode;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 public class DefaultQuery implements IQuery {
@@ -51,10 +50,6 @@ public class DefaultQuery implements IQuery {
 	public IQuery setFirstResult(int fr)	{ _firstResult = fr; return this; }	
 	public IQuery setDistinct(boolean d)	{ _isdistinct = d; return this; }
 	
-	
-	protected XWikiCache getCache() {
-		return _queryFactory.getCache();
-	}
 	protected XWikiContext getContext() {
 		return _queryFactory.getContext();
 	}

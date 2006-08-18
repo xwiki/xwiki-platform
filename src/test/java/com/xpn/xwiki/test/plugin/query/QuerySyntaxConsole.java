@@ -26,11 +26,8 @@ import java.io.InputStreamReader;
 
 import javax.jcr.query.Query;
 
-import org.apache.jackrabbit.core.query.LocationStepQueryNode;
-import org.apache.jackrabbit.core.query.NodeTypeQueryNode;
 import org.apache.jackrabbit.core.query.QueryParser;
 import org.apache.jackrabbit.core.query.QueryRootNode;
-import org.apache.jackrabbit.name.QName;
 
 import com.xpn.xwiki.plugin.query.XWikiNamespaceResolver;
 

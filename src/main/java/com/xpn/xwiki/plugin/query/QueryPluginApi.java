@@ -22,6 +22,7 @@
 
 package com.xpn.xwiki.plugin.query;
 
+import javax.jcr.ValueFactory;
 import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
@@ -29,8 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /** Api for QueryPlugin */
@@ -41,20 +42,17 @@ public class QueryPluginApi extends Api implements IQueryFactory {
 		super(qp.getContext());
 		this.qp = qp;
 	}
-	public IQuery getDocs(String docname, String prop, String order) throws InvalidQueryException {
+	public IQuery getDocs(String docname, String prop, String order) throws XWikiException {
 		return qp.getDocs(docname, prop, order);
 	}
-	public IQuery getChildDocs(String docname, String prop, String order) throws InvalidQueryException {
+	public IQuery getChildDocs(String docname, String prop, String order) throws XWikiException {
 		return qp.getChildDocs(docname, prop, order);
 	}
-	public IQuery getAttachment(String docname, String attachname, String order) throws InvalidQueryException {		
+	public IQuery getAttachment(String docname, String attachname, String order) throws XWikiException {		
 		return qp.getAttachment(docname, attachname, order);
 	}
-	public IQuery getObjects(String docname, String oclass, String prop, String order) throws InvalidQueryException {		
+	public IQuery getObjects(String docname, String oclass, String prop, String order) throws XWikiException {		
 		return qp.getObjects(docname, oclass, prop, order);
-	}
-	public XWikiCache getCache() {		
-		return qp.getCache();
 	}
 	public XWikiContext getContext() {		
 		return qp.getContext();
@@ -63,19 +61,34 @@ public class QueryPluginApi extends Api implements IQueryFactory {
 		return qp.getStore();
 	}
 	
-	public IQuery xpath(String q) throws InvalidQueryException {
+	public IQuery xpath(String q) throws XWikiException {
 		if (log.isDebugEnabled())
 			log.debug("create sec xpath query: "+q);
 		if (qp.isHibernate())
-			return new SecHibernateQuery( qp.parse(q, Query.XPATH), this);
+			try {
+				return new SecHibernateQuery( qp.parse(q, Query.XPATH), this);
+			} catch (InvalidQueryException e) {
+				throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
+			}
+		if (qp.isJcr())
+			return new SecJcrQuery( q, Query.XPATH, this );
 		return null;
 	}
 	
-	public IQuery ql(String q) throws InvalidQueryException {
+	public IQuery ql(String q) throws XWikiException {
 		if (log.isDebugEnabled())
 			log.debug("create sec JCRSQL query: "+q);
 		if (qp.isHibernate())
-			return new SecHibernateQuery( qp.parse(q, Query.SQL), this);
+			try {
+				return new SecHibernateQuery( qp.parse(q, Query.SQL), this);
+			} catch (InvalidQueryException e) {
+				throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid jcrsql query: " + q);
+			}
+		if (qp.isJcr())
+			return new SecJcrQuery( q, Query.SQL, this );
 		return null;
+	}
+	public ValueFactory getValueFactory() {
+		return qp.getValueFactory();
 	}
 }

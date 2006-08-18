@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
+import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
@@ -166,11 +167,15 @@ public class PackageTest extends HibernateTestCase {
         testDocName("Test.first_filtered", myOtherPackage.getFiles());
         testDocName("Test.third_filtered", myOtherPackage.getFiles());
     }
+    
+    public void cleanUpStore() throws HibernateException, XWikiException {
+    	StoreHibernateTest.cleanUp(getXWikiContext().getWiki().getHibernateStore(), getXWikiContext());
+    }
 
     public void testImportPackage(Package pack) throws XWikiException {
         // Setup database xwikitest2
         getXWikiContext().setDatabase("xwikitest2");
-        StoreHibernateTest.cleanUp(getXWikiContext().getWiki().getHibernateStore(), getXWikiContext());
+        cleanUpStore();
 
         XWikiDocument doc = getXWikiContext().getWiki().getDocument("Test.first", getXWikiContext());
         assertTrue(doc.isNew());
@@ -358,7 +363,7 @@ public class PackageTest extends HibernateTestCase {
         myPackage.exportToDir(dir, getXWikiContext());
 
         // Empty the wiki
-        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        cleanUpStore();
         getXWiki().flushCache();
 
         myPackage = new Package();
@@ -387,7 +392,7 @@ public class PackageTest extends HibernateTestCase {
         String scdate1 = getXWiki().formatDate(cdate1, "yyyyMMddHHmmss", getXWikiContext());
 
         // Empty the wiki
-        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        cleanUpStore();
         getXWiki().flushCache();
 
         try {
@@ -420,7 +425,7 @@ public class PackageTest extends HibernateTestCase {
         testExportWikiToDirOverExisting();
 
         // Empty the wiki
-        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        cleanUpStore();
         getXWiki().flushCache();
 
         // Reinitialize
@@ -449,7 +454,7 @@ public class PackageTest extends HibernateTestCase {
         testExportWikiToDirOverExisting();
 
         // Empty the wiki
-        cleanUp(getXWiki().getHibernateStore(), getXWikiContext());
+        cleanUpStore();
         getXWiki().flushCache();
 
         // Reinitialize

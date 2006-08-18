@@ -211,7 +211,7 @@ public class XWikiHibernateBaseStore {
         try {
             // No updating of schema if we have a config parameter saying so
             try {
-                if ((!force)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
+                if ((!force)&&(context.getWiki()!=null)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
                     if (log.isInfoEnabled())
                         log.info("Schema update deactivated for wiki " + context.getDatabase());
                     return;

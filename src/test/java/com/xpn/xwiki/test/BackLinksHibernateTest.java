@@ -84,6 +84,7 @@ public class BackLinksHibernateTest extends HibernateTestCase {
 
     public void testBackLinkHibernateEmpty() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
         testBackLinksHibernateStoreEmpty(testDoc1);
         List loadedlinks = getXWiki().getStore().loadLinks(testDoc1.getId(), getXWikiContext(), true);
         assertEquals("lists size are not equal", 0, loadedlinks.size());
@@ -91,6 +92,7 @@ public class BackLinksHibernateTest extends HibernateTestCase {
 
     public void testBackLinksHibernateStoreOneLink() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
         // the expected list contains only one link for only one docId
         List expected_list = new ArrayList();
 
@@ -110,6 +112,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreMultiDocIds() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected list contains two different link for only one docId
         List expected_list = new ArrayList();
         List expected_list2 = new ArrayList();
@@ -125,6 +129,9 @@ public class BackLinksHibernateTest extends HibernateTestCase {
         XWikiLink link1 = new XWikiLink ( testDoc2.getId(),"Test.B",testDoc2.getFullName());
         expected_list2.add(link1);
         testDoc2.setContent("[Test.B]");
+        
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
 
         // writing both lists
         testBackLinksHibernateStoreWrite(testDoc2, expected_list2);
@@ -138,6 +145,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreMultiLinks() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected list contains the same link for two docIds
         List expected_list = new ArrayList();
         XWikiLink link = new XWikiLink (testDoc1.getId(),"Test.A", testDoc1.getFullName());
@@ -158,6 +167,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreDoubleMulti() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected lists contain the same two different links for two docIds
         List expected_list = new ArrayList();
         XWikiLink link = new XWikiLink (testDoc1.getId(),"Test.A",testDoc1.getFullName());
@@ -190,6 +201,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreUniqueSeparate() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected list contains one different link for two different docIds
         List expected_list = new ArrayList();
         XWikiLink link = new XWikiLink (testDoc1.getId(),"Test.A",testDoc1.getFullName());
@@ -212,6 +225,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreMultiSeparate() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected list contains four different links, two for each two different docIds
         List expected_list = new ArrayList();
         XWikiLink link = new XWikiLink (testDoc1.getId(),"Test.A",testDoc1.getFullName());
@@ -245,6 +260,8 @@ public class BackLinksHibernateTest extends HibernateTestCase {
     public void testBackLinksHibernateStoreMultiMix() throws XWikiException {
         XWikiDocument testDoc1 = new XWikiDocument( "Test", "SaveBackLinks");
         XWikiDocument testDoc2 = new XWikiDocument( "Test", "LinksForBackLinks");
+        getXWiki().getStore().saveXWikiDoc(testDoc1, context);
+        getXWiki().getStore().saveXWikiDoc(testDoc2, context);
         // the expected list contains a mix of a same and a different link, two for each two different docIds
         List expected_list = new ArrayList();
         XWikiLink link = new XWikiLink (testDoc1.getId(),"Test.A",testDoc1.getFullName());

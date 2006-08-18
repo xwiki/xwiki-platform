@@ -35,6 +35,9 @@ import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
@@ -43,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
+
+import javax.jcr.query.InvalidQueryException;
 
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
     protected XWikiCache groupCache;
@@ -75,7 +80,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     }
 
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException {
-        List list;
+        List list = null;
         String database = context.getDatabase();
         try {
             String shortname = Util.getName(username);
@@ -88,12 +93,17 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                     list = (List) groupCache.getFromCache(key);
                 } catch (XWikiCacheNeedsRefreshException e) {
                     groupCache.cancelUpdate(key);
-                    list = context.getWiki().getStore().searchDocumentsNames(", BaseObject as obj, StringProperty as prop "
+                    
+                    if (context.getWiki().getNotCacheStore() instanceof XWikiHibernateStore) {
+                    	list = context.getWiki().getStore().searchDocumentsNames(", BaseObject as obj, StringProperty as prop "
                             + "where obj.name=" + context.getWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiGroups' "
                             + "and obj.id = prop.id.id and prop.id.name='member' "
                             + "and (prop.value='" + Utils.SQLFilter(username)
                             + "' or prop.value='" + Utils.SQLFilter(shortname) + "' or prop.value='"
                             + Utils.SQLFilter(veryshortname) + "')", context);
+                    } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+                    	list = ((XWikiJcrStore) context.getWiki().getNotCacheStore()).listGroupsForUser(username, context);
+                    }
                     groupCache.putInCache(key, list);
                 }
             }
@@ -131,8 +141,15 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
         try {
             if (group == null) {
-                sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'";
-                return context.getWiki().getStore().searchDocumentsNames(sql, context);
+            	if (context.getWiki().getHibernateStore() != null) {
+            		sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'";
+            		return context.getWiki().getStore().searchDocumentsNames(sql, context);
+            	} else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+            		String xpath = "/*/*/obj/XWiki/XWikiUsers/jcr:deref(@doc, '*')/@fullName";
+            		QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
+            		return qp.xpath(xpath).list();
+            	} else
+            		return list;
             } else {
                 String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
@@ -151,14 +168,25 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 }
                 return list;
             }
-        } finally {
+        } catch (XWikiException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
             context.setDatabase(database);
         }
+		return null;
     }
 
     public List listAllGroups(XWikiContext context) throws XWikiException {
-        String sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'";
-        return context.getWiki().getStore().searchDocumentsNames(sql, context);
+    	if (context.getWiki().getHibernateStore()!=null) {
+    		String sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'";
+    		return context.getWiki().getStore().searchDocumentsNames(sql, context);
+    	} else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+    		String xpath = "/*/*/obj/XWiki/XWikiGroups/jcr:deref(@doc, '*')/@fullName";
+    		QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
+			return qp.xpath(xpath).list();			
+    	} else
+    		return null;
     }
 
     public List listAllLevels(XWikiContext context) throws XWikiException {

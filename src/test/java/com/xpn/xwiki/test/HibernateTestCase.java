@@ -183,7 +183,7 @@ public class HibernateTestCase extends TestCase {
             runSQL(hibstore, "delete from xwikidateclasses", context);
             runSQL(hibstore, "delete from xwikistringclasses", context);
             runSQL(hibstore, "delete from xwikidblistclasses", context);
-            runSQL(hibstore, "delete from xwikiextlistclasses", context);
+            //runSQL(hibstore, "delete from xwikiextlistclasses", context);
             runSQL(hibstore, "delete from xwikiclassesprop", context);
             runSQL(hibstore, "delete from xwikiclasses", context);
             runSQL(hibstore, "delete from xwikidates", context);

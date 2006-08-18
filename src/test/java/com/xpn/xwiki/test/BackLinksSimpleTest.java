@@ -122,7 +122,7 @@ public class BackLinksSimpleTest extends HibernateTestCase {
             XWikiLink tempLink = new XWikiLink(id,null,fullName);
             formatted_list.add(tempLink);
         }
-
+        getXWiki().getStore().saveXWikiDoc(testDoc, context);
         getXWiki().getStore().saveLinks(testDoc, getXWikiContext(), true);
         List loadedbacklinks = getXWiki().getStore().loadLinks(testDoc.getId(), getXWikiContext(), true);
 

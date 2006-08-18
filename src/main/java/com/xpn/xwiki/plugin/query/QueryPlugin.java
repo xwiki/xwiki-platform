@@ -22,6 +22,7 @@
 
 package com.xpn.xwiki.plugin.query;
 
+import javax.jcr.ValueFactory;
 import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 
@@ -30,28 +31,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.core.query.QueryParser;
 import org.apache.jackrabbit.core.query.QueryRootNode;
+import org.apache.jackrabbit.value.ValueFactoryImpl;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 
 /** Plugin for Query API */
 public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
 	private static final Log log = LogFactory.getLog(QueryPlugin.class);
-	XWikiCache		cache;
 	XWikiContext	context;
 	public QueryPlugin(String name, String className, XWikiContext context) throws XWikiException {
         super(name, className, context);
         this.context = context;
-        this.cache = this.context.getWiki().getCacheService().newCache("xwiki.plugin.query.cache", 100);
     }
 	
 	public String getName() { return "query"; }
-
+	
 	QueryPluginApi queryApi;
 	public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
 		if (queryApi == null)
@@ -59,75 +59,96 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
 		return queryApi;
 	}
 	
-	public XWikiContext getContext() {		
+	public XWikiContext getContext() {
 		return context;
-	}	
+	}
 	public XWikiStoreInterface getStore() {
 		return getContext().getWiki().getStore();
 	}
 	
-	public XWikiCache getCache() {		
-		return cache;
+	ValueFactory valueFactory = null;;
+	public ValueFactory getValueFactory() {
+		if (valueFactory==null) {
+			valueFactory = new ValueFactoryImpl();
+		}
+		return valueFactory;
 	}
 	
 	boolean isHibernate() {
 		return getContext().getWiki().getHibernateStore() != null; 
-	}	
-
+	}
+	boolean isJcr() {
+		return getContext().getWiki().getNotCacheStore() instanceof XWikiJcrStore;
+	}
+	
 	/** Translate query string to query tree */
 	protected QueryRootNode parse(String query, String language) throws InvalidQueryException {
 		if (query==null) return null;
 		final QueryRootNode qn = QueryParser.parse(query, language, XWikiNamespaceResolver.getInstance());			
 		return qn;		
 	}
-	/** create xpath query */
-	public IQuery xpath(String q) throws InvalidQueryException {
+	/** create xpath query 
+	 * @throws XWikiException */
+	public IQuery xpath(String q) throws XWikiException {
 		if (log.isDebugEnabled())
 			log.debug("create xpath query: "+q);
 		if (isHibernate())
-			return new HibernateQuery( parse(q, Query.XPATH), this);
+			try {
+				return new HibernateQuery( parse(q, Query.XPATH), this);
+			} catch (InvalidQueryException e) {
+				throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
+			}
+		if (isJcr())
+			return new JcrQuery( q, Query.XPATH, this );
 		return null;
 	}
 	/** create JCRSQL query 
-	 * unsupported for now */
-	public IQuery ql(String q) throws InvalidQueryException {
+	 * unsupported for now 
+	 * @throws XWikiException */
+	public IQuery ql(String q) throws XWikiException {
 		if (log.isDebugEnabled())
 			log.debug("create JCRSQL query: "+q);
 		if (isHibernate())
-			return new HibernateQuery( parse(q, Query.SQL), this);
+			try {
+				return new HibernateQuery( parse(q, Query.SQL), this);
+			} catch (InvalidQueryException e) {
+				throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid jcrsql query: " + q);
+			}
+		if (isJcr())
+			return new JcrQuery( q, Query.SQL, this );
 		return null;
 	}
 	/** create query for docs 
 	 * @param web, docname - document.web & .name. it may consist xpath []-selection. if any - *
 	 * @param prop - return property, start with @, if null - return document
 	 * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/- before. if null - not sort 
-	 * @throws InvalidQueryException 
+	 * @throws XWikiException 
 	 * */
-	public IQuery getDocs(String docname, String prop, String order) throws InvalidQueryException {
+	public IQuery getDocs(String docname, String prop, String order) throws XWikiException {
 		return xpath("/"+getXPathName(docname) + getPropertyXPath(prop) + getOrderXPath(order));
 	}
 	/** create query for child documents
-	 * @throws InvalidQueryException
 	 * @param web,docname must be without templates & [] select    
+	 * @throws XWikiException 
 	 * @see getDocs */
-	public IQuery getChildDocs(String docname, String prop, String order) throws InvalidQueryException {
+	public IQuery getChildDocs(String docname, String prop, String order) throws XWikiException {
 		return xpath("/*/*[@parent='"+getXWikiName(docname)+"']"+ getPropertyXPath(prop) + getOrderXPath(order));
 	}
 	/** create query for attachments
 	 * @param attachname - name of attachment, may be *, *[] 
+	 * @throws XWikiException 
 	 * @see getDocs
-	 * @throws InvalidQueryException
 	 */
-	public IQuery getAttachment(String docname, String attachname, String order) throws InvalidQueryException {
+	public IQuery getAttachment(String docname, String attachname, String order) throws XWikiException {
 		return xpath("/"+getXPathName(docname)+"/attach/" + attachname + getOrderXPath(order));
 	}
 	/** create query for objects
 	 * @param oweb, oclass - object web & class. if any - *
 	 * @param prop. for flex-attributes use f:flexname 
+	 * @throws XWikiException 
 	 * @see getDocs
-	 * @throws InvalidQueryException
 	 */
-	public IQuery getObjects(String docname, String oclass, String prop, String order) throws InvalidQueryException {
+	public IQuery getObjects(String docname, String oclass, String prop, String order) throws XWikiException {
 		return xpath("/"+getXPathName(docname)+"/obj/"+getXPathName(oclass) + getPropertyXPath(prop) + getOrderXPath(order));
 	}
 	
@@ -141,9 +162,12 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
 	protected String getXPathName(String name) {
 		int is = name.indexOf('['),
 			ip = name.indexOf('.');
-		if (is<0 || ip < is)
-			return name.replace('.', '/');
-		return name;
+		if (ip>0 && (is<0 || ip < is)) {
+			StringBuffer sb = new StringBuffer(name);
+			sb.setCharAt(ip, '/');
+			return sb.toString();
+		} else
+			return name;
 	}
 	
 	protected String getOrderXPath(String order) {

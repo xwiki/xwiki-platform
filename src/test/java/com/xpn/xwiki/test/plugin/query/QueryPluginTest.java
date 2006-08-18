@@ -24,8 +24,12 @@ package com.xpn.xwiki.test.plugin.query;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 
+import javax.jcr.RepositoryException;
+import javax.jcr.ValueFormatException;
 import javax.jcr.query.InvalidQueryException;
 
 import org.hibernate.HibernateException;
@@ -42,7 +46,6 @@ import com.xpn.xwiki.plugin.query.IQueryFactory;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.test.Utils;
 
@@ -58,19 +61,36 @@ public class QueryPluginTest extends HibernateTestCase {
         qf = plugin;
 	}
 	
+	public Object loadobj(Object obj) throws XWikiException {
+		if (obj instanceof XWikiDocument)
+			obj = getXWiki().getDocument(((XWikiDocument)obj).getFullName(), getXWikiContext());
+		else if (obj instanceof BaseObject) {
+			final BaseObject obj1 = (BaseObject) obj;
+			final XWikiDocument doc1 = getXWiki().getDocument(obj1.getName(), getXWikiContext());
+			obj = doc1.getObject(obj1.getClassName(), obj1.getNumber());					
+		}/* else if (obj instanceof XWikiAttachment) {
+			XWikiAttachment att = (XWikiAttachment) obj;
+			getXWiki().getStore().loadAttachmentContent(att, getXWikiContext(), true);
+			obj = att;
+		}*/
+		return obj;
+	}
+	
 	public void checkEquals(List lst, Object[] exps) throws XWikiException, InvalidQueryException {
 		assertEquals("Length not same", exps.length, lst.size());
 		for (int i=0; i<exps.length; i++) {
-			final Object obj = lst.get(i);
-			final Object exp = exps[i];
+			Object obj = lst.get(i);
+			Object exp = exps[i];			
 			if (obj instanceof Object[]) {
 				Object[] obj0 = (Object[]) obj,
 						exp0 = (Object[]) exp;
 				assertEquals(obj0.length, exp0.length);
-				for (int j=0; i<obj0.length; i++) {
+				for (int j=0; i<obj0.length; i++) {					
 					assertEquals(obj0[j], exp0[j]);
 				}
 			} else {
+				obj = loadobj(obj);
+				exp = loadobj(exp);
 				if (exp==obj) continue; // XXX: bugs with proxy objects?
                 if (exp instanceof XWikiDocument)
                  assertEquals("Objects #"+i+" not equals",
@@ -117,8 +137,7 @@ public class QueryPluginTest extends HibernateTestCase {
 		XWikiHibernateStore hibstore = getXWiki().getHibernateStore();
 		
 		testSearchXP("//*/*",		NOTHING);
-		checkEquals(qf.getDocs("*/*", null, null).list(), NOTHING);
-		// testSearchXP("//*",		NOTHING); - not supported
+		checkEquals(qf.getDocs("*/*", null, null).list(), NOTHING);		
 		
 		XWikiDocument doc1 = new XWikiDocument("Main", "WebHome");
         doc1.setContent("no content");
@@ -129,8 +148,6 @@ public class QueryPluginTest extends HibernateTestCase {
 
         testSearchXP1("//*/*", doc1);
         checkEquals(qf.getDocs("*/*", null, null).list(), new Object[]{doc1});
-        //testSearchXP1("//*", "Main");
-        //testSearchXP1("//Main", "Main");
         testSearchXP1("//Main/WebHome", doc1);
         checkEquals(qf.getDocs("Main.WebHome", null, null).list(), new Object[]{doc1});
         testSearchXP1("//*/WebHome", doc1);
@@ -159,15 +176,12 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getDocs("*/*", null, "-@creationDate").list(), new Object[]{doc2, doc1});
         testSearchXP("//*/*/@name",			new Object[]{"WebHome", "WebHome2"});
         checkEquals(qf.getDocs("*/*", "@name", null).list(), new Object[]{"WebHome", "WebHome2"});
-        //testSearchXP("//*",					new Object[]{"Main"});
         testSearchXP("//*/WebHome",			new Object[]{doc1});
         checkEquals(qf.getDocs("*/WebHome", null, null).list(), new Object[]{doc1});
         testSearchXP("//*/WebHome2",		new Object[]{doc2});
         checkEquals(qf.getDocs("*/WebHome2", null, null).list(), new Object[]{doc2});
-        //testSearchXP("//Main",				new Object[]{"Main"});
         testSearchXP("//Main/*",			new Object[]{doc1,doc2});
         checkEquals(qf.getDocs("Main/*", null, null).list(), new Object[]{doc1,doc2});
-        //testSearchXP("//*",					new Object[]{"Main"});        
         testSearchXP("//Main/*[jcr:like(@name, '%2')]",		new Object[]{doc2});
         checkEquals(qf.getDocs("Main/*[jcr:like(@name, '%2')]", null, null).list(), new Object[]{doc2});
 
@@ -259,7 +273,7 @@ public class QueryPluginTest extends HibernateTestCase {
         hb.saveXWikiDoc(doc1, getXWikiContext());
                 
         // attachment1 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment1.getId()));
-                
+         
         testSearchXP("//*/*/attach/*", new Object[]{attachment1});
         testSearchXPnQl1("//element(*, xwiki:attachment)", "select * from xwiki:attachment", attachment1);
         checkEquals(qf.getAttachment("*/*", "*", null).list(), new Object[]{attachment1});
@@ -287,9 +301,9 @@ public class QueryPluginTest extends HibernateTestCase {
         hb.saveXWikiDoc(doc1, getXWikiContext());
         // attachment2 = (XWikiAttachment) hb.getSession(getXWikiContext()).load(XWikiAttachment.class, new Long(attachment2.getId()));
         
-        testSearchXP("//*/*/attach/*",				new Object[]{attachment1, attachment2});
-        testSearchXPnQl("/element(*,xwiki:attachment)", "select * from xwiki:attachment", new Object[]{attachment1, attachment2});
-        checkEquals(qf.getAttachment("*/*", "*", null).list(), new Object[]{attachment1,attachment2});
+        testSearchXP("//*/*/attach/* order by @filename",				new Object[]{attachment1, attachment2});
+        testSearchXPnQl("/element(*,xwiki:attachment) order by @filename", "select * from xwiki:attachment order by filename", new Object[]{attachment1, attachment2});
+        checkEquals(qf.getAttachment("*/*", "*", "@filename").list(), new Object[]{attachment1,attachment2});
         testSearchXP("//*/*/attach/testfile1",		new Object[]{attachment1});
         checkEquals(qf.getAttachment("*/*", "testfile1", null).list(), new Object[]{attachment1});
         testSearchXP("//*/*/attach/testfile2",		new Object[]{attachment2});
@@ -308,12 +322,13 @@ public class QueryPluginTest extends HibernateTestCase {
         XWikiAttachment attachment3 = new XWikiAttachment(doc2, "testfile1");
         byte[] attachcontent3 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment3.setContent(attachcontent3);
+        attachment3.setComment("test comment");
         doc2.saveAttachmentContent(attachment3, getXWikiContext());
         doc2.getAttachmentList().add(attachment3);
         hb.saveXWikiDoc(doc2, getXWikiContext());
 
-        testSearchXP("//*/*/attach/*",				new Object[]{attachment1, attachment2, attachment3});
-        checkEquals(qf.getAttachment("*/*", "*", null).list(), new Object[]{attachment1,attachment2,attachment3});
+        testSearchXP("//*/*/attach/* order by @filename, @comment",				new Object[]{attachment1, attachment3, attachment2});
+        checkEquals(qf.getAttachment("*/*", "*", "@filename,@comment").list(), new Object[]{attachment1,attachment3,attachment2});
         testSearchXP("//Test/TestAttach2/attach/*",	new Object[]{attachment3});
         checkEquals(qf.getAttachment("Test.TestAttach2", "*", null).list(), new Object[]{attachment3});
         testSearchXP("//Test/TestAttach2/attach/testfile1",	new Object[]{attachment3});
@@ -328,24 +343,18 @@ public class QueryPluginTest extends HibernateTestCase {
 	
 	public void testObjects() throws HibernateException, XWikiException, InvalidQueryException {		
 		XWikiHibernateStore hb = getXWiki().getHibernateStore();
-		hb.beginTransaction(getXWikiContext());
 		XWikiDocument doc0, doc = doc0 = new XWikiDocument("Test", "TestClass");		
 		BaseClass bclass1, bclass = bclass1 = Utils.prepareClass(doc, "Test.TestClass");
 		hb.saveXWikiDoc(doc, getXWikiContext());
 		
 		XWikiDocument doc1 = doc = new XWikiDocument("Test", "TestObject");
 		hb.saveXWikiDoc(doc, getXWikiContext());
-		hb.endTransaction(getXWikiContext(), true);
 		
 		testSearchXP("//*/*/obj/*/*",									NOTHING);
 		checkEquals(qf.getObjects("*/*","*/*",null,null).list(), NOTHING);
 		testSearchXP("//*/*/obj/*/*/@doc:self",						NOTHING);
 		checkEquals(qf.getObjects("*/*","*.*","@doc:self",null).list(), NOTHING);
 		
-		//doc = new XWikiDocument("Test", "TestObject");
-		//doc = hb.loadXWikiDoc(doc, getXWikiContext());
-		
-		hb.beginTransaction(getXWikiContext());
 		BaseObject object1, object = object1 = new BaseObject();
         doc.setObject(bclass.getName(), 0, object);
         object.setClassName(bclass.getName());
@@ -356,14 +365,9 @@ public class QueryPluginTest extends HibernateTestCase {
         object.put("password", ((PropertyClass)bclass.get("password")).fromString("sesame"));
         object.put("comment",((PropertyClass)bclass.get("comment")).fromString("Hello1\nHello2\nHello3\n"));       
         hb.saveXWikiDoc(doc, getXWikiContext());
-        hb.endTransaction(getXWikiContext(), true);
-        
-        hb.beginTransaction(getXWikiContext());
-        object1 = (BaseObject) hb.getSession(getXWikiContext()).load(object.getClass(), new Integer(object1.getId()));        
         
         testSearchXP("//*/*/obj/*/*",							new Object[]{object1});
         checkEquals(qf.getObjects("*/*","*/*",null,null).list(), new Object[]{object1});
-        //XXX: testsearch("//*/*/obj/*",					new Object[]{"Test"});        
         testSearchXP("//Test/TestObject/obj/*/*",				new Object[]{object1});
         checkEquals(qf.getObjects("Test.TestObject","*/*",null,null).list(), new Object[]{object1});
         testSearchXP("//Test/TestObject/obj/Test/TestClass",	new Object[]{object1});
@@ -380,14 +384,10 @@ public class QueryPluginTest extends HibernateTestCase {
         testSearchXP("//Test/TestObject/obj/Test/TestClass/(@name,@className)",			new Object[]{new Object[]{"Test.TestObject", "Test.TestClass"}});
         checkEquals(qf.getObjects("Test.TestObject","Test.TestClass","@name,@className",null).list(), new Object[]{new Object[]{"Test.TestObject", "Test.TestClass"}});
         
-        doc = (XWikiDocument) hb.getSession(getXWikiContext()).load(XWikiDocument.class, new Long(doc1.getId())); 
-        testSearchXP("//*/*/obj/*/*/@doc:self",						new Object[]{doc});
-		checkEquals(qf.getObjects("*/*","*/*","@doc:self",null).list(), new Object[]{doc});
+        testSearchXP("//*/*/obj/*/*/@doc:self",						new Object[]{doc1});
+		checkEquals(qf.getObjects("*/*","*/*","@doc:self",null).list(), new Object[]{doc1});
         
-        hb.endTransaction(getXWikiContext(), false);
-        hb.beginTransaction(getXWikiContext());
-        
-        doc = hb.loadXWikiDoc(doc1, getXWikiContext());
+		doc = doc1;
         BaseObject object2 = object = new BaseObject();
         doc.setObject("Test.TestClass", 1, object);
         object.setClassName("Test.TestClass");
@@ -396,13 +396,8 @@ public class QueryPluginTest extends HibernateTestCase {
         object.put("last_name", ((PropertyClass)bclass.get("last_name")).fromString("Ivanov"));
         object.put("age", ((PropertyClass)bclass.get("age")).fromString("21"));
         object.put("password", ((PropertyClass)bclass.get("password")).fromString("sesame"));
-        object.put("comment",((PropertyClass)bclass.get("comment")).fromString("Hello2\nHello3\nHello4\n"));        
-        hb.saveXWikiObject(object, getXWikiContext(), false);
-        hb.endTransaction(getXWikiContext(), true);
-        
-        hb.beginTransaction(getXWikiContext());
-        object1 = (BaseObject) hb.getSession(getXWikiContext()).load(object.getClass(), new Integer(object1.getId()));
-        object2 = (BaseObject) hb.getSession(getXWikiContext()).load(object.getClass(), new Integer(object2.getId()));        
+        object.put("comment",((PropertyClass)bclass.get("comment")).fromString("Hello2\nHello3\nHello4\n"));
+        getXWiki().getStore().saveXWikiDoc(doc, getXWikiContext());
         
         testSearchXP("//*/*/obj/*/* order by @number",						new Object[]{object1, object2});
         checkEquals(qf.getObjects("*/*","*/*",null,"+@number").list(), new Object[]{object1, object2});
@@ -412,7 +407,6 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getObjects("Test/TestObject","Test/TestClass",null,"@number").list(), new Object[]{object1, object2});
         testSearchXP("//*/*/obj/Test/TestClass/@f:first_name order by @f:first_name descending",	new Object[]{"Ivan", "Artem"});
         checkEquals(qf.getObjects("*/*","Test/TestClass","@f:first_name","-@f:first_name").list(), new Object[]{"Ivan", "Artem"});
-        // XXX: needed classname. testsearch("//*/*/obj/*/*/@f:first_name order by @f:first_name",	new Object[]{"Artem", "Ivan"});
         testSearchXP("//*/*/obj/Test/TestClass/@f:age  order by @f:age",						new Object[]{new Integer(20), new Integer(21)});
         checkEquals(qf.getObjects("*/*","Test.TestClass","@f:age","+@f:age").list(), new Object[]{new Integer(20), new Integer(21)});
         testSearchXP("//*/*/obj/Test/TestClass/@f:comment  order by @number",					new Object[]{"Hello1\nHello2\nHello3\n", "Hello2\nHello3\nHello4\n"});
@@ -454,8 +448,6 @@ public class QueryPluginTest extends HibernateTestCase {
 		checkEquals(qf.getObjects("*/*","Test.TestClass[@f:first_name!='Artem' and @f:first_name!='Ivan']","@doc:fullName",null).list(), NOTHING);
 		
 		testSearchXP("//*/*/obj/Test/TestClass[@f:first_name!='Artem' and @f:first_name!='Ivan']/@f:first_name",	NOTHING);
-		
-        hb.endTransaction(getXWikiContext(), false);
 	}
 	
 	public void test_jcr_contain() throws HibernateException, XWikiException, InvalidQueryException {
@@ -595,7 +587,7 @@ public class QueryPluginTest extends HibernateTestCase {
 		getXWiki().getHibernateStore().beginTransaction(false, getXWikiContext());
 		testSearchXP1("//element(Doc, xwiki:document)//element(*, xwiki:object)/@id", object1.getId());
 		testSearchXP1("/Test/Doc/element(*, xwiki:object)/@id", object1.getId());
-		testSearchXP1("//element(Doc, xwiki:document)//*[@jcr:primaryType='xwiki:attachment']/@id", attachment1.getId());
+		//testSearchXP1("//element(Doc, xwiki:document)//*[@jcr:primaryType='xwiki:attachment']/@id", attachment1.getId());
 		testSearchXP1("/Test/Doc/element(*, xwiki:attachment)/@id", attachment1.getId());
 		testSearchXP1("/Test/Doc/element(*, xwiki:object)/@id", object1.getId());
 		getXWiki().getHibernateStore().endTransaction(getXWikiContext(), false);
@@ -616,5 +608,42 @@ public class QueryPluginTest extends HibernateTestCase {
 		testSearchXP1("/Test/Doc/doc/*/*/doc/*/*/@fullName", "Test.Doc3");
 		
 		//testsearch("/Test/Doc//element(*, xwiki:document)", new Object[]{}); // list all descendants! of Test.Doc. How implement this?
+	}
+	
+	public void testDates() throws XWikiException, ValueFormatException, IllegalStateException, RepositoryException {
+//		 new Class
+        XWikiDocument doc0, doc = doc0 = new XWikiDocument("Class", "Class1");
+		BaseClass bclass = new BaseClass();
+		bclass.addDateField("date", "pdate");
+		doc.setxWikiClass(bclass);
+		getXWiki().getStore().saveXWikiDoc(doc0, getXWikiContext());		
+		
+		// new Doc
+		XWikiDocument doc1 = doc = new XWikiDocument("Test", "Doc");		
+		BaseObject object1, object = object1 = new BaseObject();        
+        object.setClassName(bclass.getName());
+        object.setName(doc.getFullName());
+        Calendar cal1 = Calendar.getInstance();        
+        cal1.set(Calendar.YEAR, 2005);        
+        Timestamp ts1 = new Timestamp(cal1.getTimeInMillis());
+        object.put("date", ((PropertyClass)bclass.get("date")).fromValue(ts1));        
+        doc.setObject(bclass.getName(), 0, object1);
+        
+        BaseObject object2 = object = new BaseObject();
+        object.setClassName(bclass.getName());
+        object.setName(doc.getFullName());
+        Calendar cal2 = Calendar.getInstance();
+        cal2.set(Calendar.YEAR, 2006);
+        Timestamp ts2 = new Timestamp(cal2.getTimeInMillis());
+        object.put("date", ((PropertyClass)bclass.get("date")).fromValue(ts2));
+        doc.setObject(bclass.getName(), 1, object2);
+        getXWiki().getStore().saveXWikiDoc(doc1, getXWikiContext());
+        
+        testSearchXPnQl("//obj/Class/Class1/@f:date order by @f:date", "select f:date from xwiki:object where className='Class.Class1' order by f:date", new Object[]{ts1, ts2});
+        String sdate = qf.getValueFactory().createValue(cal1).getString();
+        testSearchXPnQl("//obj/Class/Class1[@f:date < xs:dateTime('"+sdate+"')]/@f:date", "select f:date from xwiki:object where className='Class.Class1' and f:date < TIMESTAMP '"+sdate+"'", NOTHING);
+        testSearchXPnQl1("//obj/Class/Class1[@f:date <= xs:dateTime('"+sdate+"')]/@f:date", "select f:date from xwiki:object where className='Class.Class1' and f:date <= TIMESTAMP '"+sdate+"'", ts1);
+        testSearchXPnQl1("//obj/Class/Class1[@f:date > xs:dateTime('"+sdate+"')]/@f:date", "select f:date from xwiki:object where className='Class.Class1' and f:date > TIMESTAMP '"+sdate+"'", ts2);
+        testSearchXPnQl("//obj/Class/Class1[@f:date >= xs:dateTime('"+sdate+"')]/@f:date  order by @f:date descending", "select f:date from xwiki:object where className='Class.Class1' and f:date >= TIMESTAMP '"+sdate+"' order by f:date DESC", new Object[]{ts2, ts1});
 	}
 }

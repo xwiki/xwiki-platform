@@ -31,7 +31,7 @@ import com.xpn.xwiki.i18n.i18n;
 public class i18nTest extends HibernateTestCase {
 
      public void testTranslation() throws XWikiException {
-         Utils.createDoc(getXWiki().getHibernateStore(), "Test", "TranslationTest", getXWikiContext());
+         Utils.createDoc(getXWiki().getStore(), "Test", "TranslationTest", getXWikiContext());
          XWikiDocument doc = getXWiki().getDocument("Test.TranslationTest", getXWikiContext());
          doc.setDefaultLanguage(i18n.LANGUAGE_ENGLISH);
          XWikiDocument doc2 = new XWikiDocument("Test", "TranslationTest");

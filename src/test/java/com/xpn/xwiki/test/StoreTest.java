@@ -111,7 +111,7 @@ public class StoreTest extends HibernateTestCase {
         assertEquals(doc4.getVersion(),Utils.version);
         assertEquals(doc4.getAuthor(), Utils.author);
         Version[] versions = versioningStore.getXWikiDocVersions(doc4, getXWikiContext());
-        assertTrue(versions.length==1);
+        assertEquals(2, versions.length);
     }
 
     public void testNotExist() throws XWikiException {

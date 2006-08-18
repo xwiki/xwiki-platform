@@ -27,18 +27,17 @@ package com.xpn.xwiki;
 
 
 // import com.xpn.xwiki.store.XWikiBatcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.hibernate.JDBCException;
-
-import javax.servlet.ServletException;
-import javax.xml.transform.TransformerException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
-import java.util.List;
+
+import javax.servlet.ServletException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.exception.MethodInvocationException;
+import org.hibernate.JDBCException;
 
 public class XWikiException extends Exception {
 
@@ -126,6 +125,28 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3301;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE = 3401;
 
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_DOC = 3501;
+    public static final int ERROR_XWIKI_STORE_JCR_READING_DOC = 3502;
+    public static final int ERROR_XWIKI_STORE_JCR_DELETING_DOC = 3503;
+    public static final int ERROR_XWIKI_STORE_JCR_CANNOT_DELETE_UNLOADED_DOC = 3504;
+    public static final int ERROR_XWIKI_STORE_JCR_READING_REVISIONS = 3503;
+    public static final int ERROR_XWIKI_STORE_JCR_READING_VERSION = 3504;
+    public static final int ERROR_XWIKI_STORE_JCR_UNEXISTANT_VERSION = 3505;
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_OBJECT = 3511;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_OBJECT = 3512;
+    public static final int ERROR_XWIKI_STORE_JCR_DELETING_OBJECT = 3513;
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_CLASS = 3521;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_CLASS = 3522;
+    public static final int ERROR_XWIKI_STORE_JCR_SEARCH = 3523;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_ATTACHMENT = 3531;
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_ATTACHMENT = 3532;
+    public static final int ERROR_XWIKI_STORE_JCR_DELETING_ATTACHMENT = 3533;
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_ATTACHMENT_LIST = 3534;
+    public static final int ERROR_XWIKI_STORE_JCR_SEARCHING_ATTACHMENT = 3535;
+    public static final int ERROR_XWIKI_STORE_JCR_CHECK_EXISTS_DOC = 3536;
+    public static final int ERROR_XWIKI_STORE_JCR_SWITCH_DATABASE = 3601;
+    public static final int ERROR_XWIKI_STORE_JCR_CREATE_DATABASE = 3701;
+    
     public static final int ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION = 4001;
     public static final int ERROR_XWIKI_RENDERING_GROOVY_EXCEPTION = 4002;
 
@@ -193,6 +214,17 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LINKS = 13013;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS = 13014;
 
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_LOCK = 13106;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_LOCK = 13107;
+    public static final int ERROR_XWIKI_STORE_JCR_DELETING_LOCK = 13108;
+    public static final int ERROR_XWIKI_STORE_JCR_INVALID_MAPPING = 13109;
+    public static final int ERROR_XWIKI_STORE_JCR_MAPPING_INJECTION_FAILED = 13110;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_LINKS = 13111;
+    public static final int ERROR_XWIKI_STORE_JCR_SAVING_LINKS = 13112;
+    public static final int ERROR_XWIKI_STORE_JCR_DELETING_LINKS = 13113;
+    public static final int ERROR_XWIKI_STORE_JCR_LOADING_BACKLINKS = 13114;
+    public static final int ERROR_XWIKI_STORE_JCR_OTHER = 13130; // temporary
+    
     public static final int ERROR_XWIKI_GROOVY_COMPILE_FAILED = 14001;
     public static final int ERROR_XWIKI_GROOVY_EXECUTION_FAILED = 14002;
 

@@ -1,0 +1,161 @@
+<!--
+/*
+ * Copyright 2004-2005 The Apache Software Foundation or its licensors,
+ *                     as applicable.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+
+<!ELEMENT graffito-jcr (class-descriptor*)>
+
+<!ATTLIST graffito-jcr package CDATA #IMPLIED>
+
+<!--
+    Class descriptor - Each class descriptor describes the mapping strategy used for one a java class
+    * className : the class name
+    * jcrNodeType : the primary jcr node type, it can be nt:unstructured
+    * jcrSuperTypes : the jcr super types, optional
+    * jcrMixinTypes: the jcr mixin types (comma separated list) (optional)
+    * extends: name of super class (optional)
+    * abstract: true if this class is abstract and it is used in hierarchy mappings
+    * discriminator true if the mapped node  requires  an graffito:discriminator node type. This type contains a classname property.
+-->
+<!ELEMENT class-descriptor (implement-descriptor*, field-descriptor*, bean-descriptor*, collection-descriptor*)>
+
+<!ATTLIST class-descriptor
+	className CDATA #REQUIRED
+	jcrNodeType CDATA #IMPLIED
+    jcrSuperTypes CDATA #IMPLIED
+    jcrMixinTypes CDATA #IMPLIED
+    extend CDATA #IMPLIED
+	abstract (true|false) "false"
+	interface (true|false) "false"
+	discriminator (true|false) "true"
+>
+
+<!--
+   Implement descriptor - This descriptor matches to one java  interface implemented by the class descriptor
+   interfaceName : the full interface name
+-->
+<!ELEMENT implement-descriptor EMPTY>
+
+<!ATTLIST implement-descriptor
+	interfaceName CDATA #REQUIRED
+>
+
+<!--
+    Field descriptor - A field descriptor maps one atomic object attribute (primitive types, String, Long, ...)  into a JCR property
+    * fieldName : the field/attribute name
+    * fieldType: the primitive type or fully qualified class name of the field (optional)
+    * jcrName : the jcr property name (optional). If it is not defined, fieldname is used to specify the jcr property name
+    * id : specifies if the field is an id. Id is optional. If the class contains an id field, some process can run faster
+    * path : specified if the fiels is the object path
+    * jcrType: specifies the JCR property type (supported jcr property types: STRING, DATE, LONG, DOUBLE, BOOLEAN), optional
+    * jcrAutoCreated: specifies if this JCR property will be autocreated (true/false / default is false), optional
+    * jcrMandatory: specifies if this JCR property is mandatory (true/false / default is false), optional
+    * jcrOnParentVersion: specifies how this JCR property acts on inherited versioned node properties (default is COPY), optional
+    * jcrProtected: specifies if this JCR node property is protected (true/false / default is false), optional
+    * jcrMultiple: specifies if this JCR node property is a multivalued property (true/false / default is false), optional
+-->
+
+<!ELEMENT field-descriptor EMPTY>
+<!ATTLIST field-descriptor
+	fieldName CDATA #REQUIRED
+	fieldType CDATA #IMPLIED
+	jcrName CDATA #IMPLIED 
+	id (true | false) "false"
+	path (true | false) "false"
+    jcrType (String | Date | Long | Double | Boolean | Binary) #IMPLIED
+    jcrAutoCreated (true | false) "false"
+    jcrMandatory (true | false) "false"
+    jcrOnParentVersion (COPY | VERSION | INITIALIZE | COMPUTE | IGNORE | ABORT) "COPY"
+    jcrProtected (true | false) "false"
+    jcrMultiple (true | false) "false"
+>
+
+<!--
+    Bean descriptor - A bean descriptor maps one "complex" object attribute into a JCR node.
+    * fieldName : the field/attribute name
+    * jcrName : the jcr node name (optional). If it is not defined, fieldname is used to specify the jcr node name
+    * proxy : Use lazy loading or not. if true, this attributes is not loaded when the main object is retrieved. it will be loaded when the get method is called.
+    * autoRetrieve : If false, the bean associated to this descriptor is not retrieved when the main ojbect is retrieved
+    * autoUpdate : If false, the bean associated to this descriptor is not updated when the main ojbect is updated
+    * autoInsert : If false, the bean associated to this descriptor is not inserted  when the main ojbect is inserted    
+    * inline: persist/retrieve bean properties from the current node (if true).
+    * converter: fully qualified name of the converter class to be used (default is ObjectConverterImpl)
+    * jcrNodeType: defines the child node type, optional
+    * jcrAutoCreated (boolean) default is "false"
+    * jcrMandatory (boolean) default is "false"
+    * jcrOnParentVersion default is "COPY"
+    * jcrProtected (boolean) default is "false"
+    * jcrSameNameSiblings (boolean) default is "false"   
+-->
+<!ELEMENT bean-descriptor EMPTY>
+<!ATTLIST bean-descriptor
+	fieldName CDATA #REQUIRED
+	jcrName CDATA #IMPLIED 
+	proxy (true | false) "false" 
+	autoRetrieve (true|false) "true"
+	autoUpdate (true|false) "true"
+	autoInsert (true|false) "true"	
+	inline (true | false) "false"
+	converter CDATA #IMPLIED
+	jcrNodeType CDATA #IMPLIED
+    jcrAutoCreated (true | false) "false"   
+    jcrMandatory (true | false) "false"
+    jcrOnParentVersion (COPY | VERSION | INITIALIZE | COMPUTE | IGNORE | ABORT) "COPY"
+    jcrProtected (true | false) "false"
+    jcrSameNameSiblings (true | false) "false"         
+>
+
+<!--
+    Collection descriptor - A collection descriptor maps one object attribute based on a collection (or a map) into a series of JCR nodes.
+    * fieldName : the field/attribute name (matching to the collection attribute)
+    * jcrName : the jcr property name (optional). If it is not defined, fieldname is used to specify the jcr node name
+    * proxy : Use lazy loading or not. if true, this attributes is not loaded when the main object is retrieve. it will be loaded when the get method is called.
+    * autoRetrieve : If false, the collection associated to this descriptor is not retrieved when the main ojbect is retrieved
+    * autoUpdate : If false, the collection associated to this descriptor is not updated when the main ojbect is updated
+    * autoInsert : If false, the collection associated to this descriptor is not inserted  when the main ojbect is inserted    
+    * elementClassName : contains a fully qualified class name.	This class is the Object type of the persistent collection elements.
+    * collectionClassName : contains a fully qualified class name. This class must be the Java type of the Collection attribute. 	
+                            This attribute must only specified if the attribute type is not a java.util.Collection (or subclass). 
+                            The declared class must implement ManageableCollection to let the persistence engine handles this type of collection.
+    * collectionConverter : The class name converter. This is the collection mapping strategy to used. 
+                            If this attribute is not specify, the default collection mapping strategy is used (DefaultCollectionConverterImpl)                            
+    * jcrNodeType: defines the child node type, optional
+    * jcrAutoCreated (boolean) default is "false"
+    * jcrMandatory (boolean) default is "false"
+    * jcrOnParentVersion default is "COPY"
+    * jcrProtected (boolean) default is "false"
+    * jcrSameNameSiblings (boolean) default is "false"
+-->
+
+<!ELEMENT collection-descriptor EMPTY>
+<!ATTLIST collection-descriptor
+	fieldName CDATA #REQUIRED
+	jcrName CDATA #IMPLIED 
+	proxy (true | false) "false"
+	autoRetrieve (true|false) "true"
+	autoUpdate (true|false) "true"
+	autoInsert (true|false) "true"	
+	elementClassName CDATA #REQUIRED
+	collectionClassName CDATA #IMPLIED
+	collectionConverter CDATA #IMPLIED
+	jcrNodeType CDATA #IMPLIED
+    jcrAutoCreated (true | false) "false"   
+    jcrMandatory (true | false) "false"
+    jcrOnParentVersion (COPY | VERSION | INITIALIZE | COMPUTE | IGNORE | ABORT) "COPY"
+    jcrProtected (true | false) "false"
+    jcrSameNameSiblings (true | false) "false"	
+>

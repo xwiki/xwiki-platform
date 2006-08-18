@@ -28,6 +28,7 @@ import java.util.List;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 public class DBListClass extends ListClass {
     public DBListClass(PropertyMetaClass wclass) {
@@ -41,7 +42,10 @@ public class DBListClass extends ListClass {
     public List getList(XWikiContext context) {
         XWiki xwiki = context.getWiki();
         try {
-            return xwiki.search(getSql(), context);
+        	if (xwiki.getHibernateStore()!=null)
+        		return xwiki.search(getSql(), context);
+        	else
+        		return ((QueryPlugin)xwiki.getPlugin("query", context)).xpath(getSql()).list();
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList();

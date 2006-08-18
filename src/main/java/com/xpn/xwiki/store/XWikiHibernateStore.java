@@ -29,39 +29,61 @@
 package com.xpn.xwiki.store;
 
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.stats.impl.XWikiStats;
-import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.doc.*;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.objects.*;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.util.Util;
-import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.rcs.Node;
-import org.suigeneris.jrcs.rcs.Version;
+import java.io.BufferedReader;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.*;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.EntityMode;
+import org.hibernate.FlushMode;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
+import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
 
-import java.io.Serializable;
-import java.io.BufferedReader;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.*;
-import java.lang.reflect.Field;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLink;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseElement;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.render.XWikiRenderer;
+import com.xpn.xwiki.stats.impl.XWikiStats;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface {
@@ -203,6 +225,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (monitor!=null)
                 monitor.startTimer("hibernate");
             doc.setStore(this);
+            // Make sure the database name is stored
+            doc.setDatabase(context.getDatabase());
 
             if (bTransaction) {
                 checkHibernate(context);
@@ -259,9 +283,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 session.save(doc);
             else
                 session.update(doc);
-
-            // Make sure the database name is stored
-            doc.setDatabase(context.getDatabase());
 
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
@@ -2086,6 +2107,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
         return searchDocuments(wheresql,  distinctbyname, customMapping, true, nb, start, context);
     }
+
+	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
+		List result = new ArrayList();
+        String hql = "select doc.language from XWikiDocument as doc where doc.web = '"
+                + Utils.SQLFilter(doc.getWeb()) + "' and doc.name = '" + Utils.SQLFilter(doc.getName()) + "' and doc.language <> ''";
+
+        List list = context.getWiki().search(hql, context);
+        if ((list == null) || (list.size() == 0)) {
+            return result;
+        }
+
+        for (int i = 0; i < list.size(); i++) {
+            result.add(list.get(i));
+        }
+        return result;
+	}
 
   /*
     public void updateArchive(String text) throws XWikiException {

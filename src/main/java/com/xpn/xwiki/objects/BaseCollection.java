@@ -135,7 +135,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public String getStringValue(String name) {
         BaseProperty prop = (BaseProperty) safeget(name);
-        if (prop==null)
+        if (prop==null || prop.getValue()==null)
          return "";
         else
          return prop.getValue().toString();

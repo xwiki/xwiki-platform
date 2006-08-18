@@ -154,6 +154,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument(basedoc.getWeb(), basedoc.getName());
+        doc.setDatabase(basedoc.getDatabase());
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer

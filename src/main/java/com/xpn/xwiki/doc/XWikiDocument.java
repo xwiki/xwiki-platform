@@ -2162,19 +2162,7 @@ public class XWikiDocument {
     }
 
     public List getTranslationList(XWikiContext context) throws XWikiException {
-        List result = new ArrayList();
-        String hql = "select doc.language from XWikiDocument as doc where doc.web = '"
-                + Utils.SQLFilter(getWeb()) + "' and doc.name = '" + Utils.SQLFilter(getName()) + "' and doc.language <> ''";
-
-        List list = context.getWiki().search(hql, context);
-        if ((list == null) || (list.size() == 0)) {
-            return result;
-        }
-
-        for (int i = 0; i < list.size(); i++) {
-            result.add(list.get(i));
-        }
-        return result;
+    	return getStore().getTranslationList(this, context);
     }
 
     public List getXMLDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context) throws XWikiException, DifferentiationFailedException {

@@ -338,4 +338,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException {
         store.injectUpdatedCustomMappings(context);
     }
+
+	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
+		return store.getTranslationList(doc, context);
+	}
 }

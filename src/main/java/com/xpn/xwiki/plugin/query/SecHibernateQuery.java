@@ -72,7 +72,7 @@ public class SecHibernateQuery extends HibernateQuery {
 	protected void _addSelect(ObjProperty p) {
 		super._addSelect(p);
 		if (ObjProperty.class.equals(p.getClass())) {
-			isReturnClasses.add(p.objclass);				
+			isReturnClasses.add(p.objclass);
 		}
 		if (ObjPropProperty.class.equals(p.getClass())) {
 			ObjPropProperty p1 = (ObjPropProperty) p;

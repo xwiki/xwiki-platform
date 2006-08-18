@@ -23,13 +23,11 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +49,6 @@ import org.apache.jackrabbit.core.query.QueryRootNode;
 import org.apache.jackrabbit.core.query.RelationQueryNode;
 import org.apache.jackrabbit.core.query.TextsearchQueryNode;
 import org.apache.jackrabbit.name.QName;
-import org.apache.jackrabbit.util.ISO8601;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -486,12 +483,25 @@ public class HibernateQuery extends DefaultQuery {
 	        	_userwhere.append(node.getPositionValue()); // XXX: I don`t know that is it
 	        } else if (vt == QueryConstants.TYPE_STRING) {
 	        	_userwhere.append("'").append(tosqlstring(node.getStringValue())).append("'");
-	        } else if (vt == QueryConstants.TYPE_TIMESTAMP || vt == QueryConstants.TYPE_DATE) {
-	        	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-	            cal.setTime(node.getDateValue());
-	            _userwhere.append("'").append(ISO8601.format(cal)).append("'");
+	        } else if (vt == QueryConstants.TYPE_TIMESTAMP || vt == QueryConstants.TYPE_DATE) {        		        	
+	        	String datename = newNameParam("pvd", node.getDateValue());
+	            _userwhere.append(":").append(datename);
 	        }
 	        return data;
+		}
+
+		Map nameParamQueue;
+		private String newNameParam(String string, Object v) {
+			if (nameParamQueue==null)
+				nameParamQueue = new HashMap();				
+			final Integer Ir = (Integer) nameParamQueue.get(string);
+			int ir;
+			if (Ir!=null) ir = Ir.intValue();
+				else ir = 0;
+			nameParamQueue.put(string, new Integer(ir+1));			
+			final String sr = string + ir;
+			_addHqlParam(sr, v);
+			return sr;
 		}
 
 		public Object visit(OrderQueryNode node, Object data) {
@@ -686,7 +696,7 @@ public class HibernateQuery extends DefaultQuery {
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_GE_VALUE),	">=");
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_GE_GENERAL),	">=");
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_LE_VALUE),	"<=");
-		_mapOphql.put(new Integer(QueryConstants.OPERATION_LE_GENERAL),	"=");
+		_mapOphql.put(new Integer(QueryConstants.OPERATION_LE_GENERAL),	"<=");
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_LIKE),		" like ");
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_BETWEEN),	" between ");		
 		_mapOphql.put(new Integer(QueryConstants.OPERATION_IN),			" in ");

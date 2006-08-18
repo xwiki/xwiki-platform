@@ -25,14 +25,13 @@
 
 package com.xpn.xwiki.store;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import java.util.List;
 
 
 public interface XWikiStoreInterface {
@@ -69,4 +68,5 @@ public interface XWikiStoreInterface {
     public void injectCustomMappings(XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException;
     public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
+    public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
 }

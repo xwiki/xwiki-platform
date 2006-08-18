@@ -64,7 +64,7 @@ public class HibernateCustomClassTest extends HibernateTestCase {
     }
 
     public void testGetCustomClassNameInDoc() throws XWikiException {
-        XWikiDocument doc1 = Utils.createDoc(getXWiki().getHibernateStore(), "Test", "HCMClass", getXWikiContext());
+        XWikiDocument doc1 = Utils.createDoc(getXWiki().getStore(), "Test", "HCMClass", getXWikiContext());
         Utils.prepareClass(doc1, "Test.HCMClass");
         Utils.prepareAdvancedClass(doc1, "Test.HCMClass");
         BaseClass doc1class = doc1.getxWikiClass();

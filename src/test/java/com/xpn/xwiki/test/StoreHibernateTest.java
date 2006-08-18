@@ -23,22 +23,26 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
 public class StoreHibernateTest extends HibernateTestCase {
 
     public void testLockReadWrite() throws XWikiException {
-        XWikiLock lock = new XWikiLock(1, "AnyUser");
+    	XWikiDocument doc = new XWikiDocument("Main", "LockTest");
+    	getXWiki().getStore().saveXWikiDoc(doc, getXWikiContext());
+    	
+        XWikiLock lock = new XWikiLock(doc.getId(), "AnyUser");
 
         getXWiki().getStore().saveLock(lock, getXWikiContext(), true);
 
-        XWikiLock newlock = getXWiki().getStore().loadLock(1, getXWikiContext(), true);
+        XWikiLock newlock = getXWiki().getStore().loadLock(doc.getId(), getXWikiContext(), true);
         assertEquals("Same user", newlock.getUserName(), lock.getUserName());
         assertTrue("Same date", Math.abs(newlock.getDate().getTime()-lock.getDate().getTime())<1000);
 
         getXWiki().getStore().deleteLock(lock, getXWikiContext(), true);
 
-        XWikiLock testlock = getXWiki().getStore().loadLock(1, getXWikiContext(), true);
+        XWikiLock testlock = getXWiki().getStore().loadLock(doc.getId(), getXWikiContext(), true);
         assertEquals("No lock", null, testlock);
     }
 

@@ -22,20 +22,22 @@
 
 package com.xpn.xwiki.plugin.query;
 
+import javax.jcr.ValueFactory;
 import javax.jcr.query.InvalidQueryException;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /** AbstractFactory interface for XWiki Queries */
 public interface IQueryFactory {
-	/** create xpath query */
-	IQuery xpath(String q) throws InvalidQueryException;
+	/** create xpath query 
+	 * @throws XWikiException */
+	IQuery xpath(String q) throws XWikiException;
 	
 	/** create JCRSQL query 
 	 * unsupported for now */
-	IQuery ql(String q) throws InvalidQueryException;
+	IQuery ql(String q) throws XWikiException;
 	
 	/** create query for docs 
 	 * @param docname - full document name (web/name | web.name). name may consist xpath []-selection. if any (name|web) - *
@@ -43,20 +45,20 @@ public interface IQueryFactory {
 	 * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/- before. if null - not sort 
 	 * @throws InvalidQueryException 
 	 * */
-	IQuery getDocs(String docname, String prop, String order) throws InvalidQueryException;
+	IQuery getDocs(String docname, String prop, String order) throws XWikiException;
 	
 	/** create query for child documents
 	 * @throws InvalidQueryException
 	 * @param web,docname must be without templates & [] select    
 	 * @see getDocs */
-	IQuery getChildDocs(String docname, String prop, String order) throws InvalidQueryException;
+	IQuery getChildDocs(String docname, String prop, String order) throws XWikiException;
 	
 	/** create query for attachments
 	 * @param attachname - name of attachment, may be *, *[] 
 	 * @see getDocs
 	 * @throws InvalidQueryException
 	 */
-	IQuery getAttachment(String docname, String attachname, String order) throws InvalidQueryException;
+	IQuery getAttachment(String docname, String attachname, String order) throws XWikiException;
 	
 	/** create query for objects
 	 * @param oclass - full name of object class (web/name | web.name).  if any(name|web) - *
@@ -64,9 +66,12 @@ public interface IQueryFactory {
 	 * @see getDocs
 	 * @throws InvalidQueryException
 	 */
-	IQuery getObjects(String docname, String oclass, String prop, String order) throws InvalidQueryException;
+	IQuery getObjects(String docname, String oclass, String prop, String order) throws XWikiException;
 	
-	XWikiCache getCache();	
+	/** Returns ValueFactory for creating correct jcr values
+	 * @return javax.jcr.ValueFactory */
+	ValueFactory getValueFactory();
+	
 	XWikiContext getContext();
 	XWikiStoreInterface getStore();
 }

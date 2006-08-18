@@ -295,5 +295,10 @@ public class MockStore implements XWikiStoreInterface, XWikiAttachmentStoreInter
     };
     public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException{};
 
-    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{};
+    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{}
+
+	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
+		// TODO Auto-generated method stub
+		return null;
+	};
 }

@@ -222,7 +222,7 @@ public class XWikiTest extends HibernateTestCase {
         doc1.getAttachmentList().add(attachment1);
         getXWiki().getStore().saveXWikiDoc(doc1, getXWikiContext());
 
-        getXWiki().copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", getXWikiContext());
+        assertTrue( getXWiki().copyDocument("Test.CopyDocumentWithAttachment", "Test.CopyDocumentWithAttachment2", getXWikiContext()) );
         getXWiki().flushCache();
 
         XWikiDocument doc2 = getXWiki().getDocument("Test.CopyDocumentWithAttachment2", getXWikiContext());

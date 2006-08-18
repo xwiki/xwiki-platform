@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>ClassSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1107708421000</creationDate>
+<date>1155294967000</date>
+<contentUpdateDate>1155294967000</contentUpdateDate>
+<version>1.5</version>
+<title></title>
+<template></template>
+<content>#includeTopic("XWiki.XWikiCommonJavascript")
+#set( $class = $doc.name.substring(0,$doc.name.indexOf("Class")))
+#set( $doc1new = $xwiki.getDocument("${doc.web}.${class}ClassSheet").isNew())
+#set( $doc2new = $xwiki.getDocument("${doc.web}.${class}ClassTemplate").isNew())
+#if (!$defaultweb)
+#set($defaultweb = "Main")
+#end
+#if (!$defaultparent)
+#set($defaultparent = "${doc.web}.${class}Class")
+#end
+
+1 Class: $doc.name
+
+The first thing to do is to &lt;a href="$doc.getURL("edit", "editor=class")"&gt;Edit the Class&lt;/a&gt; to add properties to it.
+
+#if (!($doc1new||$doc2new))
+
+1.1 Create a new document
+
+To create a new document, you should first choose a name for you document
+
+&lt;form action="" id="newdoc"&gt;
+&lt;input type="hidden" name="parent" value="${defaultparent}"/&gt;
+&lt;input type="hidden" name="template" value="${doc.web}.${class}ClassTemplate"/&gt;
+&lt;input type="hidden" name="sheet" value="1"/&gt;
+Web: &lt;input type="text" name="webname" value="${defaultweb}" size="8"/&gt;
+Document: &lt;input type="text" name="name" value="Name of your document" /&gt;
+&lt;br /&gt;
+&lt;br /&gt;
+&lt;input type="button" value="Create this document" onclick='if (updateName(this.form.name)) {this.form.action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }'/&gt;
+&lt;/form&gt;
+
+1.1 Existing documents
+
+#set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='${doc.web}.${class}Class' and obj.name&lt;&gt;'${doc.web}.${class}ClassTemplate'")
+#foreach ($item in $xwiki.searchDocuments($sql))
+   * [$item]
+#end
+#else
+1.1 Create templates and sheets
+
+Before using this class you must first create the sheet and template for it. Follow the instructions below to do this.
+
+#if ($doc1new)
+&lt;form action=""&gt;
+&lt;input type="hidden" name="parent" value="${doc.web}.${class}Class"/&gt;
+&lt;input type="hidden" name="template" value="XWiki.ClassItemSheet"/&gt;
+&lt;input type="hidden" name="sheet" value="1"/&gt;
+&lt;input type="submit" value="Create the document sheet" onclick='this.form.action="../../edit/${doc.web}/${class}ClassSheet"; this.form.submit();'/&gt;
+&lt;/form&gt;
+#else
+The Sheet allows to control the presentation of documents using the class you define. You can use the default presentation which looks for all available fields and presents them in a table, or you can decide to write your own presentation showing only part of the fields. You can also decide to have a different presentation for the viewing and for the editing modes.
+   * [${class}ClassSheet] 
+#end
+
+#if ($doc2new)
+&lt;form action=""&gt;
+&lt;input type="hidden" name="parent" value="${doc.web}.${class}Class"/&gt;
+&lt;input type="hidden" name="template" value="XWiki.ClassItemTemplate"/&gt;
+&lt;input type="hidden" name="sheet" value="1"/&gt;
+&lt;input type="submit" value="Create the document template" onclick='this.form.action="../../edit/${doc.web}/${class}ClassTemplate"; this.form.submit();'/&gt;
+&lt;/form&gt;
+#else
+The template is the document that will be "copied" into the new document that you create. It will automatically contain a reference to the Sheet defined previously and an instance of the object of your Class.
+
+You need to add the instance of your class manually using the "Edit Objects" link in the right menu and also modify the content of the template to reference update the class name. You should also customize the parent field which will be the default parent of all documents that are created using the class.
+   * [${class}ClassTemplate] 
+#end
+#end</content>
+</xwikidoc>

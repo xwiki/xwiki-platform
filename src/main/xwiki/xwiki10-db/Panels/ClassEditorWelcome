@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>ClassEditorWelcome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1154086211000</creationDate>
+<date>1154112990000</date>
+<contentUpdateDate>1154112990000</contentUpdateDate>
+<version>1.12</version>
+<title></title>
+<template></template>
+<content>#largepanelheader($msg.get("Welcome!"))
+&lt;p&gt;You are editing &lt;strong&gt;${doc.fullName}&lt;/strong&gt;. Choose a field to edit or add a field to the class.&lt;/p&gt;
+&lt;div&gt;
+#set($rsvc= $xwiki.xWiki.getRightService())
+&lt;form id="changeclass" method="post" action="$doc.getURL("redirect")"&gt;
+&lt;div class="centered"&gt;
+&lt;select id="classname" name="xredirect" size="1"&gt;
+&lt;option value="---"&gt;{pre}--Edit another class--{/pre}&lt;/option&gt;
+#foreach ($classname in $xwiki.classList)
+#if($!xwiki.hasAccessLevel("edit", $classname))
+#set($classdoc = $xwiki.getDocument($classname))
+&lt;option value="$classdoc.getURL("edit", "editor=class")"&gt;$classname&lt;/option&gt;
+#end
+#end
+&lt;/select&gt;&lt;/div&gt;
+&lt;div class="centered"&gt;
+&lt;script type="text/javascript"&gt;
+function gotoclass(dest) {
+ if (dest!="---") {
+   location = dest;
+   }
+   return false;
+}
+&lt;/script&gt;
+&lt;input class="button" type="submit" value="$msg.get("changeclass")" onclick="return gotoclass(this.form.classname.value)" /&gt;&lt;/div&gt;
+##&lt;div&gt;(unsaved changes will be lost)&lt;/div&gt;
+&lt;/form&gt;
+&lt;/div&gt;
+#panelfooter()</content>
+</xwikidoc>

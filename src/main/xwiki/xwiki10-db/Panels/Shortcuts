@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>Shortcuts</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1153570237000</creationDate>
+<date>1153743455000</date>
+<contentUpdateDate>1153743455000</contentUpdateDate>
+<version>1.6</version>
+<title></title>
+<template></template>
+<content>#panelheader("Shortcuts")
+&lt;a href="#xwikicomments"&gt;$msg.get("comments")&lt;/a&gt;
+&lt;span class="pitemseparator"&gt; | &lt;/span&gt;
+&lt;span class="panelitem"&gt;&lt;a href="#xwikiattachments"&gt;$msg.get("attachments")&lt;/a&gt;&lt;/span&gt;
+#panelfooter()
+</content>
+</xwikidoc>

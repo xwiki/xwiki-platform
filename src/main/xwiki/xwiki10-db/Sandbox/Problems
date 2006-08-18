@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Sandbox</web>
+<name>Problems</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.hritcu</author>
+<contentAuthor>XWiki.hritcu</contentAuthor>
+<creationDate>1155303387000</creationDate>
+<date>1155818555000</date>
+<contentUpdateDate>1155818555000</contentUpdateDate>
+<version>1.9</version>
+<title></title>
+<template></template>
+<object>
+<class>
+<name>XWiki.XWikiComments</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<author>
+<name>author</name>
+<prettyName>Author</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</author>
+<highlight>
+<name>highlight</name>
+<prettyName>Highlighted Text</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>2</rows>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</highlight>
+<date>
+<name>date</name>
+<prettyName>Date</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+<emptyIsToday>1</emptyIsToday>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+</date>
+<comment>
+<name>comment</name>
+<prettyName>Comment</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</comment>
+<replyto>
+<name>replyto</name>
+<prettyName>Reply To</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<numberType>integer</numberType>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</replyto>
+</class>
+<name>Sandbox.Problems</name>
+<number>0</number>
+<className>XWiki.XWikiComments</className>
+<property>
+<comment>I think the latest TinyMCE works well in Safari and almost well in Opera 9. We'll have to upgrade and check this.</comment>
+</property>
+<property>
+<date>2006-08-11 16:48:54.0</date>
+</property>
+<property>
+<author>XWiki.Admin</author>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.XWikiComments</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<author>
+<name>author</name>
+<prettyName>Author</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</author>
+<highlight>
+<name>highlight</name>
+<prettyName>Highlighted Text</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>2</rows>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</highlight>
+<date>
+<name>date</name>
+<prettyName>Date</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+<emptyIsToday>1</emptyIsToday>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+</date>
+<comment>
+<name>comment</name>
+<prettyName>Comment</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</comment>
+<replyto>
+<name>replyto</name>
+<prettyName>Reply To</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<numberType>integer</numberType>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</replyto>
+</class>
+<name>Sandbox.Problems</name>
+<number>1</number>
+<className>XWiki.XWikiComments</className>
+<property>
+<comment>Catalin:
+
+Just gave the newest TinyMCE a spin. It appears to be working a little better in Safari (still not perfect) and perfect with Opera (while the previous version won't even start). Probably worth updating.</comment>
+</property>
+<property>
+<date>2006-08-11 16:49:12.0</date>
+</property>
+<property>
+<author>XWiki.Admin</author>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.XWikiComments</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<author>
+<name>author</name>
+<prettyName>Author</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</author>
+<highlight>
+<name>highlight</name>
+<prettyName>Highlighted Text</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>2</rows>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</highlight>
+<date>
+<name>date</name>
+<prettyName>Date</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+<emptyIsToday>1</emptyIsToday>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+</date>
+<comment>
+<name>comment</name>
+<prettyName>Comment</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</comment>
+<replyto>
+<name>replyto</name>
+<prettyName>Reply To</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<numberType>integer</numberType>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</replyto>
+</class>
+<name>Sandbox.Problems</name>
+<number>2</number>
+<className>XWiki.XWikiComments</className>
+<property>
+<comment>Ludovic:
+
+Updating to the newer TinyMCE needs a little work but we did it without completely finishing it. It should be possible and definitively worth it to run the latest one. We will put somebody on this.</comment>
+</property>
+<property>
+<date>2006-08-11 16:49:33.0</date>
+</property>
+<property>
+<author>XWiki.Admin</author>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.XWikiComments</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<author>
+<name>author</name>
+<prettyName>Author</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</author>
+<highlight>
+<name>highlight</name>
+<prettyName>Highlighted Text</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>2</rows>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</highlight>
+<date>
+<name>date</name>
+<prettyName>Date</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
+<emptyIsToday>1</emptyIsToday>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.DateClass</classType>
+</date>
+<comment>
+<name>comment</name>
+<prettyName>Comment</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</comment>
+<replyto>
+<name>replyto</name>
+<prettyName>Reply To</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<numberType>integer</numberType>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</replyto>
+</class>
+<name>Sandbox.Problems</name>
+<number>3</number>
+<className>XWiki.XWikiComments</className>
+<property>
+<comment>Compatiblity Chart: http://tinymce.moxiecode.com/tinymce/docs/compatiblity_chart.html</comment>
+</property>
+<property>
+<date>2006-08-11 16:49:48.0</date>
+</property>
+<property>
+<author>XWiki.Admin</author>
+</property>
+</object>
+<content>1 Problems
+
+1.1 Creating a new page is almost impossible
+* No menu allows this (yet)
+* When adding a new link in an existing page [New] the resulting link is broken (xpage=--- is bad):
+   http://89.34.62.77:8080/xwiki/bin/edit/XWiki/New?parent=XWiki.Problems&amp;xpage=---
+* Only way that works is to enter the right url by hand
+* Fixed. Make a patch for trunk?
+
+1.1 Login: No error message on wrong password
+* When you try to log-in and something goes wrong you must be informed about it
+* Fixed. Committed to trunk.
+
+1.1 Adding Attachments Fails
+* 300k, 170k
+* see [Problem.html&gt;http://89.34.62.77:8080/xwiki/bin/download/XWiki/Problems/Problem.html] (small attachment) for the error message. Not the same as the error message for too large attachments [AttachmentTooLarge.html&gt;http://89.34.62.77:8080/xwiki/bin/download/XWiki/Problems/AttachmentTooLarge.html].
+* same error for changing picture/avatar
+
+1.1 Diff between the same version causes error
+
+~~From Version 1.31 to 1.31 edited by XWiki Admin on 2006/07/31 11:30~~
+
+~~Error number 13005 in 13: Error while making meta object diff of Main.WebHome between version 1.31 and version 1.31 Wrapped Exception: null~~
+
+1.1 Visual editor has many problems in Safari
+Q: Is this a problem of the edit control or of XWiki ?
+* Typing enter at the end of the first line deletes the last character
+* Selecting &amp; applying format does not work
+* many many other
+
+1.1 Links: Problems with UNICODE
+* http://89.34.62.77:8080/xwiki/bin/view/Sandbox/TestTopic1
+* [The JIRA task|http://jira.xwiki.org/jira/browse/XWIKI-188]
+</content>
+</xwikidoc>

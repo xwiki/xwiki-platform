@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1107708421000</creationDate>
+<date>1154352045000</date>
+<contentUpdateDate>1154352045000</contentUpdateDate>
+<version>1.5</version>
+<title></title>
+<template></template>
+<object>
+<class>
+<name>XWiki.XWikiPreferences</name>
+<customClass></customClass>
+<customMapping>internal</customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<admin_email>
+<name>admin_email</name>
+<prettyName>Admin eMail</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>14</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</admin_email>
+<macros_wiki>
+<name>macros_wiki</name>
+<prettyName>Macros for the Wiki Parser</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>32</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_wiki>
+<title>
+<name>title</name>
+<prettyName>Title</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>10</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+<macros_mapping>
+<name>macros_mapping</name>
+<prettyName>Macros Mapping</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<rows>15</rows>
+<number>29</number>
+<editor>---</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</macros_mapping>
+<upload_maxsize>
+<name>upload_maxsize</name>
+<prettyName>Maximum attachment size</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<numberType>long</numberType>
+<number>39</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</upload_maxsize>
+<authenticate_view>
+<name>authenticate_view</name>
+<prettyName>Authenticated View</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>5</number>
+<displayType>yesno</displayType>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</authenticate_view>
+<auth_active_check>
+<name>auth_active_check</name>
+<prettyName>Authentication Active Check</prettyName>
+<unmodifiable>0</unmodifiable>
+<displayType>yesno</displayType>
+<number>30</number>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</auth_active_check>
+<languages>
+<name>languages</name>
+<prettyName>Supported languages</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>38</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</languages>
+<meta>
+<name>meta</name>
+<prettyName>HTTP Meta Info</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>9</number>
+<editor>---</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</meta>
+<stylesheet>
+<name>stylesheet</name>
+<prettyName>Stylesheet</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>17</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</stylesheet>
+<use_email_verification>
+<name>use_email_verification</name>
+<prettyName>Use eMail Verification</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>24</number>
+<displayType>yesno</displayType>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</use_email_verification>
+<macros_velocity>
+<name>macros_velocity</name>
+<prettyName>Macros for Velocity</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>26</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_velocity>
+<webbgcolor>
+<name>webbgcolor</name>
+<prettyName>Web Background Color</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>10</size>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</webbgcolor>
+<webcopyright>
+<name>webcopyright</name>
+<prettyName>Copyright</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>12</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</webcopyright>
+<showLeftPanels>
+<name>showLeftPanels</name>
+<prettyName>Display the left panel column</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>36</number>
+<displayType>checkbox</displayType>
+<defaultValue>1</defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</showLeftPanels>
+<plugins>
+<name>plugins</name>
+<prettyName>Plugins</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<number>6</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</plugins>
+<notification_pages>
+<name>notification_pages</name>
+<prettyName>Notification Pages</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>33</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</notification_pages>
+<menu>
+<name>menu</name>
+<prettyName>Menu</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<rows>8</rows>
+<number>8</number>
+<editor>---</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</menu>
+<skin>
+<name>skin</name>
+<prettyName>Skin</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</skin>
+<confirmation_email_content>
+<name>confirmation_email_content</name>
+<prettyName>Confirmation eMail Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>72</size>
+<rows>10</rows>
+<number>16</number>
+<editor>---</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</confirmation_email_content>
+<rightPanels>
+<name>rightPanels</name>
+<prettyName>Panels displayed on the right</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>35</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</rightPanels>
+<stylesheets>
+<name>stylesheets</name>
+<prettyName>Stylesheets</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>18</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</stylesheets>
+<showRightPanels>
+<name>showRightPanels</name>
+<prettyName>Display the right panel column</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>37</number>
+<displayType>checkbox</displayType>
+<defaultValue>1</defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</showRightPanels>
+<language>
+<name>language</name>
+<prettyName>Language</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</language>
+<ad_clientid>
+<name>ad_clientid</name>
+<prettyName>Advertisement Client ID</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>25</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ad_clientid>
+<editor>
+<name>editor</name>
+<prettyName>Default Editor</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<number>23</number>
+<values>Text|Wysiwyg</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</editor>
+<version>
+<name>version</name>
+<prettyName>Version</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>12</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</version>
+<editbox_width>
+<name>editbox_width</name>
+<prettyName>Editbox Width</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<number>10</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</editbox_width>
+<smtp_server>
+<name>smtp_server</name>
+<prettyName>SMTP Server</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>13</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server>
+<editbox_height>
+<name>editbox_height</name>
+<prettyName>Editbox Height</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<number>11</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</editbox_height>
+<backlinks>
+<name>backlinks</name>
+<prettyName>Backlinks</prettyName>
+<unmodifiable>0</unmodifiable>
+<displayType>yesno</displayType>
+<number>31</number>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</backlinks>
+<leftPanels>
+<name>leftPanels</name>
+<prettyName>Panels displayed on the left</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>34</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</leftPanels>
+<default_language>
+<name>default_language</name>
+<prettyName>Default Language</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>5</size>
+<number>20</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</default_language>
+<validation_email_content>
+<name>validation_email_content</name>
+<prettyName>Validation eMail Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>72</size>
+<rows>10</rows>
+<number>15</number>
+<editor>---</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</validation_email_content>
+<multilingual>
+<name>multilingual</name>
+<prettyName>Multi-Lingual</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>19</number>
+<displayType>yesno</displayType>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</multilingual>
+<macros_wiki2>
+<name>macros_wiki2</name>
+<prettyName>Macros for new Wiki Parser</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>28</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_wiki2>
+<authenticate_edit>
+<name>authenticate_edit</name>
+<prettyName>Authenticate On Edit</prettyName>
+<unmodifiable>0</unmodifiable>
+<number>7</number>
+<displayType>yesno</displayType>
+<defaultValue></defaultValue>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</authenticate_edit>
+<macros_languages>
+<name>macros_languages</name>
+<prettyName>Macros Languages</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>25</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_languages>
+<macros_groovy>
+<name>macros_groovy</name>
+<prettyName>Macros for Groovy</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>27</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_groovy>
+<pageWidth>
+<name>pageWidth</name>
+<prettyName>Preferred page width</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<values>default|640|800|1024|1280|1600</values>
+<number>40</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</pageWidth>
+<invitation_email_content>
+<name>invitation_email_content</name>
+<prettyName>Invitation eMail Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>72</size>
+<rows>10</rows>
+<number>41</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</invitation_email_content>
+</class>
+<name>XWiki.WebHome</name>
+<number>0</number>
+<className>XWiki.XWikiPreferences</className>
+<property>
+<admin_email></admin_email>
+</property>
+<property>
+<title></title>
+</property>
+<property>
+<macros_wiki></macros_wiki>
+</property>
+<property>
+<macros_mapping></macros_mapping>
+</property>
+<property>
+<stylesheet></stylesheet>
+</property>
+<property>
+<meta></meta>
+</property>
+<property>
+<macros_velocity></macros_velocity>
+</property>
+<property>
+<webbgcolor></webbgcolor>
+</property>
+<property>
+<webcopyright></webcopyright>
+</property>
+<property>
+<plugins></plugins>
+</property>
+<property>
+<menu></menu>
+</property>
+<property>
+<notification_pages></notification_pages>
+</property>
+<property>
+<confirmation_email_content></confirmation_email_content>
+</property>
+<property>
+<skin></skin>
+</property>
+<property>
+<stylesheets></stylesheets>
+</property>
+<property>
+<language></language>
+</property>
+<property>
+<editor></editor>
+</property>
+<property>
+<version></version>
+</property>
+<property>
+<ad_clientid></ad_clientid>
+</property>
+<property>
+<editbox_width></editbox_width>
+</property>
+<property>
+<smtp_server></smtp_server>
+</property>
+<property>
+<editbox_height></editbox_height>
+</property>
+<property>
+<default_language></default_language>
+</property>
+<property>
+<validation_email_content></validation_email_content>
+</property>
+<property>
+<macros_wiki2></macros_wiki2>
+</property>
+<property>
+<macros_languages></macros_languages>
+</property>
+<property>
+<macros_groovy></macros_groovy>
+</property>
+</object>
+<content>1 Administration
+
+1.1 User Administration
+
+* [Users&gt;XWiki.XWikiUsers]
+* [Groups&gt;XWiki.XWikiGroups]
+
+1.1 Blog
+
+* [Categories&gt;Blog.Categories]
+* [Article Sheet&gt;XWiki.ArticleClassSheet]
+* [Article Template&gt;XWiki.ArticleClassTemplate]
+
+1.1 Photos
+
+* [Photo Album Sheet&gt;XWiki.PhotoAlbumClassSheet]
+* [Photo Album Template&gt;XWiki.PhotoAlbumClassTemplate]
+
+1.1 Rss
+
+* [RSS Feed&gt;Main.WebRss?xpage=rdf]
+* [Blog RSS Feed&gt;Main.BlogRss?xpage=rdf]
+
+1.1 Presentation
+
+* [Menu&gt;XWiki.Menu]: Menu on the left
+* [Toolbar&gt;XWiki.Toolbar]: Toolbar on the right
+* [Skin&gt;XWiki.MySkin]: Skin</content>
+</xwikidoc>

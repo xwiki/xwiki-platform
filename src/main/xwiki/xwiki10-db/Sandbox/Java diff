@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Sandbox</web>
+<name>Java diff</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1155302699000</creationDate>
+<date>1155302711000</date>
+<contentUpdateDate>1155302711000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<content>1 Java diff
+
+1.1 JavaSVN
+* http://tmate.org/svn/
+* [SVNDiffClient &gt; http://www.tmate.org/svn/kb/javadoc/org/tmatesoft/svn/core/wc/SVNDiffClient.html]
+* Incompatible license (TMate License)
+
+1.1 JRCS
+* http://www.suigeneris.org/jrcs/
+* Used by XWiki
+* What's the problem with using this ?
+** No documentation
+** Dead?
+
+1.1 JavaHL
+* [Part of SVN&gt;http://svn.collab.net/repos/svn/trunk/subversion/bindings/java/javahl/src/org/tigris/subversion/javahl/]
+
+1.1 java-diff
+* http://www.incava.org/projects/java/java-diff/index.html
+* Simple (3 classes)
+* LGPL
+
+1.1 BMSI Diff
+* http://www.bmsi.com/java/#diff
+* Simple (1 file)
+* Same algorithm as GNU diff
+* GPL :(
+
+1.1 JLibDiff
+* http://potiron.loria.fr/projects/jlibdiff ([older&gt;http://jlibdiff.sourceforge.net/])
+* Looks like the nicest to me (catalin)
+* Merge done by [Atleap&gt;https://atleap.dev.java.net/] - apache license (MergeUtil.mergeText method)
+* LGPL
+
+1.1 3DM
+* http://tdm.berlios.de/3dm/doc/index.html
+* XML diff/merge tool
+* LGPL
+</content>
+</xwikidoc>

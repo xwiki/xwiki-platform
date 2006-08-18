@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>RecentMembers</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107708421000</creationDate>
+<date>1107708421000</date>
+<contentUpdateDate>1155849667000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<content>#set ($sql = ", BaseObject as obj where obj.name=${xwiki.getFullNameSQL()} and obj.className='XWiki.XWikiUsers' order by doc.creationDate desc")
+&lt;table width="90%" border="0"&gt;
+&lt;tr&gt;
+#foreach ($member in $xwiki.searchDocuments($sql,5,0))
+&lt;td align="center"&gt;
+#set($memberdoc = $xwiki.getDocument($member))
+#if($memberdoc.isNew())
+&lt;br /&gt;&lt;br /&gt;
+[$member]
+#else
+#set($cobj = $memberdoc.getObject("XWiki.XWikiUsers",0))
+#set($fname = $memberdoc.display("first_name","view",$cobj))
+#set($lname = $memberdoc.display("last_name","view",$cobj))
+#set($company = $memberdoc.display("company","view",$cobj))
+#set($country = $memberdoc.display("country","view",$cobj))
+#set($division = $memberdoc.display("division","view",$cobj))
+#if($memberdoc.attachmentList.size()&gt;0)
+#set($last = $memberdoc.attachmentList.size())
+#set($last = $last - 1)
+#set($attach = $memberdoc.attachmentList.get($last))
+#set($attachurl = $memberdoc.getAttachmentURL($attach.filename,"download"))
+#set($attachimg = "&lt;img src='$attachurl'  height='50' /&gt;")
+#else
+#set($attachurl = $memberdoc.getURL("attach"))
+#set($attachimg = "&lt;br /&gt;&lt;a href='$attachurl'&gt;Add a photo&lt;/a&gt;&lt;br /&gt;")
+#end
+$!attachimg &lt;br/&gt; [$!fname $!lname&gt;$member] $!division
+#end
+&lt;/td&gt;
+#end
+&lt;/tr&gt;
+&lt;/table&gt;
+</content>
+</xwikidoc>

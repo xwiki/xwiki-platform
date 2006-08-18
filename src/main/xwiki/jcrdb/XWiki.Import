@@ -1,0 +1,39 @@
+1 Import tool
+
+copy&paste this script to some xwiki document, and click force to start import
+
+<%
+fromdir = "src/main/xwiki/jcrdb"
+%>
+
+<% if (request.get("force")==null) { %>
+
+Import from dir : <%print new File(fromdir).getAbsolutePath()%>
+
+To import please append "?force" to url
+
+<a href="?force">force</a>
+
+<% } else {
+
+println "Starting import\n"
+db = "xwiki"
+
+println("Import database " + db + "\n")
+context.setDatabase(db);
+
+pack = new com.xpn.xwiki.plugin.packaging.Package()
+pack.setWithVersions(false)
+pack.setBackupPack(true)
+println "Reading documents"
+pack.readFromDir(new File(fromdir), context.getContext())
+println "Installing documents\n"
+pack.install(context.getContext())
+
+xwiki.getXWiki().getNotCacheStore().shutdown(context.getContext())
+
+println "Finished.\n"
+
+}
+
+%>

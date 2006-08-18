@@ -38,9 +38,10 @@ public class JcrTestConvertor {
 		config.put("xwiki.store.versioning.class",		"com.xpn.xwiki.store.jcr.XWikiJcrPropertyVersioningStore");
 		config.put("xwiki.backlinks",					"1");
 		config.put("xwiki.store.cache",					"1");
-		config.put("xwiki.store.jcr.provider",						"com.xpn.xwiki.store.jcr.JackRabbitJCRProvider");
+		config.put("xwiki.store.jcr.provider",			"com.xpn.xwiki.store.jcr.JackRabbitJCRProvider");
+		config.put("xwiki.store.jcr.mapping",			"jcrmapping.xml");
 		config.put("xwiki.store.jcr.jackrabbit.repository.config",	"jackrabbit/repository.xml");
 		config.put("xwiki.store.jcr.jackrabbit.repository.path",	"jackrabbitrepo");
-		config.put("xwiki.store.jcr.jackrabbit.nodetypes.config",	"jackrabbit/nodetypes.cnd");
+		config.put("xwiki.store.jcr.jackrabbit.nodetypes.config",	"jackrabbit/nodetypes.cnd");		
     }
 }

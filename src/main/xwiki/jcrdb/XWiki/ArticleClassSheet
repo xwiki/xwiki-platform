@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>ArticleClassSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.ArticleClass</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107690420000</creationDate>
+<date>1107690420000</date>
+<contentUpdateDate>1147857674000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<content>#set($obj = $doc.getObject("XWiki.ArticleClass",0))
+
+&lt;div class="article_title"&gt;
+1.1 $doc.display("title", "view", $obj)
+&lt;/div&gt;
+#if($context.action!="inline")
+&lt;div class="article_content"&gt;
+$doc.display("content", "rendered", $obj)
+&lt;/div&gt;
+&lt;div class="article_footer" &gt;
+Posted by $xwiki.getLocalUserName($doc.creator) at $xwiki.formatDate($doc.creationDate, "MMM DD, YYYY HH:mm") in $!doc.display("category","view",$obj) | Modified by $xwiki.getLocalUserName($doc.author) at $xwiki.formatDate($doc.date, "MMM DD, YYYY HH:mm") | [$doc.comments.size() Comment(s)&gt;${doc.fullName}?xpage=comments] | [Permalink&gt;$doc.fullName]
+&lt;/div&gt;
+#else
+&lt;table border="0"&gt;
+&lt;tr&gt;
+&lt;td&gt;
+Title:
+&lt;/td&gt;
+&lt;td&gt;
+$doc.display("title", "edit", $obj)
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
+Category:
+&lt;/td&gt;
+&lt;td&gt;
+$doc.display("category", "edit", $obj)
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;
+Content:
+&lt;/td&gt;
+&lt;td&gt;
+$doc.display("content", "edit", $obj)
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;
+Extract:
+&lt;/td&gt;
+&lt;td&gt;
+$doc.display("extract", "edit", $obj)
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+#if($context.action=="inline")
+#set($newtitle = $request.title)
+#if($newtitle)
+#set($newtitle = $newtitle.replace('"',"'"))
+&lt;script type="text/javascript"&gt;
+var title = "${newtitle}";
+{pre}
+document.forms.edit["XWiki.ArticleClass_0_title"].value = title;
+{/pre}
+&lt;/script&gt;
+#end
+#end
+#end</content>
+</xwikidoc>

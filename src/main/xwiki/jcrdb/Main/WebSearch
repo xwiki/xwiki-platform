@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WebSearch</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>xwiki:XWiki.WikiWiki</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107690420000</creationDate>
+<date>1109516545000</date>
+<contentUpdateDate>1147857675000</contentUpdateDate>
+<version>1.4</version>
+<title></title>
+<template></template>
+<content>1 Search on this Wiki
+
+#set($formatDate = "MMMM dd, yyyy HH:mm")
+#if ($request.getParameter("text"))
+#set ($text = $request.getParameter("text") )
+#else
+#set($text = "")
+#end
+
+&lt;center&gt;
+&lt;form action="WebSearch"&gt;
+&lt;input type="text" name="text" value="$!text"&gt;&amp;nbsp;&lt;input type="submit" name="search" value="Search"&gt;
+&lt;/form&gt;
+&lt;/center&gt;
+
+#if($text!="")
+#set ($xpath = "*/*[jcr:like(@web, '%$text%') or jcr:like(@name, '%$text%') or jcr:contains(@content, '$text')]")
+#set ($start = 0)
+#set ($nb = 50)
+&lt;!-- 
+Sql: $sql
+Sql: $start
+Sql: $nb
+--&gt;
+
+1.1 Search in documents
+
+#foreach ($item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
+#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+   * [$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] by $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date, $formatDate)
+#end
+#end
+
+----
+
+1.1 Search in text fields
+
+#set ($xpath = "*/*/obj/*/*/*[jcr:contains(@value, '$text')]/jcr:deref(@obj, '*')/jcr:deref(@doc, '*')")
+#foreach ( $item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
+#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+   * [$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] by $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date, $formatDate)
+#end
+#end
+
+----
+
+1.1 Search in attachment file names
+
+#set ($xpath = "*/*/attach/*[jcr:like(@filename, '%$text%')]/jcr:deref(@doc, '*')")
+#foreach ( $item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
+#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+   * [$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] by $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date, $formatDate)
+#end
+#end
+
+----
+
+1.1 Search in attachment file content
+
+#set ($xpath = "*/*/attach/*/content[jcr:contains(@jcr:data, 'a')]/jcr:deref(@attach, '*')/jcr:deref(@doc, '*')")
+#foreach ( $item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
+#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+   * [$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] by $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date, $formatDate)
+#end
+#end
+#end</content>
+</xwikidoc>

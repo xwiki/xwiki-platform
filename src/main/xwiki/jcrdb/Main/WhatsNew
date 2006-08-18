@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WhatsNew</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107698577000</creationDate>
+<date>1107698704000</date>
+<contentUpdateDate>1147857675000</contentUpdateDate>
+<version>1.4</version>
+<title></title>
+<template></template>
+<content>#set($diff = $request.get("diff"))
+#if(!$diff)
+#set($diff = "0")
+#end
+1 What's New
+
+The following documents have been recently created or modified:
+
+#if($diff == "0")
+[Click here to view the changes&gt;$doc.name?diff=1]
+#end
+
+#set ($xpath = "*/*[@fullName!='Main.WhatsNew']")
+#set ($list = $xwiki.query.getDocs($xpath, "@fullName", "-@date").setMaxResults(20).list())
+#foreach ($item in $list)
+#if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+#set($author = $bentrydoc.author)
+#set($i = $author.indexOf(".")+1)
+   * [$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] by [${author.substring($i)}&gt;$author] on $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
+
+
+
+#if ($diff == "1")
+#set($deltas= $bentrydoc.getLastChanges())
+#foreach($delta in $deltas)
+#set($chunk = $delta.revised)
+#if ($chunk.size()&gt;0)
+&lt;div style="border-left: 8px solid #00FF00"&gt;
+#if (($type == "source")||($type == "xml"))
+&lt;pre&gt;
+$xwiki.renderChunk($chunk, true, $tdoc)
+&lt;/pre&gt;
+#else
+$xwiki.renderChunk($chunk, $tdoc)
+#end
+&lt;/div&gt;
+#end
+
+#set($chunk = $delta.original)
+#if ($chunk.size()&gt;0)
+&lt;div style="border-left: 8px solid #FF0000"&gt;
+#if (($type == "source")||($type == "xml"))
+&lt;pre&gt;
+$xwiki.renderChunk($chunk, true, $tdoc)
+&lt;/pre&gt;
+#else
+$xwiki.renderChunk($chunk, $tdoc)
+#end
+&lt;/div&gt;
+#end
+#end
+#end
+
+#end
+#end</content>
+</xwikidoc>

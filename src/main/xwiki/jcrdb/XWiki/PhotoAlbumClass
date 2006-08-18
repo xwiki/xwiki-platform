@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>PhotoAlbumClass</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiClasses</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<contentAuthor></contentAuthor>
+<creationDate>1107690421000</creationDate>
+<date>1107704418000</date>
+<contentUpdateDate>1147857674000</contentUpdateDate>
+<version>1.4</version>
+<title></title>
+<template></template>
+<class>
+<name>XWiki.PhotoAlbumClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<height2>
+<numberType>long</numberType>
+<prettyName>Photo Height</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<name>height2</name>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</height2>
+<height>
+<numberType>long</numberType>
+<prettyName>Thumbnail Height</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<name>height</name>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+</height>
+<title>
+<prettyName>title</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<name>title</name>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+<description>
+<prettyName>description</prettyName>
+<rows>5</rows>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<name>description</name>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+</class>
+<content>#set($defaultparent = "Photos.WebHome")
+#set($defaultweb = "Photos")
+#includeForm("XWiki.ClassSheet")</content>
+</xwikidoc>

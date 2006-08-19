@@ -28,6 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.filter.CacheFilter;
@@ -44,66 +46,69 @@ import com.xpn.xwiki.util.TOCGenerator;
  * A customized version of Radeox Heading Filter
  */
 public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheFilter {
-  private final String TOC_NUMBERED = "tocNumbered";
-  private final String TOC_DATA = "tocData";
-  
-  private MessageFormat formatter;
+	private static Log log = LogFactory.getFactory().getInstance(XWikiHeadingFilter.class);
+
+	private final String TOC_NUMBERED = "tocNumbered";
+	private final String TOC_DATA = "tocData";
+
+	private MessageFormat formatter;
 
 
-  protected String getLocaleKey() {
-    return "filter.heading";
-  }
+	protected String getLocaleKey() {
+		return "filter.heading";
+	}
 
-  public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
-    buffer.append(handleMatch(result, context));
-  }
+	public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
+		buffer.append(handleMatch(result, context));
+	}
 
-  public void setInitialContext(InitialRenderContext context) {
-    super.setInitialContext(context);
-    String outputTemplate = outputMessages.getString(getLocaleKey()+".print");
-    formatter = new MessageFormat("");
-    formatter.applyPattern(outputTemplate);
- }
+	public void setInitialContext(InitialRenderContext context) {
+		super.setInitialContext(context);
+		String outputTemplate = outputMessages.getString(getLocaleKey()+".print");
+		formatter = new MessageFormat("");
+		formatter.applyPattern(outputTemplate);
+	}
 
-  public String handleMatch(MatchResult result, FilterContext context) {
-    String id = null;
-    String level = result.group(1);
-	   int level_i = (level.length()+3)/2;
-	   String hlevel = (level_i <= 6 ? level_i : 6)+ "";
-    String text = result.group(3);
-    String numbering = "";
-    
-    RenderContext rcontext = context.getRenderContext();
-    XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
-    
-    // generate unique ID of the heading  
-    List processedHeadings = (List) rcontext.get("processedHeadings");
-    if (processedHeadings == null) {
-      processedHeadings = new ArrayList();
-      rcontext.set("processedHeadings", processedHeadings);
-    }
-	   boolean isIdOk = false;
-	   id = TOCGenerator.makeHeadingID(text, 0, xcontext);
-	   while(!isIdOk){
-    int occurence = 0;
-	     for (Iterator iter = processedHeadings.iterator(); iter.hasNext();){
-	       if (iter.next().equals(id)) occurence++;
-	     }
-	     id = TOCGenerator.makeHeadingID(id, occurence, xcontext);
-	     if(occurence == 0){
-	       isIdOk = true;
-	     }
-	   }
-	   processedHeadings.add(id);
-    
-    //  add numbering if the flag is set
-    if (xcontext.containsKey(TOC_NUMBERED) && ((Boolean)xcontext.get(TOC_NUMBERED)).booleanValue()) {
-      if (xcontext.containsKey(TOC_DATA)) {
-        Map tocEntry = (Map) ((Map) xcontext.get(TOC_DATA)).get(id);
-        if (tocEntry != null) numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
-      }
-    }
-    
-		   return formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
-  } 
+	public String handleMatch(MatchResult result, FilterContext context) {
+		String id = null;
+		String level = result.group(1);
+		int level_i = (level.length()+3)/2;
+		String hlevel = (level_i <= 6 ? level_i : 6)+ "";
+		String text = result.group(3);
+		String numbering = "";
+
+		RenderContext rcontext = context.getRenderContext();
+		XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
+
+		// generate unique ID of the heading  
+		List processedHeadings = (List) rcontext.get("processedHeadings");
+		if (processedHeadings == null) {
+			processedHeadings = new ArrayList();
+			rcontext.set("processedHeadings", processedHeadings);
+		}
+		log.error("1");
+		boolean isIdOk = false;
+		id = TOCGenerator.makeHeadingID(text, 0, xcontext);
+		while(!isIdOk){
+			int occurence = 0;
+			for (Iterator iter = processedHeadings.iterator(); iter.hasNext();){
+				if (iter.next().equals(id)) occurence++;
+			}
+			id = TOCGenerator.makeHeadingID(id, occurence, xcontext);
+			if(occurence == 0){
+				isIdOk = true;
+			}
+		}
+		processedHeadings.add(id);
+
+		//  add numbering if the flag is set
+		if (xcontext.containsKey(TOC_NUMBERED) && ((Boolean)xcontext.get(TOC_NUMBERED)).booleanValue()) {
+			if (xcontext.containsKey(TOC_DATA)) {
+				Map tocEntry = (Map) ((Map) xcontext.get(TOC_DATA)).get(id);
+				if (tocEntry != null) numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
+			}
+		}
+
+		return formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+	}
 }

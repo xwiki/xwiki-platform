@@ -130,6 +130,7 @@ Content
   padding: 10px 4px 4px;
 }
 #editcolumn{
+  width: 634px;
   margin: 0px;
   float: left;
   overflow: auto;
@@ -483,6 +484,7 @@ Rico Acordeon
 
 .accordionTabTitleBar{
   border: 1px solid #FFF;
+  cursor: default;
 }
 
 

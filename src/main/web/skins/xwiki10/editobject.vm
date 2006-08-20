@@ -38,7 +38,7 @@
 #end
 </div>
 </form>
-<script type="text/javascript">new Rico.Accordion( 'xwikiobjects', {panelHeight:'max'} );</script>
+<script type="text/javascript">new Rico.Accordion( 'xwikiobjects', {panelHeight:'flex'} );</script>
 
 
 

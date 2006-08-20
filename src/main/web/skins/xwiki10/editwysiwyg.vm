@@ -8,10 +8,9 @@
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="language" value="$!tdoc.language" />
+<input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>
+<input type="hidden" id="xwikidocparentinput" name="parent" value="$!tdoc.parent"/>
 <div id="xwikitext">
-<div id="xwikiedittitle">
-<label for="xwikidoctitleinput">$msg.get("titlefield"):</label><input type="text" id="xwikidoctitleinput" name="title" value="$!tdoc.title" size="80"/>
-</div>
 <div id="xwikidoccontent">
 $xwiki.getTextArea($tdoc.content)
 </div>
@@ -37,60 +36,3 @@ $xwiki.getTextArea($tdoc.content)
         alert("$msg.get('browsernoncompatible')");
 }
 </script>
-
-
-#*
-
-
-<script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
-#set($xredirect=$!request.getParameter("xredirect"))
-<form id="edit" method="post" action="$doc.getURL("preview")" onsubmit="tinyMCE.triggerSave();">
-<div>
-<input type="hidden" name="template" value="$!request.template" />
-<input type="hidden" name="xredirect" value="$!xredirect" />
-<input type="hidden" name="language" value="$!tdoc.language" />
-<div id="xwikitext">
-#template("simpleedittoolbar.vm")
-<div id="xwikidoccontent">
-$xwiki.getTextArea($tdoc.content)
-</div>
-</div>
-</div>
-</form>
-<script language="javascript" type="text/javascript">
-
-    if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
-/*  var panels = document.getElementById("editPanels");
-  panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
-  if(panels.getElementsByTagName("div").length > 0){
-    visiblePanels = true;
-  }
-  else{
-    visiblePanels = false;
-  }
-  if(!visiblePanels){
-    panels.style.display = "none";
-    document.getElementById("editcolumn").style.marginRight = 0;
-    document.getElementById("content").style.width = "${contentwidth}px";
-}
-    document.getElementById("xwikihelpsyntax").style.display = "none";
-    document.getElementById("simpleedittoolbar").style.display = "none";*/
-        wikiEditor.init({
-            language: "en",
-            elements : "content",
-            mode: "exact",
-            content_css: "$xwiki.getSkinFile("style.css")",
-            debug : false,
-            remove_linebreaks : false,
-            plugins: 'table, contextmenu, paste, searchreplace',
-            wiki_images_path : '${request.contextPath}/bin/download/$doc.web/$doc.name/',
-            wiki_attach_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
-            wiki_macro_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
-            wiki_plugins: 'core,attachments,macros'
-});
-} else {
-        alert("$msg.get('browsernoncompatible')");
-}
-</script>
-*#

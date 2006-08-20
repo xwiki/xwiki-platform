@@ -1343,8 +1343,8 @@ Rico.DragAndDrop.prototype = {
 	         document.addEventListener("mouseup",   this._mouseUpHandler.bindAsEventListener(this),  false);
 	         document.addEventListener("mousemove", this._mouseMoveHandler.bindAsEventListener(this), false);
 	      }
-	      else {
-	         document.attachEvent( "onmouseup",   this._mouseUpHandler.bindAsEventListener(this) );
+              else if(document.attachEvent) {
+                 document.attachEvent( "onmouseup",   this._mouseUpHandler.bindAsEventListener(this) );
 	         document.attachEvent( "onmousemove", this._mouseMoveHandler.bindAsEventListener(this) );
 	      }
 	   }

@@ -17,6 +17,10 @@
 #end
 #end
 ##
+## "Compute" the title
+##
+#set($title = $xwiki.parseContent("editpageTitle"))
+##
 ## Header
 ##
 #template("xwikivars.vm")

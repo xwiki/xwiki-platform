@@ -85,38 +85,82 @@
       includes="hibernate-3.0.3.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
-      includes="c3p0-0.8.4.5.jar,cglib-2.1.jar,dom4j-1.6.jar,ehcache-1.1.jar,hibernate-tools-2.1.3.jar,mysql-connector-java-3.1.7-bin.jar,hsqldb-1.8.0.jar,odmg-3.0.jar,oscache-2.3.2M.jar,concurrent.jar,jgroups-2.2.9.1.jar,swarmcache.jar,xalan-2.6.0.jar,xerces-2.4.0.jar,xml-apis-2.0.2.jar,jta.jar,antlr-2.7.5.jar,asm-1.5.3.jar,asm-util-1.5.3.jar,
-     	commons-beanutils-1.7.0.jar,commons-codec-1.3.jar,commons-collections-3.1.jar,commons-dbcp-1.2.1.jar,commons-digester-1.6.jar,commons-fileupload-1.0.jar,commons-lang-2.1.jar,commons-logging-1.0.4.jar,commons-pool-1.1.jar,commons-net-1.1.0.jar,commons-httpclient-2.0.2.jar,ecs-1.4.2.jar,oro-2.0.8.jar,log4j-1.2.8.jar,
-     	org.suigeneris.jrcs.rcs-0.3.0.jar,
-     	org.suigeneris.jrcs.diff-0.3.0.jar,
-     	struts-1.2.4.jar,
-     	velocity-1.4.jar,velocity-tools-1.1.jar,
-     	securityfilter-2.0.jar,
-     	radeox.jar,
-     	portlet.jar,
-     	xmlrpc-1.2.jar,
-     	groovy-all-1.0-jsr-06.jar,
-     	xalan-2.6.0.jar,xerces.jar-2.4.0,xml-apis-2.0.2,jimi.jar,avalon-framework-4.1.5.jar,fop-0.20.5.jar,jtidy.jar,
-    	batik-all-1.6.jar,
-    	ldap.jar,
-     	rome-0.8.jar,rome-fetcher-0.7.jar,jdom-1.0.jar,
-     	axis-1.2RC2.jar,jaxrpc-1.1.jar,saaj-1.2.jar,wsdl4j-1.5.jar,commons-discovery-0.2.jar,googleapi.jar,googleadwords.jar,alexa.jar,terraservice.jar,ipresolver.jar,flipper.jar,
-     	mail-1.3.2.jar,ical4j-0.9.19M.jar,flickrapi-1.0a7.jar,
-     	jackrabbit-core-1.0.1.jar,jackrabbit-jcr-commons-1.0.1.jar,jcr-1.0.jar,graffito-jcr-mapping-1.0-a1-amelentev-dev.jar,slf4j-log4j12-1.0.1.jar,derby-10.1.2.1.jar,lucene-1.4.3.jar,
-        ant-1.6.2.jar,
+      includes="c3p0-0.8.4.5.jar,
+    	cglib-2.1.jar,
+    	dom4j-1.6.1.jar,
+    	ehcache-1.1.jar,
+    	hibernate-tools-2.1.3.jar,
+    	mysql-connector-java-3.1.7-bin.jar,
+    	hsqldb-1.8.0.jar,
+    	odmg-3.0.jar,
+    	oscache-2.3.2M.jar,
+    	concurrent.jar,
+    	jgroups-2.4.CR1.jar,
+    	swarmcache.jar,
+    	xalan-2.7.0.jar,xerces-2.7.1.jar,xsltc-2.7.0.jar,serializer-2.7.0.jar,xml-apis-2.0.2.jar,
+    	jta.jar,
+    	antlr-2.7.5.jar,
+    	asm-1.5.3.jar,asm-util-1.5.3.jar,
+        commons-beanutils-1.7.0.jar,
+    	commons-codec-1.3.jar,
+    	commons-collections-3.2.jar,
+    	commons-dbcp-1.2.1.jar,
+    	commons-digester-1.7.jar,
+    	commons-discovery-0.2.jar,
+    	commons-fileupload-1.1.1.jar,
+    	commons-httpclient-3.0.1.jar,
+    	commons-lang-2.1.jar,
+    	commons-logging-1.1.jar,
+    	commons-logging-api-1.1.jar,
+    	commons-logging-adapters-1.1.jar,
+    	commons-net-1.4.1.jar,
+    	commons-pool-1.1.jar,
+    	ecs-1.4.2.jar,
+    	oro-2.0.8.jar,
+    	log4j-1.2.13.jar,
+        org.suigeneris.jrcs.rcs-0.3.0.jar,
+        org.suigeneris.jrcs.diff-0.3.0.jar,
+        struts-1.2.9.jar,
+        velocity-1.4.jar,velocity-tools-1.2.jar,
+        securityfilter-2.0.jar,
+        radeox.jar,
+        portlet-api-1.0.jar,
+        xmlrpc-1.2.jar,
+        groovy-all-1.0-jsr-06.jar,
+        xalan-2.7.0.jar,xerces-2.7.1.jar,xml-apis-2.0.2,
+    	jimi.jar,
+    	avalon-framework-4.1.5.jar,fop-0.20.5.jar,jtidy.jar,
+        batik-all-1.6.jar,
+        ldap.jar,
+        rome-0.8.jar,rome-fetcher-0.7.jar,
+    	jdom-1.0.jar,
+        axis-1.4.jar,
+    	jaxrpc-1.1.jar,
+    	saaj-1.2.jar,
+    	wsdl4j-1.5.2.jar,qname-1.5.2.jar,
+    	googleapi.jar,
+    	googleadwords.jar,
+    	alexa.jar,
+    	terraservice.jar,
+    	ipresolver.jar,
+    	flipper.jar,
+        mail-1.4.jar,
+    	ical4j-0.9.19M.jar,
+    	flickrapi-1.0a7.jar,
+        jackrabbit-core-1.0.1.jar,jackrabbit-jcr-commons-1.0.1.jar,jcr-1.0.jar,graffito-jcr-mapping-1.0-a1-amelentev-dev.jar,slf4j-log4j12-1.0.1.jar,derby-10.1.2.1.jar,lucene-1.4.3.jar,
+        ant-1.6.5.jar,
         jfreechart-1.0.0-rc1.jar,
-        jcommon-1.0.0-rc1.jar"
-        />
+        jcommon-1.0.5.jar"/>
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />
 
      <fileset id="libs.exo.fileset" dir="${lib.dir}"
-	includes="picocontainer-1.0.jar,exo-platform.commons.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.sercurity.api-2.0.jar,exo-platform.service.sercurity.impl-2.0.jar" />
+	includes="picocontainer-1.1.jar,exo-platform.commons.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.sercurity.api-2.0.jar,exo-platform.service.sercurity.impl-2.0.jar" />
 
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
-        includes="cactus-1.7.jar,cactus-ant-1.7.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-3.8.1.jar,nekohtml-0.9.1.jar,clover-1.3.9.jar,jmock-1.0.1.jar,jmock-cglib-1.0.1.jar,org.mortbay.jetty-5.1.3.jar" />
+        includes="cactus-1.7.2.jar,cactus-ant-1.7.2.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-4.1.jar,nekohtml-0.9.5.jar,clover-1.3.9.jar,jmock-1.1.0RC1.jar,jmock-cglib-1.1.0RC1.jar,org.mortbay.jetty-5.1.3.jar" />
 
     <pathconvert pathsep=";" property="libs.main" refid="libs.main.fileset" />
     <pathconvert pathsep=";" property="libs.hib" refid="libs.hib.fileset" />
@@ -131,11 +175,11 @@
     <available property="clover.available" classname="org.apache.tools.ant.taskdefs.CloverCompilerAdapter" />
 
     <target name="junit-check" depends="prepare" unless="junit.available">
-        <fail message="Cannot run test cases. Please copy lib/build/junit-3.8.1.jar to ${ant.home}/lib"/>
+        <fail message="Cannot run test cases. Please copy lib/build/junit-4.1.jar to ${ant.home}/lib"/>
     </target>
 
     <target name="clover-check" depends="prepare" unless="clover.available">
-        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.3.6.jar to ${ant.home}/lib"/>
+        <fail message="Cannot run coverage tests. Please copy lib/build/clover-1.3.9.jar to ${ant.home}/lib"/>
     </target>
 
     <target name="clover-yes" depends="prepare" if="clover.available">
@@ -150,12 +194,13 @@
     <!-- Define the Cactus tasks -->
     <taskdef resource="cactus.tasks">
         <classpath>
-            <pathelement location="${lib.dir}/junit-3.8.1.jar"/>
-            <pathelement location="${lib.dir}/cactus-1.7.jar"/>
-            <pathelement location="${lib.dir}/cactus-ant-1.7.jar"/>
-            <pathelement location="${lib.dir}/commons-httpclient-2.0.2.jar"/>
-            <pathelement location="${lib.dir}/commons-logging-1.0.4.jar"/>
+            <pathelement location="${lib.dir}/junit-4.1.jar"/>
+            <pathelement location="${lib.dir}/cactus-1.7.2.jar"/>
+            <pathelement location="${lib.dir}/cactus-ant-1.7.2.jar"/>
+            <pathelement location="${lib.dir}/commons-httpclient-3.0.1.jar"/>
+            <pathelement location="${lib.dir}/commons-logging-1.1.jar"/>
             <pathelement location="${lib.dir}/aspectjrt-1.2.1.jar"/>
+            <pathelement location="${lib.dir}/cargo-0.5.jar"/>
         </classpath>
     </taskdef>
 
@@ -292,6 +337,9 @@
             	<fileset dir="${java.test.src.dir}">
             		<include name="**/*Test.java"/>
                     <exclude name="**/Abstract*.java"/>
+                    <!-- Excluded because it throws OutOfMemoryException >
+                    <exclude name="**/StoreObjectHibernateTest.java"/>
+                    <exclude name="**/StoreTest.java"/-->
                     <!-- Excluded because hibernate store is the one used -->
                     <exclude name="**/StoreRCSFileTest.java"/>
                     <exclude name="**/StoreObjectRCSFileTest.java"/>

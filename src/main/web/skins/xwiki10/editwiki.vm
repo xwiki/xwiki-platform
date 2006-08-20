@@ -6,9 +6,8 @@
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="language" value="$!tdoc.language" />
-<div id="xwikiedittitle">
-<label for="xwikidoctitleinput">$msg.get("titlefield"):</label><input type="text" id="xwikidoctitleinput" name="title" value="$!tdoc.title" size="80"/>
-</div>
+<input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>
+<input type="hidden" id="xwikidocparentinput" name="parent" value="$!tdoc.parent"/>
 <div id="xwikitext">
 #template("simpleedittoolbar.vm")
 <div id="xwikidoccontent">

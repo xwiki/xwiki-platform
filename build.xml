@@ -95,7 +95,7 @@
     	odmg-3.0.jar,
     	oscache-2.3.2M.jar,
     	concurrent.jar,
-    	jgroups-2.4.CR1.jar,
+    	jgroups-2.4CR1.jar,
     	swarmcache.jar,
     	xalan-2.7.0.jar,xerces-2.7.1.jar,xsltc-2.7.0.jar,serializer-2.7.0.jar,xml-apis-2.0.2.jar,
     	jta.jar,

@@ -19,8 +19,12 @@ Login Error: $message
 <td><input type="text" id="j_username" name="j_username" value=""/></td></tr>
 <tr><th><label for="j_password">$msg.get("password"):</label></th>
 <td><input type="password" id="j_password" name="j_password" value=""/></td></tr>
+#if(0 #*TODO: xwiki rememberme option*#)
 <tr><td colspan="2" style="text-align: left;"><input id="remembermeno" type="radio" name="j_rememberme" value="false" checked="checked"/><label for="remembermeno">$msg.get("dontrememberme")</label></td></tr>
 <tr><td colspan="2" style="text-align: left;"><input id="remembermeyes" type="radio" name="j_rememberme" value="true"/><label for="remembermeyes">$msg.get("rememberme")</label></td></tr>
+#else
+<tr><td colspan="2" style="text-align: left;"><input id="rememberme" type="checkbox" name="j_rememberme"/><label for="rememberme">$msg.get("remembermeonthiscomp")</label></td></tr>
+#end
 </table>
 <div class="buttons"><input type="submit" class="button" value="$msg.get("login")"/></div>
 #xwikimessageboxend()

@@ -32,12 +32,8 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
@@ -48,10 +44,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.lang.*;
 import java.lang.Object;
-
-import groovy.lang.GroovyClassLoader;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -64,8 +57,7 @@ public class XWiki extends Api {
     public com.xpn.xwiki.XWiki getXWiki() {
         if (checkProgrammingRights())
             return xwiki;
-        else
-            return null;
+        return null;
     }
 
     public String getVersion() {
@@ -241,15 +233,13 @@ public class XWiki extends Api {
     public List search(String wheresql) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.search(wheresql, context);
-        else
-            return null;
+		return null;
     }
 
     public List search(String wheresql, int nb, int start) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.search(wheresql, nb, start, context);
-        else
-            return null;
+		return null;
     }
 
     public List searchDocuments(String wheresql) throws XWikiException {
@@ -263,8 +253,7 @@ public class XWiki extends Api {
     public List searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
-        else
-            return null;
+        return null;
     }
 
     public List searchDocuments(String wheresql, boolean distinctbylanguage) throws XWikiException {
@@ -295,10 +284,7 @@ public class XWiki extends Api {
         String message = (String) context.get("message");
         if (message == null)
             return null;
-        else {
-            return parseMessage(message);
-        }
-
+        return parseMessage(message);
     }
 
     public String parseMessage(String id) {
@@ -450,8 +436,7 @@ public class XWiki extends Api {
 
             if (registerRight)
                 return xwiki.createUser(withValidation, userRights, context);
-            else
-                return -1;
+            return -1;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -474,7 +459,7 @@ public class XWiki extends Api {
                              String baseWikiName, String description, String language, boolean failOnExist) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language, failOnExist, context);
-        else return -1;
+        return -1;
     }
 
     public int validateUser(boolean withConfirmEmail) throws XWikiException {
@@ -510,43 +495,37 @@ public class XWiki extends Api {
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, null, null, null, false, context);
-        else
-            return false;
+		return false;
     }
 
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, null, null, wikilanguage, false, context);
-        else
-            return false;
+		return false;
     }
 
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, context);
-        else
-            return false;
+		return false;
     }
 
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, context);
-        else
-            return false;
+		return false;
     }
 
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, context);
-        else
-            return false;
+		return false;
     }
 
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean) throws XWikiException {
         if (checkProgrammingRights())
             return xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, context);
-        else
-            return -1;
+		return -1;
     }
 
     public String includeTopic(String topic) throws XWikiException {
@@ -560,15 +539,13 @@ public class XWiki extends Api {
     public String includeTopic(String topic, boolean pre) throws XWikiException {
         if (pre)
             return "{pre}" + xwiki.include(topic, context, false) + "{/pre}";
-        else
-            return xwiki.include(topic, context, false);
+		return xwiki.include(topic, context, false);
     }
 
     public String includeForm(String topic, boolean pre) throws XWikiException {
         if (pre)
             return "{pre}" + xwiki.include(topic, context, true) + "{/pre}";
-        else
-            return xwiki.include(topic, context, true);
+		return xwiki.include(topic, context, true);
     }
 
     public boolean hasAccessLevel(String level) {
@@ -672,15 +649,13 @@ public class XWiki extends Api {
     public java.lang.Object getService(String className) throws XWikiException {
         if (hasProgrammingRights())
             return xwiki.getService(className);
-        else
-            return null;
+        return null;
     }
 
     public java.lang.Object getPortalService(String className) throws XWikiException {
         if (hasProgrammingRights())
             return xwiki.getPortalService(className);
-        else
-            return null;
+        return null;
     }
 
     public List getArrayList() {
@@ -816,8 +791,7 @@ public class XWiki extends Api {
         XWikiStatsService stats = context.getWiki().getStatsService(context);
         if (stats == null)
             return new ArrayList();
-        else
-            return stats.getRecentActions(action, size, context);
+        return stats.getRecentActions(action, size, context);
     }
 
     /**
@@ -1028,17 +1002,15 @@ public class XWiki extends Api {
 
     public Object parseGroovyFromString(String script) throws XWikiException {
         if (checkProgrammingRights())
-            return (Object)xwiki.parseGroovyFromString(script, context);
-        else
-            return "groovy_missingrights";
+            return xwiki.parseGroovyFromString(script, context);
+		return "groovy_missingrights";
     }
 
     public Object parseGroovyFromPage(String fullname) throws XWikiException {
         XWikiDocument doc = xwiki.getDocument(fullname, context);
         if (xwiki.getRightService().hasProgrammingRights(doc, context))
             return xwiki.parseGroovyFromString(doc.getContent(),context);
-        else
-            return "groovy_missingrights";
+		return "groovy_missingrights";
     }
 
     public String getMacroList() {

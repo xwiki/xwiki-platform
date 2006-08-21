@@ -41,8 +41,7 @@ public class User extends Api {
     public XWikiUser getUser() {
         if (checkProgrammingRights())
             return user;
-        else
-            return null;
+		return null;
     }
     
     public boolean isUserInGroup(String groupName) throws XWikiException {

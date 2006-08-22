@@ -131,7 +131,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -174,7 +174,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthOwnerTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -222,7 +222,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthMasterAdminTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -272,7 +272,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthAllGroupTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -321,7 +321,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthAllGroupTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -371,7 +371,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthAllGroupTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -420,7 +420,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthAllGroupTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -590,7 +590,7 @@ public class ServletVirtualTest extends ServletTest {
         // Use a virtual server URL
         setVirtualUrl(webRequest, "127.0.0.1", "xwikitest2", "view", "VirtualAuthTest", "");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 

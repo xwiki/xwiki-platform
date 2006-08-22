@@ -255,7 +255,7 @@ public class ServletAuthTest extends ServletTest {
         setUrl(webRequest, "view", "WebHome");
 
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -287,7 +287,7 @@ public class ServletAuthTest extends ServletTest {
         setUrl(webRequest, "view", "WebHome");
 
         MyFormAuthentication auth = new MyFormAuthentication("ludovicdubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -319,7 +319,7 @@ public class ServletAuthTest extends ServletTest {
 
         // Can't seem to be able to test failed auth
         // MyFormAuthentication auth = new MyFormAuthentication("PierreDupont", "");
-        //auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        //auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         // webRequest.setAuthentication(auth);
     }
 
@@ -351,7 +351,7 @@ public class ServletAuthTest extends ServletTest {
 
         // Cannot test this.. too bad..
         //MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "tata");
-        //auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        //auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         //webRequest.setAuthentication(auth);
     }
 
@@ -391,7 +391,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_last_name","Dubost");
 
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -436,7 +436,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_last_name","Dubost");
 
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -480,7 +480,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_last_name","Dubost");
 
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 
@@ -592,7 +592,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_last_name","Dubost");
 
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
         context.put("timer", new Date());
     }
@@ -666,7 +666,7 @@ public class ServletAuthTest extends ServletTest {
         webRequest.addParameter("register_last_name","Dubost");
 
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
 
         // Let's start the email server

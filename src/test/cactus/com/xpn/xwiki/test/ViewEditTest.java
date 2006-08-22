@@ -551,8 +551,9 @@ public class ViewEditTest extends ServletTest {
         doc2.setStringValue("Main.RollbackRevWithObjOkTest", "first_name", "John");
         doc2.setContent("Hello First name now is $doc.last_name");
         xwiki.saveDocument(doc2, context);
-        setUrl(webRequest, "rollback", "RollbackRevWithObjOkTest", "");
+        setUrl(webRequest, "rollback", "RollbackRevWithObjOkTest", "confirm=1");
         webRequest.addParameter("rev", "1.2");
+        webRequest.addParameter("confirm", "1");
     }
 
     public void endRollbackRevWithObjOk(WebResponse webResponse) throws XWikiException, HibernateException {
@@ -1591,7 +1592,7 @@ public class ViewEditTest extends ServletTest {
     public void endDefaultSkin(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1);
+            assertTrue("Could not find style in header: " + result, (result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1) || (result.indexOf("<link href=\"/xwiki/testbin/skin/skins/default/style.css\"") != -1) );
         } finally {
             clientTearDown();
         }
@@ -1636,7 +1637,7 @@ public class ViewEditTest extends ServletTest {
     public void endWikiPageSkin(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find style in header: " + result, result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1);
+            assertTrue("Could not find style in header: " + result, (result.indexOf("<link href=\"/xwiki/skins/default/style.css\"") != -1) || (result.indexOf("<link href=\"/xwiki/testbin/skin/skins/default/style.css\"") != -1) );
         } finally {
             clientTearDown();
         }

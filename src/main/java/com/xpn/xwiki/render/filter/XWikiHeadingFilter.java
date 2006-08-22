@@ -86,7 +86,6 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 			processedHeadings = new ArrayList();
 			rcontext.set("processedHeadings", processedHeadings);
 		}
-		log.error("1");
 		boolean isIdOk = false;
 		id = TOCGenerator.makeHeadingID(text, 0, xcontext);
 		while(!isIdOk){

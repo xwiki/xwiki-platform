@@ -110,6 +110,7 @@
     	commons-discovery-0.2.jar,
     	commons-fileupload-1.1.1.jar,
     	commons-httpclient-3.0.1.jar,
+    	commons-io-1.2.jar,
     	commons-lang-2.1.jar,
     	commons-logging-1.1.jar,
     	commons-logging-api-1.1.jar,
@@ -324,7 +325,7 @@
 
     	<!-- TODO: Remove the dir attibute which should not be needed if all tests get
     	     their resources from the classpath -->
-        <junit printsummary="yes" dir="${tests.build.dir}" haltonfailure="no" fork="on">
+        <junit printsummary="yes" dir="${tests.build.dir}" haltonfailure="no" fork="on" maxmemory="1400m">
 
             <classpath>
                 <pathelement path="${tests.build.dir}" />
@@ -379,7 +380,7 @@
 
         <mkdir dir="${test.reports.dir}" />
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${tests.build.dir}"
-            haltonfailure="no" fork="on"  maxmemory="256m" >
+            haltonfailure="no" fork="on"  maxmemory="1256m" >
 
             <classpath>
                 <pathelement path="${tests.build.dir}" />
@@ -404,7 +405,7 @@
               <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
                   port="18080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
               <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="18080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
+                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx1300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
             </containerset>
         </cactus>
         <delete file="${cactus.warfile}" />

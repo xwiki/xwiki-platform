@@ -7,14 +7,14 @@
 <property name="use_outer_join">true</property>
 
 <property name="dbcp.defaultAutoCommit">false</property>
-<property name="dbcp.maxActive">50</property>
-<property name="dbcp.maxIdle">5</property>
+<property name="dbcp.maxActive">100</property>
+<property name="dbcp.maxIdle">50</property>
 <property name="dbcp.maxWait">30000</property>
 <property name="dbcp.whenExhaustedAction">1</property>
 <property name="dbcp.ps.whenExhaustedAction">1</property>
-<property name="dbcp.ps.maxActive">20</property>
+<property name="dbcp.ps.maxActive">100</property>
 <property name="dbcp.ps.maxWait">120000</property>
-<property name="dbcp.ps.maxIdle">20</property>
+<property name="dbcp.ps.maxIdle">50</property>
 
 <property name="connection.url">@connection.url@</property>
 <property name="connection.username">@connection.username@</property>

@@ -31,6 +31,7 @@ public class LoginAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(LoginAction.class);
     
 	public String render(XWikiContext context) throws XWikiException {
+		context.getResponse().setStatus(401);
         return "login";
 	}
 }

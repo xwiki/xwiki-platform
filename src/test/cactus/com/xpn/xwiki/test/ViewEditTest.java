@@ -2013,7 +2013,7 @@ public class ViewEditTest extends ServletTest {
             String result = webResponse.getText();
             assertTrue("Could not find This document does not exist in Content: " + result, result.indexOf("This document does not exist in this version") != -1);
         } finally {
-            // clientTearDown();
+            clientTearDown();
         }
     }
 

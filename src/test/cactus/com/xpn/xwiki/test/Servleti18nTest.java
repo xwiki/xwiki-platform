@@ -159,7 +159,7 @@ public class Servleti18nTest extends ServletTest {
 
         setUrl(webRequest, "view", "ViewLocTest");
         MyFormAuthentication auth = new MyFormAuthentication("LudovicDubost", "toto");
-        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/login/XWiki/XWikiLogin"));
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
     }
 

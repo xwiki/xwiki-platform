@@ -190,7 +190,7 @@ public class Context extends Api {
             return null;
     }
 
-    public void put(String key, Object value) {
+    public void put(String key, java.lang.Object value) {
         if (checkProgrammingRights())
             context.put(key, value);
     }

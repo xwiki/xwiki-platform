@@ -1,5 +1,5 @@
 #template("startpage.vm")
-<div id="xwikicontent">
+<div class="main layoutsubsection">
     #set($message = $xwiki.parseMessage())
     #if($message)
     <center>
@@ -16,5 +16,6 @@
         $exp.getFullMessage()
     </pre>
     #end
+<div class="clearfloats"></div>
 </div>
 #template("endpage.vm")

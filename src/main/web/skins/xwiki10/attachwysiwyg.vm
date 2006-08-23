@@ -26,9 +26,9 @@
 <form id="attach" action="$doc.getURL("upload")" enctype="multipart/form-data" method="post"
       onsubmit="return updateAttachName(this)" >
 <input type="hidden" name="xredirect" value="" />
-<p>
-$msg.get("choosetargetfilename"):
-<input type="text" name="filename" value="" size="20" />
+<!-- <p>
+$msg.get("choosetargetfilename"): -->
+<input type="hidden" name="filename" value="" size="20" />
 <br /><br />
 $msg.get("choosefiletoupload"):
 <input type="file" name="filepath" value="" size="40"  />

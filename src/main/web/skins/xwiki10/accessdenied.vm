@@ -2,7 +2,9 @@
 ### Access denied messge
 ###
 ###
+
 #template("startpage.vm")
+<div class="main layoutsubsection">
 #if ($xwiki.isReadOnly())
 #xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
 #else
@@ -10,4 +12,6 @@
 #end
 $!exception
 #xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>
 #template("endpage.vm")

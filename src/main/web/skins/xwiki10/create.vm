@@ -1,8 +1,10 @@
 #set($tocreate=$request.getParameter("tocreate"))
 #set($title = $request.getParameter("title"))
+#set($template = $request.getParameter("template"))
 #if($tocreate=="page")
 #set($docname=$title.replace("/", "."))
 #elseif($tocreate=="space")
+#set($title=$title.replace(" \.\/", ""))
 #set($docname="${title}.WebHome")
 #elseif($tocreate=="post")
 #set($docname="Blog.${title.replace(' ', '')}")
@@ -12,7 +14,7 @@
 #if($tocreate == "post")
 $response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$title"))
 #else
-$response.sendRedirect($newdoc.getURL("edit"))
+$response.sendRedirect($newdoc.getURL("edit", "template=${template}"))
 #end
 #else
 $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))

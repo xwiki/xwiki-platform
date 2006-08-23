@@ -7,6 +7,11 @@
 ## #set($showattachments = $xwiki.getWebPreference("showattachments"))
 ## #end
 ## #if($showattachments!="no")
+#if($request.xredirect)
+#set( $redirect = $request.xredirect)
+#else
+#set( $redirect = $xwiki.getRequestURL())
+#end
 #set($showactions = 0)
 #set($attachments = $doc.attachmentList)
 #set($counter = 0)
@@ -43,7 +48,7 @@
           <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
           <td>$attach.filesize</td>
 #if($hasedit || $hasadmin)
-          <td class="xwikibuttonlink"><a href="$doc.getAttachmentURL("${attach.filename}", "delattachment")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+          <td class="xwikibuttonlink"><a href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
 #end
         </tr>
 #set($counter = $counter + 1)
@@ -54,10 +59,11 @@ $msg.get("noattachments")
 #end
 #if($hasedit || $hasadmin)
       <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
-        <fieldset class="expanded" id="attachform">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<fieldset class="expanded" id="attachform">
         <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
-        <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get("choosetargetfilename"):</label></div>
-        <div><input id="xwikiuploadname" type="text" name="filename" value="" size="40"/></div>
+     <!--  <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get("choosetargetfilename"):</label></div> -->
+        <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
         <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
         <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
         <div>

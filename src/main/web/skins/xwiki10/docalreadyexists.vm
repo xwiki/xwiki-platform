@@ -3,6 +3,7 @@
 ###
 ###
 #template("startpage.vm")
+<div class="main layoutsubsection">
 #if($xwiki.exists("XWiki.DocumentAlreadyExist"))
     $xwiki.includeForm("XWiki.DocumentAlreadyExist",false)
 #else
@@ -10,4 +11,6 @@
 $!exception
 #xwikimessageboxend()
 #end
+<div class="clearfloats"></div>
+</div>
 #template("endpage.vm")

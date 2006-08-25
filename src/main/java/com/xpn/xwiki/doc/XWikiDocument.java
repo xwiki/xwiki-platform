@@ -73,6 +73,8 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.lang.ref.SoftReference;
@@ -2581,5 +2583,112 @@ public class XWikiDocument {
         objects.set(bobj.getNumber(), null);
         addObjectsToRemove(bobj);
         return true;
+    }
+
+    /** This method add for sectional editting */
+    public List getSplitSectionsAccordingToTitle() {
+        Pattern pattern = Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(getContent());
+        List splitSections = new ArrayList();
+        int sectionNumber = 0;
+        String contentTemp = getContent();
+        int beforeIndex = 0;
+        while (matcher.find()){
+            String sectionLevel = matcher.group(1);
+            if (sectionLevel.equals("1") || sectionLevel.equals("1.1")) {
+                sectionNumber++ ;
+                String sectionTitle = matcher.group(3);
+                String sectionIndex = "" + contentTemp.indexOf(matcher.group(0), beforeIndex);
+                beforeIndex = Integer.parseInt(sectionIndex) + matcher.group(0).length();
+
+                String[] sectionDoc = createArrayInfosOfSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
+                splitSections.add(sectionDoc);
+            }
+        }
+       return splitSections;
+    }
+
+    public String[] createArrayInfosOfSection(int sectionNumber, String sectionIndex, String sectionLevel, String sectionTitle) {
+        String[] sectionDoc = new String[4];
+        sectionDoc[0] = "" + sectionNumber;
+        sectionDoc[1] = sectionIndex;
+        sectionDoc[2] = sectionLevel;
+        sectionDoc[3] = sectionTitle;
+        return sectionDoc;
+    }
+
+    public String[] getSection(int sectionNumber) {
+        return (String[])getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
+    }
+
+    public int getIndexOfSection(int sectionNumber){
+        String[] sectionObj = getSection(sectionNumber);
+        return Integer.parseInt(sectionObj[1]);
+    }
+
+    public String getTitleOfSection(int sectionNumber){
+        String[] sectionObj = getSection(sectionNumber);
+        return sectionObj[3];
+    }
+
+    public String getContentOfSection(int sectionNumber) {
+         List splitSections = getSplitSectionsAccordingToTitle();
+         int indexEnd = 0 ;
+         String[] section = (String[]) splitSections.get(sectionNumber - 1);
+         int indexStart = Integer.parseInt(section[1]);
+         String sectionLevel = section[2];
+         for(int i = sectionNumber; i < splitSections.size(); i++){
+             String[] nextSection =(String[])splitSections.get(i);
+             String nextLevel = nextSection[2];
+             if(sectionLevel.equals(nextLevel)){
+                 indexEnd = Integer.parseInt(nextSection[1]);
+                 break ;
+             }
+             if (sectionLevel.length() > nextLevel.length()) {
+                 indexEnd = Integer.parseInt(nextSection[1]);
+                 break ;
+             }
+         }
+         String sectionContent = null;
+         if(indexStart < 0) indexStart = 0;
+         if(indexEnd == 0) sectionContent = getContent().substring(indexStart);
+         else sectionContent = getContent().substring(indexStart,indexEnd);
+         return sectionContent;
+     }
+
+    public String updateSection(int sectionNumber , String newSectionContent) {
+     int indexSection = getIndexOfSection(sectionNumber);
+         if (getSplitSectionsAccordingToTitle().size() == 1){
+             return newSectionContent;
+         }else if(sectionNumber == getSplitSectionsAccordingToTitle().size()){
+             String contentBegin = getContent().substring(0,indexSection);
+             return contentBegin + newSectionContent;
+         } else {
+             List splitSections = getSplitSectionsAccordingToTitle();
+             String[] sectionObj = (String[]) splitSections.get(sectionNumber-1);
+             String sectionLevel = sectionObj[2];
+             int nextIndex = 0;
+             for(int i=sectionNumber ; i<splitSections.size(); i++){
+                 String[] nextSection = (String[])splitSections.get(i);
+                 String nextLevel = nextSection[2];
+                  if(sectionLevel.equals(nextLevel)){
+                      nextIndex = Integer.parseInt(nextSection[1]);
+                      break;
+                 }else if (sectionLevel.length() > nextLevel.length()) {
+                     nextIndex = Integer.parseInt(nextSection[1]);
+                     break;
+                 }
+             }
+             if(nextIndex == 0)
+                 return getContent().substring(0,indexSection) + newSectionContent;
+             else if(sectionNumber == 1){
+                 String contentAfter = getContent().substring(nextIndex);
+                 return newSectionContent + contentAfter;
+             }else{
+                 String contentAfter = getContent().substring(nextIndex);
+                 String contentBegin = getContent().substring(0, indexSection);
+                 return  contentBegin + newSectionContent + contentAfter;
+             }
+        }
     }
 }

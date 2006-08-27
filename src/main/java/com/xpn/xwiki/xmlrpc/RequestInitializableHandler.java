@@ -9,7 +9,7 @@ import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 
 import com.xpn.xwiki.XWikiException;
 
-interface RequestInitializableHandler {
+public interface RequestInitializableHandler {
 	public void init(Servlet servlet, ServletRequest request)
 	        throws XWikiException;
 

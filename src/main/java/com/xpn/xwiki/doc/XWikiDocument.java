@@ -107,35 +107,6 @@ public class XWikiDocument {
     private int translation;
     private String database;
 
-    public String getVersionHashCode(XWikiContext context){
-        MessageDigest md5 = null;
-
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: " + e);
-            return this.hashCode() + "";
-        }
-
-        try {
-        	//Document doc = toXMLDocument(true, false, true, false);
-        	String valueBeforeMD5 = toXML(true, false, true, false, context);
-            md5.update(valueBeforeMD5.getBytes());
-
-            byte[] array = md5.digest();
-            StringBuffer sb = new StringBuffer();
-            for (int j = 0; j < array.length; ++j) {
-                int b = array[j] & 0xFF;
-                if (b < 0x10) sb.append('0');
-                sb.append(Integer.toHexString(b));
-            }
-            String valueAfterMD5 = sb.toString();
-            return valueAfterMD5;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return this.hashCode() + "";
-    }
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = true;
     // Used to make sure the MetaData String is regenerated
@@ -2720,5 +2691,35 @@ public class XWikiDocument {
                  return  contentBegin + newSectionContent + contentAfter;
              }
         }
+    }
+
+    public String getVersionHashCode(XWikiContext context){
+        MessageDigest md5 = null;
+
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error: " + e);
+            return this.hashCode() + "";
+        }
+
+        try {
+        	//Document doc = toXMLDocument(true, false, true, false);
+        	String valueBeforeMD5 = toXML(true, false, true, false, context);
+            md5.update(valueBeforeMD5.getBytes());
+
+            byte[] array = md5.digest();
+            StringBuffer sb = new StringBuffer();
+            for (int j = 0; j < array.length; ++j) {
+                int b = array[j] & 0xFF;
+                if (b < 0x10) sb.append('0');
+                sb.append(Integer.toHexString(b));
+            }
+            String valueAfterMD5 = sb.toString();
+            return valueAfterMD5;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this.hashCode() + "";
     }
 }

@@ -47,8 +47,7 @@ public class BaseRpcHandler implements RequestInitializableHandler {
     private XWikiRequest request;
     private XWikiResponse response;	
         
-	public void init(Servlet servlet, ServletRequest request)
-			throws XWikiException {
+	public void init(Servlet servlet, ServletRequest request) throws XWikiException {
         this.request = new XWikiXMLRPCRequest((HttpServletRequest)request); // use the real request
         this.response = new XWikiXMLRPCResponse(new MockXWikiResponse()); // use fake response
         
@@ -61,18 +60,9 @@ public class BaseRpcHandler implements RequestInitializableHandler {
         } else {
         	this.econtext = new XWikiXMLRPCContext(new MockXWikiServletContext());
         }
-        
-//        java.lang.NullPointerException
-//    	at com.xpn.xwiki.XWiki.getXWiki(XWiki.java:363)
-//    	at com.xpn.xwiki.xmlrpc.BaseRpcHandler.getXWikiContext(BaseRpcHandler.java:67)
-//    	at com.xpn.xwiki.xmlrpc.ConfluenceRpcHandler.login(ConfluenceRpcHandler.java:59)
-//    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-//    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-//    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-
     }
 
-    public XWikiContext getXWikiContext() throws XWikiException {
+    protected XWikiContext getXWikiContext() throws XWikiException {
         XWikiContext context = Utils.prepareContext("", request, response, econtext);
         context.setDatabase("xwikitest");
         XWiki xwiki = XWiki.getXWiki(context);
@@ -81,18 +71,4 @@ public class BaseRpcHandler implements RequestInitializableHandler {
         XWikiVelocityRenderer.prepareContext(context);
         return context;
     }
-
-
-    protected byte[] convertToBase64( String content )
-    {
-        try
-        {
-            return content.getBytes("UTF-8");
-        }
-        catch( UnsupportedEncodingException e )
-        {
-            return content.getBytes();
-        }
-    }
 }
-

@@ -24,11 +24,12 @@ package com.xpn.xwiki.xmlrpc;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.apache.commons.logging.Log;
@@ -46,7 +47,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 
-public class ConfluenceRpcHandler extends BaseRpcHandler {
+public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface {
 	private static final Log log = LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
 	
     public class RemoteUser {
@@ -77,10 +78,10 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
             return null;
     }
 
-    private Hashtable getTokens(XWikiContext context) {
-        Hashtable tokens = (Hashtable) context.getEngineContext().getAttribute("xmlrpc_tokens");
+    private Map getTokens(XWikiContext context) {
+        Map tokens = (Map) context.getEngineContext().getAttribute("xmlrpc_tokens");
         if (tokens==null) {
-            tokens = new Hashtable();
+            tokens = new HashMap();
             context.getEngineContext().setAttribute("xmlrpc_tokens", tokens);
         }
         return tokens;
@@ -148,7 +149,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         return true;
     }
 
-    Hashtable getServerInfo(String token) throws XWikiException {
+    Map getServerInfo(String token) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -158,26 +159,24 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         return null;
     }
 
-    public Vector getSpaces(String token) throws XWikiException {
+    public Object[] getSpaces(String token) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        Vector spaces = new Vector();
         List webs = xwiki.search("select distinct doc.web from XWikiDocument doc", context);
-        if (webs==null)
-            return spaces;
-        for (int i=0;i<webs.size();i++) {
+        ArrayList spaces = new ArrayList(webs.size());
+        for (int i=0; i<webs.size(); i++) {
             String web = (String)webs.get(i);
             SpaceSummary spacesum = new SpaceSummary(web, web, "http://127.0.0.1:9080/xwiki/bin/view/" + web + "/WebHome");
             spaces.add(spacesum.getHashtable());
         }
-        return spaces;
+        return spaces.toArray();
     }
 
-    public Hashtable getSpace(String token, String spaceKey) throws XWikiException {
+    public Map getSpace(String token, String spaceKey) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -188,27 +187,25 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome")).getHashtable();
     }
 
-    public Vector getPages(String token, String spaceKey) throws XWikiException {
+    public Object[] getPages(String token, String spaceKey) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        Vector pages = new Vector();
         List docs = xwiki.getStore().searchDocumentsNames("where doc.web='" + Utils.SQLFilter(spaceKey) + "'", context);
-        if (docs==null)
-            return null;
+        ArrayList pages = new ArrayList(docs.size());
         for (int i=0;i<docs.size();i++) {
             String docname = (String)docs.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
             PageSummary pagesum = new PageSummary(doc, context);
             pages.add(pagesum.getHashtable());
         }
-        return pages;
+        return pages.toArray();
     }
 
-    public Hashtable getPage(String token, String pageId) throws XWikiException {
+    public Map getPage(String token, String pageId) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -220,46 +217,45 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         return page.getHashtable();
     }
 
-    public Vector getPageHistory(String token, String pageId) throws XWikiException {
+    public Object[] getPageHistory(String token, String pageId) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        Vector result = new Vector();
         XWikiDocument doc = xwiki.getDocument(pageId, context);
         Version[] versions = doc.getRevisions(context);
+        ArrayList result = new ArrayList(versions.length);
         for (int i=0;i<versions.length;i++) {
             String version = versions[i].toString();
             XWikiDocument revdoc = xwiki.getDocument(doc, version, context);
             result.add((new PageHistorySummary(revdoc)).getHashtable());
         }
-        return result;
+        return result.toArray();
     }
 
-    public Vector search(String token, String query, int maxResults) throws XWikiException {
+    public Object[] search(String token, String query, int maxResults) throws XWikiException {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        Vector result = new Vector();
         List doclist = xwiki.getStore().searchDocumentsNames("where doc.content like '%" + Utils.SQLFilter(query) +
                 "%' or doc.name like '%" + Utils.SQLFilter(query) + "%'", context);
         if (doclist == null)
-            return result;
+            return new Object[0];
 
+        List result = new ArrayList(doclist.size());
         for (int i=0;i<doclist.size();i++) {
             String docname = (String)doclist.get(i);
             XWikiDocument document = xwiki.getDocument(docname, context);
             SearchResult sresult = new SearchResult(document);
             result.add(sresult.getHashtable());
         }
-        return result;
+        return result.toArray();
     }
-
 
     public String renderContent(String token, String spaceKey, String pageId, String content) {
         XWikiContext context = null;
@@ -296,20 +292,16 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         context.setDoc(document);
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
 
-        Object[] result = null;
         List attachlist = document.getAttachmentList();
-        if (attachlist!=null) {
-        	result = new Object[attachlist.size()];
-            for (int i=0;i<attachlist.size();i++) {
-                Attachment attach = new Attachment(document, (XWikiAttachment)attachlist.get(i), context);
-                result[i] = new HashMap(attach.getHashtable());
-            }
+        ArrayList result = new ArrayList(attachlist.size());
+        for (int i=0;i<attachlist.size();i++) {
+            Attachment attach = new Attachment(document, (XWikiAttachment)attachlist.get(i), context);
+            result.add(attach.getHashtable());
         }
-        log.error(result);
-        return result;
+        return result.toArray();
     }
 
-    public Vector getComments(String token, String pageId) throws XWikiException {
+    public Object[] getComments(String token, String pageId) throws XWikiException {
         XWikiContext context = null;
         context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -322,20 +314,20 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         context.setDoc(document);
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
 
-        Vector result = new Vector();
-        Vector commentlist = document.getObjects("XWiki.XWikiComments");
+        List commentlist = document.getObjects("XWiki.XWikiComments");
+        ArrayList result = new ArrayList(commentlist.size());
         if (commentlist!=null) {
             for (int i=0;i<commentlist.size();i++) {
                 Comment comment = new Comment(document, (BaseObject)commentlist.get(i), context);
                 result.add(comment);
             }
         }
-        return result;
+        return result.toArray();
     }
 
-    public Hashtable storePage(String token, Hashtable pageht) throws XWikiException {
+    public Map storePage(String token, Map pageht) throws XWikiException {
         try {
-        Page page = new Page(pageht);
+        Page page = new Page(new Hashtable(pageht));
 
         XWikiContext context = null;
         context = getXWikiContext();
@@ -378,18 +370,18 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         context.getWiki().deleteDocument(document, context);
     }
 
-    public Hashtable getUser(String token, String username) {
+    public Map getUser(String token, String username) {
         return null;
     }
 
-    public void addUser(String token, Hashtable user, String password) {
+    public void addUser(String token, Map user, String password) {
     }
 
     public void addGroup(String token, String group) {
     }
 
-    public Vector getUserGroups(String token, String username) {
-        return null;
+    public Object[] getUserGroups(String token, String username) {
+        return new Object[0];
     }
 
     public void addUserToGroup(String token, String username, String groupname) {

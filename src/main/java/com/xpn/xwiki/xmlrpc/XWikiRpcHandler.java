@@ -23,7 +23,6 @@
 package com.xpn.xwiki.xmlrpc;
 
 import java.util.List;
-import java.util.Vector;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,33 +31,27 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 
-public class XWikiRpcHandler extends BaseRpcHandler {
+public class XWikiRpcHandler extends BaseRpcHandler implements XWikiRpcInterface {
 
-    // JSP Wiki API
-    public Vector getAllPages() throws XWikiException, Exception {
-        try {
-        XWikiContext context = getXWikiContext();
-        List doclist = context.getWiki().getStore().searchDocumentsNames("", context);
-        Vector result = new Vector();
-        for (int i=0;i<doclist.size();i++) {
-            result.add(doclist.get(i));
-        }
-        return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-    }
-
-    public byte[] getPage(String name) throws XWikiException, Exception {
+    public String getPage(String name) throws XWikiException, Exception {
         try {
           XWikiContext context = getXWikiContext();
           XWikiDocument doc = context.getWiki().getDocument(name, context);
-          return convertToBase64( doc.getContent());
+          return doc.getContent();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
     }
 
+    public List getAllPages() throws XWikiException, Exception {
+        try {
+        XWikiContext context = getXWikiContext();
+        List doclist = context.getWiki().getStore().searchDocumentsNames("", context);
+        return doclist;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

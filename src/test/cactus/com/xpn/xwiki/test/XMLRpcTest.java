@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import org.apache.xmlrpc.client.util.ClientFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -46,6 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.xmlrpc.ConfluenceRpcInterface;
+import com.xpn.xwiki.xmlrpc.XWikiRpcInterface;
 
 public class XMLRpcTest  extends TestCase {
 	private static final Log log = LogFactory.getFactory().getInstance(XMLRpcTest.class);
@@ -54,7 +57,11 @@ public class XMLRpcTest  extends TestCase {
     public XWikiContext context = new XWikiContext();
     public XWiki xwiki;
     private XmlRpcClient rpcClient;
-    private String loginToken;
+    private String token;
+
+	private ConfluenceRpcInterface xwikiRpc;
+
+	private String pageId;
 
     public XMLRpcTest ()
     {
@@ -64,7 +71,8 @@ public class XMLRpcTest  extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
     	String configpath = "./xwiki.cfg";
-    	XWikiConfig config = new XWikiConfig(new FileInputStream(configpath));
+    	pageId = "Main.XmlRpcTest";
+		XWikiConfig config = new XWikiConfig(new FileInputStream(configpath));
         xwiki = new XWiki(config, context);
 
         context.setWiki(xwiki);
@@ -73,7 +81,7 @@ public class XMLRpcTest  extends TestCase {
         StoreHibernateTest.cleanUp(hibstore, context);
         Utils.createDoc(hibstore, "Main", "XmlRpcTest", context);
 
-        XWikiDocument doc1 = xwiki.getDocument("Main.XmlRpcTest", context);
+        XWikiDocument doc1 = xwiki.getDocument(pageId, context);
         XWikiAttachment attachment1 = new XWikiAttachment(doc1, Utils.filename);
         byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
         attachment1.setContent(attachcontent1);
@@ -90,10 +98,10 @@ public class XMLRpcTest  extends TestCase {
         clientConfig.setServerURL(new URL("http://127.0.0.1:9080/xwiki/xmlrpc"));
         rpcClient.setConfig(clientConfig);
         
-        Vector loginParams = new Vector (2);
-        loginParams.add ("Admin");
-        loginParams.add ("admin");
-        loginToken = (String) rpcClient.execute ("confluence1.login", loginParams);
+        ClientFactory factory = new ClientFactory(rpcClient);
+        xwikiRpc = (ConfluenceRpcInterface)
+                		factory.newInstance(ConfluenceRpcInterface.class);
+		token = (String) xwikiRpc.login("Admin", "admin");
     }
 
     public XWikiHibernateStore getHibStore() {
@@ -131,7 +139,7 @@ public class XMLRpcTest  extends TestCase {
         context = null;
 
         Vector params = new Vector (1);
-        params.add (loginToken);
+        params.add (token);
         rpcClient.execute ("confluence1.logout", params);
         super.tearDown();
     }
@@ -139,24 +147,32 @@ public class XMLRpcTest  extends TestCase {
 
     public void testGetPage () throws Exception
     {
-        Vector args = new Vector(2);
-        args.add (loginToken);
-        args.add ("Main.XmlRpcTest");
-        Map result = (Map) rpcClient.execute ("confluence1.getPage", args);
-        assertEquals ("Main.XmlRpcTest", result.get("title"));
+        Map result = (Map)xwikiRpc. getPage(token, pageId);
+        assertEquals (pageId, result.get("title"));
         // assuming there is some content inside the sandbox homepage:
         assertTrue(((String)result.get("content")).length()>0);
     }
 
     public void testAttachments () throws Exception
     {
-        Vector args = new Vector(2);
-        args.add (loginToken);
-        args.add ("Main.XmlRpcTest");
-        // throws exception on next line, if there is at least on attachment:
-        log.error(rpcClient.execute ("confluence1.getAttachments", args));
-        Object[] result = (Object[]) rpcClient.execute ("confluence1.getAttachments", args);
+        Object[] result = (Object[])xwikiRpc.getAttachments(token, pageId);
         // assuming we have exactly one attachment:
         assertEquals (1, result.length);
+        assertTrue(Map.class.isInstance(result[0]));
+        Map attachment = (Map)result[0];
+        assertEquals("test1.sxw", attachment.get("fileName"));
+        assertEquals("test1.sxw", attachment.get("id"));
+        assertEquals("Main.XmlRpcTest", attachment.get("pageId"));
+    }
+    
+    public void testGetSpaces() throws Exception {
+    	Object[] spaces = xwikiRpc.getSpaces(token);
+    	for (int i = 0; i<spaces.length; i++) {
+    		Map space = (Map)spaces[i];
+    		String name = (String)space.get("name");
+    		Map sameSpace = xwikiRpc.getSpace(token, (String)space.get("key"));
+    		assertEquals(space.get("key"), sameSpace.get("key"));
+    		assertEquals(space.get("name"), sameSpace.get("name"));
+    	}
     }
 }

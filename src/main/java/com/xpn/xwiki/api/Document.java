@@ -923,4 +923,8 @@ public class Document extends Api {
                     "Access denied with no programming rights document {0}", null, args);
         }
     }
+    
+    public String getVersionHashCode(){
+    	return doc.getVersionHashCode(context);
+    }
 }

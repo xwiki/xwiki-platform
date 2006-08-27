@@ -80,7 +80,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 		RenderContext rcontext = context.getRenderContext();
 		XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
 
-		// generate unique ID of the heading  
+		// generate unique ID of the heading
 		List processedHeadings = (List) rcontext.get("processedHeadings");
 		if (processedHeadings == null) {
 			processedHeadings = new ArrayList();
@@ -93,7 +93,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 			for (Iterator iter = processedHeadings.iterator(); iter.hasNext();){
 				if (iter.next().equals(id)) occurence++;
 			}
-			id = TOCGenerator.makeHeadingID(id, occurence, xcontext);
+			id = TOCGenerator.makeHeadingID(text, occurence, xcontext);
 			if(occurence == 0){
 				isIdOk = true;
 			}

@@ -34,14 +34,10 @@ import com.xpn.xwiki.web.XWikiResponse;
 
 public class XWikiRpcHandler extends BaseRpcHandler {
 
-    public XWikiRpcHandler(XWikiRequest request, XWikiResponse response, XWikiEngineContext econtext) {
-        super(request, response, econtext);
-    }
-
     // JSP Wiki API
     public Vector getAllPages() throws XWikiException, Exception {
         try {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         List doclist = context.getWiki().getStore().searchDocumentsNames("", context);
         Vector result = new Vector();
         for (int i=0;i<doclist.size();i++) {
@@ -56,7 +52,7 @@ public class XWikiRpcHandler extends BaseRpcHandler {
 
     public byte[] getPage(String name) throws XWikiException, Exception {
         try {
-          XWikiContext context = init();
+          XWikiContext context = getXWikiContext();
           XWikiDocument doc = context.getWiki().getDocument(name, context);
           return convertToBase64( doc.getContent());
         } catch (Exception e) {

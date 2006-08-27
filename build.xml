@@ -101,7 +101,8 @@
     	jta.jar,
     	antlr-2.7.5.jar,
     	asm-1.5.3.jar,asm-util-1.5.3.jar,
-        clover-1.3.9.jar,clover.license,
+        clover-1.3.9.jar,
+    	clover.license,
         commons-beanutils-1.7.0.jar,
     	commons-codec-1.3.jar,
     	commons-collections-3.2.jar,
@@ -151,6 +152,12 @@
     	flickrapi-1.0a7.jar,
         jackrabbit-core-1.0.1.jar,jackrabbit-jcr-commons-1.0.1.jar,jcr-1.0.jar,graffito-jcr-mapping-1.0-a1-amelentev-dev.jar,slf4j-log4j12-1.0.1.jar,derby-10.1.2.1.jar,lucene-1.4.3.jar,
         ant-1.6.5.jar,
+    	ws-commons-java5-1.0.1.jar,
+    	ws-commons-util-1.0.1.jar,
+    	xmlrpc-client-3.0rc1.jar,
+    	xmlrpc-common-3.0rc1.jar,
+    	xmlrpc-server-3.0rc1.jar,
+    	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar"/>
 
@@ -339,9 +346,9 @@
             	<fileset dir="${java.test.src.dir}">
             		<include name="**/*Test.java"/>
                     <exclude name="**/Abstract*.java"/>
-                    <!-- Excluded because it throws OutOfMemoryException >
+                    <!-- Excluded because it throws OutOfMemoryException-->
                     <exclude name="**/StoreObjectHibernateTest.java"/>
-                    <exclude name="**/StoreTest.java"/-->
+                    <exclude name="**/StoreTest.java"/>
                     <!-- Excluded because hibernate store is the one used -->
                     <exclude name="**/StoreRCSFileTest.java"/>
                     <exclude name="**/StoreObjectRCSFileTest.java"/>
@@ -380,7 +387,7 @@
 
         <mkdir dir="${test.reports.dir}" />
         <cactus printsummary="yes" warfile="${cactus.warfile}" dir="${tests.build.dir}"
-            haltonfailure="no" fork="on"  maxmemory="1256m" >
+            haltonfailure="no" fork="on" maxmemory="256m" >
 
             <classpath>
                 <pathelement path="${tests.build.dir}" />
@@ -392,20 +399,23 @@
 
             <batchtest todir="${test.reports.dir}" >
                 <fileset dir="${cactus.test.src.dir}">
-                    <include name="**/*Test.java"/>
+                	<include name="**/ServletAuthTest.java"/>
+                	<include name="**/ServletVirtualTest.java"/>
+
+<!--                	<include name="**/*Test.java"/>
                     <exclude name="**/AllTests.java"/>
                     <exclude name="**/AllServletTests.java"/>
                     <exclude name="**/ServletTest.java"/>
                     <exclude name="**/XWikiIntegrationTest.java"/>
-                    <exclude name="**/atom/**" />
+                    <exclude name="**/atom/**" />-->
                 </fileset>
             </batchtest>
 
             <containerset>
               <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="18080" todir="${test.reports.dir}" jvmArgs="-Xmx300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
+                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx512m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
               <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
-                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx1300m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
+                  port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx512m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
             </containerset>
         </cactus>
         <delete file="${cactus.warfile}" />
@@ -483,7 +493,7 @@
         <lib refid="libs.exo.fileset" />
         <lib refid="libs.xwiki.fileset" />
       </war>
-      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
+<!--      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
       <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web-exo.xml" >
         <exclude name="**/web*.xml" />
@@ -492,6 +502,7 @@
           <lib refid="libs.xwiki.fileset" />
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+-->
     </target>
 
     <target name="bin.dist" depends="release, test, javadoc">

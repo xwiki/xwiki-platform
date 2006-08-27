@@ -24,11 +24,15 @@ package com.xpn.xwiki.xmlrpc;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -43,7 +47,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 
 public class ConfluenceRpcHandler extends BaseRpcHandler {
-
+	private static final Log log = LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
+	
     public class RemoteUser {
 
         public RemoteUser (String username, String ip) {
@@ -55,12 +60,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         public String username;
     }
 
-    public ConfluenceRpcHandler(XWikiRequest request, XWikiResponse response, XWikiEngineContext econtext) {
-        super(request, response, econtext);
-    }
-
     public String login(String username, String password) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         if (username.equals("guest")) {
             String ip = context.getRequest().getRemoteAddr();
@@ -137,7 +138,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public boolean logout(String token) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -148,7 +149,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     Hashtable getServerInfo(String token) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -158,7 +159,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Vector getSpaces(String token) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -177,7 +178,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Hashtable getSpace(String token, String spaceKey) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -188,7 +189,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Vector getPages(String token, String spaceKey) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -208,7 +209,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Hashtable getPage(String token, String pageId) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -220,7 +221,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Vector getPageHistory(String token, String pageId) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -238,7 +239,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
     }
 
     public Vector search(String token, String query, int maxResults) throws XWikiException {
-        XWikiContext context = init();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
@@ -264,7 +265,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         XWikiContext context = null;
         String result = "";
         try {
-            context = init();
+            context = getXWikiContext();
             XWiki xwiki = context.getWiki();
             context.setAction("view");
 
@@ -282,9 +283,9 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         return result;
     }
 
-    public Vector getAttachments(String token, String pageId) throws XWikiException {
+    public Object[] getAttachments(String token, String pageId) throws XWikiException {
         XWikiContext context = null;
-        context = init();
+        context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("view");
 
@@ -295,20 +296,22 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         context.setDoc(document);
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
 
-        Vector result = new Vector();
+        Object[] result = null;
         List attachlist = document.getAttachmentList();
         if (attachlist!=null) {
+        	result = new Object[attachlist.size()];
             for (int i=0;i<attachlist.size();i++) {
                 Attachment attach = new Attachment(document, (XWikiAttachment)attachlist.get(i), context);
-                result.add(attach.getHashtable());
+                result[i] = new HashMap(attach.getHashtable());
             }
         }
+        log.error(result);
         return result;
     }
 
     public Vector getComments(String token, String pageId) throws XWikiException {
         XWikiContext context = null;
-        context = init();
+        context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("view");
 
@@ -335,7 +338,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
         Page page = new Page(pageht);
 
         XWikiContext context = null;
-        context = init();
+        context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("save");
 
@@ -362,7 +365,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler {
 
     public void deletePage(String token, String pageId) throws XWikiException {
         XWikiContext context = null;
-        context = init();
+        context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("delete");
 

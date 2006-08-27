@@ -70,7 +70,17 @@
 
         <load-on-startup>10</load-on-startup>
     </servlet>
-
+    
+     <servlet>
+        <servlet-name>xmlrpc</servlet-name>
+        <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
+        <init-param>
+          <param-name>enabledForExtensions</param-name>
+          <param-value>false</param-value>
+          <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
+        </init-param>
+     </servlet>
+     
      <servlet>
         <servlet-name>ServletRedirector</servlet-name>
         <servlet-class>org.apache.cactus.server.ServletTestRedirector</servlet-class>
@@ -92,6 +102,11 @@
     <servlet-mapping>
         <servlet-name>action</servlet-name>
         <url-pattern>/testbin/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>xmlrpc</servlet-name>
+        <url-pattern>/xmlrpc/*</url-pattern>
     </servlet-mapping>
 
      <servlet-mapping>

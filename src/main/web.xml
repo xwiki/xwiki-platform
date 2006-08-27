@@ -70,6 +70,16 @@
 
         <load-on-startup>10</load-on-startup>
     </servlet>
+    
+     <servlet>
+        <servlet-name>xmlrpc</servlet-name>
+        <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
+        <init-param>
+          <param-name>enabledForExtensions</param-name>
+          <param-value>false</param-value>
+          <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
+        </init-param>
+     </servlet>
 
     <servlet-mapping>
         <servlet-name>action</servlet-name>
@@ -85,7 +95,11 @@
         <servlet-name>action</servlet-name>
         <url-pattern>/xwiki/*</url-pattern>
     </servlet-mapping>
-
+    
+    <servlet-mapping>
+        <servlet-name>xmlrpc</servlet-name>
+        <url-pattern>/xmlrpc/*</url-pattern>
+    </servlet-mapping>
 
     <!-- The Usual Welcome File List -->
     <welcome-file-list>

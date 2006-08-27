@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcServer;
+import org.apache.xmlrpc.server.XmlRpcServer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;

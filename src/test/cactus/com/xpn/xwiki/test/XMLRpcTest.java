@@ -25,6 +25,7 @@ package com.xpn.xwiki.test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,10 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.apache.xmlrpc.XmlRpcClient;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.xmlrpc.client.XmlRpcClient;
+import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -43,8 +47,9 @@ import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-public class XMLRpcTest  extends TestCase
-    {
+public class XMLRpcTest  extends TestCase {
+	private static final Log log = LogFactory.getFactory().getInstance(XMLRpcTest.class);
+	
     public String hibpath = "hibernate-test.cfg.xml";
     public XWikiContext context = new XWikiContext();
     public XWiki xwiki;
@@ -80,15 +85,15 @@ public class XMLRpcTest  extends TestCase
         map.put("password", "admin");
         xwiki.createUser("Admin", map, "", "", "view, edit", context);
 
-        rpcClient = new XmlRpcClient ("http://127.0.0.1:9080/xwiki/testbin/xmlrpc/confluence");
+        rpcClient = new XmlRpcClient();
+        XmlRpcClientConfigImpl clientConfig = new XmlRpcClientConfigImpl();
+        clientConfig.setServerURL(new URL("http://127.0.0.1:9080/xwiki/xmlrpc"));
+        rpcClient.setConfig(clientConfig);
+        
         Vector loginParams = new Vector (2);
         loginParams.add ("Admin");
         loginParams.add ("admin");
-        try {
-          loginToken = (String) rpcClient.execute ("confluence1.login", loginParams);
-        } catch (Exception e) {
-          loginToken = null;
-        }
+        loginToken = (String) rpcClient.execute ("confluence1.login", loginParams);
     }
 
     public XWikiHibernateStore getHibStore() {
@@ -149,10 +154,9 @@ public class XMLRpcTest  extends TestCase
         args.add (loginToken);
         args.add ("Main.XmlRpcTest");
         // throws exception on next line, if there is at least on attachment:
-        Collection result = (Collection) rpcClient.execute ("confluence1.getAttachments", args);
+        log.error(rpcClient.execute ("confluence1.getAttachments", args));
+        Object[] result = (Object[]) rpcClient.execute ("confluence1.getAttachments", args);
         // assuming we have exactly one attachment:
-        assertEquals (1, result.size());
+        assertEquals (1, result.length);
     }
-
 }
-

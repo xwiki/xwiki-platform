@@ -71,7 +71,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
     }
 
     public String getName() {
-        return "charting";
+        return super.getName();
     }
     
     public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {

@@ -25,26 +25,56 @@ package com.xpn.xwiki.xmlrpc;
 
 import java.io.UnsupportedEncodingException;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class BaseRpcHandler extends Object {
+public class BaseRpcHandler implements RequestInitializableHandler {
 
     private XWikiEngineContext econtext;
     private XWikiRequest request;
-    private XWikiResponse response;
+    private XWikiResponse response;	
+        
+	public void init(Servlet servlet, ServletRequest request)
+			throws XWikiException {
+        this.request = new XWikiXMLRPCRequest((HttpServletRequest)request); // use the real request
+        this.response = new XWikiXMLRPCResponse(new MockXWikiResponse()); // use fake response
+        
+        ServletContext sContext = null;
+        try {
+        	sContext = servlet.getServletConfig().getServletContext();
+        } catch (Exception ignore) { }
+        if (sContext != null) {
+        	this.econtext = new XWikiXMLRPCContext(sContext);
+        } else {
+        	this.econtext = new XWikiXMLRPCContext(new MockXWikiServletContext());
+        }
+        
+//        java.lang.NullPointerException
+//    	at com.xpn.xwiki.XWiki.getXWiki(XWiki.java:363)
+//    	at com.xpn.xwiki.xmlrpc.BaseRpcHandler.getXWikiContext(BaseRpcHandler.java:67)
+//    	at com.xpn.xwiki.xmlrpc.ConfluenceRpcHandler.login(ConfluenceRpcHandler.java:59)
+//    	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//    	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//    	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
 
-    public BaseRpcHandler(XWikiRequest request, XWikiResponse response, XWikiEngineContext econtext) {
-        this.request = request;
-        this.response = response;
-        this.econtext = econtext;
     }
 
-    public XWikiContext init() throws XWikiException {
+    public XWikiContext getXWikiContext() throws XWikiException {
         XWikiContext context = Utils.prepareContext("", request, response, econtext);
+        context.setDatabase("xwikitest");
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
@@ -64,6 +94,5 @@ public class BaseRpcHandler extends Object {
             return content.getBytes();
         }
     }
-
 }
 

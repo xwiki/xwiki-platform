@@ -336,8 +336,8 @@ public class QueryPluginTest extends HibernateTestCase {
         checkEquals(qf.getAttachment("Test.TestAttach2", "*", null).list(), new Object[]{attachment3});
         testSearchXP("//Test/TestAttach2/attach/testfile1",	new Object[]{attachment3});
         checkEquals(qf.getAttachment("Test.TestAttach2", "testfile1", null).list(), new Object[]{attachment3});
-        testSearchXP("//*/*/attach/testfile1",		new Object[]{attachment1, attachment3});
-        checkEquals(qf.getAttachment("*.*", "testfile1", null).list(), new Object[]{attachment1, attachment3});
+        testSearchXP("//*/*/attach/testfile1",		new Object[]{attachment3, attachment1});
+        checkEquals(qf.getAttachment("*.*", "testfile1", null).list(), new Object[]{attachment3, attachment1});
         testSearchXP("//Test/*[@author='Someone']/attach/*[@comment!='']",	new Object[]{attachment2});
         checkEquals(qf.getAttachment("Test.*[@author='Someone']", "*[@comment!='']", null).list(), new Object[]{attachment2});
         // hb.endTransaction(getXWikiContext(), false);

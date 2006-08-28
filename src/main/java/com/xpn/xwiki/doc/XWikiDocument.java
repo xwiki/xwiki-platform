@@ -2587,33 +2587,25 @@ public class XWikiDocument {
         return true;
     }
 
-    /**
-     * This method to split the document to sections according to title of document.
-     * @return a list of DocumentSection
-     */
+    //  This method to split section according to title
     public List getSplitSectionsAccordingToTitle() throws XWikiException {
         throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
                 XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
+    // This function to return a Document section with parameter is sectionNumber
     public DocumentSection getDocumentSection(int sectionNumber) throws XWikiException {
         throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
                 XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
-    /**
-     * @param sectionNumber
-     * @return  a string that is content of the document section according to section number
-     */
+    // This method to return the content of a section
     public String getContentOfSection(int sectionNumber) throws XWikiException {
         throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
                 XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
-    /**
-     * Update a content of section .
-     * @return a string that containt new content of document after updated the content of a section
-     */
+    // This function to update a section content in document
     public String updateDocumentSection(int sectionNumber , String newSectionContent) throws XWikiException {
         throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
                 XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");

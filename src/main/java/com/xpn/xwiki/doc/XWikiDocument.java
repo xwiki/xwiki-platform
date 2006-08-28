@@ -30,6 +30,7 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -2541,7 +2542,7 @@ public class XWikiDocument {
         return newobject;
     }
 
-    public boolean isAdvancedContent() {                     
+    public boolean isAdvancedContent() {
         String[] matches = { "<%" , "#set", "#include", "#if",  "public class",  "/* Advanced content */", "## Advanced content", "/* Programmatic content */", "## Programmatic content" };
         String content2 = content.toLowerCase();
         for (int i=0;i<matches.length;i++) {
@@ -2586,111 +2587,36 @@ public class XWikiDocument {
         return true;
     }
 
-    /** This method add for sectional editting */
-    public List getSplitSectionsAccordingToTitle() {
-        Pattern pattern = Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
-        Matcher matcher = pattern.matcher(getContent());
-        List splitSections = new ArrayList();
-        int sectionNumber = 0;
-        String contentTemp = getContent();
-        int beforeIndex = 0;
-        while (matcher.find()){
-            String sectionLevel = matcher.group(1);
-            if (sectionLevel.equals("1") || sectionLevel.equals("1.1")) {
-                sectionNumber++ ;
-                String sectionTitle = matcher.group(3);
-                String sectionIndex = "" + contentTemp.indexOf(matcher.group(0), beforeIndex);
-                beforeIndex = Integer.parseInt(sectionIndex) + matcher.group(0).length();
-
-                String[] sectionDoc = createArrayInfosOfSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
-                splitSections.add(sectionDoc);
-            }
-        }
-       return splitSections;
+    /**
+     * This method to split the document to sections according to title of document.
+     * @return a list of DocumentSection
+     */
+    public List getSplitSectionsAccordingToTitle() throws XWikiException {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
+                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
-    public String[] createArrayInfosOfSection(int sectionNumber, String sectionIndex, String sectionLevel, String sectionTitle) {
-        String[] sectionDoc = new String[4];
-        sectionDoc[0] = "" + sectionNumber;
-        sectionDoc[1] = sectionIndex;
-        sectionDoc[2] = sectionLevel;
-        sectionDoc[3] = sectionTitle;
-        return sectionDoc;
+    public DocumentSection getDocumentSection(int sectionNumber) throws XWikiException {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
+                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
-    public String[] getSection(int sectionNumber) {
-        return (String[])getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
+    /**
+     * @param sectionNumber
+     * @return  a string that is content of the document section according to section number
+     */
+    public String getContentOfSection(int sectionNumber) throws XWikiException {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
+                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
-    public int getIndexOfSection(int sectionNumber){
-        String[] sectionObj = getSection(sectionNumber);
-        return Integer.parseInt(sectionObj[1]);
-    }
-
-    public String getTitleOfSection(int sectionNumber){
-        String[] sectionObj = getSection(sectionNumber);
-        return sectionObj[3];
-    }
-
-    public String getContentOfSection(int sectionNumber) {
-         List splitSections = getSplitSectionsAccordingToTitle();
-         int indexEnd = 0 ;
-         String[] section = (String[]) splitSections.get(sectionNumber - 1);
-         int indexStart = Integer.parseInt(section[1]);
-         String sectionLevel = section[2];
-         for(int i = sectionNumber; i < splitSections.size(); i++){
-             String[] nextSection =(String[])splitSections.get(i);
-             String nextLevel = nextSection[2];
-             if(sectionLevel.equals(nextLevel)){
-                 indexEnd = Integer.parseInt(nextSection[1]);
-                 break ;
-             }
-             if (sectionLevel.length() > nextLevel.length()) {
-                 indexEnd = Integer.parseInt(nextSection[1]);
-                 break ;
-             }
-         }
-         String sectionContent = null;
-         if(indexStart < 0) indexStart = 0;
-         if(indexEnd == 0) sectionContent = getContent().substring(indexStart);
-         else sectionContent = getContent().substring(indexStart,indexEnd);
-         return sectionContent;
-     }
-
-    public String updateSection(int sectionNumber , String newSectionContent) {
-     int indexSection = getIndexOfSection(sectionNumber);
-         if (getSplitSectionsAccordingToTitle().size() == 1){
-             return newSectionContent;
-         }else if(sectionNumber == getSplitSectionsAccordingToTitle().size()){
-             String contentBegin = getContent().substring(0,indexSection);
-             return contentBegin + newSectionContent;
-         } else {
-             List splitSections = getSplitSectionsAccordingToTitle();
-             String[] sectionObj = (String[]) splitSections.get(sectionNumber-1);
-             String sectionLevel = sectionObj[2];
-             int nextIndex = 0;
-             for(int i=sectionNumber ; i<splitSections.size(); i++){
-                 String[] nextSection = (String[])splitSections.get(i);
-                 String nextLevel = nextSection[2];
-                  if(sectionLevel.equals(nextLevel)){
-                      nextIndex = Integer.parseInt(nextSection[1]);
-                      break;
-                 }else if (sectionLevel.length() > nextLevel.length()) {
-                     nextIndex = Integer.parseInt(nextSection[1]);
-                     break;
-                 }
-             }
-             if(nextIndex == 0)
-                 return getContent().substring(0,indexSection) + newSectionContent;
-             else if(sectionNumber == 1){
-                 String contentAfter = getContent().substring(nextIndex);
-                 return newSectionContent + contentAfter;
-             }else{
-                 String contentAfter = getContent().substring(nextIndex);
-                 String contentBegin = getContent().substring(0, indexSection);
-                 return  contentBegin + newSectionContent + contentAfter;
-             }
-        }
+    /**
+     * Update a content of section .
+     * @return a string that containt new content of document after updated the content of a section
+     */
+    public String updateDocumentSection(int sectionNumber , String newSectionContent) throws XWikiException {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
+                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
     }
 
     public String getVersionHashCode(XWikiContext context){

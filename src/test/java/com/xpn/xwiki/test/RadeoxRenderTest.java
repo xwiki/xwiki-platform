@@ -65,7 +65,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         renderTest(wikibase, "Hello 1\n1.1 Title\nHello 2",
                 "<h3 class=\"heading-1-1\">", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n1.1 Title\nHello 2",
-            "<h3 class=\"heading-1-1\"><span id=\"HHTitle\">Title</span></h3>", false, getXWikiContext());
+            "<h3 class=\"heading-1-1\"><span id=\"HTitle\">Title</span></h3>", false, getXWikiContext());
     }
 
     public void testWikiBasePreRenderer() throws XWikiException {
@@ -78,7 +78,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         renderTest(wikibase, "This is a text with{pre} *strong* {/pre}text\n",
         "This is a text with *strong* text", false, getXWikiContext());
         renderTest(wikibase, "1 Title {pre}\n*strong*\n{/pre}",
-        "<h2 class=\"heading-1\"><span id=\"HHTitle25025\">Title \n*strong*\n</span></h2>", false, getXWikiContext());
+        "<h2 class=\"heading-1\"><span id=\"HTitle25025\">Title \n*strong*\n</span></h2>", false, getXWikiContext());
         renderTest(wikibase, "   * Item {pre}*strong*{/pre}",
         "<li>Item *strong*</li>", false, getXWikiContext());
         renderTest(wikibase, "This is a text with{pre} *one* {/pre}and{pre} *two* {/pre}items\n",

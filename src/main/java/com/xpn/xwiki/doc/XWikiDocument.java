@@ -38,26 +38,19 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.web.Utils;
-import org.suigeneris.jrcs.diff.Diff;
-import org.suigeneris.jrcs.diff.DifferentiationFailedException;
-import org.suigeneris.jrcs.diff.Revision;
-import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.util.ToString;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.collections.ListUtils;
 import org.apache.ecs.filter.CharacterFilter;
+import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
-import org.apache.oro.text.regex.MalformedPatternException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -66,20 +59,25 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.suigeneris.jrcs.diff.Diff;
+import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.diff.Revision;
+import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.util.ToString;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.ref.SoftReference;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import java.lang.ref.SoftReference;
 
 
 public class XWikiDocument {
@@ -2587,28 +2585,109 @@ public class XWikiDocument {
         return true;
     }
 
-    //  This method to split section according to title
+    //  This method to split section according to title .
     public List getSplitSectionsAccordingToTitle() throws XWikiException {
-        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
+        // pattern to match the title
+        Pattern pattern = Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(getContent());
+        List splitSections = new ArrayList();
+        int sectionNumber = 0;
+        String contentTemp = getContent();
+        int beforeIndex = 0;
+        while (matcher.find()){  // find title to split
+            String sectionLevel = matcher.group(1);
+            if (sectionLevel.equals("1") || sectionLevel.equals("1.1")) {
+                // only set editting for the title that is 1 or 1.1
+                sectionNumber++ ;
+                String sectionTitle = matcher.group(3);
+                int sectionIndex = contentTemp.indexOf(matcher.group(0), beforeIndex);
+                beforeIndex = sectionIndex + matcher.group(0).length();
+                // initialize a documentSection object
+                DocumentSection docSection = new DocumentSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
+                // add the document section to list
+                splitSections.add(docSection);
+            }
+        }
+        return splitSections;
     }
 
     // This function to return a Document section with parameter is sectionNumber
     public DocumentSection getDocumentSection(int sectionNumber) throws XWikiException {
-        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
+        // return a document section according to section number
+        return (DocumentSection)getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
     }
 
     // This method to return the content of a section
     public String getContentOfSection(int sectionNumber) throws XWikiException {
-        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
+        List splitSections = getSplitSectionsAccordingToTitle();
+        int indexEnd = 0 ;
+        // get current section
+        DocumentSection section = getDocumentSection(sectionNumber);
+        int indexStart = section.getSectionIndex();
+        String sectionLevel = section.getSectionLevel();
+        for(int i = sectionNumber; i < splitSections.size(); i++){
+            // get next section
+            DocumentSection nextSection = getDocumentSection(i + 1);
+            String nextLevel = nextSection.getSectionLevel();
+            if (sectionLevel.equals(nextLevel)) {
+                // if section level is next section level
+                indexEnd = nextSection.getSectionIndex();
+                break ;
+            }
+            if (sectionLevel.length() > nextLevel.length()) {
+                // section level length is greater than next section level length (1.1 and 1)
+                indexEnd = nextSection.getSectionIndex();
+                break ;
+            }
+        }
+        String sectionContent = null;
+        if (indexStart < 0) indexStart = 0;
+        if (indexEnd == 0) sectionContent = getContent().substring(indexStart);
+        else sectionContent = getContent().substring(indexStart,indexEnd); // get section content
+        return sectionContent;
     }
 
     // This function to update a section content in document
     public String updateDocumentSection(int sectionNumber , String newSectionContent) throws XWikiException {
-        throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED , "Not implemented !");
+        String newContent;
+        //  get document section that will be edited
+        DocumentSection docSection = getDocumentSection(sectionNumber);
+        int numberOfSection = getSplitSectionsAccordingToTitle().size();
+        int indexSection = docSection.getSectionIndex();
+        if (numberOfSection == 1) {
+            //  there is only a sections in document
+            return newSectionContent;
+        } else if (sectionNumber == numberOfSection) {
+            //  edit lastest section that doesn't contain subtitle
+            String contentBegin = getContent().substring(0,indexSection);
+            return contentBegin + newSectionContent;
+        } else {
+            String sectionLevel = docSection.getSectionLevel();
+            int nextSectionIndex = 0;
+            //  get index of next section
+            for (int i=sectionNumber; i < numberOfSection; i++) {
+                DocumentSection nextSection = getDocumentSection(i + 1); // get next section
+                String nextSectionLevel = nextSection.getSectionLevel();
+                if (sectionLevel.equals(nextSectionLevel)) {
+                    nextSectionIndex = nextSection.getSectionIndex();
+                    break;
+                } else if (sectionLevel.length() > nextSectionLevel.length()) {
+                    nextSectionIndex = nextSection.getSectionIndex();
+                    break;
+                }
+            }
+            if (nextSectionIndex == 0) //  edit the last section
+                return getContent().substring(0,indexSection) + newSectionContent;
+            if (sectionNumber == 1) { //  edit the first section
+                String contentAfter = getContent().substring(nextSectionIndex);
+                newContent = newSectionContent + contentAfter;
+            } else {
+                String contentAfter = getContent().substring(nextSectionIndex);
+                String contentBegin = getContent().substring(0, indexSection);
+                newContent = contentBegin + newSectionContent + contentAfter;
+            }
+            return newContent;
+        }
     }
 
     public String getVersionHashCode(XWikiContext context){
@@ -2622,8 +2701,8 @@ public class XWikiDocument {
         }
 
         try {
-        	//Document doc = toXMLDocument(true, false, true, false);
-        	String valueBeforeMD5 = toXML(true, false, true, false, context);
+            //Document doc = toXMLDocument(true, false, true, false);
+            String valueBeforeMD5 = toXML(true, false, true, false, context);
             md5.update(valueBeforeMD5.getBytes());
 
             byte[] array = md5.digest();

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Date;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
@@ -101,6 +102,8 @@ public class QueryPluginTest extends HibernateTestCase {
                  assertEquals("Objects #"+i+" not equals",
                          ((XWikiAttachment)obj).toStringXML(false, false, context),
                          ((XWikiAttachment)exp).toStringXML(false, false, context));
+                else if( exp instanceof Date)
+                    assertEquals("Objects #"+i+" not equals", (((Date)obj).getTime()/1000)*1000, (((Date)exp).getTime()/1000)*1000);                    
                 else
                  assertEquals("Objects #"+i+" not equals", obj, exp);
 			}

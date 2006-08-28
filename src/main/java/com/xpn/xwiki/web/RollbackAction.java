@@ -61,6 +61,8 @@ public class RollbackAction extends XWikiAction {
         String username = context.getUser();
         newdoc.setAuthor(username);
         newdoc.setRCSVersion(tdoc.getRCSVersion());
+        newdoc.setVersion(tdoc.getVersion());
+        newdoc.setContentDirty(true);
         xwiki.saveDocument(newdoc, olddoc, context);
 
         // forward to view

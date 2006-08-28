@@ -250,11 +250,9 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                         return new SimplePrincipal(user);
                     } else {
                         context.put("message", "wrongpassword");
-                        return null;
                     }
                 } else {
                     context.put("message", "wronguser");
-                    return null;
                 }
             } catch (Exception e) {
                 // continue
@@ -286,7 +284,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                     context.setDatabase(db);
                 }
             } else {
-                context.put("message", "loginfailed");
+                // error message was already set
                 return null;
             }
         } else {

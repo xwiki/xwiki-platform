@@ -44,6 +44,18 @@ public class Class extends Collection {
         return (BaseClass) getCollection();
     }
 
+      public java.lang.Object[] getPropertyNames() {
+          Element[] properties = getProperties();
+          if (properties==null)
+           return super.getPropertyNames();
+          String[] props = new String[properties.length];
+          for (int i=0;i<properties.length;i++) {
+              String propname = properties[i].getName();
+              props[i] = propname;
+          }
+          return props;          
+    }
+
     /**
      *
      * @return an array with the properties of the class

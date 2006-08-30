@@ -72,11 +72,6 @@
     <action-mappings>
 
     <!-- XWiki Struts Application with Velocity -->
-    <action path="/xmlrpc/"
-            type="com.xpn.xwiki.web.XMLRPCAction"
-            name="xmlrpc"
-            scope="request">
-    </action>
     <action path="/view/"
             type="com.xpn.xwiki.web.ViewAction"
             name="view"

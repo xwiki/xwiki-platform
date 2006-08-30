@@ -23,12 +23,9 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import com.xpn.xwiki.XWiki;

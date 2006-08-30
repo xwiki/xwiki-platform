@@ -516,7 +516,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         setConfig(config);
         String storeclass = Param("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
         try {
-            Class[] classes = new Class[]{this.getClass(), context.getClass()};
+            Class[] classes = new Class[]{XWiki.class, XWikiContext.class};
             Object[] args = new Object[]{this, context};
             basestore = (XWikiStoreInterface) Class.forName(storeclass).getConstructor(classes).newInstance(args);
         } catch (InvocationTargetException e) {
@@ -541,7 +541,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         String attachmentStoreclass = Param("xwiki.store.attachment.class", "com.xpn.xwiki.store.XWikiHibernateAttachmentStore");
         try {
-            Class[] classes = new Class[]{this.getClass(), context.getClass()};
+            Class[] classes = new Class[]{XWiki.class, XWikiContext.class};
             Object[] args = new Object[]{this, context};
             setAttachmentStore( (XWikiAttachmentStoreInterface) Class.forName(attachmentStoreclass).getConstructor(classes).newInstance(args));
         } catch (InvocationTargetException e) {
@@ -558,7 +558,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         String versioningStoreclass = Param("xwiki.store.versioning.class", "com.xpn.xwiki.store.XWikiHibernateVersioningStore");
         try {
-            Class[] classes = new Class[]{this.getClass(), context.getClass()};
+            Class[] classes = new Class[]{XWiki.class, XWikiContext.class};
             Object[] args = new Object[]{this, context};
             setVersioningStore( (XWikiVersioningStoreInterface) Class.forName(versioningStoreclass).getConstructor(classes).newInstance(args));
         } catch (InvocationTargetException e) {

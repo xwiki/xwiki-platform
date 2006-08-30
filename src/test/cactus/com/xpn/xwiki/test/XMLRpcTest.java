@@ -171,7 +171,6 @@ public class XMLRpcTest  extends TestCase {
     		Map space = (Map)spaces[i];
     		String name = (String)space.get("name");
     		Map sameSpace = xwikiRpc.getSpace(token, (String)space.get("key"));
-    		assertEquals(space.get("key"), sameSpace.get("key"));
     		assertEquals(space.get("name"), sameSpace.get("name"));
     	}
     }

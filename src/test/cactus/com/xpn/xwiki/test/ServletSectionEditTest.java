@@ -299,9 +299,9 @@ public class ServletSectionEditTest extends ServletTest {
         try {
             String result = webResponse.getText();
             assertTrue("Content should have edit button for title 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is title 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=1'>edit</a>") != -1);
-            assertTrue("Content should have edit 1 button for subtitle 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=2'>edit</a>") != -1);
-            assertTrue("Content should have edit 1 button for subtitle 2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=3'>edit</a>") != -1);
-            assertTrue("Content should have edit 1 button for title2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the title 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=4'>edit</a>") != -1);
+            assertTrue("Content should have edit button for subtitle 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=2'>edit</a>") != -1);
+            assertTrue("Content should have edit button for subtitle 2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=3'>edit</a>") != -1);
+            assertTrue("Content should have edit button for title2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the title 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=4'>edit</a>") != -1);
         } finally {
             clientTearDown();
         }

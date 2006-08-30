@@ -275,4 +275,39 @@ public class ServletSectionEditTest extends ServletTest {
     public void testPreviewSectionOk() throws Throwable {
         launchTest();
     }
+
+    // Check if the "Edit" button for a section is present
+    public void beginPresentEdit(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        context.setDatabase("xwikitest");
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.PreviewSectionTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+
+        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is the subtitle 2\nThis is content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
+        Utils.createDoc(xwiki.getStore(), "Main", "PresentSectionEditTest", content, bobject, bclass, context);
+
+        Utils.updateRight(xwiki, context, "XWiki.PresentSectionEditTest", "XWiki.LudovicDubost","","edit", true, true);
+        setUrl(webRequest, "view", "Main", "PresentSectionEditTest", "");
+    }
+
+    public void endPresentEdit(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Content should have edit button for title 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is title 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=1'>edit</a>") != -1);
+            assertTrue("Content should have edit 1 button for subtitle 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=2'>edit</a>") != -1);
+            assertTrue("Content should have edit 1 button for subtitle 2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=3'>edit</a>") != -1);
+            assertTrue("Content should have edit 1 button for title2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the title 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=4'>edit</a>") != -1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testPresentEdit() throws Throwable {
+        launchTest();
+    }
 }

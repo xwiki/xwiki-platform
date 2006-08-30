@@ -119,5 +119,10 @@ public class SectionalEditTest extends HibernateTestCase {
         doc.setContent("1.1 This is title (level 1.1) without title level 1\nThis is the content of title");
         assertEquals("Update title level 1.1 without title level 1 is false", "1.1 'Update' This is title (level 1.1) without title level 1\nThis is the content of title 'Update'",
                 doc.updateDocumentSection(1, "1.1 'Update' This is title (level 1.1) without title level 1\nThis is the content of title 'Update'"));
+
+        // test update a title by not title
+        doc.setContent("1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1 This is the title 2\nThis is the content of title 2");
+        assertEquals("Update a title by not title is false !", "This is modification\n1 This is the title 2\nThis is the content of title 2",
+                doc.updateDocumentSection(1, "This is modification\n"));
     }
 }

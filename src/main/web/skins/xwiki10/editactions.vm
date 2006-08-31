@@ -1,24 +1,23 @@
 ###
-### @deprecated
 ###
 ###
 #if((!$showactions)||($showactions==1))
 <script type="text/javascript">
 function checkDocumentContent() {
-  if (document.forms.${formname}.content) {
-    var content = document.forms.${formname}.content.value;
+  if (this.form.content) {
+    var content = this.form.content.value;
     if (content == null || content == "") {
       alert("$msg.get('wikicontentcannotbeempty')");
       return false ;
-}
-}
+    }
+  }
   return true;
 }
 </script>
-<div class="layoutsubsection editactions">
-##<button type="submit" name="actionbtn" value="
-  <a href="$doc.getURL("cancel")"><button class="button" value="cancel">$msg.get("cancel")</button></a>
-  <button class="button" type="submit" value="preview" onclick="document.forms.${formname}.action='$doc.getURL("preview")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;">$msg.get("preview")</button>
-  <button  class="button" type="submit" value="save" onclick="document.forms.${formname}.action='$doc.getURL("${saveaction}")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;" >$msg.get("save")</button>
-</div>
+##<div class="layoutsubsection editactions">
+  <button class="button" type="submit" name="formaction" value="_cancel_" onclick="this.form.action='$doc.getURL("cancel")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("cancel")</button>
+#if($previewenabled)  <button class="button" type="submit" name="formaction" value="_preview_" onclick="this.form.action='$doc.getURL("preview")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("preview")</button>#end
+  <button class="button" type="submit" name="formaction" value="_saveandcontinue_" onclick="this.form.action='$doc.getURL("saveandcontinue")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("saveandcontinue")</button>
+  <button  class="button" type="submit" name="formaction" value="_save_" onclick="this.form.action='$doc.getURL("${saveaction}")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;" >$msg.get("saveandview")</button>
+##</div>
 #end

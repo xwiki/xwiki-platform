@@ -2,12 +2,9 @@
 #set($saveaction = "propupdate")
 #set( $class = $doc.getxWikiClass())
 #set( $redirect = $xwiki.getRequestURL())
-<h2>$msg.get("editingClass") $class.name</h2>
-<h3>$msg.get("properties"):</h3>
-<form id="$formname" method="post" action="$doc.getURL("propupdate")" onsubmit="cancelCancelEdit()">
-<div id="intro">
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-</div>
+##<h2 style="padding: 0px; margin: 0px;">$msg.get("editingClass") $class.name</h2>
+<form id="$formname" method="post" action="$doc.getURL("preview")" onsubmit="cancelCancelEdit()">
+<div class="topbuttons">#template("editactions.vm")</div>
 <div id="xwikiclassproperties" class="accordion">
 #foreach ($field in $class.properties)
 <div id="field_$field.name">
@@ -24,5 +21,6 @@
 </div>
 #end
 </div>
+<div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 <script type="text/javascript">new Rico.Accordion( 'xwikiclassproperties', {panelHeight:'flex'} );</script>

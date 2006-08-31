@@ -52,9 +52,6 @@ ul.xwikiintra{
   border-bottom-color: #FFF;
   border-top-color: #DDD;
 }
-.xwikibuttonlink a{
-  background-color: #BBB;
-}
 
 table.xwikidatatable, table.xwikidatatable th{
   border-color: #DDD;
@@ -99,10 +96,19 @@ fieldset.xwikimessage legend{
   color: #FFF;
 }
 
-input.button{
+input.button, button.button{
   background-color: #EEE;
 }
-
+input.button:hover, button.button:hover{
+  background-color: #CDF;
+  color: #369;
+}
+.topbuttons button, .bottombuttons button{
+  background-color: #369;
+  color: #FFF;
+  border: 1px solid #EEE;
+  padding: 2px 4px;
+}
 /*
 ---------------------------------------
 Editors
@@ -251,7 +257,7 @@ th{
   color: #fff;
 }
 .xwikibuttonlink a:hover{
-  background-color: #ffd;
+  background-color: #CDF;
   color: #369;
 }
 .xwikitabbar li.active{

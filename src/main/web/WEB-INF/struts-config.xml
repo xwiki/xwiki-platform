@@ -36,6 +36,8 @@
                    type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="save"
                    type="com.xpn.xwiki.web.EditForm"/>
+        <form-bean name="saveandcontinue"
+                   type="com.xpn.xwiki.web.EditForm"/>
         <form-bean name="rollback"
                    type="com.xpn.xwiki.web.RollbackForm"/>
         <form-bean name="cancel"
@@ -72,6 +74,11 @@
     <action-mappings>
 
     <!-- XWiki Struts Application with Velocity -->
+    <action path="/xmlrpc/"
+            type="com.xpn.xwiki.web.XMLRPCAction"
+            name="xmlrpc"
+            scope="request">
+    </action>
     <action path="/view/"
             type="com.xpn.xwiki.web.ViewAction"
             name="view"
@@ -128,7 +135,14 @@
                 name="save"
                 scope="request">
             <forward name="save" path="/templates/save.vm"/>
-        </action>
+          </action>
+
+        <action path="/saveandcontinue/"
+                type="com.xpn.xwiki.web.SaveAndContinueAction"
+                name="save"
+                scope="request">
+            <forward name="save" path="/templates/save.vm"/>
+          </action>
 
         <action path="/rollback/"
                 type="com.xpn.xwiki.web.RollbackAction"

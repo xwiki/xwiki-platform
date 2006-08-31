@@ -24,7 +24,6 @@
   <div id="contentcolumn" class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
 <div>#template("menuview.vm")</div>
 #template("edit${editor}.vm")
-<div>#template("editactions.vm")</div>
 </div>
 <div class="clearfloats"></div>
 ##

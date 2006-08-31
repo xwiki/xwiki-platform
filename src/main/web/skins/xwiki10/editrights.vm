@@ -1,6 +1,5 @@
 #set($formname = "update")
 #set($saveaction = "save")
-<div class="layoutsubsection">
 #if ( $request.getParameter("global").equals("1"))
 #set ($classname = "XWiki.XWikiGlobalRights")
 #else
@@ -10,8 +9,8 @@
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <div style="overflow:auto">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div class="topbuttons">#template("editactions.vm")</div>
 <div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />
@@ -32,28 +31,6 @@
 #end
   </table>
  </div>
+<div class="bottombuttons">#template("editactions.vm")</div>
 </form>
-</div>
-##includeHelp("Doc.EditRightsHelp")
-
-#*
-<h2>$msg.get("rightseditor")</h2>
-<br />
-<p>
-<input type="button" value="$msg.get("saverights")" onclick="document.forms.update.submit()" />
-</p>
-<br />
-<div id="class_${class.name}">
-<br /><br />
-
-<h3>$msg.get("addrightentry")</h3>
-<form id="objectadd" method="post" action="$doc.getURL("objectadd")" onsubmit="cancelCancelEdit()">
-<p>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
-<input type="hidden" name="classname" value="$classname" />
-<input type="submit" value="$msg.get("addrightentry")" />
-</p>
-</form>
-<br />
-*#
 </div>

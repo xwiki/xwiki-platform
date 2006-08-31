@@ -1,9 +1,11 @@
 #set($formname = "edit")
 #set($saveaction = "save")
+#set($previewenabled = true)
 <script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
 #set($xredirect=$!request.getParameter("xredirect"))
 <form id="edit" method="post" action="$doc.getURL("preview")" onsubmit="tinyMCE.triggerSave();">
+<div class="topbuttons">#template("editactions.vm")</div>
 <div>
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="xredirect" value="$!xredirect" />
@@ -16,6 +18,7 @@ $xwiki.getTextArea($tdoc.content)
 </div>
 </div>
 </div>
+<div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 <script language="javascript" type="text/javascript">
     if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {

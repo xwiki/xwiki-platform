@@ -19,7 +19,7 @@
 ##
 ## "Compute" the title
 ##
-#set($title = $xwiki.parseContent("editpageTitle"))
+#set($title = $xwiki.parseContent($msg.get("editpageTitle")))
 ##
 ## Header
 ##
@@ -42,16 +42,14 @@
 </div>
 <div id="xwikieditor" class="layoutsection">
 <div id="editcolumn" class="editor">
-##<div>#template("editactions.vm")</div>
 #template("edit${editor}.vm")
-<div>#template("editactions.vm")</div>
 </div>
 #template("editpanels.vm")
 <div class="clearfloats"></div>
+#end
 ##
 ## Footer
 ##
-#end
 </div>
 #template("footer.vm")
 #template("htmlfooter.vm")

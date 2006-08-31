@@ -144,7 +144,7 @@ Content
   width: 95%;
 }
 html > body #xwikidoccontent textarea{
-  width: 630px;
+  width: 628px;
 }
 .layoutsubsection{
   border: 1px solid #DDD;
@@ -230,7 +230,12 @@ fieldset.xwikimessage .buttons a {
   font-weight: bold;
   text-align: center;
 }
-
+.topbuttons{
+  margin-bottom: 5px;
+}
+.bottombuttons{
+  margin-top: 5px;
+}
 /*
 ----------------------------------------------
 Comments

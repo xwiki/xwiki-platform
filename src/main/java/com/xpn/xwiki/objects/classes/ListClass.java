@@ -25,9 +25,9 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -43,243 +43,250 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 public abstract class ListClass extends PropertyClass {
 
-    public ListClass(String name, String prettyname, PropertyMetaClass wclass) {
-        super(name, prettyname, wclass);
-        setRelationalStorage(false);
-        setDisplayType("select");
-        setMultiSelect(false);
-        setSize(1);
-    }
+	public ListClass(String name, String prettyname, PropertyMetaClass wclass) {
+		super(name, prettyname, wclass);
+		setRelationalStorage(false);
+		setDisplayType("select");
+		setMultiSelect(false);
+		setSize(1);
+	}
 
+	public ListClass(PropertyMetaClass wclass) {
+		this("list", "List", wclass);
+	}
 
-    public ListClass(PropertyMetaClass wclass) {
-        this("list", "List", wclass);
-    }
+	public ListClass() {
+		this(null);
+	}
 
-    public ListClass() {
-        this(null);
-    }
+	public String getDisplayType() {
+		return getStringValue("displayType");
+	}
 
-    public String getDisplayType() {
-        return getStringValue("displayType");
-    }
+	public void setDisplayType(String type) {
+		setStringValue("displayType", type);
+	}
 
-    public void setDisplayType(String type) {
-        setStringValue("displayType", type);
-    }
+	public int getSize() {
+		return getIntValue("size");
+	}
 
+	public void setSize(int size) {
+		setIntValue("size", size);
+	}
 
+	public boolean isMultiSelect() {
+		return (getIntValue("multiSelect") == 1);
+	}
 
-    public int getSize() {
-        return getIntValue("size");
-    }
+	public void setMultiSelect(boolean multiSelect) {
+		setIntValue("multiSelect", multiSelect ? 1 : 0);
+	}
 
-    public void setSize(int size) {
-        setIntValue("size", size);
-    }
+	public boolean isRelationalStorage() {
+		return (getIntValue("relationalStorage") == 1);
+	}
 
-    public boolean isMultiSelect() {
-        return (getIntValue("multiSelect")==1);
-    }
+	public void setRelationalStorage(boolean storage) {
+		setIntValue("relationalStorage", storage ? 1 : 0);
+	}
 
-    public void setMultiSelect(boolean multiSelect) {
-        setIntValue("multiSelect", multiSelect ? 1 : 0);
-    }
+	public static List getListFromString(String value) {
+		List list = new ArrayList();
+		if (value == null)
+			return list;
 
-    public boolean isRelationalStorage() {
-        return (getIntValue("relationalStorage")==1);
-    }
+		String val = StringUtils.replace(value, "\\|", "%PIPE%");
+		String[] result = StringUtils.split(val, "|");
+		for (int i = 0; i < result.length; i++)
+			list.add(StringUtils.replace(result[i], "%PIPE%", "|"));
+		return list;
+	}
 
-    public void setRelationalStorage(boolean storage) {
-        setIntValue("relationalStorage", storage ? 1 : 0);
-    }
+	public BaseProperty newProperty() {
+		BaseProperty lprop;
 
-    public static List getListFromString(String value) {
-        List list = new ArrayList();
-        if (value==null)
-            return list;
+		if (isRelationalStorage() && isMultiSelect())
+			lprop = new DBStringListProperty();
+		else if (isMultiSelect())
+			lprop = new StringListProperty();
+		else
+			lprop = new StringProperty();
 
-        String val = StringUtils.replace(value, "\\|", "%PIPE%");
-        String[] result = StringUtils.split(value,"|");
-        for (int i=0;i<result.length;i++)
-            list.add(StringUtils.replace(result[i],"%PIPE%", "|"));
-        return list;
-    }
+		if (isMultiSelect() && getDisplayType().equals("input")) {
+			((ListProperty) lprop).setFormStringSeparator("|");
+		}
 
-    public BaseProperty newProperty() {
-        BaseProperty lprop;
+		return lprop;
+	}
 
-        if (isRelationalStorage()&&isMultiSelect())
-            lprop = new DBStringListProperty();
-        else if (isMultiSelect())
-            lprop = new StringListProperty();
-        else
-            lprop = new StringProperty();
+	public BaseProperty fromString(String value) {
+		BaseProperty prop = newProperty();
+		if (isMultiSelect()) {
+			if (!getDisplayType().equals("input")) {
+				((ListProperty) prop).setList(getListFromString(value));
+			} else {
+				((ListProperty) prop).setList(Arrays.asList(StringUtils.split(value, " ,|")));
+			}
+		} else
+			prop.setValue(value);
+		return prop;
+	}
 
-        if (isMultiSelect() && getDisplayType().equals("input")) {
-            ((ListProperty)lprop).setFormStringSeparator("|");
-        }
+	public BaseProperty fromStringArray(String[] strings) {
+		if ((!isMultiSelect()) || (strings.length == 1))
+			return fromString(strings[0]);
+		List list = new ArrayList();
+		for (int i = 0; i < strings.length; i++)
+			list.add(strings[i]);
+		BaseProperty prop = newProperty();
+		((ListProperty) prop).setList(list);
+		return prop;
+	}
 
+	public BaseProperty newPropertyfromXML(Element ppcel) {
+		if ((!isRelationalStorage()) && (!isMultiSelect()))
+			return super.newPropertyfromXML(ppcel);
 
-        return lprop;
-    }
+		List elist = ppcel.elements("value");
+		BaseProperty lprop = newProperty();
 
-    public BaseProperty fromString(String value) {
-        BaseProperty prop = newProperty();
-        if (isMultiSelect()) {
-          if (!getDisplayType().equals("input")) {
-            ((ListProperty)prop).setList(getListFromString(value));
-          } else {
-            ((ListProperty)prop).setList(Arrays.asList(StringUtils.split(value," ,|")));
-          }
-        } else
-            prop.setValue(value);
-        return prop;
-    }
+		if (lprop instanceof ListProperty) {
+			List llist = ((ListProperty) lprop).getList();
+			for (int i = 0; i < elist.size(); i++) {
+				Element el = (Element) elist.get(i);
+				llist.add(el.getText());
+			}
+		} else {
+			for (int i = 0; i < elist.size(); i++) {
+				Element el = (Element) elist.get(i);
+				((StringProperty) lprop).setValue(el.getText());
+			}
+		}
+		return lprop;
+	}
 
-    public BaseProperty fromStringArray(String[] strings) {
-        if ((!isMultiSelect())||(strings.length==1))
-            return fromString(strings[0]);
-        else {
-            List list = new ArrayList();
-            for (int i=0;i<strings.length;i++)
-                list.add(strings[i]);
-            BaseProperty prop = newProperty();
-            ((ListProperty)prop).setList(list);
-            return prop;
-        }
-    }
+	public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+		input input = new input();
+		BaseProperty prop = (BaseProperty) object.safeget(name);
+		if (prop != null)
+			input.setValue(prop.toFormString());
 
+		input.setType("hidden");
+		input.setName(prefix + name);
+		input.setID(prefix + name);
+		buffer.append(input.toString());
+	}
 
-    public BaseProperty newPropertyfromXML(Element ppcel) {
-        if ((!isRelationalStorage())&&(!isMultiSelect()))
-            return super.newPropertyfromXML(ppcel);
+	public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+		List selectlist;
+		BaseProperty prop = (BaseProperty) object.safeget(name);
+		if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+			selectlist = (List) prop.getValue();
+			buffer.append(StringUtils.join(selectlist.toArray(), " "));
+		} else {
+			buffer.append(prop.getValue().toString());
+		}
+	}
 
-        List elist = ppcel.elements("value");
-        BaseProperty lprop = (BaseProperty)newProperty();
+	public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+		if (getDisplayType().equals("input")) {
+			input input = new input();
+			BaseProperty prop = (BaseProperty) object.safeget(name);
+			if (prop != null)
+				input.setValue(prop.toFormString());
+			input.setType("text");
+			input.setSize(60);
+			input.setName(prefix + name);
+			input.setID(prefix + name);
+			buffer.append(input.toString());
+		} else if (getDisplayType().equals("radio")) {
+			displayRadioEdit(buffer, name, prefix, object, context);
+		} else {
+			displaySelectEdit(buffer, name, prefix, object, context);
+		}
+	}
 
+	protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+		List list = getList(context);
+		List selectlist;
 
-        if (lprop instanceof ListProperty) {
-            List llist = ((ListProperty)lprop).getList();
-            for (int i=0;i<elist.size();i++) {
-                Element el = (Element) elist.get(i);
-                llist.add(el.getText());
-            }
-        }
-        else {
-            for (int i=0;i<elist.size();i++) {
-                Element el = (Element) elist.get(i);
-                ((StringProperty)lprop).setValue(el.getText());
-            }
-        }
-        return lprop;
-    }
+		BaseProperty prop = (BaseProperty) object.safeget(name);
+		if (prop == null) {
+			selectlist = new ArrayList();
+		} else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+			selectlist = (List) prop.getValue();
+		} else {
+			selectlist = new ArrayList();
+			selectlist.add(prop.getValue());
+		}
 
+		// Add options from Set
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			String value = it.next().toString();
+			input radio = new input(input.radio, prefix + name, value);
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        input input = new input();
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop!=null) input.setValue(prop.toFormString());
+			if (selectlist.contains(value))
+				radio.setChecked(true);
+			radio.addElement(value);
+			buffer.append(radio.toString());
+			if (it.hasNext()) {
+				buffer.append("<br/>");
+			}
+		}
+	}
 
-        input.setType("hidden");
-        input.setName(prefix + name);
-        input.setID(prefix + name);
-        buffer.append(input.toString());
-    }
+	protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+		select select = new select(prefix + name, 1);
+		select.setMultiple(isMultiSelect());
+		select.setSize(getSize());
+		select.setName(prefix + name);
+		select.setID(prefix + name);
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        List selectlist;
-        BaseProperty prop =  (BaseProperty)object.safeget(name);
-        if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
-            buffer.append(StringUtils.join(selectlist.toArray(), " "));
-        } else {
-            buffer.append(prop.getValue().toString());
-        }
-    }
+		List list = getList(context);
+		List selectlist;
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        if (getDisplayType().equals("input")) {
-            input input = new input();
-            BaseProperty prop = (BaseProperty) object.safeget(name);
-            if (prop!=null) input.setValue(prop.toFormString());
-            input.setType("text");
-            input.setSize(60);
-            input.setName(prefix + name);
-            input.setID(prefix + name);
-            buffer.append(input.toString());
-        } else if (getDisplayType().equals("radio")) {
-        	displayRadioEdit(buffer, name, prefix, object, context);
-        }
-        else {
-        	displaySelectEdit(buffer, name, prefix, object, context);
-        }
-    }
-    
-    protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
-        List list = getList(context);
-        List selectlist;
+		BaseProperty prop = (BaseProperty) object.safeget(name);
+		if (prop == null) {
+			selectlist = new ArrayList();
+		} else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+			selectlist = (List) prop.getValue();
+		} else {
+			selectlist = new ArrayList();
+			selectlist.add(prop.getValue());
+		}
 
-        BaseProperty prop =  (BaseProperty)object.safeget(name);
-        if (prop==null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
-        } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
-        }
+		// Add options from Set
+		for (Iterator it = list.iterator(); it.hasNext();) {
+			String value = it.next().toString();
+			String display = getDisplayValue(context, value);
+			option option = new option(value, display);
+			option.addElement(display);
+			if (selectlist.contains(value))
+				option.setSelected(true);
+			select.addElement(option);
+		}
 
-        // Add options from Set
-        for (Iterator it=list.iterator();it.hasNext();) {
-            String value = it.next().toString();
-            input radio = new input(input.radio, prefix + name, value);
+		buffer.append(select.toString());
+	}
 
-            if (selectlist.contains(value))
-                radio.setChecked(true);
-            radio.addElement(value);
-            buffer.append(radio.toString());
-            if(it.hasNext()){
-            	buffer.append("<br/>");
-            }
-        }
-    }
+	public abstract List getList(XWikiContext context);
 
-    protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
-            select select = new select(prefix + name, 1);
-            select.setMultiple(isMultiSelect());
-            select.setSize(getSize());
-        select.setName(prefix + name);
-        select.setID(prefix + name);
-
-            List list = getList(context);
-            List selectlist;
-
-            BaseProperty prop =  (BaseProperty)object.safeget(name);
-            if (prop==null) {
-                selectlist = new ArrayList();
-            } else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
-                selectlist = (List) prop.getValue();
-            } else {
-                selectlist = new ArrayList();
-                selectlist.add(prop.getValue());
-            }
-
-            // Add options from Set
-            for (Iterator it=list.iterator();it.hasNext();) {
-                String value = it.next().toString();
-                option option = new option(value, value);
-                option.addElement(value);
-                if (selectlist.contains(value))
-                    option.setSelected(true);
-                select.addElement(option);
-            }
-
-            buffer.append(select.toString());
-        }
-
-    public abstract List getList(XWikiContext context);
+	private String getDisplayValue(XWikiContext context, String value) {
+		try {
+			XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
+			String strname = "option_" + value;
+			String result = msg.get(strname);
+			if (result.equals(strname)) {
+				return value;
+			}
+			return result;
+		} catch (Exception e) {
+			return value;
+		}
+	}
 }

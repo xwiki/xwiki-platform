@@ -264,7 +264,7 @@ public abstract class ListClass extends PropertyClass {
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String value = it.next().toString();
 			String display = getDisplayValue(context, value);
-			option option = new option(value, display);
+			option option = new option(value, value);
 			option.addElement(display);
 			if (selectlist.contains(value))
 				option.setSelected(true);

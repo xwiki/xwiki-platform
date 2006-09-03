@@ -23,9 +23,8 @@
 
 package com.xpn.xwiki.plugin;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
+import java.lang.reflect.Method;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,6 +34,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 public class XWikiPluginManager {
     private Vector plugins = new Vector();
     private Map plugins_classes = new HashMap();
+    private Map functionList = new HashMap();
+
+
 
     public XWikiPluginManager() {
     }
@@ -58,10 +60,12 @@ public class XWikiPluginManager {
             args[0] = name;
             args[1] = className;
             args[2] = context;
-            XWikiPluginInterface plugin = (XWikiPluginInterface) Class.forName(className).getConstructor(classes).newInstance(args);
+            Class pluginClass = Class.forName(className);
+            XWikiPluginInterface plugin = (XWikiPluginInterface) pluginClass.getConstructor(classes).newInstance(args);
             if (plugin!=null) {
                 plugins.add(plugin.getName());
                 plugins_classes.put(plugin.getName(), plugin);
+                initPlugin(plugin, pluginClass);
             }
         } catch (Exception e) {
             // Log an error but do not fail..
@@ -72,10 +76,20 @@ public class XWikiPluginManager {
 
     public void removePlugin(String className) {
         plugins.remove(className);
+        Object plugin = plugins_classes.get(className);
         plugins_classes.remove(className);
+
+        Iterator it = functionList.keySet().iterator();
+        while (it.hasNext())
+        {
+            String name = (String) it.next();
+            Vector pluginList = (Vector) functionList.get(name);
+            pluginList.remove(plugin);
+        }
     }
 
     public void addPlugins(String[] classNames,  XWikiContext context) {
+        initInterface();
         for (int i=0;i<classNames.length;i++) {
             addPlugin(classNames[i], classNames[i], context);
         }
@@ -93,28 +107,58 @@ public class XWikiPluginManager {
         this.plugins = plugins;
     }
 
+    public void initInterface(){
+        Method[] methods = XWikiPluginInterface.class.getMethods();
+        for (int i = 0; i < methods.length; i++)
+        {
+            Method method = methods[i];
+            String name = method.getName();
+            functionList.put(name, new Vector());
+        }
+    }
+    
+    public void initPlugin(Object plugin, Class pluginClass){
+        Method[] methods = pluginClass.getDeclaredMethods();
+        for (int i = 0; i < methods.length; i++)
+        {
+            Method method = methods[i];
+            String name = method.getName();
+            ((Vector)functionList.get(name)).add(plugin);
+        }
+    }
+
+    public Vector getPlugins(String functionName){
+        if (functionList.containsKey(functionName)){
+            return (Vector) functionList.get(functionName);
+        }
+        return null;
+    }
+
     public void virtualInit(XWikiContext context) {
+        Vector plugins = getPlugins("virtualInit");
         for (int i=0;i<plugins.size();i++) {
             try {
-                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).virtualInit(context);
+                ((XWikiPluginInterface)plugins.get(i)).virtualInit(context);
             } catch (Exception e)
             {}
         }
     }
 
     public void flushCache() {
+        Vector plugins = getPlugins("virtualInit");
         for (int i=0;i<plugins.size();i++) {
             try {
-                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).flushCache();
+                ((XWikiPluginInterface)plugins.get(i)).flushCache();
             } catch (Exception e)
             {}
         }
     }
 
     public String commonTagsHandler(String text, XWikiContext context) {
+        Vector plugins = getPlugins("virtualInit");
         for (int i=0;i<plugins.size();i++) {
             try {
-                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).commonTagsHandler(text,context);
+                text = ((XWikiPluginInterface)plugins.get(i)).commonTagsHandler(text,context);
             } catch (Exception e)
             {}
         }
@@ -122,9 +166,10 @@ public class XWikiPluginManager {
     }
 
     public String startRenderingHandler(String text, XWikiContext context) {
+        Vector plugins = getPlugins("virtualInit");
         for (int i=0;i<plugins.size();i++) {
             try {
-                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).startRenderingHandler(text,context);
+                text = ((XWikiPluginInterface)plugins.get(i)).startRenderingHandler(text,context);
             } catch (Exception e)
             {}
         }
@@ -132,9 +177,10 @@ public class XWikiPluginManager {
     }
 
     public String outsidePREHandler(String text, XWikiContext context) {
+        Vector plugins = getPlugins("virtualInit");
         for (int i=0;i<plugins.size();i++) {
             try {
-                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).outsidePREHandler(text,context);
+                text = ((XWikiPluginInterface)plugins.get(i)).outsidePREHandler(text,context);
             } catch (Exception e)
             {}
         }
@@ -144,7 +190,7 @@ public class XWikiPluginManager {
     public String insidePREHandler(String text, XWikiContext context) {
         for (int i=0;i<plugins.size();i++) {
             try {
-                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).insidePREHandler(text,context);
+                text = ((XWikiPluginInterface)plugins.get(i)).insidePREHandler(text,context);
             } catch (Exception e)
             {}
         }
@@ -154,7 +200,7 @@ public class XWikiPluginManager {
     public String endRenderingHandler(String text, XWikiContext context) {
         for (int i=0;i<plugins.size();i++) {
             try {
-                text = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).endRenderingHandler(text,context);
+                text = ((XWikiPluginInterface)plugins.get(i)).endRenderingHandler(text,context);
             } catch (Exception e)
             {}
         }
@@ -164,7 +210,7 @@ public class XWikiPluginManager {
     public void beginRendering(XWikiContext context) {
         for (int i=0;i<plugins.size();i++) {
             try {
-                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).beginRendering(context);
+                ((XWikiPluginInterface)plugins.get(i)).beginRendering(context);
             } catch (Exception e)
             {}
         }
@@ -173,7 +219,7 @@ public class XWikiPluginManager {
     public void endRendering(XWikiContext context) {
         for (int i=0;i<plugins.size();i++) {
             try {
-                ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).endRendering(context);
+                ((XWikiPluginInterface)plugins.get(i)).endRendering(context);
             } catch (Exception e)
             {}
         }
@@ -183,7 +229,7 @@ public class XWikiPluginManager {
         XWikiAttachment attach = attachment;
         for (int i=0;i<plugins.size();i++) {
             try {
-                attach = ((XWikiPluginInterface)plugins_classes.get(plugins.get(i))).downloadAttachment(attach, context);
+                attach = ((XWikiPluginInterface)plugins.get(i)).downloadAttachment(attach, context);
             } catch (Exception e)
             {}
         }

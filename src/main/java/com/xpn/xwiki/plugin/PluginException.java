@@ -43,6 +43,23 @@ public class PluginException extends XWikiException{
         setPluginName(pluginName);
     }
 
+    //java.lang.Class aClass
+        public PluginException(java.lang.Class plugin, int code, String message, Throwable e, Object[] args)
+    {
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, plugin.getName() + ": " + message, e, args);
+        setPluginName(plugin.getName());
+    }
+
+    public PluginException(java.lang.Class plugin, int code, String message, Throwable e){
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, plugin.getName() + ": " + message, e);
+        setPluginName(plugin.getName());
+    }
+
+    public PluginException(java.lang.Class plugin, int code, String message){
+        super(XWikiException.MODULE_XWIKI_PLUGINS, code, plugin.getName() + ": " + message);
+        setPluginName(plugin.getName());
+    }
+
     public PluginException(){
         super();
     }

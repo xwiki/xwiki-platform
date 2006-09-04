@@ -493,7 +493,7 @@
         <lib refid="libs.exo.fileset" />
         <lib refid="libs.xwiki.fileset" />
       </war>
-<!--      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
+      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
       <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web-exo.xml" >
         <exclude name="**/web*.xml" />
@@ -502,7 +502,7 @@
           <lib refid="libs.xwiki.fileset" />
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
--->
+
     </target>
 
     <target name="bin.dist" depends="release, test, javadoc">

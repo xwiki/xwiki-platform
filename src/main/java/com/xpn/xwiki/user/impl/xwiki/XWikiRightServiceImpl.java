@@ -187,14 +187,14 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             }
         } catch (Exception e) {
 // This should not happen..
-            logDeny(username, doc.getFullName(), action, "access manager exception " + e.getMessage());
+            logDeny(username, (doc==null) ? "" : doc.getFullName(), action, "access manager exception " + e.getMessage());
             e.printStackTrace();
             return false;
         }
 
         if (user == null) {
 // Denied Guest need to be authenticated
-            logDeny("unauthentified", doc.getFullName(), action, "Guest has been denied - Redirecting to authentication");
+            logDeny("unauthentified", (doc==null) ? "" : doc.getFullName(), action, "Guest has been denied - Redirecting to authentication");
             if (context.getRequest() != null)
                 context.getWiki().getAuthService().showLogin(context);
             return false;

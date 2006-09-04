@@ -113,40 +113,41 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 			}
 		}
 
+        String heading = formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+
+
         Object beforeAction = xcontext.get("action");
         boolean showEditButton = false;
         // only show sectional edit button for view action
-        if (xcontext.getAction().equals("view"))
-            showEditButton = true;
-        if (beforeAction != null) {
-            if(!beforeAction.toString().equals("HeadingFilter")) {
-                xcontext.put("action","HeadingFilter");
-                sectionNumber = 0;
-            }
+        if (xcontext.getWiki().hasSectionEdit(xcontext)&&("view".equals(xcontext.getAction()))) {
+            try {
+             if ((doc!=null)&&(xcontext.getWiki().checkAccess("edit", doc, xcontext)))
+              showEditButton = true;
+            } catch  (Exception e) {}
         }
 
-        boolean accessRight = false ;
-        try {
-            accessRight = xcontext.getWiki().checkAccess("edit", doc, xcontext);
-        } catch (XWikiException e){
-            e.printStackTrace();
-        }
-
-        if (level.equals("1") || level.equals("1.1") ) {
-            if(doc.getContent().indexOf(title) != -1 && accessRight && xcontext.getWiki().hasSectionEdit(xcontext) && showEditButton) {
-                sectionNumber++;
-                String url =xcontext.getDoc().getURL("edit",xcontext);
-                String textfomat = formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
-                if(xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
-                    url += "?xpage=wysiwyg&section=" + sectionNumber;
-                } else {
-                    url +="?section=" + sectionNumber;
+        if (showEditButton) {
+            if (beforeAction != null) {
+                if(!beforeAction.toString().equals("HeadingFilter")) {
+                    xcontext.put("action","HeadingFilter");
+                    sectionNumber = 0;
                 }
-                textfomat += "<span style='float:right;margin-left:5px;margin-right:5px;'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
-                return textfomat;
+            }
+
+            if (level.equals("1") || level.equals("1.1") ) {
+                if(doc.getContent().indexOf(title) != -1) {
+                    sectionNumber++;
+                    String url = xcontext.getDoc().getURL("edit",xcontext);
+                    if(xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
+                        url += "?xpage=wysiwyg&section=" + sectionNumber;
+                    } else {
+                        url +="?section=" + sectionNumber;
+                    }
+                    return heading + "<span style='float:right;margin-left:5px;margin-right:5px;'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
+                }
             }
         }
 
-        return formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+        return heading;
     }
 }

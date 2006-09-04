@@ -16,7 +16,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/axis-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-all-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/c3p0-0.8.4.5.jar"/>
-	<classpathentry exported="true" sourcepath="/Users/hritcu/jakarta-cactus-src-1.7.2/framework/src" kind="lib" path="lib/cactus-1.7.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cactus-1.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cactus-ant-1.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cargo-0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-2.1.jar"/>
@@ -121,8 +121,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jgroups-2.2.9.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-java5-1.0.1.jar"/>
-	<classpathentry exported="true" sourcepath="lib/xmlrpc-server-3.0rc1-sources.jar" kind="lib" path="lib/xmlrpc-server-3.0rc1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-3.0rc1.jar"/>
-	<classpathentry exported="true" sourcepath="lib/xmlrpc-client-3.0rc1-sources.jar" kind="lib" path="lib/xmlrpc-client-3.0rc1.jar"/>
+	<classpathentry exported="true" sourcepath="lib/xmlrpc-client-3.0-sources.jar" kind="lib" path="lib/xmlrpc-client-3.0.jar"/>
+	<classpathentry exported="true" sourcepath="lib/xmlrpc-common-3.0-sources.jar" kind="lib" path="lib/xmlrpc-common-3.0.jar"/>
+	<classpathentry exported="true" sourcepath="lib/xmlrpc-server-3.0-sources.jar" kind="lib" path="lib/xmlrpc-server-3.0.jar"/>
 	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
 </classpath>

@@ -154,9 +154,9 @@
         ant-1.6.5.jar,
     	ws-commons-java5-1.0.1.jar,
     	ws-commons-util-1.0.1.jar,
-    	xmlrpc-client-3.0rc1.jar,
-    	xmlrpc-common-3.0rc1.jar,
-    	xmlrpc-server-3.0rc1.jar,
+    	xmlrpc-client-3.0.jar,
+    	xmlrpc-common-3.0.jar,
+    	xmlrpc-server-3.0.jar,
     	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar"/>
@@ -493,7 +493,7 @@
         <lib refid="libs.exo.fileset" />
         <lib refid="libs.xwiki.fileset" />
       </war>
-      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
+<!--      <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
       <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web-exo.xml" >
         <exclude name="**/web*.xml" />
@@ -502,6 +502,7 @@
           <lib refid="libs.xwiki.fileset" />
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki-normal.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
+-->
     </target>
 
     <target name="bin.dist" depends="release, test, javadoc">

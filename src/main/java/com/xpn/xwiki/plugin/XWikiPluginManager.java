@@ -123,7 +123,8 @@ public class XWikiPluginManager {
         {
             Method method = methods[i];
             String name = method.getName();
-            ((Vector)functionList.get(name)).add(plugin);
+            if (functionList.containsKey(name))
+                ((Vector)functionList.get(name)).add(plugin);
         }
     }
 
@@ -145,7 +146,7 @@ public class XWikiPluginManager {
     }
 
     public void flushCache() {
-        Vector plugins = getPlugins("virtualInit");
+        Vector plugins = getPlugins("flushCache");
         for (int i=0;i<plugins.size();i++) {
             try {
                 ((XWikiPluginInterface)plugins.get(i)).flushCache();
@@ -155,7 +156,7 @@ public class XWikiPluginManager {
     }
 
     public String commonTagsHandler(String text, XWikiContext context) {
-        Vector plugins = getPlugins("virtualInit");
+        Vector plugins = getPlugins("commonTagsHandler");
         for (int i=0;i<plugins.size();i++) {
             try {
                 text = ((XWikiPluginInterface)plugins.get(i)).commonTagsHandler(text,context);
@@ -166,7 +167,7 @@ public class XWikiPluginManager {
     }
 
     public String startRenderingHandler(String text, XWikiContext context) {
-        Vector plugins = getPlugins("virtualInit");
+        Vector plugins = getPlugins("startRenderingHandler");
         for (int i=0;i<plugins.size();i++) {
             try {
                 text = ((XWikiPluginInterface)plugins.get(i)).startRenderingHandler(text,context);
@@ -177,7 +178,7 @@ public class XWikiPluginManager {
     }
 
     public String outsidePREHandler(String text, XWikiContext context) {
-        Vector plugins = getPlugins("virtualInit");
+        Vector plugins = getPlugins("outsidePREHandler");
         for (int i=0;i<plugins.size();i++) {
             try {
                 text = ((XWikiPluginInterface)plugins.get(i)).outsidePREHandler(text,context);
@@ -188,6 +189,7 @@ public class XWikiPluginManager {
     }
 
     public String insidePREHandler(String text, XWikiContext context) {
+        Vector plugins = getPlugins("insidePREHandler");
         for (int i=0;i<plugins.size();i++) {
             try {
                 text = ((XWikiPluginInterface)plugins.get(i)).insidePREHandler(text,context);
@@ -198,6 +200,7 @@ public class XWikiPluginManager {
     }
 
     public String endRenderingHandler(String text, XWikiContext context) {
+        Vector plugins = getPlugins("endRenderingHandler");
         for (int i=0;i<plugins.size();i++) {
             try {
                 text = ((XWikiPluginInterface)plugins.get(i)).endRenderingHandler(text,context);
@@ -208,6 +211,7 @@ public class XWikiPluginManager {
     }
 
     public void beginRendering(XWikiContext context) {
+        Vector plugins = getPlugins("beginRendering");
         for (int i=0;i<plugins.size();i++) {
             try {
                 ((XWikiPluginInterface)plugins.get(i)).beginRendering(context);
@@ -217,6 +221,7 @@ public class XWikiPluginManager {
     }
 
     public void endRendering(XWikiContext context) {
+        Vector plugins = getPlugins("endRendering");
         for (int i=0;i<plugins.size();i++) {
             try {
                 ((XWikiPluginInterface)plugins.get(i)).endRendering(context);
@@ -226,6 +231,7 @@ public class XWikiPluginManager {
     }
 
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
+        Vector plugins = getPlugins("downloadAttachment");
         XWikiAttachment attach = attachment;
         for (int i=0;i<plugins.size();i++) {
             try {

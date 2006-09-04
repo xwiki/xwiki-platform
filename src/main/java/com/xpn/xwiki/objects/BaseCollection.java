@@ -283,6 +283,21 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
+    public List getListValue(String name) {
+        ListProperty prop = (ListProperty)safeget(name);
+        if (prop==null)
+         return new ArrayList();
+        else {
+            return  (List)prop.getValue();
+        }
+    }
+
+    public void setListValue(String name, List value) {
+        ListProperty property = new ListProperty();
+        property.setValue(value);
+        safeput(name, property);
+    }
+
     // These functions should not be used
     // but instead our own implementation
     private Map getFields() {

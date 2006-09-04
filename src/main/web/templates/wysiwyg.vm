@@ -16,6 +16,10 @@
 #else
 #set($colsclass = "hide-both")
 #end
+#set($switchParam = "")
+#if ($sectionNumber != 0)
+   #set($switchParam = "section=$sectionNumber")
+#end
 <script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
 <script language="javascript" type="text/javascript">
@@ -65,7 +69,7 @@ $msg.get("youareediting"): $tdoc.language
 #end
 $msg.get("titlefield"):&nbsp;<input type="text" name="title" value="$!tdoc.title" size="60" />
 <br /><br />
-   Switch to &nbsp; <span style="color: blue; cursor:pointer;" onclick="document.forms.edit.action='$doc.getURL("edit")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;"><u>$msg.get("wikieditor")</u></span>
+   $msg.get("switchto") &nbsp; <span style="color: blue; cursor:pointer;" onclick="document.forms.edit.action='$doc.getURL("edit","$switchParam")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;"><u>$msg.get("wikieditor")</u></span>
 <br />
 $xwiki.getTextArea($tdoc.content)
 <br/>

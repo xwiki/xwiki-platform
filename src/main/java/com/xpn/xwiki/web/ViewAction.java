@@ -32,6 +32,7 @@ import java.io.IOException;
 public class ViewAction extends XWikiAction {
     public boolean action(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
+        context.put("action","view");
         String rev = request.getParameter("rev");
         if (rev!=null) {
             String url = context.getDoc().getURL("viewrev", request.getQueryString(), context);

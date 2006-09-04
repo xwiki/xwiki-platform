@@ -71,6 +71,12 @@ public class PreviewAction extends XWikiAction {
 			XWikiDocument doc2 = (XWikiDocument) doc.clone();
 			context.put("doc", doc2);
 
+           int sectionNumber = 0;
+           if (request.getParameter("section") != null && context.getWiki().hasSectionEdit(context)) {
+               sectionNumber = Integer.parseInt(request.getParameter("section"));
+            }
+            vcontext.put("sectionNumber",new Integer(sectionNumber));
+
 			if ((language == null) || (language.equals("")) || (language.equals("default")) || (language.equals(doc.getDefaultLanguage()))) {
 				tdoc = doc2;
 				context.put("tdoc", doc2);

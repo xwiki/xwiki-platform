@@ -2,7 +2,7 @@
 #template("httpheader.vm")
 #template("header.vm")
 #template("previewheader.vm")
-<div id="xwikicontent">
+&nbsp;<div id="xwikicontent">
 $tdoc.getRenderedContent($tdoc.content)
 <form id="edit" method="post" action="$doc.getURL("save")">
 <p>
@@ -15,7 +15,6 @@ $tdoc.getRenderedContent($tdoc.content)
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <input type="hidden" name="xnotification" value="$!request.getParameter("xnotification")" />
 <input type="hidden" name="language" value="$!request.getParameter("language")" />
-
 </p>
 <div id="xwikiobject">
 #template("hiddenobject.vm")

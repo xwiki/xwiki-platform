@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
@@ -3949,5 +3950,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         else
           return username;
     }
-}
 
+    public boolean hasSectionEdit(XWikiContext context) {
+        if (context.getWiki().ParamAsLong("xwiki.section.edit", 0) == 1)
+            return true;
+         else
+            return false;
+    }
+}

@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
@@ -40,8 +41,18 @@ public class EditAction extends XWikiAction {
         XWikiRequest request = context.getRequest();
         String content = request.getParameter("content");
         XWikiDocument doc = context.getDoc();
+        XWiki xwiki = context.getWiki();
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+
+         // Check for edit section
+         String sectionContent = "";
+         int sectionNumber = 0;
+         if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
+            sectionNumber = Integer.parseInt(request.getParameter("section"));
+            sectionContent = doc.getContentOfSection(sectionNumber);
+         }
+         vcontext.put("sectionNumber",new Integer(sectionNumber));
 
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
@@ -97,6 +108,11 @@ public class EditAction extends XWikiAction {
             XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
             if (content != null && !content.equals(""))
                 tdoc2.setContent(content);
+            if(sectionContent != null && !sectionContent.equals("")){
+                if(content != null && !content.equals("")) tdoc2.setContent(content);
+                else tdoc2.setContent(sectionContent);
+                tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
+            }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", new Document(tdoc2, context));
             try{

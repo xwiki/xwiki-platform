@@ -3,18 +3,22 @@
     <a href="$doc.getURL("cancel")" onclick="document.forms.edit.action=this.href; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;" >$msg.get("cancel")</a>
     <span> | </span>
     #if($doc.content.indexOf("includeForm(")!=-1)
-        #set($editaction = "inline")
+      #set($editaction = "inline")
+      #set($editparams="")
     #else
-        #set($editaction = "edit")
+      #set($editaction = "edit")
     ## Check WYSISYG editing option
-        #if($xwiki.getUserPreference("editor")=="Wysiwyg")
-            #set($editparams="xpage=wysiwyg")
-        #else
-            #set($editparams="")
-        #end
+      #if($xwiki.getUserPreference("editor")=="Wysiwyg")
+        #set($editparams="xpage=wysiwyg")
+      #else
+        #set($editparams="")
+      #end
+      #if ($sectionNumber != 0)
+        #set($editparams = "$editparams&section=$sectionNumber")
+      #end
     #end
-<a href="$doc.getURL($editaction,$editparams)"  onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;"> $msg.get("backtoedit")</a>
-<span> | </span>
-<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-</div>
+    <a href="$doc.getURL($editaction,$editparams)"  onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;"> $msg.get("backtoedit")</a>
+    <span> | </span>
+    <a href="$doc.getURL("save",$editparams)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+  </div>
 </div>

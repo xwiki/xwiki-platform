@@ -32,11 +32,18 @@ import com.xpn.xwiki.doc.XWikiLock;
 public class SaveAction extends XWikiAction {
 	public boolean save(XWikiContext context) throws XWikiException {
 		XWiki xwiki = context.getWiki();
+        XWikiRequest request = context.getRequest();
 		XWikiDocument doc = context.getDoc();
 		XWikiForm form = context.getForm();
 
 		// This is pretty useless, since contexts aren't shared between threads.
 		// It just slows down execution.
+        String title = doc.getTitle();
+        // Check save session
+        int sectionNumber = 0;
+        if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
+           sectionNumber = Integer.parseInt(request.getParameter("section"));
+        }
 		synchronized (doc) {
 			String language = ((EditForm) form).getLanguage();
 			// FIXME Which one should be used: doc.getDefaultLanguage or
@@ -67,7 +74,16 @@ public class SaveAction extends XWikiAction {
 				}
 			}
 
-			tdoc.readFromForm((EditForm) form, context);
+            if(sectionNumber != 0 ){
+                XWikiDocument sectionDoc = (XWikiDocument)tdoc.clone();
+                sectionDoc.readFromForm((EditForm)form, context);
+                String sectionContent = sectionDoc.getContent() +"\n";
+                String content = doc.updateDocumentSection(sectionNumber, sectionContent);
+                tdoc.setContent(content);
+                tdoc.setTitle(title);
+            }else{
+		    	tdoc.readFromForm((EditForm) form, context);
+            }
 
 			// TODO: handle Author
 			String username = context.getUser();

@@ -38,6 +38,8 @@ import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.util.TOCGenerator;
 
@@ -52,6 +54,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 	private final String TOC_DATA = "tocData";
 
 	private MessageFormat formatter;
+    private int sectionNumber = 0;
 
 
 	protected String getLocaleKey() {
@@ -71,6 +74,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
 	public String handleMatch(MatchResult result, FilterContext context) {
 		String id = null;
+        String title = result.group(0);
 		String level = result.group(1);
 		int level_i = (level.length()+3)/2;
 		String hlevel = (level_i <= 6 ? level_i : 6)+ "";
@@ -79,6 +83,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
 		RenderContext rcontext = context.getRenderContext();
 		XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
+        XWikiDocument doc = xcontext.getDoc();
 
 		// generate unique ID of the heading
 		List processedHeadings = (List) rcontext.get("processedHeadings");
@@ -108,6 +113,40 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 			}
 		}
 
-		return formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
-	}
+        Object beforeAction = xcontext.get("action");
+        boolean showEditButton = false;
+        // only show sectional edit button for view action
+        if (xcontext.getAction().equals("view"))
+            showEditButton = true;
+        if (beforeAction != null) {
+            if(!beforeAction.toString().equals("HeadingFilter")) {
+                xcontext.put("action","HeadingFilter");
+                sectionNumber = 0;
+            }
+        }
+
+        boolean accessRight = false ;
+        try {
+            accessRight = xcontext.getWiki().checkAccess("edit", doc, xcontext);
+        } catch (XWikiException e){
+            e.printStackTrace();
+        }
+
+        if (level.equals("1") || level.equals("1.1") ) {
+            if(doc.getContent().indexOf(title) != -1 && accessRight && xcontext.getWiki().hasSectionEdit(xcontext) && showEditButton) {
+                sectionNumber++;
+                String url =xcontext.getDoc().getURL("edit",xcontext);
+                String textfomat = formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+                if(xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
+                    url += "?xpage=wysiwyg&section=" + sectionNumber;
+                } else {
+                    url +="?section=" + sectionNumber;
+                }
+                textfomat += "<span style='float:right;margin-left:5px;margin-right:5px;'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
+                return textfomat;
+            }
+        }
+
+        return formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+    }
 }

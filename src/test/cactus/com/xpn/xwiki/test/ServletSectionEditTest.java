@@ -20,6 +20,7 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,6 +43,39 @@ public class ServletSectionEditTest extends ServletTest {
         super.cleanUp();
     }
 
+    // Check if the "Edit" button for a section is present
+    public void beginPresentEdit(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.PresentSectionEditTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+
+        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is the subtitle 2\nThis is content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
+        Utils.createDoc(xwiki.getStore(), "Main", "PresentSectionEditTest", content, bobject, bclass, context);
+
+        setUrl(webRequest, "view", "Main", "PresentSectionEditTest", "");
+    }
+
+    public void endPresentEdit(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Content should have edit button for title 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is title 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=1'>edit</a>") != -1);
+            assertTrue("Content should have edit button for subtitle 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=2'>edit</a>") != -1);
+            assertTrue("Content should have edit button for subtitle 2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=3'>edit</a>") != -1);
+            assertTrue("Content should have edit button for title2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the title 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=4'>edit</a>") != -1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testPresentEdit() throws Throwable {
+        launchTest();
+    }
+
     /** Test edit section for title 1 */
     public void beginSectionEditTitle1(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -54,7 +88,7 @@ public class ServletSectionEditTest extends ServletTest {
 
         String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1 This is the title 2\nThis is the content of title 2";
         Utils.createDoc(xwiki.getStore(), "Main", "SectionEditTest", content, bobject, bclass, context);
-        setUrl(webRequest, "edit", "SectionEditTest", "section=1");
+        setUrl(webRequest, "edit", "Main", "SectionEditTest", "section=1");
     }
 
     public void endSectionEditTitle1(WebResponse webResponse) throws HibernateException {
@@ -64,7 +98,7 @@ public class ServletSectionEditTest extends ServletTest {
             assertTrue("Find out the contents of title 2 :" + result, result.indexOf("1 This is the title 2\nThis is the content of title 2") == -1);
        } finally {
             clientTearDown();
-        }
+       }
     }
 
     public void testSectionEditTitle1() throws Throwable {
@@ -83,13 +117,13 @@ public class ServletSectionEditTest extends ServletTest {
 
         String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is the subtitle 2\nThis is content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
         Utils.createDoc(xwiki.getStore(), "Main", "SectionEditTest", content, bobject, bclass, context);
-        setUrl(webRequest, "edit", "SectionEditTest", "section=2");
+        setUrl(webRequest, "edit", "Main", "SectionEditTest", "section=2");
     }
 
     public void endSectionEditSubtitle1(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find the contents of title 1 : " + result, result.indexOf("1.1 This is the subtitle 1\nThis is content of subtitle 1") != -1);
+            assertTrue("Could not find the contents of subtitle 1 : " + result, result.indexOf("1.1 This is the subtitle 1\nThis is content of subtitle 1") != -1);
             assertTrue("Find out the contents of title 1 :" + result, result.indexOf("1 This is title 1\nThis is content of title 1") == -1);
             assertTrue("Find out the contents of subtitle 2 :" + result, result.indexOf("1.1 This is the subtitle 2\nThis is content of subtitle 2") == -1);
             assertTrue("Find out the contents of title 2 :" + result, result.indexOf("1 This is title 2\nThis is content of title 2") == -1);
@@ -98,7 +132,7 @@ public class ServletSectionEditTest extends ServletTest {
         }
     }
 
-    public void testSectionEditSubtitle11() throws Throwable {
+    public void testSectionEditSubtitle1() throws Throwable {
         launchTest();
     }
 
@@ -112,24 +146,24 @@ public class ServletSectionEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
 
-        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is subtitle2\nThis is the content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
+        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is subtitle 2\nThis is the content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
         Utils.createDoc(xwiki.getStore(), "Main", "SectionEditTest", content, bobject, bclass, context);
-        setUrl(webRequest, "edit", "SectionEditTest", "section=3");
+        setUrl(webRequest, "edit", "Main", "SectionEditTest", "section=3");
     }
 
     public void endSectionEditSubtitle2(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find the contents of title 1 : " + result, result.indexOf("1.1 This is the subtitle 2\nThis is content of subtitle 2") != -1);
-            assertTrue("Find out the contents of title 1 :" + result, result.indexOf("1 This is title 1\nThis is content of title 1") == -1);
-            assertTrue("Find out the contents of subtile 1:" + result, result.indexOf("1.1 This is the subtitle 1\nThis is content of subtitle 1") == -1);
-            assertTrue("Find out the contents of title 2 :" + result, result.indexOf("1 This is title 2\nThis is content of title 2") == -1);
+            assertTrue("Could not find the contents of sub title 2 : " + result, result.indexOf("1.1 This is subtitle 2\nThis is the content of subtitle 2") != -1);
+            assertFalse("Find out the contents of title 1 :" + result, result.indexOf("1 This is title 1\nThis is content of title 1") != -1);
+            assertFalse("Find out the contents of subtile 1:" + result, result.indexOf("1.1 This is the subtitle 1\nThis is content of subtitle 1") != -1);
+            assertFalse("Find out the contents of title 2 :" + result, result.indexOf("1 This is title 2\nThis is content of title 2") != -1);
         } finally {
             clientTearDown();
         }
     }
 
-    public void testSectionEditSubtitle12() throws Throwable {
+    public void testSectionEditSubtitle2() throws Throwable {
         launchTest();
     }
 
@@ -143,15 +177,15 @@ public class ServletSectionEditTest extends ServletTest {
         BaseClass bclass = doc.getxWikiClass();
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
 
-        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is subtitle2\nThis is the content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
+        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is subtitle 2\nThis is the content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
         Utils.createDoc(xwiki.getStore(), "Main", "SectionEditTest", content, bobject, bclass, context);
-        setUrl(webRequest, "edit", "SectionEditTest", "section=4");
+        setUrl(webRequest, "edit", "Main", "SectionEditTest", "section=4");
     }
 
-    public void endSectionEditTitle12(WebResponse webResponse) throws HibernateException {
+    public void endSectionEditTitle2(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Could not find the contents of title 1 : " + result, result.indexOf("1 This is the title 2\nThis is the content of title 2") != -1);
+            assertTrue("Could not find the contents of title 2 : " + result, result.indexOf("1 This is the title 2\nThis is the content of title 2") != -1);
             assertTrue("Find out the contents of title 1 :" + result, result.indexOf("1 This is title 1\nThis is content of title 1") == -1);
             assertTrue("Find out the contents of subtile 1:" + result, result.indexOf("1.1 This is the subtitle 1\nThis is content of subtitle 1") == -1);
             assertTrue("Find out the contents of subtitle 2 :" + result, result.indexOf("1.1 This is subtitle 2\nThis is content of subtitle 2") == -1);
@@ -218,7 +252,7 @@ public class ServletSectionEditTest extends ServletTest {
         Utils.createDoc(xwiki.getStore(), "Main", "SaveSectionTest", content, bobject, bclass, context);
 
         // Save section 1 with new content.
-        setUrl(webRequest, "save", "SaveSectionTest", "section=2");
+        setUrl(webRequest, "save", "Main", "SaveSectionTest", "section=2");
         webRequest.addParameter("content", "This is modification");
         webRequest.addParameter("parent", "Main.WebHome");
     }
@@ -263,51 +297,16 @@ public class ServletSectionEditTest extends ServletTest {
     }
 
     public void endPreviewSection(WebResponse webResponse) throws HibernateException, XWikiException {
-         try {
-            String result = webResponse.getText();
-            assertTrue("Could not find PreviewSectionTest's Content: " + result, result.indexOf("This is modification\n1 This is the title 2\nThis is the content of title 2") != -1);
-            assertTrue("Could not find object hidden form value: " + result, result.indexOf("Main.PreviewSectionTest_0_first_name") != -1);
-        } finally {
-            clientTearDown();
-        }
-    }
-
-    public void testPreviewSectionOk() throws Throwable {
-        launchTest();
-    }
-
-    // Check if the "Edit" button for a section is present
-    public void beginPresentEdit(WebRequest webRequest) throws HibernateException, XWikiException {
-        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
-        context.setDatabase("xwikitest");
-        StoreHibernateTest.cleanUp(hibstore, context);
-        clientSetUp(hibstore);
-
-        XWikiDocument doc = new XWikiDocument();
-        Utils.prepareObject(doc, "Main.PreviewSectionTest");
-        BaseClass bclass = doc.getxWikiClass();
-        BaseObject bobject = doc.getObject(bclass.getName(), 0);
-
-        String content = "1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1.1 This is the subtitle 2\nThis is content of subtitle 2\n1 This is the title 2\nThis is the content of title 2";
-        Utils.createDoc(xwiki.getStore(), "Main", "PresentSectionEditTest", content, bobject, bclass, context);
-
-        Utils.updateRight(xwiki, context, "XWiki.PresentSectionEditTest", "XWiki.LudovicDubost","","edit", true, true);
-        setUrl(webRequest, "view", "Main", "PresentSectionEditTest", "");
-    }
-
-    public void endPresentEdit(WebResponse webResponse) throws HibernateException {
         try {
             String result = webResponse.getText();
-            assertTrue("Content should have edit button for title 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is title 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=1'>edit</a>") != -1);
-            assertTrue("Content should have edit button for subtitle 1 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 1' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=2'>edit</a>") != -1);
-            assertTrue("Content should have edit button for subtitle 2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the subtitle 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=3'>edit</a>") != -1);
-            assertTrue("Content should have edit button for title2 : " + result, result.indexOf("<a style='text-decoration: none;' title='Edit section: This is the title 2' href='/xwiki/testbin/edit/Main/PresentSectionEditTest?section=4'>edit</a>") != -1);
+            assertTrue("Could not find link back to edit with valid section : " + result, result.indexOf("<a href=\"/xwiki/testbin/edit/Main/PreviewSectionTest?&section=1") != -1);
+            assertTrue("Could not find content hidden form value: " + result, result.indexOf("<input type=\"hidden\" name=\"content\" value=\"This is modification\" />") != -1);
         } finally {
             clientTearDown();
         }
     }
 
-    public void testPresentEdit() throws Throwable {
+    public void testPreviewSection() throws Throwable {
         launchTest();
     }
 }

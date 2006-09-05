@@ -160,6 +160,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR = 7004;
     public static final int ERROR_XWIKI_CLASSES_PROPERTY_CLASS_INSTANCIATION = 7005;
     public static final int ERROR_XWIKI_CLASSES_PROPERTY_CLASS_IN_METACLASS = 7006;
+    public static final int ERROR_XWIKI_CLASSES_CANNOT_PREPARE_CUSTOM_DISPLAY = 7007;
 
 
     public static final int ERROR_XWIKI_USER_INIT = 8001;

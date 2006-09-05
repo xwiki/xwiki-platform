@@ -27,15 +27,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.ecs.xhtml.input;
+import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
@@ -185,6 +188,34 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
       return displayEdit(name, "", object, context);
     }
 
+    public boolean isCustomDisplayed(XWikiContext context){
+        String disp = getCustomDisplay();
+        return disp != null && disp.length() > 0;
+    }
+
+    public void displayCustom(StringBuffer buffer, String fieldName, String prefix, BaseObject object, XWikiContext context) throws XWikiException {
+        String content = getCustomDisplay();
+
+        try {
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            vcontext.put("name", fieldName);
+            vcontext.put("prefix", prefix);
+            vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
+            vcontext.put("type", context.getAction());
+            vcontext.put("context", new com.xpn.xwiki.api.Context(context));
+
+            BaseProperty prop = (BaseProperty) object.safeget(fieldName);
+            if (prop!=null)
+                vcontext.put("value", prop.getValue());
+
+            content = context.getWiki().parseContent(content, context);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_CANNOT_PREPARE_CUSTOM_DISPLAY,
+                    "Exception while preparing the custom display of " + fieldName, e, null);
+
+        }
+        buffer.append(content);
+    }
 
     public BaseClass getxWikiClass(XWikiContext context) {
         return getxWikiClass();
@@ -203,6 +234,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void setName(String name) {
       setStringValue("name", name);
+    }
+
+    public String getCustomDisplay() {
+        return getStringValue("customDisplay");
+    }
+
+    public void setCustomDisplay(String value) {
+      setLargeStringValue("customDisplay", value);
     }
 
     public String getPrettyName() {

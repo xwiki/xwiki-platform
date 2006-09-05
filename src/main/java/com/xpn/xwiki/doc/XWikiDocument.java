@@ -890,7 +890,10 @@ public class XWikiDocument {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String prefix = obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
-            if (type.equals("view")) {
+            if (pclass.isCustomDisplayed(context)){
+                pclass.displayCustom(result, fieldname, prefix, obj, context);  
+            }
+            else if (type.equals("view")) {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             } else if (type.equals("rendered")) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
@@ -2318,6 +2321,13 @@ public class XWikiDocument {
         return difflist;
     }
 
+    /**
+     * Only do a copy and not a renaming
+     * @param docname
+     * @param context
+     * @return
+     * @throws XWikiException
+     */
     public XWikiDocument renameDocument(String docname, XWikiContext context) throws XWikiException {
         String oldname = getFullName();
         if (oldname.equals(docname))
@@ -2582,6 +2592,26 @@ public class XWikiDocument {
          return false;
         objects.set(bobj.getNumber(), null);
         addObjectsToRemove(bobj);
+        return true;
+    }
+
+    /**
+     * Remove all the object of the class in parameter
+     * @param className the class name of the objects to be removed
+     * @return
+     */
+    public boolean removeObjects(String className) {
+        Vector objects = getObjects(className);
+        if (objects==null)
+            return false;
+        Iterator it = objects.iterator();
+        while (it.hasNext()) {
+            BaseObject bobj = (BaseObject) it.next();
+            if (bobj != null) {
+                objects.set(bobj.getNumber(), null);
+                addObjectsToRemove(bobj);
+            }
+        }
         return true;
     }
 

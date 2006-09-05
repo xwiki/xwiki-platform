@@ -46,7 +46,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
@@ -766,6 +767,20 @@ public class Document extends Api {
         return getDoc().getObject(classOrFieldName);
     }
 
+    public java.lang.Object getValue(String fieldName) {
+        Object object;
+        if (currentObj == null)
+            object = new Object(getDoc().getFirstObject(fieldName, context), context);
+        else
+            object = currentObj;
+        if (object!=null){
+            //com.xpn.xwiki.objects.classes.PropertyClass pclass = (PropertyClass) object.getBaseObject().getxWikiClass(context).get(fieldName);
+            //return getDoc().displayView(pclass, fieldName, object.getBaseObject(), context);
+            return ((BaseProperty)object.getBaseObject().safeget(fieldName)).getValue();
+        }
+        return null;
+    }
+
 
     public String getTextArea() {
         return com.xpn.xwiki.XWiki.getTextArea(doc.getContent(), context);
@@ -902,6 +917,10 @@ public class Document extends Api {
 
     public boolean removeObject(Object obj) {
         return getDoc().removeObject(obj.getBaseObject());
+    }
+
+    public boolean removeObjects(String className){
+        return getDoc().removeObjects(className);
     }
 
     public void delete() throws XWikiException {

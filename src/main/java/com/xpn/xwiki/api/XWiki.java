@@ -992,7 +992,7 @@ public class XWiki extends Api {
 
     public void renamePage(XWikiDocument doc, String newFullName) throws XWikiException {
         if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)) {
-            xwiki.renamePage(doc, context, newFullName);
+            xwiki.renamePage(doc, newFullName, context);
         }
     }
 

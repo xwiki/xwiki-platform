@@ -23,10 +23,7 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.*;
 
 public class PropertyMetaClass extends BaseClass implements PropertyInterface {
 
@@ -45,11 +42,19 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         name_class.setUnmodifiable(true);
         name_class.setSize(40);
         safeput("name", name_class);
+
         StringClass prettyname_class = new StringClass(this);
         prettyname_class.setName("prettyName");
         prettyname_class.setPrettyName("Pretty Name");
         prettyname_class.setSize(40);
         safeput("prettyName", prettyname_class);
+
+        TextAreaClass customdisplay_class = new TextAreaClass(this);
+        customdisplay_class.setName("customDisplay");
+        customdisplay_class.setPrettyName("Custom Display");
+        customdisplay_class.setRows(5);
+        customdisplay_class.setSize(80);
+        safeput("customDisplay", customdisplay_class);
 
         BooleanClass unmodif_class = new BooleanClass(this);
         unmodif_class.setName("unmodifiable");

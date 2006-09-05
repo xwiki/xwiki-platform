@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
@@ -2330,7 +2329,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public void SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException {
+
+    public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException {
         BaseClass gclass = getGroupClass(context);
 
         XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
@@ -2354,7 +2354,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc) throws XWikiException {
+    /**
+     * @deprecated replaced by {@link #setUserDefaultGroup(String fullwikiname, XWikiContext context)}
+     * @param context
+     * @param fullwikiname
+     * @throws XWikiException
+     */
+    public void SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException {
+        setUserDefaultGroup(fullwikiname, context);
+    }
+
+
+    public void protectUserPage(String fullwikiname, String userRights, XWikiDocument doc, XWikiContext context) throws XWikiException {
         BaseClass rclass = getRightsClass(context);
         // Add protection to the page
         BaseObject newrightsobject = (BaseObject) rclass.newObject(context);
@@ -2372,6 +2383,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         newuserrightsobject.setStringValue("levels", userRights);
         newuserrightsobject.setIntValue("allow", 1);
         doc.addObject(rclass.getName(), newuserrightsobject);
+    }
+
+    /**
+     * @deprecated replaced by {@link #protectUserPage(String,String,XWikiDocument,XWikiContext)}
+     * @param context
+     * @param fullwikiname
+     * @param userRights
+     * @param doc
+     * @throws XWikiException
+     */
+    public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc) throws XWikiException {
+        protectUserPage(fullwikiname, userRights, doc, context);
     }
 
     public User getUser(XWikiContext context) {
@@ -2409,7 +2432,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return getRightService().checkAccess(action, doc, context);
     }
 
+
+    /**
+     * @deprecated replaced by {@link #include(String topic, boolean isForm, XWikiContext context)}
+     * @param topic
+     * @param context
+     * @param isForm
+     * @return
+     * @throws XWikiException
+     */
     public String include(String topic, XWikiContext context, boolean isForm) throws XWikiException {
+        return include(topic, isForm, context);
+    }
+
+
+    public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException {
         String database = null, incdatabase = null;
         Document currentdoc = null, currentcdoc = null, currenttdoc = null;
         Document gcurrentdoc = null, gcurrentcdoc = null, gcurrenttdoc = null;
@@ -2851,7 +2888,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             if (serverdoc.isNew()) {
                 // clear entry in virtual wiki cache
                 virtualWikiMap.flushEntry(wikiUrl);
-                
+
                 // Create Wiki Server page
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "owner", wikiAdmin);
@@ -3878,12 +3915,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return dweb;
     }
 
-    public XWikiDocument renamePage(XWikiDocument doc, XWikiContext context, String newFullName) throws XWikiException {
+    public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context) throws XWikiException {
         XWikiDocument renamedDoc = doc.renameDocument(newFullName, context);
         saveDocument(renamedDoc, context);
         deleteDocument(doc, context);
         refreshLinks(context);
         return renamedDoc;
+    }
+
+    /**
+     * @deprecated replaced by {@link #renamePage(XWikiDocument doc, String newFullName, XWikiContext context)}
+     * @param doc
+     * @param context
+     * @param newFullName
+     * @return
+     * @throws XWikiException
+     */
+    public XWikiDocument renamePage(XWikiDocument doc, XWikiContext context, String newFullName) throws XWikiException {
+        return renamePage(doc, newFullName, context);
     }
 
     public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException {
@@ -3956,5 +4005,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return true;
          else
             return false;
+    }
+
+    public String clearName(String name, XWikiContext context) {
+        name = name.replaceAll("[àâä]","a");
+        name = name.replaceAll("[éèêë]","e");
+        name = name.replaceAll("[îï]","i");
+        name = name.replaceAll("[ôö]","o");
+        name = name.replaceAll("[ùûü]","u");
+        name = name.replaceAll("[\"!?]","");
+        name = name.replaceAll("[_':,;]"," ");
+        name = name.replaceAll("\\s+","");
+        return name;
+
     }
 }

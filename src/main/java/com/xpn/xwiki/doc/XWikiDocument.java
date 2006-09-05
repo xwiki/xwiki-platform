@@ -2322,6 +2322,7 @@ public class XWikiDocument {
     }
 
     /**
+     * @deprecated {@link #copyDocument(String docname, XWikiContext context)}
      * Only do a copy and not a renaming
      * @param docname
      * @param context
@@ -2329,7 +2330,15 @@ public class XWikiDocument {
      * @throws XWikiException
      */
     public XWikiDocument renameDocument(String docname, XWikiContext context) throws XWikiException {
+        return copyDocument(docname, context);
+    }
+
+    public XWikiDocument copyDocument(String docname, XWikiContext context) throws XWikiException {
         String oldname = getFullName();
+
+        loadAttachments(context);
+        loadArchive(context);
+
         if (oldname.equals(docname))
             return this;
 

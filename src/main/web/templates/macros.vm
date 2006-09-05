@@ -402,3 +402,15 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 
 #end
+
+#macro(xwikiobjectfield $fielddoc $fieldname $fieldtext $action)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+#if($fieldname!="")
+$fielddoc.display($fieldname, $action)
+#end
+#if($html!="")
+$html
+#end
+</div>
+#end

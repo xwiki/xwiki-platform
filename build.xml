@@ -159,7 +159,8 @@
     	xmlrpc-server-3.0.jar,
     	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
-        jcommon-1.0.5.jar"/>
+        jcommon-1.0.5.jar,
+        jcaptcha-all-1.0.jar"/>
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />

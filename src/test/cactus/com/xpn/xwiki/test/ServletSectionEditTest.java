@@ -16,6 +16,9 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ * @author Phung Hai Nam (phunghainam@xwiki.com)
+ * @version 5 Sep 2006
  */
 package com.xpn.xwiki.test;
 
@@ -29,10 +32,6 @@ import org.apache.cactus.WebRequest;
 import org.apache.cactus.WebResponse;
 import org.hibernate.HibernateException;
 
-/**
- * @author Phung Hai Nam
- * @version 28 Aug 2006
- */
 public class ServletSectionEditTest extends ServletTest {
 
     public void setUp() throws Exception {

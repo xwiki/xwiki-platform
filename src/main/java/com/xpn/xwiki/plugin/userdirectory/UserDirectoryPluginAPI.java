@@ -56,11 +56,15 @@ public class UserDirectoryPluginAPI extends Api {
     }
 
     public List getAllGroupsPageName(XWikiContext context) throws XWikiException {
-         return userDir.getAllGroupsPageName(context);
+        return userDir.getAllGroupsPageName(context);
     }
 
     public List getAllGroups(XWikiContext context) throws XWikiException {
         return userDir.getAllGroups(context);
+    }
+
+    public List getAllGroups(String orderBy, XWikiContext context) throws XWikiException {
+        return userDir.getAllGroups(orderBy, context);
     }
 
     public List getMembers(String grpPage, XWikiContext context) throws XWikiException {

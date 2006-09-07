@@ -400,4 +400,10 @@ public class Group {
             return getGroup(UserDirectoryPlugin.DEFAULT_PLUGIN_SPACE, name, context);
     }
 
+    public static List getAllGroupsPageName(String orderBy, XWikiContext context) throws XWikiException {
+        String className = getXWikiDirectoryGroupClass(context).getName();
+        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                        + " and obj.className='" + className + "' and obj.id=prop.id.id and prop.name='" + orderBy + "' order by prop.value";
+        return context.getWiki().getStore().searchDocumentsNames(hql, context);
+    }
 }

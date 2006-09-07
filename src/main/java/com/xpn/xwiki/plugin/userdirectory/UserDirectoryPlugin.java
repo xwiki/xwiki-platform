@@ -114,8 +114,20 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         return Group.getAllGroupsPageName(context);
     }
 
+    public List getAllGroupsPageName(String orderBy, XWikiContext context) throws XWikiException {
+        return Group.getAllGroupsPageName(orderBy, context);
+    }
+
     public List getAllGroups(XWikiContext context) throws XWikiException {
-        List allGroupsPageName = getAllGroupsPageName(context);
+        return getAllGroups(null, context);
+    }
+
+    public List getAllGroups(String orderBy, XWikiContext context) throws XWikiException {
+        List allGroupsPageName;
+        if (orderBy == null)
+            allGroupsPageName = getAllGroupsPageName(context);
+        else
+             allGroupsPageName = getAllGroupsPageName(orderBy, context);
         List groups = new ArrayList();
         if (allGroupsPageName == null)
             return groups;
@@ -123,7 +135,6 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         while (it.hasNext())
             groups.add(getGroup((String) it.next(), context));
         return groups;
-
     }
 
     public List getMembers(String grpPage, XWikiContext context) throws XWikiException {

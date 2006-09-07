@@ -103,6 +103,11 @@ public class UserDirectoryPluginAPI extends Api {
         return userDir.getUsersDocumentName(grpPage, context);
     }
 
+    public List getUsersDocument(String grpPage, XWikiContext context) throws XWikiException {
+        return userDir.getUsersDocument(grpPage, context);
+    }
+
+
     public boolean removeMemberships(String userPage, String grpPage, XWikiContext context) throws XWikiException {
         return userDir.removeMemberships(userPage, grpPage, context);
     }

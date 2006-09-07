@@ -67,7 +67,12 @@
     #end
 ## End "Add Attachment" link
 ## Begin "PDF" link
-    #xwikiimglink($doc.getExternalURL("pdf", "$!{revparams}") $xwiki.getSkinFile("pdf.gif") $msg.get("pdf"))
+    #set($pdfparams="$!{revparams}")
+    ## Check language option
+      #if (($xwiki.isMultiLingual()==true)&&($tdoc.realLanguage!=""))
+          #set($pdfparams="${languageparams}&$!{pdfparams}")
+      #end
+    #xwikiimglink($doc.getExternalURL("pdf", "$!{pdfparams}") $xwiki.getSkinFile("pdf.gif") $msg.get("pdf"))
 ## End "PDF" link
 ## Begin "History" link
     #xwikiimglink($doc.getURL("view","xpage=history") $xwiki.getSkinFile("history.gif") $msg.get("history"))

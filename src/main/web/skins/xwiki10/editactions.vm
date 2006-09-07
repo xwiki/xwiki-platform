@@ -14,10 +14,14 @@ function checkDocumentContent() {
   return true;
 }
 </script>
+#set($param = "")
+#if ($sectionNumber != 0)
+   #set($param = "section=$sectionNumber")
+#end
 ##<div class="layoutsubsection editactions">
   <button class="button" type="submit" name="formaction" value="_cancel_" onclick="this.form.action='$doc.getURL("cancel")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("cancel")</button>
-#if($previewenabled)  <button class="button" type="submit" name="formaction" value="_preview_" onclick="this.form.action='$doc.getURL("preview")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("preview")</button>#end
-  <button class="button" type="submit" name="formaction" value="_saveandcontinue_" onclick="this.form.action='$doc.getURL("saveandcontinue")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("saveandcontinue")</button>
-  <button  class="button" type="submit" name="formaction" value="_save_" onclick="this.form.action='$doc.getURL("${saveaction}")'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;" >$msg.get("saveandview")</button>
+#if($previewenabled)  <button class="button" type="submit" name="formaction" value="_preview_" onclick="this.form.action='$doc.getURL("preview", $param)'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("preview")</button>#end
+  <button class="button" type="submit" name="formaction" value="_saveandcontinue_" onclick="this.form.action='$doc.getURL("saveandcontinue", $param)'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;">$msg.get("saveandcontinue")</button>
+  <button  class="button" type="submit" name="formaction" value="_save_" onclick="this.form.action='$doc.getURL("${saveaction}", $param)'; if (this.form.onsubmit) this.form.onsubmit();if (checkDocumentContent()) this.form.submit(); return false;" >$msg.get("saveandview")</button>
 ##</div>
 #end

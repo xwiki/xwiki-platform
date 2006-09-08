@@ -135,7 +135,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
 
             if (level.equals("1") || level.equals("1.1") ) {
-                if(doc.getContent().indexOf(title) != -1) {
+                if(doc.getContent().indexOf(title.trim()) != -1) {
                     sectionNumber++;
                     String url = xcontext.getDoc().getURL("edit",xcontext);
                     if(xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {

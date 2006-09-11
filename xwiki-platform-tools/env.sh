@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XWIKIHOME=/Users/hritcu/xwiki/xwiki/trunk
+XWIKIHOME=../../xwiki/trunk
 XWIKILIB=${XWIKIHOME}/lib
 TOOLSLIB=./lib
 
@@ -13,4 +13,6 @@ do
 done
 
 export CP="${TOOLSPATH}:${XWIKIPATH}"
+# For windows + cygwin:
+#export CLASSPATH=`cygpath --path --windows "$CP"`
 export CLASSPATH="${TOOLSPATH}:${XWIKIPATH}"

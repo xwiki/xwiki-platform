@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db=/Users/hritcu/xwiki/xwiki/trunk/src/main/xwiki/xwiki10-db
+db=../../xwiki/trunk/src/main/xwiki/xwiki10-db
 
 current=`pwd`
 source export.sh $db

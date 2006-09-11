@@ -14,10 +14,12 @@ config.put("xwiki.store.hibernate.updateschema", "1");
 config.put("xwiki.virtual", "1");
 
 println "Starting xwiki"
-xwiki = new XWiki(config, context)
+xwiki = new XWiki(config, context);
 context.setWiki(xwiki);
 
-db = "xwiki" // Change this to export a different database
+db = "xwiki"
+// Change this to export a different database
+// db = "mydb"
 
 println("Export database " + db)
 context.setDatabase(db);

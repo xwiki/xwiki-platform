@@ -68,7 +68,6 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
     }
 
     public String displayCaptcha(CaptchaParams captchaParams, String classname, XWikiContext context) throws XWikiException {
-        if (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) != 1) return "";
         StringBuffer output = new StringBuffer();
         String user = (String) captchaParams.get("user");
         String action = (String) captchaParams.get("action");
@@ -106,7 +105,6 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
     }
 
     public Boolean verifyCaptcha(CaptchaParams captchaParams, XWikiContext context) throws XWikiException {
-        if (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) != 1) return Boolean.TRUE;
         String user = (String) captchaParams.get("user");
         String action = (String) captchaParams.get("action");
         String actionuser;

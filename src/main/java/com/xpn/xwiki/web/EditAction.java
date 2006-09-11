@@ -48,7 +48,7 @@ public class EditAction extends XWikiAction {
 
         // Add captcha plugin to avoid spam robots
         CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-        if (captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
+        if (xwiki.hasCaptcha(context) && captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
         else vcontext.put("captchaPlugin", "noCaptchaPlugin");
 
         // Check for edit section

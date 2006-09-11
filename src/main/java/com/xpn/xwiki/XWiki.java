@@ -4014,6 +4014,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return false;
     }
 
+    public boolean hasCaptcha(XWikiContext context) {
+        if (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1)
+            return true;
+        else
+            return false;
+    }
+
     public String clearName(String name, XWikiContext context) {
         name = name.replaceAll("[àâä]","a");
         name = name.replaceAll("[éèêë]","e");

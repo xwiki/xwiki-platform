@@ -293,12 +293,12 @@ public class XWikiContext extends Hashtable {
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addDocumentArchive(String  key, Object obj) {
-        classCache.put(key, obj);
+        archiveCache.put(key, obj);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public Object getDocumentArchive(String key) {
-        return classCache.get(key);
+        return archiveCache.get(key);
     }
 
     public void setLinksAction(String action) {

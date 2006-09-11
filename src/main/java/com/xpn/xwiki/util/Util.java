@@ -145,7 +145,10 @@ public class Util {
     }
 
     public static Map getObject(XWikiRequest request, String prefix) {
-        Map map = request.getParameterMap();
+        return getSubMap(request.getParameterMap(), prefix);
+    }
+
+    public static Map getSubMap(Map map, String prefix) {
         HashMap map2 = new HashMap();
         Iterator it = map.keySet().iterator();
         while (it.hasNext()) {
@@ -153,6 +156,9 @@ public class Util {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length()+1);
                 map2.put(newname, map.get(name));
+            }
+            if (name.equals(prefix)) {
+                map2.put("", map.get(name));
             }
         }
         return map2;

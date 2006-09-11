@@ -26,6 +26,8 @@ package com.xpn.xwiki.objects.classes;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DoubleProperty;
@@ -33,6 +35,9 @@ import com.xpn.xwiki.objects.FloatProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+
+import java.util.Map;
+import java.util.List;
 
 public class NumberClass  extends PropertyClass {
 
@@ -112,4 +117,45 @@ public class NumberClass  extends PropertyClass {
         input.setSize(getSize());
         buffer.append(input.toString());
     }
+
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        input input1 = new input();
+        input1.setType("text");
+        input1.setName(prefix + name + "_from");
+        input1.setID(prefix + name);
+        input1.setSize(getSize());
+
+        input input2 = new input();
+
+        input2.setType("text");
+        input2.setName(prefix + name+ "_to");
+        input2.setID(prefix + name);
+        input2.setSize(getSize());
+
+        buffer.append(((XWikiMessageTool)context.get("msg")).get("from"));
+        buffer.append(input1.toString());
+        buffer.append(((XWikiMessageTool)context.get("msg")).get("to"));
+        buffer.append(input2.toString());
+    }
+    
+    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
+        Number value = (Number)map.get(prefix);
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("@f:" + getName() + "=" + value.toString());
+         return;
+        }
+
+        value = (Number)map.get(prefix + "lessthan");
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("@f:" + getName() + "<" + value.toString());
+         return;
+        }
+
+        value = (Number)map.get(prefix + "morethan");
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("@f:" + getName() + ">" + value.toString());
+         return;
+        }
+    }
+
 }

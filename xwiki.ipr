@@ -430,11 +430,11 @@
     </library>
     <library name="XMLRPC">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-common-3.0rc1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-client-3.0rc1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-server-3.0rc1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ws-commons-util-1.0.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ws-commons-java5-1.0.1.jar!/" />
+        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-common-3.0.jar!/" />
+        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-client-3.0.jar!/" />
+        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-server-3.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -563,6 +563,14 @@
       <SOURCES>
         <root url="file://C:/dev/java/jrcs/src/java" />
       </SOURCES>
+    </library>
+    <library name="Captcha">
+      <CLASSES>
+        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-client-3.0.jar!/" />
+        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/jcaptcha-all-1.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
   </component>
   <component name="uidesigner-configuration">

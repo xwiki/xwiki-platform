@@ -24,10 +24,7 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -36,6 +33,7 @@ import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
@@ -289,4 +287,92 @@ public abstract class ListClass extends PropertyClass {
 			return value;
 		}
 	}
+
+    protected void displayRadioSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
+        List list = getList(context);
+        List selectlist = new ArrayList();
+
+        /*
+        BaseProperty prop =  (BaseProperty)object.safeget(name);
+        if (prop==null) {
+            selectlist = new ArrayList();
+        } else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
+        } else {
+            selectlist = new ArrayList();
+            selectlist.add(prop.getValue());
+        }
+        */
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            input radio = new input(input.radio, prefix + name, value);
+
+            if (selectlist.contains(value))
+                radio.setChecked(true);
+            radio.addElement(value);
+            buffer.append(radio.toString());
+            if(it.hasNext()){
+            	buffer.append("<br/>");
+            }
+        }
+    }
+
+    protected void displaySelectSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
+        select select = new select(prefix + name, 1);
+        select.setMultiple(true);
+        select.setSize(getSize());
+        select.setName(prefix + name);
+        select.setID(prefix + name);
+
+        List list = getList(context);
+        List selectlist = new ArrayList();
+
+        /*
+        BaseProperty prop =  (BaseProperty)object.safeget(name);
+        if (prop==null) {
+            selectlist = new ArrayList();
+        } else if ((prop instanceof ListProperty)||(prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
+        } else {
+            selectlist = new ArrayList();
+            selectlist.add(prop.getValue());
+        }
+        */
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            option option = new option(value, value);
+            option.addElement(value);
+            if (selectlist.contains(value))
+                option.setSelected(true);
+            select.addElement(option);
+        }
+
+        buffer.append(select.toString());
+    }
+    
+    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
+        Object values = map.get(prefix);
+        if ((values==null)||(values.equals(""))) {
+            return;
+        }
+
+        if (values instanceof String) {
+            criteriaList.add("jcr:contains(@f:" + getName() + ",'" + values.toString() + "')");
+            // testQueryGenerator(query, "//*/*/obj/Test/TestClass[jcr:contains(@f:category, '1') or jcr:contains(@f:category, '2')]");
+        }
+        else {
+            String[] valuesarray = (String[])values;
+            String[] criteriaarray = new String[valuesarray.length];
+            for (int i=0;i<valuesarray.length;i++) {
+                criteriaarray[i] = "jcr:contains(@f:" + getName() + ",'" + valuesarray[i] + "')";
+            }
+            criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
+        }
+        return;
+    }
+
 }

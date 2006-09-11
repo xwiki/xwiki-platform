@@ -32,6 +32,7 @@ import java.io.StringReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -40,6 +41,7 @@ import org.dom4j.dom.DOMElement;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -571,5 +573,19 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public void setNameField(String nameField) {
         this.nameField = nameField;
+    }
+
+    public String makeQuery(XWikiCriteria query) {
+        List criteriaList = new ArrayList();
+        Iterator classit = getFieldList().iterator();
+        while (classit.hasNext()) {
+            PropertyClass property = (PropertyClass) classit.next();
+            String name = property.getName();
+            Map map = query.getParameters(getName() + "_" + name);
+            if (map.size()>0) {
+              property.makeQuery(map, "", query, criteriaList);
+            }
+        }
+        return StringUtils.join(criteriaList.toArray(), " and ");
     }
 }

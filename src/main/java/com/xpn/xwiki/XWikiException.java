@@ -225,7 +225,9 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_JCR_DELETING_LINKS = 13113;
     public static final int ERROR_XWIKI_STORE_JCR_LOADING_BACKLINKS = 13114;
     public static final int ERROR_XWIKI_STORE_JCR_OTHER = 13130; // temporary
-    
+
+    public static final int ERROR_XWIKI_STORE_SEARCH_NOTIMPL = 13200;
+
     public static final int ERROR_XWIKI_GROOVY_COMPILE_FAILED = 14001;
     public static final int ERROR_XWIKI_GROOVY_EXECUTION_FAILED = 14002;
 
@@ -401,5 +403,4 @@ public class XWikiException extends Exception {
         pwriter.flush();
         return swriter.getBuffer().toString();
     }
-
 }

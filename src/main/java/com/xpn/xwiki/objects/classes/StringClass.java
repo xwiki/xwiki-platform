@@ -26,10 +26,15 @@ package com.xpn.xwiki.objects.classes;
 import org.apache.ecs.xhtml.input;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+
+import java.util.Map;
+import java.util.List;
+import java.util.Iterator;
 
 public class StringClass extends PropertyClass {
 
@@ -76,5 +81,34 @@ public class StringClass extends PropertyClass {
         input.setID(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());
+    }
+
+    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        input input = new input();
+        input.setType("text");
+        input.setName(prefix + name);
+        input.setID(prefix + name);
+        input.setSize(getSize());
+        buffer.append(input.toString());
+    }
+    
+    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
+        String value = (String)map.get(prefix);
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "%')");
+         return;
+        }
+
+        value = (String)map.get(prefix + "exact");
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("@f:" + getName() + "='" + value + "'");
+         return;
+        }
+
+        value = (String)map.get(prefix + "not");
+        if ((value!=null)&&(!value.equals(""))) {
+         criteriaList.add("@f:" + getName() + "!='" + value + "'");
+         return;
+        }
     }
 }

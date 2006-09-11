@@ -43,6 +43,7 @@
     <orderEntry type="library" name="Chart" level="project" />
     <orderEntry type="library" name="cache" level="project" />
     <orderEntry type="library" name="Jrcs" level="project" />
+    <orderEntry type="library" name="Captcha" level="project" />
     <orderEntryProperties />
   </component>
 </module>

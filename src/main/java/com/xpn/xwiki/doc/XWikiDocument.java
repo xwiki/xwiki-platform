@@ -44,6 +44,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +71,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -2758,4 +2762,21 @@ public class XWikiDocument {
         }
         return this.hashCode() + "";
     }
+
+    public static String getInternalPropertyName(String propname, XWikiContext context) {
+        XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
+        String cpropname = StringUtils.capitalize(propname);
+        return (msg==null) ? cpropname : msg.get(cpropname);
+    }
+
+    public String getInternalProperty(String propname) {
+        String methodName = "get" + StringUtils.capitalize(propname);
+        try {
+            Method method = getClass().getDeclaredMethod(methodName, null);
+            return (String) method.invoke(this, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

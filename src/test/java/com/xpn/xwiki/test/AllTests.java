@@ -68,7 +68,6 @@ public class AllTests {
         suite.addTestSuite(StatsTest.class);
         suite.addTestSuite(StoreHibernateTest.class);
         suite.addTestSuite(StoreHibernateCacheTest.class);
-        suite.addTestSuite(StoreObjectRCSFileTest.class);
         suite.addTestSuite(StoreObjectHibernateTest.class);
         suite.addTestSuite(SearchTest.class);
         suite.addTestSuite(UserTest.class);

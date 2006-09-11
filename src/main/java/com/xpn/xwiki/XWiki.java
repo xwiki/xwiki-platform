@@ -105,15 +105,12 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.notify.XWikiPageNotification;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.LevelsClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -4033,4 +4030,101 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return name;
 
     }
+
+    public List search(XWikiQuery query, XWikiContext context) throws XWikiException {
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        if (qp == null)
+         return null;
+        return qp.search(query);
+    }
+
+    public String searchAsTable(XWikiRequest request, String className, XWikiContext context) throws XWikiException {
+        XWikiQuery query = new XWikiQuery();
+        String columns = request.getParameter("columns");
+        query.setDisplayProperties(StringUtils.split(columns, ", "));
+        Set properties = getDocument(className, context).getxWikiClass().getPropertyList();
+        Iterator propid = properties.iterator();
+        while (propid.hasNext()) {
+            String propname = (String) propid.next();
+            Map map = Util.getObject(request, className + "_" + propname);
+            Iterator mapid = map.keySet().iterator();
+            while (mapid.hasNext()) {
+                String key = (String) mapid.next();
+                String[] data = (String[])map.get(key);
+                if (data.length==1)
+                 query.setParam(className + "_" + propname + key, data[0]);
+                else
+                 query.setParam(className + "_" + propname + key, data);
+            }
+        }
+        return searchAsTable(query, context);
+    }
+
+    public String searchAsTable(XWikiQuery query, XWikiContext context) throws XWikiException {
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        if (qp == null)
+         return null;
+        List list = qp.search(query);
+        String result = "{table}\r\n";
+        List headerColumns = new ArrayList();
+        List displayProperties = query.getDisplayProperties();
+        Iterator displayListIt = displayProperties.iterator();
+        while (displayListIt.hasNext()) {
+            String propname = (String) displayListIt.next();
+            PropertyClass pclass = getPropertyClassFromName(propname, context);
+            if (pclass!=null)
+             headerColumns.add(pclass.getPrettyName());
+            else {
+                if (propname.startsWith("doc.")) {
+                    propname = propname.substring(4);
+                    headerColumns.add(XWikiDocument.getInternalPropertyName(propname, context));
+                }
+                else
+                 headerColumns.add(propname);
+
+            }
+        }
+        result += StringUtils.join(headerColumns.toArray(), " | ") + "\r\n";
+        Iterator resultIt = list.iterator();
+        while (resultIt.hasNext()) {
+            List rowColumns = new ArrayList();
+            String docname = (String) resultIt.next();
+            XWikiDocument doc = getDocument(docname, context);
+            displayListIt = displayProperties.iterator();
+            while (displayListIt.hasNext()) {
+                String propname = (String) displayListIt.next();
+                PropertyClass pclass = getPropertyClassFromName(propname, context);
+                if (pclass==null) {
+                    if (propname.startsWith("doc.")) {
+                        propname = propname.substring(4);
+                    }
+                    String value = doc.getInternalProperty(propname);
+                    rowColumns.add((value==null) ? " " : value);
+                }
+                else {
+                 BaseObject bobj = doc.getObject(pclass.getObject().getName());
+                 rowColumns.add(doc.display(pclass.getName(), "view", bobj, context));
+                } 
+            }
+            result += StringUtils.join(rowColumns.toArray(), " | ") + "\r\n";
+        }
+        result += "{table}\r\n";
+        return result;
+    }
+
+    public PropertyClass getPropertyClassFromName(String propPath, XWikiContext context) {
+        int i1 = propPath.indexOf("_");
+        if (i1==-1)
+         return null;
+        else {
+          String className = propPath.substring(0, i1);
+          String propName = propPath.substring(i1+1);
+            try {
+                return (PropertyClass)getDocument(className,context).getxWikiClass().get(propName);
+            } catch (XWikiException e) {
+                return null;
+            }
+        }
+    }
+
 }

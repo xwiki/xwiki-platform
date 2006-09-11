@@ -60,20 +60,20 @@ public class QueryPluginApi extends Api implements IQueryFactory {
 	public XWikiStoreInterface getStore() {
 		return qp.getStore();
 	}
-	
-	public IQuery xpath(String q) throws XWikiException {
-		if (log.isDebugEnabled())
-			log.debug("create sec xpath query: "+q);
-		if (qp.isHibernate())
-			try {
-				return new SecHibernateQuery( qp.parse(q, Query.XPATH), this);
-			} catch (InvalidQueryException e) {
-				throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
-			}
-		if (qp.isJcr())
-			return new SecJcrQuery( q, Query.XPATH, this );
-		return null;
-	}
+
+    public IQuery xpath(String q) throws XWikiException {
+        if (log.isDebugEnabled())
+            log.debug("create sec xpath query: "+q);
+        if (qp.isHibernate())
+            try {
+                return new SecHibernateQuery( qp.parse(q, Query.XPATH), this);
+            } catch (InvalidQueryException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
+            }
+        if (qp.isJcr())
+            return new SecJcrQuery( q, Query.XPATH, this );
+        return null;
+    }
 	
 	public IQuery ql(String q) throws XWikiException {
 		if (log.isDebugEnabled())
@@ -91,4 +91,8 @@ public class QueryPluginApi extends Api implements IQueryFactory {
 	public ValueFactory getValueFactory() {
 		return qp.getValueFactory();
 	}
+
+    public String makeQuery(XWikiQuery query) throws XWikiException {
+        return qp.makeQuery(query);
+    }
 }

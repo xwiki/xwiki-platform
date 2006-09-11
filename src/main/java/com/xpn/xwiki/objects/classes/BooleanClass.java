@@ -179,4 +179,74 @@ public class BooleanClass extends PropertyClass {
 		}
 	}
 
+    public void displaySelectSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        select select = new select(prefix + name, 1);
+        select.setMultiple(true);
+        String String0 = getDisplayValue(context, 0);
+        String String1 = getDisplayValue(context, 1);
+
+        option[] options = { new option("---", "" ), new option(String1, "1" ), new option(String0, "0")};
+        options[0].addElement("---");
+        options[1].addElement(String1);
+        options[2].addElement(String0);
+
+        /*
+        try {
+        IntegerProperty prop = (IntegerProperty) object.safeget(name);
+        if (prop!=null) {
+            Integer ivalue = (Integer)prop.getValue();
+            if (ivalue!=null) {
+                int value = ivalue.intValue();
+                if (value==1)
+                    options[1].setSelected(true);
+                else if (value==0)
+                    options[2].setSelected(true);
+            }  else {
+                int value = getDefaultValue();
+                if (value==1)
+                    options[1].setSelected(true);
+                else if (value==0)
+                    options[2].setSelected(true);
+            }
+	        }
+        } catch (Exception e) {
+            // This should not happen
+            e.printStackTrace();
+        }
+        */
+        select.addElement(options);
+        buffer.append(select.toString());
+    }
+
+    public void displayCheckboxSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
+        org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
+
+        /*
+        try {
+        IntegerProperty prop = (IntegerProperty) object.safeget(name);
+        if (prop!=null) {
+            Integer ivalue = (Integer)prop.getValue();
+            if (ivalue!=null) {
+                int value = ivalue.intValue();
+                if (value==1)
+                    check.setChecked(true);
+                else if (value==0)
+                	check.setChecked(false);
+            }
+            else {
+                int value = getDefaultValue();
+                if (value==1)
+                    check.setChecked(true);
+                else
+                    check.setChecked(false);
+            }
+        }} catch (Exception e) {
+            // This should not happen
+            e.printStackTrace();
+        }
+        */
+        buffer.append(check.toString());
+        buffer.append(checkNo.toString());
+    }
 }

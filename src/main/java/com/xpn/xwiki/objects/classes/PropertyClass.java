@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ecs.xhtml.input;
 import org.apache.velocity.VelocityContext;
@@ -34,7 +35,7 @@ import org.hibernate.mapping.Property;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -346,5 +347,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseProperty newProperty() {
         return new BaseProperty();
+    }
+
+    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
     }
 }

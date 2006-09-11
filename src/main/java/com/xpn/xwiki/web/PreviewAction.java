@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  * @author sdumitriu
+ * @author Phung Hai Nam (phunghainam@xwiki.com)
  */
 package com.xpn.xwiki.web;
 
@@ -25,6 +26,9 @@ import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
+import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -58,11 +62,24 @@ public class PreviewAction extends XWikiAction {
 
 	public String render(XWikiContext context) throws XWikiException {
 		XWikiRequest request = context.getRequest();
+        XWiki xwiki = context.getWiki();
 		String formaction = request.getParameter("formaction");
 		if (formaction == null || formaction.equals("") || formaction.equals("_preview_")) {
 			XWikiDocument doc = context.getDoc();
 			XWikiForm form = context.getForm();
 			VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+
+            Boolean isResponseCorrect = Boolean.TRUE;
+            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+            if (captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
+            else vcontext.put("captchaPlugin", "noCaptchaPlugin");
+            if (captchaPluginApi != null) {
+                // verify captcha
+                CaptchaParams captchaParams = captchaPluginApi.getCaptchaParams(context.getUser(), "edit");
+                isResponseCorrect = captchaPluginApi.verifyCaptcha(captchaParams);
+            }
+            // put isResponseCorrect value to vcontext for save action
+            vcontext.put("isResponseCorrect", isResponseCorrect.toString());
 
 			String language = ((EditForm) form).getLanguage();
 			XWikiDocument tdoc;
@@ -97,7 +114,10 @@ public class PreviewAction extends XWikiAction {
 				tdoc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				tdoc2.readFromForm((EditForm) form, context);
 			}
-			return "preview";
+            // recomfirm edit (captcha) when jcaptcha is not correct
+            if ((context.get("recheckcaptcha") != null) && ((Boolean)context.get("recheckcaptcha")).booleanValue())
+                return "captcha";
+            else return "preview";
 		}
 		return "disambiguation";
 	}

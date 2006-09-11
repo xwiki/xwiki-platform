@@ -259,14 +259,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     "Could not initialize main XWiki context", e);
         }
     }
-    
+
     public XWikiStoreInterface getNotCacheStore() {
     	XWikiStoreInterface store = getStore();
     	if (store instanceof XWikiCacheStoreInterface)
             store = ((XWikiCacheStoreInterface) store).getStore();
     	return store;
     }
-    
+
     public XWikiHibernateStore getHibernateStore() {
         XWikiStoreInterface store = getStore();
         if (store instanceof XWikiHibernateStore)
@@ -584,7 +584,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         // HACK: can anyone think of a better way to do this?
         XWikiCacheListener.setXWiki(this);
-        
+
         // Make sure these classes exists
         if (noupdate) {
             getPrefsClass(context);
@@ -1903,6 +1903,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("macros_groovy", "Macros for Groovy", 60);
         needsUpdate |= bclass.addTextField("macros_wiki", "Macros for the Wiki Parser", 60);
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
+
+        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
+        needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
+        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
 
@@ -3653,7 +3660,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return cacheService;
         }
     }
-    
+
     public String getURLContent(String surl) throws IOException {
         HttpClient client = new HttpClient();
 

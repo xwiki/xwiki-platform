@@ -15,10 +15,11 @@
       #end
       #if ($sectionNumber != 0)
         #set($editparams = "$editparams&section=$sectionNumber")
+        #set($saveparams = "section=$sectionNumber")
       #end
     #end
     <a href="$doc.getURL($editaction,$editparams)"  onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;"> $msg.get("backtoedit")</a>
     <span> | </span>
-    <a href="$doc.getURL("save",$editparams)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
+    <a href="$doc.getURL("save",$saveparams)" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
   </div>
 </div>

@@ -26,15 +26,31 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
+import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 
-public class SaveAction extends XWikiAction {
+public class SaveAction extends PreviewAction {
 	public boolean save(XWikiContext context) throws XWikiException {
 		XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
 		XWikiDocument doc = context.getDoc();
 		XWikiForm form = context.getForm();
+
+        // Confirm edit to avoid spam robots
+        Boolean isResponseCorrect = Boolean.TRUE;
+        CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+        // If  'save' action after preview
+        String isResponsePreviewCorrect = request.getParameter("isResponsePreviewCorrect");
+        if ((isResponsePreviewCorrect != null))
+            isResponseCorrect = Boolean.valueOf(isResponsePreviewCorrect);
+        else if (captchaPluginApi != null) {
+            CaptchaParams captchaParams = captchaPluginApi.getCaptchaParams(context.getUser(), "edit");
+            isResponseCorrect = captchaPluginApi.verifyCaptcha(captchaParams);
+        }
+        // If captcha is not correct it will be required again
+        if (!isResponseCorrect.booleanValue()) return true;
 
 		// This is pretty useless, since contexts aren't shared between threads.
 		// It just slows down execution.
@@ -112,7 +128,12 @@ public class SaveAction extends XWikiAction {
 		XWikiException e = (XWikiException) context.get("exception");
 		if ((e != null) && (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY)) {
 			return "docalreadyexists";
-		}
-		return "exception";
-	}
+        } else if (e != null) {
+            return "exception";
+        } else {
+            // If captcha is not correct it will require to confirm again
+            context.put("recheckcaptcha",new Boolean(true));
+            return super.render(context);
+        }
+    }
 }

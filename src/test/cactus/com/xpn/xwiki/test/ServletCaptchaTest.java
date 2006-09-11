@@ -65,6 +65,32 @@ public class ServletCaptchaTest  extends ServletTest {
         launchTest();
     }
 
+    // ====================== Test does not show a captcha  when preview edit by anonymous ==============================
+    public void beginNotShowCaptchaForAnonymousPreviewEdit(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "Image", context);
+        Utils.setStringValue("XWiki.XWikiPreferences", "edit_registered", "Image", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "WebHome", context);
+        setUrl(webRequest, "preview", "Main", "WebHome", "");
+    }
+
+    public void endNotShowCaptchaForAnonymousPreviewEdit(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertFalse("Find out captcha image  : " + result, result.indexOf("<input type=\"text\" name=\"jcaptcha_response\"") != -1);
+            assertFalse("Find out simple math question : " + result, result.indexOf("Please answer this simple math question") != -1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testNotShowCaptchaForAnonymousPreviewEdit() throws Throwable {
+        launchTest();
+    }
+
     // ====================== Test show a simple question to confirm for edit by anonymous =============================
     public void beginShowCaptchaTextForAnonymousEdit(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -111,6 +137,41 @@ public class ServletCaptchaTest  extends ServletTest {
     }
 
     public void testNotShowCaptchaImageForAnonymousEdit() throws Throwable {
+        launchTest();
+    }
+
+    // ============ Verify the captcha does not show up for registered users when configured on anonymous ==============
+    public void beginNotShowCaptchaForRegisteredUserEdit(WebRequest webRequest) throws HibernateException, XWikiException, MalformedURLException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+
+        Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "Emage", context);
+        Utils.createDoc(xwiki.getStore(), "Main", "WebHome1", context);
+        HashMap map = new HashMap();
+        map.put("password", "toto");
+        xwiki.createUser("PhungHaiNam", map, "", "", "view, edit", context);
+        Utils.updateRight(xwiki, context, "Main.WebHome1", "XWiki.PhungHaiNam", "", "edit", true, false);
+
+        MyFormAuthentication auth = new MyFormAuthentication("PhungHaiNam", "toto");
+        auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
+        webRequest.setAuthentication(auth);
+        setUrl(webRequest, "edit", "Main", "WebHome1", "");
+    }
+
+    public void endNotShowCaptchaForRegisteredUserEdit(WebResponse webResponse) throws HibernateException {
+        try {
+            assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
+            String result = webResponse.getText();
+            assertTrue("Could not find WebHome1 Content: " + result, result.indexOf("Hello 1")!=-1);
+            assertFalse("Find out captcha image  : " + result, result.indexOf("<input type=\"text\" name=\"jcaptcha_response\"") != -1);
+            assertFalse("Find out simple math question : " + result, result.indexOf("Please answer this simple math question") != -1);
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testNotShowCaptchaForRegisteredUserEdit() throws Throwable {
         launchTest();
     }
 

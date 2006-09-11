@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
@@ -45,14 +46,19 @@ public class EditAction extends XWikiAction {
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
-         // Check for edit section
-         String sectionContent = "";
-         int sectionNumber = 0;
-         if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
+        // Add captcha plugin to avoid spam robots
+        CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+        if (captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
+        else vcontext.put("captchaPlugin", "noCaptchaPlugin");
+
+        // Check for edit section
+        String sectionContent = "";
+        int sectionNumber = 0;
+        if (request.getParameter("section") != null && xwiki.hasSectionEdit(context)) {
             sectionNumber = Integer.parseInt(request.getParameter("section"));
             sectionContent = doc.getContentOfSection(sectionNumber);
-         }
-         vcontext.put("sectionNumber",new Integer(sectionNumber));
+        }
+        vcontext.put("sectionNumber",new Integer(sectionNumber));
 
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");

@@ -128,6 +128,7 @@
                 name="preview"
                 scope="request">
             <forward name="preview" path="/templates/preview.vm"/>
+            <forward name="captcha" path="/templates/captcha.vm"/>
         </action>
 
         <action path="/save/"
@@ -366,9 +367,16 @@
                 scope="request">
         </action>
 
+        <action path="/jcaptcha/"
+                type="com.octo.captcha.module.struts.image.RenderImageCaptchaAction">
+        </action>
+
     </action-mappings>
 
     <controller processorClass="com.xpn.xwiki.web.XWikiRequestProcessor"
                 debug="0" contentType="text/html"/>
+
+    <!-- ============================ Plugins =============================== -->
+    <plug-in className="com.octo.captcha.module.struts.CaptchaServicePlugin"/>
 
 </struts-config>

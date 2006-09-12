@@ -1,21 +1,18 @@
 package com.xpn.xwiki.plugin.userdirectory;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.PluginException;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.Iterator;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.

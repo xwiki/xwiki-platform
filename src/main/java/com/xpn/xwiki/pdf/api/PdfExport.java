@@ -22,11 +22,11 @@
 
 package com.xpn.xwiki.pdf.api;
 
-import java.io.OutputStream;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import java.io.OutputStream;
 
 public interface PdfExport {
     public void exportXHtml(byte[] xhtml, OutputStream out, int type) throws XWikiException;

@@ -23,22 +23,19 @@
 
 package com.xpn.xwiki.render;
 
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.IOException;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.DocChangeRule;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.PropertyChangedRule;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChangeNotificationInterface {
     private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);

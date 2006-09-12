@@ -26,10 +26,10 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
-import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.plugin.captcha.CaptchaParams;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class SaveAction extends PreviewAction {
 	public boolean save(XWikiContext context) throws XWikiException {

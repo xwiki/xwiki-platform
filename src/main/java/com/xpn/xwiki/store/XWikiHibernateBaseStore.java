@@ -1,31 +1,30 @@
 package com.xpn.xwiki.store;
 
-import org.hibernate.*;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
-import org.hibernate.impl.SessionFactoryImpl;
-import org.hibernate.impl.SessionImpl;
-import org.hibernate.cfg.Configuration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Date;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.Statement;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.web.XWikiRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.*;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.impl.SessionImpl;
+import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

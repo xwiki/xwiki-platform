@@ -31,42 +31,46 @@
 
 package com.xpn.xwiki;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-import java.util.zip.ZipOutputStream;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.User;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.impl.OSCacheService;
+import com.xpn.xwiki.cache.impl.XWikiCacheListener;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.notify.*;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
+import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.SearchEngineRule;
+import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
+import com.xpn.xwiki.store.*;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
+import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
+import com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+import com.xpn.xwiki.util.MenuSubstitution;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -85,66 +89,23 @@ import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.User;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.impl.OSCacheService;
-import com.xpn.xwiki.cache.impl.XWikiCacheListener;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.notify.DocObjectChangedRule;
-import com.xpn.xwiki.notify.PropertyChangedRule;
-import com.xpn.xwiki.notify.XWikiActionRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.notify.XWikiPageNotification;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
-import com.xpn.xwiki.stats.api.XWikiStatsService;
-import com.xpn.xwiki.stats.impl.SearchEngineRule;
-import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
-import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
-import com.xpn.xwiki.store.XWikiCacheStore;
-import com.xpn.xwiki.store.XWikiCacheStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
-import com.xpn.xwiki.util.MenuSubstitution;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactoryService;
-import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
-import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.zip.ZipOutputStream;
 
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface {
@@ -4044,6 +4005,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     }
 
+    /*
+    public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
+        BaseClass bclass = getDocument(className, context).getxWikiClass();
+        PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
+        if (criteria==null)
+         criteria = new XWikiCriteria();
+        if (pclass==null)
+         return "";
+        else
+         return pclass.displaySearch(fieldname, prefix, criteria, context);
+    }
+
     public List search(XWikiQuery query, XWikiContext context) throws XWikiException {
         QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
         if (qp == null)
@@ -4051,26 +4024,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return qp.search(query);
     }
 
-    public String searchAsTable(XWikiRequest request, String className, XWikiContext context) throws XWikiException {
-        XWikiQuery query = new XWikiQuery();
-        String columns = request.getParameter("columns");
-        query.setDisplayProperties(StringUtils.split(columns, ", "));
-        Set properties = getDocument(className, context).getxWikiClass().getPropertyList();
-        Iterator propid = properties.iterator();
-        while (propid.hasNext()) {
-            String propname = (String) propid.next();
-            Map map = Util.getObject(request, className + "_" + propname);
-            Iterator mapid = map.keySet().iterator();
-            while (mapid.hasNext()) {
-                String key = (String) mapid.next();
-                String[] data = (String[])map.get(key);
-                if (data.length==1)
-                 query.setParam(className + "_" + propname + key, data[0]);
-                else
-                 query.setParam(className + "_" + propname + key, data);
-            }
-        }
-        return searchAsTable(query, context);
+    public XWikiQuery createQueryFromRequest(String className, XWikiContext context) throws XWikiException {
+        return new XWikiQuery(context.getRequest(), className, context);
     }
 
     public String searchAsTable(XWikiQuery query, XWikiContext context) throws XWikiException {
@@ -4117,7 +4072,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 else {
                  BaseObject bobj = doc.getObject(pclass.getObject().getName());
                  rowColumns.add(doc.display(pclass.getName(), "view", bobj, context));
-                } 
+                }
             }
             result += StringUtils.join(rowColumns.toArray(), " | ") + "\r\n";
         }
@@ -4139,5 +4094,5 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
     }
-
+    */
 }

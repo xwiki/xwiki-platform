@@ -23,18 +23,18 @@
 
 package com.xpn.xwiki.plugin.calendar;
 
-import java.util.*;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
-import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.velocity.VelocityContext;
+
+import java.util.*;
 
 public class CalendarData {
     private List cdata = new ArrayList();

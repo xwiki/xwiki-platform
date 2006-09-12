@@ -21,16 +21,6 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.radeox.macro.BaseLocaleMacro;
-import org.radeox.macro.LocaleMacro;
-import org.radeox.macro.parameter.MacroParameter;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -39,6 +29,15 @@ import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.params.DefaultChartParams;
 import com.xpn.xwiki.render.macro.XWikiMacro;
+import org.radeox.macro.BaseLocaleMacro;
+import org.radeox.macro.LocaleMacro;
+import org.radeox.macro.parameter.MacroParameter;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ChartingMacro extends BaseLocaleMacro implements LocaleMacro, XWikiMacro {
 	public ChartingMacro() {

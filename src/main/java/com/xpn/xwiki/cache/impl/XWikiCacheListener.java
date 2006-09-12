@@ -1,16 +1,11 @@
 package com.xpn.xwiki.cache.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.opensymphony.oscache.base.events.CacheEntryEvent;
-import com.opensymphony.oscache.base.events.CacheEntryEventListener;
-import com.opensymphony.oscache.base.events.CacheGroupEvent;
-import com.opensymphony.oscache.base.events.CachePatternEvent;
-import com.opensymphony.oscache.base.events.CachewideEvent;
+import com.opensymphony.oscache.base.events.*;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /*
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated

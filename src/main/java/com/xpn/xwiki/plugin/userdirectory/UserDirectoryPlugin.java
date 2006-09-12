@@ -23,21 +23,23 @@ package com.xpn.xwiki.plugin.userdirectory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.plugin.usertools.XWikiUserManagementTools;
-import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.util.*;
-
+import com.xpn.xwiki.plugin.usertools.XWikiUserManagementTools;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPluginInterface {

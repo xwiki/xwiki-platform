@@ -1,11 +1,9 @@
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
 
 public class UsersMetaClass extends ListMetaClass {
     public UsersMetaClass() {

@@ -22,13 +22,12 @@
 
 package com.xpn.xwiki.objects.meta;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
-import com.xpn.xwiki.XWikiContext;
 
 public class MetaClass extends BaseClass {
 

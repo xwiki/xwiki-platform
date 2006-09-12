@@ -23,12 +23,12 @@
 
 package com.xpn.xwiki.api;
 
-import java.util.Collection;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
+
+import java.util.Collection;
 
 public class User extends Api {
     private XWikiUser user;

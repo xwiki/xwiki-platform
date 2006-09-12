@@ -21,13 +21,13 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.Map;
 
 public class NumberFormatChartParam extends LocaleChartParam {
 	public static final String TYPE = "type";

@@ -21,15 +21,13 @@
  */
 package com.xpn.xwiki.plugin.charts.actions;
 
-import org.apache.velocity.VelocityContext;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.params.DefaultChartParams2;
-import com.xpn.xwiki.plugin.charts.params.HorizontalAlignmentChartParam;
-import com.xpn.xwiki.plugin.charts.wizard.FontHelper;
 import com.xpn.xwiki.plugin.charts.wizard.DatasourceDefaultsHelper;
+import com.xpn.xwiki.plugin.charts.wizard.FontHelper;
 import com.xpn.xwiki.web.XWikiAction;
+import org.apache.velocity.VelocityContext;
 
 public class ChartWizardAction extends XWikiAction {
     public String render(XWikiContext context) throws XWikiException {

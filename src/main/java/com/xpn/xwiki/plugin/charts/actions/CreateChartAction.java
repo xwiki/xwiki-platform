@@ -21,11 +21,6 @@
  */
 package com.xpn.xwiki.plugin.charts.actions;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,6 +31,11 @@ import com.xpn.xwiki.plugin.charts.params.DefaultChartParams;
 import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
+
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CreateChartAction extends XWikiAction {
 

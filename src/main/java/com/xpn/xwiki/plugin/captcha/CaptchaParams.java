@@ -23,8 +23,8 @@
 
 package com.xpn.xwiki.plugin.captcha;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CaptchaParams {
 

@@ -43,8 +43,8 @@ import org.suigeneris.jrcs.diff.Chunk;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
 import java.lang.Object;
+import java.util.*;
 
 public class XWiki extends Api {
     private com.xpn.xwiki.XWiki xwiki;
@@ -1028,5 +1028,27 @@ public class XWiki extends Api {
     public String convertUsername(String username) {
         return xwiki.convertUsername(username, context);
     }
+     /*
+    public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
+       return xwiki.displaySearch(fieldname, className, prefix, criteria, context);
+    }
+
+    public List search(XWikiQuery query) throws XWikiException {
+        return xwiki.search(query, context);
+    }
+
+    public XWikiQuery createQueryFromRequest(String className) throws XWikiException {
+        return xwiki.createQueryFromRequest(className, context);
+    }
+
+    public String searchAsTable(XWikiQuery query) throws XWikiException {
+        return xwiki.searchAsTable(query, context);
+    }
+
+    public PropertyClass getPropertyClassFromName(String propPath) {
+        return xwiki.getPropertyClassFromName(propPath, context);
+    }
+    */
+
 }
 

@@ -21,9 +21,6 @@
  */
 package com.xpn.xwiki.store;
 
-import org.hibernate.jdbc.*;
-import org.hibernate.Interceptor;
-
 /**
  * Created by IntelliJ IDEA.
  * User: ludovic

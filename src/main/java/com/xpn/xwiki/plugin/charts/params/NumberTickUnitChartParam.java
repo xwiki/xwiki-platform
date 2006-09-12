@@ -21,13 +21,12 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.text.NumberFormat;
-import java.util.Map;
-
-import org.jfree.chart.axis.NumberTickUnit;
-
 import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import org.jfree.chart.axis.NumberTickUnit;
+
+import java.text.NumberFormat;
+import java.util.Map;
 
 public class NumberTickUnitChartParam extends NumberFormatChartParam {
 	

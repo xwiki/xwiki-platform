@@ -23,12 +23,12 @@
 
 package com.xpn.xwiki.api;
 
-import java.util.Iterator;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+
+import java.util.Iterator;
 
 public abstract class Collection extends Element {
 

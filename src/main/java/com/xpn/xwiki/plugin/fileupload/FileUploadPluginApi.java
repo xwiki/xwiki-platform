@@ -23,11 +23,11 @@
 
 package com.xpn.xwiki.plugin.fileupload;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PluginApi;
+
+import java.util.List;
 
 public class FileUploadPluginApi extends PluginApi {
 

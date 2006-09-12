@@ -21,9 +21,8 @@
  */
 package com.xpn.xwiki.store.jcr;
 
-import java.io.IOException;
-
 import javax.jcr.RepositoryException;
+import java.io.IOException;
 
 /**
  * XWiki-specific jcr provider interface

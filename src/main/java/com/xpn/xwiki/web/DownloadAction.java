@@ -22,14 +22,14 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+
+import java.io.IOException;
 
 public class DownloadAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {

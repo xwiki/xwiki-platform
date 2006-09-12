@@ -22,17 +22,15 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Date;
-import java.net.URL;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import java.io.IOException;
+import java.util.Date;
 
 public class SkinAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {

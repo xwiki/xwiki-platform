@@ -21,11 +21,10 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.Shape;
-
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import org.jfree.chart.plot.DefaultDrawingSupplier;
 
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import java.awt.*;
 
 public class ShapeChartParam extends AbstractChartParam {
 	private ChartParam choice;

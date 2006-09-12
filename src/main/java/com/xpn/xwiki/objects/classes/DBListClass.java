@@ -22,13 +22,13 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBListClass extends ListClass {
     public DBListClass(PropertyMetaClass wclass) {

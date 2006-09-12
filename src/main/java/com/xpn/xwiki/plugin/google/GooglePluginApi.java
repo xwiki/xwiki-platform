@@ -22,16 +22,15 @@
 
 package com.xpn.xwiki.plugin.google;
 
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
 import com.google.api.search.GoogleSearchPort;
 import com.google.api.search.GoogleSearchResult;
 import com.google.api.search.GoogleSearchService;
 import com.google.api.search.GoogleSearchServiceLocator;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import javax.xml.rpc.ServiceException;
+import java.rmi.RemoteException;
 
 public class GooglePluginApi extends Api {
     private GooglePlugin plugin;

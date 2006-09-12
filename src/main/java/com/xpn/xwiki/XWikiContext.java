@@ -24,22 +24,17 @@
 
 package com.xpn.xwiki;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-
-import org.apache.xmlrpc.server.XmlRpcServer;
-
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiForm;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.*;
+import org.apache.xmlrpc.server.XmlRpcServer;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class XWikiContext extends Hashtable {
 

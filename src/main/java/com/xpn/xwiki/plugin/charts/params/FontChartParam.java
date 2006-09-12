@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.Font;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class FontChartParam extends AbstractChartParam {
 	private Map styleChoices = new HashMap();

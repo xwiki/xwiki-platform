@@ -21,6 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
+import com.xpn.xwiki.plugin.charts.params.ChartParams;
+import com.xpn.xwiki.plugin.charts.source.DataSource;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
@@ -28,12 +33,6 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-
-import com.xpn.xwiki.plugin.charts.ChartCustomizer;
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
-import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
-import com.xpn.xwiki.plugin.charts.params.ChartParams;
-import com.xpn.xwiki.plugin.charts.source.DataSource;
 
 public class CategoryPlotFactory {
 	private static CategoryPlotFactory uniqueInstance = new CategoryPlotFactory();

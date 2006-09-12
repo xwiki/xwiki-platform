@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.util.Locale;
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.util.Locale;
+import java.util.Map;
 
 public class LocaleChartParam extends AbstractChartParam {
 	public static final String LANGUAGE = "language";

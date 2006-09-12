@@ -23,35 +23,6 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.core.query.AndQueryNode;
-import org.apache.jackrabbit.core.query.DefaultQueryNodeVisitor;
-import org.apache.jackrabbit.core.query.DerefQueryNode;
-import org.apache.jackrabbit.core.query.ExactQueryNode;
-import org.apache.jackrabbit.core.query.LocationStepQueryNode;
-import org.apache.jackrabbit.core.query.NAryQueryNode;
-import org.apache.jackrabbit.core.query.NodeTypeQueryNode;
-import org.apache.jackrabbit.core.query.NotQueryNode;
-import org.apache.jackrabbit.core.query.OrQueryNode;
-import org.apache.jackrabbit.core.query.OrderQueryNode;
-import org.apache.jackrabbit.core.query.PathQueryNode;
-import org.apache.jackrabbit.core.query.QueryConstants;
-import org.apache.jackrabbit.core.query.QueryNode;
-import org.apache.jackrabbit.core.query.QueryNodeVisitor;
-import org.apache.jackrabbit.core.query.QueryRootNode;
-import org.apache.jackrabbit.core.query.RelationQueryNode;
-import org.apache.jackrabbit.core.query.TextsearchQueryNode;
-import org.apache.jackrabbit.name.QName;
-import org.hibernate.Query;
-import org.hibernate.Session;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,6 +34,14 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jackrabbit.core.query.*;
+import org.apache.jackrabbit.name.QName;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import java.util.*;
 
 /** Query implementation for Hibernate */
 public class HibernateQuery extends DefaultQuery {

@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.util.Map;
 
 public class MapChartParam extends AbstractChartParam {
 

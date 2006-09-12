@@ -1,8 +1,8 @@
 package com.xpn.xwiki.web;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ResetVersionsAction extends XWikiAction {

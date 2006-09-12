@@ -2,15 +2,15 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.BaseCollection;
-import org.apache.ecs.xhtml.select;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.button;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.button;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
 
 import java.util.ArrayList;
 import java.util.Iterator;

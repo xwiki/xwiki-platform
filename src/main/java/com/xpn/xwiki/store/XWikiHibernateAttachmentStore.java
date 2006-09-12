@@ -1,17 +1,15 @@
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentContent;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import org.hibernate.Session;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 import java.util.List;
 

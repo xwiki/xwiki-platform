@@ -23,25 +23,25 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import org.apache.ecs.xhtml.input;
 import org.apache.velocity.VelocityContext;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.mapping.Property;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface {
     private BaseClass object;
@@ -79,6 +79,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             this.object = (BaseClass)object;
     }
 
+    public String getFieldFullName() {
+        return getObject().getName() + "_" + getName();
+    }
+    
     public int getId() {
         if (getObject()==null)
             return id;
@@ -125,7 +129,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
        buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop!=null) input.setValue(prop.toFormString());
@@ -161,13 +165,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
       return displayHidden(name, "", object, context);
     }
 
-    public String displaySearch(String name, String prefix, BaseCollection object, XWikiContext context) {
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
-      displaySearch(buffer, name, prefix, object, context);
+      displaySearch(buffer, name, prefix, criteria, context);
       return buffer.toString();
     }
-    public String displaySearch(String name, BaseCollection object, XWikiContext context) {
-      return displaySearch(name, "", object, context);
+    public String displaySearch(String name, XWikiCriteria criteria, XWikiContext context) {
+      return displaySearch(name, "", criteria, context);
     }
 
     public String displayView(String name, String prefix, BaseCollection object, XWikiContext context) {
@@ -350,5 +354,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
+    }
+
+    public void fromSearchMap(XWikiQuery query, Map map) {
     }
 }

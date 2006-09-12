@@ -22,9 +22,9 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import javax.servlet.http.HttpServletRequest;
-
 import com.xpn.xwiki.web.XWikiServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 public class XWikiXMLRPCRequest extends XWikiServletRequest {

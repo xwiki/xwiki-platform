@@ -23,20 +23,21 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-import org.apache.ecs.xhtml.input;
-import org.dom4j.Element;
-
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import org.apache.ecs.xhtml.input;
+import org.dom4j.Element;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 
 public class DateClass  extends PropertyClass {
 
@@ -164,5 +165,20 @@ public class DateClass  extends PropertyClass {
         buffer.append(input1.toString());
         buffer.append(((XWikiMessageTool)context.get("msg")).get("to"));
         buffer.append(input2.toString());
+    }
+
+    public void fromSearchMap(XWikiQuery query, Map map) {
+        String[] data  = (String[])map.get("");
+        if ((data!=null)&&(data.length==1))
+            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
+        else {
+            data  = (String[])map.get("lessthan");
+            if ((data!=null)&&(data.length==1))
+                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
+            data  = (String[])map.get("morethan");
+            if ((data!=null)&&(data.length==1))
+                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
+
+        }
     }
 }

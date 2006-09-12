@@ -23,16 +23,12 @@
 
 package com.xpn.xwiki.render.macro;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.macro.Macro;
+
+import java.util.*;
 
 public class MacroRepository extends org.radeox.macro.PluginRepository {
   protected static Log log = LogFactory.getLog(MacroRepository.class);

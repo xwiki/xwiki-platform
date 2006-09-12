@@ -22,11 +22,10 @@
 
 package com.xpn.xwiki.objects;
 
-import org.dom4j.Element;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import org.dom4j.Element;
 
 public interface ObjectInterface extends ElementInterface {
     public BaseClass getxWikiClass(XWikiContext context) throws XWikiException;

@@ -21,15 +21,7 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import org.jfree.data.time.Day;
-import org.jfree.data.time.Hour;
-import org.jfree.data.time.Millisecond;
-import org.jfree.data.time.Minute;
-import org.jfree.data.time.Month;
-import org.jfree.data.time.Quarter;
-import org.jfree.data.time.Second;
-import org.jfree.data.time.Week;
-import org.jfree.data.time.Year;
+import org.jfree.data.time.*;
 
 public class TimePeriodClassChartParam extends ChoiceChartParam {
 

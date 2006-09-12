@@ -37,6 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -71,9 +72,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -912,7 +911,8 @@ public class XWikiDocument {
                 result.append("{/pre}");
             } else if (type.equals("search")) {
                 result.append("{pre}");
-                pclass.displaySearch(result, fieldname, prefix, obj, context);
+                prefix = obj.getxWikiClass(context).getName() + "_";
+                pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
                 result.append("{/pre}");
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -1906,8 +1906,8 @@ public class XWikiDocument {
         return (pclass == null) ? "" : pclass.displayHidden(pclass.getName(), prefix, object, context);
     }
 
-    public String displaySearch(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context) {
-        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, object, context);
+    public String displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria, XWikiContext context) {
+        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
     }
 
     public XWikiAttachment getAttachment(String filename) {

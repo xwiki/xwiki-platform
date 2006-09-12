@@ -91,6 +91,7 @@ public class QueryGeneratorTest extends HibernateTestCase {
         hb.saveXWikiDoc(doc1, getXWikiContext());
     }
 
+    /*
     public void testRunQuery() throws XWikiException {
         XWikiHibernateStore hb = getXWiki().getHibernateStore();
         prepareData(hb);
@@ -115,5 +116,5 @@ public class QueryGeneratorTest extends HibernateTestCase {
         String result =  xwiki.searchAsTable(query, context);
         assertTrue("Result is invalid:\r\n" + result, result.indexOf("dfdfsd")!=-1);
     }
-
+      */
 }

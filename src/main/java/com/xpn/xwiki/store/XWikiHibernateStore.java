@@ -29,37 +29,6 @@
 package com.xpn.xwiki.store;
 
 
-import java.io.BufferedReader;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.EntityMode;
-import org.hibernate.FlushMode;
-import org.hibernate.ObjectNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Settings;
-import org.hibernate.connection.ConnectionProvider;
-import org.hibernate.impl.SessionFactoryImpl;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -68,14 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseElement;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.LargeStringProperty;
-import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -84,6 +46,23 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.*;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+
+import java.io.BufferedReader;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.*;
 
 
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface {

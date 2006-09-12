@@ -24,31 +24,8 @@ package com.xpn.xwiki.plugin.charts.params;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PiePlot3D;
 import org.jfree.chart.plot.RingPlot;
-import org.jfree.chart.renderer.category.AreaRenderer;
-import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.BarRenderer3D;
-import org.jfree.chart.renderer.category.CategoryStepRenderer;
-import org.jfree.chart.renderer.category.GroupedStackedBarRenderer;
-import org.jfree.chart.renderer.category.IntervalBarRenderer;
-import org.jfree.chart.renderer.category.LayeredBarRenderer;
-import org.jfree.chart.renderer.category.LevelRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.renderer.category.LineRenderer3D;
-import org.jfree.chart.renderer.category.StackedAreaRenderer;
-import org.jfree.chart.renderer.category.StackedBarRenderer;
-import org.jfree.chart.renderer.category.StackedBarRenderer3D;
-import org.jfree.chart.renderer.category.WaterfallBarRenderer;
-import org.jfree.chart.renderer.xy.ClusteredXYBarRenderer;
-import org.jfree.chart.renderer.xy.StackedXYAreaRenderer;
-import org.jfree.chart.renderer.xy.StackedXYAreaRenderer2;
-import org.jfree.chart.renderer.xy.StackedXYBarRenderer;
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
-import org.jfree.chart.renderer.xy.XYAreaRenderer2;
-import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.jfree.chart.renderer.xy.XYLine3DRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.renderer.xy.XYStepAreaRenderer;
-import org.jfree.chart.renderer.xy.XYStepRenderer;
+import org.jfree.chart.renderer.category.*;
+import org.jfree.chart.renderer.xy.*;
 
 public class RendererClassChartParam extends ChoiceChartParam {
 

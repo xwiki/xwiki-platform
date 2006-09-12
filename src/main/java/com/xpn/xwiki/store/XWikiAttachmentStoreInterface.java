@@ -1,8 +1,8 @@
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * Created by IntelliJ IDEA.

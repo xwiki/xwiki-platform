@@ -21,19 +21,18 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
-import java.lang.reflect.Constructor;
-
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
+import com.xpn.xwiki.plugin.charts.params.ChartParams;
+import com.xpn.xwiki.plugin.charts.source.DataSource;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 
-import com.xpn.xwiki.plugin.charts.ChartCustomizer;
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
-import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
-import com.xpn.xwiki.plugin.charts.params.ChartParams;
-import com.xpn.xwiki.plugin.charts.source.DataSource;
+import java.lang.reflect.Constructor;
 
 public class BarPlotFactory implements PlotFactory {
 	private static BarPlotFactory uniqueInstance = new BarPlotFactory();

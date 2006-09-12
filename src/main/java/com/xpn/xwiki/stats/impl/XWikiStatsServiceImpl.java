@@ -23,28 +23,6 @@
 
 package com.xpn.xwiki.stats.impl;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.portals.graffito.jcr.query.Filter;
-import org.apache.portals.graffito.jcr.query.QueryManager;
-import org.hibernate.Query;
-import org.hibernate.Session;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -57,6 +35,22 @@ import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.portals.graffito.jcr.query.Filter;
+import org.apache.portals.graffito.jcr.query.QueryManager;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 public class XWikiStatsServiceImpl implements XWikiStatsService {
 

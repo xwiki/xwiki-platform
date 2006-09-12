@@ -22,10 +22,10 @@
 
 package com.xpn.xwiki.user.api;
 
-import java.security.Principal;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+
+import java.security.Principal;
 
 public interface XWikiAuthService {
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException;

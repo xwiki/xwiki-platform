@@ -21,12 +21,12 @@
  */
 package com.xpn.xwiki.plugin.charts.source;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 
 public class MainDataSourceFactory implements DataSourceFactory {
     private static DataSourceFactory uniqueInstance = new MainDataSourceFactory();

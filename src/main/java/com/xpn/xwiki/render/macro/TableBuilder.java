@@ -19,6 +19,7 @@
 package com.xpn.xwiki.render.macro;
 
 import org.radeox.macro.table.Table;
+
 import java.util.StringTokenizer;
 
 /**

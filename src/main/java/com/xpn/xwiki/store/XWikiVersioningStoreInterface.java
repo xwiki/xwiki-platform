@@ -1,11 +1,10 @@
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.rcs.Archive;
 
 public interface XWikiVersioningStoreInterface {
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException;

@@ -22,10 +22,10 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+
+import java.util.List;
 
 public class StaticListClass extends ListClass {
 

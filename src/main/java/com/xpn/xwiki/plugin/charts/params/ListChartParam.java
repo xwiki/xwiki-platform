@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class ListChartParam extends AbstractChartParam {
 	private ChartParam param;

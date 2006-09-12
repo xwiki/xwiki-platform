@@ -22,20 +22,12 @@
 
 package com.xpn.xwiki.plugin.terraserver;
 
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
-import com.ms.terraservice.LonLatPt;
-import com.ms.terraservice.Place;
-import com.ms.terraservice.PlaceFacts;
-import com.ms.terraservice.Scale;
-import com.ms.terraservice.TerraServiceLocator;
-import com.ms.terraservice.TerraServiceSoap;
-import com.ms.terraservice.TileId;
-import com.ms.terraservice.TileMeta;
+import com.ms.terraservice.*;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import javax.xml.rpc.ServiceException;
+import java.rmi.RemoteException;
 
 public class TerraServerPluginApi extends Api {
     private TerraServerPlugin plugin;

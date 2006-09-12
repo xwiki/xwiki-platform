@@ -1,9 +1,9 @@
 package com.xpn.xwiki.doc;
 
+import com.xpn.xwiki.XWikiException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
-import com.xpn.xwiki.XWikiException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.util.ToString;
 

@@ -26,9 +26,11 @@
 
 package com.xpn.xwiki.render;
 
-import java.net.URL;
-import java.util.Iterator;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.filter.XWikiFilter;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,13 +42,10 @@ import org.radeox.filter.Filter;
 import org.radeox.filter.FilterPipe;
 import org.radeox.util.Service;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.filter.XWikiFilter;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
-import java.util.List;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
     private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);

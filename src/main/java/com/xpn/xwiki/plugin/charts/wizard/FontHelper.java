@@ -21,10 +21,7 @@
  */
 package com.xpn.xwiki.plugin.charts.wizard;
 
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-
-import org.jfree.chart.JFreeChart;
+import java.awt.*;
 
 public class FontHelper {
   public FontHelper(){

@@ -1,9 +1,9 @@
 package com.xpn.xwiki.objects.meta;
 
-import com.xpn.xwiki.objects.classes.GroupsClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.GroupsClass;
 
 public class GroupsMetaClass extends ListMetaClass {
     public GroupsMetaClass() {

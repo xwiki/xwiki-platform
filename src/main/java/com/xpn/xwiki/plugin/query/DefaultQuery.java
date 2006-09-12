@@ -22,13 +22,12 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.List;
-
-import org.apache.jackrabbit.core.query.QueryRootNode;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.apache.jackrabbit.core.query.QueryRootNode;
+
+import java.util.List;
 
 public class DefaultQuery implements IQuery {
 	protected IQueryFactory _queryFactory;

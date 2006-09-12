@@ -21,11 +21,7 @@
  */
 package com.xpn.xwiki.plugin.charts.source;
 
-import com.xpn.xwiki.plugin.charts.exceptions.ColumnIndexOutOfBoundsException;
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
-import com.xpn.xwiki.plugin.charts.exceptions.NoHeaderColumnException;
-import com.xpn.xwiki.plugin.charts.exceptions.NoHeaderRowException;
-import com.xpn.xwiki.plugin.charts.exceptions.RowIndexOutOfBoundsException;
+import com.xpn.xwiki.plugin.charts.exceptions.*;
 
 public class DefaultDataSource implements DataSource {
     protected Number[][] data;

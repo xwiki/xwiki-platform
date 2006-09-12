@@ -21,17 +21,16 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.Plot;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.XYDataset;
-
 import com.xpn.xwiki.plugin.charts.ChartCustomizer;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.source.DataSource;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 
 public class XYPlotFactory {
 	private static XYPlotFactory uniqueInstance = new XYPlotFactory();

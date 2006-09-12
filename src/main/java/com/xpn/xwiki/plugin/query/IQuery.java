@@ -22,9 +22,9 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWikiException;
+
+import java.util.List;
 
 /** XWiki Query interface */
 public interface IQuery {

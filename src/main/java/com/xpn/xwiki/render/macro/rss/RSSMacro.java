@@ -23,16 +23,6 @@
 
 package com.xpn.xwiki.render.macro.rss;
 
-import java.io.Writer;
-import java.net.MalformedURLException;
-import java.util.List;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.radeox.macro.BaseLocaleMacro;
-import org.radeox.macro.parameter.MacroParameter;
-import org.radeox.util.Encoder;
-import org.radeox.util.logging.Logger;
-
 import com.sun.syndication.feed.WireFeed;
 import com.sun.syndication.feed.rss.Channel;
 import com.sun.syndication.feed.rss.TextInput;
@@ -41,6 +31,15 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndImage;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import org.apache.commons.beanutils.BeanUtils;
+import org.radeox.macro.BaseLocaleMacro;
+import org.radeox.macro.parameter.MacroParameter;
+import org.radeox.util.Encoder;
+import org.radeox.util.logging.Logger;
+
+import java.io.Writer;
+import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * A Radeox MacroFilter for rendering an RSS feed.

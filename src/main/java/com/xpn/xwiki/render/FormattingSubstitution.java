@@ -22,9 +22,8 @@
 
 package com.xpn.xwiki.render;
 
-import org.apache.oro.text.regex.MatchResult;
-
 import com.xpn.xwiki.util.Util;
+import org.apache.oro.text.regex.MatchResult;
 
 public class FormattingSubstitution extends WikiSubstitution {
 

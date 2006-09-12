@@ -1,14 +1,5 @@
 package com.xpn.xwiki.store.jcr;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-
-import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -17,6 +8,13 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
+
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import java.lang.reflect.InvocationTargetException;
 
 /** Versions store in jcr property '@archive' of xwiki:document */
 public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implements XWikiVersioningStoreInterface {

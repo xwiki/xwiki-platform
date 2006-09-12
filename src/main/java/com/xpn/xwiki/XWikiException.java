@@ -27,17 +27,16 @@ package com.xpn.xwiki;
 
 
 // import com.xpn.xwiki.store.XWikiBatcher;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.text.MessageFormat;
-
-import javax.servlet.ServletException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.hibernate.JDBCException;
+
+import javax.servlet.ServletException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 
 public class XWikiException extends Exception {
 

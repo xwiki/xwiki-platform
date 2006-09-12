@@ -1,21 +1,16 @@
 package com.xpn.xwiki.xmlrpc;
 
+import com.xpn.xwiki.web.XWikiResponse;
+
+import javax.portlet.*;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.portlet.PortletMode;
-import javax.portlet.PortletModeException;
-import javax.portlet.PortletURL;
-import javax.portlet.WindowState;
-import javax.portlet.WindowStateException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-
-import com.xpn.xwiki.web.XWikiResponse;
 
 public class MockXWikiResponse implements XWikiResponse {
 

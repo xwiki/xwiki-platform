@@ -23,15 +23,11 @@
 
 package com.xpn.xwiki.render;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.oro.text.regex.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.oro.text.regex.MatchResult;
-import org.apache.oro.text.regex.Pattern;
-import org.apache.oro.text.regex.PatternMatcher;
-import org.apache.oro.text.regex.PatternMatcherInput;
-import org.apache.oro.text.regex.Perl5Compiler;
 
 
 public class PreTagSubstitution extends WikiSubstitution {

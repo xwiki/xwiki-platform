@@ -25,8 +25,6 @@ package com.xpn.xwiki.user.impl.exo;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import org.exoplatform.commons.utils.PageList;

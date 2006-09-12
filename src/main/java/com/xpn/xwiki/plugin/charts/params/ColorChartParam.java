@@ -21,12 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.Color;
-import java.awt.Shape;
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.awt.*;
+import java.util.Map;
 
 public class ColorChartParam extends AbstractChartParam {
 	private ChartParam colorChoice;

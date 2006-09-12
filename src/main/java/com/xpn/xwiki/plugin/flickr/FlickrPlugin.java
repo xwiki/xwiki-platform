@@ -22,15 +22,13 @@
 
 package com.xpn.xwiki.plugin.flickr;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.aetrion.flickr.RequestContext;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class FlickrPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =

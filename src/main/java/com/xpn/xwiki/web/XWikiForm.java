@@ -23,12 +23,12 @@
 package com.xpn.xwiki.web;
 
 
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionMapping;
+
 import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionMapping;
 
 public abstract class XWikiForm extends ActionForm {
     private XWikiRequest request;

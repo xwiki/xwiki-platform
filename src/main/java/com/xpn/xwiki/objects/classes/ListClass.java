@@ -24,24 +24,19 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import java.util.*;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DBStringListProperty;
-import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.StringListProperty;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.web.XWikiMessageTool;
+import java.util.*;
 
 public abstract class ListClass extends PropertyClass {
 
@@ -288,7 +283,7 @@ public abstract class ListClass extends PropertyClass {
 		}
 	}
 
-    protected void displayRadioSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
+    protected void displayRadioSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context){
         List list = getList(context);
         List selectlist = new ArrayList();
 
@@ -319,7 +314,7 @@ public abstract class ListClass extends PropertyClass {
         }
     }
 
-    protected void displaySelectSearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context){
+    protected void displaySelectSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context){
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
         select.setSize(getSize());
@@ -375,4 +370,9 @@ public abstract class ListClass extends PropertyClass {
         return;
     }
 
+    public void fromSearchMap(XWikiQuery query, Map map) {
+        String[] data  = (String[])map.get("");
+        if (data!=null)
+            query.setParam(getObject().getName() + "_" + getName(), fromStringArray(data).getValue());
+    }
 }

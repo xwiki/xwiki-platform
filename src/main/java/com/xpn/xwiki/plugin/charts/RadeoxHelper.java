@@ -21,13 +21,6 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.radeox.macro.table.Table;
-import org.radeox.macro.table.TableBuilder;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,6 +29,12 @@ import com.xpn.xwiki.plugin.charts.source.TableDataSource;
 import com.xpn.xwiki.render.PreTagSubstitution;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import org.radeox.macro.table.Table;
+import org.radeox.macro.table.TableBuilder;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 public class RadeoxHelper {
 	// lazily initiated single CustomXWikiRenderingEngine instance

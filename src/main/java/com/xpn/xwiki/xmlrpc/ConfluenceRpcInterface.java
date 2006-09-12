@@ -1,8 +1,8 @@
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Map;
-
 import com.xpn.xwiki.XWikiException;
+
+import java.util.Map;
 
 public interface ConfluenceRpcInterface {
 

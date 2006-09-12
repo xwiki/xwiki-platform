@@ -36,25 +36,18 @@
 
 package com.xpn.xwiki.render.groovy;
 
+import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 import groovy.lang.*;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Map;
-import java.util.HashMap;
-import java.beans.Introspector;
-
 import org.codehaus.groovy.control.CompilationFailedException;
-import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.DefaultGroovyStaticMethods;
-import com.xpn.xwiki.cache.impl.XWikiCachedObject;
+import org.codehaus.groovy.runtime.InvokerHelper;
+
+import java.beans.Introspector;
+import java.io.*;
+import java.util.Map;
 
 
 /**

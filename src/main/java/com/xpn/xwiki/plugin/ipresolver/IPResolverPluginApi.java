@@ -22,17 +22,16 @@
 
 package com.xpn.xwiki.plugin.ipresolver;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.rmi.RemoteException;
-
-import javax.xml.rpc.ServiceException;
-
 import com.cdyne.ipresolver.IP2GeoLocator;
 import com.cdyne.ipresolver.IP2GeoSoap;
 import com.cdyne.ipresolver.IPInformation;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import javax.xml.rpc.ServiceException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
 
 public class IPResolverPluginApi extends Api {
     private IPResolverPlugin plugin;

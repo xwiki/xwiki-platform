@@ -22,11 +22,11 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Date;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+
+import java.util.Date;
 
 public class Comment {
     private String id;

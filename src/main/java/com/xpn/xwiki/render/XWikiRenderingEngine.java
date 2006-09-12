@@ -23,13 +23,6 @@
 
 package com.xpn.xwiki.render;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,6 +36,8 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.*;
 
 public class XWikiRenderingEngine {
     private static final Log log = LogFactory.getLog(XWikiRenderingEngine.class);

@@ -23,29 +23,22 @@
 
 package com.xpn.xwiki.plugin.image;
 
-import java.awt.Container;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Properties;
-
-import javax.imageio.ImageIO;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.impl.OSCacheCache;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class ImagePlugin extends XWikiDefaultPlugin {
     private static final Log log = LogFactory.getLog(ImagePlugin.class);

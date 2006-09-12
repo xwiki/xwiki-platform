@@ -1,13 +1,10 @@
 package com.xpn.xwiki.xmlrpc;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-
+import com.xpn.xwiki.XWikiException;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 
-import com.xpn.xwiki.XWikiException;
+import javax.servlet.Servlet;
+import javax.servlet.ServletRequest;
 
 public interface RequestInitializableHandler {
 	public void init(Servlet servlet, ServletRequest request)

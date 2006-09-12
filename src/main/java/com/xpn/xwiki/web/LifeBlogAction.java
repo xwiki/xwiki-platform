@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.atom.lifeblog.LifeblogServices;
+
+import java.io.IOException;
 
 public class LifeBlogAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {

@@ -22,16 +22,15 @@
 
 package com.xpn.xwiki.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCURLFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {

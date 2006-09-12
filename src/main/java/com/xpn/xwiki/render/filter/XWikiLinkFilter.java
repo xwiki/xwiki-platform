@@ -24,9 +24,6 @@
 
 package com.xpn.xwiki.render.filter;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.RenderEngine;
@@ -36,6 +33,9 @@ import org.radeox.filter.interwiki.InterWiki;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
+
+import java.io.IOException;
+import java.io.Writer;
 
 
 /*

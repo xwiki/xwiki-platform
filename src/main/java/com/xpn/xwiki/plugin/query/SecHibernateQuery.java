@@ -22,15 +22,6 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.jackrabbit.core.query.QueryRootNode;
-import org.apache.jackrabbit.name.QName;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -40,6 +31,10 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjPropProperty;
 import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import org.apache.jackrabbit.core.query.QueryRootNode;
+import org.apache.jackrabbit.name.QName;
+
+import java.util.*;
 
 /** Security version of HibernateQuery */
 public class SecHibernateQuery extends HibernateQuery {

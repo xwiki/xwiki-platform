@@ -23,10 +23,10 @@
 
 package com.xpn.xwiki.plugin.graphviz;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import java.io.IOException;
 
 public class GraphVizPluginApi extends Api {
     private GraphVizPlugin plugin;

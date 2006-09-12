@@ -21,14 +21,14 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-
-import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DateChartParam extends DateFormatChartParam {
 

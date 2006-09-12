@@ -21,18 +21,9 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.util.List;
-
+import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
@@ -42,7 +33,8 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.TextTitle;
 
-import com.xpn.xwiki.plugin.charts.params.ChartParams;
+import java.awt.*;
+import java.util.List;
 
 public class ChartCustomizer {
 

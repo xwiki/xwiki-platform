@@ -21,11 +21,11 @@
  */
 package com.xpn.xwiki.store.jcr;
 
+import org.apache.jackrabbit.util.ISO9075;
+
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
-
-import org.apache.jackrabbit.util.ISO9075;
 
 public class JcrUtil {
 	public static Node getOrCreateSubNode(Node root, String subnodename, String subnodetype) throws RepositoryException {

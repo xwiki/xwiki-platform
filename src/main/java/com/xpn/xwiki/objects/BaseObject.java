@@ -25,18 +25,17 @@
 package com.xpn.xwiki.objects;
 
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public class BaseObject extends BaseCollection implements ObjectInterface, Serializable {
 
@@ -55,10 +54,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         ((PropertyClass)getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiContext context) {
-        ((PropertyClass)getxWikiClass(context).get(name)).displaySearch(buffer, name, prefix, this, context);
-    }
-
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context) {
         ((PropertyClass)getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
@@ -70,12 +65,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     public String displayHidden(String name, String prefix, XWikiContext context) {
         StringBuffer buffer = new StringBuffer();
         ((PropertyClass)getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
-        return buffer.toString();
-    }
-
-    public String displaySearch(String name, String prefix, XWikiContext context) {
-        StringBuffer buffer = new StringBuffer();
-        ((PropertyClass)getxWikiClass(context).get(name)).displaySearch(buffer, name, prefix, this, context);
         return buffer.toString();
     }
 
@@ -93,10 +82,6 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
     public String displayHidden(String name, XWikiContext context) {
         return displayHidden(name, "", context);
-    }
-
-    public String displaySearch(String name, XWikiContext context) {
-        return displaySearch(name, "", context);
     }
 
     public String displayView(String name, XWikiContext context) {

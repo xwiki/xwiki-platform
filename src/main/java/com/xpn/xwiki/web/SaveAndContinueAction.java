@@ -23,10 +23,10 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+
+import java.io.IOException;
 
 public class SaveAndContinueAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {

@@ -22,16 +22,11 @@
 
 package com.xpn.xwiki.monitor.api;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.net.URL;
+import java.util.*;
 
 public class MonitorData {
     private static final Log log = LogFactory.getLog(MonitorData.class);

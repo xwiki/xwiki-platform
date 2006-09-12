@@ -23,10 +23,9 @@
 
 package com.xpn.xwiki.web.includeservletasstring;
 
+import javax.servlet.ServletOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import javax.servlet.ServletOutputStream;
 
 /**
  *

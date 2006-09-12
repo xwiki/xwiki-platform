@@ -23,11 +23,10 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 public class MyFilterConfig implements FilterConfig {
     protected Hashtable params = new Hashtable();

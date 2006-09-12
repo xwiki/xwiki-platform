@@ -22,15 +22,14 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
-
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
-import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.captcha.CaptchaParams;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
+import org.apache.velocity.VelocityContext;
 
 public class PreviewAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {

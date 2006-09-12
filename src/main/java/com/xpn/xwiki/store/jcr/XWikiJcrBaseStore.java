@@ -21,29 +21,23 @@
  */
 package com.xpn.xwiki.store.jcr;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import javax.jcr.LoginException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.Property;
-import javax.jcr.RepositoryException;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryResult;
-import javax.jcr.util.TraversingItemVisitor;
-
-import org.apache.jackrabbit.util.ISO9075;
-import org.apache.portals.graffito.jcr.query.Filter;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.jackrabbit.util.ISO9075;
+import org.apache.portals.graffito.jcr.query.Filter;
+
+import javax.jcr.*;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryResult;
+import javax.jcr.util.TraversingItemVisitor;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 public class XWikiJcrBaseStore {
 	IJcrProvider jcr;

@@ -23,13 +23,15 @@
 
 package com.xpn.xwiki.plugin;
 
-import java.util.*;
-import java.lang.reflect.Method;
-
-import org.apache.commons.lang.StringUtils;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import org.apache.commons.lang.StringUtils;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 public class XWikiPluginManager {
     private Vector plugins = new Vector();

@@ -22,12 +22,11 @@
 
 package com.xpn.xwiki.plugin.svg;
 
-import java.io.IOException;
-
-import org.apache.batik.apps.rasterizer.SVGConverterException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import org.apache.batik.apps.rasterizer.SVGConverterException;
+
+import java.io.IOException;
 
 public class SVGPluginApi extends Api {
     private SVGPlugin plugin;

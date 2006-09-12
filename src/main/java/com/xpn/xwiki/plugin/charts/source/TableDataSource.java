@@ -22,12 +22,6 @@
  */
 package com.xpn.xwiki.plugin.charts.source;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Map;
-
-import org.radeox.macro.table.Table;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -35,6 +29,11 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.charts.RadeoxHelper;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.EmptyDataSourceException;
+import org.radeox.macro.table.Table;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Map;
 
 public class TableDataSource extends DefaultDataSource implements DataSource {
     public static final String DOC = "doc";

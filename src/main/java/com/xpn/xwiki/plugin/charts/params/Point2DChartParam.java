@@ -21,10 +21,10 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
 import java.awt.geom.Point2D;
 import java.util.Map;
-
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class Point2DChartParam extends AbstractChartParam {
 

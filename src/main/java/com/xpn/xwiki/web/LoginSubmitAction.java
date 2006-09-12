@@ -21,11 +21,10 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class LoginSubmitAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(LoginSubmitAction.class);

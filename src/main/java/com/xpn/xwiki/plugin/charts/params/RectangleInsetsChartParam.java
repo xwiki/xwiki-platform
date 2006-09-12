@@ -21,11 +21,10 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.util.Map;
-
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import org.jfree.ui.RectangleInsets;
 
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import java.util.Map;
 
 public class RectangleInsetsChartParam extends AbstractChartParam {
 

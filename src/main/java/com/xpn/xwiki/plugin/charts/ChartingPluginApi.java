@@ -21,12 +21,12 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
+
+import java.io.IOException;
 
 public class ChartingPluginApi extends Api {
 	private ChartingPlugin plugin;

@@ -22,14 +22,13 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.jcr.NamespaceException;
-
 import org.apache.jackrabbit.core.SearchManager;
 import org.apache.jackrabbit.name.AbstractNamespaceResolver;
 import org.apache.jackrabbit.name.QName;
+
+import javax.jcr.NamespaceException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** XWiki NamespaceResolver for JackRabbits. Singleton */
 public class XWikiNamespaceResolver extends AbstractNamespaceResolver {

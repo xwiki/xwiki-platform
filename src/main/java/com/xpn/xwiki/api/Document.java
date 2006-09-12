@@ -28,29 +28,22 @@
 
 package com.xpn.xwiki.api;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
-
-import org.suigeneris.jrcs.diff.DifferentiationFailedException;
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
+import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.rcs.Version;
+
+import java.util.*;
 
 
 public class Document extends Api {
@@ -492,7 +485,7 @@ public class Document extends Api {
             return "";
         return doc.display(fieldname, mode, obj.getBaseObject(), context);
     }
-
+    
     public String displayForm(String className,String header, String format) {
         return doc.displayForm(className, header, format, context);
     }
@@ -527,12 +520,6 @@ public class Document extends Api {
         if ((pclass==null)||(object==null))
             return "";
         return doc.displayHidden(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
-    }
-
-    public String displaySearch(com.xpn.xwiki.api.PropertyClass pclass, String prefix, Collection object) {
-        if ((pclass==null)||(object==null))
-            return "";
-        return doc.displaySearch(pclass.getBasePropertyClass(), prefix, object.getCollection(), context);
     }
 
     public List getIncludedPages() {

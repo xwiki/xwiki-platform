@@ -22,11 +22,11 @@
 
 package com.xpn.xwiki.objects;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class DateProperty extends BaseProperty {

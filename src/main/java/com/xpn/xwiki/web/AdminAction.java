@@ -22,15 +22,14 @@
 
 package com.xpn.xwiki.web;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 
 public class AdminAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(AdminAction.class);

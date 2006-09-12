@@ -25,13 +25,13 @@
 
 package com.xpn.xwiki.store;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+
+import java.util.List;
 
 
 public interface XWikiStoreInterface {

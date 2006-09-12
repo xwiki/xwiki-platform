@@ -24,29 +24,28 @@
 
 package com.xpn.xwiki.doc;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.io.StringWriter;
-import java.io.IOException;
-import java.io.StringReader;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import org.apache.commons.codec.binary.Base64;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.dom.DOMElement;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+import org.hibernate.ObjectNotFoundException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Node;
 import org.suigeneris.jrcs.rcs.Version;
-import org.dom4j.Element;
-import org.dom4j.Document ;
-import org.dom4j.DocumentException;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.io.SAXReader;
-import org.dom4j.dom.DOMElement;
-import org.dom4j.dom.DOMDocument;
-import org.hibernate.ObjectNotFoundException;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class XWikiAttachment {
     private XWikiDocument doc;

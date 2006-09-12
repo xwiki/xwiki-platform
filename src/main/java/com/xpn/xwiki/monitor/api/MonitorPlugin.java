@@ -22,17 +22,16 @@
 
 package com.xpn.xwiki.monitor.api;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MonitorPlugin extends XWikiDefaultPlugin {
     private static final Log log = LogFactory.getLog(MonitorPlugin.class);

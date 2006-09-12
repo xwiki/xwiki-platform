@@ -24,21 +24,19 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
+import org.securityfilter.filter.SecurityRequestWrapper;
 
 import javax.crypto.Cipher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
-import org.securityfilter.authenticator.FormAuthenticator;
-import org.securityfilter.filter.SecurityRequestWrapper;
+import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager {
     private static final Log log = LogFactory.getLog(MyPersistentLoginManager.class);

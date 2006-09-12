@@ -22,12 +22,12 @@
 
 package com.xpn.xwiki.plugin.ldap;
 
-import java.util.HashMap;
-
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import java.util.HashMap;
 
 public class LDAPPluginApi extends Api {
         private LDAPPlugin plugin;

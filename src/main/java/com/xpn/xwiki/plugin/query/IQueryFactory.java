@@ -22,14 +22,12 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import javax.jcr.ValueFactory;
-import javax.jcr.query.InvalidQueryException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import java.util.List;
+import javax.jcr.ValueFactory;
+import javax.jcr.query.InvalidQueryException;
 
 /** AbstractFactory interface for XWiki Queries */
 public interface IQueryFactory {

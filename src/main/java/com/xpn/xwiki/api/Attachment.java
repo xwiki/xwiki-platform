@@ -23,15 +23,14 @@
 
 package com.xpn.xwiki.api;
 
-import java.util.Date;
-import java.util.List;
-
-import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
+
+import java.util.Date;
+import java.util.List;
 
 public class Attachment extends Api {
     private Document doc;

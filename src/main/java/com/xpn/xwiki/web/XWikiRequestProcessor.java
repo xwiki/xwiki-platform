@@ -25,10 +25,9 @@ package com.xpn.xwiki.web;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor {
     protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {

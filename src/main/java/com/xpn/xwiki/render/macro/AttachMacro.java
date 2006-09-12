@@ -22,18 +22,17 @@
 
 package com.xpn.xwiki.render.macro;
 
-import java.io.IOException;
-import java.io.Writer;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.radeox.util.Encoder;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import java.io.IOException;
+import java.io.Writer;
 
 public class AttachMacro   extends BaseLocaleMacro {
   public String getLocaleKey() {

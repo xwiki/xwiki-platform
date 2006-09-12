@@ -28,8 +28,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import java.lang.*;
-
 public class Object extends Collection {
 
     public Object(BaseObject obj, XWikiContext context) {

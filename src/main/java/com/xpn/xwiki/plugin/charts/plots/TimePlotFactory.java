@@ -21,8 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
-import java.lang.reflect.Constructor;
-
+import com.xpn.xwiki.plugin.charts.ChartCustomizer;
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
+import com.xpn.xwiki.plugin.charts.params.ChartParams;
+import com.xpn.xwiki.plugin.charts.source.DataSource;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.Plot;
@@ -31,11 +34,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 
-import com.xpn.xwiki.plugin.charts.ChartCustomizer;
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
-import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
-import com.xpn.xwiki.plugin.charts.params.ChartParams;
-import com.xpn.xwiki.plugin.charts.source.DataSource;
+import java.lang.reflect.Constructor;
 
 public class TimePlotFactory implements PlotFactory {
 	private static TimePlotFactory uniqueInstance = new TimePlotFactory();

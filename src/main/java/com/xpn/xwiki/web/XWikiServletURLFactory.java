@@ -26,20 +26,16 @@
 
 package com.xpn.xwiki.web;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.io.IOException;
-import java.util.List;
-
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.velocity.VelocityContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     protected URL serverURL;

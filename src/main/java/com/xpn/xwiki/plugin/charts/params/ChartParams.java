@@ -21,34 +21,23 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.Point2D;
-import java.security.InvalidParameterException;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.xpn.xwiki.plugin.charts.exceptions.MissingMandatoryParamException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.DateTickMarkPosition;
 import org.jfree.chart.axis.DateTickUnit;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.RangeType;
-import org.jfree.ui.HorizontalAlignment;
-import org.jfree.ui.RectangleAnchor;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.RectangleInsets;
-import org.jfree.ui.VerticalAlignment;
+import org.jfree.ui.*;
 
-import com.xpn.xwiki.plugin.charts.exceptions.MissingMandatoryParamException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.security.InvalidParameterException;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.*;
+import java.util.List;
 
 public class ChartParams {
 	private Map paramMap = new HashMap(); // Map<String,ChartParam>

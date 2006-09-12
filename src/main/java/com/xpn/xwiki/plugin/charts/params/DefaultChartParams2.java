@@ -21,24 +21,9 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.text.DateFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.DateTickMarkPosition;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -52,7 +37,14 @@ import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DefaultChartParams2 extends ChartParams {
 	public static DefaultChartParams2 uniqueInstance;

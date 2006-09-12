@@ -22,10 +22,7 @@
 
 package com.xpn.xwiki.objects;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
-
+import com.xpn.xwiki.web.Utils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
@@ -33,7 +30,9 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import com.xpn.xwiki.web.Utils;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
 
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden

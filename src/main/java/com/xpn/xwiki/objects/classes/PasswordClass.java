@@ -22,13 +22,12 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import org.apache.ecs.xhtml.input;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ElementInterface;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import org.apache.ecs.xhtml.input;
 
 public class PasswordClass extends StringClass {
     public PasswordClass(PropertyMetaClass wclass) {
@@ -49,10 +48,6 @@ public class PasswordClass extends StringClass {
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
         // Passwords cannot go through the preview interface of we don't do something here..
-    }
-
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        super.displaySearch(buffer, name, prefix, object, context);
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {

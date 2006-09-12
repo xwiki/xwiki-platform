@@ -25,14 +25,14 @@
 
 package com.xpn.xwiki.api;
 
-import java.util.Iterator;
-import java.util.Arrays;
-import java.util.Comparator;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
 
 public class Class extends Collection {
 

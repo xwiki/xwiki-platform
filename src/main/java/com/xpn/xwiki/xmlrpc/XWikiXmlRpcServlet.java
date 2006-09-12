@@ -1,22 +1,19 @@
 package com.xpn.xwiki.xmlrpc;
 
-import java.io.IOException;
-import java.net.URL;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-
+import com.xpn.xwiki.XWikiException;
 import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
-import org.apache.xmlrpc.XmlRpcRequest;
 
-import com.xpn.xwiki.XWikiException;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.net.URL;
 
 public class XWikiXmlRpcServlet extends XmlRpcServlet {
 

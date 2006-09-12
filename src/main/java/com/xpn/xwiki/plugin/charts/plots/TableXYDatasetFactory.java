@@ -21,14 +21,13 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
-import org.jfree.data.xy.DefaultTableXYDataset;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYSeries;
-
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
 import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
 import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.plugin.charts.source.DataSource;
+import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
 
 public class TableXYDatasetFactory {
 	private static TableXYDatasetFactory uniqueInstance = new TableXYDatasetFactory();

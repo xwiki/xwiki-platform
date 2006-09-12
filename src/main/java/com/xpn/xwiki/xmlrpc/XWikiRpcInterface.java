@@ -1,8 +1,8 @@
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWikiException;
+
+import java.util.List;
 
 public interface XWikiRpcInterface {
 

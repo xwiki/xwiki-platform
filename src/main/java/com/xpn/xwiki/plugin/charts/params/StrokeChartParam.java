@@ -21,13 +21,12 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.awt.BasicStroke;
-import java.awt.Stroke;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidParamException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StrokeChartParam extends AbstractChartParam {
 	private Map capChoices = new HashMap();

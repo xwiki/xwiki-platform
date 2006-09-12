@@ -22,15 +22,13 @@
 
 package com.xpn.xwiki.doc;
 
-import java.io.ByteArrayInputStream;
-import java.util.Date;
-
-import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.util.ToString;
-import org.apache.commons.codec.binary.Base64;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.util.ToString;
+
+import java.io.ByteArrayInputStream;
+import java.util.Date;
 
 public class XWikiAttachmentArchive {
 

@@ -21,12 +21,10 @@
  */
 package com.xpn.xwiki.web;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.user.impl.xwiki.MyFormAuthenticator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class LoginErrorAction extends XWikiAction {
     private static final Log log = LogFactory.getLog(LoginErrorAction.class);

@@ -24,21 +24,6 @@
 
 package com.xpn.xwiki.render.groovy;
 
-import groovy.text.Template;
-import groovy.lang.Writable;
-import groovy.lang.GroovyClassLoader;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.io.Writer;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.codehaus.groovy.runtime.InvokerHelper;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
@@ -51,6 +36,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.XWikiRequest;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.Writable;
+import groovy.text.Template;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.groovy.runtime.InvokerHelper;
+
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class XWikiGroovyRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);

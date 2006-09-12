@@ -1,12 +1,5 @@
 package com.xpn.xwiki.cache.impl;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.opensymphony.oscache.base.Cache;
 import com.opensymphony.oscache.base.CacheEntry;
 import com.opensymphony.oscache.base.EntryRefreshPolicy;
@@ -16,6 +9,12 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Copyright 2006, XpertNet SARL, and individual contributors as indicated by

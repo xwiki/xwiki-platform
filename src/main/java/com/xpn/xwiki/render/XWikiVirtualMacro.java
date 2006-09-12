@@ -22,11 +22,11 @@
  */
 package com.xpn.xwiki.render;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by IntelliJ IDEA.

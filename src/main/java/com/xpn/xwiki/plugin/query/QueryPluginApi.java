@@ -22,17 +22,16 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import javax.jcr.ValueFactory;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.jcr.ValueFactory;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
 
 /** Api for QueryPlugin */
 public class QueryPluginApi extends Api implements IQueryFactory {

@@ -21,21 +21,20 @@
  */
 package com.xpn.xwiki.plugin.charts.plots;
 
-import java.lang.reflect.Constructor;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
+import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
+import com.xpn.xwiki.plugin.charts.params.ChartParams;
+import com.xpn.xwiki.plugin.charts.source.DataSource;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
-import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
-import com.xpn.xwiki.plugin.charts.exceptions.GenerateException;
-import com.xpn.xwiki.plugin.charts.params.ChartParams;
-import com.xpn.xwiki.plugin.charts.source.DataSource;
+import java.lang.reflect.Constructor;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TimeSeriesCollectionFactory {
 	private static TimeSeriesCollectionFactory uniqueInstance = new TimeSeriesCollectionFactory();

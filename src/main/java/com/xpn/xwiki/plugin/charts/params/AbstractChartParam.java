@@ -21,15 +21,11 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
 import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
+import java.util.*;
 
 public abstract class AbstractChartParam implements ChartParam {
 	protected String name;

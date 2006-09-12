@@ -21,17 +21,17 @@
  */
 package com.xpn.xwiki.plugin.charts.source;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class ObjectidDataSourceFactory implements DataSourceFactory {
 	private static DataSourceFactory uniqueInstance = new ObjectidDataSourceFactory();

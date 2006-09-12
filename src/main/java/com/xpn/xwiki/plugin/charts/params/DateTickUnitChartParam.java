@@ -21,14 +21,13 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+import org.jfree.chart.axis.DateTickUnit;
+
 import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.jfree.chart.axis.DateTickUnit;
-
-import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DateTickUnitChartParam extends DateFormatChartParam {
 	private Map unitChoice;

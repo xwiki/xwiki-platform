@@ -1,24 +1,18 @@
 package com.xpn.xwiki.plugin.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore;
+import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore.JcrCallBack;
+import com.xpn.xwiki.store.jcr.XWikiJcrSession;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.PropertyType;
-import javax.jcr.RepositoryException;
-import javax.jcr.Value;
-import javax.jcr.ValueFormatException;
+import javax.jcr.*;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
-
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore;
-import com.xpn.xwiki.store.jcr.XWikiJcrSession;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
-import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore.JcrCallBack;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JcrQuery implements IQuery {
 	String	query,

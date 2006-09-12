@@ -22,17 +22,11 @@
 
 package com.xpn.xwiki.plugin.mail;
 
-import java.util.Properties;
-
-import javax.mail.FetchProfile;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Store;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+
+import javax.mail.*;
+import java.util.Properties;
 
 public class MailPluginApi extends Api {
     private MailPlugin plugin;

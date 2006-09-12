@@ -21,19 +21,9 @@
  */
 package com.xpn.xwiki.store.jcr;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Map;
-
-import javax.jcr.LoginException;
-import javax.jcr.NamespaceException;
-import javax.jcr.Repository;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
-import javax.jcr.Workspace;
-
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jackrabbit.core.TransientRepository;
@@ -53,9 +43,11 @@ import org.apache.portals.graffito.jcr.persistence.objectconverter.impl.ObjectCo
 import org.apache.portals.graffito.jcr.query.QueryManager;
 import org.apache.portals.graffito.jcr.query.impl.QueryManagerImpl;
 
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiEngineContext;
+import javax.jcr.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Map;
 
 public class JackRabbitJCRProvider implements IJcrProvider {
 	static final Log log = LogFactory.getLog(JackRabbitJCRProvider.class);

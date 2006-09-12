@@ -22,12 +22,12 @@
 
 package com.xpn.xwiki.notify;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 public class XWikiNotificationManager {
     private Vector generalrules = new Vector();

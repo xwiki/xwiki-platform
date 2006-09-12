@@ -32,7 +32,6 @@ import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import org.suigeneris.jrcs.rcs.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

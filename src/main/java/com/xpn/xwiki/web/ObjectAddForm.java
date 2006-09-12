@@ -24,8 +24,6 @@ package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.util.Util;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 

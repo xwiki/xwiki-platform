@@ -23,11 +23,11 @@
 
 package com.xpn.xwiki.plugin.laszlo;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PluginApi;
+
+import java.io.IOException;
 
 public class LaszloPluginApi extends PluginApi {
 

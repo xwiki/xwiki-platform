@@ -1,9 +1,13 @@
 package com.xpn.xwiki.plugin.query;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import java.util.*;
-import java.lang.reflect.Array;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,6 +22,24 @@ public class XWikiQuery extends XWikiCriteria {
     protected List addProperties = new ArrayList();
     protected List groupbyProperties = new ArrayList();
     protected List orderProperties = new ArrayList();
+
+    public XWikiQuery() {
+        super();
+    }
+    
+    public XWikiQuery(XWikiRequest request, String className, XWikiContext context) throws XWikiException {
+        super();
+        String[] columns = request.getParameterValues("columns");
+        setDisplayProperties(columns);
+        BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
+        Set properties = bclass.getPropertyList();
+        Iterator propid = properties.iterator();
+        while (propid.hasNext()) {
+            String propname = (String) propid.next();
+            Map map = Util.getObject(request, className + "_" + propname);
+            ((PropertyClass)(bclass.get(propname))).fromSearchMap(this, map);
+        }
+    }
 
     public void reset() {
         displayProperties = new ArrayList();

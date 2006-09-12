@@ -21,14 +21,14 @@
  */
 package com.xpn.xwiki.plugin.charts.actions;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.charts.ChartingPluginApi;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiAction;
 import com.xpn.xwiki.web.XWikiRequest;
+
+import java.io.IOException;
 
 public class ChartingAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {

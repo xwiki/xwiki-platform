@@ -46,12 +46,12 @@
 
 package com.xpn.xwiki.render.macro;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import org.apache.commons.lang.StringUtils;
 import org.radeox.macro.CodeMacro;
 import org.radeox.macro.parameter.MacroParameter;
+
+import java.io.IOException;
+import java.io.Writer;
 
 
 

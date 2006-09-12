@@ -19,9 +19,9 @@
 
 package com.xpn.xwiki.render.macro;
 
+import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.radeox.macro.table.Table;
-import org.radeox.macro.BaseLocaleMacro;
 
 import java.io.IOException;
 import java.io.Writer;

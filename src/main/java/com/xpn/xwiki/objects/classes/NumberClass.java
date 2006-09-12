@@ -23,21 +23,16 @@
 
 package com.xpn.xwiki.objects.classes;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.ecs.xhtml.input;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DoubleProperty;
-import com.xpn.xwiki.objects.FloatProperty;
-import com.xpn.xwiki.objects.IntegerProperty;
-import com.xpn.xwiki.objects.LongProperty;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 public class NumberClass  extends PropertyClass {
 
@@ -118,12 +113,16 @@ public class NumberClass  extends PropertyClass {
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input1 = new input();
         input1.setType("text");
         input1.setName(prefix + name + "_from");
         input1.setID(prefix + name);
         input1.setSize(getSize());
+        String fieldFullName = getFieldFullName();
+        String value = criteria.getParameter(fieldFullName + "_lessthan");
+        if (value!=null)
+         input1.setValue(value);
 
         input input2 = new input();
 
@@ -131,6 +130,9 @@ public class NumberClass  extends PropertyClass {
         input2.setName(prefix + name+ "_to");
         input2.setID(prefix + name);
         input2.setSize(getSize());
+        value = criteria.getParameter(fieldFullName + "_morethan");
+        if (value!=null)
+         input2.setValue(value);
 
         buffer.append(((XWikiMessageTool)context.get("msg")).get("from"));
         buffer.append(input1.toString());
@@ -158,4 +160,18 @@ public class NumberClass  extends PropertyClass {
         }
     }
 
+    public void fromSearchMap(XWikiQuery query, Map map) {
+        String data[]  = (String[])map.get("");
+        if ((data!=null)&&(data.length==1))
+            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
+        else {
+            data  = (String[])map.get("lessthan");
+            if ((data!=null)&&(data.length==1))
+                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
+            data  = (String[])map.get("morethan");
+            if ((data!=null)&&(data.length==1))
+                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
+
+        }
+    }
 }

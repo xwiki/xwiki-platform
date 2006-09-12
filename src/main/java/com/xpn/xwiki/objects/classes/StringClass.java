@@ -23,18 +23,17 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import org.apache.ecs.xhtml.input;
-
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import org.apache.ecs.xhtml.input;
 
-import java.util.Map;
 import java.util.List;
-import java.util.Iterator;
+import java.util.Map;
 
 public class StringClass extends PropertyClass {
 
@@ -83,12 +82,16 @@ public class StringClass extends PropertyClass {
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input = new input();
         input.setType("text");
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        String fieldFullName = getFieldFullName();
+        String value = criteria.getParameter(fieldFullName);
+        if (value!=null)
+         input.setValue(value);
         buffer.append(input.toString());
     }
     
@@ -111,4 +114,11 @@ public class StringClass extends PropertyClass {
          return;
         }
     }
+
+    public void fromSearchMap(XWikiQuery query, Map map) {
+        String[] data = (String[]) map.get("");
+        if ((data!=null)&&(data.length==1))
+         query.setParam(getObject().getName() + "_" + getName(), data[0]);
+    }
+
 }

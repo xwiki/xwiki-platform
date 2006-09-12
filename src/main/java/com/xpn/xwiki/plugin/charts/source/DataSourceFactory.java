@@ -21,10 +21,10 @@
  */
 package com.xpn.xwiki.plugin.charts.source;
 
-import java.util.Map;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.charts.exceptions.DataSourceException;
+
+import java.util.Map;
 
 public interface DataSourceFactory {
 	

@@ -47,8 +47,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import javax.jcr.query.InvalidQueryException;
-
 public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface {
     protected XWikiCache groupCache;
 

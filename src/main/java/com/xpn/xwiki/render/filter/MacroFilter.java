@@ -23,10 +23,9 @@
 
 package com.xpn.xwiki.render.filter;
 
+import com.xpn.xwiki.render.macro.MacroRepository;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.macro.Repository;
-
-import com.xpn.xwiki.render.macro.MacroRepository;
 
 public class MacroFilter extends org.radeox.filter.MacroFilter {
  private MacroRepository macros;

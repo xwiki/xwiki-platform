@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.IntegerProperty;
@@ -209,6 +210,6 @@ public class ClassesTest extends TestCase {
             result.toString().toLowerCase().indexOf(editexpected.toLowerCase())!=-1);
 
         pclass.displayHidden(result,cname, "", obj, context);
-        pclass.displaySearch(result,cname, "", obj, context);
+        pclass.displaySearch(result,cname, "", new XWikiQuery(), context);
     }
 }

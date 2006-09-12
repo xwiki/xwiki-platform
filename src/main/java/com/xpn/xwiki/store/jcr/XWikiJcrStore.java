@@ -21,30 +21,6 @@
  */
 package com.xpn.xwiki.store.jcr;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import javax.jcr.ItemExistsException;
-import javax.jcr.Node;
-import javax.jcr.NodeIterator;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-import javax.jcr.query.Row;
-import javax.jcr.query.RowIterator;
-import javax.jcr.version.VersionException;
-import javax.transaction.NotSupportedException;
-
-import org.apache.portals.graffito.jcr.query.Filter;
-import org.apache.portals.graffito.jcr.query.QueryManager;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -62,6 +38,20 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
+import org.apache.portals.graffito.jcr.query.Filter;
+import org.apache.portals.graffito.jcr.query.QueryManager;
+
+import javax.jcr.*;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+import javax.jcr.version.VersionException;
+import javax.transaction.NotSupportedException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 /** XWikiJCRStore - XWiki Store System backend to JCR */
 public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterface {

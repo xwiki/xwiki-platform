@@ -23,10 +23,10 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.net.URL;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
+
+import java.net.URL;
 
 public class XWikiXMLRPCURLFactory extends XWikiServletURLFactory {
     public XWikiXMLRPCURLFactory() {

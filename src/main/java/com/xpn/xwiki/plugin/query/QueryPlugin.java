@@ -22,10 +22,14 @@
 
 package com.xpn.xwiki.plugin.query;
 
-import javax.jcr.ValueFactory;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,19 +37,11 @@ import org.apache.jackrabbit.core.query.QueryParser;
 import org.apache.jackrabbit.core.query.QueryRootNode;
 import org.apache.jackrabbit.value.ValueFactoryImpl;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
-
-import java.util.Set;
+import javax.jcr.ValueFactory;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
 
 /** Plugin for Query API */
 public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
@@ -239,9 +235,16 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         BaseClass bclass = context.getWiki().getClass(className, context);
         xpath.append("//*/*/obj/");
         xpath.append(className.replace('.','/'));
-        xpath.append("[");
-        xpath.append(bclass.makeQuery(query));
-        xpath.append("]/@name");
+        String where= bclass.makeQuery(query);
+        if (where.equals(""))
+            xpath.append("*");
+        else
+        {
+            xpath.append("[");
+            xpath.append(where);
+            xpath.append("]");
+        }
+        xpath.append("/@name");
         return xpath.toString();
     }
 

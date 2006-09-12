@@ -21,25 +21,6 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import org.apache.batik.apps.rasterizer.SVGConverterException;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.Plot;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -52,6 +33,19 @@ import com.xpn.xwiki.plugin.charts.source.DataSource;
 import com.xpn.xwiki.plugin.charts.source.MainDataSourceFactory;
 import com.xpn.xwiki.plugin.svg.SVGPlugin;
 import com.xpn.xwiki.web.XWikiResponse;
+import org.apache.batik.apps.rasterizer.SVGConverterException;
+import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.Plot;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+
+import java.awt.geom.Rectangle2D;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class ChartingPlugin extends XWikiDefaultPlugin implements
 		XWikiPluginInterface {

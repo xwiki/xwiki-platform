@@ -21,15 +21,15 @@
  */
 package com.xpn.xwiki.plugin.charts.params;
 
+import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
+import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import com.xpn.xwiki.plugin.charts.exceptions.InvalidArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.MissingArgumentException;
-import com.xpn.xwiki.plugin.charts.exceptions.ParamException;
 
 public class DateFormatChartParam extends LocaleChartParam {
 	public static final String TYPE = "type";

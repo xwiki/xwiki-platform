@@ -1,19 +1,19 @@
 package com.xpn.xwiki.store;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import org.suigeneris.jrcs.rcs.Version;
+import com.xpn.xwiki.util.Util;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Session;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Node;
-import org.hibernate.Session;
-import org.hibernate.ObjectNotFoundException;
+import org.suigeneris.jrcs.rcs.Version;
 
 /**
  * Created by IntelliJ IDEA.                                                   

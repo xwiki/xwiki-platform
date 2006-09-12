@@ -23,18 +23,17 @@
 
 package com.xpn.xwiki.plugin.laszlo;
 
-import java.io.IOException;
-import java.io.Writer;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import java.io.IOException;
+import java.io.Writer;
 
 public class LaszloMacro  extends BaseLocaleMacro {
   public String getLocaleKey() {

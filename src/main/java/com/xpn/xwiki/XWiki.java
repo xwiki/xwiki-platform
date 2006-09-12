@@ -49,6 +49,9 @@ import com.xpn.xwiki.objects.classes.*;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -4005,7 +4008,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     }
 
-    /*
     public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
         BaseClass bclass = getDocument(className, context).getxWikiClass();
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
@@ -4094,5 +4096,4 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
     }
-    */
 }

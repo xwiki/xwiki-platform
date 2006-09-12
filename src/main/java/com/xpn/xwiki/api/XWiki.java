@@ -32,6 +32,8 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
@@ -1028,7 +1030,7 @@ public class XWiki extends Api {
     public String convertUsername(String username) {
         return xwiki.convertUsername(username, context);
     }
-     /*
+
     public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
        return xwiki.displaySearch(fieldname, className, prefix, criteria, context);
     }
@@ -1045,10 +1047,8 @@ public class XWiki extends Api {
         return xwiki.searchAsTable(query, context);
     }
 
-    public PropertyClass getPropertyClassFromName(String propPath) {
-        return xwiki.getPropertyClassFromName(propPath, context);
+    public com.xpn.xwiki.api.PropertyClass getPropertyClassFromName(String propPath) {
+        return new PropertyClass(xwiki.getPropertyClassFromName(propPath, context), context);
     }
-    */
-
 }
 

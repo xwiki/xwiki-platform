@@ -36,13 +36,12 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.core.query.*;
 import org.apache.jackrabbit.name.QName;
+import org.apache.jackrabbit.core.query.*;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.util.*;
-
 /** Query implementation for Hibernate */
 public class HibernateQuery extends DefaultQuery {
 	private static final Log log = LogFactory.getLog(HibernateQuery.class);
@@ -130,7 +129,7 @@ public class HibernateQuery extends DefaultQuery {
 		jcl_xwiki_classes.put(qn_xwiki_attachment,		XWikiAttachment.class);
 	}
 	
-	protected class XWikiHibernateQueryTranslator implements QueryNodeVisitor {
+	protected class XWikiHibernateQueryTranslator implements org.apache.jackrabbit.core.query.QueryNodeVisitor {
 		XWikiHibernateQueryTranslator(QueryNode node) {
 			super();
 			node.accept(this, null);

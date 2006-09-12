@@ -43,9 +43,9 @@
     <orderEntry type="library" name="JCR" level="project" />
     <orderEntry type="library" name="XML" level="project" />
     <orderEntry type="library" name="cache" level="project" />
-    <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntry type="library" name="Tomcat 5.0" level="application" />
     <orderEntry type="library" name="Jrcs" level="project" />
+    <orderEntry type="library" name="Tomcat" level="application_server_libraries" />
     <orderEntryProperties />
   </component>
   <component name="VcsManagerConfiguration">
@@ -76,6 +76,10 @@
       <url>file://$MODULE_DIR$/build/xwikibase_test</url>
     </containerElement>
     <containerElement type="library" level="project" name="cache">
+      <attribute name="method" value="1" />
+      <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" level="project" name="Captcha">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
@@ -163,13 +167,8 @@
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
     </containerElement>
-    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web-test.xml" optional="false" version="2.3" />
+    <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/src/main/web.xml" optional="false" version="2.3" />
     <deploymentDescriptor name="context.xml" url="file://$MODULE_DIR$/src/main/web/META-INF/context.xml" optional="false" version="5.x" />
-    <deploymentDescriptor name="" url="file://$MODULE_DIR$/src/main/web/META-INF/context.xml" optional="false">
-      <option name="DEFAULT_DIR" value="WEB-INF" />
-      <option name="NAME" value="" />
-      <option name="DESCRIPTION" value="" />
-    </deploymentDescriptor>
     <webroots>
       <root url="file://$MODULE_DIR$/src/main/web" relative="/" />
     </webroots>

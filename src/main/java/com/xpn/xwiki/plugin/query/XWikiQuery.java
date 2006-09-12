@@ -61,7 +61,8 @@ public class XWikiQuery extends XWikiCriteria {
     }
 
     public void setDisplayProperties(String[] properties) {
-        displayProperties = Arrays.asList(properties);
+        if (properties!=null)
+         displayProperties = Arrays.asList(properties);
     }
 
     public List getDisplayProperties() {

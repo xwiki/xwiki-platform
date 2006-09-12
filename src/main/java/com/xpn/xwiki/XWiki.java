@@ -4008,6 +4008,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     }
 
+    public String displaySearch(String fieldname, String className, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
+        return displaySearch(fieldname, className, "", criteria, context);
+    }
+
+    public String displaySearch(String fieldname, String className, XWikiContext context) throws XWikiException {
+        return displaySearch(fieldname, className, "", new XWikiCriteria(), context);
+    }
+
     public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
         BaseClass bclass = getDocument(className, context).getxWikiClass();
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
@@ -4016,7 +4024,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (pclass==null)
          return "";
         else
-         return pclass.displaySearch(fieldname, prefix, criteria, context);
+         return pclass.displaySearch(fieldname, prefix + "XWiki.XWikiUsers_", criteria, context);
     }
 
     public List search(XWikiQuery query, XWikiContext context) throws XWikiException {

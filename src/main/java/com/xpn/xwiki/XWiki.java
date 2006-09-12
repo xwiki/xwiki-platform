@@ -1910,13 +1910,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
 
+        needsUpdate |= bclass.addBooleanField("renderXWikiVelocityRenderer", "Render velocity code", "yesno");
+        needsUpdate |= bclass.addBooleanField("renderXWikiGroovyRenderer", "Render Groovy code", "yesno");
+        needsUpdate |= bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
+
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "checkbox");
-        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "checkbox");
+        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
+        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
+
+        if (((BooleanClass)bclass.get("showLeftPanels")).getDisplayType().equals("checkbox"))
+        {
+            ((BooleanClass)bclass.get("showLeftPanels")).setDisplayType("yesno");
+            ((BooleanClass)bclass.get("showRightPanels")).setDisplayType("yesno");
+            needsUpdate = true;
+        }
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
@@ -2683,7 +2694,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (docname.equals(targetdocname))
                         tdoc = (XWikiDocument) sdoc.clone();
                     else
-                        tdoc = (XWikiDocument) sdoc.renameDocument(targetdocname, context);
+                        tdoc = sdoc.copyDocument(targetdocname, context);
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
@@ -2734,7 +2745,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (docname.equals(targetdocname))
                             ttdoc = (XWikiDocument) stdoc.clone();
                         else
-                            ttdoc = stdoc.renameDocument(targetdocname, context);
+                            ttdoc = stdoc.copyDocument(targetdocname, context);
 
                         // forget past versions
                         if (reset) {
@@ -3958,7 +3969,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException {
-        return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy")).parseGroovyFromString(script, context);
+        if (getRenderingEngine().getRenderer("groovy") != null)
+            return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy")).parseGroovyFromString(script, context);
+        return null;
     }
 
     public Object parseGroovyFromPage(String fullname, XWikiContext context) throws XWikiException {

@@ -41,9 +41,11 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class XWikiRenderingEngine {
-
+    private static final Log log = LogFactory.getLog(XWikiRenderingEngine.class);
     private List renderers = new ArrayList();
     private HashMap renderermap = new LinkedHashMap();
     private XWikiCache cache;
@@ -103,24 +105,24 @@ public class XWikiRenderingEngine {
     }
 
     public XWikiRenderer getRenderer(String name) {
-		return (XWikiRenderer) renderermap.get(name);
-	}
+        return (XWikiRenderer) renderermap.get(name);
+    }
 
-	public List getRendererList() {
-		return (List) ((ArrayList) renderers).clone();
-	}
+    public List getRendererList() {
+        return (List) ((ArrayList) renderers).clone();
+    }
 
-	public List getRendererNames() {
-		return new LinkedList(renderermap.keySet());
-	}
+    public List getRendererNames() {
+        return new LinkedList(renderermap.keySet());
+    }
 
-	protected XWikiRenderer removeRenderer(String name) {
-		XWikiRenderer result = (XWikiRenderer) renderermap.remove(name);
-		if (result != null) {
-			renderers.remove(result);
-		}
-		return result;
-	}
+    protected XWikiRenderer removeRenderer(String name) {
+        XWikiRenderer result = (XWikiRenderer) renderermap.remove(name);
+        if (result != null) {
+            renderers.remove(result);
+        }
+        return result;
+    }
 
     public String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
            return renderText(doc.getTranslatedContent(context), doc, context);
@@ -204,8 +206,14 @@ public class XWikiRenderingEngine {
                 context.getWiki().getPluginManager().beginRendering(context);
 
                 try {
-                    for (int i=0;i<renderers.size();i++)
-                        content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
+                    for (int i=0;i<renderers.size();i++){
+                        XWikiRenderer renderer = ((XWikiRenderer)renderers.get(i));
+                        String rendererName = renderer.getClass().getName();
+                        if (isRendered(contentdoc, rendererName, context))
+                            content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
+                        else
+                            if (log.isDebugEnabled()) log.debug("skip renderer: " + rendererName + " for the document " + contentdoc.getFullName());
+                    }
                 } finally {
                     // Remove including doc or set the previous one
                     if (idoc==null)
@@ -227,7 +235,7 @@ public class XWikiRenderingEngine {
                     int cacheDuration = context.getCacheDuration();
                     if (cacheDuration>0) {
                         XWikiRenderingCache cacheObject = new XWikiRenderingCache(key, content, cacheDuration, new Date());
-                        cache.putInCache(key, (Object)cacheObject);
+                        cache.putInCache(key, cacheObject);
                     }
                 } catch (Exception e) {}
                 return content;
@@ -236,6 +244,26 @@ public class XWikiRenderingEngine {
                 if (monitor!=null)
                     monitor.endTimer("rendering");
             }
+        }
+    }
+
+    private boolean isRendered(XWikiDocument doc, String rendererName, XWikiContext context){
+        try{
+            if (rendererName.contains(".")){
+                rendererName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
+            }
+            String render = context.getWiki().getWebPreference("render" + rendererName, context);
+            if (render != null && render.length() > 0)
+                return render.equals("1");
+
+            render = context.getWiki().getXWikiPreference("render" + rendererName, context);
+            if (render != null && render.length() > 0)
+                return render.equals("1");
+            return true;
+        }
+        catch(Exception e){
+            log.error("Error in the function isRendered", e);
+            return true;
         }
     }
 

@@ -34,7 +34,7 @@ document.forms.objectadd.submit();
 #set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets", "leftPanels", "rightPanels", "showLeftPanels", "showRightPanels", "pageWidth"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
-#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages" ])
+#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages", "renderXWikiVelocityRenderer", "renderXWikiGroovyRenderer", "renderXWikiRadeoxRenderer" ])
 #set($sectionitemsmap.registration = [ "use_email_verification", "admin_email", "smtp_server", "validation_email_content",  "confirmation_email_content" , "invitation_email_content"])
 #set($sectionitemsmap.antispam = [ "registration_anonymous", "registration_registered", "edit_anonymous", "edit_registered",  "comment_anonymous", "comment_registered"])
 #macro(showsection $section $sectionitemsmap)

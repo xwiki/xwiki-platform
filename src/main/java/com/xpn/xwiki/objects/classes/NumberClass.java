@@ -134,9 +134,10 @@ public class NumberClass  extends PropertyClass {
         if (value!=null)
          input2.setValue(value);
 
-        buffer.append(((XWikiMessageTool)context.get("msg")).get("from"));
+        XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
+        buffer.append((msg==null) ? "from" : msg.get("from"));
         buffer.append(input1.toString());
-        buffer.append(((XWikiMessageTool)context.get("msg")).get("to"));
+        buffer.append((msg==null) ? "from" : msg.get("to"));
         buffer.append(input2.toString());
     }
     

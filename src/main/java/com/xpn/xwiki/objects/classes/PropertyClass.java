@@ -131,12 +131,14 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input = new input();
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop!=null) input.setValue(prop.toFormString());
-
         input.setType("text");
         input.setName(prefix + name);
         input.setID(prefix + name);
+        input.setSize(20);
+        String fieldFullName = getFieldFullName();
+        String value = criteria.getParameter(fieldFullName);
+        if (value!=null)
+         input.setValue(value);
         buffer.append(input.toString());
     }
 

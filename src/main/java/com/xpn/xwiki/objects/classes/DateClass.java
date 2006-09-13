@@ -161,9 +161,10 @@ public class DateClass  extends PropertyClass {
         input2.setID(prefix + name);
         input2.setSize(getSize());
 
-        buffer.append(((XWikiMessageTool)context.get("msg")).get("from"));
+        XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
+        buffer.append((msg==null) ? "from" : msg.get("from"));
         buffer.append(input1.toString());
-        buffer.append(((XWikiMessageTool)context.get("msg")).get("to"));
+        buffer.append((msg==null) ? "from" : msg.get("to"));
         buffer.append(input2.toString());
     }
 

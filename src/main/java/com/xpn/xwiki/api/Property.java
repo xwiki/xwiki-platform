@@ -47,6 +47,8 @@ public class Property extends Element {
     }
 
     public java.lang.Object getValue() {
-       return ((BaseProperty)element).getValue();
+        if (element.getName().equals("password") && !context.getWiki().getRightService().hasProgrammingRights(context))
+            return null;
+        return ((BaseProperty)element).getValue();
     }
 }

@@ -49,10 +49,10 @@ public class ServletCaptchaTest  extends ServletTest {
 
         Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "Image", context);
         Utils.createDoc(xwiki.getStore(), "Main", "WebHome", context);
-        setUrl(webRequest, "edit", "Main", "WebHome", "");
+        setUrl(webRequest, "edit", "WebHome", "");
     }
 
-    public void endShowCaptchaImageForAnonymousEdit(WebResponse webResponse) throws HibernateException {
+    public void endShowCaptchaImageForAnonymousEdit(WebResponse webResponse) throws HibernateException, XWikiException {
         try {
             String result = webResponse.getText();
             assertTrue("Could not find captcha image : " + result, result.indexOf("<input type=\"text\" name=\"jcaptcha_response\"") != -1);
@@ -99,7 +99,7 @@ public class ServletCaptchaTest  extends ServletTest {
 
         Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "Text", context);
         Utils.createDoc(xwiki.getStore(), "Main", "WebHome", context);
-        setUrl(webRequest, "edit", "Main", "WebHome", "");
+        setUrl(webRequest, "edit", "WebHome", "");
     }
 
     public void endShowCaptchaTextForAnonymousEdit(WebResponse webResponse) throws HibernateException {
@@ -123,7 +123,7 @@ public class ServletCaptchaTest  extends ServletTest {
 
         Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "---", context);
         Utils.createDoc(xwiki.getStore(), "Main", "WebHome", context);
-        setUrl(webRequest, "edit", "Main", "WebHome", "");
+        setUrl(webRequest, "edit", "WebHome", "");
     }
 
     public void endNotShowCaptchaImageForAnonymousEdit(WebResponse webResponse) throws HibernateException {
@@ -156,7 +156,7 @@ public class ServletCaptchaTest  extends ServletTest {
         MyFormAuthentication auth = new MyFormAuthentication("PhungHaiNam", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
-        setUrl(webRequest, "edit", "Main", "WebHome1", "");
+        setUrl(webRequest, "edit", "WebHome1", "");
     }
 
     public void endNotShowCaptchaForRegisteredUserEdit(WebResponse webResponse) throws HibernateException {
@@ -183,7 +183,7 @@ public class ServletCaptchaTest  extends ServletTest {
 
         Utils.setStringValue("XWiki.XWikiPreferences", "edit_anonymous", "Image", context);
         Utils.createDoc(xwiki.getStore(), "Main", "WebHome", context);
-        setUrl(webRequest, "save", "Main", "WebHome", "");
+        setUrl(webRequest, "save", "WebHome", "");
         webRequest.addParameter("content", "This is modification");
         webRequest.addParameter("parent", "Main.WebHome");
         webRequest.addParameter("jcaptcha_response", "false");
@@ -217,7 +217,7 @@ public class ServletCaptchaTest  extends ServletTest {
         MyFormAuthentication auth = new MyFormAuthentication("PhungHaiNam", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
-        setUrl(webRequest, "edit", "Main", "WebHome1", "");
+        setUrl(webRequest, "edit", "WebHome1", "");
     }
 
     public void endShowCaptchaImageForRegisteredUserEdit(WebResponse webResponse) throws HibernateException {
@@ -250,7 +250,7 @@ public class ServletCaptchaTest  extends ServletTest {
         MyFormAuthentication auth = new MyFormAuthentication("PhungHaiNam", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
-        setUrl(webRequest, "edit", "Main", "WebHome1", "");
+        setUrl(webRequest, "edit", "WebHome1", "");
     }
 
     public void endShowCaptchaTextForRegisteredUserEdit(WebResponse webResponse) throws HibernateException {
@@ -283,7 +283,7 @@ public class ServletCaptchaTest  extends ServletTest {
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
-        setUrl(webRequest, "edit", "Main", "WebHome1", "");
+        setUrl(webRequest, "edit", "WebHome1", "");
     }
 
     public void endNotShowCaptchaTextForAdminEdit(WebResponse webResponse) throws HibernateException {
@@ -317,7 +317,7 @@ public class ServletCaptchaTest  extends ServletTest {
         MyFormAuthentication auth = new MyFormAuthentication("admin", "toto");
         auth.setSecurityCheckURL(new URL("http://127.0.0.1:9080/xwiki/testbin/loginsubmit/XWiki/XWikiLogin"));
         webRequest.setAuthentication(auth);
-        setUrl(webRequest, "save", "Main", "WebHome", "");
+        setUrl(webRequest, "save", "WebHome", "");
 
     }
 

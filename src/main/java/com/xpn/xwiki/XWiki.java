@@ -1865,11 +1865,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("macros_wiki", "Macros for the Wiki Parser", 60);
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
 
-        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "Image|Text|---");
+        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);

@@ -1885,6 +1885,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
+        needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
 
         if (((BooleanClass)bclass.get("showLeftPanels")).getDisplayType().equals("checkbox"))
         {
@@ -3963,10 +3964,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return newobject;
     }
 
+    public String getConvertingUserNameType(XWikiContext context){
+        if (context.getWiki().getXWikiPreference("convertmail", context) != null)
+            return context.getWiki().getXWikiPreference("convertmail", context);
+        return context.getWiki().Param("xwiki.authentication.convertemail", "0");
+    }
+
     public String convertUsername(String username, XWikiContext context) {
         if (username==null)
           return null;
-        if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("1")&&(username.indexOf("@")!=-1)) {
+        if (getConvertingUserNameType(context).equals("1")&&(username.indexOf("@")!=-1)) {
             String id = "" + username.hashCode();
             id = id.replaceAll("-", "");
             if (username.length()>1) {
@@ -3975,7 +3982,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
             return id;
         }
-        else if (context.getWiki().Param("xwiki.authentication.convertemail", "0").equals("2"))
+        else if (getConvertingUserNameType(context).equals("2"))
           return username.replaceAll("[\\.\\@]", "_");
         else
           return username;

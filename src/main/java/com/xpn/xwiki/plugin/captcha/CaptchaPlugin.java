@@ -73,7 +73,8 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
         String action = (String) captchaParams.get("action");
         String actionuser = "";
         if(user.equals("XWiki.XWikiGuest")) actionuser = action + "_anonymous" ;
-        else if (user.equals("XWiki.Admin")) return ""; // not captcha with admin
+        else if (user.equals("XWiki.Admin"))
+            return ""; // not captcha with admin
         else actionuser = action + "_registered"  ;
 
         String typecaptcha = context.getWiki().getWebPreference(actionuser, context);
@@ -109,7 +110,8 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
         String action = (String) captchaParams.get("action");
         String actionuser;
         if(user.equals("XWiki.XWikiGuest")) actionuser = action + "_anonymous";
-        else if (user.equals("XWiki.Admin")) return Boolean.TRUE;  // if is admin then return TRUE for confirm captcha
+        else if (user.equals("XWiki.Admin"))
+            return Boolean.TRUE;  // if is admin then return TRUE for confirm captcha
         else actionuser = action + "_registered";
         String typecaptcha = context.getWiki().getWebPreference(actionuser, context);
 
@@ -144,8 +146,6 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
                 isResponseCorrect = Boolean.TRUE;
         } else
             isResponseCorrect = Boolean.TRUE;
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        vcontext.put("confirmresult", isResponseCorrect.toString());
 
         return isResponseCorrect;
     }

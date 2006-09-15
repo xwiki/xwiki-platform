@@ -53,13 +53,13 @@ document.forms.objectadd.submit();
 <tr>
   <td>
     #if($item=="registration_anonymous")
-      <b><i> Registration  </i></b>
+      <b><i> $msg.get("registration")  </i></b>
     #end
     #if($item=="edit_anonymous")
-      <br><b><i> Edit  </i></b>
+      <br><b><i> $msg.get("edit")  </i></b>
     #end
     #if($item=="comment_anonymous")
-      <br><b><i> Comment  </i></b>
+      <br><b><i> $msg.get("comment")  </i></b>
     #end
   </td>
 </tr>

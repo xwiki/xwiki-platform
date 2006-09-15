@@ -2083,7 +2083,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public int validateUser(boolean withConfirmEmail, XWikiContext context) throws XWikiException {
         try {
             XWikiRequest request = context.getRequest();
-            String xwikiname = request.getParameter("xwikiname");
+            String xwikiname = convertUsername(request.getParameter("xwikiname"), context);
             String validkey = request.getParameter("validkey");
 
             if (xwikiname.indexOf(".") == -1)

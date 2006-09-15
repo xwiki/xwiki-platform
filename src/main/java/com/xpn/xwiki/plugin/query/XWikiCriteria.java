@@ -14,8 +14,8 @@ import java.util.*;
 public class XWikiCriteria {
     protected HashMap params = new HashMap();
 
-    public String getParameter(String field) {
-        return (String ) params.get(field);
+    public Object getParameter(String field) {
+        return params.get(field);
     }
 
     public Map getParameters(String field) {

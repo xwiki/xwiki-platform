@@ -33,6 +33,7 @@ import org.apache.ecs.xhtml.input;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 public class NumberClass  extends PropertyClass {
 
@@ -116,23 +117,25 @@ public class NumberClass  extends PropertyClass {
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input1 = new input();
         input1.setType("text");
-        input1.setName(prefix + name + "_from");
+        input1.setName(prefix + name + "_morethan");
         input1.setID(prefix + name);
         input1.setSize(getSize());
         String fieldFullName = getFieldFullName();
-        String value = criteria.getParameter(fieldFullName + "_lessthan");
-        if (value!=null)
-         input1.setValue(value);
+        Number value = (Number) criteria.getParameter(fieldFullName + "_morethan");
+        if (value!=null) {
+            input1.setValue(value.toString());
+        }
 
         input input2 = new input();
 
         input2.setType("text");
-        input2.setName(prefix + name+ "_to");
+        input2.setName(prefix + name+ "_lessthan");
         input2.setID(prefix + name);
         input2.setSize(getSize());
-        value = criteria.getParameter(fieldFullName + "_morethan");
-        if (value!=null)
-         input2.setValue(value);
+        value = (Number) criteria.getParameter(fieldFullName + "_lessthan");
+        if (value!=null) {
+            input2.setValue(value.toString());
+        }
 
         XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
         buffer.append((msg==null) ? "from" : msg.get("from"));
@@ -140,7 +143,7 @@ public class NumberClass  extends PropertyClass {
         buffer.append((msg==null) ? "from" : msg.get("to"));
         buffer.append(input2.toString());
     }
-    
+
     public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
         Number value = (Number)map.get(prefix);
         if ((value!=null)&&(!value.equals(""))) {
@@ -150,13 +153,13 @@ public class NumberClass  extends PropertyClass {
 
         value = (Number)map.get(prefix + "lessthan");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + "<" + value.toString());
+         criteriaList.add("@f:" + getName() + "<=" + value.toString());
          return;
         }
 
         value = (Number)map.get(prefix + "morethan");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + ">" + value.toString());
+         criteriaList.add("@f:" + getName() + ">=" + value.toString());
          return;
         }
     }

@@ -182,9 +182,20 @@ public class BooleanClass extends PropertyClass {
         }
     }
 
-    public void displaySelectSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
+        if (getDisplayType().equals("input")) {
+            return super.displaySearch(name, prefix, criteria, context);
+        } else if (getDisplayType().equals("radio")) {
+            return displayCheckboxSearch(name, prefix, criteria, context);
+        } else {
+            return displaySelectSearch(name, prefix, criteria, context);
+        }
+    }
+
+    public String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
+        select.setSize(3);
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);
 
@@ -192,7 +203,7 @@ public class BooleanClass extends PropertyClass {
         options[0].addElement("---");
         options[1].addElement(String1);
         options[2].addElement(String0);
-
+        
         /*
         try {
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
@@ -218,10 +229,11 @@ public class BooleanClass extends PropertyClass {
         }
         */
         select.addElement(options);
-        buffer.append(select.toString());
+        return select.toString();
     }
 
-    public void displayCheckboxSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
+    public String displayCheckboxSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
 
@@ -251,6 +263,7 @@ public class BooleanClass extends PropertyClass {
         */
         buffer.append(check.toString());
         buffer.append(checkNo.toString());
+        return buffer.toString();
     }
 
     public void fromSearchMap(XWikiQuery query, Map map) {

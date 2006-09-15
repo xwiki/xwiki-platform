@@ -89,9 +89,9 @@ public class StringClass extends PropertyClass {
         input.setID(prefix + name);
         input.setSize(getSize());
         String fieldFullName = getFieldFullName();
-        String value = criteria.getParameter(fieldFullName);
+        Object value = criteria.getParameter(fieldFullName);
         if (value!=null)
-         input.setValue(value);
+         input.setValue(value.toString());
         buffer.append(input.toString());
     }
     

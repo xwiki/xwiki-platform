@@ -1031,6 +1031,14 @@ public class XWiki extends Api {
         return xwiki.convertUsername(username, context);
     }
 
+    public String displaySearchColumns(String className, XWikiQuery query) throws XWikiException {
+        return xwiki.displaySearchColumns(className,"",query, context);
+    }
+
+    public String displaySearchColumns(String className, String prefix, XWikiQuery query) throws XWikiException {
+        return xwiki.displaySearchColumns(className,prefix,query, context);
+    }
+
     public String displaySearch(String fieldname, String className) throws XWikiException {
         return xwiki.displaySearch(fieldname,className, context);
     }

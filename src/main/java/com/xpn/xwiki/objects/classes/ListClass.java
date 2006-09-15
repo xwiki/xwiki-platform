@@ -233,7 +233,9 @@ public abstract class ListClass extends PropertyClass {
 		}
 	}
 
-	protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+
+
+    protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		select select = new select(prefix + name, 1);
 		select.setMultiple(isMultiSelect());
 		select.setSize(getSize());
@@ -283,7 +285,18 @@ public abstract class ListClass extends PropertyClass {
 		}
 	}
 
-    protected void displayRadioSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context){
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
+        if (getDisplayType().equals("input")) {
+            return super.displaySearch(name, prefix, criteria, context);
+        } else if (getDisplayType().equals("radio")) {
+            return displayRadioSearch(name, prefix, criteria, context);
+        } else {
+            return displaySelectSearch(name, prefix, criteria, context);
+        }
+    }
+
+    protected String displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
+        StringBuffer buffer = new StringBuffer();
         List list = getList(context);
         List selectlist = new ArrayList();
 
@@ -312,17 +325,20 @@ public abstract class ListClass extends PropertyClass {
             	buffer.append("<br/>");
             }
         }
+        return buffer.toString();
     }
 
-    protected void displaySelectSearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context){
+    protected String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
-        select.setSize(getSize());
+        select.setSize(5);
         select.setName(prefix + name);
         select.setID(prefix + name);
 
         List list = getList(context);
-        List selectlist = new ArrayList();
+        String fieldFullName = getFieldFullName();
+        String[] selectArray = ((String[])criteria.getParameter(fieldFullName));
+        List selectlist = (selectArray!=null) ? Arrays.asList(selectArray) : new ArrayList();
 
         /*
         BaseProperty prop =  (BaseProperty)object.safeget(name);
@@ -346,7 +362,7 @@ public abstract class ListClass extends PropertyClass {
             select.addElement(option);
         }
 
-        buffer.append(select.toString());
+        return select.toString();
     }
     
     public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
@@ -373,6 +389,6 @@ public abstract class ListClass extends PropertyClass {
     public void fromSearchMap(XWikiQuery query, Map map) {
         String[] data  = (String[])map.get("");
         if (data!=null)
-            query.setParam(getObject().getName() + "_" + getName(), fromStringArray(data).getValue());
+            query.setParam(getObject().getName() + "_" + getName(), data);
     }
 }

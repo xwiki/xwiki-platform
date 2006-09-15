@@ -29,6 +29,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.ecs.xhtml.input;
 import org.dom4j.Element;
@@ -147,19 +148,33 @@ public class DateClass  extends PropertyClass {
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
         input input1 = new input();
         input1.setType("text");
-        input1.setName(prefix + name + "_from");
+        input1.setName(prefix + name + "_morethan");
         input1.setID(prefix + name);
         input1.setSize(getSize());
+        String fieldFullName = getFieldFullName();
+
+        Date value = (Date) criteria.getParameter(fieldFullName + "_morethan");
+        if (value!=null) {
+            DateProperty dprop = new DateProperty();
+            dprop.setValue(value);
+            input1.setValue(toFormString(dprop));
+        }
 
         input input2 = new input();
 
         input2.setType("text");
-        input2.setName(prefix + name+ "_to");
+        input2.setName(prefix + name+ "_lessthan");
         input2.setID(prefix + name);
         input2.setSize(getSize());
+        value = (Date) criteria.getParameter(fieldFullName + "_lessthan");
+        if (value!=null) {
+            DateProperty dprop = new DateProperty();
+            dprop.setValue(value);
+            input2.setValue(toFormString(dprop));
+        }
 
         XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
         buffer.append((msg==null) ? "from" : msg.get("from"));

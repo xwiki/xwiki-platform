@@ -30,9 +30,12 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.ecs.xhtml.select;
+import org.apache.ecs.xhtml.option;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -582,5 +585,36 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             }
         }
         return StringUtils.join(criteriaList.toArray(), " and ");
+    }
+
+    public String displaySearchColumns(String prefix, XWikiQuery query, XWikiContext context) {
+        select select = new select(prefix + "searchcolumns", 5);
+        select.setMultiple(true);
+        select.setName(prefix + "searchcolumns");
+        select.setID(prefix + "searchcolumns");
+
+        List list = Arrays.asList(getPropertyNames());
+        Map prettynamesmap = new HashMap();
+        for (int i=0;i<list.size();i++) {
+            String propname = (String) list.get(i);
+            list.set(i, prefix + propname);
+            prettynamesmap.put(prefix + propname, ((PropertyClass)get(propname)).getPrettyName());
+        }
+
+        List selectlist = query.getDisplayProperties();
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            String displayValue = (String) prettynamesmap.get(value);
+            option option = new option(displayValue, displayValue);
+            option.addElement(displayValue);
+            option.setValue(value);
+            if (selectlist.contains(value))
+                option.setSelected(true);
+            select.addElement(option);
+        }
+
+        return select.toString();
     }
 }

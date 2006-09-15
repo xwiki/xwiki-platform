@@ -29,7 +29,7 @@ public class XWikiQuery extends XWikiCriteria {
     
     public XWikiQuery(XWikiRequest request, String className, XWikiContext context) throws XWikiException {
         super();
-        String[] columns = request.getParameterValues("columns");
+        String[] columns = request.getParameterValues(className + "_" + "searchcolumns");
         setDisplayProperties(columns);
         BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
         Set properties = bclass.getPropertyList();

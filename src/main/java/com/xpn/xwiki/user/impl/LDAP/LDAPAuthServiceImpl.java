@@ -414,7 +414,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                 log.debug("LDAP Password check reverting to XWiki");
 
             // Use XWiki password if user not in LDAP
-            result = checkPassword(username.replaceAll(" ",""), password, context);
+            result = checkPassword(findUser(username, context), password, context);
             foundDN = null;
         }
 

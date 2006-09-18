@@ -59,10 +59,10 @@ public class QueryGeneratorTest extends HibernateTestCase {
         testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:first_name!='Artem']/@name");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_age_morethan", new Integer(20));
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age>20]/@name");
+        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age>=20]/@name");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_age_lessthan", new Integer(20));
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age<20]/@name");
+        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age<=20]/@name");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_category", "1");
         testQueryGenerator(query, "//*/*/obj/Test/TestClass[jcr:contains(@f:category,'1')]/@name");

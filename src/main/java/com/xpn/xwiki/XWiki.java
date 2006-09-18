@@ -4040,13 +4040,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String displaySearchColumns(String className, String prefix, XWikiQuery query, XWikiContext context) throws XWikiException {
         BaseClass bclass = getDocument(className, context).getxWikiClass();
+
         if (query==null)
          query = new XWikiQuery();
         return bclass.displaySearchColumns(className + "_" + prefix, query, context);
     }
 
     public List search(XWikiQuery query, XWikiContext context) throws XWikiException {
-        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);                                              
         if (qp == null)
          return null;
         return qp.search(query);

@@ -46,9 +46,14 @@ public class EditAction extends XWikiAction {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
         // Add captcha plugin to avoid spam robots
-        CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-        if (xwiki.hasCaptcha(context) && captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
-        else vcontext.put("captchaPlugin", "noCaptchaPlugin");
+        if (xwiki.hasCaptcha(context)) {
+            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+            if (captchaPluginApi != null)
+                vcontext.put("captchaPlugin", captchaPluginApi);
+            else
+                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+                        XWikiException.ERROR_XWIKI_UNKNOWN, "CaptchaPlugin not loaded");
+        }
 
         // Check for edit section
         String sectionContent = "";

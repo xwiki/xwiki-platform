@@ -35,7 +35,6 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 
 public class CaptchaPlugin extends XWikiDefaultPlugin {
 
@@ -60,17 +59,9 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
         super.init(context);
     }
 
-    public CaptchaParams getCaptchaParams(String user, String action, XWikiContext context) throws XWikiException {
-        CaptchaParams cparams = new CaptchaParams();
-        cparams.put("user", user);
-        cparams.put("action", action);
-        return cparams;
-    }
-
-    public String displayCaptcha(CaptchaParams captchaParams, String classname, XWikiContext context) throws XWikiException {
+    public String displayCaptcha(String action, String classname, XWikiContext context) throws XWikiException {
         StringBuffer output = new StringBuffer();
-        String user = (String) captchaParams.get("user");
-        String action = (String) captchaParams.get("action");
+        String user = context.getUser();
         String actionuser = "";
         if(user.equals("XWiki.XWikiGuest")) actionuser = action + "_anonymous" ;
         else if (user.equals("XWiki.Admin"))
@@ -105,13 +96,12 @@ public class CaptchaPlugin extends XWikiDefaultPlugin {
         return output.toString();
     }
 
-    public Boolean verifyCaptcha(CaptchaParams captchaParams, XWikiContext context) throws XWikiException {
-        String user = (String) captchaParams.get("user");
-        String action = (String) captchaParams.get("action");
+    public Boolean verifyCaptcha(String action, XWikiContext context) throws XWikiException {
+        String user = context.getUser();
         String actionuser;
         if(user.equals("XWiki.XWikiGuest")) actionuser = action + "_anonymous";
         else if (user.equals("XWiki.Admin"))
-            return Boolean.TRUE;  // if is admin then return TRUE for confirm captcha
+            return Boolean.TRUE;  // If is admin then return TRUE for confirm captcha
         else actionuser = action + "_registered";
         String typecaptcha = context.getWiki().getWebPreference(actionuser, context);
 

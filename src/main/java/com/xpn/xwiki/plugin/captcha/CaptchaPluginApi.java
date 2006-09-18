@@ -44,15 +44,11 @@ public class CaptchaPluginApi extends Api {
         this.plugin = plugin;
     }
 
-    public String displayCaptcha(CaptchaParams captchaParams, String classname) throws XWikiException {
-        return getPlugin().displayCaptcha(captchaParams, classname, context);
+    public String displayCaptcha(String action, String classname) throws XWikiException {
+        return getPlugin().displayCaptcha(action, classname, context);
     }
 
-    public Boolean verifyCaptcha(CaptchaParams captchaParams) throws XWikiException {
-        return getPlugin().verifyCaptcha(captchaParams, context);
-    }
-
-    public CaptchaParams getCaptchaParams(String user, String typecaptcha) throws XWikiException {
-        return getPlugin().getCaptchaParams(user, typecaptcha, context);
+    public Boolean verifyCaptcha(String action) throws XWikiException {
+        return getPlugin().verifyCaptcha(action, context);
     }
 }

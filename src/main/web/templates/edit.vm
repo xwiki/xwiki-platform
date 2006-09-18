@@ -81,9 +81,8 @@ function openHelp() {
 // -->
 </script>
 $msg.get("helponsyntax") <a href="" onClick="openHelp(); return false;">$msg.get("xwikisyntax")</a>
-#if (!$captchaPlugin.equals("noCaptchaPlugin"))
-#set($captchaParams = $captchaPlugin.getCaptchaParams($context.user,"edit"))
-$captchaPlugin.displayCaptcha($captchaParams,"wiki_captcha")
+#if ($captchaPlugin)
+  $captchaPlugin.displayCaptcha("edit","wiki_captcha")
 #end
 <br />
 #if ($tdoc.language=="")

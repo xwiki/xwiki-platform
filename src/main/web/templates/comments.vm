@@ -32,6 +32,13 @@ $msg.get("newcomment")<br />
 #set($pclass = $comment.getxWikiClass().get("comment"))
 $doc.displayEdit($pclass,"XWiki.XWikiComments_",$comment)
 <br />
+#if ($captchaPlugin)
+  #if ($request.confirm == "false")
+    <br /><font color="red">$msg.get("confirmcommentnotcorrect")</font>
+  #end
+  $captchaPlugin.displayCaptcha("comment","wiki_captcha")
+#end
+<br />
 <input type="submit" value="$msg.get("addcomment")" />
 </p>
 </form>

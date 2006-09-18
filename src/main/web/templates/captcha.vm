@@ -4,9 +4,8 @@
 #template("previewheader.vm")
 &nbsp;<div id="xwikicontent">
 <form id="edit" method="post" action="$doc.getURL("save")">
-#if (!$captchaPlugin.equals("noCaptchaPlugin"))
-#set($captchaParams = $captchaPlugin.getCaptchaParams($context.user,"edit"))
-$captchaPlugin.displayCaptcha($captchaParams,"wiki_captcha")
+#if ($captchaPlugin)
+  $captchaPlugin.displayCaptcha("edit","wiki_captcha")
 <br />
 #end
 <p>

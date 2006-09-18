@@ -27,7 +27,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 import org.apache.velocity.VelocityContext;
 
@@ -68,17 +67,12 @@ public class PreviewAction extends XWikiAction {
 			XWikiForm form = context.getForm();
 			VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
-            Boolean isResponseCorrect = Boolean.TRUE;
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null) vcontext.put("captchaPlugin", captchaPluginApi);
-            else vcontext.put("captchaPlugin", "noCaptchaPlugin");
-            if (captchaPluginApi != null) {
-                // verify captcha
-                CaptchaParams captchaParams = captchaPluginApi.getCaptchaParams(context.getUser(), "edit");
-                isResponseCorrect = captchaPluginApi.verifyCaptcha(captchaParams);
+            if (xwiki.hasCaptcha(context)) {
+                CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+                if (captchaPluginApi != null)
+                    vcontext.put("captchaPlugin", captchaPluginApi);
+                vcontext.put("isResponseCorrect", captchaPluginApi.verifyCaptcha("edit").toString());
             }
-            // put isResponseCorrect value to vcontext for save action
-            vcontext.put("isResponseCorrect", isResponseCorrect.toString());
 
 			String language = ((EditForm) form).getLanguage();
 			XWikiDocument tdoc;

@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class CommentAddAction extends XWikiAction {
     public boolean action(XWikiContext context) throws XWikiException {
@@ -36,25 +37,40 @@ public class CommentAddAction extends XWikiAction {
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
+        Boolean isResponseCorrect = Boolean.TRUE;
+        if (xwiki.hasCaptcha(context)) {
+            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+            if (captchaPluginApi != null)
+                isResponseCorrect = captchaPluginApi.verifyCaptcha("comment");
+        }
+
         // Make sure this class exists
         BaseClass baseclass = xwiki.getCommentsClass(context);
-
-        if (doc.isNew()) {
-            return true;
+        if (isResponseCorrect.booleanValue()) {
+            if (doc.isNew()) {
+                return true;
+            } else {
+                XWikiDocument olddoc = (XWikiDocument) doc.clone();
+                String className = "XWiki.XWikiComments";
+                int nb = doc.createNewObject(className, context);
+                BaseObject oldobject = doc.getObject(className, nb);
+                BaseObject newobject = (BaseObject) baseclass.fromMap(oform.getObject(className), oldobject);
+                newobject.setNumber(oldobject.getNumber());
+                newobject.setName(doc.getFullName());
+                doc.setObject(className, nb, newobject);
+                xwiki.saveDocument(doc, olddoc, context);
+            }
+            // forward to edit
+            String redirect = Utils.getRedirect("edit", context);
+            sendRedirect(response, redirect);
         } else {
-            XWikiDocument olddoc = (XWikiDocument) doc.clone();
-            String className = "XWiki.XWikiComments";
-            int nb = doc.createNewObject(className, context);
-            BaseObject oldobject = doc.getObject(className, nb);
-            BaseObject newobject = (BaseObject) baseclass.fromMap(oform.getObject(className), oldobject);
-            newobject.setNumber(oldobject.getNumber());
-            newobject.setName(doc.getFullName());
-            doc.setObject(className, nb, newobject);
-            xwiki.saveDocument(doc, olddoc, context);
+                String url = context.getDoc().getURL("view", "xpage=comments&confirm=false",context);
+            try {
+                response.sendRedirect(url);
+            } catch (Exception e) {
+                System.err.println(e.getStackTrace().toString());
+            }
         }
-        // forward to edit
-        String redirect = Utils.getRedirect("edit", context);
-        sendRedirect(response, redirect);
         return false;
     }
 

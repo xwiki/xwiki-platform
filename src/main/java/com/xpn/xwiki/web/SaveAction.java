@@ -28,7 +28,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.plugin.captcha.CaptchaParams;
 import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class SaveAction extends PreviewAction {
@@ -40,14 +39,16 @@ public class SaveAction extends PreviewAction {
 
         // Confirm edit to avoid spam robots
         Boolean isResponseCorrect = Boolean.TRUE;
-        CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
         // If  'save' action after preview
         String isResponsePreviewCorrect = request.getParameter("isResponsePreviewCorrect");
         if ((isResponsePreviewCorrect != null))
             isResponseCorrect = Boolean.valueOf(isResponsePreviewCorrect);
-        else if (captchaPluginApi != null) {
-            CaptchaParams captchaParams = captchaPluginApi.getCaptchaParams(context.getUser(), "edit");
-            isResponseCorrect = captchaPluginApi.verifyCaptcha(captchaParams);
+        else {
+            if (xwiki.hasCaptcha(context)) {
+                CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+                if (captchaPluginApi != null)
+                      isResponseCorrect = captchaPluginApi.verifyCaptcha("edit");
+            }
         }
         // If captcha is not correct it will be required again
         if (!isResponseCorrect.booleanValue()) return true;

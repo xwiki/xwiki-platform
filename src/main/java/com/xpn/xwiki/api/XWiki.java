@@ -1345,6 +1345,9 @@ v     * API to check rights on a document for a given user
     public Map getHashMap() {
         return new HashMap();
     }
+    public Map getTreeMap() {
+    	return new TreeMap();
+    }
 
     /**
      * API to sort a list over standard comparator.
@@ -1356,6 +1359,13 @@ v     * API to check rights on a document for a given user
     public List sort(List list) {
         Collections.sort(list);
         return list;
+    }
+    public Number toNumber(Object o) {
+    	try {
+    		return new Long(o.toString());
+    	} catch (Exception e) {
+    		return null;
+    	}
     }
 
     /**

@@ -1624,6 +1624,7 @@ public class XWikiDocument {
         setParent(getElement(docel, "parent"));
         setCreator(getElement(docel, "creator"));
         setAuthor(getElement(docel, "author"));
+        setContentAuthor(getElement(docel, "contentAuthor"));
         setVersion(getElement(docel, "version"));
         setContent(getElement(docel, "content"));
         setLanguage(getElement(docel, "language"));

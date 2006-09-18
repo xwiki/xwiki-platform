@@ -266,12 +266,16 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 	}
 	
 	private void saveXWikiProperty(XWikiJcrSession ses, Node objnode, BaseProperty prop) throws ItemExistsException, PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException {
-		Node propNode = ses.insertObject(objnode, prop.getName(), prop);
+		Node propNode = ses.insertObject(objnode, "xp:"+prop.getName(), prop);
 		propNode.setProperty("obj", objnode);
 	}
 	private BaseProperty loadXWikiProperty(XWikiJcrSession ses, Node nprop) throws RepositoryException {
 		BaseProperty prop = (BaseProperty) ses.loadObject(nprop.getPath());
-		prop.setName( decode( nprop.getName() ) );
+		final String sname = nprop.getName();
+		int ip = sname.indexOf(":");
+		if (ip<0)
+			return null;
+		prop.setName( decode( sname.substring(ip+1) ) );
 		return prop;
 	}
 	
@@ -662,7 +666,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 			executeRead(context, new JcrCallBack(){
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
 					// XXX: if username contains "'" ?
-					String xpath = "store/*/*/obj/XWiki/XWikiGroups/member[@value='"+username+"' or @value='"+shortname+"']";
+					String xpath = "store/*/*/obj/XWiki/XWikiGroups/xp:member[@value='"+username+"' or @value='"+shortname+"']";
 					Query query = session.getQueryManager().createQuery(xpath, Query.XPATH);
 					NodeIterator ni = query.execute().getNodes();
 					while (ni.hasNext()) {

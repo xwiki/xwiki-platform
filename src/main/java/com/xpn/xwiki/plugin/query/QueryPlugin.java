@@ -185,8 +185,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             boolean descending = (c == '-');
             if (c=='-' || c=='+')
                 prop = prop.substring(1);
-            c = prop.charAt(0);
-            if (c!='@')
+            if (prop.indexOf("@")<0)
                 res.append("@");
             res.append(prop);
             if (descending)
@@ -209,7 +208,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         for (int i=0; i<props.length; i++) {
             final String p = props[i];
             sb.append(comma);
-            if (p.charAt(0)!='@')
+            if (p.indexOf("@")<0)
                 sb.append("@");
             sb.append(p);
             comma = ",";

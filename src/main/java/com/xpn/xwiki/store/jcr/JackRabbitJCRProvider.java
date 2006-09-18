@@ -44,6 +44,7 @@ import org.apache.portals.graffito.jcr.query.QueryManager;
 import org.apache.portals.graffito.jcr.query.impl.QueryManagerImpl;
 
 import javax.jcr.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -112,22 +113,15 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 		//TODO: namespace and nodetypes in one compact node def.
 		XWikiJcrSession s = getSession(workspace);
 		try {
-			try { 
-				s.getWorkspace().getNamespaceRegistry().registerNamespace("xwiki", "http://www.xwiki.org");
-				log.info("namespace 'xwiki' registered!");
-			} catch (NamespaceException e) {}; 
-			try { 
-				s.getWorkspace().getNamespaceRegistry().registerNamespace("graffito", "http://incubator.apache.org/graffito");
-				log.info("namespace 'graffito' registered!");
-			} catch (NamespaceException e) {};
+			registerNamespace(s.getWorkspace(), "xwiki", "http://www.xwiki.org");
+			registerNamespace(s.getWorkspace(), "xp", "http://www.xwiki.org/property");
+			registerNamespace(s.getWorkspace(), "graffito", "http://incubator.apache.org/graffito");
 			registerNodeTypes(s.getWorkspace(), getRealConfigPath("xwiki.store.jcr.jackrabbit.nodetypes.config", "jackrabbit/nodetypes.cnd"));
 			s.save();
-		}
-		catch (RepositoryException e) {
+		} catch (RepositoryException e) {
 			log.info("Node types not registered", e);
 			return false;
-		}
-		finally {
+		} finally {
 			s.logout();
 		}
 		return true;
@@ -143,6 +137,15 @@ public class JackRabbitJCRProvider implements IJcrProvider {
 			public void nodeTypeUnregistered(QName ntName) {}			
 		});
 		ntm.registerNodeTypes(fis, NodeTypeManagerImpl.TEXT_X_JCR_CND);
+	}
+	private boolean registerNamespace(Workspace w, String preffix, String uri) throws UnsupportedRepositoryOperationException, AccessDeniedException, RepositoryException {
+		try {
+			w.getNamespaceRegistry().registerNamespace(preffix, uri);
+			log.info("namespace '"+preffix+"' registered!");
+		} catch (NamespaceException e) {
+			return false;
+		};
+		return true;
 	}
 
 	public void shutdown() {

@@ -50,15 +50,15 @@
 <number>4</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </comment>
-<snumber>
+<number>
 <numberType>integer</numberType>
 <prettyName>number</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
-<name>snumber</name>
+<name>number</name>
 <number>2</number>
 <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-</snumber>
+</number>
 </class>
 <content>#set($defaultparent = "XWiki.SlideClass")
 #set($defaultweb = "Main")

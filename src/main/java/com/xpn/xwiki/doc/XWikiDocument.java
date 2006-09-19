@@ -544,7 +544,7 @@ public class XWikiDocument {
 
     public String getURL(String action, String querystring, XWikiContext context) {
         URL url = context.getURLFactory().createURL(getWeb(), getName(), action,
-                querystring, getDatabase(), context);
+                querystring, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 

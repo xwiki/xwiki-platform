@@ -180,13 +180,33 @@ public class XWikiDocument {
         this.id = id;
     }
 
+
+    public String getSpace() {
+            return web;
+        }
+
+    public void setSpace(String space) {
+        this.web = space;
+    }
+
+    /**
+     *
+     *
+     * @deprecated use {@link #getSpace()} instead of this function
+     * @return the name of the space of the document
+     */
     public String getWeb() {
         return web;
     }
 
+    /**
+     * @deprecated use {@link #setSpace(String)} instead of this function
+     * @param web
+     */
     public void setWeb(String web) {
         this.web = web;
     }
+
 
     public String getVersion() {
         return getRCSVersion().toString();

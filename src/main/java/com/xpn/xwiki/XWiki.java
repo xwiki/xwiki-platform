@@ -2215,6 +2215,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             String port = getXWikiPreference("smtp_port", context);
             String login = getXWikiPreference("smtp_login", context);
 
+            if (context.get("debugMail") != null)
+            {
+                StringBuffer msg = new StringBuffer(message);
+                msg.append("\n Recipient: ");
+                msg.append(recipient);
+                recipient = ((String)context.get("debugMail")).split(",");
+                message = msg.toString();
+            }
+
+            
             if ((server == null) || server.equals(""))
                 server = "127.0.0.1";
             if ((port == null) || (port.equals("")))

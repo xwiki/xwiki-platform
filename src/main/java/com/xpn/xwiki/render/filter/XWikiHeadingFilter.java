@@ -23,6 +23,7 @@
 package com.xpn.xwiki.render.filter;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 import com.xpn.xwiki.util.TOCGenerator;
@@ -130,12 +131,20 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             if (level.equals("1") || level.equals("1.1") ) {
                 if(doc.getContent().indexOf(title.trim()) != -1) {
                     sectionNumber++;
-                    String url = xcontext.getDoc().getURL("edit",xcontext);
-                    if(xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
-                        url += "?xpage=wysiwyg&section=" + sectionNumber;
-                    } else {
-                        url +="?section=" + sectionNumber;
-                    }
+                    String editparams = "";
+                    if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg"))
+                        editparams += "xpage=wysiwyg&section=" + sectionNumber;
+                    else
+                        editparams += "section=" + sectionNumber;
+                    try {
+                        if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null)) {
+                             String languageParam = "language=" + doc.getRealLanguage(xcontext);
+                            editparams = languageParam + "&" + editparams;
+                        }
+                    } catch (XWikiException e) { }
+
+                    String url = doc.getURL("edit", editparams, xcontext);
+
                     return heading + "<span style='float:right;margin-left:5px;margin-right:5px;'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
                 }
             }

@@ -60,6 +60,12 @@ public class Document extends Api {
         this.doc = doc;
     }
 
+
+    /**
+     *  this function is accessible only if you have the programming rights
+     * give access to the priviledged API of the Document
+     * @return
+     */
     public XWikiDocument getDocument() {
         if (checkProgrammingRights())
             return doc;
@@ -67,24 +73,67 @@ public class Document extends Api {
             return null;
     }
 
+
     protected XWikiDocument getDoc() {
         if (doc == olddoc)
             doc = (XWikiDocument) doc.clone();
         return doc;
     }
 
+    /**
+     * return the ID of the document. this ID is uniq accross the wiki.
+     *
+     * @return the id of the document
+     */
     public long getId() {
         return doc.getId();
     }
 
+    /**
+     * return the name of a document.
+     *
+     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc
+     *
+     * @return the name of the document
+     */
     public String getName() {
         return doc.getName();
     }
 
+    /**
+     * return the name of the space of the document
+     *
+     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MySpace
+     *
+     * @deprecated use {@link #getSpace()} instead of this function
+     * @return
+     */
+    public String getSpace() {
+        return doc.getSpace();
+    }
+
+
+    /**
+     * return the name of the space of the document
+     *
+     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MySpace
+     *
+     * @deprecated use {@link #getSpace()} instead of this function
+     * @return
+     */
     public String getWeb() {
         return doc.getWeb();
     }
 
+
+    /**
+     * return the fullName of a doucment
+     *
+     * if a document has for name "MyDoc" and space "MySpace", the fullname is "MySpace.MyDoc"
+     * In a wiki, all the documents have a different fullName.
+     *
+     * @return
+     */
     public String getFullName() {
         return doc.getFullName();
     }
@@ -93,54 +142,105 @@ public class Document extends Api {
         return doc.getRCSVersion();
     }
 
+    /**
+     * return a String with the version of the document.
+     * @return
+     */
     public String getVersion() {
         return doc.getVersion();
     }
 
+    /**
+     * return the title of a document
+     * @return
+     */
     public String getTitle() {
         return doc.getTitle();
     }
 
+    /**
+     * return the title of the document. If there is no title, return the first title in the document
+     * @return
+     */
     public String getDisplayTitle() {
         return doc.getDisplayTitle();
     }
+
 
     public String getFormat() {
         return doc.getFormat();
     }
 
+    /**
+     * return the name of the last author of the document
+     * @return
+     */
     public String getAuthor() {
         return doc.getAuthor();
     }
+
+    /**
+     * return the name of the last author of the content of the document
+     * @return
+     */
 
     public String getContentAuthor() {
         return doc.getContentAuthor();
     }
 
+
+    /**
+     * return the modification date
+     * @return
+     */
     public Date getDate() {
         return doc.getDate();
     }
 
+    /**
+     * return the date of the last modification of the content
+     * @return
+     */
     public Date getContentUpdateDate() {
         return doc.getContentUpdateDate();
     }
 
+    /**
+     * return the date of the creation of the document
+     * @return
+     */
     public Date getCreationDate() {
         return doc.getCreationDate();
     }
 
+    /**
+     * return the name of the parent document
+     * @return
+     */
     public String getParent() {
         return doc.getParent();
     }
 
+    /**
+     * return the name of the creator of the document
+     * @return
+     */
     public String getCreator() {
         return doc.getCreator();
     }
 
+    /**
+     * return the content of the document
+     * @return
+     */
     public String getContent() {
         return doc.getContent();
     }
 
+    /**
+     * return the language of the document if it's a traduction, otherwise, it return default
+     * @return
+     */
     public String getLanguage() {
         return doc.getLanguage();
     }
@@ -149,10 +249,19 @@ public class Document extends Api {
         return doc.getTemplate();
     }
 
+    /**
+     * return the real language of the document
+     * @return
+     * @throws XWikiException
+     */
     public String getRealLanguage() throws XWikiException {
         return doc.getRealLanguage(context);
     }
 
+    /**
+     * return the language of the default document
+     * @return
+     */
     public String getDefaultLanguage() {
         return doc.getDefaultLanguage();
     }
@@ -161,86 +270,207 @@ public class Document extends Api {
         return doc.getDefaultTemplate();
     }
 
+    /**
+     * return the list of possible traduction for this document
+     * @return
+     * @throws XWikiException
+     */
     public List getTranslationList() throws XWikiException {
         return doc.getTranslationList(context);
     }
 
+
+    /**
+     * return the tranlated document's content
+     * if the wiki is multilingual, the language is first checked in the URL, the cookie, the user profile and finally the wiki configuration
+     * if not, the language is the one on the wiki configuration
+     * @return
+     * @throws XWikiException
+     */
     public String getTranslatedContent() throws XWikiException {
         return doc.getTranslatedContent(context);
     }
 
+    /**
+     * return the translated content in the given language
+     * @param language
+     * @return
+     * @throws XWikiException
+     */
     public String getTranslatedContent(String language) throws XWikiException {
         return doc.getTranslatedContent(language, context);
     }
 
+    /**
+     * return the translated document in the given document
+     * @param language
+     * @return
+     * @throws XWikiException
+     */
     public Document getTranslatedDocument(String language) throws XWikiException {
         return new Document(doc.getTranslatedDocument(language, context), context);
     }
 
+    /**
+     * return the tranlated Document
+     * if the wiki is multilingual, the language is first checked in the URL, the cookie, the user profile and finally the wiki configuration
+     * if not, the language is the one on the wiki configuration
+     * @return
+     * @throws XWikiException
+     */
     public Document getTranslatedDocument() throws XWikiException {
         return new Document(doc.getTranslatedDocument(context), context);
     }
 
+    /**
+     * return the content of the document rendererd
+     * @return
+     * @throws XWikiException
+     */
     public String getRenderedContent() throws XWikiException {
         return doc.getRenderedContent(context);
     }
 
+    /**
+     * return the given text rendered in the context of this document
+     * @param text
+     * @return
+     * @throws XWikiException
+     */
     public String getRenderedContent(String text) throws XWikiException {
         return doc.getRenderedContent(text, context);
     }
 
+    /**
+     * return a escaped version of the content of this document
+     * @return
+     * @throws XWikiException
+     */
     public String getEscapedContent() throws XWikiException {
         return doc.getEscapedContent(context);
     }
 
+    /**
+     * return the archive of the document in a string format
+     * @return
+     * @throws XWikiException
+     */
     public String getArchive() throws XWikiException {
         return doc.getDocumentArchive(context).getArchive();
     }
 
+    /**
+     *  this function is accessible only if you have the programming rights
+     * return the archive of the document
+     * @return
+     * @throws XWikiException
+     */
     public XWikiDocumentArchive getDocumentArchive() throws XWikiException {
-        return doc.getDocumentArchive(context);
+        if (checkProgrammingRights())
+            return doc.getDocumentArchive(context);
+        return null;
     }
 
+    /**
+     * return true if the document is a new one (Has never been saved)
+     * @return
+     */
     public boolean isNew() {
         return doc.isNew();
     }
 
+    /**
+     * return the URL of download for the  the given attachment name
+     * @param filename the name of the attachment
+     * @return A String with the URL
+     */
     public String getAttachmentURL(String filename) {
         return doc.getAttachmentURL(filename, "download", context);
     }
 
+    /**
+     * return the URL of the given action for the  the given attachment name
+     * @param filename
+     * @param action
+     * @return A string with the URL
+     */
     public String getAttachmentURL(String filename, String action) {
         return doc.getAttachmentURL(filename, action, context);
     }
 
-    public String getAttachmentURL(String filename, String action, String querystring) {
-        return doc.getAttachmentURL(filename, action, querystring, context);
+    /**
+     * return the URL of the given action for the  the given attachment name with "queryString" parameters
+     * @param filename
+     * @param action
+     * @param queryString parameters added to the URL
+     * @return
+     */
+    public String getAttachmentURL(String filename, String action, String queryString) {
+        return doc.getAttachmentURL(filename, action, queryString, context);
     }
 
+    /**
+     * return the URL for accessing to the archive of the attachment "filename" at the version "version"
+     * @param filename
+     * @param version
+     * @return
+     */
     public String getAttachmentRevisionURL(String filename, String version) {
         return doc.getAttachmentRevisionURL(filename, version, context);
     }
 
+    /**
+     * return the URL for accessing to the archive of the attachment "filename" at the version "version" and  with the given queryString parameters
+     * @param filename
+     * @param version
+     * @param querystring
+     * @return
+     */
     public String getAttachmentRevisionURL(String filename, String version, String querystring) {
         return doc.getAttachmentRevisionURL(filename, version, querystring, context);
     }
 
+    /**
+     * return the URL of this document in view mode
+     * @return
+     */
     public String getURL() {
         return doc.getURL("view", context);
     }
 
+    /**
+     * return thr URL of this document with the given action
+     * @param action
+     * @return
+     */
     public String getURL(String action) {
         return doc.getURL(action, context);
     }
 
+    /**
+     * return thr URL of this document with the given action and queryString as parameters
+     * @param action
+     * @param querystring
+     * @return
+     */
     public String getURL(String action, String querystring) {
         return doc.getURL(action, querystring, context);
     }
 
+
+    /**
+     * return the full URL of the document
+     * @return
+     */
     public String getExternalURL() {
         return doc.getExternalURL("view", context);
     }
 
+    /**
+     * return the full URL of the document for the given action     
+     * @param action
+     * @return
+     */
     public String getExternalURL(String action) {
         return doc.getExternalURL(action, context);
     }

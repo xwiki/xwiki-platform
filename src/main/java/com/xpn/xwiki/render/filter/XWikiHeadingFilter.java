@@ -131,21 +131,21 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             if (level.equals("1") || level.equals("1.1") ) {
                 if(doc.getContent().indexOf(title.trim()) != -1) {
                     sectionNumber++;
-                    String editparams = "";
+                    StringBuffer editparams = new StringBuffer();
                     if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg"))
-                        editparams += "xpage=wysiwyg&section=" + sectionNumber;
+                        editparams.append("xpage=wysiwyg&section=").append(sectionNumber);
                     else
-                        editparams += "section=" + sectionNumber;
+                        editparams.append("section=").append(sectionNumber);
                     try {
                         if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null)) {
-                             String languageParam = "language=" + doc.getRealLanguage(xcontext);
-                            editparams = languageParam + "&" + editparams;
+                            String languageParam = "language=" + doc.getRealLanguage(xcontext);
+                            editparams.append("&").append(languageParam);
                         }
                     } catch (XWikiException e) { }
 
-                    String url = doc.getURL("edit", editparams, xcontext);
+                    String url = doc.getURL("edit", editparams.toString(), xcontext);
 
-                    return heading + "<span style='float:right;margin-left:5px;margin-right:5px;'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
+                    return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
                 }
             }
         }

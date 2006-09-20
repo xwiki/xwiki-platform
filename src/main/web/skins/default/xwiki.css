@@ -565,3 +565,10 @@
   margin-top: 5px;
   margin-left: 20px;
 }
+
+.edit_section {
+  float: right;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+

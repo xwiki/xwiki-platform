@@ -6,12 +6,14 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.util.List;
+import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -96,6 +98,35 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             Object[] args = { attachment.getFilename(), attachment.getDoc().getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachment {0} of document {1}", e, args);
+        } finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {}
+        }
+
+    }
+
+    public void saveAttachmentsContent(List attachments, XWikiDocument doc, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
+        try{
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            if (attachments == null)
+                return;
+            Iterator it = attachments.iterator();
+            while(it.hasNext()){
+                XWikiAttachment att = (XWikiAttachment) it.next();
+                saveAttachmentContent(att, false, context, false);
+            }
+            if (bParentUpdate){
+                context.getWiki().getStore().saveXWikiDoc(doc, context, true);
+            }
+        }
+        catch (Exception e) {
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+                    "Exception while saving attachments", e);
         } finally {
             try {
                 if (bTransaction)

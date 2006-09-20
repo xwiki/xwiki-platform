@@ -6,9 +6,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 
 import javax.jcr.*;
+import javax.transaction.NotSupportedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -55,7 +57,12 @@ public class XWikiJcrAttachmentStore extends XWikiJcrBaseStore implements XWikiA
                     "Exception while saving attachment {0} of document {1}", e, args);
         }
 	}
-	String getAttachmentPath(XWikiAttachment att) {
+
+    public void saveAttachmentsContent(List attachments, XWikiDocument doc, boolean bParentUpdate, XWikiContext context, boolean bTransaction)  {
+        new NotSupportedException().printStackTrace();
+    }
+
+    String getAttachmentPath(XWikiAttachment att) {
 		return getBaseDocPath( att.getDoc() ) + "/attach/"+att.getFilename();		
 	}
 	String getAttachmentContentPath(XWikiAttachmentContent ac) {

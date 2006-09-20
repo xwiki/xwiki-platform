@@ -51,7 +51,14 @@ public class XWikiDocumentArchive {
             if ((text!=null)&&(!text.trim().equals(""))) {
                 StringInputStream is = new StringInputStream(text);
                 archive = new Archive("", is);
-            } else {
+            } else
+            if (text == null){
+                Object[] lines = new Object[1];
+                lines[0] = "";
+                archive = new Archive(lines, "", "1.0");
+            }
+            else
+            {
                 Object[] lines = ToString.stringToArray(text);
                 archive = new Archive(lines, "", "1.0");
             }

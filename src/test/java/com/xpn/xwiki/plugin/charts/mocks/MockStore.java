@@ -172,6 +172,10 @@ public class MockStore implements XWikiStoreInterface, XWikiAttachmentStoreInter
 
     }
 
+    public void saveAttachmentsContent(List attachments, XWikiDocument doc, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException {
+        
+    }
+
     public void loadAttachmentContent(XWikiAttachment attachment,
                                       XWikiContext context, boolean bTransaction) throws XWikiException {
 

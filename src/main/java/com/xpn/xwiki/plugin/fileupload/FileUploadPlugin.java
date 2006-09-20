@@ -203,10 +203,32 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         return data;
     }
 
+
     /**
      * Allows to retrieve the data of FileItem named name
      * loadFileList needs to be called beforehand
 
+     * @param name Name of the item
+     * @param context Context of the request
+     * @return String of the data
+     * @throws XWikiException Exception is thrown if the data could not be read
+     * @param name
+     * @param context
+     * @return
+     * @throws XWikiException
+     */
+    public String getFileItemAsString(String name, XWikiContext context) throws XWikiException {
+        byte[] data = getFileItemData(name, context);
+        if (data==null)
+            return null;
+        else
+            return new String(data);
+    }
+
+    /**
+     * Allows to retrieve the data of FileItem named name
+     * loadFileList needs to be called beforehand
+     * @deprecated not well named, use {@link #getFileItemAsString(String, com.xpn.xwiki.XWikiContext)}
      * @param name Name of the item
      * @param context Context of the request
      * @return String of the data

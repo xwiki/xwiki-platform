@@ -1697,7 +1697,7 @@ public class XWikiDocument {
         }
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
+    public void saveAttachmentsContent(List attachments, XWikiContext context) throws XWikiException {
         String database = context.getDatabase();
         try {
             // We might need to switch database to
@@ -1705,7 +1705,34 @@ public class XWikiDocument {
             if (getDatabase() != null)
                 context.setDatabase(getDatabase());
 
-           context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, context,true);
+           context.getWiki().getAttachmentStore().saveAttachmentsContent(attachments, this, true, context, true);
+        }catch(java.lang.OutOfMemoryError e){
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+                    "Out Of Memory Exception");
+        }
+        finally {
+            if (database != null)
+                context.setDatabase(database);
+        }
+
+    }
+
+
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
+        saveAttachmentContent(attachment, true, true, context);
+    }
+    
+
+    protected void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction, XWikiContext context) throws XWikiException {
+        String database = context.getDatabase();
+        try {
+            // We might need to switch database to
+            // get the translated content
+            if (getDatabase() != null)
+                context.setDatabase(getDatabase());
+
+           context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
         }catch(java.lang.OutOfMemoryError e){
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,

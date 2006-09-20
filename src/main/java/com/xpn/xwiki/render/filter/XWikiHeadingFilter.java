@@ -137,14 +137,11 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                     else
                         editparams.append("section=").append(sectionNumber);
                     try {
-                        if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null)) {
-                            String languageParam = "language=" + doc.getRealLanguage(xcontext);
-                            editparams.append("&").append(languageParam);
-                        }
+                        if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null))
+                            editparams.append("&").append("language=").append(doc.getRealLanguage(xcontext));
                     } catch (XWikiException e) { }
 
                     String url = doc.getURL("edit", editparams.toString(), xcontext);
-
                     return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
                 }
             }

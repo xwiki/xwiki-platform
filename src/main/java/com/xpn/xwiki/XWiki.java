@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  * @author ludovic
- * @author namphunghai
+ * @author phunghainam
  * @author wr0ngway
  * @author markj
  * @author erwan
@@ -3989,17 +3989,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean hasSectionEdit(XWikiContext context) {
-        if (context.getWiki().ParamAsLong("xwiki.section.edit", 0) == 1)
-            return true;
-         else
-            return false;
+        return (context.getWiki().ParamAsLong("xwiki.section.edit", 0) == 1);
     }
 
     public boolean hasCaptcha(XWikiContext context) {
-        if (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1)
-            return true;
-        else
-            return false;
+        return (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1);
     }
 
     public String clearName(String name, XWikiContext context) {
@@ -4047,7 +4041,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public List search(XWikiQuery query, XWikiContext context) throws XWikiException {
-        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);                                              
+        QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
         if (qp == null)
          return null;
         return qp.search(query);

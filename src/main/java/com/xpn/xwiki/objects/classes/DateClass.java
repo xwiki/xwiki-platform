@@ -81,7 +81,8 @@ public class DateClass  extends PropertyClass {
         BaseProperty property = newProperty();
 
         if ((value==null)||(value.equals(""))) {
-            property.setValue(new Date());
+            if (getEmptyIsToday()==1)
+             property.setValue(new Date());
             return property;
         }
 
@@ -101,6 +102,8 @@ public class DateClass  extends PropertyClass {
     }
 
     public String toFormString(BaseProperty property) {
+        if (property.getValue()==null)
+         return "";
         SimpleDateFormat sdf = new SimpleDateFormat(getDateFormat());
         return sdf.format(property.getValue());
     }

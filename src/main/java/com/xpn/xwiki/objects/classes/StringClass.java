@@ -98,8 +98,16 @@ public class StringClass extends PropertyClass {
     public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
         String value = (String)map.get(prefix);
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "%')");
-         return;
+
+         String startsWith = (String)map.get(prefix + "startswith");
+         String endsWith = (String)map.get(prefix + "endswith");
+            if( "1".equals(startsWith))
+                criteriaList.add("jcr:like(@f:" + getName() + ", '" + value + "%')");
+            else if("1".equals(endsWith))
+                criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "')");
+            else
+                criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "%')");
+            return;
         }
 
         value = (String)map.get(prefix + "exact");

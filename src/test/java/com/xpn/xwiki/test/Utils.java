@@ -49,6 +49,7 @@ import org.apache.ecs.filter.CharacterFilter;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
@@ -236,6 +237,16 @@ public class Utils {
                                      Map bobjects, XWikiContext context) throws XWikiException {
               return createDoc(store, web, name, content1, bobject, bclass, bobjects, context);
         }
+    
+    public static XWikiAttachment createAttachment(XWikiStoreInterface store, XWikiDocument doc, String attname, String filename, XWikiContext context) throws IOException, XWikiException {
+    	XWikiAttachment attachment = new XWikiAttachment(doc, attname);
+        byte[] attachcontent = Utils.getDataAsBytes(new File(filename));
+        attachment.setContent(attachcontent);
+        doc.getAttachmentList().add(attachment);
+        doc.saveAttachmentContent(attachment, context);
+        store.saveXWikiDoc(doc, context);
+        return attachment;
+    }
 
     public static BaseObject prepareObject(XWikiDocument doc) throws XWikiException {
         return prepareObject(doc, "Test.TestObject");

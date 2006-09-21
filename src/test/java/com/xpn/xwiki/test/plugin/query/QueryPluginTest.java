@@ -26,8 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.ValueFormatException;
@@ -45,12 +45,10 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.plugin.query.IQueryFactory;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.test.Utils;
-import junit.framework.TestCase;
 
 public class QueryPluginTest extends HibernateTestCase {
     private static final Object[] NOTHING = new Object[]{};
@@ -94,7 +92,7 @@ public class QueryPluginTest extends HibernateTestCase {
             } else {
                 obj = loadobj(obj);
                 exp = loadobj(exp);
-                if (exp==obj) continue; // XXX: bugs with proxy objects?
+                if (exp==obj) continue;
                 if (exp instanceof XWikiDocument)
                  assertEquals("Objects #"+i+" not equals",
                          ((XWikiDocument)obj).toFullXML(context),
@@ -322,7 +320,7 @@ public class QueryPluginTest extends HibernateTestCase {
         doc2.setContent("no content");
         doc2.setAuthor("Someone over");
         doc2.setParent("Test.WebHome");
-        hb.saveXWikiDoc(doc2, getXWikiContext()); // XXX: Was same attachments of different documents be? That would query return? 2 or 1
+        hb.saveXWikiDoc(doc2, getXWikiContext());
 
         XWikiAttachment attachment3 = new XWikiAttachment(doc2, "testfile1");
         byte[] attachcontent3 = Utils.getDataAsBytes(new File(Utils.filename));
@@ -616,7 +614,7 @@ public class QueryPluginTest extends HibernateTestCase {
     }
 
     public void testDates() throws XWikiException, ValueFormatException, IllegalStateException, RepositoryException {
-//		 new Class
+    	// new Class
         XWikiDocument doc0, doc = doc0 = new XWikiDocument("Class", "Class1");
         BaseClass bclass = new BaseClass();
         bclass.addDateField("date", "pdate");
@@ -650,5 +648,33 @@ public class QueryPluginTest extends HibernateTestCase {
         testSearchXPnQl1("//obj/Class/Class1[@f:date <= xs:dateTime('"+sdate+"')]/@f:date", "select f:date from xwiki:object where className='Class.Class1' and f:date <= TIMESTAMP '"+sdate+"'", ts1);
         testSearchXPnQl1("//obj/Class/Class1[@f:date > xs:dateTime('"+sdate+"')]/@f:date", "select f:date from xwiki:object where className='Class.Class1' and f:date > TIMESTAMP '"+sdate+"'", ts2);
         testSearchXPnQl("//obj/Class/Class1[@f:date >= xs:dateTime('"+sdate+"')]/@f:date  order by @f:date descending", "select f:date from xwiki:object where className='Class.Class1' and f:date >= TIMESTAMP '"+sdate+"' order by f:date DESC", new Object[]{ts2, ts1});
+    }
+    public void testJcrDeref() throws XWikiException, IOException, InvalidQueryException {
+    	XWikiStoreInterface store = xwiki.getStore();
+    	Utils.setStandardData();
+    	XWikiDocument doc1 = Utils.createDoc("Test.JcrDeref", "content", store, context);
+    	XWikiAttachment att1 = Utils.createAttachment(store, doc1, "testatt1", Utils.filename, context);
+        
+    	testSearchXP1("/*/*", doc1);
+    	testSearchXP1("/*/*/attach/testatt1", att1);
+        testSearchXP1("/*/*/attach/testatt1/jcr:deref(@doc, '*')", doc1);
+        testSearchXP1("/*/*/attach/*/jcr:deref(@doc, '*')/@fullName", doc1.getFullName());
+        
+        XWikiDocument doc2 = Utils.createDoc("Test.JcrDeref2", "content2", store, context);
+        Utils.createAttachment(store, doc2, "testatt1", Utils.filename, context);
+        
+        testSearchXP("/*/*/attach/testatt1/jcr:deref(@doc, '*') order by @fullName", new Object[]{doc1, doc2});
+        testSearchXP1("/*/*[@content='content2']/attach/*/jcr:deref(@doc, '*')/@fullName", doc2.getFullName());
+        
+        BaseObject bo = Utils.prepareObject(doc1, doc1.getFullName());
+        xwiki.saveDocument(doc1, context);
+        testSearchXP1("/*/*/obj/*/*", bo);
+        testSearchXP1("/*/*/obj/*/*/jcr:deref(@doc, '*')", doc1);
+        testSearchXP1("/*/*/obj/*/*/jcr:deref(@doc, '*')/obj/Test/JcrDeref", bo);
+        testSearchXP1("/*/*/obj/*/*/jcr:deref(@doc, '*')/obj/Test/JcrDeref/jcr:deref(@doc, '*')", doc1);
+        testSearchXP1("/*/*/obj/Test/JcrDeref/jcr:deref(@doc, '*')/attach/testatt1", att1);
+        testSearchXP1("/*/*/obj/*/*/jcr:deref(@doc, '*')/attach/*/jcr:deref(@doc, '*')", doc1);
+        testSearchXP("//element(*, xwiki:attachment)/jcr:deref(@doc, '*')/@content order by @name", new Object[]{doc1.getContent(),doc2.getContent()});
+        testSearchXP1("//element(*, xwiki:object)/jcr:deref(@doc, '*')", doc1);
     }
 }

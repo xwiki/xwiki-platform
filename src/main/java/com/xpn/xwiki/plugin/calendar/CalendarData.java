@@ -167,6 +167,7 @@ public class CalendarData {
             if ((idate>= isdate)&&(idate<=iedate)) {
                     StringBuffer message = new StringBuffer();
                     String user = event.getUser();
+                    message.append("<div class=\"event\">");
                     if ((user!=null)&&(!user.equals("")))
                      message.append(context.getWiki().getLocalUserName(event.getUser(), context));
                     String desc = event.getDescription();
@@ -174,6 +175,7 @@ public class CalendarData {
                       message.append(": ");
                     message.append(desc);
                     message.append("<br />");
+                    message.append("</div>");
                     result.append(message);
                 }
         }

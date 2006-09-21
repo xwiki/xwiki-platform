@@ -269,19 +269,24 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         if (url!=null)
         {
             output.append("<div class=\"wiki-calendar-daytitle\">");
+            if ( content!=null && content.length() > 0)
+                output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
             output.append("<a href=\""+url+"\">");
             output.append(cal.get(Calendar.DAY_OF_MONTH));
-            if ( content!=null ) {
-                output.append( "<br />");
+            if ( content!=null  && content.length() > 0) {
+                output.append( "<br />");                
                 output.append( content );
+                output.append("</div>");
             }
             output.append("</a></div>");
         }
         else
         {
             output.append("<div class=\"wiki-calendar-daytitle\">");
+            if ( content!=null  && content.length() > 0)
+                output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
             output.append(cal.get(Calendar.DAY_OF_MONTH));
-            if ( content!=null ) {
+            if ( content!=null  && content.length() > 0) {
                 output.append( "<br />");
                 output.append( content );
             }

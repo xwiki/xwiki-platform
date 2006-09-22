@@ -53,17 +53,18 @@ function cancelAction() {
 </head>
 <body onload="init();">
 <form onsubmit="insertTable();return false;">
-  <table border="0" cellpadding="0" cellspacing="0" width="200">
+  <table  border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0">
+      <td align="center" valign="middle"><table border="0" cellpadding="4" cellspacing="0" width="100%">
           <tr>
             <td colspan="4" class="title">{$lang_insert_table_title}</td>
           </tr>
+          <tr><td colspan="4"></td></tr>
           <tr>
             <td>{$lang_insert_table_cols}:</td>
-            <td><input name="cols" type="text" id="cols" value="" size="3" maxlength="3"></td>
-            <td>{$lang_insert_table_rows}:</td>
-            <td><input name="rows" type="text" id="rows" value="" size="3" maxlength="3"></td>
+            <td><input name="cols" type="text" id="cols" value="" size="7" maxlength="3"></td>
+            <td align="center">{$lang_insert_table_rows}:</td>
+            <td><input name="rows" type="text" id="rows" value="" size="7" maxlength="3"></td>
           </tr>
           <tr id = "align" style="display: none">
             <td>{$lang_insert_table_align}:</td>
@@ -86,14 +87,14 @@ function cancelAction() {
             <td></td>
           </tr>
           <tr>
-            <td><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertTable();"></td>
-            <td align="right">&nbsp;</td>
-            <td align="right">&nbsp;</td>
-            <td align="right"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
+            <td align="right"><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertTable();"></td>
+            <td colspan="2">&nbsp;</td>
+            <td align="left"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onclick="cancelAction();"></td>
           </tr>
         </table></td>
     </tr>
   </table>
 </form>
+<hr />
 </body>
 </html>

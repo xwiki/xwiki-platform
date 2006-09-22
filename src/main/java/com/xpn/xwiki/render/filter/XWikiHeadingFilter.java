@@ -138,7 +138,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                         editparams.append("section=").append(sectionNumber);
                     try {
                         if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null))
-                            editparams.append("&").append("language=").append(doc.getRealLanguage(xcontext));
+                            editparams.append("&language=").append(doc.getRealLanguage(xcontext));
                     } catch (XWikiException e) { }
 
                     String url = doc.getURL("edit", editparams.toString(), xcontext);

@@ -89,7 +89,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     }
 
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
-    this.setHtmlTagRemover('removeHtmlTags_Paragraph');
+    this.setHtmlTagRemover('removeSpecialHtmlTags');
     // Toolbar handlers
 	this.addToolbarHandler('handleTextButtons');
 	this.addToolbarHandler('handleListButtons');
@@ -114,10 +114,14 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
     return str.replace(remove_html_tags_regexp, "");
 }
 
-WikiEditor.prototype.removeHtmlTags_Paragraph = function(str) {
+//  This will remove some special Html tags to fix some bugs when switch between text and wysiwyg editor
+//  We will replace or remove this method in future when find out the better solutions.
+WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
-    str = str.replace(/<p>([\s\S]+?)<\/p>/g,'$1');
+    str = str.replace(/<span class="wikilink">([\s\S]+?)<\/span>/gi,'$1');
+    str = str.replace(/<span class="wikiexternallink">([\s\S]+?)<\/span>/gi,'$1');
+    str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n')
     return str;
 }

@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -243,7 +244,34 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             xpath.append(where);
             xpath.append("]");
         }
-        xpath.append("/@name");
+        xpath.append("/@doc:fullName");
+
+        List oProps = query.getOrderProperties();
+        String orderClause = "";
+        if ((oProps!=null)&&(oProps.size()>0)) {
+            for (int i=0;i<oProps.size();i++) {
+                OrderClause clause = (OrderClause) oProps.get(i);
+                String propPath = clause.getProperty();
+                int i1 = propPath.indexOf("_");
+                if (i1!=-1) {
+                    String propClassName = propPath.substring(0, i1);
+                    if (propClassName.equals(className)) {
+                        String propName = propPath.substring(i1+1);
+                        if (!orderClause.equals("")) {
+                            orderClause += " and ";
+                        }
+                        orderClause += "@f:" + propName;
+                        if (clause.getOrder()==OrderClause.DESC)
+                            orderClause += " descending";
+                    }
+                }
+            }
+        }
+        if (!orderClause.equals("")) {
+            xpath.append(" order by ");
+            xpath.append(orderClause);
+        }
+
         return xpath.toString();
     }
 

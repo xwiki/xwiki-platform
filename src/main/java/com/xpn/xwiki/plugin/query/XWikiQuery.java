@@ -93,4 +93,8 @@ public class XWikiQuery extends XWikiCriteria {
     public void addOrderProperty(String property, int order) {
         orderProperties.add(new OrderClause(property, order));
     }
+
+    public List getOrderProperties() {
+        return orderProperties;
+    }
 }

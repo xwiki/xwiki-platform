@@ -71,7 +71,7 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
         var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
         var r = imgname_reg.exec(href);
         if(r) {
-            var imgname = r[1];
+            var imgname = r[1].replace(/%20/g," ");;
 			str = "{image:" + imgname;
             var width=att["width"]?this.trimString(att["width"]):"";
 			var height=att["height"]?this.trimString(att["height"]):"";

@@ -15,10 +15,10 @@ WikiEditor.prototype.initCorePlugin = function() {
 	this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
 
-	//this.addExternalProcessor((/^\s*----\s*$/gim), '$1<hr class="line" \/>$2');
-	//this.addInternalProcessor(, );
+	this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
+	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
 
-	// Must remove the html tag format so it won't interfere with paragraph conversion
+    // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
@@ -119,8 +119,8 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
-    str = str.replace(/<span class="wikilink">([\s\S]+?)<\/span>/gi,'$1');
     str = str.replace(/<span class="wikiexternallink">([\s\S]+?)<\/span>/gi,'$1');
+    str = str.replace(/<\/?span[^>]*>/gi, "");
     str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n')
     return str;
@@ -160,8 +160,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
         var att = this.readAttributes(result[1] + " " + result[3]);
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
-            var r = /%20/g;
-            href = href.replace(r," ");
+            href = href.replace(/%20/g," ");
             if(href.toLowerCase() == txt.toLowerCase()) {
                 str = "[" + txt + "]";
             } else {
@@ -178,29 +177,27 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
     if (browser.isIE) str += "\r\n";
     str += "{table}\r\n";
     var rows = text.split("<\/tr>");
-    for(var i=0; i< rows.length; i++) {
-        rows[i] = rows[i].replace("<tr>","")
-        rows[i] = this.trimString(rows[i]);
+    for(var i=0; i< (rows.length - 1); i++) {
+        rows[i] = this.trimString(rows[i].replace("<tr>", ""));
         var cols = rows[i].split("<\/td>");
         for(var j=0; j< cols.length-1; j++) {
-            if (cols[j] != null && cols[j] != "") {
-                var r = /<td\s*([^>]*)>/g;
-                cols[j] = cols[j].replace(r,"");
-                cols[j] = this.trimString(cols[j]);
-                var r1 = /\r\n\r|\r(?!\\\\)\n&nbsp;\r\n/g;
-                cols[j] = cols[j].replace(r1,'\\\\');
-                var r2 = /\r(?!\\\\)/g;
-                cols[j] = cols[j].replace(r2,'\\\\');
-                var r3 = /\\\\\\\\/g;
-                cols[j] = cols[j].replace(r3,'\\\\');
-                var r4 = /<br \/>/g;
-                cols[j] = cols[j].replace(r4,'\\\\\r\n');
-                if (j != cols.length-2) {
-                    str += cols[j] + "|" ;
-                } else {
-                    str += cols[j] +"\r\n";
-                }
-            }
+            cols[j] = cols[j].replace(/<td\s*([^>]*)>/g, "");  // remove <td> tag
+            var lines = this._getLines(cols[j]);
+            var colj = "";
+            if (lines.length == 1) colj = cols[j].replace(/<br \/>/g, "").replace(/\r\n/g, "");
+            else if (lines.length > 1)
+                for (var l=0; l < lines.length; l++)
+                    lines[l] = lines[l].replace(/\r|\n/g, "");
+                for (var k=0; k < lines.length; k++)
+                    if (lines[k] != "")
+                        if (k < (lines.length - 2)) colj += (lines[k] + "\\\\" + "\r\n");
+                        else if (k == (lines.length - 2))
+                            if (lines[k+1] != "")
+                                colj += lines[k] + "\\\\" + "\r\n" + lines[k+1];
+                            else colj += lines[k];
+
+            if (j != (cols.length - 2)) str += (colj + "|") ;
+            else str += (colj + "\r\n");
         }
     }
     str += "{table}";
@@ -760,37 +757,41 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimString(result[1]);
-    text = text.replace(/<br \/>/g, '\r\n');
-    var rows = text.split("\r\n");
-    var str = "";
-    str += "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
-    for (var i=0; i<rows.length; i++) {
-        rows[i] = this.trimString(rows[i]);
+    text = text.replace(/<br \/>/g, '\n');
+    var lines = this._getLines(text);
+    var str = "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
+    for (var i=0; i < lines.length; i++)
+        lines[i] = this.trimString(lines[i].replace(/\r|\n/g, ""));
+    var rows = new Array();  // rows of table
+    var rowindex = 0;
+    for (var i=0; i < lines.length; i++) {
+        var row = "";
         var k = 0;
-        if (rows[i] != null && rows[i] != "") {
-            while (this.trimString(rows[i]).lastIndexOf("\\\\") == (this.trimString(rows[i]).length-2)) {
-                rows[i] = rows[i].substring(0,rows[i].lastIndexOf("\\\\"));
-                k++;
-                if ("\\\\" == this.trimString(rows[i+k]))
-                    rows[i] = rows[i] + "<br \/>&nbsp;" + rows[i+k];
-                 else
-                    rows[i] = rows[i] + "<br \/>" + rows[i+k];
-            }
-            var regExp = new RegExp('\\\\','g');
-            rows[i] = rows[i].replace(regExp,"<br \/>");
-            var cols = rows[i].split("|");
-            str += "<tr>";
-            for (var j=0; j<cols.length; j++) {
-                if (i == 0) {
-                    str += "<td style=\"background:#b6c5f2;font-weight:bold;\">" + this.trimString(cols[j]) + "&nbsp;<\/td>"
-                }
-                else
-                    str += "<td style=\"background:#FFFFFF\">" + this.trimString(cols[j]) + "&nbsp;<\/td>" ;
-            }
-            str += "<\/tr>" ;
+        do {
+            row += lines[i+k];
+            k++;
+        } while ((lines[i + k] != "") && (lines[i+k-1].lastIndexOf("\\\\") == (lines[i+k-1].length - 2)))
+        rows[rowindex] = row;
+        rowindex++;
+        i += (k - 1);
+    }
 
+    for (var i=0; i < rows.length; i ++) {
+        str += "<tr>";
+        var cols = rows[i].split("|");  // get cols
+        for (var j=0; j < cols.length; j++) {
+            if ( i== 0) str += "<td style='background:#b6c5f2;font-weight:bold;'>";
+            else  str += "<td style='background:#FFFFFF'>";
+            var linescol = cols[j].split("\\\\");
+            if (linescol.length == 1) str += linescol[0];
+            else if (linescol.length > 1)
+                for (var k=0; k < linescol.length; k++) {
+                    if (linescol[k] == "") linescol[k] = "&nbsp;"  // for empty paragraph
+                    str += ("<p class='paragraph'>" + linescol[k] + "<\/p>");
+                }
+            str += "<\/td>";
         }
-        i += k;
+        str += "<\/tr>";
     }
     str += "<\/table>";
     return content.replace(regexp, str) ;

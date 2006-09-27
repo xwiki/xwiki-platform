@@ -34,7 +34,6 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
-	this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
 	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
@@ -120,9 +119,7 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
     str = str.replace(/<span class="wikiexternallink">([\s\S]+?)<\/span>/gi,'$1');
-    str = str.replace(/<\/?span[^>]*>/gi, "");
-    str = str.replace(/<\/?p[^>]*>/gi, "");
-    str = str.replace(/<br \/>/g, '\r\n')
+    str = str.replace(/<span class="wikilink">([\s\S]+?)<\/span>/gi,'$1');
     return str;
 }
 
@@ -187,7 +184,7 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
             if (lines.length == 1) colj = cols[j].replace(/<br \/>/g, "").replace(/\r\n/g, "");
             else if (lines.length > 1)
                 for (var l=0; l < lines.length; l++)
-                    lines[l] = lines[l].replace(/\r|\n/g, "");
+                    lines[l] = lines[l].replace(/<br \/>|\r|\n/g, "");
                 for (var k=0; k < lines.length; k++)
                     if (lines[k] != "")
                         if (k < (lines.length - 2)) colj += (lines[k] + "\\\\" + "\r\n");
@@ -757,7 +754,6 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimString(result[1]);
-    text = text.replace(/<br \/>/g, '\n');
     var lines = this._getLines(text);
     var str = "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
     for (var i=0; i < lines.length; i++)

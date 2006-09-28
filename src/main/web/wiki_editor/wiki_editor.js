@@ -414,11 +414,12 @@ WikiEditor.prototype.readAttributes = function(str) {
     var result = str.match(attrib_regexp);
     var attributes = new Array();
 	var n=0;
-    for(var i=0; i < result.length; i++) {
-        var attrib = attrib_local_regexp.exec(result[i]);
-        n++;
-        attributes[attrib[1]] = attrib[2];
-    }
+    if (result != null)
+        for(var i=0; i < result.length; i++) {
+            var attrib = attrib_local_regexp.exec(result[i]);
+            n++;
+            attributes[attrib[1]] = attrib[2];
+        }
 
     return (n>0)?attributes:null;
 }

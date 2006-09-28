@@ -120,6 +120,8 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
     str = str.replace(/<span class="wikiexternallink">([\s\S]+?)<\/span>/gi,'$1');
     str = str.replace(/<span class="wikilink">([\s\S]+?)<\/span>/gi,'$1');
+    str = str.replace(/<\/?p[^>]*>/gi, "");
+    str = str.replace(/<br \/>/g, '\r\n')
     return str;
 }
 
@@ -805,7 +807,7 @@ WikiEditor.prototype.convertHeadingExternal = function(regexp, result, content) 
 }
 
 WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
-	var bounds = this.replaceMatchingTag(content, result[1], null);
+    var bounds = this.replaceMatchingTag(content, result[1], null);
 	var str = "";
 	if(bounds && bounds["start"] > -1) {
 		str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]));

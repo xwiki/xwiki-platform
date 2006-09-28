@@ -119,8 +119,7 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">([\s\S]+?)<\/p>/g,'$1');
-    str = str.replace(/<span class="wikiexternallink">([\s\S]+?)<\/span>/gi,'$1');
-    str = str.replace(/<span class="wikilink">([\s\S]+?)<\/span>/gi,'$1');
+    str = str.replace(/<\/?span\s*([^>]*)>/gi, "");
     str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n')
     return str;

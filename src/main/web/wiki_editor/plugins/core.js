@@ -92,7 +92,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Toolbar handlers
 	this.addToolbarHandler('handleTextButtons');
 	this.addToolbarHandler('handleListButtons');
-	this.addToolbarHandler('handleUndoButtons');
+    this.addToolbarHandler('handleIndentButtons');
+    this.addToolbarHandler('handleUndoButtons');
 	this.addToolbarHandler('handleTitlesList');
 	this.addToolbarHandler('handleLinkButtons');
     this.addToolbarHandler('handleTableButtons');
@@ -369,6 +370,18 @@ WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, un
 	}
 }
 
+WikiEditor.prototype.handleIndentButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
+    // indent, outdent for all element
+    tinyMCE.switchClassSticky(editor_id + '_outdent', 'mceButtonDisabled', true);
+	tinyMCE.switchClassSticky(editor_id + '_indent', 'mceButtonNormal');
+
+    var indent = this.core.getParentElement(node, "blockquote");
+    var ul = this.core.getParentElement(node, "ul");
+    if (indent || ul) {
+        tinyMCE.switchClassSticky(editor_id + '_outdent', 'mceButtonNormal', false);
+    }
+}
+
 WikiEditor.prototype.handleUndoButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	if (undo_levels != -1)
 	{
@@ -393,8 +406,6 @@ WikiEditor.prototype.handleListButtons = function(editor_id, node, undo_index, u
 	// Reset old states
 	tinyMCE.switchClassSticky(editor_id + '_bullist', 'mceButtonNormal');
 	tinyMCE.switchClassSticky(editor_id + '_numlist', 'mceButtonNormal');
-	tinyMCE.switchClassSticky(editor_id + '_outdent', 'mceButtonDisabled', true);
-	tinyMCE.switchClassSticky(editor_id + '_indent', 'mceButtonDisabled', true);
 
 	do {
 		switch (node.nodeName.toLowerCase()) {

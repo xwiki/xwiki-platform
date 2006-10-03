@@ -22,13 +22,6 @@
  */
 package com.xpn.xwiki.plugin.charts.tests;
 
-import java.io.File;
-import java.net.URL;
-
-import javax.servlet.ServletContext;
-
-import junit.framework.TestCase;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +38,11 @@ import com.xpn.xwiki.plugin.charts.params.ChartParams;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
+import junit.framework.TestCase;
+
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.net.URL;
 
 public class ChartingPluginTest extends TestCase {
 

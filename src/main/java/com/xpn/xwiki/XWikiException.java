@@ -75,6 +75,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_DOES_NOT_EXIST = 2;
     public static final int ERROR_XWIKI_INIT_FAILED = 3;
     public static final int ERROR_XWIKI_MKDIR = 4;
+    public static final int ERROR_XWIKI_DOC_CUSTOMDOCINVOCATIONERROR = 5;
 
     // Config
     public static final int ERROR_XWIKI_CONFIG_FILENOTFOUND = 1001;

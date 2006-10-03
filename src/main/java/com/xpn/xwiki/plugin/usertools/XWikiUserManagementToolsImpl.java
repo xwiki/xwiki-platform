@@ -62,7 +62,7 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
         if (!isValidEmail(email))
            throw new PluginException(getName(), ERROR_XWIKI_EMAIL_INVALID_EMAIL, "The email is not valid");
 
-        Document userdoc = createUserDocument(email, context);
+        Document userdoc = createUserDocument(name, email, context);
         userdoc.use(DEFAULT_USER_CLASS);
         userdoc.set("last_name", name);
         userdoc.set("email", email);
@@ -93,13 +93,17 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
        return true;
      }
 
-    protected Document createUserDocument(String email, XWikiContext context) throws XWikiException {
-        String pageName = getUserPage(email, context);
+    protected Document createUserDocument(String name, String email, XWikiContext context) throws XWikiException {
+        String pageName;
+        if (context.getWiki().getConvertingUserNameType(context).equals("0"))
+            pageName = getUserPage(name, context);
+        else
+            pageName = getUserPage(email, context);
         XWikiDocument userDoc = context.getWiki().getDocument(pageName, context);
         if (!userDoc.isNew()) {
             throw new PluginException(getName(), ERROR_XWIKI_USER_PAGE_ALREADY_EXIST, "This document already exist, try another name");
         }
-        Document userApiDoc = new Document(userDoc, context);
+        Document userApiDoc = userDoc.newDocument(context);
 
         String template = DEFAULT_USERTEMPLATE_CLASS;
         if ((template != null) && (!template.equals(""))) {
@@ -131,13 +135,13 @@ public class XWikiUserManagementToolsImpl extends XWikiDefaultPlugin implements 
     }
 
     public String getUserName(String userPage, XWikiContext context) throws XWikiException {
-        Document doc = new Document(context.getWiki().getDocument(userPage, context), context);
+        Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
         doc.use(DEFAULT_USER_CLASS);
         return doc.get("first_name") + " " + doc.get("last_name");
     }
 
     public String getEmail(String userPage, XWikiContext context) throws XWikiException {
-        Document doc = new Document(context.getWiki().getDocument(userPage, context), context);
+        Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
         doc.use(DEFAULT_USER_CLASS);
         return (String) doc.get("email");
     }

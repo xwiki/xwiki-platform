@@ -155,7 +155,7 @@ public class SecHibernateQuery extends HibernateQuery {
 			if (element instanceof XWikiDocument) {
 				XWikiDocument doc = (XWikiDocument) element;
 				doc = getStore().loadXWikiDoc(doc, getContext());
-				result.add(new Document(doc, getContext()));
+				result.add(doc.newDocument(getContext()));
 			} else if (element instanceof BaseObject) {
 				getHibernateStore().loadXWikiObject((BaseObject) element, getContext(), true);
 				result.add(new com.xpn.xwiki.api.Object((BaseObject) element, getContext()));

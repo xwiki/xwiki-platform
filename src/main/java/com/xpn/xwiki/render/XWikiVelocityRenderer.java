@@ -78,7 +78,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
             Document previousdoc = (Document) vcontext.get("doc");
 
             try {
-                vcontext.put("doc", new Document(doc, context));
+                vcontext.put("doc", doc.newDocument(context));
 
                 try {
                     // We need to do this in case there are any macros in the content

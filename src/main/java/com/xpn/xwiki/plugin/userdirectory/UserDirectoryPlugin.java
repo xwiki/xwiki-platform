@@ -80,7 +80,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         XWikiDocument tmpDoc = context.getWiki().getDocument(DEFAULT_PLUGIN_SPACE, name, context);
         if (!tmpDoc.isNew())
             throw new PluginException(UserDirectoryPlugin.class, ERROR_USERDIRECTORYPLUGIN_ALREADYEXIST, "This document already exist, try another name");
-        Document doc = new Document(tmpDoc, context);
+        Document doc = tmpDoc.newDocument(context);
         doc.addObjectFromRequest("XWiki.DirectoryGroupClass");
         doc.setContent(getTemplate(context));
         doc.saveWithProgrammingRights();
@@ -95,7 +95,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         XWikiRequest req = context.getRequest();
         String pageName = req.get("pageName");
         XWikiDocument tmpDoc = context.getWiki().getDocument(pageName, context);
-        Document doc = new Document(tmpDoc, context);
+        Document doc = tmpDoc.newDocument(context);
         doc.updateObjectFromRequest("XWiki.DirectoryGroupClass");
         doc.save();
     }
@@ -184,7 +184,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         XWikiDocument doc = context.getWiki().getDocument(userTools.getUserSpace(context) + "." + pageName, context);
         if (doc.isNew()) {
             String userDocName = userTools.inviteUser(name, email, context);
-            Document userDoc = new Document(context.getWiki().getDocument(userDocName,context), context);
+            Document userDoc = context.getWiki().getDocument(userDocName, context).newDocument(context);
             userDoc.use("XWiki.XWikiUsers");
             userDoc.set("first_name", firstName);
             userDoc.saveWithProgrammingRights();
@@ -221,7 +221,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
         List usersDoc = new ArrayList();
         Iterator it = users.iterator();
         while(it.hasNext()){
-            usersDoc.add(new Document(context.getWiki().getDocument((String) it.next(), context), context));
+            usersDoc.add(context.getWiki().getDocument((String) it.next(), context).newDocument(context));
         }
         return usersDoc;
     }
@@ -287,7 +287,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
     }
 
     public boolean deactivateAccount(String userPage, XWikiContext context) throws XWikiException {
-        Document doc = new Document(context.getWiki().getDocument(userPage, context), context);
+        Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
         doc.use("XWiki.XWikiUsers");
         doc.set("active", "0");
         String validkey = context.getWiki().generateValidationKey(16);

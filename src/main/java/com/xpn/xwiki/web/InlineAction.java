@@ -47,7 +47,7 @@ public class InlineAction extends XWikiAction {
             EditForm peform = (EditForm) form;
 
             XWikiDocument doc2 = (XWikiDocument) doc.clone();
-            Document vdoc2 = new Document(doc2, context);
+            Document vdoc2 = doc2.newDocument(context);
             context.put("doc", doc2);
             vcontext.put("doc", vdoc2);
 
@@ -75,7 +75,7 @@ public class InlineAction extends XWikiAction {
             } else {
                 XWikiDocument cdoc = vcdoc.getDocument();
                 XWikiDocument cdoc2 = (XWikiDocument) cdoc.clone();
-                vcontext.put("cdoc", new Document(cdoc2, context));
+                vcontext.put("cdoc", cdoc2.newDocument(context));
                 cdoc2.readFromTemplate(peform, context);
             }
 

@@ -73,6 +73,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -96,6 +97,7 @@ public class XWikiDocument {
     private String creator;
     private String author;
     private String contentAuthor;
+    private String customClass;
     private Date contentUpdateDate;
     private Date updateDate;
     private Date creationDate;
@@ -254,6 +256,7 @@ public class XWikiDocument {
         this.language = "";
         this.defaultLanguage = "";
         this.attachmentList = new ArrayList();
+        this.customClass = "";
     }
 
     public XWikiDocument getParentDoc() {
@@ -591,6 +594,38 @@ public class XWikiDocument {
     public XWikiDocumentArchive getDocumentArchive(XWikiContext context) throws XWikiException {
         loadArchive(context);
         return getDocumentArchive();
+    }
+
+    /**
+     * return a wrapped version of an XWikiDocument. Prefer this function instead of new Document(XWikiDocument, XWikiContext)
+     *
+     * @param context
+     * @return
+     */
+    public com.xpn.xwiki.api.Document newDocument(String className, XWikiContext context) {
+            if (!((className==null)||(className.equals(""))))
+                try {
+                    Class[] classes = new Class[]{XWikiDocument.class, XWikiContext.class};
+                    Object[] args = new Object[]{this, context};
+                    return (com.xpn.xwiki.api.Document) Class.forName(className).getConstructor(classes).newInstance(args);
+                } catch (InstantiationException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+        return new com.xpn.xwiki.api.Document(this, context);
+
+    }
+
+    public com.xpn.xwiki.api.Document newDocument(XWikiContext context) {
+        String customClass = getCustomClass();
+        return newDocument(customClass, context);
     }
 
     public void loadArchive(XWikiContext context) throws XWikiException {
@@ -1244,6 +1279,7 @@ public class XWikiDocument {
         doc.setContentDirty(isContentDirty());
         doc.setCreationDate(getCreationDate());
         doc.setDate(getDate());
+        doc.setCustomClass(getCustomClass());
         doc.setContentUpdateDate(getContentUpdateDate());
         doc.setTitle(getTitle());
         doc.setFormat(getFormat());
@@ -1473,6 +1509,10 @@ public class XWikiDocument {
         el.addText(getAuthor());
         docel.add(el);
 
+        el = new DOMElement("customClass");
+        el.addText(getCustomClass());
+        docel.add(el);
+
         el = new DOMElement("contentAuthor");
         el.addText(getContentAuthor());
         docel.add(el);
@@ -1644,6 +1684,7 @@ public class XWikiDocument {
         setParent(getElement(docel, "parent"));
         setCreator(getElement(docel, "creator"));
         setAuthor(getElement(docel, "author"));
+        setCustomClass(getElement(docel, "customClass"));
         setContentAuthor(getElement(docel, "contentAuthor"));
         setVersion(getElement(docel, "version"));
         setContent(getElement(docel, "content"));
@@ -2827,4 +2868,11 @@ public class XWikiDocument {
         }
     }
 
+    public String getCustomClass() {
+        return customClass;
+    }
+
+    public void setCustomClass(String customClass) {
+        this.customClass = customClass;
+    }
 }

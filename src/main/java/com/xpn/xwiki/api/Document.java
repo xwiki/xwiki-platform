@@ -28,10 +28,9 @@
 
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.*;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPluginApi;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
@@ -39,14 +38,21 @@ import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
+import org.apache.commons.fileupload.DefaultFileItem;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.rcs.Version;
-import org.apache.commons.fileupload.DefaultFileItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 
 public class Document extends Api {
@@ -308,7 +314,7 @@ public class Document extends Api {
      * @throws XWikiException
      */
     public Document getTranslatedDocument(String language) throws XWikiException {
-        return new Document(doc.getTranslatedDocument(language, context), context);
+        return doc.getTranslatedDocument(language, context).newDocument(context);
     }
 
     /**
@@ -319,7 +325,7 @@ public class Document extends Api {
      * @throws XWikiException
      */
     public Document getTranslatedDocument() throws XWikiException {
-        return new Document(doc.getTranslatedDocument(context), context);
+        return doc.getTranslatedDocument(context).newDocument(context);
     }
 
     /**
@@ -1083,6 +1089,10 @@ public class Document extends Api {
         getDoc().setTitle(title);
     }
 
+    public void setCustomClass(String customClass) {
+        getDoc().setCustomClass(customClass);
+    }
+
     public void setParent(String parent) {
         getDoc().setParent(parent);
     }
@@ -1181,6 +1191,7 @@ public class Document extends Api {
 
         XWiki xwiki = context.getWiki();
         FileUploadPlugin fileupload = (FileUploadPlugin) xwiki.getPlugin("fileupload", context);
+        fileupload.loadFileList(context);
         List fileuploadlist = fileupload.getFileItems(context);
         List attachments = new ArrayList();
         int nb = 0;

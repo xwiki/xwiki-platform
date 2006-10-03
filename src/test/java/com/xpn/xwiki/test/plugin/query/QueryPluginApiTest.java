@@ -121,7 +121,7 @@ public class QueryPluginApiTest extends HibernateTestCase {
         getXWiki().flushCache();
         //hb.beginTransaction(true, getXWikiContext());
         doc = getXWiki().getStore().loadXWikiDoc(new XWikiDocument("Test", "Test0"), getXWikiContext());
-        Document secdoc1 = new Document(doc, getXWikiContext());
+        Document secdoc1 = doc.newDocument(getXWikiContext());
         //object = (BaseObject) hb.getSession(getXWikiContext()).load(BaseObject.class, new Integer(object1.getId()));
         Object secobj1	 = new com.xpn.xwiki.api.Object(object1, getXWikiContext());
         getXWiki().flushCache();
@@ -189,7 +189,7 @@ public class QueryPluginApiTest extends HibernateTestCase {
         Utils.updateRight(getXWiki(), getXWikiContext(), "Test.Test0", "XWiki.XWikiGuest", "", "view", false, false);
         getXWiki().flushCache();
         doc1 = getXWiki().getStore().loadXWikiDoc(doc1, getXWikiContext());
-        secdoc1 = new Document(doc1, getXWikiContext());
+        secdoc1 = doc1.newDocument(getXWikiContext());
         testSearchXP("//Test/Test0",									new Object[]{secdoc1});
         testSearchXP("//Test/Test0/@name",							EMPTY);
         testSearchXP("//Test/Test0/@web",								new Object[]{"Test"});

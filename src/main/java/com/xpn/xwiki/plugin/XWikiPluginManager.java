@@ -24,6 +24,7 @@
 package com.xpn.xwiki.plugin;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import org.apache.commons.lang.StringUtils;
 
@@ -67,7 +68,7 @@ public class XWikiPluginManager {
             if (plugin!=null) {
                 plugins.add(plugin.getName());
                 plugins_classes.put(plugin.getName(), plugin);
-                initPlugin(plugin, pluginClass);
+                initPlugin(plugin, pluginClass, context);
             }
         } catch (Exception e) {
             // Log an error but do not fail..
@@ -119,7 +120,7 @@ public class XWikiPluginManager {
         }
     }
     
-    public void initPlugin(Object plugin, Class pluginClass){
+    public void initPlugin(Object plugin, Class pluginClass, XWikiContext context) throws XWikiException {
         Method[] methods = pluginClass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++)
         {
@@ -128,6 +129,7 @@ public class XWikiPluginManager {
             if (functionList.containsKey(name))
                 ((Vector)functionList.get(name)).add(plugin);
         }
+        ((XWikiPluginInterface)plugin).init(context);
     }
 
     public Vector getPlugins(String functionName){

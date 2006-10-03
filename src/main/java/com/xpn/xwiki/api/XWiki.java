@@ -101,7 +101,7 @@ public class XWiki extends Api {
             return null;
         }
 
-        Document newdoc = new Document(doc, context);
+        Document newdoc = doc.newDocument(context);
         return newdoc;
     }
 
@@ -148,7 +148,7 @@ public class XWiki extends Api {
             return null;
         }
 
-        Document newdoc = new Document(doc, context);
+        Document newdoc = doc.newDocument(context);
         return newdoc;
     }
 
@@ -171,7 +171,7 @@ public class XWiki extends Api {
 
         try {
             XWikiDocument revdoc = xwiki.getDocument(doc.getDoc(), rev, context);
-            Document newdoc = new Document(revdoc, context);
+            Document newdoc = revdoc.newDocument(context);
             return newdoc;
         } catch (Exception e) {
             // Can't read versioned document
@@ -377,7 +377,7 @@ public class XWiki extends Api {
         if (docs != null) {
             for (Iterator iter = result.iterator(); iter.hasNext();) {
                 XWikiDocument doc = (XWikiDocument) iter.next();
-                Document wrappedDoc = new Document(doc, context);
+                Document wrappedDoc = doc.newDocument(context);
                 result.add(wrappedDoc);
             }
         }
@@ -1903,7 +1903,7 @@ v     * API to check rights on a document for a given user
      * @return an XWikiDocument wrapped in a Document
      */
     public Document createDocument() {
-        return new Document(new XWikiDocument(), context);
+        return new XWikiDocument().newDocument(context);
     }
 
     /**

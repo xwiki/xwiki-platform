@@ -77,7 +77,7 @@ public class XWikiTest extends HibernateTestCase {
         String xml = doc.getXMLContent(getXWikiContext());
         assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
         assertTrue("XML should contain password", xml.indexOf("toto")!=-1);
-        Document ddoc = new Document(doc, getXWikiContext());
+        Document ddoc = doc.newDocument(getXWikiContext());
         xml = ddoc.getXMLContent();
         assertTrue("XML should should contain password field", xml.indexOf("<password>")!=-1);
         assertTrue("XML should not contain password", xml.indexOf("toto")==-1);

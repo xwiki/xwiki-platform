@@ -191,7 +191,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
             Writer previouswriter  = (Writer) gcontext.get("out");
 
             try {
-                gcontext.put("doc", new Document(contextdoc, context));
+                gcontext.put("doc", contextdoc.newDocument(context));
                 return evaluate(content, name, gcontext);
             } finally {
                 if (previousdoc!=null)

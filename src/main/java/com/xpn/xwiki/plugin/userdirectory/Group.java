@@ -30,7 +30,7 @@ public class Group {
     public static final int ERROR_USERDIRECTORYPLUGIN_GROUP_DOESNT_EXIST = 1;
 
     public Group(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        this(new Document(doc, context), context);
+        this(doc.newDocument(context), context);
     }
 
     public Group(Document doc, XWikiContext context) throws XWikiException {
@@ -43,7 +43,7 @@ public class Group {
 
     public void reload(Document doc, XWikiContext context) throws XWikiException {
         if (doc == null)
-            doc = new Document(context.getWiki().getDocument(this.doc.getFullName(), context), context);
+            doc = context.getWiki().getDocument(this.doc.getFullName(), context).newDocument(context);
         this.doc = doc;
 
         BaseClass dirGrpClass = getXWikiDirectoryGroupClass(context);
@@ -214,7 +214,7 @@ public class Group {
         Iterator it = members.iterator();
         while(it.hasNext()){
             String userPage = (String) it.next();
-            Document doc = new Document(context.getWiki().getDocument(userPage, context), context);
+            Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
             doc.use("XWiki.XWikiUsers");
             Integer active = (Integer) doc.getValue("active");
             if (active.intValue() == 0){
@@ -230,7 +230,7 @@ public class Group {
         Iterator it = members.iterator();
         while(it.hasNext()){
             String userPage = (String) it.next();
-            Document doc = new Document(context.getWiki().getDocument(userPage, context), context);
+            Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
             doc.use("XWiki.XWikiUsers");
             String active = (String) doc.getValue("active");
             if (active.equals("0")){
@@ -376,7 +376,7 @@ public class Group {
 
 
     public static boolean isValidGroup(String grpName, XWikiContext context) throws XWikiException {
-        Document doc = new Document(context.getWiki().getDocument(grpName, context), context);
+        Document doc = context.getWiki().getDocument(grpName, context).newDocument(context);
         if (doc.isNew())
             return false;
         return (doc.getObjects(getXWikiDirectoryGroupClass(context).getName()).size() > 0);

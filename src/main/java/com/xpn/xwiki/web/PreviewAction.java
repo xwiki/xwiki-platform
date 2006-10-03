@@ -90,7 +90,7 @@ public class PreviewAction extends XWikiAction {
 			if ((language == null) || (language.equals("")) || (language.equals("default")) || (language.equals(doc.getDefaultLanguage()))) {
 				tdoc = doc2;
 				context.put("tdoc", doc2);
-				vcontext.put("doc", new Document(doc2, context));
+				vcontext.put("doc", doc2.newDocument(context));
 				vcontext.put("tdoc", vcontext.get("doc"));
 				vcontext.put("cdoc", vcontext.get("doc"));
 				doc2.readFromTemplate(((EditForm) form).getTemplate(), context);
@@ -102,7 +102,7 @@ public class PreviewAction extends XWikiAction {
 				tdoc.setTranslation(1);
 				XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
 				context.put("tdoc", tdoc2);
-				vcontext.put("tdoc", new Document(tdoc2, context));
+				vcontext.put("tdoc", tdoc2.newDocument(context));
 				vcontext.put("cdoc", vcontext.get("tdoc"));
 				tdoc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				tdoc2.readFromForm((EditForm) form, context);

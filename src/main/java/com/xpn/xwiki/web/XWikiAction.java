@@ -261,9 +261,9 @@ public abstract class XWikiAction extends Action {
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            vcontext.put("doc", new Document(rdoc, context));
+            vcontext.put("doc", rdoc.newDocument(context));
             vcontext.put("cdoc", vcontext.get("doc"));
-            vcontext.put("tdoc", new Document(rtdoc, context));
+            vcontext.put("tdoc", rtdoc.newDocument(context));
         }
     }
 

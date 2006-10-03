@@ -414,3 +414,12 @@ $html
 #end
 </div>
 #end
+
+#macro(xwikiobjectfield $fielddoc $fieldname $fieldtext $action)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+#if($fieldname!="")
+$fielddoc.display($fieldname, $action)
+#end
+</div>
+#end

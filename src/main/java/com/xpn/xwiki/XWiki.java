@@ -3087,7 +3087,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             doc = getDocument(getDocumentName(request, context), context);
             context.put("doc", doc);
-            vcontext.put("doc", new Document(doc, context));
+            vcontext.put("doc", doc.newDocument(context));
             vcontext.put("cdoc", vcontext.get("doc"));
         } catch (XWikiException e) {
             doc = context.getDoc();
@@ -3098,7 +3098,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
                     doc.setStore(getStore());
                     context.put("doc", doc);
-                    vcontext.put("doc", new Document(doc, context));
+                    vcontext.put("doc", doc.newDocument(context));
                     vcontext.put("cdoc", vcontext.get("doc"));
                 }
                 if (!checkAccess("admin", doc, context)) {
@@ -3123,7 +3123,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         XWikiDocument tdoc = doc.getTranslatedDocument(context);
         context.put("tdoc", tdoc);
-        vcontext.put("tdoc", new Document(tdoc, context));
+        vcontext.put("tdoc", tdoc.newDocument(context));
         return true;
     }
 
@@ -3975,8 +3975,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getConvertingUserNameType(XWikiContext context){
-        if (context.getWiki().getXWikiPreference("convertmail", context) != null)
-            return context.getWiki().getXWikiPreference("convertmail", context);
+        if (context.getWiki().getXWikiPreference("convertmail", context) != null
+                && context.getWiki().getXWikiPreference("convertmail", context).length() > 0)
+            return context.getWiki().getXWikiPreference("convertmail", "0", context);
         return context.getWiki().Param("xwiki.authentication.convertemail", "0");
     }
 

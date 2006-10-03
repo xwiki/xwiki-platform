@@ -111,7 +111,7 @@ public class EditAction extends XWikiAction {
                     tdoc.setAuthor(context.getUser());
                     tdoc.setStore(doc.getStore());
                     context.put("tdoc", tdoc);
-                    vcontext.put("tdoc", new Document(tdoc, context));
+                    vcontext.put("tdoc", tdoc.newDocument(context));
                 }
             }
 
@@ -124,7 +124,7 @@ public class EditAction extends XWikiAction {
                 tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
             }
             context.put("tdoc", tdoc2);
-            vcontext.put("tdoc", new Document(tdoc2, context));
+            vcontext.put("tdoc", tdoc2.newDocument(context));
             try{
             tdoc2.readFromTemplate(peform, context);
             }

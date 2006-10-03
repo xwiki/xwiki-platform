@@ -437,6 +437,7 @@ public class Package {
 
                 // We don't want date and version to change
                 // So we need to cancel the dirty status
+                // TODO check pb with version
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
 

@@ -70,6 +70,11 @@
             <column name="XWD_VERSION" length="255" not-null="true"/>
         </property>
 
+        <property name="customClass" type="string">
+            <column name="XWD_CUSTOM_CLASS" length="255" not-null="true"/>
+        </property>
+
+
         <property name="parent" type="string">
             <column name="XWD_PARENT" length="511" not-null="true"/>
         </property>

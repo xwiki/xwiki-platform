@@ -39,6 +39,20 @@ public class SaveAndContinueAction extends XWikiAction {
 			if (back == null || back.equals("")) {
 				back = context.getDoc().getURL("edit", context);
 			}
+            else{
+                int qm = back.indexOf('?');
+                String base = back.substring(0, qm != -1 ? qm : back.length());
+                String query = "";
+                int start = back.indexOf("editor=");
+                if(start != -1){
+                    int end = back.indexOf('&', start);
+                    if(end == -1){
+                        end = back.length();
+                    }
+                    query = query + back.substring(start, end);
+                }
+                back = base + "?" + query;
+            }
 		}
 
 		if (back != null && back.indexOf("editor=class") >= 0) {

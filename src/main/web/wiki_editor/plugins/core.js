@@ -34,7 +34,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
-	this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
+    this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
+    this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
 	this.addInternalProcessor((/<em[^>]*>(.*?)<\/em>/gi), '~~$1~~');
@@ -63,7 +64,7 @@ WikiEditor.prototype.initCorePlugin = function() {
                   "?|©|®|¢|?|¥|" +
                   "£|¤|" +
                   //Other characters
-                  ">|<";
+                  ">|<|&|\"";
     var characterEntityStr = "&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Auml;|&Aring;|" +
                              "&AElig;|&Ccedil;|&Egrave;|&Eacute;|&Ecirc;|&Euml;|" +
                              "&Igrave;|&Iacute;|&Icirc;|&Iuml;|&Ntilde;|&Ograve;|" +
@@ -78,7 +79,7 @@ WikiEditor.prototype.initCorePlugin = function() {
                              "&trade;|&copy;|&reg;|&cent;|&euro;|&yen;|" +
                              "&pound;|&curren;|" +
                              //Other characters
-                             "&gt;|&lt;"
+                             "&gt;|&lt;|&amp;|&quot;"
 
     var characterEntitys = characterEntityStr.split("|");
     var chars = charStr.split("|");

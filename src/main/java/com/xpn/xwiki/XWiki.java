@@ -1283,9 +1283,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String getWebPreference(String prefname, String default_value, XWikiContext context) {
+        XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
+        return getWebPreference(prefname, currentdoc.getWeb(), default_value, context);
+    }
+
+    public String getWebPreference(String prefname, String space, String default_value, XWikiContext context) {
         try {
-            XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
-            XWikiDocument doc = getDocument(currentdoc.getWeb() + ".WebPreferences", context);
+            XWikiDocument doc = getDocument(space + ".WebPreferences", context);
 
             // First we try to get a translated preference object
             BaseObject object = doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage(), true);
@@ -1301,7 +1305,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         return getXWikiPreference(prefname, default_value, context);
     }
-
     public String getUserPreference(String prefname, XWikiContext context) {
         try {
             String user = context.getUser();
@@ -1347,7 +1350,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getLanguagePreference(XWikiContext context) {
     	return getDocLanguagePreference(context);
-        /*
+    }
+    
+    public String getDocLanguagePreference(XWikiContext context) {
         // First we get the language from the request
         String language;
 
@@ -1429,11 +1434,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         context.setLanguage("");
         return "";
-        */
     }
 
-    public String getDocLanguagePreference(XWikiContext context) {
-        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "", cookieLanguage = "", contextLanguage = "";
+    public String getDocLanguagePreferenceNew(XWikiContext context) {
+        // Get context language
+    	String contextLanguage = context.getLanguage();
+        // If the language exists in the context, it was previously set by another call
+        if(contextLanguage != null && contextLanguage != ""){
+        	return contextLanguage;
+        }
+
+        String language = "", requestLanguage = "", userPreferenceLanguage = "", navigatorLanguage = "", cookieLanguage = "";
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
@@ -1448,9 +1459,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         catch (Exception ex){
         }
-
-        // Get context language
-       	contextLanguage = context.getLanguage();
 
         // Get user preference
         try {
@@ -1495,12 +1503,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 return language;
             }
         }
-        // Next we get the language from the context
-        if(contextLanguage != null && contextLanguage != ""){
-        	language = contextLanguage;
-        }
         // Next we get the language from the cookie
-        else if(cookieLanguage != null && cookieLanguage != ""){
+        if(cookieLanguage != null && cookieLanguage != ""){
         	language = cookieLanguage;
         }
         // Next from the default user preference
@@ -2292,6 +2296,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // TODO: throws Exception
                 return -3;
             }
+            if(!this.checkAccess("register", doc, context)){
+                return -1;
+            }
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map, context);
             newobject.setName(fullwikiname);
@@ -2393,12 +2400,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return user;
     }
 
+    public User getUser(String username, XWikiContext context) {
+        XWikiUser xwikiUser = new XWikiUser(username);
+        User user = new User(xwikiUser, context);
+        return user;
+    }
+
     public void prepareResources(XWikiContext context) {
         if (context.get("msg") == null) {
-            String language = getInterfaceLanguagePreference(context);
+            //String ilanguage = getInterfaceLanguagePreference(context);
+            String dlanguage = getDocLanguagePreference(context);
             if (context.getResponse() != null)
-                context.getResponse().setLocale(new Locale(language));
-            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(language));
+                context.getResponse().setLocale(new Locale(dlanguage));
+            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(dlanguage));
             if (bundle == null)
                 bundle = ResourceBundle.getBundle("ApplicationResources");
             XWikiMessageTool msg = new XWikiMessageTool(bundle);

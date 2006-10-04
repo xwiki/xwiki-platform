@@ -544,11 +544,37 @@ public class XWiki extends Api {
      * This function will find the right preference object associated to the current active language
      * If no preference is found it will look in the XWiki Preferences
      * @param prefname Preference name
+     * @param space The space for which this preference is requested
+     * @return The preference for this wiki and the current language
+     */
+    public String getWebPreferenceFor(String prefname, String space) {
+        return xwiki.getWebPreference(prefname, space, "", context);
+    }
+
+    /**
+     * API to access an Space Preference
+     * There can be one preference object per language
+     * This function will find the right preference object associated to the current active language
+     * If no preference is found it will look in the XWiki Preferences
+     * @param prefname Preference name
      * @param default_value  default value to return if the prefenrece does not exist or is empty
      * @return The preference for this wiki and the current language
      */
     public String getWebPreference(String prefname, String default_value) {
         return xwiki.getWebPreference(prefname, default_value, context);
+    }
+
+    /**
+     * API to access an XWiki Preference as a long number
+     * There can be one preference object per language
+     * This function will find the right preference object associated to the current active language
+     * @param prefname Preference name
+     * @param space The space for which this preference is requested
+     * @param default_value  default value to return if the prefenrece does not exist or is empty
+     * @return The preference for this wiki and the current language in long format
+     */
+    public String getWebPreferenceFor(String prefname, String space, String default_value) {
+        return xwiki.getWebPreference(prefname, space, default_value, context);
     }
 
     /**
@@ -781,9 +807,12 @@ public class XWiki extends Api {
     public int createUser(boolean withValidation, String userRights) throws XWikiException {
         boolean registerRight;
         try {
+	    // So, what's the register right for? This says that if the creator of the page
+	    // (Admin) has programming rights, anybody can register. Is this OK?
             if (checkProgrammingRights()) {
                 registerRight = true;
-            } else {
+            } else
+            {
                 registerRight = xwiki.getRightService().hasAccessLevel("register", context.getUser(),
                         "XWiki.XWikiPreferences", context);
             }
@@ -1553,6 +1582,14 @@ v     * API to check rights on a document for a given user
         } catch (Exception e) {
             return xwiki.getUserName(user, format, link, context);
         }
+    }
+    
+    public User getUser(){
+    	return xwiki.getUser(context);
+    }
+    
+    public User getUser(String username){
+    	return xwiki.getUser(username, context);
     }
 
     /**

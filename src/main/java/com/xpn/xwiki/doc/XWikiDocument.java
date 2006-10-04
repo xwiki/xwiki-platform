@@ -947,7 +947,7 @@ public class XWikiDocument {
             String prefix = obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
             if (pclass.isCustomDisplayed(context)){
-                pclass.displayCustom(result, fieldname, prefix, obj, context);  
+                pclass.displayCustom(result, fieldname, prefix, type, obj, context);  
             }
             else if (type.equals("view")) {
                 pclass.displayView(result, fieldname, prefix, obj, context);

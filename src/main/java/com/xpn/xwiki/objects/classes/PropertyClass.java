@@ -200,7 +200,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return disp != null && disp.length() > 0;
     }
 
-    public void displayCustom(StringBuffer buffer, String fieldName, String prefix, BaseObject object, XWikiContext context) throws XWikiException {
+    public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object, XWikiContext context) throws XWikiException {
         String content = getCustomDisplay();
 
         try {
@@ -208,7 +208,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             vcontext.put("name", fieldName);
             vcontext.put("prefix", prefix);
             vcontext.put("object", new com.xpn.xwiki.api.Object(object, context));
-            vcontext.put("type", context.getAction());
+            vcontext.put("type", type);
             vcontext.put("context", new com.xpn.xwiki.api.Context(context));
 
             BaseProperty prop = (BaseProperty) object.safeget(fieldName);

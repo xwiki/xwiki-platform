@@ -170,8 +170,7 @@ $paneldoc.display("content", "view", $obj)
 #end
 #end
 #macro(displayPropName $prop)
-#if($msg.get("$class.getName()_$prop.name") ==
-"$class.getName()_$prop.name")
+#if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
 $prop.prettyName#else
 $msg.get($prop.name)#end
 #end

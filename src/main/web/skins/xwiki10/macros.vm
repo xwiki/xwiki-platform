@@ -155,6 +155,36 @@
 #end
 
 ###
+###    Display Panel
+###
+### Extract and display the panel code from the panel object
+###
+#macro(displaypanel $name)
+#set($obj = "")
+#set($paneldoc = $xwiki.getDocument($name))
+#set($obj = $paneldoc.getObject("Panels.PanelClass"))
+#if($obj == "")
+## discarded
+#else
+$paneldoc.display("content", "view", $obj)
+#end
+#end
+#macro(displayPropName $prop)
+#if($msg.get("$class.getName()_$prop.name") ==
+"$class.getName()_$prop.name")
+$prop.prettyName#else
+$msg.get($prop.name)#end
+#end
+
+###
+###    Display Panel content
+###
+###
+#macro(displaypanelcontent $doc $obj)
+$doc.display("content", $obj)
+#end
+
+###
 ###    Toplevel Menu entry with subitems
 ###
 ### Generate a menu entry and start the subitem section

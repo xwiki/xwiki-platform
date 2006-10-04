@@ -111,8 +111,7 @@ public class Document extends Api {
      *
      * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MySpace
      *
-     * @deprecated use {@link #getSpace()} instead of this function
-     * @return
+     * @return the name of the space of the document
      */
     public String getSpace() {
         return doc.getSpace();

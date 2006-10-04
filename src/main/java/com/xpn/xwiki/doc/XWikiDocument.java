@@ -888,11 +888,9 @@ public class XWikiDocument {
             if (objects != null) {
                 Vector tobjects = (Vector) templatedoc.getxWikiObjects().get(name);
                 for (int i = 0; i < tobjects.size(); i++) {
-                    {
-                        BaseObject bobj = (BaseObject) ((BaseObject) tobjects.get(i)).clone();
-                        objects.add(bobj);
-                        bobj.setNumber(objects.size() - 1);
-                    }
+                    BaseObject bobj = (BaseObject) ((BaseObject) tobjects.get(i)).clone();
+                    objects.add(bobj);
+                    bobj.setNumber(objects.size() - 1);
                 }
             } else {
                 Vector tobjects = (Vector) templatedoc.getObjects(name);
@@ -1132,29 +1130,7 @@ public class XWikiDocument {
         this.fromCache = fromCache;
     }
 
-    public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException {
-        String content = eform.getContent();
-        if ((content != null) && (!content.equals(""))) {
-            // Cleanup in case we use HTMLAREA
-            // content = context.getUtil().substitute("s/<br class=\\\"htmlarea\\\"\\/>/\\r\\n/g", content);
-            content = context.getUtil().substitute("s/<br class=\"htmlarea\" \\/>/\r\n/g", content);
-            setContent(content);
-        }
-        String parent = eform.getParent();
-        if (parent != null)
-            setParent(parent);
-
-        String title = eform.getTitle();
-        if (title != null)
-            setTitle(title);
-
-        String creator = eform.getCreator();
-        if ((creator != null) && (!creator.equals(getCreator()))) {
-            if ((getCreator().equals(context.getUser()))
-                    || (context.getWiki().getRightService().hasAdminRights(context)))
-                setCreator(creator);
-        }
-
+    public void readDocMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException {
         String defaultLanguage = eform.getDefaultLanguage();
         if (defaultLanguage != null)
             setDefaultLanguage(defaultLanguage);
@@ -1163,9 +1139,32 @@ public class XWikiDocument {
         if (defaultTemplate != null)
             setDefaultTemplate(defaultTemplate);
 
-        // This is now done before
-        // readFromTemplate(eform, context);
+        String creator = eform.getCreator();
+        if ((creator != null) && (!creator.equals(getCreator()))) {
+            if ((getCreator().equals(context.getUser()))
+                    || (context.getWiki().getRightService().hasAdminRights(context)))
+                setCreator(creator);
+        }
 
+        String parent = eform.getParent();
+        if (parent != null)
+            setParent(parent);
+    }
+
+    public void readTranslationMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException {
+        String content = eform.getContent();
+        if ((content != null) && (!content.equals(""))) {
+            // Cleanup in case we use HTMLAREA
+            // content = context.getUtil().substitute("s/<br class=\\\"htmlarea\\\"\\/>/\\r\\n/g", content);
+            content = context.getUtil().substitute("s/<br class=\"htmlarea\" \\/>/\r\n/g", content);
+            setContent(content);
+        }
+        String title = eform.getTitle();
+        if (title != null)
+            setTitle(title);
+    }
+
+    public void readObjectsFromForm(EditForm eform, XWikiContext context) throws XWikiException {
         Iterator itobj = getxWikiObjects().keySet().iterator();
         while (itobj.hasNext()) {
             String name = (String) itobj.next();
@@ -1173,7 +1172,7 @@ public class XWikiDocument {
             Vector newobjects = new Vector();
             newobjects.setSize(bobjects.size());
             for (int i = 0; i < bobjects.size(); i++) {
-                BaseObject oldobject = (BaseObject) getObject(name, i);
+                BaseObject oldobject = getObject(name, i);
                 if (oldobject != null) {
                     BaseClass baseclass = oldobject.getxWikiClass(context);
                     BaseObject newobject = (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
@@ -1184,6 +1183,12 @@ public class XWikiDocument {
             }
             getxWikiObjects().put(name, newobjects);
         }
+    }
+    
+    public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException {
+        readDocMetaFromForm(eform, context);
+        readTranslationMetaFromForm(eform, context);
+        readObjectsFromForm(eform, context);
     }
 
     /*
@@ -1221,7 +1226,6 @@ public class XWikiDocument {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                         "Cannot add a template to document {0} because it already has content", null, args);
             } else {
-
                 if (template.indexOf('.') == -1) {
                     template = getWeb() + "." + template;
                 }
@@ -2250,8 +2254,15 @@ public class XWikiDocument {
         return tdoc;
     }
 
-
     public String getRealLanguage(XWikiContext context) throws XWikiException {
+        String lang = getLanguage();
+        if ((lang.equals("") || lang.equals("default")))
+            return getDefaultLanguage();
+        else
+            return lang;
+    }
+
+    public String getRealLanguage() {
         String lang = getLanguage();
         if ((lang.equals("") || lang.equals("default")))
             return getDefaultLanguage();
@@ -2822,18 +2833,22 @@ public class XWikiDocument {
         }
     }
 
+    /**
+      * Computes a document hash, taking into account all document data:
+      * content, objects, attachments, metadata...
+      * TODO: cache the hash value, update only on modification.
+      */
     public String getVersionHashCode(XWikiContext context){
         MessageDigest md5 = null;
 
         try {
             md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: " + e);
+        } catch (NoSuchAlgorithmException ex) {
+            log.error("Cannot create MD5 object", ex);
             return this.hashCode() + "";
         }
 
         try {
-            //Document doc = toXMLDocument(true, false, true, false);
             String valueBeforeMD5 = toXML(true, false, true, false, context);
             md5.update(valueBeforeMD5.getBytes());
 
@@ -2844,10 +2859,9 @@ public class XWikiDocument {
                 if (b < 0x10) sb.append('0');
                 sb.append(Integer.toHexString(b));
             }
-            String valueAfterMD5 = sb.toString();
-            return valueAfterMD5;
-        } catch (Exception e) {
-            e.printStackTrace();
+            return sb.toString();
+        } catch (Exception ex) {
+            log.error("Exception while computing document hash", ex);
         }
         return this.hashCode() + "";
     }

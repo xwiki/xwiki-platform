@@ -2792,7 +2792,7 @@ public class XWikiDocument {
 
     // This function to update a section content in document
     public String updateDocumentSection(int sectionNumber , String newSectionContent) throws XWikiException {
-        String newContent;
+        StringBuffer newContent = new StringBuffer();
         //  get document section that will be edited
         DocumentSection docSection = getDocumentSection(sectionNumber);
         int numberOfSection = getSplitSectionsAccordingToTitle().size();
@@ -2803,7 +2803,8 @@ public class XWikiDocument {
         } else if (sectionNumber == numberOfSection) {
             //  edit lastest section that doesn't contain subtitle
             String contentBegin = getContent().substring(0,indexSection);
-            return contentBegin + newSectionContent;
+            newContent = newContent.append(contentBegin).append(newSectionContent);
+            return newContent.toString();
         } else {
             String sectionLevel = docSection.getSectionLevel();
             int nextSectionIndex = 0;
@@ -2819,17 +2820,15 @@ public class XWikiDocument {
                     break;
                 }
             }
-            if (nextSectionIndex == 0) //  edit the last section
-                return getContent().substring(0,indexSection) + newSectionContent;
-            if (sectionNumber == 1) { //  edit the first section
-                String contentAfter = getContent().substring(nextSectionIndex);
-                newContent = newSectionContent + contentAfter;
+            if (nextSectionIndex == 0) {//  edit the last section
+                newContent = newContent.append(getContent().substring(0,indexSection)).append(newSectionContent);
+                return newContent.toString();
             } else {
                 String contentAfter = getContent().substring(nextSectionIndex);
                 String contentBegin = getContent().substring(0, indexSection);
-                newContent = contentBegin + newSectionContent + contentAfter;
+                newContent = newContent.append(contentBegin).append(newSectionContent).append(contentAfter);
             }
-            return newContent;
+            return newContent.toString();
         }
     }
 

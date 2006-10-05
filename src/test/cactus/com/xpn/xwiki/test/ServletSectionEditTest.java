@@ -104,6 +104,36 @@ public class ServletSectionEditTest extends ServletTest {
         launchTest();
     }
 
+    /** Test edit section for title 1 */
+    public void beginSectionEditTitle1WithContentAbove(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.SectionEditTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+
+        String content = "This is the content above\n1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1 This is the title 2\nThis is the content of title 2";
+        Utils.createDoc(xwiki.getStore(), "Main", "SectionEditTest", content, bobject, bclass, context);
+        setUrl(webRequest, "edit", "Main", "SectionEditTest", "section=1");
+    }
+
+    public void endSectionEditTitle1WithContentAbove(WebResponse webResponse) throws HibernateException {
+        try {
+            String result = webResponse.getText();
+            assertTrue("Could not find the contents of title 1 : " + result, result.indexOf("1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1") != -1);
+            assertTrue("Find out the contents above title :" + result, result.indexOf("This is the content above") == -1);
+            assertTrue("Find out the contents of title 2 :" + result, result.indexOf("1 This is the title 2\nThis is the content of title 2") == -1);
+       } finally {
+            clientTearDown();
+       }
+    }
+
+    public void testSectionEditTitle1WithContentAbove() throws Throwable {
+        launchTest();
+    }
+
     /** Test edit section for subtitle 1 */
     public void beginSectionEditSubtitle1(WebRequest webRequest) throws HibernateException, XWikiException {
         XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
@@ -234,6 +264,46 @@ public class ServletSectionEditTest extends ServletTest {
     }
 
     public void testSaveSection() throws Throwable {
+        launchTest();
+    }
+
+     /** Test save a section title after edit it */
+    public void beginSaveSectionWithContentAbove(WebRequest webRequest) throws HibernateException, XWikiException {
+        XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
+        StoreHibernateTest.cleanUp(hibstore, context);
+        clientSetUp(hibstore);
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareObject(doc, "Main.SaveSectionWithContentAboveTest");
+        BaseClass bclass = doc.getxWikiClass();
+        BaseObject bobject = doc.getObject(bclass.getName(), 0);
+
+        String content = "This is content above first section\n1 This is title 1\nThis is content of title 1\n1.1 This is the subtitle 1\nThis is content of subtitle 1\n1 This is the title 2\nThis is the content of title 2";
+        Utils.createDoc(xwiki.getStore(), "Main", "SaveSectionWithContentAboveTest", content, bobject, bclass, context);
+
+        // Save section 1 with new content.
+        setUrl(webRequest, "save", "SaveSectionWithContentAboveTest", "section=1");
+        webRequest.addParameter("content", "This is modification");
+        webRequest.addParameter("parent", "Main.WebHome");
+    }
+
+    public void endSaveSectionWithContentAbove(WebResponse webResponse) throws HibernateException, XWikiException {
+        try {
+            String result = webResponse.getText();
+            // Verify return
+            assertTrue("Saving returned exception: " + result, result.indexOf("Exception") == -1);
+            // Flush cache to make sure we read from db
+            xwiki.flushCache();
+
+            XWikiDocument doc = xwiki.getDocument("Main.SaveSectionWithContentAboveTest", context);
+            String content = doc.getContent();
+            assertEquals("Content is not indentical", "This is content above first section\nThis is modification\n1 This is the title 2\nThis is the content of title 2", content);
+            assertEquals("Parent is not identical", "Main.WebHome", doc.getParent());
+        } finally {
+            clientTearDown();
+        }
+    }
+
+    public void testSaveSectionWithContentAbove() throws Throwable {
         launchTest();
     }
 

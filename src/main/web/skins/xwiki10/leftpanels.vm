@@ -1,7 +1,7 @@
-#if($showLeftPanels == "1")
-<div id="leftPanels" class="panels left">
+#if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+<div id="leftPanels" class="panels left"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 #foreach($panel in $leftPanels)
-$xwiki.includeForm("$panel",false)
+#displaypanel($panel)
 #end
 </div>
 #end

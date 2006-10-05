@@ -67,11 +67,9 @@ $response.sendRedirect($redirecturl)
 </div>
 <div id="xwikieditor" class="layoutsection">
 <div id="editcolumn" class="editor">
-##<div>#template("adminactions.vm")</div>
 #set($formname = "update")
 #set($saveaction = "save")
 #template("admin${editor}.vm")
-<div>#template("adminactions.vm")</div>
 </div>
 #template("adminpanels.vm")
 <div class="clearfloats"></div>

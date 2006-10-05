@@ -10,7 +10,8 @@
 #set($editorPanels = $editorPanels.split(","))
 <div id="editPanels" class="panels editor">
 #foreach($panel in $editorPanels)
-$xwiki.includeForm("$panel",false)
+##$xwiki.includeForm("$panel",false)
+#displaypanel($panel)
 #end
 </div>
 #if($editor == "wysiwyg")

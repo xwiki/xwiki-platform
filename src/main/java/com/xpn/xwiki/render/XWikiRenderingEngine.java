@@ -151,6 +151,7 @@ public class XWikiRenderingEngine {
 
     public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
         String key = getKey(text, contentdoc, includingdoc, context);
+        int currentCacheDuration = context.getCacheDuration();
 
         try {
             if (cache==null)
@@ -180,6 +181,8 @@ public class XWikiRenderingEngine {
 
             MonitorPlugin monitor  = Util.getMonitorPlugin(context);
             try {
+                // We need to make sure we don't use the cache duretion currently in the system
+                context.setCacheDuration(0);
                 // Start monitoring timer
                 if (monitor!=null)
                     monitor.startTimer("rendering");
@@ -236,6 +239,9 @@ public class XWikiRenderingEngine {
                 return content;
             }
             finally {
+                // We need to make sure we reset the cache Duration
+                context.setCacheDuration(currentCacheDuration);
+
                 if (monitor!=null)
                     monitor.endTimer("rendering");
             }

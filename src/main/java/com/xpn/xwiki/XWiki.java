@@ -1284,7 +1284,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getWebPreference(String prefname, String default_value, XWikiContext context) {
         XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
-        return getWebPreference(prefname, currentdoc.getWeb(), default_value, context);
+        return getWebPreference(prefname, (currentdoc==null) ? null : currentdoc.getWeb(), default_value, context);
     }
 
     public String getWebPreference(String prefname, String space, String default_value, XWikiContext context) {

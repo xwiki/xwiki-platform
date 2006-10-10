@@ -27,7 +27,6 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;

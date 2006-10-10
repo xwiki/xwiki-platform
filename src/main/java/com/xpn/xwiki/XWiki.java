@@ -4030,6 +4030,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         name = name.replaceAll("[\"!?]","");
         name = name.replaceAll("[_':,;]"," ");
         name = name.replaceAll("\\s+","");
+        if (name.length() > 250)
+            name = name.substring(0, 250);
         return name;
 
     }

@@ -2636,10 +2636,38 @@ public class XWikiDocument {
 
     // This functions adds an object from an new object creation form
     public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException {
+        return addObjectFromRequest(className, 0, context);
+    }
+
+        // This functions adds multiple objects from an new objects creation form
+    public List addObjectsFromRequest(String className, XWikiContext context) throws XWikiException {
+        Map map = context.getRequest().getParameterMap();
+        List objectsNumberDone = new ArrayList();
+        List objects  = new ArrayList();
+        Iterator it = map.keySet().iterator();
+        String start = className + "_";
+
+        while (it.hasNext()) {
+            String name = (String) it.next();
+            if (name.startsWith(start)) {
+                int pos = name.indexOf("_", start.length() + 1);
+                String prefix = name.substring(0, pos);
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1));
+                if (!objectsNumberDone.contains(num)){
+                    objectsNumberDone.add(num);
+                    objects.add(addObjectFromRequest(className, num, context));
+                }
+            }
+        }
+            return objects;
+    }
+
+    // This functions adds object from an new object creation form
+    public BaseObject addObjectFromRequest(String className, int num, XWikiContext context) throws XWikiException {
         int nb = createNewObject(className, context);
         BaseObject oldobject = getObject(className, nb);
         BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_0"), oldobject);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_" + num), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
@@ -2883,7 +2911,7 @@ public class XWikiDocument {
 
     public String getCustomClass() {
         if (customClass == null)
-            return ("");
+            return "";
         return customClass;
     }
 

@@ -125,7 +125,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
         }
         catch (Exception e) {
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                     "Exception while saving attachments", e);
         } finally {
             try {

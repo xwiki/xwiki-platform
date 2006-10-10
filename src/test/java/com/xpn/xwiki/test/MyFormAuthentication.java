@@ -25,12 +25,6 @@
 
 package com.xpn.xwiki.test;
 
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.cactus.Cookie;
 import org.apache.cactus.WebRequest;
 import org.apache.cactus.client.authentication.AbstractAuthentication;
@@ -44,6 +38,12 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Form-based authentication implementation. An instance of this class

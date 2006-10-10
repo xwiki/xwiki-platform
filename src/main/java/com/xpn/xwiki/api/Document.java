@@ -43,6 +43,7 @@ import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.io.CopyUtils;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.rcs.Version;
 
@@ -53,12 +54,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 
 public class Document extends Api {
-    private XWikiDocument olddoc;
-    private XWikiDocument doc;
-    private Object currentObj;
+    protected XWikiDocument olddoc;
+    protected XWikiDocument doc;
+    protected Object currentObj;
 
     public Document(XWikiDocument doc, XWikiContext context) {
         super(context);
@@ -1133,6 +1137,16 @@ public class Document extends Api {
         return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, context), context);
     }
 
+    public List addObjectsFromRequest(String className) throws XWikiException {
+        List objs = getDoc().addObjectsFromRequest(className, context);
+        List wrapped = new ArrayList();
+        Iterator it = objs.iterator();
+        while(it.hasNext()){
+            wrapped.add(new com.xpn.xwiki.api.Object((BaseObject) it.next(), context));
+        }
+        return wrapped;
+    }
+
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException {
         return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, context), context);
     }
@@ -1187,10 +1201,8 @@ public class Document extends Api {
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                     "Access denied in edit mode on document {0}", null, args);
         }
-
         XWiki xwiki = context.getWiki();
         FileUploadPlugin fileupload = (FileUploadPlugin) xwiki.getPlugin("fileupload", context);
-        fileupload.loadFileList(context);
         List fileuploadlist = fileupload.getFileItems(context);
         List attachments = new ArrayList();
         int nb = 0;
@@ -1206,24 +1218,35 @@ public class Document extends Api {
             byte[] data = fileupload.getFileItemData(name, context);
             if ((data != null) && (data.length > 0)){
                 String fname = fileupload.getFileName(name, context);
-                int i = fname.indexOf("\\");
-                if (i == -1)
-                    i = fname.indexOf("/");
-                String filename = fname.substring(i + 1);
-                filename = filename.replaceAll("\\+", " ");
-                XWikiAttachment attachment = new XWikiAttachment();
-                doc.getAttachmentList().add(attachment);
-                attachment.setContent(data);
-                attachment.setFilename(filename);
-                attachment.setAuthor(context.getUser());
-                // Add the attachment to the document
-                attachment.setDoc(doc);
+                XWikiAttachment attachment = addAttachment(fname, data);
                 attachments.add(attachment);
                 nb++;
             }
         }
-        doc.saveAttachmentsContent(attachments, context);
+        getDoc().saveAttachmentsContent(attachments, context);
         return nb;
+    }
+
+    protected XWikiAttachment  addAttachment(String fileName, InputStream iStream) throws XWikiException, IOException {
+        ByteArrayOutputStream bAOut = new ByteArrayOutputStream();
+        CopyUtils.copy(iStream, bAOut);
+        return addAttachment(fileName, bAOut.toByteArray());
+    }
+
+    protected XWikiAttachment addAttachment(String fileName, byte[] data) throws XWikiException {
+        int i = fileName.indexOf("\\");
+        if (i == -1)
+            i = fileName.indexOf("/");
+        String filename = fileName.substring(i + 1);
+        filename = context.getWiki().clearName(filename, context);
+        XWikiAttachment attachment = new XWikiAttachment();
+        getDoc().getAttachmentList().add(attachment);
+        attachment.setContent(data);
+        attachment.setFilename(filename);
+        attachment.setAuthor(context.getUser());
+        // Add the attachment to the document
+        attachment.setDoc(getDoc());
+        return attachment;
     }
 
 }

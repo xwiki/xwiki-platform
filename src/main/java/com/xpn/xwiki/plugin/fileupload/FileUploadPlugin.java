@@ -74,7 +74,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * @param context Context of the request
     */
     public void endRendering(XWikiContext context) {
-        cleanFileList(context);
+        //cleanFileList(context);
     }
 
     /**

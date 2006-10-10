@@ -2882,6 +2882,8 @@ public class XWikiDocument {
     }
 
     public String getCustomClass() {
+        if (customClass == null)
+            return ("");
         return customClass;
     }
 

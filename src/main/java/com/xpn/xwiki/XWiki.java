@@ -2296,9 +2296,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // TODO: throws Exception
                 return -3;
             }
-            if(!this.checkAccess("register", doc, context)){
+
+            /*
+              if(!this.checkAccess("register", doc, context)){
                 return -1;
             }
+            */
 
             BaseObject newobject = (BaseObject) baseclass.fromMap(map, context);
             newobject.setName(fullwikiname);

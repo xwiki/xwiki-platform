@@ -95,6 +95,10 @@ public class PreviewAction extends XWikiAction {
 				vcontext.put("cdoc", vcontext.get("doc"));
 				doc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				doc2.readFromForm((EditForm) form, context);
+                doc2.setAuthor(context.getUser());
+                if(doc2.isNew()){
+                    doc2.setCreator(context.getUser());
+                }
 			} else {
 				// Need to save parent and defaultLanguage if they have changed
 				tdoc = doc.getTranslatedDocument(language, context);
@@ -106,8 +110,12 @@ public class PreviewAction extends XWikiAction {
 				vcontext.put("cdoc", vcontext.get("tdoc"));
 				tdoc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				tdoc2.readFromForm((EditForm) form, context);
+                tdoc2.setAuthor(context.getUser());
+                if(tdoc2.isNew()){
+                    tdoc2.setCreator(context.getUser());
+                }
 			}
-            // recomfirm edit (captcha) when jcaptcha is not correct
+            // reconfirm edit (captcha) when jcaptcha is not correct
             if ((context.get("recheckcaptcha") != null) && ((Boolean)context.get("recheckcaptcha")).booleanValue())
                 return "captcha";
             else return "preview";

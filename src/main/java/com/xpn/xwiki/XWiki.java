@@ -4039,6 +4039,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     }
 
+    public String getUniquePageName(String space, String name, XWikiContext context){
+        String pageName = clearName(name, context);
+        if (exists(space + "." + pageName, context)){
+            int i = 0;
+            while (exists(space + "." + pageName + "_" + i, context))
+                i++;
+            return pageName + "_" + i;
+        }
+        return pageName;
+    }
+
     public String displaySearch(String fieldname, String className, XWikiCriteria criteria, XWikiContext context) throws XWikiException {
         return displaySearch(fieldname, className, "", criteria, context);
     }

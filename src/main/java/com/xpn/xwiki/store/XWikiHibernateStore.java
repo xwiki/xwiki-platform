@@ -1598,8 +1598,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             while (it.hasNext()) {
                 list.add(it.next());
             }
-            if (bTransaction)
-                endTransaction(context, false, false);
             return list;
         }
         catch (Exception e) {

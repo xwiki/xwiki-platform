@@ -418,6 +418,25 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
+    public boolean addDBListField(String fieldName, String fieldPrettyName, String sql) {
+        return addDBListField(fieldName, fieldPrettyName, 1, false, sql);
+    }
+
+    public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql) {
+        if (get(fieldName)==null) {
+            DBListClass list_class = new DBListClass();
+            list_class.setName(fieldName);
+            list_class.setPrettyName(fieldPrettyName);
+            list_class.setSize(size);
+            list_class.setMultiSelect(multiSelect);
+            list_class.setSql(sql);
+            list_class.setObject(this);
+            put(fieldName, list_class);
+            return true;
+        }
+        return false;
+    }
+
     public boolean addNumberField(String fieldName, String fieldPrettyName, int size, String type) {
         if (get(fieldName)==null) {
             NumberClass number_class = new NumberClass();

@@ -2059,5 +2059,13 @@ v     * API to check rights on a document for a given user
     public com.xpn.xwiki.api.PropertyClass getPropertyClassFromName(String propPath) {
         return new PropertyClass(xwiki.getPropertyClassFromName(propPath, context), context);
     }
+
+    public String getUniquePageName(String space, String name){
+        return xwiki.getUniquePageName(space, name, context);
+    }
+
+    public String clearName(String name){
+        return xwiki.clearName(name, context);
+    }
 }
 

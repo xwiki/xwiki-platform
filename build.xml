@@ -42,14 +42,18 @@
     <property name="src.dir" value="${basedir}/src/" />
 
     <property name="main.src.dir" value="${src.dir}/main/" />
-    <property name="java.main.src.dir" value="${main.src.dir}/java/" />
-    <property name="resources.main.src.dir" value="${main.src.dir}/resources/" />
     <property name="web.main.src.dir" value="${main.src.dir}/web" />
 
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="java.test.src.dir" value="${test.src.dir}/java" />
     <property name="resources.test.src.dir" value="${test.src.dir}/resources/" />
 	<property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
+
+    <property name="core.dir" value="${basedir}/core" />
+    <property name="core.src.dir" value="${core.dir}/src" />
+    <property name="core.main.src.dir" value="${core.src.dir}/main" />
+    <property name="core.java.main.src.dir" value="${core.main.src.dir}/java" />
+    <property name="core.resources.main.src.dir" value="${core.main.src.dir}/resources" />
 
     <property name="lib.dir" value="${basedir}/lib" />
 
@@ -257,7 +261,7 @@
 
     <target name="xwiki.nonjava" depends="prepare">
         <copy todir="${classes.dir}">
-            <fileset dir="${resources.main.src.dir}" />
+            <fileset dir="${core.resources.main.src.dir}" />
         </copy>
 
         <copy todir="${build.dir}/web">
@@ -281,7 +285,7 @@
     </target>
 	
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
-        <javac srcdir="${java.main.src.dir}"
+        <javac srcdir="${core.java.main.src.dir}"
             destdir="${classes.dir}"
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"
@@ -297,7 +301,7 @@
 		        <include name="**/*.class"/>
 		    </fileset>
 		    <!-- resources -->
-		    <fileset dir="${resources.main.src.dir}">
+		    <fileset dir="${core.resources.main.src.dir}">
 		        <include name="**/*"/>
 		    </fileset>
 		</jar>
@@ -448,7 +452,7 @@
     <target name="javadoc" depends="">
         <mkdir dir="${javadoc.dir}" />
         <javadoc packagenames="com.xpn.xwiki.*"
-            sourcepath="${java.main.src.dir}"
+            sourcepath="${core.java.main.src.dir}"
             destdir="${javadoc.dir}"
             classpath="${libs}"
             author="true"
@@ -588,7 +592,5 @@
     <target name="importdb">
         <groovy src="import.groovy" />
     </target>
-
-
 
 </project>

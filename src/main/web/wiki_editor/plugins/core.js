@@ -256,9 +256,14 @@ WikiEditor.prototype._substituteNode = function(oldNode, newNode) {
 		for(var i=0; oldNode.childNodes[i];i++) {
 			newNode.appendChild(oldNode.childNodes[i]);
 		}
-		parent.insertBefore(newNode, oldNode);
-		parent.removeChild(oldNode);
-	}
+        // fix bug oldNode is BODY in MSIE
+        if (oldNode.nodeName.toLowerCase() == 'body') {
+            oldNode.appendChild(newNode);
+        } else {
+            parent.insertBefore(newNode, oldNode);
+            parent.removeChild(oldNode);
+        }
+    }
 }
 
 WikiEditor.prototype.titleCommand = function(editor_id, element, command, user_interface, value) {

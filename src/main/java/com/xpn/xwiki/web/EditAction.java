@@ -116,19 +116,17 @@ public class EditAction extends XWikiAction {
             }
 
             XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
-            if (content != null && !content.equals(""))
-                tdoc2.setContent(content);
-            if(sectionContent != null && !sectionContent.equals("")){
-                if(content != null && !content.equals("")) tdoc2.setContent(content);
+            if (content != null) tdoc2.setContent(content);
+            if(sectionContent != null && !sectionContent.equals("")) {
+                if(content != null) tdoc2.setContent(content);
                 else tdoc2.setContent(sectionContent);
                 tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
             }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", tdoc2.newDocument(context));
-            try{
-            tdoc2.readFromTemplate(peform, context);
-            }
-            catch (XWikiException e) {
+            try {
+                tdoc2.readFromTemplate(peform, context);
+            } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     context.put("exception", e);
                     return "docalreadyexists";

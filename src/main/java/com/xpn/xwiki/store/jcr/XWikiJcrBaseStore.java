@@ -125,8 +125,13 @@ public class XWikiJcrBaseStore {
 							out.print("@ "+property.getName() + " = ");
 							if (property.getDefinition().isMultiple())
 								out.print("'"+property.getValues()+"'");
-							else
-								out.print("'"+property.getValue().getString()+"'");
+							else {
+								String s = property.getValue().getString();
+								if (s.length() > 50)
+									out.print("...");
+								else
+									out.print("'"+s+"'");
+							}
 							out.println(" - " + property.getType());
 						}
 					});
@@ -181,7 +186,7 @@ public class XWikiJcrBaseStore {
 		}
 	}
 	protected String getBaseDocPath(XWikiDocument doc) {
-		return "/store/"+ encode(doc.getWeb()) + '/' + encode( ( doc.getName() ) );
+		return "/store/"+ encode(doc.getSpace()) + '/' + encode( ( doc.getName() ) );
 	}
 	protected String getDocPath(XWikiDocument doc) {
 		String s = getBaseDocPath(doc);

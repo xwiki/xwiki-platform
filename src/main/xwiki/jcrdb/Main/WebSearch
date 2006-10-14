@@ -54,7 +54,7 @@ Sql: $nb
 
 1.1 Search in text fields
 
-#set ($xpath = "*/*/obj/*/*/*[jcr:contains(@value, '$text')]/jcr:deref(@obj, '*')/jcr:deref(@doc, '*')")
+#set ($xpath = "*/*/obj/*/*[jcr:contains(., '$text')]/jcr:deref(@doc, '*')")
 #foreach ( $item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
 #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
 #set($bentrydoc = $xwiki.getDocument($item))
@@ -78,7 +78,7 @@ Sql: $nb
 
 1.1 Search in attachment file content
 
-#set ($xpath = "*/*/attach/*/content[jcr:contains(@jcr:data, 'a')]/jcr:deref(@attach, '*')/jcr:deref(@doc, '*')")
+#set ($xpath = "*/*/attach/*/content[jcr:contains(@jcr:data, '$text')]/jcr:deref(@attach, '*')/jcr:deref(@doc, '*')")
 #foreach ( $item in $xwiki.query.getDocs($xpath, "@fullName", "").setFirstResult($start).setMaxResults($nb).list())
 #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
 #set($bentrydoc = $xwiki.getDocument($item))

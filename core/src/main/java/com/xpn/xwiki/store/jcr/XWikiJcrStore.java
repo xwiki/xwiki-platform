@@ -21,6 +21,37 @@
  */
 package com.xpn.xwiki.store.jcr;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.jcr.ItemExistsException;
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import javax.jcr.PropertyIterator;
+import javax.jcr.RepositoryException;
+import javax.jcr.Value;
+import javax.jcr.ValueFactory;
+import javax.jcr.lock.LockException;
+import javax.jcr.nodetype.ConstraintViolationException;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+import javax.jcr.version.VersionException;
+import javax.transaction.NotSupportedException;
+
+import org.apache.portals.graffito.jcr.query.Filter;
+import org.apache.portals.graffito.jcr.query.QueryManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -32,26 +63,21 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.BaseStringProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.DateProperty;
+import com.xpn.xwiki.objects.DoubleProperty;
+import com.xpn.xwiki.objects.FloatProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.LongProperty;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
-import org.apache.portals.graffito.jcr.query.Filter;
-import org.apache.portals.graffito.jcr.query.QueryManager;
-
-import javax.jcr.*;
-import javax.jcr.lock.LockException;
-import javax.jcr.nodetype.ConstraintViolationException;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-import javax.jcr.query.Row;
-import javax.jcr.query.RowIterator;
-import javax.jcr.version.VersionException;
-import javax.transaction.NotSupportedException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 
 /** XWikiJCRStore - XWiki Store System backend to JCR */
 public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterface {
@@ -116,7 +142,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
             executeWrite(context, new JcrCallBack() {
 				public Object doInJcr(XWikiJcrSession ses) throws RepositoryException, XWikiException {
 					Node storeNode = ses.getStoreNode();
-					Node spaceNode = JcrUtil.getOrCreateSubNode(storeNode, doc.getWeb(), ntXWikiSpace);
+					Node spaceNode = JcrUtil.getOrCreateSubNode(storeNode, doc.getSpace(), ntXWikiSpace);
 					String docNodeName = doc.getName();
 					String docLang = doc.getLanguage();
 					if (docLang!=null) {
@@ -125,16 +151,32 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 							docNodeName += "." + docLang;
 					}
 					Node docNode = JcrUtil.getOrCreateSubNode(spaceNode, docNodeName, ntXWikiDocument);
-					Node baseDocNode = JcrUtil.getOrCreateSubNode(spaceNode, doc.getName(), ntXWikiDocument);
-					Node attachNode = JcrUtil.getOrCreateSubNode(docNode, "attach", ntXWikiAttachments);
+					Node baseDocNode = JcrUtil.getOrCreateSubNode(spaceNode, doc.getName(), ntXWikiDocument);					
 					ses.updateObject(docNode, doc);
 					
-					NodeIterator ni = attachNode.getNodes();
-					while (ni.hasNext()) {
-						ni.nextNode().setProperty("doc", docNode);
+					if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+						Node nattachs = JcrUtil.getOrCreateSubNode(baseDocNode, "attach", ntXWikiAttachments);
+						Iterator it = doc.getAttachmentList().iterator();
+						Set attachset = new HashSet();
+						while (it.hasNext()) {
+							XWikiAttachment att = (XWikiAttachment) it.next();
+							attachset.add( att.getFilename() );
+							Node natt = JcrUtil.getOrCreateSubNode(nattachs, att.getFilename(), ntXWikiAttachment);							
+							ses.updateObject(natt, att);
+							natt.setProperty("doc", baseDocNode);							
+						}
+						NodeIterator ni = nattachs.getNodes();
+						while (ni.hasNext()) {
+							Node natt = ni.nextNode();
+							if (!attachset.contains(natt.getName()))
+								natt.remove();
+						}
+					} else {
+						try {
+							baseDocNode.getNode("attach").remove();
+						} catch (PathNotFoundException e) {};
 					}
 					
-					// Not needed: Remove objects planned for removal
 					doc.setObjectsToRemove(new ArrayList());
 					if (bclass!=null) {
 		                bclass.setName(doc.getFullName());
@@ -206,12 +248,12 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
             
 			String oclassname = object.getClassName();
 			int i = oclassname.lastIndexOf(".");
-		    String oweb = oclassname.substring(0, i);
+		    String ospace = oclassname.substring(0, i);
 		    String oname = oclassname.substring(i+1);
 		    Node wnode = docnode;
 			wnode = JcrUtil.getOrCreateSubNode(wnode, "obj", ntXWikiObjects);
-			if (!"".equals(oweb)) // if className = internal, then save to .../doc/obj/internal
-				wnode = JcrUtil.getOrCreateSubNode(wnode, oweb,	 ntXWikiSpaceObject);
+			if (!"".equals(ospace)) // if className = internal, then save to .../doc/obj/internal
+				wnode = JcrUtil.getOrCreateSubNode(wnode, ospace,	 ntXWikiSpaceObject);
 			Node onode;
 			if (stats)
 				onode = ses.insertObject(wnode, oname, object);
@@ -243,22 +285,25 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 	                "Exception while saving object {0}", e, args);
 	    }
 	}
-	private BaseObject loadXWikiCollection(XWikiJcrSession ses, Node nobj, XWikiContext context) throws RepositoryException, XWikiException {
+	private BaseObject loadXWikiCollection(XWikiJcrSession ses, Node nobj, BaseClass bclass, XWikiContext context) throws RepositoryException, XWikiException {		
 		BaseObject object = (BaseObject) ses.loadObject(nobj.getPath());
-		if (!object.getClassName().equals("")) {
-			BaseObject newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
-			if (newobject!=null) {
-                newobject.setId(object.getId());
-                newobject.setClassName(object.getClassName());
-                newobject.setName(object.getName());
-                newobject.setNumber(object.getNumber());
-                object = newobject;
-            }
-		}
-		NodeIterator npi = nobj.getNodes(); // properties
-		while (npi.hasNext()) {
-			Node nprop = npi.nextNode();
-			BaseProperty prop = loadXWikiProperty(ses, nprop);
+		BaseObject newobject = (BaseObject) bclass.newObject(context);
+		newobject.setId(object.getId());
+		newobject.setClassName(bclass.getName());
+		newobject.setNumber(object.getNumber());
+		object = newobject;
+		PropertyIterator pi = nobj.getProperties();		
+		while (pi.hasNext()) {
+			Property iprop = pi.nextProperty();
+			String sprop = iprop.getName();
+			if (!sprop.startsWith("xp:"))
+				continue;
+			int ind = sprop.indexOf(':');
+			sprop = sprop.substring(ind+1);
+			PropertyClass pc = (PropertyClass) bclass.get(sprop);
+			BaseProperty prop = pc.newProperty();
+			prop.setName(sprop);
+			loadXWikiProperty(ses, iprop, prop);
 			prop.setObject(object);
 			object.addField(prop.getName(), prop);
 		}
@@ -266,17 +311,76 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 	}
 	
 	private void saveXWikiProperty(XWikiJcrSession ses, Node objnode, BaseProperty prop) throws ItemExistsException, PathNotFoundException, VersionException, ConstraintViolationException, LockException, RepositoryException {
-		Node propNode = ses.insertObject(objnode, "xp:"+prop.getName(), prop);
-		propNode.setProperty("obj", objnode);
+		if (prop.getValue()==null) return;
+		final String propname = "xp:"+prop.getName();
+		final ValueFactory vf = ses.getValueFactory();
+		if (prop instanceof BaseStringProperty) {
+			objnode.setProperty(propname, (String)prop.getValue());
+		} else if (DateProperty.class.equals(prop)) {
+			Date date = (Date) prop.getValue();
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			objnode.setProperty(propname, vf.createValue(cal));
+		} else if (IntegerProperty.class.equals(prop.getClass())
+				|| LongProperty.class.equals(prop.getClass())) {
+			objnode.setProperty(propname, vf.createValue(
+					((Number)prop.getValue()).longValue()
+					));
+		} else if (FloatProperty.class.equals(prop.getClass())
+				|| DoubleProperty.class.equals(prop.getClass())) {
+			objnode.setProperty(propname, vf.createValue(
+					((Number)prop.getValue()).doubleValue()
+					));
+		} else if (StringListProperty.class.equals(prop.getClass())) {
+			objnode.setProperty(propname, vf.createValue(
+					((StringListProperty) prop).getTextValue()
+					));
+		} else if (DBStringListProperty.class.equals(prop.getClass())) {
+			List list = ((DBStringListProperty) prop).getList();
+			Value[] v = new Value[ list.size() ];
+			for (int i=0; i<list.size(); i++)
+				v[i] = vf.createValue((String)list.get(i));
+			objnode.setProperty(propname, v);
+		}
+		/*was: Node propNode = ses.insertObject(objnode, "xp:"+prop.getName(), prop);
+		propNode.setProperty("obj", objnode);*/
 	}
-	private BaseProperty loadXWikiProperty(XWikiJcrSession ses, Node nprop) throws RepositoryException {
-		BaseProperty prop = (BaseProperty) ses.loadObject(nprop.getPath());
+	private void loadXWikiProperty(XWikiJcrSession ses, Property iprop, BaseProperty prop) throws RepositoryException {
+		if (prop instanceof BaseStringProperty) {
+			prop.setValue(
+					iprop.getString());
+		} else if (DateProperty.class.equals(prop)) {
+			prop.setValue(
+					iprop.getDate().getTime());
+		} else if (IntegerProperty.class.equals(prop.getClass())) {
+			prop.setValue(
+					new Integer((int) iprop.getLong()));
+		} else if (LongProperty.class.equals(prop.getClass())) {
+			prop.setValue(
+					new Long(iprop.getLong()));
+		} else if (FloatProperty.class.equals(prop.getClass())) {
+			prop.setValue(
+					new Float(iprop.getDouble()));
+		} else if (DoubleProperty.class.equals(prop.getClass())) {
+			prop.setValue(
+					new Double(iprop.getDouble()));
+		} else if (StringListProperty.class.equals(prop.getClass())) {
+			((StringListProperty)prop).setTextValue( 
+					iprop.getString() );
+		} else if (DBStringListProperty.class.equals(prop.getClass())) {
+			Value[] v = iprop.getValues();			
+			List list = new ArrayList(v.length);
+			for (int i=0; i<v.length; i++)
+				list.add(v[i].getString());
+			((ListProperty)prop).setList(list);
+		}
+		/*was: BaseProperty prop = (BaseProperty) ses.loadObject(nprop.getPath());
 		final String sname = nprop.getName();
 		int ip = sname.indexOf(":");
 		if (ip<0)
 			return null;
 		prop.setName( decode( sname.substring(ip+1) ) );
-		return prop;
+		return prop;*/
 	}
 	
 	public XWikiDocument loadXWikiDoc(final XWikiDocument doc, final XWikiContext context) throws XWikiException {
@@ -292,19 +396,26 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 						retdoc.setStore(context.getWiki().getStore());
 						retdoc.setDatabase(context.getDatabase());
 						retdoc.setNew(false);
-						if (retdoc.getAttachmentList()==null) 
-							retdoc.setAttachmentList(new ArrayList());
-						Iterator it = retdoc.getAttachmentList().iterator();
-						while (it.hasNext()) {
-							XWikiAttachment att = (XWikiAttachment) it.next();
-							att.setDoc(retdoc);
-						}
 					} else {
 						doc.setNew(true);
 						return doc;
 					}
-					Node baseDocNode = ses.getNode(getBaseDocPath(doc));
-					//TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
+					Node baseDocNode = ses.getNode(getBaseDocPath(retdoc));
+					
+					if (retdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
+						List attlist = new ArrayList();
+						NodeIterator ni = baseDocNode.getNode("attach").getNodes();
+						while (ni.hasNext()) {
+							Node natt = ni.nextNode();
+							XWikiAttachment att = (XWikiAttachment) ses.loadObject(natt.getPath());
+							att.setFilename(natt.getName());
+							att.setDoc(retdoc);
+							attlist.add(att);
+						}
+						retdoc.setAttachmentList(attlist);
+					} else
+						retdoc.setAttachmentList(new ArrayList(0));
+					
 					BaseClass bclass = new BaseClass();
 					String cxml = retdoc.getxWikiClassXML();
 		            if (cxml!=null) {
@@ -324,8 +435,8 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		            // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
 		            context.addBaseClass(bclass);
 			        
-		            if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-			            Node nobjs = JcrUtil.getOrCreateSubNode(baseDocNode, "obj", ntXWikiObjects);
+		            if (retdoc.hasElement(XWikiDocument.HAS_OBJECTS)) {
+			            Node nobjs = baseDocNode.getNode("obj");
 						NodeIterator nsi = nobjs.getNodes(); // spaces
 						while (nsi.hasNext()) {
 							Node nspace = nsi.nextNode();
@@ -335,8 +446,9 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 							NodeIterator noi = nspace.getNodes(); // objects
 							while (noi.hasNext()) {
 								Node nobj = noi.nextNode();
-								BaseObject object = loadXWikiCollection(ses, nobj, context);
-								object.setName(doc.getFullName());
+								BaseClass objclass = context.getWiki().getClass(nspace.getName() + "." + nobj.getName(), context);
+								BaseObject object = loadXWikiCollection(ses, nobj, objclass, context);
+								object.setName(retdoc.getFullName());
 								retdoc.setObject(object.getClassName(), object.getNumber(), object);
 							}
 						}
@@ -588,7 +700,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
 					Filter filter = session.getObjectQueryManager().createFilter(XWikiDocument.class);
 					filter.addEqualTo("name", doc.getName());
-					filter.addEqualTo("web", doc.getWeb());
+					filter.addEqualTo("space", doc.getSpace());
 					filter.addNotEqualTo("language", "");
 					return searchStringAttribute(session, filter, "language");
 				}
@@ -651,7 +763,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 			return (List) executeRead(context, new JcrCallBack(){
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
 					Filter filter = session.getObjectQueryManager().createFilter(XWikiDocument.class)
-						.addEqualTo("web", spaceName);
+						.addEqualTo("space", spaceName);
 					return searchStringAttribute(session, filter, "name");
 				}
 			});
@@ -666,12 +778,12 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 			executeRead(context, new JcrCallBack(){
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
 					// XXX: if username contains "'" ?
-					String xpath = "store/*/*/obj/XWiki/XWikiGroups/xp:member[@value='"+username+"' or @value='"+shortname+"']";
+					String xpath = "store/*/*/obj/XWiki/XWikiGroups[@xp:member='"+username+"' or @xp:member='"+shortname+"']/jcr:deref(@doc, '*')/@fullName";
 					Query query = session.getQueryManager().createQuery(xpath, Query.XPATH);
-					NodeIterator ni = query.execute().getNodes();
+					RowIterator ni = query.execute().getRows();
 					while (ni.hasNext()) {
-						Node docnode = ni.nextNode().getParent().getParent().getParent().getParent();
-						result.add(docnode.getParent().getName() + "." + docnode.getName());
+						Row row = ni.nextRow();
+						result.add(row.getValues()[0].getString());
 					}
 					return null;
 				}
@@ -680,6 +792,44 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		} catch (Exception e) {
 			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while listGroupsForUser", e);
 		}
+	}
+	//
+	public List getAllObjectsByClass(final Class cl, XWikiContext context) throws XWikiException {
+		QueryManager qm = getObjectQueryManager(context);
+		return getObjects( qm.createQuery( qm.createFilter(cl) ), context );		
+	}
+	public QueryManager getObjectQueryManager(XWikiContext context) throws XWikiException {
+		// TODO: store query manager in class.
+		try {
+			return (QueryManager) executeRead(context, new JcrCallBack() {
+				public Object doInJcr(XWikiJcrSession session) throws Exception {
+					return session.getObjectQueryManager();
+				}
+			 });
+		} catch (Exception e) {
+			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while getObjectQueryManager", e);
+		}
+	}
+
+	public List getObjects(final org.apache.portals.graffito.jcr.query.Query query, XWikiContext context) throws XWikiException {
+		final List result = new ArrayList();
+		try {
+			executeRead(context, new JcrCallBack() {
+				public Object doInJcr(XWikiJcrSession session) throws Exception {
+					String xpath = session.getObjectQueryManager().buildJCRExpression(query);
+					NodeIterator ni = session.getQueryManager().createQuery(xpath, Query.XPATH).execute().getNodes();
+					while (ni.hasNext()) {
+						Node node = ni.nextNode();
+						Object object = session.loadObject(node.getPath());
+						result.add(object);
+					}
+					return null;
+				}
+			});
+		} catch (Exception e) {
+			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while getObjects", e);
+		}
+		return result;
 	}
 	
 	public void notSupportedCall() {
@@ -772,43 +922,5 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 	public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
 		notSupportedCall();
 		return null;
-	}
-	//
-	public List getAllObjectsByClass(final Class cl, XWikiContext context) throws XWikiException {
-		QueryManager qm = getObjectQueryManager(context);
-		return getObjects( qm.createQuery( qm.createFilter(cl) ), context );		
-	}
-	public QueryManager getObjectQueryManager(XWikiContext context) throws XWikiException {
-		// TODO: store query manager in class.
-		try {
-			return (QueryManager) executeRead(context, new JcrCallBack() {
-				public Object doInJcr(XWikiJcrSession session) throws Exception {
-					return session.getObjectQueryManager();
-				}
-			 });
-		} catch (Exception e) {
-			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while getObjectQueryManager", e);
-		}
-	}
-
-	public List getObjects(final org.apache.portals.graffito.jcr.query.Query query, XWikiContext context) throws XWikiException {
-		final List result = new ArrayList();
-		try {
-			executeRead(context, new JcrCallBack() {
-				public Object doInJcr(XWikiJcrSession session) throws Exception {
-					String xpath = session.getObjectQueryManager().buildJCRExpression(query);
-					NodeIterator ni = session.getQueryManager().createQuery(xpath, Query.XPATH).execute().getNodes();
-					while (ni.hasNext()) {
-						Node node = ni.nextNode();
-						Object object = session.loadObject(node.getPath());
-						result.add(object);
-					}
-					return null;
-				}
-			});
-		} catch (Exception e) {
-			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while getObjects", e);
-		}
-		return result;
-	}
+	}	
 }

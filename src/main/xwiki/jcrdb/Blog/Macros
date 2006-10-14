@@ -20,7 +20,7 @@
 #if($category=='')
 #set ($xpath = "*/*[@fullName!='XWiki.ArticleClassTemplate']/obj/XWiki/ArticleClass/jcr:deref(@doc, '*')")
 #else
-#set ($xpath = "*/*[@fullName!='XWiki.ArticleClassTemplate']/obj/XWiki/ArticleClass/xp:category[@value='${category}']/jcr:deref(@obj, '*')/jcr:deref(@doc, '*')")
+#set ($xpath = "*/*[@fullName!='XWiki.ArticleClassTemplate']/obj/XWiki/ArticleClass[@xp:category='${category}']/jcr:deref(@doc, '*')")
 #end
 #set($cdate = "")
 #set($inbitems = $xwiki.parseInt($nbitems))

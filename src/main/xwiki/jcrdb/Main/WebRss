@@ -17,8 +17,7 @@
 <title></title>
 <template></template>
 <content>$response.setContentType("text/xml")
-#set ($sql = "where 1=1 order by doc.date desc")
-#set ($list = $xwiki.searchDocuments($sql , 20 , 0))
+#set ($list = $xwiki.query.getDocs("*.*", "@fullName", "-@date").setMaxResults(20).list())
 #set ($baseurl =  "http://${request.serverName}")
 #includeForm("XWiki.WebRssCode")</content>
 </xwikidoc>

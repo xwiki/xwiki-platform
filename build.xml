@@ -129,7 +129,7 @@
         struts-1.2.9.jar,
         velocity-1.4.jar,velocity-tools-1.1.jar,
         securityfilter-2.0.jar,
-        radeox.jar,
+        radeox-UNKNOWN-xwiki.jar,
         portlet-api-1.0.jar,
         xmlrpc-1.2.jar,
         groovy-all-1.0-jsr-06.jar,

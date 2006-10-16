@@ -47,7 +47,7 @@ public class ImageMacro  extends BaseLocaleMacro {
     String img = params.get("text", 0);
     String height = params.get("height", 1);
     String width = params.get("width", 2);
-
+    String align = params.get("align", 3);
     XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
     XWikiDocument doc = xcontext.getDoc();
 
@@ -60,6 +60,9 @@ public class ImageMacro  extends BaseLocaleMacro {
     }
     if ((!"none".equals(width))&&(width!=null)&&(!"".equals(width.trim()))){
     	str.append("width=\"" + width.trim() + "\" ");
+    }
+    if ((!"none".equals(align))&&(align!=null)&&(!"".equals(align.trim()))){
+    	str.append("align=\"" + align.trim() + "\" ");
     }
     str.append("alt=\"");
     str.append(img);

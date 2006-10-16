@@ -23,7 +23,6 @@
 <!-- NOTE: THIS IS A WORK IN PROGRESS. IT'S STILL MISSING SOME JARS FOR THE COMPILATION TO WORK -->
 <!-- ISSUES:
 
-radeox.jar : custom repackaging. Custom changes need to be brought to XWiki instead. Sergiu working on this.
 suigeneris.jrcs: doesn't exist on central repo. Is this something generic?
 jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
             upgrade to that?
@@ -49,6 +48,30 @@ googleaddwords.jar: what version and license?
   <packaging>jar</packaging>
   <description>The main XWiki JAR</description>
   <dependencies>
+
+    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
+
+    <!-- This JAR has been modified by Sergiu Dumitriu to generate valid xhtml. TODO: create a patch and send it
+         to the radeox project. Other solution: extract the modifications outside of the radeox jar and into XWiki
+         source tree. See http://jira.xwiki.org/jira/browse/XWIKI-377 -->
+    <dependency>
+      <groupId>radeox</groupId>
+      <artifactId>radeox</artifactId>
+      <version>UNKNOWN</version>
+      <classifier>xwiki</classifier>
+    </dependency>
+
+    <!-- Exo POMs seems to have a problem. See http://jira.exoplatform.org/browse/PLT-24. When this is resolved,
+         get the Exo JARS from the ObjectWeb remote repo (or from Maven3's official remote repo when ObjectWeb
+         is synced to there. -->
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.container</artifactId>
+      <version>2.0</version>
+    </dependency>
+
+    <!-- Standard dependencies found in the main Maven remote repository -->
+
     <dependency>
       <groupId>velocity</groupId>
       <artifactId>velocity</artifactId>
@@ -142,5 +165,21 @@ googleaddwords.jar: what version and license?
       <version>1.6.5</version>
     </dependency>
   </dependencies>
+
+  <repositories>
+
+    <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main
+         remote repository. To be removed once we're only using official JARs -->
+    <repository>
+      <id>xwiki</id>
+      <name>XWiki Maven2 Remote Repository</name>
+      <url>http://laam.xpertnet.biz/~vmassol/repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+
+  </repositories>
+
 </project>
         

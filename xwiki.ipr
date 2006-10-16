@@ -556,7 +556,7 @@
     </library>
     <library name="cache">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2M.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/concurrent-1.3.2.jar!/" />
       </CLASSES>

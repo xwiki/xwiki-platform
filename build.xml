@@ -97,7 +97,7 @@
     	mysql-connector-java-3.1.7-bin.jar,
     	hsqldb-1.8.0.jar,
     	odmg-3.0.jar,
-    	oscache-2.3.2M.jar,
+    	oscache-2.3.2-xwiki.jar,
     	concurrent.jar,
     	jgroups-2.4CR1.jar,
     	swarmcache.jar,

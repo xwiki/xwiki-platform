@@ -29,8 +29,6 @@ jackrabbit: problem with the jackrabbit POM including lots of dependencies which
             in addition there's a failed dep: jsr170:jcr:jar:1.0 (should be javax.jcr). Reported in
             http://jira.codehaus.org/browse/MEV-453
 alexa.jar: what version are we using? Is the license compatible?
-oscache.jar : there's only version 2.3 on repo1.maven.org. In lib/ it says 2.3.2M. We need to upload version 2.3.2 to
-              the central repo
 googleaddwords.jar: what version and license?
               
 -->
@@ -82,6 +80,15 @@ googleaddwords.jar: what version and license?
       <groupId>org.suigeneris</groupId>
       <artifactId>jrcs.rcs</artifactId>
       <version>0.3.0</version>
+      <classifier>xwiki</classifier>
+    </dependency>
+
+    <!-- Version 2.3.2 of oscache needs to be uploaded to Maven2 central repo and XWiki's patch to be applied
+         before we can remove this jar from our repo -->
+    <dependency>
+      <groupId>opensymphony</groupId>
+      <artifactId>oscache</artifactId>
+      <version>2.3.2</version>
       <classifier>xwiki</classifier>
     </dependency>
 

@@ -12,7 +12,7 @@ WikiEditor.prototype.initAttachmentsPlugin = function() {
 		return;
 	}
 	
-	this.addExternalProcessor((/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
+	this.addExternalProcessor((/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
 	this.addInternalProcessor((/<img\s*([^>]*)(class=\"wikiimage\")\s*([^>]*)\/>/i), 'convertImageInternal');
 
 	this.addExternalProcessor((/{\s*attach\s*:\s*(.*?)}/i), 'convertAttachmentExternal');
@@ -53,8 +53,8 @@ WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_i
     return this.dummyCommand();
 }
 
-WikiEditor.prototype.insertImage = function(src, width, height) {
-	this.core.insertImage(this.getImagePath() + src, "", "", "", "", width, height, "", "", "", "");
+WikiEditor.prototype.insertImage = function(src, width, height, align) {
+	this.core.insertImage(this.getImagePath() + src, "", "", "", "", width, height, align, "", "", "");
 }
 
 WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
@@ -75,10 +75,13 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
 			str = "{image:" + imgname;
             var width=att["width"]?this.trimString(att["width"]):"";
 			var height=att["height"]?this.trimString(att["height"]):"";
-			if(width != "" || height != "") {
-				str += "|" + (height?height:"") + "|" + (width?width:"");
-			}
-			str += "}";
+            var align=att["align"]?this.trimString(att["align"]):"";
+            if (width != "" || height != "" || align != "") {
+				str += "|" + (height?height:" ") + "|" + (width?width:" ");
+                if (align != "") str += "|" + (align?align:"");
+            }
+
+            str += "}";
 		}
 	}
 	return content.replace(regexp, str);
@@ -88,17 +91,21 @@ WikiEditor.prototype.IMAGE_CLASS_NAME = "wikiimage";
 
 WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
 	var str = "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";
-	var width, height;
+	var width, height, align;
 	if( result[5] && (width = this.trimString(result[5])) != "") {
 		str += "width=\"" + width + "\" ";
 	}
 	if( result[3] && (height = this.trimString(result[3])) != "") {
 		str += "height=\"" + height + "\" ";
 	}
-	
-	str += "\/>";
-	
-	return content.replace(regexp, str);
+
+    if( result[7] && (align = this.trimString(result[7])) != "") {
+		str += "align=\"" + align + "\" ";
+	}
+
+    str += "\/>";
+
+    return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.handleAttachmentsButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {

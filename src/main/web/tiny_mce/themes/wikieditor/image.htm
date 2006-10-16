@@ -11,8 +11,8 @@ var baseurl = tinyMCE.getParam("wiki_attach_path");
 			var src = document.forms[0].href.value;
 			var width = document.forms[0].width.value;
 			var height = document.forms[0].height.value;
-
-			window.opener.wikiEditor.insertImage(src, width, height);
+            var align = document.forms[0].align.options[document.forms[0].align.selectedIndex].value;
+            window.opener.wikiEditor.insertImage(src, width, height, align);
 			top.close();
 		}
 	}
@@ -162,6 +162,20 @@ var baseurl = tinyMCE.getParam("wiki_attach_path");
             <td><input name="width" type="text" id="width" value="" size="3" maxlength="3" />
               x
               <input name="height" type="text" id="height" value="" size="3" maxlength="3" /></td>
+          </tr>
+          <tr>
+              <td nowrap="nowrap">{$lang_insert_image_align}:</td>
+              <td><select name="align" style="width: 100px">
+                  <option value="">{$lang_insert_image_align_default}</option>
+                  <option value="left">{$lang_insert_image_align_left}</option>
+                  <option value="right">{$lang_insert_image_align_right}</option>
+                  <option value="baseline">{$lang_insert_image_align_baseline}</option>
+                  <option value="top">{$lang_insert_image_align_top}</option>
+                  <option value="middle">{$lang_insert_image_align_middle}</option>
+                  <option value="bottom">{$lang_insert_image_align_bottom}</option>
+                  <option value="texttop">{$lang_insert_image_align_texttop}</option>
+              </select>
+              </td>
           </tr>
           <tr>
             <td nowrap="nowrap"><input type="button" id="insert" name="insert" value="{$lang_insert}" onclick="insertImage();">

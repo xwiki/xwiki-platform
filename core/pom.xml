@@ -23,7 +23,6 @@
 <!-- NOTE: THIS IS A WORK IN PROGRESS. IT'S STILL MISSING SOME JARS FOR THE COMPILATION TO WORK -->
 <!-- ISSUES:
 
-suigeneris.jrcs: doesn't exist on central repo. Is this something generic?
 jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
             upgrade to that?
 jackrabbit: problem with the jackrabbit POM including lots of dependencies which should probabyl be optional and
@@ -68,6 +67,22 @@ googleaddwords.jar: what version and license?
       <groupId>exo-platform</groupId>
       <artifactId>exo-platform.container</artifactId>
       <version>2.0</version>
+    </dependency>
+
+    <!-- The JRCS JARS are are in our repo till we get them published on the Maven2 central repository and till
+         we haven't succeeded in haviong suigeneric.org apply our patches.
+         JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
+    <dependency>
+      <groupId>org.suigeneris</groupId>
+      <artifactId>jrcs.diff</artifactId>
+      <version>0.3.0</version>
+      <classifier>xwiki</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.suigeneris</groupId>
+      <artifactId>jrcs.rcs</artifactId>
+      <version>0.3.0</version>
+      <classifier>xwiki</classifier>
     </dependency>
 
     <!-- Standard dependencies found in the main Maven remote repository -->

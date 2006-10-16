@@ -406,7 +406,7 @@
     </library>
     <library name="Radeox">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/radeox.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/radeox-UNKNOWN-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/asm-util-1.5.3.jar!/" />
       </CLASSES>
       <JAVADOC />
@@ -565,8 +565,8 @@
     </library>
     <library name="Jrcs">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.rcs-0.3.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.rcs-0.3.0-xwiki.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0-xwiki.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>

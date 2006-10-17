@@ -25,10 +25,6 @@
 
 jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
             upgrade to that?
-jackrabbit: problem with the jackrabbit POM including lots of dependencies which should probabyl be optional and
-            in addition there's a failed dep: jsr170:jcr:jar:1.0 (should be javax.jcr). Reported in
-            http://jira.codehaus.org/browse/MEV-453
-alexa.jar: what version are we using? Is the license compatible?
 googleaddwords.jar: what version and license?
               
 -->
@@ -90,6 +86,14 @@ googleaddwords.jar: what version and license?
       <artifactId>oscache</artifactId>
       <version>2.3.2</version>
       <classifier>xwiki</classifier>
+    </dependency>
+
+    <!-- Version 1.1 of jackrabbit core needs to be uploaded to Maven2 central repo. In addition there was a  POM
+         issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-core</artifactId>
+      <version>1.1</version>
     </dependency>
 
     <!-- Standard dependencies found in the main Maven remote repository -->
@@ -176,11 +180,6 @@ googleaddwords.jar: what version and license?
       <artifactId>jcr</artifactId>
       <version>1.0</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.apache.jackrabbit</groupId>
-      <artifactId>jackrabbit-core</artifactId>
-      <version>1.0.1</version>
-    </dependency-->
     <dependency>
       <groupId>ant</groupId>
       <artifactId>ant</artifactId>

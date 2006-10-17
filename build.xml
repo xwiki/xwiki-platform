@@ -146,7 +146,6 @@
     	wsdl4j-1.5.2.jar,qname-1.5.2.jar,
     	googleapi.jar,
     	googleadwords.jar,
-    	alexa.jar,
     	terraservice.jar,
     	ipresolver.jar,
     	flipper.jar,

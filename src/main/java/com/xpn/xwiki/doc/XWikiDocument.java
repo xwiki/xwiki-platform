@@ -2827,7 +2827,9 @@ public class XWikiDocument {
         int indexSection = docSection.getSectionIndex();
         if (numberOfSection == 1) {
             //  there is only a sections in document
-            return newSectionContent;
+            String contentBegin = getContent().substring(0, indexSection);
+            newContent = newContent.append(contentBegin).append(newSectionContent);
+            return newContent.toString();
         } else if (sectionNumber == numberOfSection) {
             //  edit lastest section that doesn't contain subtitle
             String contentBegin = getContent().substring(0,indexSection);

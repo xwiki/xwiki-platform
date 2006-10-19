@@ -46,7 +46,7 @@ public abstract class ListClass extends PropertyClass {
 		setDisplayType("select");
 		setMultiSelect(false);
 		setSize(1);
-	}
+    }
 
 	public ListClass(PropertyMetaClass wclass) {
 		this("list", "List", wclass);
@@ -56,7 +56,11 @@ public abstract class ListClass extends PropertyClass {
 		this(null);
 	}
 
-	public String getDisplayType() {
+    public String getSeparators() {
+        return null;
+    }
+    
+    public String getDisplayType() {
 		return getStringValue("displayType");
 	}
 
@@ -88,19 +92,54 @@ public abstract class ListClass extends PropertyClass {
 		setIntValue("relationalStorage", storage ? 1 : 0);
 	}
 
-	public static List getListFromString(String value) {
+    public static List getListFromString(String value) {
+        return getListFromString(value, "|", true);
+    }
+
+    public static List getListFromString(String value, String separators, boolean withMap) {
 		List list = new ArrayList();
 		if (value == null)
 			return list;
 
-		String val = StringUtils.replace(value, "\\|", "%PIPE%");
-		String[] result = StringUtils.split(val, "|");
-		for (int i = 0; i < result.length; i++)
-			list.add(StringUtils.replace(result[i], "%PIPE%", "|"));
-		return list;
+        if (separators==null)
+         separators = "|";
+
+        String val = value;
+        if (separators.length()==1)
+          val = StringUtils.replace(val, "\\" + separators, "%PIPE%");
+
+        String[] result = StringUtils.split(val, separators);
+		for (int i = 0; i < result.length; i++) {
+		    String element = StringUtils.replace(result[i], "%PIPE%", separators);
+            if (withMap&&(element.indexOf('=')!=-1)) {
+              list.add(StringUtils.split(element,"=")[0]);                
+            }
+            else
+              list.add(element);
+        }
+        return list;
 	}
 
-	public BaseProperty newProperty() {
+    public static Map getMapFromString(String value) {
+        Map map = new HashMap();
+        if (value == null)
+            return map;
+
+        String val = StringUtils.replace(value, "\\|", "%PIPE%");
+        String[] result = StringUtils.split(val, "|");
+        for (int i = 0; i < result.length; i++) {
+            String element = StringUtils.replace(result[i], "%PIPE%", "|");
+            if (element.indexOf('=')!=-1) {
+                String[] data = StringUtils.split(element,"=");
+                map.put(data[0], data[1]);
+            }
+            else
+              map.put(element, element);
+        }
+        return map;
+    }
+
+    public BaseProperty newProperty() {
 		BaseProperty lprop;
 
 		if (isRelationalStorage() && isMultiSelect())
@@ -111,7 +150,7 @@ public abstract class ListClass extends PropertyClass {
 			lprop = new StringProperty();
 
 		if (isMultiSelect() && getDisplayType().equals("input")) {
-			((ListProperty) lprop).setFormStringSeparator("|");
+			((ListProperty) lprop).setFormStringSeparator("" + getSeparators().charAt(0));
 		}
 
 		return lprop;
@@ -119,25 +158,31 @@ public abstract class ListClass extends PropertyClass {
 
 	public BaseProperty fromString(String value) {
 		BaseProperty prop = newProperty();
-		if (isMultiSelect()) {
-			if (!getDisplayType().equals("input")) {
-				((ListProperty) prop).setList(getListFromString(value));
-			} else {
-				((ListProperty) prop).setList(Arrays.asList(StringUtils.split(value, " ,|")));
-			}
-		} else
+        if (isMultiSelect()) {
+            ((ListProperty) prop).setList(getListFromString(value, getSeparators(), false));
+        } else
 			prop.setValue(value);
 		return prop;
 	}
 
 	public BaseProperty fromStringArray(String[] strings) {
-		if ((!isMultiSelect()) || (strings.length == 1))
+        BaseProperty prop = newProperty();
+        List list = new ArrayList();
+        ((ListProperty) prop).setList(list);
+		if (strings.length==0)
+         return prop;
+
+        if (!isMultiSelect())
 			return fromString(strings[0]);
-		List list = new ArrayList();
-		for (int i = 0; i < strings.length; i++)
+
+        if ((strings.length==1)&&getDisplayType().equals("input")) {
+            ((ListProperty) prop).setList(getListFromString(strings[0], getSeparators(), false));
+            return prop;
+        }
+
+        // If Multiselect and multiple results
+        for (int i = 0; i < strings.length; i++)
 			list.add(strings[i]);
-		BaseProperty prop = newProperty();
-		((ListProperty) prop).setList(list);
 		return prop;
 	}
 
@@ -163,7 +208,23 @@ public abstract class ListClass extends PropertyClass {
 		return lprop;
 	}
 
-	public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    protected String getDisplayValue(String value, Map map, XWikiContext context) {
+        String result = (String) map.get(value);
+        if (result==null)
+         result = value;
+        if ((context==null)||(context.getWiki()==null))
+         return result;
+        else {
+            String msgname = getFieldFullName() + "_" + result;
+            String newresult = context.getWiki().getMessage(msgname, context);
+            if (msgname.equals(newresult))
+             return result;
+            else
+             return newresult;
+        }
+    }
+
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		input input = new input();
 		BaseProperty prop = (BaseProperty) object.safeget(name);
 		if (prop != null)
@@ -178,11 +239,16 @@ public abstract class ListClass extends PropertyClass {
 	public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		List selectlist;
 		BaseProperty prop = (BaseProperty) object.safeget(name);
+        Map map = getMap(context);
 		if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
 			selectlist = (List) prop.getValue();
-			buffer.append(StringUtils.join(selectlist.toArray(), " "));
-		} else {
-			buffer.append(prop.getValue().toString());
+            List newlist = new ArrayList();
+            for (int i=0; i<selectlist.size();i++) {
+                newlist.add(getDisplayValue((String)selectlist.get(i), map, context));
+            }
+            buffer.append(StringUtils.join(newlist.toArray(), " "));
+        } else {
+			buffer.append(getDisplayValue((String)prop.getValue(), map, context));
 		}
 	}
 
@@ -193,7 +259,7 @@ public abstract class ListClass extends PropertyClass {
 			if (prop != null)
 				input.setValue(prop.toFormString());
 			input.setType("text");
-			input.setSize(60);
+			input.setSize(getSize());
 			input.setName(prefix + name);
 			input.setID(prefix + name);
 			buffer.append(input.toString());
@@ -206,6 +272,7 @@ public abstract class ListClass extends PropertyClass {
 
 	protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		List list = getList(context);
+        Map map = getMap(context);
 		List selectlist;
 
 		BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -225,15 +292,13 @@ public abstract class ListClass extends PropertyClass {
 
 			if (selectlist.contains(value))
 				radio.setChecked(true);
-			radio.addElement(value);
-			buffer.append(radio.toString());
+			radio.addElement(getDisplayValue(value, map, context));
+            buffer.append(radio.toString());
 			if (it.hasNext()) {
 				buffer.append("<br/>");
 			}
 		}
 	}
-
-
 
     protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		select select = new select(prefix + name, 1);
@@ -243,6 +308,7 @@ public abstract class ListClass extends PropertyClass {
 		select.setID(prefix + name);
 
 		List list = getList(context);
+        Map map = getMap(context);
 		List selectlist;
 
 		BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -258,7 +324,7 @@ public abstract class ListClass extends PropertyClass {
 		// Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String value = it.next().toString();
-			String display = getDisplayValue(context, value);
+			String display = getDisplayValue(value, map, context);
 			option option = new option(value, value);
 			option.addElement(display);
 			if (selectlist.contains(value))
@@ -270,20 +336,7 @@ public abstract class ListClass extends PropertyClass {
 	}
 
 	public abstract List getList(XWikiContext context);
-
-	private String getDisplayValue(XWikiContext context, String value) {
-		try {
-			XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
-			String strname = "option_" + value;
-			String result = msg.get(strname);
-			if (result.equals(strname)) {
-				return value;
-			}
-			return result;
-		} catch (Exception e) {
-			return value;
-		}
-	}
+    public abstract Map getMap(XWikiContext context);
 
     public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
         if (getDisplayType().equals("input")) {
@@ -319,7 +372,7 @@ public abstract class ListClass extends PropertyClass {
 
             if (selectlist.contains(value))
                 radio.setChecked(true);
-            radio.addElement(value);
+            radio.addElement(getDisplayValue(value, getMap(context), context));
             buffer.append(radio.toString());
             if(it.hasNext()){
             	buffer.append("<br/>");
@@ -356,7 +409,7 @@ public abstract class ListClass extends PropertyClass {
         for (Iterator it=list.iterator();it.hasNext();) {
             String value = it.next().toString();
             option option = new option(value, value);
-            option.addElement(value);
+            option.addElement(getDisplayValue(value, getMap(context), context));
             if (selectlist.contains(value))
                 option.setSelected(true);
             select.addElement(option);

@@ -86,9 +86,13 @@
         <property name="elements" type="integer" not-null="true">
             <column name="XWD_ELEMENTS" />
         </property>
-        
+
         <property name="defaultTemplate" type="string">
             <column name="XWD_DEFAULT_TEMPLATE" />
+        </property>
+
+        <property name="validationScript" type="string">
+            <column name="XWD_VALIDATION_SCRIPT" />
         </property>
 
     </class>
@@ -125,7 +129,7 @@
             <column name="XWL_FULLNAME" length="255"/>
         </property>
     </class>
-    
+
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
         <id name="id" type="long" unsaved-value="any">
             <column name="XWA_ID" not-null="true"/>
@@ -201,6 +205,9 @@
         </property>
         <property name="customDisplay" type="string">
             <column name="XWP_CUSTOMDISPLAY" length="60000" />
+        </property>
+        <property name="validationRegExp" type="string">
+            <column name="XWP_VALIDATION_REGEXP" />
         </property>
 
         <joined-subclass name="com.xpn.xwiki.objects.classes.NumberClass" table="xwikinumberclasses">
@@ -349,6 +356,9 @@
         </property>
         <property name="customClass" type="string">
             <column name="XWO_CUSTOM_CLASS" length="255"/>
+        </property>
+        <property name="validationScript" type="string">
+            <column name="XWO_VALIDATION_SCRIPT" />
         </property>
     </class>
 
@@ -749,7 +759,7 @@
             <column name="XWP_DATE" />
         </property>
     </class>
-    
+
     <!-- XWikiPreferences custom mapping -->
     <!--
     <class entity-name="XWiki.XWikiUsers" table="xwikiusers">

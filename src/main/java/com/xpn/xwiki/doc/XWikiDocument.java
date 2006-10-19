@@ -137,6 +137,8 @@ public class XWikiDocument {
     // Template by default assign to a view
     private String defaultTemplate;
 
+    //
+    private String validationScript;
     private Object wikiNode;
 
     // We are using a SoftReference which will allow the archive to be
@@ -2919,5 +2921,13 @@ public class XWikiDocument {
 
     public void setCustomClass(String customClass) {
         this.customClass = customClass;
+    }
+
+    public void setValidationScript(String validationScript) {
+        this.validationScript = validationScript;
+    }
+
+    public String getValidationScript() {
+        return validationScript;
     }
 }

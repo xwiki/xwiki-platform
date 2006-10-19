@@ -12,9 +12,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class GroupsClass extends ListClass {
 
@@ -39,6 +37,10 @@ public class GroupsClass extends ListClass {
         }
 
         return list;
+    }
+
+    public Map getMap(XWikiContext context) {
+        return new HashMap();
     }
 
     public boolean isUsesList() {

@@ -47,6 +47,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     private BaseClass object;
     private int id;
     private PropertyMetaClass pMetaClass;
+    private String validationRegExp;
 
     public PropertyClass() {
     }
@@ -360,4 +361,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void fromSearchMap(XWikiQuery query, Map map) {
     }
+
+    public void setValidationRegExp(String validationRegExp) {
+        this.validationRegExp = validationRegExp;
+    }
+
+    public String getValidationRegExp() {
+        return validationRegExp;
+    }
+
 }

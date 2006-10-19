@@ -74,6 +74,8 @@ import com.xpn.xwiki.util.MenuSubstitution;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -4157,5 +4159,42 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 return null;
             }
         }
+    }
+
+    public boolean validateDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        XWikiValidationException xwe;
+        String validationScript = "";
+        XWikiRequest req = context.getRequest();
+        if (req!=null) {
+            validationScript = req.get("xvalidation");
+        }
+        if ((validationScript==null)||(validationScript.trim().equals(""))) {
+            validationScript = doc.getValidationScript();
+        }
+        if ((validationScript==null)||(validationScript.trim().equals(""))) {
+           XWikiValidationInterface validObject = (XWikiValidationInterface) parseGroovyFromPage(validationScript, context);
+           return validObject.validateDocument(doc, context);   
+        }
+        return true;
+    }
+
+    public String getMessage(String item, XWikiContext context) {
+        XWikiMessageTool msg = context.getMessageTool();
+        if (msg==null)
+         return item;
+        else
+         return msg.get(item);
+    }
+
+    public String parseMessage(String id, XWikiContext context) {
+        XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
+        return parseContent(msg.get(id), context);
+    }
+
+    public String parseMessage(XWikiContext context) {
+        String message = (String) context.get("message");
+        if (message == null)
+            return null;
+        return parseMessage(message, context);
     }
 }

@@ -29,6 +29,8 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class DBListClass extends ListClass {
     public DBListClass(PropertyMetaClass wclass) {
@@ -50,6 +52,26 @@ public class DBListClass extends ListClass {
             e.printStackTrace();
             return new ArrayList();
         }
+    }
+
+    public Map getMap(XWikiContext context) {
+        List list = getList(context);
+        Map map = new HashMap();
+        if ((list==null)||(list.size()==0))
+         return map;
+        for(int i=0;i<list.size();i++) {
+            Object res = list.get(i);
+            if (res instanceof String)
+             map.put(res, res);
+            else {
+                String[] res2 = (String[]) res;
+                if (res2.length==1)
+                    map.put(res2[0], res2[0]);
+                else
+                    map.put(res2[0], res2[1]);
+            }
+        }
+        return map;
     }
 
     public String getSql() {

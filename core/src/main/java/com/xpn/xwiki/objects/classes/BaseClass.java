@@ -456,6 +456,21 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
+    public boolean addDBListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql) {
+        if (get(fieldName)==null) {
+            DBListClass list_class = new DBListClass();
+            list_class.setName(fieldName);
+            list_class.setPrettyName(fieldPrettyName);
+            list_class.setSize(size);
+            list_class.setMultiSelect(multiSelect);
+            list_class.setSql(sql);
+            list_class.setObject(this);
+            put(fieldName, list_class);
+            return true;
+        }
+        return false;
+    }
+
     public void setCustomMapping(String customMapping) {
         this.customMapping = customMapping;
     }

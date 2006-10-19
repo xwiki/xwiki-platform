@@ -401,10 +401,7 @@ public class XWiki extends Api {
      * @return Final message
      */
     public String parseMessage() {
-        String message = (String) context.get("message");
-        if (message == null)
-            return null;
-        return parseMessage(message);
+        return xwiki.parseMessage(context);
     }
 
     /**
@@ -417,8 +414,20 @@ public class XWiki extends Api {
      * @return the result of the parsed message
      */
     public String parseMessage(String id) {
-        XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
-        return parseContent(msg.get(id));
+        return xwiki.parseMessage(id, context);
+    }
+
+    /**
+     * API to get a message
+     * A message can be an error message or an information message either as text
+     * or as a message ID pointing to ApplicationResources
+     * The message is also parsed for velocity scripts
+     * @return Final message
+     * @param id
+     * @return the result of the parsed message
+     */
+    public String getMessage(String id) {
+        return xwiki.getMessage(id, context);
     }
 
     /**
@@ -2061,7 +2070,7 @@ v     * API to check rights on a document for a given user
     }
 
     public String getUniquePageName(String space, String name){
-        return xwiki.getUniquePageName(space, name, context);
+        return "";// xwiki.getUniquePageName(space, name, context);
     }
 
     public String clearName(String name){

@@ -17,16 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
+ * @author jeremi
  */
+package com.xpn.xwiki.validation;
 
-package com.xpn.xwiki.objects;
+import com.xpn.xwiki.XWikiException;
 
-import com.xpn.xwiki.objects.classes.ListClass;
-
-public class StringListProperty extends ListProperty {
-
-    public void setTextValue(String value) {
-        setList(ListClass.getListFromString(value));
-    }
-
+public class XWikiValidationException extends XWikiException {
 }

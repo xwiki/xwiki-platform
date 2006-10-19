@@ -36,14 +36,7 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.NumberProperty;
 import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.*;
 
 public class ClassesTest extends TestCase {
 
@@ -137,6 +130,7 @@ public class ClassesTest extends TestCase {
         StaticListClass pclass = new StaticListClass();
         pclass.setMultiSelect(true);
         pclass.setDisplayType("input");
+        pclass.setSeparators("|, ");
 
         ListProperty property;
         property = (ListProperty)pclass.fromString ("1");
@@ -193,23 +187,63 @@ public class ClassesTest extends TestCase {
         testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
     }
 
-    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected, XWikiContext context) {
+    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String[] viewexpected, String[] editexpected) {
+        testDisplayer(cname, obj, bclass, viewexpected, editexpected, null);
+    }
+
+    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String[] viewexpected, String[] editexpected, XWikiContext context) {
         if (context==null)
             context = new XWikiContext();
         StringBuffer result = new StringBuffer();
         PropertyClass pclass = (PropertyClass)bclass.get(cname);
         pclass.displayView(result,cname, "", obj, context);
-        assertEquals("Class " + cname + " view displayer not correct:\n" +
-            "Expected: " + viewexpected + "\nResult: " + result,
-            viewexpected.toLowerCase(), result.toString().toLowerCase());
-
+        for (int i=0;i<viewexpected.length;i++) {
+         assertEquals("Class " + cname + " view displayer not correct:\n" +
+            "Expected: " + viewexpected[i] + "\nResult: " + result,
+            viewexpected[i].toLowerCase(), result.toString().toLowerCase());
+        }
         result = new StringBuffer();
-        pclass.displayEdit(result,cname, "", obj, context);
-        assertTrue("Class " + cname + " edit displayer not correct" +
-            "\nExpected: " + editexpected + "\nResult: " + result,
-            result.toString().toLowerCase().indexOf(editexpected.toLowerCase())!=-1);
+        for (int i=0;i<editexpected.length;i++) {
+         pclass.displayEdit(result,cname, "", obj, context);
+         assertTrue("Class " + cname + " edit displayer not correct" +
+            "\nExpected: " + editexpected[i] + "\nResult: " + result,
+            result.toString().toLowerCase().indexOf(editexpected[i].toLowerCase())!=-1);
+        }
 
         pclass.displayHidden(result,cname, "", obj, context);
         pclass.displaySearch(result,cname, "", new XWikiQuery(), context);
     }
+
+    public static void testDisplayer(String cname, BaseObject obj, BaseClass bclass, String viewexpected, String editexpected, XWikiContext context) {
+        String[] viewexpected2 = new String[1];
+        viewexpected2[0] = viewexpected;
+        String[] editexpected2 = new String[1];
+        editexpected2[0] = editexpected;
+        testDisplayer(cname, obj, bclass, viewexpected2, editexpected2, context );
+    }
+
+    /**
+     * 
+     * @throws XWikiException
+     */
+    public void testListMapDisplayers() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        ((StaticListClass)bclass.get("category")).setValues("1=France|2=Germany|3=UK|4=USA|5=Other");
+        ((StaticListClass)bclass.get("category2")).setValues("1=France|2=Germany|3=UK|4=USA|5=Other");
+        ((StaticListClass)bclass.get("category3")).setValues("1=France|2=Germany|3=UK|4=USA|5=Other");
+        BaseObject obj = doc.getObject(bclass.getName(), 0);
+
+        String[] viewresult = {"France"};
+        String[] editresult = {"<select", ">France"};
+        testDisplayer("category", obj, bclass, viewresult, editresult);
+        viewresult = new String[] {"France Germany"};
+        editresult = new String[] {"<select", "multiple", ">France", ">Germany", ">UK"};
+        testDisplayer("category2", obj, bclass, viewresult, editresult);
+        viewresult = new String[] {"France Germany"};
+        editresult = new String[] {"<select", "multiple", ">France"};
+        testDisplayer("category3", obj, bclass, viewresult, editresult);
+    }
+
 }

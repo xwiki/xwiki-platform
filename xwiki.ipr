@@ -103,15 +103,15 @@
         <used_levels>
           <error>
             <option name="myName" value="ERROR" />
-            <option name="myVal" value="200" />
+            <option name="myVal" value="400" />
           </error>
           <warning>
             <option name="myName" value="WARNING" />
-            <option name="myVal" value="100" />
+            <option name="myVal" value="300" />
           </warning>
           <information>
             <option name="myName" value="INFO" />
-            <option name="myVal" value="100" />
+            <option name="myVal" value="200" />
           </information>
           <server>
             <option name="myName" value="SERVER PROBLEM" />
@@ -305,11 +305,7 @@
   </component>
   <component name="StarteamVcsAdapter" />
   <component name="UI designer component loader factory" />
-  <component name="VssVcs">
-    <SourceSafePersistencyRemovedFolder>C:/dev/maven/trunks/plugins/maven-clover-plugin/src/main/java/org/apache/maven/plugin/clover/internal/execution</SourceSafePersistencyRemovedFolder>
-    <SourceSafePersistencyRemovedFolder>C:/dev/maven/trunks/plugins/maven-clover-plugin/src/it/notests/src/main/java/org/apache/maven/plugin/clover/samples/simple</SourceSafePersistencyRemovedFolder>
-    <SourceSafePersistencyRemovedFolder>C:/dev/maven/trunks/plugins/maven-clover-plugin/src/it/notest</SourceSafePersistencyRemovedFolder>
-  </component>
+  <component name="VssVcs" />
   <component name="WebManager">
     <option enabled="true" />
   </component>
@@ -511,7 +507,6 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/googleadwords.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/googleapi.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/alexa.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/terraservice.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ipresolver.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/" />
@@ -530,9 +525,8 @@
     <library name="JCR">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/jcr-1.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-jcr-commons-1.0.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-core-1.0.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/graffito-jcr-mapping-1.0-a1-amelentev-dev.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jackrabbit-core-1.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -565,8 +559,9 @@
     </library>
     <library name="Jrcs">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.rcs-0.3.0-xwiki.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0-xwiki.jar!/" />
+        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.rcs-0.3.0.jar!/" />
+        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.diff-0.3.0.jar!/" />
+        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.tests-0.3.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>

@@ -67,6 +67,12 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         number_class.setPrettyName("Number");
         number_class.setNumberType("integer");
         safeput("number", number_class);
+
+        StringClass validationRegExp_class = new StringClass(this);
+        validationRegExp_class.setName("validationRegExp");
+        validationRegExp_class.setPrettyName("Validation Regular Expression");
+        validationRegExp_class.setSize(40);
+        safeput("validationRegExp", validationRegExp_class);
     }
 
     public BaseCollection getObject() {

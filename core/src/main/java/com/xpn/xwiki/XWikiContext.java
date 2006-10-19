@@ -319,4 +319,8 @@ public class XWikiContext extends Hashtable {
     public String getLinksQueryString() {
         return (String) get("links_qs");
     }
+
+    public XWikiMessageTool getMessageTool() {
+      return ((XWikiMessageTool) get("msg"));
+    }    
 }

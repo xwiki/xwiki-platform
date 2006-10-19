@@ -26,11 +26,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 import java.util.List;
+import java.util.Map;
 
 public class StaticListClass extends ListClass {
 
     public StaticListClass(PropertyMetaClass wclass) {
         super("staticlist", "Static List", wclass);
+        setSeparators(" ,|");
     }
 
     public StaticListClass() {
@@ -45,8 +47,21 @@ public class StaticListClass extends ListClass {
         setStringValue("values", values);
     }
 
+    public String getSeparators() {
+        return getStringValue("separators");
+    }
+
+    public void setSeparators(String separators) {
+        setStringValue("separators", separators);
+    }
+
     public List getList(XWikiContext context) {
         String values = (String) getValues();
         return getListFromString(values);
+    }
+
+    public Map getMap(XWikiContext context) {
+        String values = (String) getValues();
+        return getMapFromString(values);
     }
 }

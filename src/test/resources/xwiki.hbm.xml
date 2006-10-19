@@ -70,6 +70,11 @@
             <column name="XWD_VERSION" length="255" not-null="true"/>
         </property>
 
+        <property name="customClass" type="string">
+            <column name="XWD_CUSTOM_CLASS" length="255" not-null="true"/>
+        </property>
+
+
         <property name="parent" type="string">
             <column name="XWD_PARENT" length="511" not-null="true"/>
         </property>
@@ -84,6 +89,10 @@
 
         <property name="defaultTemplate" type="string">
             <column name="XWD_DEFAULT_TEMPLATE" />
+        </property>
+
+        <property name="validationScript" type="string">
+            <column name="XWD_VALIDATION_SCRIPT" />
         </property>
 
     </class>
@@ -193,6 +202,12 @@
         </property>
         <property name="number" type="integer">
             <column name="XWP_NUMBER" />
+        </property>
+        <property name="customDisplay" type="string">
+            <column name="XWP_CUSTOMDISPLAY" length="60000" />
+        </property>
+        <property name="validationRegExp" type="string">
+            <column name="XWP_VALIDATION_REGEXP" />
         </property>
 
         <joined-subclass name="com.xpn.xwiki.objects.classes.NumberClass" table="xwikinumberclasses">
@@ -341,6 +356,9 @@
         </property>
         <property name="customClass" type="string">
             <column name="XWO_CUSTOM_CLASS" length="255"/>
+        </property>
+        <property name="validationScript" type="string">
+            <column name="XWO_VALIDATION_SCRIPT" />
         </property>
     </class>
 

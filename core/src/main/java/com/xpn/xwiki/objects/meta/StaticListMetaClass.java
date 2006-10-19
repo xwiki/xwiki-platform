@@ -40,6 +40,12 @@ public class StaticListMetaClass extends ListMetaClass {
         values_class.setPrettyName("Values");
         values_class.setSize(40);
         safeput("values", values_class);
+
+        StringClass separators_class = new StringClass(this);
+        separators_class.setName("separators");
+        separators_class.setPrettyName("Separators");
+        separators_class.setSize(5);
+        safeput("separators", separators_class);        
     }
 
     public BaseCollection newObject(XWikiContext context) {

@@ -1207,6 +1207,9 @@ public class Document extends Api {
         List attachments = new ArrayList();
         int nb = 0;
 
+        if (fileuploadlist == null)
+            return 0;
+
         Iterator it  = fileuploadlist.iterator();
         while(it.hasNext()) {
             DefaultFileItem item = (DefaultFileItem) it.next();

@@ -304,6 +304,21 @@
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
   <component name="StarteamVcsAdapter" />
+  <component name="TestDox.ConfigurationController">
+    <option name="allowCustomPackages" value="false" />
+    <option name="testNameTemplate" value="&lt;classname&gt;Test" />
+    <option name="alphabeticalSorting" value="false" />
+    <option name="createTestIfMissing" value="true" />
+    <option name="underscoreMode" value="false" />
+    <option name="showFullyQualifiedClassName" value="false" />
+    <option name="autoscrolling" value="false" />
+    <option name="autoApplyChangesToTests" value="true" />
+    <option name="deletePackageOccurrences" value="true" />
+    <option name="testMethodPrefix" value="test" />
+    <option name="testMethodAnnotation" />
+    <option name="usingAnnotations" value="false" />
+    <custom-packaging allow="false" />
+  </component>
   <component name="UI designer component loader factory" />
   <component name="VssVcs" />
   <component name="WebManager">
@@ -318,6 +333,15 @@
         <list size="0" />
       </value>
     </option>
+  </component>
+  <component name="com.sixrr.metrics.MetricsReloaded">
+    <option name="selectedProfile" value="Default" />
+    <option name="autoscroll" value="false" />
+    <option name="calculateMetrics" value="true" />
+    <option name="includeTestClasses" value="false" />
+    <option name="flattenInnerClasses" value="true" />
+    <option name="cycleTableSpecificationString" value="" />
+    <option name="shortCycleTableSpecificationString" value="" />
   </component>
   <component name="libraryTable">
     <library name="Jakarta Commons">
@@ -364,8 +388,8 @@
         <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.8.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.2rc3.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/cglib-2.1.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/cglib-2.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -437,9 +461,9 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/ws-commons-util-1.0.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ws-commons-java5-1.0.1.jar!/" />
-        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-common-3.0.jar!/" />
-        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-client-3.0.jar!/" />
-        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-server-3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-common-3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-client-3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/xmlrpc-server-3.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -552,26 +576,22 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.3.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/concurrent-1.3.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/concurrent.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
     <library name="Jrcs">
       <CLASSES>
-        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.rcs-0.3.0.jar!/" />
-        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.diff-0.3.0.jar!/" />
-        <root url="jar://C:/dev/java/xwiki/lib/org.suigeneris.jrcs.tests-0.3.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.diff-0.3.0-xwiki.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/org.suigeneris.jrcs.rcs-0.3.0-xwiki.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/dev/java/jrcs/src/java" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="Captcha">
       <CLASSES>
-        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/xmlrpc-client-3.0.jar!/" />
-        <root url="jar://C:/dev/java/xwikisvn/xwiki-clients/p2pxwiki/xwiki/lib/jcaptcha-all-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcaptcha-all-1.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

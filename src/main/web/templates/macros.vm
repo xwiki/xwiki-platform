@@ -412,3 +412,18 @@ $fielddoc.display($fieldname, $action)
 #end
 </div>
 #end
+
+#macro(formfield $fieldtext $html)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+$html
+</div>
+#end
+
+
+#macro(defaultDisplayObj $document $obj)
+ #set($class = $obj.xWikiClass)
+ #foreach($prop in $class.properties)
+  #formfield(${prop.prettyName} $document.display($prop.getName(), "edit", $obj))
+ #end
+#end

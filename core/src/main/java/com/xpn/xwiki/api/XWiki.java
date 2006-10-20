@@ -39,7 +39,6 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import org.suigeneris.jrcs.diff.Chunk;
 
 import java.awt.image.BufferedImage;
@@ -2075,6 +2074,11 @@ v     * API to check rights on a document for a given user
 
     public String clearName(String name){
         return xwiki.clearName(name, context);
+    }
+
+
+    public String getUniquePageName(String space){
+        return xwiki.getUniquePageName(space, context);
     }
 }
 

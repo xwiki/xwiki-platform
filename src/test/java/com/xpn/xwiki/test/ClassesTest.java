@@ -219,7 +219,7 @@ public class ClassesTest extends TestCase {
         viewexpected2[0] = viewexpected;
         String[] editexpected2 = new String[1];
         editexpected2[0] = editexpected;
-        testDisplayer(cname, obj, bclass, viewexpected2, editexpected2, context );
+        testDisplayer(cname, obj, bclass, viewexpected2, editexpected2, context);
     }
 
     /**
@@ -245,5 +245,4 @@ public class ClassesTest extends TestCase {
         editresult = new String[] {"<select", "multiple", ">France"};
         testDisplayer("category3", obj, bclass, viewresult, editresult);
     }
-
 }

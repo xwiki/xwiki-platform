@@ -81,7 +81,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public String getFieldFullName() {
-        return getObject().getName() + "_" + getName();
+        if (getObject()==null)
+         return getName();
+        else
+         return getObject().getName() + "_" + getName();
     }
     
     public int getId() {

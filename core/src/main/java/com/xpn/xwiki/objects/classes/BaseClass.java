@@ -467,6 +467,27 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             list_class.setPrettyName(fieldPrettyName);
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
+            list_class.setRelationalStorage(multiSelect);
+            list_class.setSql(sql);
+            list_class.setObject(this);
+            put(fieldName, list_class);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, String sql) {
+        return addDBTreeListField(fieldName, fieldPrettyName, 1, false, sql);
+    }
+
+    public boolean addDBTreeListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String sql) {
+        if (get(fieldName)==null) {
+            DBTreeListClass list_class = new DBTreeListClass();
+            list_class.setName(fieldName);
+            list_class.setPrettyName(fieldPrettyName);
+            list_class.setSize(size);
+            list_class.setMultiSelect(multiSelect);
+            list_class.setRelationalStorage(multiSelect);
             list_class.setSql(sql);
             list_class.setObject(this);
             put(fieldName, list_class);

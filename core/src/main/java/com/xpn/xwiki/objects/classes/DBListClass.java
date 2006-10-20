@@ -33,6 +33,11 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class DBListClass extends ListClass {
+
+    public DBListClass(String name, String prettyname, PropertyMetaClass wclass) {
+        super(name, prettyname, wclass);
+    }
+
     public DBListClass(PropertyMetaClass wclass) {
         super("dblist", "DB List", wclass);
     }
@@ -41,21 +46,54 @@ public class DBListClass extends ListClass {
         this(null);
     }
 
-    public List getList(XWikiContext context) {
+    public List makeList(List list) {
+        List list2 = new ArrayList();
+        for (int i=0;i<list.size();i++) {
+            Object result = list.get(i);
+            if (result instanceof String) {
+                list2.add(new ListItem((String) result));
+            } else {
+                Object[] res = (Object[]) result;
+                if (res.length==1)
+                 list2.add(new ListItem(res[0].toString()));
+                else if (res.length==2)
+                 list2.add(new ListItem(res[0].toString(), res[1].toString()));
+                else
+                 list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
+            }
+        }
+        return list2;
+    }
+
+    public List getDBList(XWikiContext context) {
         XWiki xwiki = context.getWiki();
+        String query = getQuery(context);
+
+        if (query==null)
+         return new ArrayList();
+
         try {
-        	if (xwiki.getHibernateStore()!=null)
-        		return xwiki.search(getSql(), context);
+        	if ((xwiki.getHibernateStore()!=null)&&(!query.startsWith("/")))
+        		return makeList(xwiki.search(query, context));
         	else
-        		return ((QueryPlugin)xwiki.getPlugin("query", context)).xpath(getSql()).list();
+        		return makeList(((QueryPlugin)xwiki.getPlugin("query", context)).xpath(query).list());
         } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList();
         }
     }
 
+    public List getList(XWikiContext context) {
+        List dblist = getDBList(context);
+        List list = new ArrayList();
+        for (int i=0;i<dblist.size();i++) {
+            list.add(((ListItem)dblist.get(i)).getId());
+        }
+        return list;
+    }
+
     public Map getMap(XWikiContext context) {
-        List list = getList(context);
+        List list = getDBList(context);
         Map map = new HashMap();
         if ((list==null)||(list.size()==0))
          return map;
@@ -64,14 +102,52 @@ public class DBListClass extends ListClass {
             if (res instanceof String)
              map.put(res, res);
             else {
-                String[] res2 = (String[]) res;
-                if (res2.length==1)
-                    map.put(res2[0], res2[0]);
-                else
-                    map.put(res2[0], res2[1]);
+                ListItem item = (ListItem) res;
+                map.put(item.getId(), item);
             }
         }
         return map;
+    }
+
+    public String getQuery(XWikiContext context) {
+        String sql = getSql();
+        if ((sql==null)||(sql.trim().equals(""))) {
+            String classname = getClassname();
+            String idField = getIdField();
+            String valueField = getValueField();
+            if ((valueField==null)||(valueField.trim().equals("")))
+             valueField =  idField;
+            if (context.getWiki().getHibernateStore()!=null) {
+             String select = "select ";
+             String tables = " from XWikiDocument as doc, BaseObject as obj";
+             String where = " where doc.fullName=obj.name and obj.className='" + classname + "'";
+             if (idField.startsWith("doc.")||idField.startsWith("obj."))
+              select += idField + ",";
+             else {
+                 select += "idprop.value,";
+                 tables += ", StringProperty as idprop";
+                 where += " and obj.id=idprop.id.id and idprop.id.name='" + idField + "'";
+             }
+                if (valueField.startsWith("doc.")||valueField.startsWith("obj."))
+                 select += valueField + ",";
+                else {
+                    if (idField.equals(valueField)) {
+                        select += "idprop.value,";
+                    } else {
+                    select += "valueprop.value,";
+                    tables += ", StringProperty as valueprop";
+                    where += " and obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'";
+                    }
+                }
+                // Let's create the sql
+                sql = select +  tables + where;
+            } else {
+                // TODO: query plugin impl.
+                // We need to generate the right query for the query plugin
+            }
+
+        }
+        return sql;
     }
 
     public String getSql() {
@@ -80,5 +156,29 @@ public class DBListClass extends ListClass {
 
     public void setSql(String sql) {
         setLargeStringValue("sql", sql);
+    }
+
+    public String getClassname() {
+        return getStringValue("classname");
+    }
+
+    public void setClassname(String classname) {
+        setStringValue("classname", classname);
+    }
+
+    public String getIdField() {
+        return getStringValue("idField");
+    }
+
+    public void setIdField(String idField) {
+        setStringValue("idField", idField);
+    }
+
+    public String getValueField() {
+        return getStringValue("valueField");
+    }
+
+    public void setValueField(String valueField) {
+        setStringValue("valueField", valueField);
     }
 }

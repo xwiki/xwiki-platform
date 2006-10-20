@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 public class DBListMetaClass extends ListMetaClass {
 
@@ -40,6 +41,24 @@ public class DBListMetaClass extends ListMetaClass {
         sql_class.setSize(80);
         sql_class.setRows(5);
         safeput("sql", sql_class);
+
+        StringClass classname_class = new StringClass(this);
+        classname_class.setName("classname");
+        classname_class.setPrettyName("XWiki Class Name");
+        classname_class.setSize(20);
+        safeput("classname", classname_class);
+
+        StringClass idfield_class = new StringClass(this);
+        idfield_class.setName("idField");
+        idfield_class.setPrettyName("Id Field Name");
+        idfield_class.setSize(20);
+        safeput("idField", idfield_class);
+
+        StringClass valuefield_class = new StringClass(this);
+        valuefield_class.setName("valueField");
+        valuefield_class.setPrettyName("Value Field Name");
+        valuefield_class.setSize(20);
+        safeput("valueField", valuefield_class);
     }
 
     public BaseCollection newObject(XWikiContext context) {

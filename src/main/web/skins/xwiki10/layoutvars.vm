@@ -26,7 +26,7 @@
 #set($blogwidth = 200)
 ##
 ##
-#set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
+#set($showLeftPanels = $xwiki.getWebPreference("showLeftPanels"))
 #if(!$showLeftPanels || $showLeftPanels == "" || $showLeftPanels == "default")
 #set($showLeftPanels = "1")
 #end
@@ -36,7 +36,7 @@
 #if($showLeftPanels == "no")
 #set($showLeftPanels = "0")
 #end
-#set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
+#set($showRightPanels = $xwiki.getWebPreference("showRightPanels"))
 #if(!$showRightPanels || $showRightPanels == "" || $showRightPanels == "default")
 #set($showRightPanels = "1")
 #end

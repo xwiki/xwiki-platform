@@ -48,6 +48,8 @@ public class MetaClass extends BaseClass {
         safeput(listclass.getName(), listclass);
         DBListMetaClass dblistclass = new DBListMetaClass();
         safeput(dblistclass.getName(), dblistclass);
+        DBTreeListMetaClass dbtreelistclass = new DBTreeListMetaClass();
+        safeput(dbtreelistclass.getName(), dbtreelistclass);
         DateMetaClass dateclass = new DateMetaClass();
         safeput(dateclass.getName(), dateclass);
         GroupsMetaClass groupsclass = new GroupsMetaClass();

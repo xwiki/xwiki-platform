@@ -1,0 +1,72 @@
+#if(!$treeviewid)
+#set($treeviewid = 1)
+#else
+#set($treeviewid = 1 + $treeviewid)
+#end
+#if(!$formname)
+#set($formname = "inline")
+#end
+<style type="text/css">
+@import "/xwiki/yui/treeview/assets/tree.css";
+</style>
+<script type="text/javascript" src="/xwiki/yui/yahoo/yahoo-min.js" ></script>
+<script type="text/javascript" src="/xwiki/yui/treeview/treeview-min.js" ></script>
+<script type="text/javascript" src="/xwiki/yui/treeview/checknode.js"></script>
+<div id="treeview${treeviewid}"></div>
+<script type="text/javascript">
+	var tree${treeviewid};
+	var nodes${treeviewid} = {};
+	var nodeIndex${treeviewid};
+
+    function addTreeElement(tree, nodes, id, text, parent, checked) {
+	    var parent2;
+	    if (parent=="")
+	     parent2 = tree.getRoot();
+	    else
+	     parent2 = nodes[parent];
+	    nodes[id] = new YAHOO.widget.CheckNode(id, text,  parent2, checked, checked);
+        nodes[id].onCheckClick = onCheckClick;
+    }
+
+	var callback = null;
+    function onCheckClick(eventType, args, tree) {
+        var out = [];
+        for (var i in tree${treeviewid}._nodes) {
+            var n = tree${treeviewid}._nodes[i];
+            if (n && "undefined" != typeof n.checkState) {
+                if (n.checkState>0) {
+                  out.push(n.data);
+                }
+            }
+        }
+        document.forms.${formname}["${fieldname}"].value=out.join("|");
+    }
+
+    function showTreeState() {
+        var out = [];
+        for (var i in tree${treeviewid}._nodes) {
+            var n = tree${treeviewid}._nodes[i];
+            if (n && "undefined" != typeof n.checkState) {
+                if (n.checkState>0) {
+                  out.push(n.data);
+                }
+            }
+        }
+        alert(out.join("|"));
+    }
+
+	function treeInit${treeviewid}() {
+		tree${treeviewid} = new YAHOO.widget.TreeView("treeview${treeviewid}");
+	    var tree = tree${treeviewid};
+        var nodes = nodes${treeviewid};
+        #foreach($item in $treelist)
+        #set($checked = $selectlist.contains($item.getId()))
+        addTreeElement(tree, nodes, "$item.id", "$item.value", "$item.parent", #if($checked) true #else false #end)
+        #end
+   		tree.draw();
+        // tree.checkClickEvent.subscribe(onCheckClick);
+	}
+
+    // Init the tree
+    treeInit${treeviewid}();
+</script>

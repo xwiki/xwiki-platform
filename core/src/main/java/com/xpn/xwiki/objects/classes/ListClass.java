@@ -92,6 +92,14 @@ public abstract class ListClass extends PropertyClass {
 		setIntValue("relationalStorage", storage ? 1 : 0);
 	}
 
+    public boolean isPicker() {
+        return (getIntValue("picker") == 1);
+    }
+
+    public void setPicker(boolean picker) {
+        setIntValue("picker", picker ? 1 : 0);
+    }
+
     public static List getListFromString(String value) {
         return getListFromString(value, "|", true);
     }
@@ -131,10 +139,10 @@ public abstract class ListClass extends PropertyClass {
             String element = StringUtils.replace(result[i], "%PIPE%", "|");
             if (element.indexOf('=')!=-1) {
                 String[] data = StringUtils.split(element,"=");
-                map.put(data[0], data[1]);
+                map.put(data[0], new ListItem(data[0], data[1]));
             }
             else
-              map.put(element, element);
+              map.put(element, new ListItem(element, element));
         }
         return map;
     }
@@ -167,15 +175,19 @@ public abstract class ListClass extends PropertyClass {
 
 	public BaseProperty fromStringArray(String[] strings) {
         BaseProperty prop = newProperty();
+        if (prop instanceof StringProperty)
+            return fromString(strings[0]);
+
         List list = new ArrayList();
         ((ListProperty) prop).setList(list);
-		if (strings.length==0)
+
+        if (strings.length==0)
          return prop;
 
         if (!isMultiSelect())
 			return fromString(strings[0]);
 
-        if ((strings.length==1)&&getDisplayType().equals("input")) {
+        if ((strings.length==1)&&(getDisplayType().equals("input")||isMultiSelect())) {
             ((ListProperty) prop).setList(getListFromString(strings[0], getSeparators(), false));
             return prop;
         }
@@ -209,16 +221,19 @@ public abstract class ListClass extends PropertyClass {
 	}
 
     protected String getDisplayValue(String value, Map map, XWikiContext context) {
-        String result = (String) map.get(value);
-        if (result==null)
-         result = value;
+        ListItem item = (ListItem) map.get(value);
+        String displayValue;
+        if (item==null)
+         displayValue = value;
+        else
+         displayValue = item.getValue();
         if ((context==null)||(context.getWiki()==null))
-         return result;
+         return displayValue;
         else {
-            String msgname = getFieldFullName() + "_" + result;
+            String msgname = getFieldFullName() + "_" + displayValue;
             String newresult = context.getWiki().getMessage(msgname, context);
             if (msgname.equals(newresult))
-             return result;
+             return displayValue;
             else
              return newresult;
         }

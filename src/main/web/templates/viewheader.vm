@@ -117,7 +117,7 @@
             #end
           #end
           #if (!$isReadOnly)
-            #xwikiitem($doc.getURL("edit") "editinline")
+            #xwikiitem($doc.getURL("inline") "editinline")
             #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
           #end
           #if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)

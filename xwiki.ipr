@@ -577,6 +577,7 @@
         <root url="jar://$PROJECT_DIR$/lib/oscache-2.3.2-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jgroups-2.2.9.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/concurrent.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ehcache-1.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

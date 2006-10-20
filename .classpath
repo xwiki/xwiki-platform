@@ -6,7 +6,7 @@
 	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="src/test/resources"/>
-	<classpathentry exported="true" kind="lib" path="lib/alexa.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/alexa-UNKNOWN-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-1.6.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/asm-1.5.3.jar"/>
@@ -90,14 +90,14 @@
 	<classpathentry exported="true" kind="lib" path="lib/nekohtml-0.9.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.mortbay.jetty-5.1.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.diff-0.3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.rcs-0.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.diff-0.3.0-xwiki.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.rcs-0.3.0-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oscache-2.3.2M.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/qname-1.5.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/radeox.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/radeox-UNKNOWN-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-fetcher-0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saaj-1.2.jar"/>

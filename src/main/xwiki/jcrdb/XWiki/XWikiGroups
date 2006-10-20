@@ -48,8 +48,8 @@ location = "/xwiki/bin/edit/XWiki/" + value + "?parent=XWiki.XWikiGroups&amp;tem
 
 1 Current XWiki Groups
 
-#set ($xpath = "*/*/obj/XWiki/XWikiGroups/jcr:deref(@doc, '*')")
-#foreach ($item in $xwiki.query.getDocs($xpath, "@fullName", "").list())
+#set ($xpath = "*/*[@fullName!='XWiki.XWikiGroupTemplate']/obj/XWiki/XWikiGroups/jcr:deref(@doc, '*')")
+#foreach ($item in $xwiki.query.getDocs($xpath, "@fullName", "").setDistinct(true).list())
    * [$item]
 #end
 

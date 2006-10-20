@@ -1,19 +1,17 @@
 package com.xpn.xwiki.test.plugin.query;
 
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.plugin.query.IQueryFactory;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.Utils;
-import com.xpn.xwiki.test.HibernateTestCase;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.query.IQueryFactory;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-
-import java.util.List;
+import com.xpn.xwiki.test.HibernateTestCase;
+import com.xpn.xwiki.test.Utils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,26 +48,26 @@ public class QueryGeneratorTest extends HibernateTestCase {
         assertEquals(query.getClasses().size(), 1);
         assertTrue(query.getClasses().contains("Test.TestClass"));
 
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[jcr:like(@f:first_name, '%Artem%')]/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[jcr:like(@xp:first_name, '%Artem%')]/jcr:deref(@doc, '*')/@fullName");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_first_name_exact", "Artem");
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:first_name='Artem']/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[@xp:first_name='Artem']/jcr:deref(@doc, '*')/@fullName");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_first_name_not", "Artem");
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:first_name!='Artem']/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[@xp:first_name!='Artem']/jcr:deref(@doc, '*')/@fullName");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_age_morethan", new Integer(20));
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age>=20]/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[@xp:age>=20]/jcr:deref(@doc, '*')/@fullName");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_age_lessthan", new Integer(20));
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[@f:age<=20]/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[@xp:age<=20]/jcr:deref(@doc, '*')/@fullName");
         query = new XWikiQuery();
         query.setParam("Test.TestClass_category", "1");
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[jcr:contains(@f:category,'1')]/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[@xp:category='1']/jcr:deref(@doc, '*')/@fullName");
         String[] params = {"1", "2"};
         query = new XWikiQuery();
         query.setParam("Test.TestClass_category", params);
-        testQueryGenerator(query, "//*/*/obj/Test/TestClass[(jcr:contains(@f:category,'1') or jcr:contains(@f:category,'2'))]/@name");
+        testQueryGenerator(query, "/*/*/obj/Test/TestClass[(@xp:category='1' or @xp:category='2')]/jcr:deref(@doc, '*')/@fullName");
     }
 
     public void prepareData(XWikiHibernateStore hb) throws XWikiException {

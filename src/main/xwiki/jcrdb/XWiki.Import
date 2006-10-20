@@ -10,9 +10,7 @@ fromdir = "src/main/xwiki/jcrdb"
 
 Import from dir : <%print new File(fromdir).getAbsolutePath()%>
 
-To import please append "?force" to url
-
-<a href="?force">force</a>
+Click <a href="?force">force</a> to import.
 
 <% } else {
 
@@ -29,8 +27,6 @@ println "Reading documents"
 pack.readFromDir(new File(fromdir), context.getContext())
 println "Installing documents\n"
 pack.install(context.getContext())
-
-xwiki.getXWiki().getNotCacheStore().shutdown(context.getContext())
 
 println "Finished.\n"
 

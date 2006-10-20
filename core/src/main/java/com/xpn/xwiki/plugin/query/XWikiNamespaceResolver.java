@@ -35,16 +35,14 @@ public class XWikiNamespaceResolver extends AbstractNamespaceResolver {
     static Map prefixToURI = new HashMap();
     static Map uriToPrefix = new HashMap();
     public static final String
-    	NS_FLEX_PREFFIX = "f",
-    	NS_FLEX_URI = "flex",
+    	NS_XWIKI_PROPERTY_PREFFIX = "xp",
+    	NS_XWIKI_PROPERTY_URI = "http://www.xwiki.org/property",
     	NS_DOC_PREFFIX = "doc",
     	NS_DOC_URI = "XWikiDocument",
     	NS_OBJ_PREFFIX = "obj",
     	NS_OBJ_URI = "BaseObject",
     	NS_XWIKI_PREFFIX	= "xwiki",
     	NS_XWIKI_URI		= "http://www.xwiki.org/";
-    	//NS_XWIKI_PROPERTY_PREFFIX	= "xp",
-    	//NS_XWIKI_PROPERTY_URI		= "http://www.xwiki.org/property";
     private static void addnamespace(String pref, String uri) {
     	prefixToURI.put(pref, uri);
     	uriToPrefix.put(uri, pref);
@@ -72,7 +70,7 @@ public class XWikiNamespaceResolver extends AbstractNamespaceResolver {
         addnamespace("xs", SearchManager.NS_XS_URI);
         
         // XWiki namespaces
-        addnamespace(NS_FLEX_PREFFIX, NS_FLEX_URI);
+        addnamespace(NS_XWIKI_PROPERTY_PREFFIX, NS_XWIKI_PROPERTY_URI);
         addnamespace(NS_DOC_PREFFIX, NS_DOC_URI);   // XXX: hibernate-specific
         addnamespace(NS_OBJ_PREFFIX, NS_OBJ_URI);   // XXX: hibernate-specific
         addnamespace(NS_XWIKI_PREFFIX, NS_XWIKI_URI);

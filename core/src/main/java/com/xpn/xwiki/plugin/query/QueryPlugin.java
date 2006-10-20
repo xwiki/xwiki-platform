@@ -100,7 +100,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             try {
                 return new HibernateQuery( parse(q, Query.XPATH), this);
             } catch (InvalidQueryException e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "Invalid xpath query: " + q, e);
             }
         if (isJcr())
             return new JcrQuery( q, Query.XPATH, this );
@@ -129,6 +129,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
      * @throws XWikiException
      * */
     public IQuery getDocs(String docname, String prop, String order) throws XWikiException {
+    	//if (prop==null) prop = "@fullName";
         return xpath("/"+getXPathName(docname) + getPropertyXPath(prop) + getOrderXPath(order));
     }
     /** create query for child documents
@@ -230,11 +231,11 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         if (classes.size()>1)
          throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_SEARCH_NOTIMPL, "Search with more than one class is not implemented");
         if (classes.size()==0)
-         return "//*/*";
+         return "/*/*";
 
         String className = (String) classes.toArray()[0];
         BaseClass bclass = context.getWiki().getClass(className, context);
-        xpath.append("//*/*/obj/");
+        xpath.append("/*/*/obj/");
         xpath.append(className.replace('.','/'));
         String where= bclass.makeQuery(query);
         if (where.equals(""))
@@ -245,7 +246,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
             xpath.append(where);
             xpath.append("]");
         }
-        xpath.append("/@doc:fullName");
+        xpath.append("/jcr:deref(@doc, '*')/@fullName");
 
         List oProps = query.getOrderProperties();
         String orderClause = "";
@@ -261,7 +262,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
                         if (!orderClause.equals("")) {
                             orderClause += " and ";
                         }
-                        orderClause += "@f:" + propName;
+                        orderClause += "@xp:" + propName;
                         if (clause.getOrder()==OrderClause.DESC)
                             orderClause += " descending";
                     }

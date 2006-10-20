@@ -102,23 +102,23 @@ public class StringClass extends PropertyClass {
          String startsWith = (String)map.get(prefix + "startswith");
          String endsWith = (String)map.get(prefix + "endswith");
             if( "1".equals(startsWith))
-                criteriaList.add("jcr:like(@f:" + getName() + ", '" + value + "%')");
+                criteriaList.add("jcr:like(@xp:" + getName() + ", '" + value + "%')");
             else if("1".equals(endsWith))
-                criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "')");
+                criteriaList.add("jcr:like(@xp:" + getName() + ", '%" + value + "')");
             else
-                criteriaList.add("jcr:like(@f:" + getName() + ", '%" + value + "%')");
+                criteriaList.add("jcr:like(@xp:" + getName() + ", '%" + value + "%')");
             return;
         }
 
         value = (String)map.get(prefix + "exact");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + "='" + value + "'");
+         criteriaList.add("@xp:" + getName() + "='" + value + "'");
          return;
         }
 
         value = (String)map.get(prefix + "not");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + "!='" + value + "'");
+         criteriaList.add("@xp:" + getName() + "!='" + value + "'");
          return;
         }
     }

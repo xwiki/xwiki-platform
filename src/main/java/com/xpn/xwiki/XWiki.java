@@ -2282,8 +2282,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
 
+    public String generateRandomString(int size){
+        return RandomStringUtils.randomAlphanumeric(size);
+    }
+
     public String generateValidationKey(int size) {
-        return RandomStringUtils.randomAlphanumeric(16);
+        return generateRandomString(size);
     }
 
     public int createUser(String xwikiname, Map map, String parent, String content, String userRights, XWikiContext context) throws XWikiException {
@@ -4033,8 +4037,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         name = name.replaceAll("[ôö]","o");
         name = name.replaceAll("[ùûü]","u");
         name = name.replaceAll("[\"!?]","");
-        name = name.replaceAll("[_':,;]"," ");
+        name = name.replaceAll("[_':,;\\\\/]"," ");
         name = name.replaceAll("\\s+","");
+        name = name.replaceAll("[\\(\\)]"," ");
         if (name.length() > 250)
             name = name.substring(0, 250);
         return name;
@@ -4196,5 +4201,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (message == null)
             return null;
         return parseMessage(message, context);
+    }
+        
+    public String getUniquePageName(String space, XWikiContext context) {
+        String pageName = generateRandomString(16);
+        return getUniquePageName(space, pageName, context);
     }
 }

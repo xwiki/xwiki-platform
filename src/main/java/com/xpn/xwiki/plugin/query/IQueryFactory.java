@@ -62,7 +62,7 @@ public interface IQueryFactory {
 
     /** create query for objects
      * @param oclass - full name of object class (web/name | web.name).  if any(name|web) - *
-     * @param prop. for flex-attributes use @f:flexname
+     * @param prop. for flex-attributes use @xp:propname
      * @see getDocs
      * @throws InvalidQueryException
      */

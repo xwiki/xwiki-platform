@@ -440,14 +440,14 @@ public abstract class ListClass extends PropertyClass {
         }
 
         if (values instanceof String) {
-            criteriaList.add("jcr:contains(@f:" + getName() + ",'" + values.toString() + "')");
-            // testQueryGenerator(query, "//*/*/obj/Test/TestClass[jcr:contains(@f:category, '1') or jcr:contains(@f:category, '2')]");
+        	// general comparison '=' - tests at least one value =
+            criteriaList.add("@xp:" + getName() + "='" + values.toString() + "'");
         }
         else {
             String[] valuesarray = (String[])values;
             String[] criteriaarray = new String[valuesarray.length];
             for (int i=0;i<valuesarray.length;i++) {
-                criteriaarray[i] = "jcr:contains(@f:" + getName() + ",'" + valuesarray[i] + "')";
+                criteriaarray[i] = "@xp:" + getName() + "='" + valuesarray[i] + "'";
             }
             criteriaList.add("(" + StringUtils.join(criteriaarray, " or ") + ")");
         }

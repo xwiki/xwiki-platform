@@ -147,19 +147,19 @@ public class NumberClass  extends PropertyClass {
     public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
         Number value = (Number)map.get(prefix);
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + "=" + value.toString());
+         criteriaList.add("@xp:" + getName() + "=" + value.toString());
          return;
         }
 
         value = (Number)map.get(prefix + "lessthan");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + "<=" + value.toString());
+         criteriaList.add("@xp:" + getName() + "<=" + value.toString());
          return;
         }
 
         value = (Number)map.get(prefix + "morethan");
         if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@f:" + getName() + ">=" + value.toString());
+         criteriaList.add("@xp:" + getName() + ">=" + value.toString());
          return;
         }
     }

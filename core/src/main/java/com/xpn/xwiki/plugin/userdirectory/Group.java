@@ -388,7 +388,7 @@ public class Group {
     }
 
     public Group getGroup(String name, XWikiContext context) throws XWikiException {
-        if (name.contains("."))
+        if (name.indexOf('.')>=0)
         {
             String[] grp = name.split("\\.");
             return getGroup(grp[0], grp[1], context);

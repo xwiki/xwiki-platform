@@ -2683,8 +2683,8 @@ public class XWikiDocument {
                 int pos = name.indexOf("_", start.length() + 1);
                 String prefix = name.substring(0, pos);
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
-                if (!objectsNumberDone.contains(Integer.valueOf(num))){
-                    objectsNumberDone.add(Integer.valueOf(num));
+                if (!objectsNumberDone.contains(new Integer(num))){
+                    objectsNumberDone.add(new Integer(num));
                     objects.add(addObjectFromRequest(className, num, context));
                 }
             }

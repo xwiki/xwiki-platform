@@ -250,7 +250,7 @@ public class XWikiRenderingEngine {
 
     private boolean isRendered(XWikiDocument doc, String rendererName, XWikiContext context){
         try{
-            if (rendererName.contains(".")){
+            if (rendererName.indexOf('.')>=0){
                 rendererName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
             }
             String render = context.getWiki().getWebPreference("render" + rendererName, context);

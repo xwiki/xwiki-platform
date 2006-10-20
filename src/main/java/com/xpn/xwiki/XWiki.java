@@ -154,7 +154,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private boolean isReadOnly = false;
 
     public static final String CFG_ENV_NAME = "XWikiConfig";
-    public static final String MACROS_FILE = "/template/macros.txt";
+    public static final String MACROS_FILE = "/templates/macros.txt";
 
     /* i don't like using static variables like, but this avoid making a JNDI lookup with
        each request ...
@@ -3981,7 +3981,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWiki xwiki = context.getWiki();
 
         try {
-            macrosmapping = xwiki.getResourceContent(MACROS_FILE);
+            macrosmapping = getResourceContent(MACROS_FILE);
         } catch (IOException e) {}
 
         macrosmapping += "\r\n" + xwiki.getXWikiPreference("macros_mapping", "", context);

@@ -12,7 +12,7 @@
                     <table cellspacing="0" cellpadding="0" width="100%" style="border: 0px">
                          <tr>
                             <td>
-                                <select id="selmacro" name="selmacro" style="border: 1px solid #808080; width:100%;" size="5" onchange="inputMacro();">
+                                <select id="selmacro" name="selmacro" style="border: 1px solid #808080; width:100%;" size="7" onchange="inputMacro();">
                                     #foreach ($macro in $macros)
                                         #if (!$macro.trim().equals(""))
                                             #set($macroname = $macro.toString().substring(0,$macro.indexOf("=")))

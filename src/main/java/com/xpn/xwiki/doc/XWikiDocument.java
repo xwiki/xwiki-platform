@@ -74,10 +74,12 @@ import java.io.StringWriter;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.Class;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -2119,6 +2121,32 @@ public class XWikiDocument {
         bobject.setStringValue(fieldName, value);
     }
 
+    public List getListValue(String className, String fieldName) {
+        BaseObject obj = getObject(className);
+        if (obj == null)
+            return new ArrayList();
+        return obj.getListValue(fieldName);
+    }
+
+    public List getListValue(String fieldName) {
+        BaseObject object = getFirstObject(fieldName, null);
+        if (object == null)
+            return new ArrayList();
+
+        return object.getListValue(fieldName);
+    }
+
+    public void setListValue(String className, String fieldName, List value) {
+        BaseObject bobject = getObject(className);
+        if (bobject == null) {
+            bobject = new BaseObject();
+            addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.setListValue(fieldName, value);
+    }
+
     public void setLargeStringValue(String className, String fieldName, String value) {
         BaseObject bobject = getObject(className);
         if (bobject == null) {
@@ -2930,4 +2958,27 @@ public class XWikiDocument {
     public String getValidationScript() {
         return validationScript;
     }
+
+    public BaseObject newObject(String classname, XWikiContext context) throws XWikiException {
+        int nb = createNewObject(classname, context);
+        return getObject(classname, nb);
+    }
+
+    public BaseObject getObject(String classname, boolean create, XWikiContext context) {
+        try {
+            BaseObject obj = getObject(classname);
+
+            if ((obj == null) && create) {
+                return newObject(classname, context);
+            }
+
+            if (obj == null)
+                return null;
+            else
+                return obj;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

@@ -28,36 +28,43 @@ import com.xpn.xwiki.objects.classes.StaticListClass;
 
 public class ListMetaClass extends PropertyMetaClass {
 
-  public ListMetaClass() {
-    super();
-    setPrettyName("List Class");
-    setName(ListClass.class.getName());
+    public ListMetaClass() {
+        super();
+        setPrettyName("List Class");
+        setName(ListClass.class.getName());
 
-    StaticListClass type_class = new StaticListClass(this);
-    type_class.setName("displayType");
-    type_class.setPrettyName("Display Type");
-    type_class.setValues("input|select|radio|checkbox");
-    safeput("displayType", type_class);
+        StaticListClass type_class = new StaticListClass(this);
+        type_class.setName("displayType");
+        type_class.setPrettyName("Display Type");
+        type_class.setValues("input|select|radio|checkbox");
+        safeput("displayType", type_class);
 
-    BooleanClass multi_class = new BooleanClass(this);
-    multi_class.setName("multiSelect");
-    multi_class.setPrettyName("Multiple Select");
-    multi_class.setDisplayType("yesno");
-    multi_class.setUnmodifiable(true);
-    safeput("multiSelect", multi_class);
+        BooleanClass multi_class = new BooleanClass(this);
+        multi_class.setName("multiSelect");
+        multi_class.setPrettyName("Multiple Select");
+        multi_class.setDisplayType("yesno");
+        multi_class.setUnmodifiable(true);
+        safeput("multiSelect", multi_class);
 
-    BooleanClass relational_class = new BooleanClass(this);
-    relational_class.setName("relationalStorage");
-    relational_class.setPrettyName("Relational Storage");
-    relational_class.setDisplayType("yesno");
-    relational_class.setUnmodifiable(true);
-    safeput("relationalStorage", relational_class);
+        BooleanClass relational_class = new BooleanClass(this);
+        relational_class.setName("relationalStorage");
+        relational_class.setPrettyName("Relational Storage");
+        relational_class.setDisplayType("yesno");
+        relational_class.setUnmodifiable(true);
+        safeput("relationalStorage", relational_class);
 
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
-    safeput("size", size_class);
-  }
+        BooleanClass picker_class = new BooleanClass(this);
+        picker_class.setName("picker");
+        picker_class.setPrettyName("Use Picker");
+        picker_class.setDisplayType("yesno");
+        picker_class.setUnmodifiable(true);
+        safeput("picker", picker_class);
+
+        NumberClass size_class = new NumberClass(this);
+        size_class.setName("size");
+        size_class.setPrettyName("Size");
+        size_class.setSize(5);
+        size_class.setNumberType("integer");
+        safeput("size", size_class);
+    }
 }

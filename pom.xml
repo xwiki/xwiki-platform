@@ -25,8 +25,6 @@
 
 jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
             upgrade to that?
-googleaddwords.jar: what version and license?
-              
 -->
 
 <project>
@@ -186,21 +184,5 @@ googleaddwords.jar: what version and license?
       <version>1.6.5</version>
     </dependency>
   </dependencies>
-
-  <repositories>
-
-    <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main
-         remote repository. To be removed once we're only using official JARs -->
-    <repository>
-      <id>xwiki</id>
-      <name>XWiki Maven2 Remote Repository</name>
-      <url>http://laam.xpertnet.biz/~vmassol/repository</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
-
-  </repositories>
-
 </project>
         

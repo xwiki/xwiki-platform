@@ -1,0 +1,29 @@
+#set($plugin=$xwiki.getPlugin("emailnotify"))
+#if($plugin)
+  #set($subscribe=$request.getParameter("subscribe"))
+  #if($subscribe)
+    $plugin.processSubscription($subscribe,$doc,$xwiki)
+  #end
+  <div class="xwikimenutitle">$msg.get("emailnotifications")</div>
+  #if ($context.getUser().equals("XWiki.XWikiGuest"))
+    #xwikiitem("#" "loginforsubscriptions")
+  #else
+    #if($plugin.isSubscribed("page",$doc,$xwiki))
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=page") "unsubscribepage")
+    #else
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=page") "subscribepage")
+    #end
+    #if($plugin.isSubscribed("web",$doc,$xwiki))
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=web") "unsubscribeweb")
+    #else
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=web") "subscribeweb")
+    #end
+    #if($plugin.isSubscribed("wiki",$doc,$xwiki))
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=wiki") "unsubscribewiki")
+    #else
+      #xwikiitem($xwiki.getURL($doc.fullName, "view", "subscribe=wiki") "subscribewiki")
+    #end
+  #end
+#else
+  <div class="xwikimenutitle">no notify plugin</div>
+#end

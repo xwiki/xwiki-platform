@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <pomVersion>3</pomVersion>
+  <name>XWiki eMail Notification Plugin</name>
+  <groupId>xwiki</groupId>
+  <artifactId>xwiki-emailnotify-plugin</artifactId>
+  <currentVersion>0.1.2</currentVersion>
+  <organization>
+    <name>jkraemer.net</name>
+    <url>http://www.jkraemer.net/</url>
+  </organization>
+  <inceptionYear>2005</inceptionYear>
+  <package>net.jkraemer.xwiki.plugins.emailnotify</package>
+  <description>eMail notification plugin for XWiki</description>
+  <shortDescription>eMail notification plugin for XWiki</shortDescription>
+  <issueTrackingUrl></issueTrackingUrl>
+  <url>http://www.jkraemer.net/static/maven/xwiki/plugins/emailnotify-plugin/</url>
+  <siteAddress>jkraemer.net</siteAddress>
+  <siteDirectory>/home/www-data/www.jkraemer.net/docroot/maven/xwiki/plugins/emailnotify-plugin</siteDirectory>
+  <distributionSite>jkraemer.net</distributionSite>
+  <distributionDirectory>/home/www-data/www.jkraemer.net/docroot/maven/xwiki/plugins/dist</distributionDirectory>
+  <repository>
+    <developerConnection></developerConnection>
+    <connection>scm+svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-plugins/emailnotification/trunk/</connection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-plugins/emailnotification/trunk/</url>
+  </repository>
+  <developers>
+    <developer>
+      <name>Jens Kraemer</name>
+      <id>jk</id>
+      <email>jk@jkraemer.net</email>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>quartz</groupId>
+      <artifactId>quartz</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+   <dependency>
+      <groupId>velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.4</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.0</version>
+      <type>jar</type>
+    </dependency>
+   <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.0</version>
+      <type>jar</type>
+    </dependency>
+   <dependency>
+      <groupId>xwiki</groupId>
+      <artifactId>xwiki</artifactId>
+      <version>0.9.840</version>
+      <type>jar</type>
+   </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.8</version>
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <type>jar</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <nagEmailAddress>jk@jkraemer.net</nagEmailAddress>
+    <sourceDirectory>src/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/conf</directory>
+			</resource>
+		</resources>
+    <unitTestSourceDirectory>test/src</unitTestSourceDirectory>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+        <include>**/*Test.class</include>
+      </includes>
+      <resources>
+        <resource>
+          <directory>${basedir}/test/conf</directory>
+        </resource>
+      </resources>
+    </unitTest>
+  </build>
+  
+</project>

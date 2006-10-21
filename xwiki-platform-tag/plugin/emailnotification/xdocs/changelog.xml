@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<document>  
+	<properties>  
+		<author email="jk AT jkraemer.net">Jens Kraemer</author>
+		<title>XWiki emailnotify Plugin - Changelog</title>
+	</properties>  
+	<meta name="keyword" content="xwiki, email, notification, plugin"/> 
+	<body>
+		<section name="Changelog">
+			<subsection name="0.1.2">
+				<ul>
+					<li>Bugfix: Now saving the subscriptions in a way so XWiki won't forget about them on application server restarts.</li>
+				</ul>
+			</subsection>
+			<subsection name="0.1.1">
+				<ul>
+					<li>Fixes in the usage of XWiki APIs by Ludovic Dubost</li>
+					<li>Changes to emailnotify_actions.vm reflecting the changes above</li>
+					<li>Updated XWiki dependency in project.xml to version 0.9.793</li>
+				</ul>
+			</subsection>
+			<subsection name="0.1">
+				<p>
+					Initial release.
+				</p>
+			</subsection>
+			
+		</section>
+	</body>
+</document>

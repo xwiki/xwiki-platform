@@ -1,0 +1,11 @@
+Hello, ${firstname} ${lastname},
+
+this is the XWiki instance named ${wikiName} running at ${server}. 
+The following documents have changed since I last notified you of 
+changes in this wiki:
+
+#foreach($modSet in $pagemodifications)
+  #set($mod=${modSet.lastModification})
+${modSet.pageData.web}.${modSet.pageData.docName} ${modSet.pageData.url}
+    last modified ${mod.modificationDate} by ${mod.modifier}
+#end

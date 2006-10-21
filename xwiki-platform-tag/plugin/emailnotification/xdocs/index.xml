@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<document>  
+	<properties>  
+		<author email="jk AT jkraemer.net">Jens Kraemer</author>
+		<title>XWiki Email Notification Plugin</title>
+	</properties>  
+	<meta name="keyword" content="xwiki, notification, email, plugin"/> 
+	<body>
+		<section name="XWiki Email Notification Plugin">
+			<subsection name="Get it!">
+				<p><a href="../dist/">Download</a> | <a href="install.html">Installation instructions</a> | <a href="http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-plugins/emailnotification/">SVN Repository</a></p>
+			</subsection>
+			<subsection name="About this plugin">
+				<p>
+					This plugin allows users of Xwiki to receive notifications about changes of 
+          documents by email. 
+				</p>
+				<p>Features:</p>
+				<ul>
+<li>Users can subscribe to single documents, webs, or choose to receive notifications for the whole wiki.</li>
+<li>Overlapping subscriptions (i.e. whole wiki and some single pages from this wiki subscribed) do not result in double-notifications.</li>
+<li>Multiple subsequent modifications to the same document in a single notification interval 
+are aggregated and result in the document being shown in the notification mail only once (last change is shown). This could easily be extended to display the complete change history.</li>
+<li>Users of course don't get notified of their own changes.</li>
+<li>The Administrator of a wiki can decide what notification intervals he wants to offer. 
+This is done by simply defining cron-like expressions in a properties file. The user can 
+then choose one of these defined intervals.</li>
+<li>Users can edit their subscription settings by opening to their home page (XWiki.username) 
+with the object editor. Once the user has subscribed his first document there will be an 
+instance of class Plugins.EmailSubscriptions attached to this page. This instance 
+holds all subscribed pages and webs, and the selected notification interval. This data 
+can be directly modified through the object editor.</li>
+<li>Notification mails are based on a velocity template which allows easy customization.</li>
+				</ul>
+			</subsection>
+		</section>
+	</body>
+</document>

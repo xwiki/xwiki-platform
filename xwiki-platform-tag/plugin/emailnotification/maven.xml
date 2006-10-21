@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	default="jar" xmlns:maven="jelly:maven"
+	xmlns:j="jelly:core" xmlns:util="jelly:util" xmlns:ant="jelly:ant" xmlns:deploy="deploy">
+
+  <goal name="deploy" prereqs="dist">
+		<ant:exec dir="." executable="/bin/bash" failonerror="true">
+			<!--<ant:arg line="-c 'scp -r ${maven.dist.dir}/* ${deployment.target}'" />-->
+			<ant:arg line="-c 'rsync -vre ssh ${maven.dist.dir}/* ${deployment.target}'" />
+		</ant:exec>
+	</goal>
+
+  <postGoal name="dist:prepare-bin-filesystem">
+    <attainGoal name="copydeps" />
+  </postGoal>
+
+  <goal name="copydeps">
+    <mkdir dir="${maven.build.dir}/${maven.final.name}/bin/${maven.final.name}/lib" />
+		<deploy:copy-deps todir="${maven.build.dir}/${maven.final.name}/bin/${maven.final.name}/lib" excludes="xwiki,junit,asm,groovy,log4j,commons-collections,commons-lang,velocity"/>
+  </goal>
+
+	<goal name="clean">
+		<ant:delete includeEmptyDirs="true">
+			<ant:fileset dir="${maven.build.dir}" excludes="eclipse*/**" />
+		</ant:delete>
+	</goal>
+
+</project>

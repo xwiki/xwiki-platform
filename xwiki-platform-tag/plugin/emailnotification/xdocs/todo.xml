@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<document>  
+	<properties>  
+		<author email="jk AT jkraemer.net">Jens Kraemer</author>
+		<title>XWiki eMail notify plugin - Todo list</title>
+	</properties>  
+	<meta name="keyword" content="xwiki, email, notification, plugin, todo"/> 
+	<body>
+		<section name="Todo">
+			<ul>
+				<li>
+					correct To: header, at the moment there is none at all. Have to look into how to 
+          correctly use XWiki's mail functions.
+				</li>
+				<li>
+					more per user preferences, i.e. choose between different types of notifications 
+          (diffs, full content of changed pages, list of changed pages only). Maybe let 
+          each user define his own velocity template for his notification mails ?
+				</li>
+				<li>
+					Internationalize notification mail template. This could be done by using message 
+					keys inside the template or by making the template a wiki page having translations 
+					for the supported languages.
+				</li>
+				<li>
+					Check performance for large user numbers and/or high change frequency. The algorithm 
+					used to compile the list of notifications to send to each user is somewhat simple,
+					there is room for improvement for sure.
+				</li>
+        <li>
+          The plugin should work in virtual wiki installations, but sonce I don't 
+          have such a setup, it's completely untested.
+        </li>
+			</ul>		
+		</section>
+	</body>
+</document>

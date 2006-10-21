@@ -1,0 +1,83 @@
+#set($itemsPerPage = "10")
+#set($doRebuild = $request.getParameter("rebuild"))
+#if($doRebuild=="yes")
+#set($lucene = $xwiki.getPlugin("lucene"))
+#if($lucene)
+#set($documentCount = $lucene.rebuildIndex($xwiki,$context))
+#if(${documentCount}>=0)
+Started index rebuild with $documentCount documents. Will take some time depending on the number of pages/attachments.
+#else
+Index rebuild failed.
+#end
+#end
+#else
+#if($xwiki.hasAdminRights())
+[rebuild Index>${doc.web}.${doc.name}?rebuild=yes]
+#end
+#end
+
+#set($query = $request.getParameter("text"))
+#if(!$query)
+#set($query = "")
+#end
+{pre}
+<form action="$doc.name" method="post">
+<input type="text" name="text" value="$query" />
+<input type="submit" value="$msg.get("tosearch")"/>
+</form>
+{/pre}
+#if($query != "")
+#set($lucene = $xwiki.getPlugin("lucene"))
+#if($lucene)
+#set($wikinames = "xwiki")
+#set($languages = "default,en,de")
+#set($firstIndex = $request.getParameter("firstIndex"))
+#if(!$firstIndex)
+#set($firstIndex = "1")
+#end
+#set($searchresults = $lucene.getSearchResults($query, $wikinames, $languages, $xwiki))
+#set($results = $searchresults.getResults($firstIndex,$itemsPerPage))
+  #if($results.size()>0)
+#if($xwiki.isVirtual())
+#macro(resultlink $xwiki $web $name)
+   * [${result.wiki}:${result.web}.${result.name}]\\ $msg.get("lastauthor"): [$result.author], $formatter.formatLongDateTime($result.date) , Score: ${result.score}
+#end
+#else
+#macro(resultlink $xwiki $web $name)
+   * [${result.web}.${result.name}]\\ $msg.get("lastauthor"): [$result.author], $formatter.formatLongDateTime($result.date) , Score: ${result.score}
+#end
+#end
+#set($lastIndex=$searchresults.getEndIndex($firstIndex, $itemsPerPage))
+#if($searchresults.hitcount==1)
+{pre} $msg.get("oneresult"):{/pre}
+#else
+{pre}$msg.get("results") $firstIndex - $lastIndex $msg.get("of") ${searchresults.hitcount}:{/pre}
+
+#if($searchresults.hasPrevious($firstIndex))
+[$msg.get("previous")>${doc.web}.${doc.name}?query=$query&firstIndex=$searchresults.getPreviousIndex($firstIndex,$itemsPerPage)]
+#else
+$msg.get("previous")
+#end
+ | 
+#if($searchresults.hasNext($firstIndex,$itemsPerPage))
+[$msg.get("next")>${doc.web}.${doc.name}?query=$query&firstIndex=$searchresults.getNextIndex($firstIndex,$itemsPerPage)]
+#else
+$msg.get("next")
+#end
+#end
+#foreach($result in $results)
+#if($result.type=='wikipage')
+#resultlink(${result.wiki} ${result.web} ${result.name})
+#end
+#if($result.type=='attachment')
+   * <a href="${result.url}">${result.filename}</a> : Attachment von [${result.web}.${result.name}]\\ $msg.get("lastauthor"): [$result.author], $formatter.formatLongDateTime($result.date), Score: ${result.score}
+#end
+#end
+#else
+$msg.get("noresults")
+#end
+
+#else
+lucene plugin not found
+#end
+#end

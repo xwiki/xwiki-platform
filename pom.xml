@@ -53,5 +53,17 @@
   <modules>
     <module>core</module>
   </modules>
+  <repositories>
+    <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main
+         remote repository. To be removed once we're only using official JARs -->
+    <repository>
+      <id>xwiki</id>
+      <name>XWiki Maven2 Remote Repository</name>
+      <url>http://laam.xpertnet.biz/~vmassol/repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
 </project>
         

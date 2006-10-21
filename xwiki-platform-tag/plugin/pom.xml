@@ -1,9 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  *
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -22,36 +20,20 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-plugins</artifactId>
-    <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>13-SNAPSHOT</version>
+    <groupId>com.xpn.xwiki</groupId>
+    <artifactId>xwiki</artifactId>
+    <version>0.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-plugin-tag</artifactId>
-  <name>XWiki Platform - Plugins - Tag</name>
-  <version>1.0-SNAPSHOT</version>
-  <description>XWiki Platform - Plugins - Tag</description>
-  <dependencies>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>1.7.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <groupId>com.xpn.xwiki.plugin</groupId>
+  <artifactId>xwiki-plugins</artifactId>
+  <packaging>pom</packaging>
+  <name>XWiki Plugins</name>
+  <description>The XWiki Plugins</description>
+  <modules>
+    <module>alexa</module>
+  </modules>
 </project>
+        

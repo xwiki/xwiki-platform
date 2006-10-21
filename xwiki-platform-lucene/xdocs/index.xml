@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<document>  
+	<properties>  
+		<author email="jk AT jkraemer.net">Jens Kraemer</author>
+		<title>XWiki Lucene Plugin</title>
+	</properties>  
+	<meta name="keyword" content="xwiki, lucene, plugin"/> 
+	<body>
+		<section name="XWiki Lucene Plugin">
+			<subsection name="Get it!">
+				<p><a href="../dist/">Download</a> | <a href="install.html">Installation instructions</a> | <a href="https://svn.jkraemer.net/svn/projects/xwiki-lucene-plugin/">SVN Repository</a></p>
+			</subsection>
+			<subsection name="About this plugin">
+				<p>
+					This plugin brings the power of <a href="http://jakarta.apache.org/lucene">Lucene</a> 
+					to <a href="http://www.xwiki.org">XWiki</a>.
+				</p>
+				<p>Features:</p>
+				<ul>
+					<li>Index is built from the content of wiki pages and attachments</li>
+					<li>Automatic index updating is triggered by page changes and file uploads</li>
+					<li>Supported document types for attachments include PDF, Word, OpenOffice Writer, XML</li>
+					<li>Integration of external Lucene indexes for combined search</li>
+				</ul>
+			</subsection>
+		</section>
+	</body>
+</document>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<document>  
+	<properties>  
+		<author email="jk AT jkraemer.net">Jens Kraemer</author>
+		<title>XWiki Lucene Plugin - Installation</title>
+	</properties>  
+	<meta name="keyword" content="xwiki, lucene, plugin"/> 
+	<body>
+		<section name="Installation (Binary distribution)">
+			<subsection name="Copy required jars">
+				<p>
+					Unpack the distribution archive and copy xwiki-lucene-plugin-x.y.jar and all 
+					jars from lib/ to	WEB-INF/lib inside your xwiki webapp.
+				</p>
+			</subsection>
+			<subsection name="XWiki configuration ">
+				<p> Edit xwiki.cfg (located in the WEB-INF dir of your xwiki web application directory):</p>
+				<ul>
+					<li>
+						Add the full class name of the plugin to the xwiki.plugins property:
+						<source>xwiki.plugins=com.xpn.xwiki.plugin.calendar.CalendarPlugin,net.jkraemer.xwiki.plugins.lucene.LucenePlugin</source>
+					</li>
+					<li>
+						Configure the index location. The indexdir property takes a comma-separated
+						list of paths pointing to lucene indexes. All those indexes will be used for
+						searching, but only the first one will be used by the plugin to index the wiki
+						contents. Remember to create the directory and set appropriate rights (the
+						server needs write access to this directory) before starting the server.
+						<source>xwiki.plugins.lucene.indexdir=/path/to/index/</source>
+						At the moment the plugin relies on the fact that the additional external indexes 
+						use the field names defined in LucenePlugin.java, too. This will change in the future,
+						i.e. by presenting unknown fields and their values as a map to the searchresults page.
+					</li>
+					<li>
+						Configure the analyzer used for indexing and searching. The choice should
+						reflect the language of the content to be indexed. See the docs at
+						http://jakarta.apache.org/lucene for more info. For other languages than german
+						or russian the StandardAnalyzer will do. There is no solution to reflect the
+						multilingual support of XWiki yet.
+						<source>xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.de.GermanAnalyzer
+# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.ru.RussianAnalyzer
+# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer</source>
+					</li>
+					<li>
+						If you like, set the time in seconds the indexer thread goes to sleep after
+						all pending documents have been indexed. Default is 300 seconds. The idea here is to 
+						aggregate some changes before opening the index for writing to reduce overhead. A 
+						lower value	leads to a more up-to-date index, but also to higher load.
+						<source>xwiki.plugins.lucene.indexinterval=300</source>
+					</li>
+				</ul>
+				<p>Now restart the application server.</p>
+			</subsection>
+			<subsection name="The search form">
+				<p>
+					Insert the content of <a href="searchForm.vm">searchForm.vm</a> into a wiki page of 
+					your choice. Customize it to fit your needs. The number of results to show per page
+					is defined in the very first line where the variable itemsPerPage is defined.
+				</p>
+				<p>
+					If you want to build your own search form from scratch, you should have a look at
+					the API docs of <a href="/xwiki/lucene-plugin/apidocs/net/jkraemer/xwiki/plugins/lucene/LucenePluginApi.html">LucenePluginApi</a>, <a href="/xwiki/lucene-plugin/apidocs/net/jkraemer/xwiki/plugins/lucene/SearchResults.html">SearchResults</a> and <a href="/xwiki/lucene-plugin/apidocs/net/jkraemer/xwiki/plugins/lucene/SearchResult.html">SearchResult</a>.
+				</p>
+				<p>
+					If you intend to keep up with the nice internationalization features of xwiki, you can 
+					add the message keys used for presenting the searchresults to the Application Resources
+					files located in WEB-INF/classes. This is completely optional, if you only use one 
+					language you can hard wire the Strings in your Search results page as well. The message 
+					keys used are:
+				</p>
+				<ul>
+					<li>noresults=No results</li>
+					<li>results=Results</li>
+					<li>oneresult=One result</li>
+					<li>search=Search</li>
+					<li>tosearch=Search</li>
+					<li>next=next</li>
+					<li>previous=previous</li>
+					<li>of=of</li>
+				</ul>
+			</subsection>
+			<subsection name="Create an initial index">
+				<p>
+					To build up the index of all existing documents in your wiki log in as a user having 
+					admin rights, and view the page you just created. There should be a link saying 'rebuild 
+					Index'. Alternatively you can simply append the url parameter rebuild=yes to the url of 
+					this page. You will need to be logged as Admin for this to be successful in any case.
+					After a short time there should be a line telling you how many documents have been 
+					scheduled for addition to the index. Attachments and translations count as documents 
+					by themselves.
+					Note that the index won't be built 
+					immediately, it can take up to xwiki.plugins.lucene.indexinterval (by default 300 
+					seconds) until the thread doing the indexing work wakes up and checks its queue 
+					for documents to be indexed. The same is true for the automatic index updates due 
+					to changes you make in documents.
+				</p>
+			</subsection>
+			<subsection name="Try it out!">
+				<p>
+					In case of any trouble set <source>log4j.logger.net.jkraemer.xwiki=debug</source> 
+					in your WEB-INF/classes/log4j.properties, restart the server and try to reproduce the problem,
+					watching the logfile (xwiki.log) in a shell nearby.
+				</p>
+				<p>
+					Please contact me if you think you've found a bug, but always try to give me as much 
+					information as possible to ease tracking down the problem.
+				</p>
+			</subsection>
+			<subsection name="Make the search form on the right side use the Lucene plugin">
+				<p>
+					This is easy. Just copy the file templates/viewtoolbar.vm to 
+					skins/yourskin/viewtoolbar.vm and change the document name in the line<br />
+					<code>#set($searchdoc = $xwiki.getDocument("Main.WebSearch"))</code><br />
+					to the name of the document containing your Lucene based searchform.
+				</p>
+				<p>
+					If you don't want to do so for any reason, you can also simply change the original
+					search page to contain the lucene search form instead of the original one.
+				</p>
+			</subsection>
+		</section>
+	</body>
+</document>

@@ -134,6 +134,13 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>2.2.9.3</version>
     </dependency>
 
+    <!-- We need to upload rome-fetcher-0.7 to the main m2 repo -->
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome-fetcher</artifactId>
+      <version>0.7</version>
+    </dependency>
+
     <!-- Standard dependencies found in the main Maven remote repository -->
 
     <dependency>
@@ -247,6 +254,11 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>batik</groupId>
       <artifactId>batik-dom</artifactId>
       <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+      <version>0.8</version>
     </dependency>
   </dependencies>
 </project>

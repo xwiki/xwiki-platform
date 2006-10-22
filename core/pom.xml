@@ -94,6 +94,22 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.1</version>
     </dependency>
 
+    <!-- We need to find what version of the googleapi we're using and get that to the main m2 repo if the license
+         allows it -->
+    <dependency>
+      <groupId>com.google</groupId>
+      <artifactId>googleapi</artifactId>
+      <version>UNKNOWN</version>
+      <classifier>xwiki</classifier>
+    </dependency>
+
+    <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
+    <dependency>
+      <groupId>org.apache.portals</groupId>
+      <artifactId>graffito-jcr-mapping</artifactId>
+      <version>1.0-a1-amelentev-dev</version>
+    </dependency>
+
     <!-- Standard dependencies found in the main Maven remote repository -->
 
     <dependency>

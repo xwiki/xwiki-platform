@@ -102,7 +102,7 @@
     	jgroups-2.4CR1.jar,
     	swarmcache.jar,
     	xalan-2.7.0.jar,xerces-2.7.1.jar,xsltc-2.7.0.jar,serializer-2.7.0.jar,xml-apis-2.0.2.jar,
-    	jta.jar,
+    	jta-1.0.1B.jar,
     	antlr-2.7.5.jar,
     	asm-1.5.3.jar,asm-util-1.5.3.jar,
         clover-1.3.9.jar,

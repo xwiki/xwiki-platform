@@ -54,8 +54,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/flickrapi-1.0a7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/flipper.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fop-0.20.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/googleadwords.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/googleapi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/googleadwords-UNKNOWN-xwiki.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/googleapi-UNKNOWN-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/graffito-jcr-mapping-1.0-a1-amelentev-dev.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/graffito-jcr-mapping-1.0-a1-amelentev-dev-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/groovy-all-1.0-jsr-06.jar"/>

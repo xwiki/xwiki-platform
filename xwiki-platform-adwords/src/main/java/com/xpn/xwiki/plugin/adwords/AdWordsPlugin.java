@@ -20,7 +20,7 @@
  * @author sdumitriu
  */
 
-package com.xpn.xwiki.plugin.google;
+package com.xpn.xwiki.plugin.adwords;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;

@@ -477,7 +477,7 @@
     </library>
     <library name="fop">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/jtidy.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jtidy-UNKNOWN.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jimi.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/avalon-framework-4.1.5.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/xml-apis-2.0.2.jar!/" />

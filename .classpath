@@ -78,7 +78,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jmock-1.1.0RC1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jmock-cglib-1.1.0RC1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jta-1.0.1B.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jtidy.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jtidy-UNKNOWN.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ldap.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.13.jar"/>

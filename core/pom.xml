@@ -141,6 +141,13 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>0.7</version>
     </dependency>
 
+    <!-- We need to find out what version of jtidy we're using and then upload it to the main m2 repo -->
+    <dependency>
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>UNKNOWN</version>
+    </dependency>
+
     <!-- Standard dependencies found in the main Maven remote repository -->
 
     <dependency>
@@ -259,6 +266,17 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
       <version>0.8</version>
+    </dependency>
+    <!-- NOte: in lib/ we're using 0.9.19M. We need to verfy if version 0.9.19 is ok to be used -->
+    <dependency>
+      <groupId>ical4j</groupId>
+      <artifactId>ical4j</artifactId>
+      <version>0.9.19</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4</version>
     </dependency>
   </dependencies>
 </project>

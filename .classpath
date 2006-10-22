@@ -66,7 +66,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/ical4j-0.9.19M.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/InlineJavaServer.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/InlineJavaUser.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ipresolver.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ipresolver-UNKNOWN.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-core-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-jcr-commons-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc-1.1.jar"/>

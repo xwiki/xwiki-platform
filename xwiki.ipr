@@ -531,7 +531,7 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/lib/googleadwords-UNKNOWN-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/googleapi-UNKNOWN-xwiki.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/terraservice.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/terraservice-UNKNOWN-xwiki.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/ipresolver.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/flickrapi-1.0a7.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/flipper.jar!/" />

@@ -118,6 +118,13 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.0.1B</version>
     </dependency>
 
+    <!-- Flickrj (http://flickrj.sourceforge.net/). To be uploaded on the main m2 repo -->
+    <dependency>
+      <groupId>flickrj</groupId>
+      <artifactId>flickrapi</artifactId>
+      <version>1.0a7</version>
+    </dependency>
+
     <!-- Standard dependencies found in the main Maven remote repository -->
 
     <dependency>
@@ -211,6 +218,11 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>javax.xml</groupId>
       <artifactId>jaxrpc-api</artifactId>
       <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.2.1</version>
     </dependency>
   </dependencies>
 </project>

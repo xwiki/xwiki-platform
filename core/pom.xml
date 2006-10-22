@@ -278,6 +278,11 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <artifactId>mail</artifactId>
       <version>1.4</version>
     </dependency>
+    <dependency>
+      <groupId>groovy</groupId>
+      <artifactId>groovy-all-1.0-jsr</artifactId>
+      <version>06</version>
+    </dependency>
   </dependencies>
 </project>
         

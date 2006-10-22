@@ -125,6 +125,15 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.0a7</version>
     </dependency>
 
+    <!-- There's only a 2.2.9.1 version of jgroups on the m2 remote repo
+         (http://repo1.maven.org/maven2/jgroups/jgroups-all/). Upload a newer version
+         (http://sourceforge.net/project/showfiles.php?group_id=6081&package_id=94868). -->
+    <dependency>
+      <groupId>jgroups</groupId>
+      <artifactId>jgroups</artifactId>
+      <version>2.2.9.3</version>
+    </dependency>
+
     <!-- Standard dependencies found in the main Maven remote repository -->
 
     <dependency>
@@ -223,6 +232,21 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-rasterizer</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-svggen</artifactId>
+      <version>1.6</version>
+    </dependency>
+    <dependency>
+      <groupId>batik</groupId>
+      <artifactId>batik-dom</artifactId>
+      <version>1.6</version>
     </dependency>
   </dependencies>
 </project>

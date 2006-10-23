@@ -80,7 +80,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jta-1.0.1B.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jtidy-UNKNOWN.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ldap.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ldap-UNKNOWN.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail-1.4.jar"/>

@@ -103,15 +103,15 @@
         <used_levels>
           <error>
             <option name="myName" value="ERROR" />
-            <option name="myVal" value="400" />
+            <option name="myVal" value="200" />
           </error>
           <warning>
             <option name="myName" value="WARNING" />
-            <option name="myVal" value="300" />
+            <option name="myVal" value="100" />
           </warning>
           <information>
             <option name="myName" value="INFO" />
-            <option name="myVal" value="200" />
+            <option name="myVal" value="100" />
           </information>
           <server>
             <option name="myName" value="SERVER PROBLEM" />
@@ -491,7 +491,7 @@
     </library>
     <library name="LDAP">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/ldap.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/ldap-UNKNOWN.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

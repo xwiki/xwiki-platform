@@ -49,8 +49,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.database.impl-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.organization.api-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.organization.impl-2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.sercurity.api-2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.sercurity.impl-2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.security.api-2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/exo-platform.service.security.impl-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/flickrapi-1.0a7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/flipper.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fop-0.20.5.jar"/>

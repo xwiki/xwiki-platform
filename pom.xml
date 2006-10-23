@@ -53,7 +53,7 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
     </dependency>
 
     <!-- Exo POMs seems to have a problem. See http://jira.exoplatform.org/browse/PLT-24. When this is resolved,
-         get the Exo JARS from the ObjectWeb remote repo (or from Maven3's official remote repo when ObjectWeb
+         get the Exo JARS from the ObjectWeb remote repo (or from the central repository when ObjectWeb
          is synced to there. -->
     <dependency>
       <groupId>exo-platform</groupId>
@@ -61,7 +61,7 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>2.0</version>
     </dependency>
 
-    <!-- The JRCS JARS are are in our repo till we get them published on the Maven2 central repository and till
+    <!-- The JRCS JARS are are in our repo till we get them published on the central repository and till
          we haven't succeeded in haviong suigeneric.org apply our patches.
          JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->
     <dependency>
@@ -77,7 +77,7 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <classifier>xwiki</classifier>
     </dependency>
 
-    <!-- Version 2.3.2 of oscache needs to be uploaded to Maven2 central repo and XWiki's patch to be applied
+    <!-- Version 2.3.2 of oscache needs to be uploaded to central repository and XWiki's patch to be applied
          before we can remove this jar from our repo -->
     <dependency>
       <groupId>opensymphony</groupId>
@@ -86,7 +86,7 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <classifier>xwiki</classifier>
     </dependency>
 
-    <!-- Version 1.1 of jackrabbit core needs to be uploaded to Maven2 central repo. In addition there was a  POM
+    <!-- Version 1.1 of jackrabbit core needs to be uploaded to central repository. In addition there was a  POM
          issue in version 1.0.1, see http://jira.codehaus.org/browse/MEV-453 -->
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
@@ -94,8 +94,8 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.1</version>
     </dependency>
 
-    <!-- We need to find what version of the googleapi we're using and get that to the main m2 repo if the license
-         allows it -->
+    <!-- We need to find what version of the googleapi we're using and get that to the central repository if the
+         license allows it -->
     <dependency>
       <groupId>com.google</groupId>
       <artifactId>googleapi</artifactId>
@@ -110,7 +110,7 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.0-a1-amelentev-dev</version>
     </dependency>
 
-    <!-- VMA: I'm not sure if we have the right to distribute this jar. It's not on the M2 repository because
+    <!-- VMA: I'm not sure if we have the right to distribute this jar. It's not on the central repository because
          of licensing issues. -->
     <dependency>
       <groupId>javax.transaction</groupId>
@@ -118,14 +118,14 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.0.1B</version>
     </dependency>
 
-    <!-- Flickrj (http://flickrj.sourceforge.net/). To be uploaded on the main m2 repo -->
+    <!-- Flickrj (http://flickrj.sourceforge.net/). To be uploaded on the central repository -->
     <dependency>
       <groupId>flickrj</groupId>
       <artifactId>flickrapi</artifactId>
       <version>1.0a7</version>
     </dependency>
 
-    <!-- There's only a 2.2.9.1 version of jgroups on the m2 remote repo
+    <!-- There's only a 2.2.9.1 version of jgroups on the central repository
          (http://repo1.maven.org/maven2/jgroups/jgroups-all/). Upload a newer version
          (http://sourceforge.net/project/showfiles.php?group_id=6081&package_id=94868). -->
     <dependency>
@@ -134,21 +134,38 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>2.2.9.3</version>
     </dependency>
 
-    <!-- We need to upload rome-fetcher-0.7 to the main m2 repo -->
+    <!-- We need to upload rome-fetcher-0.7 to the central repository -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome-fetcher</artifactId>
       <version>0.7</version>
     </dependency>
 
-    <!-- We need to find out what version of jtidy we're using and then upload it to the main m2 repo -->
+    <!-- We need to find out what version of jtidy we're using and then upload it to the central repository -->
     <dependency>
       <groupId>jtidy</groupId>
       <artifactId>jtidy</artifactId>
       <version>UNKNOWN</version>
     </dependency>
 
-    <!-- Standard dependencies found in the main Maven remote repository -->
+    <!-- We need to get JCaptcha to upload its jar to the central repository.
+         See http://forge.octo.com/jcaptcha/jira/browse/FWK-65 -->
+    <dependency>
+      <groupId>jcaptcha</groupId>
+      <artifactId>jcaptcha-all</artifactId>
+      <version>1.0-RC3</version>
+    </dependency>
+
+    <!-- We need to figure out what version we're using. I think this ldap JAR comes from
+         http://developer.novell.com/wiki/index.php/Jldap. Then we need to check the license and see if we can
+         upload it to the central repository. -->
+    <dependency>
+      <groupId>com.novell</groupId>
+      <artifactId>ldap</artifactId>
+      <version>UNKNOWN</version>
+    </dependency>
+
+    <!-- Standard dependencies found in the central repository -->
 
     <dependency>
       <groupId>velocity</groupId>

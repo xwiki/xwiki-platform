@@ -20,13 +20,6 @@
  *
 -->
 
-<!-- NOTE: THIS IS A WORK IN PROGRESS. IT'S STILL MISSING SOME JARS FOR THE COMPILATION TO WORK -->
-<!-- ISSUES:
-
-jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
-            upgrade to that?
--->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -190,6 +183,21 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>UNKNOWN</version>
     </dependency>
 
+    <!-- Version 1.0.0-rc1 has some bad dependencies in the POM. This is fixed in 1.0.0 but unfortunately we're
+         using an API (setDataAreaRatio()) that has disappeared in 1.0.0 so we need to fix this before we can
+         move to 1.0.0 or beyond... See http://jira.xwiki.org/jira/browse/XWIKI-390.
+         Note: when we move to using the central repo version we'll only need 1 dependency on jfreechart -->
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.0-rc1</version>
+    </dependency>
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jcommon</artifactId>
+      <version>1.0.5</version>
+    </dependency>
+
     <!-- Standard dependencies found in the central repository -->
 
     <dependency>
@@ -265,11 +273,6 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <version>1.2.9</version>
     </dependency>
     <dependency>
-      <groupId>jfree</groupId>
-      <artifactId>jfreechart</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>javax.jcr</groupId>
       <artifactId>jcr</artifactId>
       <version>1.0</version>
@@ -329,6 +332,23 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>fop</groupId>
       <artifactId>fop</artifactId>
       <version>0.20.5</version>
+    </dependency>
+    <dependency>
+      <groupId>picocontainer</groupId>
+      <artifactId>picocontainer</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.axis</groupId>
+      <artifactId>axis</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <!-- Note: The 2.4 version is not technically correct as 2.4 corresponds to a specification # and is not an
+           implementation version. The central repo would need to be fixed... -->
+      <version>2.4</version>
     </dependency>
   </dependencies>
 </project>

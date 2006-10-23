@@ -592,7 +592,7 @@
     </library>
     <library name="Captcha">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/jcaptcha-all-1.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/jcaptcha-all-1.0-RC3.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

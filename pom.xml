@@ -60,6 +60,31 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <artifactId>exo-platform.container</artifactId>
       <version>2.0</version>
     </dependency>
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.commons</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.service.organization.api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.service.security.api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.service.database.api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>exo-platform</groupId>
+      <artifactId>exo-platform.service.database.api</artifactId>
+      <version>2.0</version>
+    </dependency>
 
     <!-- The JRCS JARS are are in our repo till we get them published on the central repository and till
          we haven't succeeded in haviong suigeneric.org apply our patches.
@@ -299,6 +324,11 @@ jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note 
       <groupId>groovy</groupId>
       <artifactId>groovy-all-1.0-jsr</artifactId>
       <version>06</version>
+    </dependency>
+    <dependency>
+      <groupId>fop</groupId>
+      <artifactId>fop</artifactId>
+      <version>0.20.5</version>
     </dependency>
   </dependencies>
 </project>

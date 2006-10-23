@@ -165,7 +165,7 @@
         includes="servlet-api-2.4.jar" />
 
      <fileset id="libs.exo.fileset" dir="${lib.dir}"
-	includes="picocontainer-1.1.jar,exo-platform.commons.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.sercurity.api-2.0.jar,exo-platform.service.sercurity.impl-2.0.jar" />
+	includes="picocontainer-1.1.jar,exo-platform.commons-2.0.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.security.api-2.0.jar,exo-platform.service.security.impl-2.0.jar" />
 
 
     <fileset id="libs.tests.fileset" dir="${lib.dir}"

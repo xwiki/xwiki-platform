@@ -241,7 +241,9 @@ public class XWikiPluginManager {
             try {
                 attach = ((XWikiPluginInterface)plugins.get(i)).downloadAttachment(attach, context);
             } catch (Exception e)
-            {}
+            {
+                e.printStackTrace();
+            }
         }
         return attach;
     }

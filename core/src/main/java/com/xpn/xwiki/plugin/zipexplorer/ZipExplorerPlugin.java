@@ -18,6 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  * @author ravenees
+ * @author jeremi
  */
 package com.xpn.xwiki.plugin.zipexplorer;
 
@@ -46,55 +47,21 @@ import java.util.ArrayList;
 
 
 public class ZipExplorerPlugin extends XWikiDefaultPlugin {
-
-    private XWikiCache zipCache;
     private int capacity = 50;
     private static final Log log = LogFactory.getLog(ZipExplorerPlugin.class);
 
-    /**
-     * Constructor
-     */
     public ZipExplorerPlugin(String name, String className, XWikiContext context) {
         super(name, className, context);
         init(context);
     }
 
-     /**
-     *
-     * */
-     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    public String getName() {
+        return "zipexplorer";
+    }
+
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
         return new ZipExplorerPluginAPI((ZipExplorerPlugin) plugin, context);
     }
-
-    /**
-     *
-     * */
-    public void initCache(XWikiContext context) {
-        String capacityParam = "";
-        try {
-            capacityParam = context.getWiki().Param("xwiki.plugin.zip.cache.capacity");
-            if ((capacityParam != null) && (!capacityParam.equals(""))) {
-                capacity = Integer.parseInt(capacityParam);
-            }
-        } catch (NumberFormatException e) {
-            if (log.isErrorEnabled())
-                log.error("Error in ZipPlugin reading capacity: " + capacityParam, e);
-        }
-
-        Properties props = new Properties();
-        props.put("cache.memory", "true");
-        props.put("cache.unlimited.disk", "true");
-        props.put("cache.persistence.overflow.only", "false");
-        props.put("cache.blocking", "false");
-        props.put("cache.persistence.class", "com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener");
-        props.put("cache.path", "temp/imageCache");
-
-        try {
-            zipCache = context.getWiki().getCacheService().newLocalCache(props, capacity);
-        } catch (XWikiException e) {
-        }
-    }
-
 
     /**
      * @return the file name from the URI
@@ -105,37 +72,42 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         for (int i = 0; i < 4; i++) {
             pos = path.indexOf("/", pos + 1);
         }
-        return path.substring(path.lastIndexOf("/") + 1, path.length());
+        if (pos == -1)
+            return "";
+        return path.substring(pos + 1);
     }
 
-    /**
-     * @return the extries in the zip file as xwiki attachment
-     */
+    
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
+        String url = context.getRequest().getRequestURI();
+        String filename;
 
-        String URL = context.getRequest().getRequestURI();
-        String filename = getFileName(URL, context.getAction().trim());
-        XWikiAttachment newAttachment = null;
+        if (!attachment.getFilename().endsWith(".zip"))
+            return attachment;
+        try {
+            filename = getFileName(url, context.getAction().trim());
+        }
+        catch(Exception e){
+            filename = "";
+        }
 
-        if (zipCache == null)
-            initCache(context);
+        if (filename.length() == 0)
+            return attachment;
+        XWikiAttachment newAttachment;
+
 
         newAttachment = new XWikiAttachment();
         newAttachment.setDoc(attachment.getDoc());
         newAttachment.setAuthor(attachment.getAuthor());
         newAttachment.setDate(attachment.getDate());
-
         try {
-
             byte[] stream = attachment.getContent(context);
             ByteArrayInputStream bais = new ByteArrayInputStream(stream);
             ZipInputStream zis = new ZipInputStream(bais);
             ZipEntry entry;
 
             while ((entry = zis.getNextEntry()) != null) {
-
                 String entryName = entry.getName();
-                entryName = entryName.substring(entryName.lastIndexOf("/") + 1, entryName.length()).trim();
 
                 if (entryName.equals(filename)) {
                     newAttachment.setFilename(entryName);
@@ -163,17 +135,15 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     private byte[] readFromInputStream(InputStream is) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] data = new byte[4096];
-        StringBuffer buffer = new StringBuffer();
         int count;
         while ((count = is.read(data, 0, 4096)) != -1) {
-            baos.write(data);
+            baos.write(data, 0, count);
         }
         return baos.toByteArray();
     }
 
 
     List getFileList(Document doc, String attachmentName, XWikiContext context) {
-
         List zipList = null;
 
         if (attachmentName.endsWith(".zip")) {
@@ -191,7 +161,6 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
             zipList = new ArrayList();
             byte[] stream;
-
             try {
                 stream = attachment.getContent();
                 ByteArrayInputStream bais = new ByteArrayInputStream(stream);
@@ -213,46 +182,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     }
 
     String getFileLink(Document doc, String attachmentName, String fileName, XWikiContext context) {
+        String link = doc.getAttachmentURL(attachmentName);
+        return link + "/" + fileName;
 
-        String link = null;
-
-        if (attachmentName.endsWith(".zip")) {
-            Attachment attachment = null;
-            List attachList = doc.getAttachmentList();
-            Iterator itr = attachList.iterator();
-
-            while (itr.hasNext()) {
-                attachment = (Attachment) itr.next();
-                if (attachment.getFilename().equals(attachmentName)) {
-                    break;
-                }
-            }
-
-            byte[] stream;
-
-            try {
-
-                stream = attachment.getContent();
-                ByteArrayInputStream bais = new ByteArrayInputStream(stream);
-                ZipInputStream zis = new ZipInputStream(bais);
-                ZipEntry entry;
-                String fileCaption = null;
-
-                while ((entry = zis.getNextEntry()) != null) {
-                    String entryName = entry.getName();
-                    fileCaption = entryName.substring(entryName.lastIndexOf("/") + 1, entryName.length());
-                    if (fileCaption.equalsIgnoreCase(fileName)) {
-                        break;
-                    }
-                }
-                link = doc.getURL("download")+"/"+fileCaption;
-                //link = link.substring(0,link.indexOf("download/"))+fileCaption;
-            } catch (XWikiException e) {
-                //e.printStackTrace();
-            } catch (IOException e) {
-                //e.printStackTrace();
-            }
-        }
-        return link;
     }
 }

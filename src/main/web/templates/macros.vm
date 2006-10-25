@@ -427,3 +427,10 @@ $html
   #formfield(${prop.prettyName} $document.display($prop.getName(), "edit", $obj))
  #end
 #end
+
+#macro(defaultViewDisplayObj $document $obj)
+ #set($class = $obj.xWikiClass)
+ #foreach($prop in $class.properties)
+  #formfield(${prop.prettyName} $document.display($prop.getName(), "view", $obj))
+ #end
+#end

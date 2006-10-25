@@ -32,12 +32,25 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 import java.io.IOException;
 
 public class DownloadAction extends XWikiAction {
-	public String render(XWikiContext context) throws XWikiException {
+
+
+    public String getFileName(String path, String action) {
+        path = path.substring(path.indexOf("/" + action));
+        int pos = 0;
+        for (int i = 0; i < 3; i++) {
+            pos = path.indexOf("/", pos + 1);
+        }
+        if (path.indexOf("/", pos + 1) > 0)
+            return path.substring(pos + 1, path.indexOf("/", pos + 1));
+        return path.substring(pos + 1);
+    }
+
+    public String render(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
-        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
+        String filename = Utils.decode(getFileName(path, "download"), context);
          XWikiAttachment attachment = null;
 
         if (request.getParameter("id")!=null) {
@@ -53,7 +66,7 @@ public class DownloadAction extends XWikiAction {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                     XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
                     "Attachment {0} not found", null, args);
-        }
+ 	}
 
 	XWikiPluginManager plugins = context.getWiki().getPluginManager();
 	attachment = plugins.downloadAttachment(attachment, context);

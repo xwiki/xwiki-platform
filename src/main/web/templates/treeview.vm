@@ -61,7 +61,13 @@
         var nodes = nodes${treeviewid};
         #foreach($item in $treelist)
         #set($checked = $selectlist.contains($item.getId()))
-        addTreeElement(tree, nodes, "$item.id", "$item.value", "$item.parent", #if($checked) true #else false #end)
+        #if ($item.value.length() > 80)
+         #set($title_item = $item.value.substring(0, 80))
+        #else
+         #set($title_item = $item.value)
+        #end
+        #set($title_item = $title_item.replaceAll("[\r\n]"," "))
+        addTreeElement(tree, nodes, "$item.id", "$title_item", "$item.parent", #if($checked) true #else false #end)
         #end
    		tree.draw();
         // tree.checkClickEvent.subscribe(onCheckClick);

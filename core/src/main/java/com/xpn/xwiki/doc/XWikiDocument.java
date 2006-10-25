@@ -606,12 +606,12 @@ public class XWikiDocument {
      * @param context
      * @return
      */
-    public com.xpn.xwiki.api.Document newDocument(String className, XWikiContext context) {
-            if (!((className==null)||(className.equals(""))))
+    public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context) {
+            if (!((customClassName==null)||(customClassName.equals(""))))
                 try {
                     Class[] classes = new Class[]{XWikiDocument.class, XWikiContext.class};
                     Object[] args = new Object[]{this, context};
-                    return (com.xpn.xwiki.api.Document) Class.forName(className).getConstructor(classes).newInstance(args);
+                    return (com.xpn.xwiki.api.Document) Class.forName(customClassName).getConstructor(classes).newInstance(args);
                 } catch (InstantiationException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 } catch (IllegalAccessException e) {

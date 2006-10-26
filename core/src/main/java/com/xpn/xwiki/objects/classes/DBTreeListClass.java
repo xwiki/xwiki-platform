@@ -27,7 +27,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.XWikiContext;
-import com.sun.org.apache.bcel.internal.generic.Select;
 
 import java.util.*;
 

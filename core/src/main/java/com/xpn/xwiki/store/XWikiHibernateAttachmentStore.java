@@ -121,7 +121,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 saveAttachmentContent(att, false, context, false);
             }
             if (bParentUpdate){
-                context.getWiki().getStore().saveXWikiDoc(doc, context, true);
+                context.getWiki().getStore().saveXWikiDoc(doc, context, false);
             }
         }
         catch (Exception e) {
@@ -243,7 +243,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                         log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
                 }
                 try {
-                    loadAttachmentContent(attachment, context, false);
+                    loadAttachmentArchive(attachment, context, false);
                 } catch(XWikiException e){
                     if (log.isWarnEnabled())
                         log.warn("Error loading attachment archive when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());

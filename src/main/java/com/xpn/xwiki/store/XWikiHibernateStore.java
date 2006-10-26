@@ -488,7 +488,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List attachlist = doc.getAttachmentList();
             for (int i=0;i<attachlist.size();i++) {
                 XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, false, context, true);
+                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, false, context, false);
             }
 
             // deleting XWikiLinks
@@ -1231,6 +1231,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List list = doc.getAttachmentList();
             for (int i=0;i<list.size();i++) {
                 XWikiAttachment attachment = (XWikiAttachment) list.get(i);
+                attachment.setDoc(doc);
                 saveAttachment(attachment, false, context, false);
             }
 

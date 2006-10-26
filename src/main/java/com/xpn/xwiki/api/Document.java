@@ -1222,11 +1222,14 @@ public class Document extends Api {
             if ((data != null) && (data.length > 0)){
                 String fname = fileupload.getFileName(name, context);
                 XWikiAttachment attachment = addAttachment(fname, data);
+                getDoc().saveAttachmentContent(attachment, context);
+                getDoc().getAttachmentList().add(attachment);
                 attachments.add(attachment);
                 nb++;
             }
         }
-        getDoc().saveAttachmentsContent(attachments, context);
+        if (nb > 0)
+            context.getWiki().saveDocument(getDoc(), context);
         return nb;
     }
 
@@ -1242,8 +1245,13 @@ public class Document extends Api {
             i = fileName.indexOf("/");
         String filename = fileName.substring(i + 1);
         filename = context.getWiki().clearName(filename, context);
-        XWikiAttachment attachment = new XWikiAttachment();
-        getDoc().getAttachmentList().add(attachment);
+
+        XWikiAttachment attachment = getDoc().getAttachment(filename);
+        if (attachment==null) {
+            attachment = new XWikiAttachment();
+            olddoc.getAttachmentList().add(attachment);
+        }
+
         attachment.setContent(data);
         attachment.setFilename(filename);
         attachment.setAuthor(context.getUser());

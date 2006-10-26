@@ -3931,8 +3931,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context) throws XWikiException {
         XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
         saveDocument(renamedDoc, context);
+        renamedDoc.saveAllAttachments(context);
         deleteDocument(doc, context);
-        refreshLinks(context);
         return renamedDoc;
     }
 

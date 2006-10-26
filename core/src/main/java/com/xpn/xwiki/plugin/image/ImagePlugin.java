@@ -107,13 +107,19 @@ public class ImagePlugin extends XWikiDefaultPlugin {
         int width = 0;
         XWikiAttachment attachmentClone = null;
 
+        if (!attachment.isImage(context))
+            return attachment;
+
+        String sheight = context.getRequest().getParameter("height");
+        String swidth = context.getRequest().getParameter("width");
+
+        if ((sheight == null || sheight.length() == 0) && (swidth == null || swidth.length() == 0))
+            return attachment;
+
         if (imageCache==null)
             initCache(context);
 
         try {
-            String sheight = context.getRequest().getParameter("height");
-            String swidth = context.getRequest().getParameter("width");
-
             if (sheight!=null)
              height = Integer.parseInt(sheight);
             if (swidth!=null)

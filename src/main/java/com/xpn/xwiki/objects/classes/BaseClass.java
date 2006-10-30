@@ -627,6 +627,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public void setNameField(String nameField) {
+        if (nameField==null)
+         return "";
         this.nameField = nameField;
     }
 
@@ -680,7 +682,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public String getValidationScript() {
-        return validationScript;
+        if (validationScript==null)
+         return "";
+        else
+         return validationScript;
     }
 
     public boolean validateObject(BaseObject obj, XWikiContext context) throws XWikiException {

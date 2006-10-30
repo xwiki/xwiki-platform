@@ -25,6 +25,7 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -47,7 +48,6 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     private BaseClass object;
     private int id;
     private PropertyMetaClass pMetaClass;
-    private String validationRegExp;
 
     public PropertyClass() {
     }
@@ -263,6 +263,26 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setStringValue("prettyName", prettyName);
     }
 
+    public String getTooltip() {
+        return getLargeStringValue("tooltip");
+    }
+
+    public void setTooltip(String tooltip) {
+        setLargeStringValue("tooltip", tooltip);
+    }
+
+    public String getTranslatedPrettyName(XWikiContext context) {
+        String msgName = className + "_" + getName();
+        if ((context==null)||(context.getWiki()==null))
+         return getPrettyName();
+        
+        String prettyName = context.getWiki().getMessage(msgName, context);
+        if (prettyName.equals(msgName))
+            return getPrettyName();
+        else
+            return prettyName;
+    }
+
     public int getNumber() {
         return getIntValue("number");
     }
@@ -366,11 +386,40 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public void setValidationRegExp(String validationRegExp) {
-        this.validationRegExp = validationRegExp;
+        setStringValue("validationRegExp", validationRegExp);
     }
 
     public String getValidationRegExp() {
-        return validationRegExp;
+        return getStringValue("validationRegExp");
+    }
+
+    public String getValidationMessage() {
+        return getStringValue("validationMessage");
+    }
+
+    public void setValidationMessage(String validationMessage) {
+        setStringValue("validationMessage", validationMessage);
+    }
+
+    public boolean validateProperty(BaseProperty property, XWikiContext context) {
+        boolean isValid = false;
+        String regexp = getValidationRegExp();
+        if ((regexp==null)||(regexp.trim().equals("")))
+         return true;
+
+        String value = ((property==null)||(property.getValue()==null)) ? "" : property.getValue().toString();
+        try {
+            if (context.getUtil().match(regexp, value))
+             return true;
+            else {
+                XWikiValidationStatus.addErrorToContext((getObject()==null) ? "" : getObject().getClassName(), getName(), getTranslatedPrettyName(context), getValidationMessage(), context);
+                return false;
+            }
+        } catch (Exception e) {
+            XWikiValidationStatus.addExceptionToContext(getObject().getClassName(), getName(), e, context);
+            return false;
+        }
+
     }
 
 }

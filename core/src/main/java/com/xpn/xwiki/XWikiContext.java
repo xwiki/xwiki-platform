@@ -29,12 +29,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import org.apache.xmlrpc.server.XmlRpcServer;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 public class XWikiContext extends Hashtable {
 
@@ -69,6 +68,8 @@ public class XWikiContext extends Hashtable {
    private Map classCache = new HashMap();
    // Used to avoir reloading archives in the same request
    private Map archiveCache = new HashMap();
+
+   private List displayedFields = new ArrayList();
 
    public XWikiContext() {
    }
@@ -322,5 +323,21 @@ public class XWikiContext extends Hashtable {
 
     public XWikiMessageTool getMessageTool() {
       return ((XWikiMessageTool) get("msg"));
-    }    
+    }
+
+    public XWikiValidationStatus getValidationStatus() {
+        return (XWikiValidationStatus) get("validation_status");
+    }
+
+    public void setValidationStatus(XWikiValidationStatus status) {
+        put("validation_status", status);
+    }
+
+    public void addDisplayedField(String fieldname) {
+        displayedFields.add(fieldname);
+    }
+
+    public List getDisplayedFields() {
+        return displayedFields;
+    }
 }

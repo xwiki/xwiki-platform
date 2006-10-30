@@ -49,6 +49,13 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         prettyname_class.setSize(40);
         safeput("prettyName", prettyname_class);
 
+        TextAreaClass tooltip_class = new TextAreaClass(this);
+        tooltip_class.setName("tooltip");
+        tooltip_class.setPrettyName("Tooltip");
+        tooltip_class.setSize(60);
+        tooltip_class.setRows(5);
+        safeput("tooltip", tooltip_class);
+
         TextAreaClass customdisplay_class = new TextAreaClass(this);
         customdisplay_class.setName("customDisplay");
         customdisplay_class.setPrettyName("Custom Display");
@@ -73,6 +80,12 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         validationRegExp_class.setPrettyName("Validation Regular Expression");
         validationRegExp_class.setSize(40);
         safeput("validationRegExp", validationRegExp_class);
+
+        StringClass validationMessage_class = new StringClass(this);
+        validationMessage_class.setName("validationMessage");
+        validationMessage_class.setPrettyName("Validation Message");
+        validationMessage_class.setSize(80);
+        safeput("validationMessage", validationMessage_class);
     }
 
     public BaseCollection getObject() {

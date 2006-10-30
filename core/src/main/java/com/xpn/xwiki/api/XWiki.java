@@ -39,6 +39,7 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import org.suigeneris.jrcs.diff.Chunk;
 
 import java.awt.image.BufferedImage;
@@ -2068,17 +2069,52 @@ v     * API to check rights on a document for a given user
         return new PropertyClass(xwiki.getPropertyClassFromName(propPath, context), context);
     }
 
+    /**
+     * Generates a unique page name based on initial page name and already existing pages
+     * @param space
+     * @param name
+     * @return a unique page name
+     */
     public String getUniquePageName(String space, String name){
-        return "";// xwiki.getUniquePageName(space, name, context);
+        return xwiki.getUniquePageName(space, name, context);
     }
 
+    /**
+     * Cleans up the page name to make it valid
+     * @param name
+     * @return A valid page name
+     */
     public String clearName(String name){
         return xwiki.clearName(name, context);
     }
 
+    /**
+     * Inserts a tooltip using toolTip.js
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @param params Parameters in Javascropt added to the tooltip config
+     * @return HTML with working tooltip
+     */
+    public String addTooltip(String html, String message, String params) {
+        return xwiki.addTooltip(html, message, params, context);
+    }
 
-    public String getUniquePageName(String space){
-        return xwiki.getUniquePageName(space, context);
+    /**
+     * Inserts a tooltip using toolTip.js
+     * @param html HTML viewed
+     * @param message HTML Tooltip message
+     * @return HTML with working tooltip
+     */
+    public String addTooltip(String html, String message) {
+        return xwiki.addTooltip(html, message, context);
+    }
+
+    /**
+     * Inserts the tooltip Javascript
+     * @return
+     */
+    public String addTooltipJS() {
+        return xwiki.addTooltipJS(context);
     }
 }
 

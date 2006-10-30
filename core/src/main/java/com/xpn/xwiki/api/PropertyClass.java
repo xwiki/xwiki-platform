@@ -45,4 +45,21 @@ public class PropertyClass extends Collection {
         else
          return null;
     }
+
+    public String getPrettyName() {
+        return getBasePropertyClass().getPrettyName();
+    }
+
+    public String getValidationMessage() {
+        return getBasePropertyClass().getValidationMessage();
+    }
+
+    public String getValidationRegExp() {
+        return getBasePropertyClass().getValidationRegExp();
+    }
+
+    public String getTooltip() {
+        return getBasePropertyClass().getTooltip();
+    }
+
 }

@@ -33,7 +33,6 @@
     <orderEntry type="library" name="Groovy" level="project" />
     <orderEntry type="library" name="fop" level="project" />
     <orderEntry type="module" module-name="xwikibase" />
-    <orderEntry type="module" module-name="portal" />
     <orderEntry type="library" name="LDAP" level="project" />
     <orderEntry type="library" name="RSS" level="project" />
     <orderEntry type="library" name="Dom4J" level="project" />
@@ -143,6 +142,10 @@
     <containerElement type="library" name="SecurityFilter" level="project">
       <attribute name="method" value="1" />
       <attribute name="URI" value="/WEB-INF/lib" />
+    </containerElement>
+    <containerElement type="library" name="Servlet API" level="project">
+      <attribute name="method" value="0" />
+      <attribute name="URI" value="&lt;N/A&gt;" />
     </containerElement>
     <containerElement type="library" name="Struts" level="project">
       <attribute name="method" value="1" />

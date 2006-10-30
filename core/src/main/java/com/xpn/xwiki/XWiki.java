@@ -4044,6 +4044,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     }
 
+
+    public String getUniquePageName(String space, XWikiContext context) {
+  	         String pageName = generateRandomString(16);
+  	         return getUniquePageName(space, pageName, context);
+  	     }
+    
     public String getUniquePageName(String space, String name, XWikiContext context){
         String pageName = clearName(name, context);
         if (exists(space + "." + pageName, context)){

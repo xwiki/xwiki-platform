@@ -2071,6 +2071,15 @@ v     * API to check rights on a document for a given user
 
     /**
      * Generates a unique page name based on initial page name and already existing pages
+     * @param name
+     * @return a unique page name
+     */
+    public String getUniquePageName(String name){
+        return xwiki.getUniquePageName(name, context);
+    }
+
+    /**
+     * Generates a unique page name based on initial page name and already existing pages
      * @param space
      * @param name
      * @return a unique page name

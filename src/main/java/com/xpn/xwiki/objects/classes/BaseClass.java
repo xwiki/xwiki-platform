@@ -25,6 +25,8 @@ package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -163,9 +165,12 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         if (!getDefaultWeb().equals(bclass.getDefaultWeb()))
             return false;
 
-        if (!getNameField().equals(bclass.getNameField()))
+        if (!getValidationScript().equals(bclass.getValidationScript()))
             return false;
 
+        if (!getNameField().equals(bclass.getNameField()))
+            return false;
+        
         return true;
     }
 
@@ -207,6 +212,11 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         el.addText((getNameField()==null) ? "" : getNameField());
         cel.add(el);
 
+        el = new DOMElement("validationScript");
+        el.addText((getValidationScript()==null) ? "" : getValidationScript());
+        cel.add(el);
+
+
         Iterator it = getFieldList().iterator();
         while (it.hasNext()) {
             PropertyClass bprop = (PropertyClass)it.next();
@@ -247,6 +257,12 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             Element cnfel = cel.element("nameField");
             if (cnfel!=null) {
                 setNameField(cnfel.getText());
+                j++;
+            }
+
+            Element valel = cel.element("validationScript");
+            if (valel!=null) {
+                setValidationScript(valel.getText());
                 j++;
             }
 
@@ -665,6 +681,33 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public String getValidationScript() {
         return validationScript;
+    }
+
+    public boolean validateObject(BaseObject obj, XWikiContext context) throws XWikiException {
+        boolean isValid = true;
+        Object[] props = (Object[]) getPropertyNames();
+        for (int i=0;i<props.length;i++) {
+            String propname = (String) props[i];
+            BaseProperty property = (BaseProperty) obj.get(propname);
+            PropertyClass propclass = (PropertyClass) get(propname);
+            isValid &= propclass.validateProperty(property, context);
+        }
+
+        String validSript = getValidationScript();
+        if ((validSript!=null)&&(!validSript.trim().equals("")))
+          isValid &= executeValidationScript(obj, validSript, context);
+        
+        return isValid;
+    }
+
+    private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context) throws XWikiException {
+        try {
+        XWikiValidationInterface validObject = (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
+        return validObject.validateObject(obj, context);
+        } catch (Throwable e) {
+             XWikiValidationStatus.addExceptionToContext(getName(), "", e, context);
+             return false;
+        }
     }
 
 }

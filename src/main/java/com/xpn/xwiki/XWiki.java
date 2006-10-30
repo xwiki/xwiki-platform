@@ -74,8 +74,6 @@ import com.xpn.xwiki.util.MenuSubstitution;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
-import com.xpn.xwiki.validation.XWikiValidationInterface;
-import com.xpn.xwiki.validation.XWikiValidationException;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -4167,20 +4165,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean validateDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        XWikiValidationException xwe;
-        String validationScript = "";
-        XWikiRequest req = context.getRequest();
-        if (req!=null) {
-            validationScript = req.get("xvalidation");
-        }
-        if ((validationScript==null)||(validationScript.trim().equals(""))) {
-            validationScript = doc.getValidationScript();
-        }
-        if ((validationScript==null)||(validationScript.trim().equals(""))) {
-           XWikiValidationInterface validObject = (XWikiValidationInterface) parseGroovyFromPage(validationScript, context);
-           return validObject.validateDocument(doc, context);   
-        }
-        return true;
+         return doc.validate(context);
     }
 
     public String getMessage(String item, XWikiContext context) {
@@ -4202,9 +4187,29 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return null;
         return parseMessage(message, context);
     }
-        
-    public String getUniquePageName(String space, XWikiContext context) {
-        String pageName = generateRandomString(16);
-        return getUniquePageName(space, pageName, context);
+
+    public String addTooltip(String html, String message, String params, XWikiContext context) {
+      StringBuffer buffer = new StringBuffer();
+        buffer.append("<span onmouseover=\"");
+        buffer.append(params);
+        buffer.append("; return escape('");
+        buffer.append(message.replaceAll("'","\\'"));
+        buffer.append("');\">");
+        buffer.append(html);
+        buffer.append("</span>");
+        return buffer.toString();
+    }
+
+    public String addTooltipJS(XWikiContext context) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("<script type=\"text/javascript\" src=\"");
+        buffer.append(getSkinFile("ajax/wzToolTip.js", context));
+        buffer.append("\"></script>");
+        // buffer.append("<div id=\"dhtmltooltip\"></div>");
+        return buffer.toString();
+    }
+
+    public String addTooltip(String html, String message, XWikiContext context) {
+        return addTooltip(html, message, "this.WIDTH='300'", context);
     }
 }

@@ -702,6 +702,39 @@ public class Document extends Api {
         currentObj = getObject(className, nb);
     }
 
+    public String getActiveClass() {
+        if (currentObj==null)
+         return null;
+        else
+         return currentObj.getName();
+    }
+
+    public String displayPrettyName(String fieldname) {
+        if (currentObj == null)
+            return doc.displayPrettyName(fieldname, context);
+        else
+            return doc.displayPrettyName(fieldname, currentObj.getBaseObject(), context);
+    }
+
+    public String displayPrettyName(String fieldname, Object obj) {
+        if (obj == null)
+            return "";
+        return doc.displayPrettyName(fieldname, obj.getBaseObject(), context);
+    }
+
+    public String displayTooltip(String fieldname) {
+        if (currentObj == null)
+            return doc.displayTooltip(fieldname, context);
+        else
+            return doc.displayTooltip(fieldname, currentObj.getBaseObject(), context);
+    }
+
+    public String displayTooltip(String fieldname, Object obj) {
+        if (obj == null)
+            return "";
+        return doc.displayTooltip(fieldname, obj.getBaseObject(), context);
+    }
+
     public String display(String fieldname) {
         if (currentObj == null)
             return doc.display(fieldname, context);
@@ -1260,4 +1293,7 @@ public class Document extends Api {
         return attachment;
     }
 
+    public boolean validate() throws XWikiException {
+        return doc.validate(context);
+    }
 }

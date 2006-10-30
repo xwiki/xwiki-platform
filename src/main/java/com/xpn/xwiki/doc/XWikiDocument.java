@@ -30,6 +30,8 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -46,6 +48,7 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -943,6 +946,54 @@ public class XWikiDocument {
         this.template = template;
     }
 
+    public String displayPrettyName(String fieldname, XWikiContext context) {
+        try {
+            BaseObject object = getxWikiObject();
+            if (object == null)
+                object = getFirstObject(fieldname, context);
+            return displayPrettyName(fieldname, object, context);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String displayPrettyName(String fieldname, BaseObject obj, XWikiContext context) {
+        try {
+            PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
+            return pclass.getPrettyName();
+        }
+        catch (Exception e) {
+            return "";
+            // return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
+        }
+    }
+
+    public String displayTooltip(String fieldname, XWikiContext context) {
+        try {
+            BaseObject object = getxWikiObject();
+            if (object == null)
+                object = getFirstObject(fieldname, context);
+            return displayTooltip(fieldname, object, context);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context) {
+        try {
+            PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
+            String tooltip = pclass.getTooltip();
+            if ((tooltip!=null)&&(!tooltip.trim().equals(""))) {
+                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context) + "\" align=\"middle\" />";
+                return context.getWiki().addTooltip(img, tooltip, context);
+            } else
+             return "";
+        }
+        catch (Exception e) {
+            return "";
+        }
+    }
+
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context) {
         try {
             type = type.toLowerCase();
@@ -959,6 +1010,7 @@ public class XWikiDocument {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
                 result.append(getRenderedContent(fcontent, context));
             } else if (type.equals("edit")) {
+                context.addDisplayedField(fieldname);
                 result.append("{pre}");
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
                 result.append("{/pre}");
@@ -1306,6 +1358,7 @@ public class XWikiDocument {
         doc.setCreator(getCreator());
         doc.setDefaultLanguage(getDefaultLanguage());
         doc.setDefaultTemplate(getDefaultTemplate());
+        doc.setValidationScript(getValidationScript());
         doc.setLanguage(getLanguage());
         doc.setTranslation(getTranslation());
         doc.setxWikiClass((BaseClass) getxWikiClass().clone());
@@ -1387,6 +1440,12 @@ public class XWikiDocument {
         if (!getTemplate().equals(doc.getTemplate()))
             return false;
 
+        if (!getDefaultTemplate().equals(doc.getDefaultTemplate()))
+            return false;
+
+        if (!getValidationScript().equals(doc.getValidationScript()))
+            return false;
+        
         if (!getxWikiClass().equals(doc.getxWikiClass()))
             return false;
 
@@ -1552,6 +1611,14 @@ public class XWikiDocument {
         el.addText(getTemplate());
         docel.add(el);
 
+        el = new DOMElement("defaultTemplate");
+        el.addText(getDefaultTemplate());
+        docel.add(el);
+
+        el = new DOMElement("validationScript");
+        el.addText(getValidationScript());
+        docel.add(el);
+
         List alist = getAttachmentList();
         for (int ai = 0; ai < alist.size(); ai++) {
             XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
@@ -1699,6 +1766,8 @@ public class XWikiDocument {
         setLanguage(getElement(docel, "language"));
         setDefaultLanguage(getElement(docel, "defaultLanguage"));
         setTitle(getElement(docel,"title"));
+        setDefaultTemplate(getElement(docel,"defaultTemplate"));
+        setValidationScript(getElement(docel,"validationScript"));
 
         String strans = getElement(docel, "translation");
         if ((strans == null) || strans.equals(""))
@@ -2592,7 +2661,10 @@ public class XWikiDocument {
     }
 
     public String getDefaultTemplate() {
-        return defaultTemplate;
+        if (defaultTemplate==null)
+         return "";
+        else
+         return defaultTemplate;
     }
 
     public void setDefaultTemplate(String defaultTemplate) {
@@ -2956,6 +3028,9 @@ public class XWikiDocument {
     }
 
     public String getValidationScript() {
+        if (validationScript==null)
+         return "";
+        else
         return validationScript;
     }
 
@@ -2981,4 +3056,43 @@ public class XWikiDocument {
         }
     }
 
+    public boolean validate(XWikiContext context) throws XWikiException {
+        boolean isValid = true;
+        for (Iterator it = getxWikiObjects().keySet().iterator(); it.hasNext();) {
+            String classname = (String) it.next();
+            BaseClass bclass = context.getWiki().getClass(classname, context);
+            Vector objects = getObjects(classname);
+
+            for (int i = 0; i < objects.size(); i++) {
+                BaseObject obj = (BaseObject) objects.get(i);
+                if (obj != null) {
+                    isValid &= bclass.validateObject(obj, context);
+                }
+            }
+        }
+
+        String validationScript = "";
+        XWikiRequest req = context.getRequest();
+        if (req!=null) {
+            validationScript = req.get("xvalidation");
+        }
+        if ((validationScript==null)||(validationScript.trim().equals(""))) {
+            validationScript = getValidationScript();
+        }
+        if ((validationScript!=null)&&(!validationScript.trim().equals(""))) {
+            isValid &= executeValidationScript(context, validationScript);
+
+        }
+        return isValid;
+    }
+
+    private boolean executeValidationScript(XWikiContext context, String validationScript) throws XWikiException {
+        try {
+        XWikiValidationInterface validObject = (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
+        return validObject.validateDocument(this, context);
+        } catch (Throwable e) {
+             XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
+             return false;
+        }
+    }
 }

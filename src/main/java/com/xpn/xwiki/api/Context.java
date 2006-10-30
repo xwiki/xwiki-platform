@@ -24,10 +24,13 @@
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
+
+import java.util.List;
 
 
 public class Context extends Api {
@@ -238,4 +241,13 @@ public class Context extends Api {
     public String getLinksQueryString() {
         return context.getLinksQueryString();
     }
+
+    public XWikiValidationStatus getValidationStatus() {
+        return context.getValidationStatus();
+    }
+
+    public List getDisplayedFields() {
+        return context.getDisplayedFields();
+    }
+
 }

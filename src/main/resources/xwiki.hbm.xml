@@ -39,11 +39,11 @@
         </property>
 
         <property name="contentUpdateDate" type="timestamp">
-            <column name="XWD_CONTENT_UPDATE_DATE" />
+            <column name="XWD_CONTENT_UPDATE_DATE" not-null="true" />
         </property>
 
         <property name="creationDate" type="timestamp">
-            <column name="XWD_CREATION_DATE" />
+            <column name="XWD_CREATION_DATE" not-null="true" />
         </property>
 
         <property name="author" type="string">
@@ -88,11 +88,11 @@
         </property>
 
         <property name="defaultTemplate" type="string">
-            <column name="XWD_DEFAULT_TEMPLATE" />
+            <column name="XWD_DEFAULT_TEMPLATE"  not-null="true"/>
         </property>
 
         <property name="validationScript" type="string">
-            <column name="XWD_VALIDATION_SCRIPT" />
+            <column name="XWD_VALIDATION_SCRIPT"  not-null="true" />
         </property>
 
     </class>
@@ -103,7 +103,7 @@
             <generator class="assigned" />
         </id>
         <property name="archive" type="string">
-            <column name="XWD_ARCHIVE" length="200000" not-null="false"/>
+            <column name="XWD_ARCHIVE" length="200000" not-null="false" />
         </property>
     </class>
 
@@ -718,19 +718,19 @@
             <column name="XWP_LANGUAGES" length="255" />
         </property>
         <property name="registration_anonymous" type="string">
-            <column name="XWP_REGISTRATION_ANONYMUOS" length="255" />
+            <column name="XWP_REGISTRATION_ANONYMOUS" length="255" />
         </property>
         <property name="registration_registered" type="string">
             <column name="XWP_REGISTRATION_REGISTERED" length="255" />
         </property>
         <property name="edit_anonymous" type="string">
-            <column name="XWP_EDIT_ANONYMUOS" length="255" />
+            <column name="XWP_EDIT_ANONYMOUS" length="255" />
         </property>
         <property name="edit_registered" type="string">
             <column name="XWP_EDIT_REGISTERED" length="255" />
         </property>
         <property name="comment_anonymous" type="string">
-            <column name="XWP_COMMENT_ANONYMUOS" length="255" />
+            <column name="XWP_COMMENT_ANONYMOUS" length="255" />
         </property>
         <property name="comment_registered" type="string">
             <column name="XWP_COMMENT_REGISTERED" length="255" />

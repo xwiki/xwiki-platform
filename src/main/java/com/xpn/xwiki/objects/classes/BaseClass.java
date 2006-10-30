@@ -627,8 +627,6 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public void setNameField(String nameField) {
-        if (nameField==null)
-         return "";
         this.nameField = nameField;
     }
 

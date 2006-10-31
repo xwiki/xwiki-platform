@@ -27,6 +27,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 
 import java.util.List;
+import java.util.Vector;
 
 
 public class ZipExplorerPluginAPI extends Api {
@@ -44,6 +45,10 @@ public class ZipExplorerPluginAPI extends Api {
 
     public List getFileList(Document doc, String attachmentName) {
         return this.plugin.getFileList(doc, attachmentName, context);
+    }
+
+    public Vector getFileTreeList(Document doc, String attachmentName) {
+        return this.plugin.getFileTreeList(doc, attachmentName, context);
     }
 
     public String getFileLink(Document doc, String attachmentName, String fileName) {

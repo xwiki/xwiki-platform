@@ -27,6 +27,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
@@ -40,10 +41,7 @@ import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
-import java.util.Properties;
-import java.util.List;
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.*;
 
 
 public class ZipExplorerPlugin extends XWikiDefaultPlugin {
@@ -143,7 +141,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     }
 
 
-    List getFileList(Document doc, String attachmentName, XWikiContext context) {
+    public List getFileList(Document doc, String attachmentName, XWikiContext context) {
         List zipList = null;
 
         if (attachmentName.endsWith(".zip")) {
@@ -180,6 +178,32 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
         return zipList;
     }
+
+     public Vector getFileTreeList(Document doc, String attachmentName, XWikiContext context) {
+        List flatList = getFileList(doc, attachmentName, context);
+         Map fileTree = new HashMap();
+         Iterator it = flatList.iterator();
+         Vector res = new Vector();
+         while(it.hasNext()){
+             String url = (String) it.next();
+             StringBuffer buf = new StringBuffer(url.length());
+             String parentBuf = "";
+             String[] aUrl = url.split("/");
+             for (int i = 0; i < aUrl.length; i++){
+                 if (i == aUrl.length - 1 && !url.endsWith("/"))
+                    buf.append(aUrl[i]);
+                 else
+                    buf.append(aUrl[i] + "/");
+                 ListItem item = new ListItem(buf.toString(), aUrl[i], parentBuf);
+                 if (!fileTree.containsKey(buf.toString()))
+                    res.add(item);
+                 fileTree.put(buf.toString(), item);
+                 parentBuf = buf.toString();
+             }
+         }
+         return res;
+     }
+
 
     String getFileLink(Document doc, String attachmentName, String fileName, XWikiContext context) {
         String link = doc.getAttachmentURL(attachmentName);

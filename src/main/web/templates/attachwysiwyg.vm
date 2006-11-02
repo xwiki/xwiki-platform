@@ -9,14 +9,14 @@
       <br /><br />
       $msg.get("choosefiletoupload"):
       <input type="file" name="filepath" value="" size="40"  /> <br /><br />
-      <input type="submit" value="$msg.get("attachthisfile")" />
+      <input type="submit" id="attachment" name="attachment" value="$msg.get("attachthisfile")" />
     </p>
   </form>
   #set($counter=0)
   #foreach ($attach in $attachments)
     #if((!$request.images)||$attach.isImage())
       #if($counter==0)
-        <table>
+        <table width="95%">
           <tr class="title"><th></th><th>$msg.get("filename")</th><th>$msg.get("version")</th><th>$msg.get("author")</th></tr>
       #end
       <tr>

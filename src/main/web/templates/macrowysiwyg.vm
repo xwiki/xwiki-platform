@@ -27,7 +27,7 @@
             </tr>
         </table>
     </div>
-    <hr />
+
     <div id="input">
     </div>
     #foreach ($macro in $macros)

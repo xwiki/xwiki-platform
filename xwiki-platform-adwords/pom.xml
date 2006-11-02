@@ -1,0 +1,57 @@
+<!--
+ *
+ * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.plugin</groupId>
+    <artifactId>xwiki-plugins</artifactId>
+    <version>0.9-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-plugin-adwords</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <name>XWiki Adwords Plugin</name>
+  <packaging>jar</packaging>
+  <description>XWiki Adwords Plugin</description>
+  <dependencies>
+
+    <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
+
+    <dependency>
+      <groupId>com.google</groupId>
+      <artifactId>googleadwords</artifactId>
+      <version>UNKNOWN</version>
+      <classifier>xwiki</classifier>
+    </dependency>
+
+    <!-- Standard dependencies found in the main Maven remote repository -->
+
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>0.9-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+</project>
+        

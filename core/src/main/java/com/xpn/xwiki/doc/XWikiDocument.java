@@ -24,7 +24,6 @@
  * @author thomas
  */
 
-
 package com.xpn.xwiki.doc;
 
 
@@ -1003,7 +1002,7 @@ public class XWikiDocument {
             String prefix = obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
             if (pclass.isCustomDisplayed(context)){
-                pclass.displayCustom(result, fieldname, prefix, type, obj, context);
+                pclass.displayCustom(result, fieldname, prefix, type, obj, context);  
             }
             else if (type.equals("view")) {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -1241,7 +1240,7 @@ public class XWikiDocument {
             getxWikiObjects().put(name, newobjects);
         }
     }
-
+    
     public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
@@ -1447,7 +1446,7 @@ public class XWikiDocument {
 
         if (!getValidationScript().equals(doc.getValidationScript()))
             return false;
-
+        
         if (!getxWikiClass().equals(doc.getxWikiClass()))
             return false;
 
@@ -1862,7 +1861,7 @@ public class XWikiDocument {
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException {
         saveAttachmentContent(attachment, true, true, context);
     }
-
+    
 
     protected void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction, XWikiContext context) throws XWikiException {
         String database = context.getDatabase();

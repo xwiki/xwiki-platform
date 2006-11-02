@@ -20,15 +20,6 @@
  *
 -->
 
-<!-- NOTE: THIS IS A WORK IN PROGRESS. IT'S STILL MISSING SOME JARS FOR THE COMPILATION TO WORK -->
-<!-- ISSUES:
-
-jfreechart: I've used v 1.0.0 instead of 1.0.0-rc1 as in lib/. Is that ok? Note that ther's also a 1.0.2. Should we
-            upgrade to that?
-googleaddwords.jar: what version and license?
-              
--->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>

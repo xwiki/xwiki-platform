@@ -28,7 +28,6 @@
  * @author thomas
  * @author slauriere
  */
-
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.api.Api;

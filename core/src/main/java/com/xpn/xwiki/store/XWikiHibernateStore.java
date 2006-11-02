@@ -289,8 +289,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     Vector objects = (Vector) it.next();
                     for (int i=0;i<objects.size();i++) {
                         BaseCollection obj = (BaseCollection)objects.get(i);
-                        if (obj!=null)
+                        if (obj!=null){
+                            obj.setName(doc.getFullName());
                             saveXWikiCollection(obj, context, false);
+                        }
                     }
                 }
             }
@@ -548,7 +550,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         try {
             if (object==null)
                 return;
-
             // We need a slightly different behavior here
             boolean stats = (object instanceof XWikiStats);
 

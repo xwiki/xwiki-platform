@@ -24,8 +24,6 @@
  * @author sdumitriu
  * @author thomas
  */
-
-
 package com.xpn.xwiki.store;
 
 

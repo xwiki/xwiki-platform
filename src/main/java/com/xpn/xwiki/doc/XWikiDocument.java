@@ -1365,6 +1365,7 @@ public class XWikiDocument {
         doc.setxWikiClassXML(getxWikiClassXML());
         doc.clonexWikiObjects(this);
         doc.copyAttachments(this);
+        doc.elements = elements;
         return doc;
     }
 

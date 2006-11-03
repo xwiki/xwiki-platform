@@ -498,7 +498,7 @@
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${web.exo.webapp.main.src.dir}/WEB-INF/web-exo.xml" >
+      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${web.exo.webapp.main.src.dir}/WEB-INF/web.xml" >
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
           <lib refid="libs.main.fileset" />

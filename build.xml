@@ -33,16 +33,12 @@
     <!-- This setting will be used if not overided by build.properties -->
     <property name="jdbc.filter" value="hsqldb_filters.properties" />
 
-    <!-- The following line is used to read the version -->
-    <property file="src/main/web/WEB-INF/xwiki.cfg" />
-
     <property name="app.name" value="xwiki" />
     <property name="pkg" value="com.xpn.xwiki" />
 
     <property name="src.dir" value="${basedir}/src/" />
 
     <property name="main.src.dir" value="${src.dir}/main/" />
-    <property name="web.main.src.dir" value="${main.src.dir}/web" />
 
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="java.test.src.dir" value="${test.src.dir}/java" />
@@ -55,6 +51,19 @@
     <property name="core.java.main.src.dir" value="${core.main.src.dir}/java" />
     <property name="core.resources.main.src.dir" value="${core.main.src.dir}/resources" />
 
+    <property name="web.dir" value="${basedir}/web" />
+    <property name="web.standard.dir" value="${web.dir}/standard" />
+    <property name="web.standard.src.dir" value="${web.standard.dir}/src" />
+    <property name="web.standard.main.src.dir" value="${web.standard.src.dir}/main" />
+    <property name="web.standard.webapp.main.src.dir" value="${web.standard.main.src.dir}/webapp" />
+    <property name="web.exo.dir" value="${web.dir}/exo" />
+    <property name="web.exo.src.dir" value="${web.exo.dir}/src" />
+    <property name="web.exo.main.src.dir" value="${web.exo.src.dir}/main" />
+    <property name="web.exo.webapp.main.src.dir" value="${web.exo.main.src.dir}/webapp" />
+
+    <!-- The following line is used to read the version -->
+    <property file="${web.standard.webapp.main.src.dir}/WEB-INF/xwiki.cfg" />
+    
     <property name="lib.dir" value="${basedir}/lib" />
 
     <property name="build.dir" value="${basedir}/build" />
@@ -214,10 +223,10 @@
     </taskdef>
 
     <target name="prepare">
-        <propertyfile file="src/main/web/WEB-INF/version.properties" >
+        <propertyfile file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" >
             <entry key="build.number" type="int" value="1" operation="+" pattern="0000" />
         </propertyfile>
-        <property file="src/main/web/WEB-INF/version.properties" />
+        <property file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" />
         <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <property name="test.warfile" value="${release.dir}/xwiki.war" />
@@ -262,7 +271,7 @@
 
         <copy todir="${build.dir}/web">
             <fileset includes="**" excludes="JSTrim*.*,**/*_src.js"
-                dir="${web.main.src.dir}" />
+                dir="${web.standard.webapp.main.src.dir}" />
         </copy>
     	
         <copy todir="${build.dir}/web/WEB-INF">

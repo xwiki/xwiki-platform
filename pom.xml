@@ -52,6 +52,7 @@
   </scm>
   <modules>
     <module>core</module>
+    <module>web</module>
   </modules>
   <repositories>
     <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main

@@ -349,7 +349,9 @@
       <!-- Note: The 2.4 version is not technically correct as 2.4 corresponds to a specification # and is not an
            implementation version. The central repo would need to be fixed... -->
       <version>2.4</version>
-      <scope>runtime</scope>
+      <!-- TODO: Compilation is failing when the runtime scope is set. We need to investigate why as the servlet
+           API should be a runtime dependency -->
+      <!--scope>runtime</scope-->
     </dependency>
   </dependencies>
 </project>

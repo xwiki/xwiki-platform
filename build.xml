@@ -272,12 +272,6 @@
                 dir="${basedir}/" />
         </copy>
 
-        <copy todir="${build.dir}/web/WEB-INF/classes">
-            <fileset dir="${build.dir}/web/WEB-INF">
-                <include name="hibernate.cfg.xml" />
-            </fileset>
-        </copy>
-
     </target>
 	
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">

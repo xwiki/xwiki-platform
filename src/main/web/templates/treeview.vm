@@ -1,4 +1,4 @@
-#if(!$treeviewid)
+{pre}#if(!$treeviewid)
 #set($treeviewid = 1)
 #else
 #set($treeviewid = 1 + $treeviewid)
@@ -26,6 +26,15 @@
 	     parent2 = nodes[parent];
 	    nodes[id] = new YAHOO.widget.CheckNode(id, text,  parent2, checked, checked);
         nodes[id].onCheckClick = onCheckClick;
+    }
+
+    function addTreeElementViewMode(tree, nodes, id, text, parent) {
+	    var parent2;
+	    if (parent=="")
+	     parent2 = tree.getRoot();
+	    else
+	     parent2 = nodes[parent];
+	    nodes[id] = new YAHOO.widget.TextNode(text, parent2, true);
     }
 
 	var callback = null;
@@ -67,7 +76,13 @@
          #set($title_item = $item.value)
         #end
         #set($title_item = $title_item.replaceAll("[\r\n]"," "))
-        addTreeElement(tree, nodes, "$item.id", "$title_item", "$item.parent", #if($checked) true #else false #end)
+        #if($mode == "view")
+         #if($checked)
+          addTreeElementViewMode(tree, nodes, "$item.id", "$title_item", "$item.parent")
+         #end
+        #else
+         addTreeElement(tree, nodes, "$item.id", "$title_item", "$item.parent", #if($checked) true #else false #end)
+        #end
         #end
    		tree.draw();
         // tree.checkClickEvent.subscribe(onCheckClick);
@@ -75,4 +90,4 @@
 
     // Init the tree
     treeInit${treeviewid}();
-</script>
+</script>{/pre}

@@ -33,6 +33,7 @@ import java.util.*;
 import org.apache.velocity.VelocityContext;
 import org.apache.ecs.xhtml.select;
 import org.apache.ecs.xhtml.option;
+import org.apache.commons.lang.StringUtils;
 
 public class DBTreeListClass extends DBListClass {
 
@@ -103,8 +104,25 @@ public class DBTreeListClass extends DBListClass {
         list.add(item);
     }
 
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        List selectlist;
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop == null) {
+            selectlist = new ArrayList();
+        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
+        } else {
+            selectlist = new ArrayList();
+            selectlist.add(prop.getValue());
+        }
+        String result = displayTree(name, prefix, selectlist, "view", context);
+        if (result.equals(""))
+            super.displayView(buffer, name, prefix, object, context);
+        else
+            buffer.append(result);
+    }
+
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         List selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
@@ -117,12 +135,7 @@ public class DBTreeListClass extends DBListClass {
         }
 
         if (isPicker()) {
-            Map map = getTreeMap(context);
-            vcontext.put("selectlist", selectlist);
-            vcontext.put("fieldname", prefix + name);
-            vcontext.put("tree", map);
-            vcontext.put("treelist", getTreeList(map));
-            String result = context.getWiki().parseTemplate("treeview.vm", context);
+            String result = displayTree(name, prefix, selectlist, "edit", context);
             if (result.equals(""))
                 displayTreeSelectEdit(buffer, name, prefix, object, context);
             else {
@@ -132,6 +145,17 @@ public class DBTreeListClass extends DBListClass {
         } else {
             displayTreeSelectEdit(buffer, name, prefix, object, context);
         }
+    }
+
+    private String displayTree(String name, String prefix, List selectlist, String mode, XWikiContext context){
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            Map map = getTreeMap(context);
+            vcontext.put("selectlist", selectlist);
+            vcontext.put("fieldname", prefix + name);
+            vcontext.put("tree", map);
+            vcontext.put("treelist", getTreeList(map));
+            vcontext.put("mode", mode);
+            return context.getWiki().parseTemplate("treeview.vm", context);
     }
 
     protected void addToSelect(select select, List selectlist, Map map, Map treemap, String parent, String level, XWikiContext context) {

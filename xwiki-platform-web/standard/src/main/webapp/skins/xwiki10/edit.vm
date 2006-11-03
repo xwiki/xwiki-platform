@@ -1,0 +1,55 @@
+###
+### Main "edit" template
+###
+### General wrapper for edit actions
+###
+##
+## Determine what editor to show
+##
+#if((!$editor) || ($editor == ""))
+#set($editor = $request.getParameter("editor"))
+#if((!$editor) || ($editor == ""))
+#if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&(!$doc.isAdvancedContent()))
+#set($editor="wysiwyg")
+#else
+#set($editor="wiki")
+#end
+#end
+#end
+##
+## "Compute" the title
+##
+#set($title = $xwiki.parseContent($msg.get("editpageTitle")))
+##
+## Header
+##
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+##
+## Content
+##
+#set($force = $!request.get("force"))
+#if (($tdoc.getLocked()==true)&&(!$force))
+#xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
+<a href="$doc.getURL("edit", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+#xwikimessageboxend()
+#else
+<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
+#template("editmodes.vm")
+</div>
+<div id="xwikieditor" class="layoutsection">
+<div id="editcolumn" class="editor">
+#template("edit${editor}.vm")
+</div>
+#template("editpanels.vm")
+<div class="clearfloats"></div>
+#end
+##
+## Footer
+##
+</div>
+#template("footer.vm")
+#template("htmlfooter.vm")

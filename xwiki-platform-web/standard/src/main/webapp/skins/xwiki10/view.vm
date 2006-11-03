@@ -1,0 +1,51 @@
+###
+### Main "view" template
+###
+### General wrapper for view actions
+###
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("startpage.vm")
+#if((!$viewer) || ($viewer == ""))
+#set($viewer = $request.getParameter("viewer"))
+#end
+#if((!$viewer) || ($viewer == ""))
+#set($viewer = "view")
+#end
+#if($viewer == "view")
+#template("menuview.vm")
+#template("contentview.vm")
+##
+##
+## Extra data: comments, attachments ...
+##
+<div id="xwikidata" class="layoutsubsection">
+#set($show = $!request.getParameter("show"))
+#if(!$show || ($show != "comments" && $show != "attachments" && $show != "history"))
+#set($show = "comments")
+#end
+<h3 class="hidden">$msg.get("docdata")</h3>
+<ul class="xwikitabbar">
+<li id="xwikicomments"#if($show == "comments") class="active"#end><a href="$doc.getURL("view", "show=comments")#xwikicomments" title="$msg.get("showcomments")">$msg.get("comments")</a></li><li id="xwikiattachments"#if($show == "attachments") class="active"#end><a href="$doc.getURL("view", "show=attachments")#xwikiattachments" title="$msg.get("showattachments")">$msg.get("attachments")</a></li><li id="xwikihistory"#if($show == "history") class="active"#end><a href="$doc.getURL("view", "show=history")#xwikihistory" title="$msg.get("showhistory")">$msg.get("history")</a></li><li class="extern"><a href="#todo:writeme" title="$msg.get("showattributes")">$msg.get("attributes")</a></li>
+</ul>
+<div id="xwikidatacontents">
+#if($show == "comments")
+#template("commentsinline.vm")
+#elseif($show == "attachments")
+#template("attachmentsinline.vm")
+#elseif($show == "history")
+#template("historyinline.vm")
+#end
+</div>
+    </div>
+<div class="clearfloats"></div>
+#else
+<h4 id="xwikiviewerstitles">$msg.get("chooseviewer")</h4>
+#template("viewmodes.vm")
+<div class="main layoutsubsection">
+#template("${viewer}.vm")
+<div class="clearfloats"></div></div>
+#end
+#template("endpage.vm")
+#end

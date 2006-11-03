@@ -1,0 +1,5 @@
+#if($showRightPanels == "1")
+<div id="rightPanels" class="panels right">
+<div class="fakepanel"></div>
+</div>
+#end

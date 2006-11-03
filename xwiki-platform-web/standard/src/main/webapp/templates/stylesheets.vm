@@ -1,0 +1,28 @@
+<link href="$xwiki.getSkinFile("style.css", true)" rel="stylesheet" type="text/css"  />
+#set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
+#set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
+#if ($defaultstyle!="")
+<link href="$xwiki.getSkinFile($defaultstyle, true)" rel="stylesheet" type="text/css" title="default" />
+#else
+<link href="$xwiki.getSkinFile("style.css", true)" rel="stylesheet" type="text/css" />
+#end
+#if($request.getHeader("user-agent").indexOf("MSIE")!=-1)
+<link href="$xwiki.getSkinFile("ie.css")" rel="stylesheet" type="text/css" title="default" />
+#end
+#if ($stylesheets != "")
+#set( $stylenb = 1)
+#foreach ( $stylesheet in $xwiki.split($stylesheets, ","))
+<link href="$xwiki.getSkinFile($stylesheet, true)" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet $stylenb" />
+#set( $stylenb = $stylenb + 1)
+#end
+#else
+<link href="$xwiki.getSkinFile("style1.css", true)" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 1" />
+<link href="$xwiki.getSkinFile("style2.css", true)" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 2" />
+<link href="$xwiki.getSkinFile("style3.css", true)" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet 3" />
+#end
+<style type="text/css">
+$!xwiki.getWebPreference("style")
+</style>
+<style type="text/css">
+$!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
+</style>

@@ -1,0 +1,76 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+#set( $counter = 0)
+<br />
+<br />
+<table border="1" cellpadding="4" cellspacing="0" width="70%">
+<tr><th></th><th> <b>$msg.get("filename")</b> </th><th> <b>$msg.get("version")</b> </th>
+<th> <b>$msg.get("author")</b> </th><th> <b>$msg.get("size")</b> </th>
+ <th> <b>$msg.get("history")</b></th><th> <b>$msg.get("delete")</b></th>
+</tr>
+#foreach ($attach in $doc.attachmentList)
+<tr>
+<td>
+#if ($attach.isImage())
+<img src="$doc.getAttachmentURL("${attach.filename}", "download", "width=80")" alt="${attach.filename}" width="80" />
+#end
+</td><td><a href="$doc.getAttachmentURL("${attach.filename}", "download")">$attach.filename</a></td>
+<td align="center">$attach.version</td><td align="center">$attach.author</td><td align=center>$attach.filesize</td>
+<td align="center">
+  <a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")">$msg.get("history")</a>
+</td>
+<td align="center"><a href="$doc.getAttachmentURL("${attach.filename}", "delattachment")" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</a></td>
+</td>
+</tr>
+#set( $counter = $counter + 1)
+#end
+</table>
+<br />
+<br />
+<form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
+<p>
+<script type="text/javascript">
+function updateName(form) {
+  var fname = form.filepath.value;
+
+  if (fname=="") {
+    return false;
+  }
+
+  var i = fname.lastIndexOf('\\');
+  if (i==-1)
+   i = fname.lastIndexOf('/');
+
+  fname = fname.substring(i+1);
+  if (form.filename.value==fname)
+   return true;
+
+  if (form.filename.value=="")
+   form.filename.value = fname;
+  else {
+   if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?"))
+     form.filename.value = fname;
+  }
+  return true;
+}
+</script>
+$msg.get("choosetargetfilename"):
+<input type="text" name="filename" value="" size="20" />
+<br /><br />
+$msg.get("choosefiletoupload"):
+<input type="file" name="filepath" value="" size="40"  />
+<br /><br />
+<input type="submit" value="$msg.get("attachthisfile")" onclick="return updateName(this.form)" />
+</p>
+</form>
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

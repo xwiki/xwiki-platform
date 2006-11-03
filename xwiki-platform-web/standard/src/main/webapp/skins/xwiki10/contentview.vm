@@ -1,0 +1,11 @@
+###
+### Display document contents in normal "view" mode
+###
+### TODO: Web service?
+###
+<div class="main layoutsubsection">
+$cdoc.getRenderedContent()
+</div>
+<div class="about layoutsubsection">
+$msg.get("version") $tdoc.version $msg.get("lastmodifiedby") $xwiki.getLocalUserName($tdoc.author) $msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($tdoc.date, "HH:mm")
+</div>

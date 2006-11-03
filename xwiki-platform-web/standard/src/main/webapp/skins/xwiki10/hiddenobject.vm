@@ -1,0 +1,11 @@
+#foreach($class in $doc.xWikiClasses)
+#set( $nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+#foreach($obj in $doc.getObjects($class.name))
+ #if ($obj.xWikiClass)
+  #foreach($prop in $class.properties)
+   $doc.displayHidden($prop, "${class.name}_${obj.number}_",  $obj)
+    #end
+  #end
+ #end
+#end

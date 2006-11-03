@@ -1,0 +1,15 @@
+#xwikiad {
+  float: right;
+  margin-right: 30px;
+}
+#xwikireadonly {
+  color: red;
+}
+#xwikimessage {
+  margin: auto;
+  padding: 0px;
+  margin-top: 5px;
+}
+#xwikiuseravatar{
+  max-width: 150px;
+}

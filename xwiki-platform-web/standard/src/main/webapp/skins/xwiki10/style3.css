@@ -1,0 +1,41 @@
+/* Sahara StyleSheet */
+
+/* Light Sahara */
+#xwikinav_footer, #xwikinav_header, .heading-1, .heading-1-1 {
+ border-color: #FFECBF;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: #FFECBF;
+}
+
+
+/* Dark Sahara */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #BFA260;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #BFA260;
+}
+
+.heading-1, .heading-1-1 {
+ border-color: #BFA260;
+ color: #BFA260;
+}
+
+/* Comments colors */
+.xwikidata, .xwikidatafooter, .xwikidatafooter1, .xwikidatefooter2 {
+  background-color: #FFECBF;
+}
+
+.xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
+ background-color: #BFA260;
+}
+
+/* Logo */
+#companylogo img {
+ background-image: url("logosahara.jpg");
+}
+

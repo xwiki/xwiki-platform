@@ -1,0 +1,19 @@
+
+.left {
+  display: block;
+  float: left;
+  clear: left;
+  width: 200px;
+  margin: 5px;
+  padding: 5px;
+  border: 1px dashed #888888;
+}
+
+.center {
+  display: block;
+  margin-left: 240px;
+}
+
+.centered {
+  margin: auto;
+}

@@ -1,0 +1,26 @@
+#set($attachments = $doc.attachmentList)
+<div id="xwikiattachmentscontent" class="xwikidatacontent">
+  #set($counter=0)
+  #foreach ($attach in $attachments)
+    #if((!$request.images)||$attach.isImage())
+      #if($counter==0)
+        <table width="95%">
+          <tr>
+              <td nowrap="nowrap" align="left" style="font-weight:bold">$msg.get("listofallattachments") :</td>
+          </tr>
+          <tr><td nowrap="nowrap"></td></tr>
+      #end
+      <tr>
+        <td align="left"> * <a href="#" onclick="document.forms[0].attach.value='$attach.filename'; return false;" >$attach.filename</a>
+        $msg.get("attachedby") $xwiki.getLocalUserName($attach.author) on $xwiki.formatDate($attach.date)</td>
+      </tr>
+    #end
+    #set( $counter = $counter + 1)
+  #end
+  </table>
+  </div>
+  <div class="xwikidatafooter2">
+    <div class="xwikidatafooter1">&nbsp;</div>
+    <div class="xwikidatafooter">&nbsp;</div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+  <div id="contentcolumn" class="content hideleft hideright">
+#xwikimessagebox($msg.get("rollback") $msg.get('readytorollback').concat(" ").concat($request.get("rev")).concat("?") "${request.requestURL}?confirm=1&amp;${request.queryString.replace('&', '&amp;').replace('&amp;amp;', '&amp;')}" $doc.getURL('view') $msg.get("yes") $msg.get("no"))
+  </div>
+</div>
+##
+##
+##
+#template("footer.vm")
+#template("htmlfooter.vm")
+#end

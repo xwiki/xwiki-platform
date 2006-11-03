@@ -1,0 +1,40 @@
+#set($formname = "update")
+#set($saveaction = "save")
+#set( $classes = $doc.getxWikiClasses())
+#set( $redirect = $xwiki.getRequestURL())
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div class="topbuttons">#template("editactions.vm")</div>
+<div id="xwikiobjects" class="accordion">
+#foreach($class in $classes)
+#set($props = $class.getProperties())
+#foreach($prop in $props)
+#if ($velocityCount==1)
+#set($firstfield = $prop.name)
+#end
+#end
+#set($first = 1)
+#set($nb = $doc.getObjectNumbers("${class.name}"))
+#foreach($obj in $doc.getObjects($class.name))
+<div id="field_${class.name}_${obj.number}">
+<div id="field_${class.name}_${obj.number}_title" class="accordionTabTitleBar"><h6><tt><strong>${class.name}[${obj.number}]: </strong>$doc.display($firstfield, $obj)</tt></h6></div>
+<div id="field_${class.name}_${obj.number}_content" class="accordionTabContentBox"><div>
+#if($first == 1)
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+#set($first = 0)
+#end
+<table>
+#foreach($prop in $class.properties)
+<tr><td class="label"><label for="${class.name}_${obj.number}_$prop.name">$prop.prettyName:</label></td>
+<td>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)</td>
+</tr>
+#end
+</table>
+<div class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${doc.getURL('edit', 'editor=object')}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("removethisobject")</a></div>
+</div></div>
+</div>
+#end
+#end
+</div>
+<div class="bottombuttons">#template("editactions.vm")</div>
+</form>
+<script type="text/javascript">new Rico.Accordion( 'xwikiobjects', {panelHeight:'flex'} );</script>

@@ -1,0 +1,21 @@
+#set($formname = "edit")
+#set($saveaction = "save")
+#set($previewenabled = true)
+#set($xredirect=$!request.getParameter("xredirect"))
+<form id="edit" method="post" action="$doc.getURL("preview")" >
+<div class="topbuttons">#template("editactions.vm")</div>
+<div>
+<input type="hidden" name="template" value="$!request.template" />
+<input type="hidden" name="xredirect" value="$!xredirect" />
+<input type="hidden" name="language" value="$!tdoc.language" />
+<input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>
+<input type="hidden" id="xwikidocparentinput" name="parent" value="$!tdoc.parent"/>
+<div id="xwikitext">
+#template("simpleedittoolbar.vm")
+<div id="xwikidoccontent">
+$xwiki.getTextArea($tdoc.content)
+</div>
+</div>
+</div>
+<div class="bottombuttons">#template("editactions.vm")</div>
+</form>

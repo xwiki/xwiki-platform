@@ -1,0 +1,43 @@
+/* Green StyleSheet */
+
+/* Default is a Green StyleSheet */
+/* Light Green */
+
+#xwikinav_footer, #xwikinav_header, .heading-1, .heading-1-1 {
+ border-color: #BDDE7B;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: #BDDE7B;
+}
+
+
+/* Dark Green */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #009255;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #009255;
+}
+
+.heading-1, .heading-1-1 {
+ border-color: #009255;
+ color: #009255;
+}
+
+/* Comments colors */
+.xwikidata, .xwikidatafooter, .xwikidatafooter1, .xwikidatefooter2 {
+  background-color: #cf9;
+}
+
+.xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
+ background-color: #9c6;
+}
+
+/* Logo */
+#companylogo img {
+ background-image: url("logovert.jpg");
+}
+

@@ -1,0 +1,114 @@
+#set( $redirect = $xwiki.getRequestURL())
+<script type="text/javascript">
+<!--
+var currentfield = "params";
+function show(fieldname) {
+  if (currentfield!="")
+    document.getElementById(currentfield).style.display="none";
+  document.getElementById(fieldname).style.display="block";
+  currentfield = fieldname;
+}
+// -->
+</script>
+#set($obj = $doc.getObject("XWiki.XWikiPreferences"))
+
+#if(!$obj)
+<form id="objectadd" method="post" action="$doc.getURL("objectadd")">
+<p>
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<input type="hidden" name="classname" value="XWiki.XWikiPreferences" />
+</p>
+</form>
+<script type="text/javascript">
+<!--
+document.forms.objectadd.submit();
+-->
+</script>
+#else
+#set($class = $obj.xWikiClass)
+#set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
+#set($sectionitemsmap = $xwiki.hashMap)
+#set($sectionitemsmap.params = ["multilingual", "language" , "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
+#set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets"])
+#set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
+#set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
+#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages" ])
+#set($sectionitemsmap.registration = [ "use_email_verification", "admin_email", "smtp_server", "validation_email_content",  "confirmation_email_content"])
+#macro(showsection $section $sectionitemsmap)
+<h3>$msg.get($section)</h3>
+<br>
+<table border="0">
+#set($sectionitems = $sectionitemsmap.get($section))
+#foreach($item in $sectionitems)
+#set($prop = $obj.xWikiClass.get($item))
+#set($title = $msg.get($item))
+#if($title!=$item)
+#if($prop!=$xwiki.null)
+#set($title = $!prop.prettyName)
+#end
+#end
+<tr><td>$title</td>
+<td>
+#if($prop)
+$doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
+#if($item=="skin")
+#set($skin = $xwiki.skin)
+#if($skin.indexOf(".")!=-1)
+#set($skindoc = $xwiki.getDocument($skin))
+<a href="$skindoc.getURL()">Customize</a>
+#end
+#end
+#end
+</td></tr>
+#end
+</table>
+#end
+<div id="xwikicontent" class="large">
+       <div id="columns">
+        <div class="cols-wrapper">
+          <div class="float-wrapper">
+            <div id="col-a">
+              <div class="main-content">
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<p>
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+</p>
+#set($first = 1)
+#foreach($section in $sections)
+<div id="${section}" style="display: #if ($first==1) block #else none #end;">
+#if ($first==1)
+<script type="text/javascript">
+<!--
+currentfield = "${section}";
+// -->
+</script>
+#set ($first = 0)
+#end
+#showsection($section $sectionitemsmap)
+</div>
+#end
+</form>
+#includeHelp("EditPrefsHelp")
+         </div>
+            </div>
+            <div id="col-b" class="sidecol">
+              <div class="box">
+              </div>
+            </div>
+          </div>
+          <div id="col-c" class="sidecol">
+         <div class="box">
+<h3>$msg.get("preferences")</h3>
+<br />
+<p style="text-align: center">
+<input type="button" value="$msg.get("saveprefs")" onclick="cancelCancelEdit(); document.forms.update.submit()" />
+</p>
+<br />
+<h3>$msg.get("sections")</h3>
+<br />
+<p style="text-align: center">
+#foreach ($section in $sections)
+<a href="" onclick="show('${section}'); return false;">$msg.get($section)</a>
+<br />
+#end
+#end

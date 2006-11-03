@@ -1,0 +1,24 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikicontent">
+    #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+    #else
+    <center><h2>
+        $msg.get("thispagedoesnotexist")
+    </h2>
+    </center>
+    <br/><br/>
+    #set($url = $doc.getURL("edit", $editparams))
+    <center>
+        $xwiki.parseMessage("youcanclicktoedit")
+    </center>
+    <br/><br/>
+    #end
+</div>
+#template("basefooter.vm")
+#template("footer.vm")
+
+

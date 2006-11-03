@@ -1,0 +1,162 @@
+## Begin macro definitions
+## Define the "xwikiimglink" macro used in the lower menu area
+#macro(xwikiimglink $actionurl $imgurl $linktext) 
+<a href="$actionurl" class="img"><img src="$imgurl" alt="$linktext" title="$linktext"/>$linktext</a><span class="xwikisep"> | </span>
+#end
+## End macro
+## Define the "xwikiitem" macro used in the "More Actions" menu
+#macro(xwikiitem $url $msgname)
+<span class="xwikimoreactionitem"><a href="$url">$msg.get($msgname)</a></span><span class="xwikisep"> | </span>
+#end
+## End macro
+## End macro definitions
+## Begin rigths variables setting
+#if($xwiki.exists("XWiki.MaintenanceInfo"))
+  #set($maintenanceinfo = "XWiki.MaintenanceInfo")
+#else
+  #if($xwiki.exists("xwiki:XWiki.MaintenanceInfo"))
+    #set($maintenanceinfo = "xwiki:XWiki.MaintenanceInfo")
+  #end
+#end
+#if ($request.rev)
+  #set($revparams="rev=${request.rev}")
+#end
+#set($hasedit = $xwiki.hasAccessLevel("edit"))
+#set($hasadmin = $xwiki.hasAdminRights())
+#set($isReadOnly = $xwiki.isReadOnly())
+## End rigths variables setting
+## Begin Menu
+<div class="xwiki${xwikimode}a" id="xwikinav_header">
+## Begin upper menu area
+  <div id="xwikiwebusermenu">
+    <span id="xwikiwebusermenutitle">$msg.get("webusermenu")</span>
+    $!xwiki.parseContent($!xwiki.getWebPreference("menu"))
+  </div>
+## End upper menu area
+## Begin lower menu area
+  <div id="xwikieditmenu">
+## Begin "Edit this page" link
+    #if($hasedit)
+      #set($editparams="")
+## Check inline editing option
+      #if($doc.content.indexOf("includeForm(")!=-1)
+        #set($editaction = "inline")
+      #else
+        #set($editaction = "edit")
+## Check WYSISYG editing option
+        #if($xwiki.getUserPreference("editor")=="Wysiwyg")
+          #set($editparams="xpage=wysiwyg")
+        #end
+      #end
+## Check language option
+      #if (($xwiki.isMultiLingual()==true)&&($tdoc.realLanguage!=""))
+        #set($languageparams="language=${tdoc.realLanguage}")
+        #set($editparams="${languageparams}&${editparams}")
+      #end
+      #xwikiimglink($doc.getURL($editaction,$editparams) $xwiki.getSkinFile("editPage.gif") $msg.get("editpage")) 
+    #end
+## End "Edit this page" link
+## Begin "Add Comment" link
+    #if($xwiki.hasAccessLevel("comment"))
+      #xwikiimglink($doc.getURL("view", "xpage=comments") $xwiki.getSkinFile("addComment.gif") "$msg.get('addcomment') ($doc.getComments().size())")
+    #end
+## End "Add Comment" link
+## Begin "Add Atachament" link
+    #if($hasedit)
+      #xwikiimglink($doc.getURL("attach") $xwiki.getSkinFile("addFile.gif") "$msg.get('addattachment') ($doc.getAttachmentList().size())")
+    #end
+## End "Add Attachment" link
+## Begin "PDF" link
+    #set($pdfparams="$!{revparams}")
+    ## Check language option
+      #if (($xwiki.isMultiLingual()==true)&&($tdoc.realLanguage!=""))
+          #set($pdfparams="${languageparams}&$!{pdfparams}")
+      #end
+    #xwikiimglink($doc.getExternalURL("pdf", "$!{pdfparams}") $xwiki.getSkinFile("pdf.gif") $msg.get("pdf"))
+## End "PDF" link
+## Begin "History" link
+    #xwikiimglink($doc.getURL("view","xpage=history") $xwiki.getSkinFile("history.gif") $msg.get("history"))
+## End "History" link
+## Begin "More Actions" menu
+    <div id="xwikimoreactions">
+## Menu title/opener
+      <div id="xwikimoreactionstitle"><a href="" onclick="showhide('xwikimoreactionsitems'); return false;">$msg.get("more")</a></div>
+## Begin the inner menu
+      <div id="xwikimoreactionsitems">
+## View section
+        <div class="xwikimenutitle">$msg.get("view")</div>
+        #if($context.action=="viewrev")
+          #xwikiitem($doc.getURL("view","xpage=code&$!{revparams}") "raw")
+        #else
+          #xwikiitem($doc.getURL("viewrev","xpage=code&$!{revparams}") "raw")
+        #end
+        #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
+## Edit section
+        #if($hasedit)
+          <div class="xwikimenutitle">$msg.get("edit")</div>
+          #if (($xwiki.isMultiLingual()==true) && !$isReadOnly)
+            #if ($tdoc.realLanguage!="")
+              #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}") "editcontent")
+              #xwikiitem($doc.getURL("edit","language=${tdoc.realLanguage}&xpage=wysiwyg") "edithtmlcontent")
+            #else
+              #xwikiitem($doc.getURL("edit") "editcontent")
+              #xwikiitem($doc.getURL("edit","xpage=wysiwyg") "edithtmlcontent")
+            #end
+            <span class="xwikimoreactionitem">
+              <a href="$doc.getURL("edit", "language=en")">$msg.get("edit") En</a>
+              <a href="$doc.getURL("edit", "language=fr")">Fr</a>
+              <a href="$doc.getURL("edit", "language=de")">De</a>
+              <a href="$doc.getURL("edit", "language=it")">It</a>
+              <a href="$doc.getURL("edit", "language=pt")">Pt</a>
+              <a href="$doc.getURL("edit", "language=es")">Es</a>
+            </span><span class="xwikisep"> | </span>
+          #else
+            #if (!$isReadOnly)
+              #xwikiitem($doc.getURL("edit") "editcontent")
+              #xwikiitem($doc.getURL("edit","xpage=wysiwyg") "edithtmlcontent")
+            #end
+          #end
+          #if (!$isReadOnly)
+            #xwikiitem($doc.getURL("inline") "editinline")
+            #xwikiitem($doc.getURL("edit", "xpage=editobject") "editobject")
+          #end
+          #if(($hasadmin||($context.user.equals($doc.creator))) && !$isReadOnly)
+            #xwikiitem($doc.getURL("reset") "resetversions")
+            #xwikiitem($doc.getURL("delete") "delete")
+          #end
+          #if (!$isReadOnly)
+            #xwikiitem($doc.getURL("chartwizard") "chartwizard")
+            #xwikiitem($doc.getURL("edit", "xpage=editrights") "editrights")
+          #end
+        #end
+## Admin section
+        #if($hasadmin && !$isReadOnly)
+          <div class="xwikimenutitle">$msg.get("admin")</div>
+          #xwikiitem($xwiki.getURL("${doc.web}.WebHome", "view") "space")
+          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit", "xpage=editprefs") "webprefs")
+          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit" , "xpage=editrights&global=1") "webrights")
+          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editprefs") "xwikiprefs")
+          #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editrights&global=1") "xwikirights")
+          #xwikiitem($doc.getURL("edit", "xpage=editclass") "classeditor")
+        #end
+## Help section
+        <div class="xwikimenutitle">$msg.get("help")</div>
+        #xwikiitem($xwiki.getURL("Doc.WebHome", "view") "xwikidoc")
+        #xwikiitem($xwiki.getURL("Doc.XWikiSyntax", "view") "xwikisyntax")
+      </div>
+## End the inner menu
+    </div>
+## End "More Actions" menu
+  </div>
+## Begin Language menu
+  <div id="xwikilanguagemenu">
+    #template("languages.vm")
+  </div>
+## End Language menu
+  #if($maintenanceinfo)
+    <div id="xwikimessage">
+      $xwiki.includeForm("$maintenanceinfo",false)
+    </div>
+  #end
+</div>
+## End menu

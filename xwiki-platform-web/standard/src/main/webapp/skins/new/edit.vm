@@ -1,0 +1,85 @@
+#set($hasedit = $xwiki.hasAccessLevel("edit"))
+#set($hasadmin = $xwiki.hasAdminRights())
+#set($showactions=1)
+#template("editheader.vm")
+<div id="xwikiedit">
+ <div id="xwikitoolbar">
+ #if($xwiki.exists("${doc.web}.EditToolbar"))
+      $xwiki.includeForm("${doc.web}.EditToolbar",false)
+ #else
+  #if($xwiki.exists("XWiki.EditToolbar"))
+      $xwiki.includeForm("XWiki.EditToolbar",false)
+  #else
+   #if($xwiki.exists("xwiki:XWiki.EditToolbar"))
+    $xwiki.includeForm("xwiki:XWiki.EditToolbar",false)
+   #else
+    #template("edittoolbar.vm")
+   #end
+  #end
+ #end
+ </div>
+ <div id="xwikieditcontent">
+#set($xredirect=$!request.getParameter("xredirect"))
+<form id="edit" method="post" action="$doc.getURL("preview")">
+<p>
+<input type="hidden" name="template" value="$!tdoc.template" />
+<input type="hidden" name="xredirect" value="$!xredirect" />
+<input type="hidden" name="language" value="$!tdoc.language" />
+</p>
+#set($force = $!request.get("force"))
+#if (($tdoc.getLocked()==true)&&(!$force))
+<p>
+$msg.get("doclockedby"): $xwiki.getLocalUserName($doc.getLockingUser()).
+<br />
+<a href="$doc.getURL("edit", "template=$!tdoc.template&xredirect=$!xredirect&language=$!tdoc.language&force=1")">$msg.get("forcelock")
+</p>
+#else
+#set( $pages = $tdoc.includedPages)
+#if ( $pages.size() > 0)
+<p>
+$msg.get("editincludepagemsg")
+#foreach ($page in $pages)
+<a href="$xwiki.getURL($page, "edit")">$page</a>&nbsp;
+#end
+</p>
+#end
+<div id="xwikitext">
+#if ($xwiki.isMultiLingual()==true)
+$msg.get("youareediting"): $tdoc.language
+<br /><br />
+#end
+#includeHelp("EditWikiToolbar")
+$xwiki.getTextArea($tdoc.content)
+<br/>
+<script type="text/javascript">
+<!--
+function openHelp() {
+  win = open( "http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain",
+			   "syntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  if( win ) {
+	 win.focus();
+  }
+}
+// -->
+</script>
+$msg.get("helponsyntax") <a href="" onClick="openHelp(); return false;">$msg.get("xwikisyntax")</a>
+<br /><br />
+#if ($tdoc.language=="")
+$msg.get("parent"):&nbsp;<input type="text" name="parent" value="$!doc.parent" size="40" />
+<br/><br/>
+$msg.get("defaultlanguage"):&nbsp;<input type="text" name="default_language" value="$!doc.defaultLanguage" size="10" />
+<br/><br/>
+#if(($doc.creator.equals($context.user))
+     ||($hasadmin))
+$msg.get("creator"):&nbsp;<input type="text" name="creator" value="$!doc.creator" size="40" />
+#else
+$msg.get("creator"):&nbsp;$!doc.creator
+#end
+#end
+#end
+</div>
+</form>
+#includeHelp("EditHelp")
+</div>         
+</div>
+#template("editfooter.vm")

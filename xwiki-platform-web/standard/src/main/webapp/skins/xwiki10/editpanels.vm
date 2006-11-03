@@ -1,0 +1,25 @@
+#if($editor == "wiki" || $editor == "wysiwyg")
+#set($editorPanels = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
+#elseif($editor == "object")
+#set($editorPanels = "Panels.ObjectEditorWelcome,Panels.AddObject")
+#elseif($editor == "class")
+#set($editorPanels = "Panels.ClassEditorWelcome,Panels.AddClassProperty")
+#elseif($editor == "rights")
+#set($editorPanels = "Panels.RightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
+#end
+#set($editorPanels = $editorPanels.split(","))
+<div id="editPanels" class="panels editor">
+#foreach($panel in $editorPanels)
+##$xwiki.includeForm("$panel",false)
+#displaypanel($panel)
+#end
+</div>
+#if($editor == "wysiwyg")
+<script language="javascript" type="text/javascript">
+  if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
+    var panels = document.getElementById("editPanels");
+    panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
+    document.getElementById("simpleedittoolbar").style.display = "none";
+  }
+</script>
+#end

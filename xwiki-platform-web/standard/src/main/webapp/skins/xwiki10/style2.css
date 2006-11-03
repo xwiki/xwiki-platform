@@ -1,0 +1,40 @@
+/* Bordeaux StyleSheet */
+
+/* Light Bordeaux */
+#xwikinav_footer, #xwikinav_header, .heading-1, .heading-1-1 {
+ border-color: #FFBFBF;
+}
+
+#xwikinav_footer, #xwikiwebusermenu, .heading-1-1, .wiki-table th, .rsschanneltitle,
+#xwikilanguagemenu a.xwikilanguageactive, #xwikilanguagemenu a:visited.xwikilanguageactive {
+  background-color: #FFBFBF;
+}
+
+
+/* Dark Bordeaux */
+.xwikiactions a, #xwikiwebusermenu a {
+ background-color: #BF6060;
+}
+
+#xwikinav_footer, #xwikinav_header, #xwikinav_header.xwiki0b {
+ border-color: #BF6060;
+}
+
+.heading-1, .heading-1-1 {
+ border-color: #BF6060;
+ color: #BF6060;
+}
+
+/* Comments colors */
+.xwikidata, .xwikidatafooter, .xwikidatafooter1, .xwikidatefooter2 {
+  background-color: #FFBFBF;
+}
+
+.xwikidatatitle, .xwikidatatitle1, .xwikidatatitle2 {
+ background-color: #BF6060;
+}
+
+/* Logo */
+#companylogo img {
+ background-image: url("logobordeaux.jpg");
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>S5: An Introduction</title>
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.0" />
+<meta name="presdate" content="20041007" />
+<meta name="author" content="Eric A. Meyer" />
+<meta name="company" content="Complex Spiral Consulting" />
+<link rel="stylesheet" href="ui/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/opera.css" type="text/css" media="projection" id="operaFix" />
+<link rel="stylesheet" href="ui/print.css" type="text/css" media="print" id="slidePrint" />
+<script src="ui/slides.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="layout">
+
+<div id="currentSlide"></div>
+<div id="header"></div>
+<div id="footer">
+<h1>Your computer &#8226; Today's date</h1>
+<h2>S<sup>5</sup>: An Introduction</h2>
+<div id="controls"></div>
+</div>
+
+</div>
+<div class="presentation">
+
+<div class="slide">
+<h1>S<sup>5</sup>: An Introduction</h1>
+<h3>Eric A. Meyer</h3>
+<h4><a href="http://www.complexspiral.com/">Complex Spiral Consulting</a></h4>
+</div>
+
+
+<div class="slide">
+<h1>What Is S<sup>5</sup>?</h1>
+<ul>
+<li>It's a <strong>S</strong>imple <strong>S</strong>tandards-based <strong>S</strong>lide <strong>S</strong>how <strong>S</strong>ystem</li>
+<li>One XHTML document provides all of the slide show's content</li>
+<li>CSS handles the layout and look of the slides</li>
+<li>JavaScript handles the dynamic aspects of the show</li>
+<li>That's all there is to it!</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>Operatic Origins</h1>
+<ul>
+<li>Opera 4 introduced <a href="http://www.opera.com/support/tutorials/operashow/">Opera Show</a>, a projection-mode style sheet technology</li>
+<li>Allows a single XHTML document to be turned into a PowerPoint-like slide show</li>
+<li>Adding screen and print style sheets allows for multi-medium views of a single document</li>
+<li>Highly efficient, but highly browser centric...</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>Expanding The Field</h1>
+<ul>
+<li>When Opera 7.5 for OS X came out, the banner ads persisted in projection mode</li>
+<li><a href="http://tantek.com/" rel="friend colleague met">Tantek &Ccedil;elik</a> created a JavaScript-driven slide show technique that worked on multiple browsers
+<ul>
+<li>Unfortunately, it required each slide to be ID'ed ahead of time, making additions and rearrangement difficult</li>
+<li>Navigation was only linear; no way to jump to an arbitrary slide</li>
+<li>There was also no facility to "switch off" the slide show styles short of killing all CSS</li>
+</ul>
+</li>
+<li>Motive and opportunity combined to point the way...</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>Where We Are Now</h1>
+<ul>
+<li>S<sup>5</sup> builds on Tantek's scripts and ideas, with input and ideas from several other people</li>
+<li>Each slide is enclosed in a classed <code>div</code>; IDs are dynamically assigned via JavaScript</li>
+<li>Navigation menu is automatically built at run time</li>
+<li>A "toggle slide style off/on" ability now exists</li>
+<li>The S<sup>5</sup> format is compatible with <a href="http://my.opera.com/community/dev/operashow/documentation/doc_fileformat.html">Opera Show Format 1.0</a>, making it easy to move slides between the two formats as needed</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>How It Works</h1>
+<ul>
+<li>Controls are...
+<ul>
+<li>Next slide: Space bar, return, right arrow, down arrow, page down, click anywhere in slide that isn't in the control area (lower right corner), click "arrow" in lower right corner, accesskey "X"</li>
+<li>Previous slide: Up arrow, left arrow, page up, click "arrow" in lower right corner, accesskey "Z"</li>
+<li>Toggle the slide styles: Click on the toggle button (to the left of the arrows), press "t", accesskey "T"</li>
+</ul></li>
+<li>To invoke the navigation menu: mouse into the lower right corner of the slide (below the navigation arrows)</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>The Advantages</h1>
+<ul>
+<li>With one file, you get a slide show, a printable outline, and a screen presentation</li>
+<li>Files are incredibly lightweight and compress easily</li>
+<li>Thanks to being semantic XHTML, slideshow files are also highly accessible</li>
+<li>New slide themes can be created simply by writing new style sheets</li>
+<li>Unlike Opera Show, which has all of the above advantages, S<sup>5</sup> works in multiple browsers</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>S<sup>5</sup> Default File Structure</h1>
+<p style="text-align: center;">
+<img src="pix/s5filemap.png" alt="" title="At a Glance"/>
+</p>
+</div>
+
+
+<div class="slide">
+<h1>S<sup>5</sup> Themes</h1>
+<p style="width: 520px; margin: 0 auto; text-align: center;">
+<img src="pix/S501.jpg" alt="" title="Default"/>
+<img src="pix/S502.jpg" alt="" title="I18N"/>
+<img src="pix/S503.jpg" alt="" title="Blue"/>
+<img src="pix/S504.jpg" alt="" title="Flower"/>
+(just a sampling)
+</p>
+</div>
+
+
+<div class="slide">
+<h1>Current Limitations</h1>
+<ul>
+<li>Only one author can be listed in the metadata</li>
+<li>Links from within a slide to another slide will probably fail</li>
+<li>Slide content is expected to be static and atomic; that is, there is no capability to trigger dynamic slide content by hitting the "next" command</li>
+<li>Fonts are not scaled based on display resolution and available pixels; manual CSS editing is required</li>
+<li>Opera falls back to use OperaShow; thus no extras (like the navigation menu or progress indication) are available</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>Open To The Public</h1>
+<ul>
+<li>S<sup>5</sup> is released under a <a href="http://creativecommons.org/">Creative Commons</a> Attribution-ShareAlike 2.0 license</li>
+<li>Contributors to S<sup>5</sup> <strong>must</strong> be willing to accept those terms
+<ul>
+<li>In other words: if you submit a contribution, you are agreeing to abide by and place your contributions under the CC license mentioned above</li>
+</ul></li>
+<li>On the other hand, anyone can freely use S<sup>5</sup> for their own presentations, and modify S<sup>5</sup> if they agree to honor the license</li>
+</ul>
+</div>
+
+
+<div class="slide">
+<h1>In Summary</h1>
+<ul>
+<li>With minimal scripting, we have recreated and improved upon a (currently) browser-specific technology, making it cross-browser in the process</li>
+<li>The S<sup>5</sup> format is OSF 1.0 compatible</li>
+<li>S<sup>5</sup> is a very flexible and lightweight slide show system available for anyone to use</li>
+</ul>
+</div>
+
+</div>
+
+</body>
+</html>

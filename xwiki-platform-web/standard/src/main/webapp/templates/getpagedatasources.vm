@@ -1,0 +1,14 @@
+$response.setContentType("text/xml")
+<types>
+#set($objects = $doc.getxWikiObjects())
+#set($classes = $objects.keySet())
+#foreach($class in $classes)
+  #if($class.endsWith("DataSource"))
+    <type>$class</type>
+  #end
+#end
+
+#foreach($prefix in $xwiki.getSpaces())
+            <option name="$prefix" value="$prefix"/>
+#end
+</types>

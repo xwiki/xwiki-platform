@@ -1,0 +1,89 @@
+#if(!$showattachments)
+#set($showattachments = $xwiki.getWebPreference("showattachments"))
+#end
+#if($showattachments!="no")
+#set($attachments = $doc.attachmentList)
+#if($attachments.size()>0)
+<div id="xwikiattachments" class="xwikidata">
+    <div class="xwikidatatitle2">
+        <div class="xwikidatatitle1">&nbsp;</div>
+
+        <div class="xwikidatatitle">
+            <a href="" onclick="showhide('xwikiattachmentscontent'); return false">$msg.get("Attachments")</a>:
+            $!attachments.size() $msg.get("attachments") #if($attachments.size()>0) $msg.get("by")
+            $xwiki.getLocalUserName($attachments.get(0).author) ...
+            #end
+        </div>
+    </div>
+
+    <div id="xwikiattachmentscontent" class="xwikidatacontent"#if($showattachments!="open") style="display:none" #end>
+        <table>
+        <tr><th></th><th><b>$msg.get("filename")</b></th><th><b>$msg.get("version")</b></th>
+            <th><b>$msg.get("author")</b></th><th><b>$msg.get("size")</b></th><th><b>$msg.get("history")</b></th><th><b>$msg.get("delete")</b>
+        </th></tr>
+        #foreach ($attach in $attachments)
+        <tr>
+            <td>
+                #if ($attach.isImage())
+                <img src="$doc.getAttachmentURL("${attach.filename}", "download", "width=80")" alt="${attach.filename}" width="80" />
+                        #end
+                        </ td><td><a href="$doc.getAttachmentURL("${attach.filename}", "download")">$attach.filename</
+                                     a></td>
+            <td>$attach.version</td><td>$xwiki.getLocalUserName($attach.author)</td><td>$attach.filesize</td>
+            <td align="center">
+                <a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")">$msg.get("history")</ a>
+            </td>
+            <td>
+                <a href="$doc.getAttachmentURL("${attach.filename}", "delattachment")" onclick="return confirm('$msg.get("confirmdelattachment")');">$msg.get("delete")</a></td>
+        </tr>
+        #set( $counter = $counter + 1)
+        #end
+    </table>
+    <br/>
+
+    <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
+            <p>
+        <script type="text/javascript">
+            function updateAttachName(form) {
+                var fname = form.filepath.value;
+
+                if (fname == "") {
+                    return false;
+                }
+
+                var i = fname.lastIndexOf('\\');
+                if (i == -1)
+                    i = fname.lastIndexOf('/');
+
+                fname = fname.substring(i + 1);
+                if (form.filename.value == fname)
+                    return true;
+
+                if (form.filename.value == "")
+                    form.filename.value = fname;
+                else {
+                    if (confirm("$msg.get("doyouwanttoreplace") '" + fname + "' ?"
+                ))
+                    form.filename.value = fname;
+                }
+                return true;
+            }
+        </script>
+        $msg.get("choosetargetfilename"):
+        <input type="text" name="filename" value="" size="20"/>
+        <br/><br/>
+        $msg.get("choosefiletoupload"):
+        <input type="file" name="filepath" value="" size="40"/>
+        <br/><br/>
+        <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form)" />
+                </p>
+    </form>
+</div>
+<div class="xwikidatafooter2">
+    <div class="xwikidatafooter1">&nbsp;</div>
+
+    <div class="xwikidatafooter">&nbsp;</div>
+</div>
+</div>
+#end
+#end

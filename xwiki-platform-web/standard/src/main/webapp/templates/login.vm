@@ -1,0 +1,36 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+
+#set($message = $msg.get($xwiki.parseMessage()))
+#if($message)
+<!-- previous login errors -->
+<div id="xwikimessage">
+Login Error: $message
+</div>
+#end
+
+<div id="xwikicontent">
+<form id="loginForm" action="$doc.getURL("loginsubmit")" method="POST">
+<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<table border="0">
+<tr><td>$msg.get("username"):</td>
+<td><input type="text" name="j_username" value="" /></td>
+</tr>
+<tr><td>$msg.get("password"):</td>
+<td><input type="password" name="j_password" value="" /></td>
+</tr>
+<tr><td colspan="2">
+<input type="checkbox" name="j_rememberme" value="true" CHECKED /> $msg.get("rememberme") 
+</td>
+</tr>
+<tr>
+<td colspan="2"><input type="submit" value="$msg.get("login")"/></td>
+</tr>
+</table>
+</form>
+</div>
+
+#template("basefooter.vm")
+#template("footer.vm")

@@ -1,0 +1,44 @@
+#if(!$showcomments)
+#set($showcomments = $xwiki.getWebPreference("showcomments"))
+#end
+#if($showcomments!="no")
+#if($xwiki.getWebPreferenceAsInt("commentsorder",1)==0)
+#set($comments = $doc.getComments())
+#else
+#set($comments = $doc.getComments(false))
+#end
+#if($comments.size()>0)
+<div id="xwikicomments" class="xwikidata">
+<div class="xwikidatatitle2">
+<div class="xwikidatatitle1">&nbsp;</div>
+<div class="xwikidatatitle">
+<a href="" onclick="showhide('xwikicommentscontent'); return false">$msg.get("Comments")</a>:
+$!comments.size() $msg.get("comments") #if($comments.size()>0) $msg.get("by")
+$!xwiki.getLocalUserName($doc.display('author','view',$comments.get(0))) ...
+#end
+</div>
+</div>
+<div id="xwikicommentscontent" class="xwikidatacontent" #if($showcomments!="open") style="display:none" #end >
+#if($comments.size()>0)
+#set($count=0)
+#foreach($comment in $comments)
+#set($count=$count+1)
+<div id="xwikicomment_${count}" class="xwikicomment" >
+$!xwiki.getLocalUserName($doc.display('author','view',$comment))
+#set($date = $doc.display("date","view",$comment))
+#if($date != "")
+$date
+#end
+<br />
+$doc.getRenderedContent($doc.display("comment","view",$comment))
+</div>
+#end
+#end
+</div>
+<div class="xwikidatafooter2">
+<div class="xwikidatafooter1">&nbsp;</div>
+<div class="xwikidatafooter">&nbsp;</div>
+</div>
+</div>
+#end
+#end

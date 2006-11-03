@@ -1,0 +1,4 @@
+<option value="">-- $msg.get('choosespace') -- </option>
+#foreach($space in $xwiki.spaces)
+    <option value="$space">$space</option>
+#end

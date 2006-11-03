@@ -1,0 +1,567 @@
+/**
+
+General layout of the page
+for @media screen displays
+
+**/
+
+body#body{
+  position: relative;
+  width: 944px;
+  margin: 0px auto;
+  text-align: center;
+  font-size: 85%;
+}
+
+#xwikimaincontainer{
+  width: 944px;
+  margin: auto;
+  text-align: left;
+}
+.layoutsection{
+  clear: both;
+}
+
+/*
+---------------------------------------
+Global header
+---------------------------------------
+*/
+#headerglobal{
+  display: block;
+  position: relative;
+  clear: both;
+  height: 91px;
+  margin: 0px;
+  padding: 0px;
+}
+#companylogo {
+  position: relative;
+  float: left;
+  clear: left;
+  left: 0px;
+  margin: 0px;
+}
+
+#globaldoctitle {
+  visibility: hidden;
+}
+
+#globaldoctitle h1{
+  margin: 0px;
+  padding: 0px;
+}
+
+#globallinks {
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  margin: 0px;
+  padding: 0px;
+}
+
+#globalmenu {
+  text-align: right;
+  margin: 5px 0px 0px 0px;
+  padding: 0px;
+}
+
+#globalsearch {
+  text-align: right;
+  margin: 5px 5px 0px 0px;
+  padding: 0px;
+}
+
+/*
+---------------------------------------
+Space header, footer
+---------------------------------------
+*/
+#headerspace, #footerglobal{
+  margin: 0px 0px;
+}
+html > body #headerspace, html > body #footerglobal{
+  margin: 10px 0px;
+}
+
+#headerspace hr, #footerglobal hr{
+  margin: 0px;
+  padding: 0px;
+  clear: both;
+  height: 1px;
+  border: none;
+}
+#breadcrumbs{
+  margin: 0px 5px;
+}
+
+#xwikilicence {
+  float: right;
+  clear: right;
+  margin-right: 5px;
+}
+
+#xwikidocinfo {
+  float: left;
+  margin-left: 5px;
+}
+
+/*
+---------------------------------------
+Content
+---------------------------------------
+*/
+.content{
+  margin: 10px 178px 0px;
+}
+
+.contenthideleft{
+  margin: 10px 178px 0px 0px;
+}
+.contenthideright{
+  margin: 10px 0px 0px 178px;
+}
+.contenthidelefthideright{
+  margin: 10px 0px 0px;
+}
+#xwikieditor.layoutsection{
+  border: 1px solid;
+  margin: 0px;
+  padding: 10px 4px 4px;
+}
+#editcolumn{
+  width: 634px;
+  margin: 0px;
+  float: left;
+  overflow: auto;
+}
+
+#actionmenu{
+  position: relative;
+  left: 0px;
+}
+#xwikidoccontent textarea {
+  width: 95%;
+}
+html > body #xwikidoccontent textarea{
+  width: 628px;
+}
+.layoutsubsection{
+  border: 1px solid #DDD;
+  margin: 0px 0px 5px;
+  padding: 0px 4px;
+}
+
+.layoutsubsection.main{
+  padding-top: 4px;
+}
+
+.layoutsubsection.about{
+  border: none;
+  text-align: right;
+  font-style: italic;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  font-size: 85%;
+}
+.rightmenu{
+  float: right;
+}
+
+/*
+---------------------------------------
+Zone for Comments, attachments, History... 
+---------------------------------------
+*/
+#xwikidata{
+  padding: 0px;
+  border: none;
+}
+#xwikidatacontents{
+  padding: 0px 4px;
+  border: 1px solid;
+}
+.xwikiintratitle{
+  display: none;
+}
+.xwikiintracontent{
+  margin: 0px;
+}
+
+/*
+---------------------------------------------
+"Message Boxes"
+---------------------------------------------
+*/
+fieldset.xwikimessage{
+  display: block;
+  float: none;
+  width: 480px;
+  margin: auto;
+  border: 2px solid #BBB;
+  border-top: 8px solid #BBB;
+  padding: 0px 8px 16px;
+}
+html > body fieldset.xwikimessage{
+  padding-top: 8px;
+}
+
+fieldset.xwikimessage legend {
+  font-weight: bold;
+  font-size: 110%;
+  padding: 2px 8px;
+  margin: 0px;
+}
+fieldset.xwikimessage .xwikimessage{
+  text-align: center;
+  font-weight: bold;
+  font-size: 110%;
+}
+fieldset.xwikimessage .buttons {
+  text-align: center;
+}
+fieldset.xwikimessage .buttons a {
+  text-decoration: none;
+  margin: 8px;
+}
+
+.button{
+  font-family: Helvetica, sans-serif;
+  font-weight: bold;
+  text-align: center;
+}
+.topbuttons{
+  margin-bottom: 5px;
+}
+.bottombuttons{
+  margin-top: 5px;
+}
+/*
+----------------------------------------------
+Comments
+----------------------------------------------
+*/
+.xwikicomment {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 5px 5px 5px 5px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+.commentavatar{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 54px;
+}
+.commentavatar img{
+  width: 3.5em;
+  display: block;
+  margin: auto;
+}
+.commentheader{
+  margin-bottom: 1em;
+  margin-left: 64px;
+}
+.commentcontent{
+  margin-left: 64px;
+}
+
+.xwikibuttonlink a{
+  background-color: #BBB;
+  padding: 2px 4px;
+  text-decoration: none;
+  font-weight: bold;
+}
+table.xwikidatatable{
+  margin: 8px auto;
+  /* width: 100%; */
+}
+table.xwikidatatable, table.xwikidatatable th{
+  border: 1px solid #DDD;
+}
+table.xwikidatatable td{
+  padding: 2px 8px;
+}
+.xwikiintracontent{
+  margin: 8px;
+}
+
+.xwikiintracontent legend{
+  border: 1px solid #ddd;
+  padding: 2px 4px;
+}
+.xwikiintracontent fieldset{
+  border-color: #ddd;
+  border-style: solid;
+  padding: 8px 8px;
+}
+.xwikiintracontent legend{
+  font-size: 110%;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+html > body .xwikiintracontent legend{
+  margin-bottom: 0px;
+}
+.xwikiintracontent fieldset.collapsed{
+  border: none;
+}
+.xwikiintracontent fieldset.collapsed legend{
+  margin-left: 2px;
+}
+.xwikiintracontent fieldset.collapsed div{
+  display: none;
+}
+.xwikiintracontent fieldset.expanded .expands{
+  display: none;
+}
+
+/*
+---------------------------------------
+Menu
+---------------------------------------
+*/
+#actionmenu a{
+  text-decoration: none;
+}
+.topmenuentry{
+  display: inline;
+  padding-right: 1em;
+}
+.submenu{
+  display: block;
+  border: 1px solid;
+  position: absolute;
+  padding: 4px 5px 8px;
+  margin-top: -1px;
+  margin-left: 5px;
+}
+.submenu .submenuitem{
+  display: block;
+}
+.submenu.hidden{
+  display: none;
+}
+/*
+---------------------------------------
+Editors
+---------------------------------------
+*/
+#xwikieditorstitles, #xwikiviewerstitles{
+  display: none;
+}
+
+/*
+---------------------------------------
+Tabs
+---------------------------------------
+*/
+ul.xwikitabbar{
+  padding: 4px 0px;
+  margin: 0px;
+}
+.xwikitabbar li{
+  display: inline;
+  padding: 0px;
+  list-style-type: none;
+  border: 1px solid;
+  border-bottom: none;
+}
+html > body .xwikitabbar li{
+  padding: 5px 0px;
+}
+.xwikitabbar li a{
+  padding: 5px 15px;
+  font-weight: bold;
+  text-decoration: none;
+}
+.xwikitabbar li a:hover{
+  text-decoration: none;
+}
+
+.xwikitabbar li.active{
+  border: 1px solid;
+  border-bottom: 3px solid;
+}
+
+.xwikitabbar li.active a:hover{
+  cursor: default;
+}
+/*
+--
+*/
+#xwikicontentedit{
+  border: 1px solid;
+}
+
+/*
+---------------------------------------
+Panels
+---------------------------------------
+*/
+.panels{
+  display: inline;
+  width: 168px;
+  margin: 10px 5px;
+  padding: 0px;
+}
+html > body .panels{
+  margin-top: 0px;
+}
+.panels.left {
+  float: left;
+  clear: left;
+  margin-left: 0px;
+}
+.panels.right {
+  float: right;
+  clear: right;
+  margin-right: 0px;
+}
+.panel, .fakepanel{
+  width: 168px;
+  display: block;
+  margin: 0px 0px 5px;
+  padding: 0px;
+  border: 1px solid;
+}
+.fakepanel{
+  height: 320px;
+  border: 1px dashed #E5E5E5;
+}
+
+#editPanels.panels{
+  width: 290px;
+  float: right;
+  margin-right: 0px;
+}
+#editPanels .panel{
+  width: 290px;
+}
+.collapsed .xwikipanelcontents{
+  display: none;
+}
+span.panelitem{
+  display: block;
+}
+span.pitemseparator{
+  display: none;
+}
+
+/*
+----------------------------------
+Rico Acordeon
+----------------------------------
+*/
+#xwikisyntaxhelp {
+  margin-top:6px; 
+  border-top-width:1px; 
+  border-top-style:solid;
+  border: none;
+}
+
+.accordionTabTitleBar h6{
+  margin: 0px;
+  padding: 0px 4px;
+}
+
+#editPanels .accordionTabContentBox{
+  border: none;
+  overflow: auto;
+  width: 280px;
+}
+
+#editPanels .accordionTabContentBox table{
+  width: 100%;
+  border: none;
+}
+.accordionTabContentBox table th{
+  border-bottom: 1px solid #DDD;
+  text-align: center;
+}
+#xwikihelptitlesContent h1, #xwikihelptitlesContent h2, #xwikihelptitlesContent h3, #xwikihelptitlesContent h4, #xwikihelptitlesContent h5, #xwikihelptitlesContent h6{
+  margin: 0px;
+  text-align: right;
+}
+
+.accordionTabTitleBar{
+  border: 1px solid #FFF;
+  cursor: default;
+}
+
+
+/*
+-----------------------------
+Misc
+-----------------------------
+*/
+#xwikihelplistsContent ul, #xwikihelplistsContent ol{
+  margin: 0px;
+}
+#contentcolumn .large.panel{
+  width: 290px;
+}
+.accordionTabTitleBar tt{
+  font-style: normal;
+  font-size: 150%;
+  font-weight: 100;
+  padding: 0px 4px;
+}
+.accordionTabContentBox div{
+  padding: 8px;
+}
+td.label{
+  text-align: right;
+  padding-right: 4px;
+}
+#xwikiclassproperties, #xwikiobjects{
+  border: 1px solid #DDD !important;
+}
+.center{
+  text-align: center;
+}
+
+.padded{
+  padding: 8px;
+}
+
+#xwikihelpsyntax{
+  border-top: 1px solid #DDD;
+  padding: 2px 6px;
+  margin: -2px 1px 0px;
+}
+
+.editactions{
+  border: none !important;
+  margin-top: 10px;
+  padding: 0px;
+}
+#historycontent td{
+  padding: 2px;
+}
+#xwikiuserprofile th{
+  background-color: transparent;
+  text-align: right;
+}
+#xwikiuserprofile td, #xwikiuserprofile th{
+  padding: 4px;
+}
+
+#xwikiobjects td{
+  vertical-align: top;
+}
+
+
+html > body .xwikidatatable{
+  width: 100%;
+}
+
+
+.xwikiuserblog .rssfeed {
+  width: 200px;
+  float: right;
+  border: 2px solid;
+}

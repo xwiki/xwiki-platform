@@ -1,0 +1,82 @@
+###
+### List document attachments
+###
+### TODO: web service?
+###
+## #if(!$showattachments)
+## #set($showattachments = $xwiki.getWebPreference("showattachments"))
+## #end
+## #if($showattachments!="no")
+#if($request.xredirect)
+#set( $redirect = $request.xredirect)
+#else
+#set( $redirect = $xwiki.getRequestURL())
+#end
+#set($showactions = 0)
+#set($attachments = $doc.attachmentList)
+#set($counter = 0)
+    <div id="attachmentscontent" class="xwikiintracontent">
+    <h4 class="xwikiintratitle">$msg.get("attachments")</h4>
+#if($attachments.size()>0)
+      <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("attachments")">
+        <col class="attachmenttype"/>
+        <col class="attachmentname"/>
+        <col class="attachmentauthor"/>
+        <col class="attachmentversion"/>
+        <col class="attachmentdate"/>
+        <col class="attachmentsize"/>
+#if($hasedit || $hasadmin)
+        <col class="attachmentdelete"/>
+#end
+        <tr>
+          <th></th>
+          <th>$msg.get("filename")</th>
+          <th>$msg.get("author")</th>
+          <th>$msg.get("version")</th>
+          <th>$msg.get("date")</th>
+          <th>$msg.get("size")</th>
+#if($hasedit || $hasadmin)
+          <th></th>
+#end
+        </tr>
+#foreach ($attach in $attachments)
+        <tr class="row#if($counter % 2 == 0) even #else odd #end">
+          <td>#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</td>
+          <td><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></td>
+          <td>$xwiki.getLocalUserName($attach.author)</td>
+          <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
+          <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
+          <td>$attach.filesize</td>
+#if($hasedit || $hasadmin)
+          <td class="xwikibuttonlink"><a href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+#end
+        </tr>
+#set($counter = $counter + 1)
+#end
+      </table>
+#else
+$msg.get("noattachments")
+#end
+#if($hasedit || $hasadmin)
+      <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<fieldset class="expanded" id="attachform">
+        <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
+     <!--  <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get("choosetargetfilename"):</label></div> -->
+        <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
+        <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
+        <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
+        <div>
+        <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/>
+        <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+        </div>
+        </fieldset>
+      </form>
+      <script type="text/javascript">
+//<!--
+document.getElementById("attachform").className = "collapsed";
+//-->
+      </script>
+#end
+    </div>
+## #end

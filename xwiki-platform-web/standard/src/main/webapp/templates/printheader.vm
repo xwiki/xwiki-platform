@@ -1,0 +1,36 @@
+#if($context.getMode()==0)
+<div id="xwikibanner">
+<div id="xwikilogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")">
+#set($prefdoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
+#set($logo = $!prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.gif"))
+<img src="$logourl" alt="XWiki" width="150" height="40" />
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+<img src="$logourl" alt="XWiki" />
+#end
+    </a>
+  </div>
+
+<div id="xwikititle">
+<h1>$!headertitle</h1>
+</div>
+<div id="xwikilinks">
+  <div id="xwikimenu">
+  </div>
+  <div id="xwikiversion">
+    <a href="http://www.xwiki.org">XWiki</a>
+    <a href="$xwiki.getURL("Main.WebHome", "view")">
+#set( $version = $!xwiki.getWebPreference("version"))
+#if ( $version != "")
+$xwiki.parseContent($version)
+#else
+Version $xwiki.version
+#end
+    </a>
+  </div>
+</div>
+</div>
+#end

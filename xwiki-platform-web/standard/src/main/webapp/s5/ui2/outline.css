@@ -1,0 +1,9 @@
+/* don't change this unless you want the layout stuff to show up in the outline view! */
+.layout {display: none;}
+
+/* making the outline look pretty-ish */
+
+#slide0 h1, #slide0 h2, #slide0 h3, #slide0 h4 {border: none; margin: 0;}
+#slide0 h1 {padding-top: 1.5em;}
+.slide h1 {margin: 1.5em 0 0; padding-top: 0.25em;
+  border-top: 1px solid #888; border-bottom: 1px solid #AAA;}

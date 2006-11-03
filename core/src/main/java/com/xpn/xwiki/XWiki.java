@@ -3928,13 +3928,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context) throws XWikiException {
         if (context.getWiki().exists(newFullName, context)){
             XWikiDocument delDoc = context.getWiki().getDocument(newFullName, context);
-            if (checkAccess("delete", delDoc, context))
-                context.getWiki().deleteDocument(delDoc, context);
-            else
-                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                            "delete the destination document is denied");
-
+            context.getWiki().deleteDocument(delDoc, context);
         }
         XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
         saveDocument(renamedDoc, context);
@@ -4226,5 +4220,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String addTooltip(String html, String message, XWikiContext context) {
         return addTooltip(html, message, "this.WIDTH='300'", context);
+    }
+
+    public void renamePage(String fullName, String newFullName, XWikiContext context) throws XWikiException {
+        renamePage(context.getWiki().getDocument(fullName, context), newFullName, context);
     }
 }

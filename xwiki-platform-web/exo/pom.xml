@@ -32,6 +32,12 @@
   <packaging>war</packaging>
   <description>The Exoplatform XWiki WAR</description>
   <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-web-standard</artifactId>
+      <version>${version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
 </project>
         

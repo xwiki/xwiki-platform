@@ -32,6 +32,11 @@
   <packaging>war</packaging>
   <description>The standard XWiki WAR</description>
   <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${version}</version>
+    </dependency>
   </dependencies>
 </project>
         

@@ -469,26 +469,26 @@
     <target name="webapp" depends="jar">
       <mkdir dir="${release.dir}/web" />
       <copy todir="${release.dir}/web">
-	<fileset dir="${build.dir}/web">
-         <exclude name="**/web-*.xml" />
-         <exclude name="**/xwiki-*.cfg" />
-         <exclude name="**/hibernate-test.cfg.xml" />
-         <exclude name="**/hibernate.cfg.*.xml" />
-	</fileset>
+	    <fileset dir="${build.dir}/web">
+          <exclude name="**/web-*.xml" />
+          <exclude name="**/xwiki-*.cfg" />
+          <exclude name="**/hibernate-test.cfg.xml" />
+          <exclude name="**/hibernate.cfg.*.xml" />
+        </fileset>
       </copy>
       <copy todir="${release.dir}/web/WEB-INF/lib">
         <fileset refid="libs.main.fileset" />
         <fileset refid="libs.hib.fileset" />
         <fileset refid="libs.exo.fileset" />
         <fileset refid="libs.xwiki.fileset" />
-	</copy>
+	  </copy>
       <copy tofile="${release.dir}/web/WEB-INF/web.xml" overwrite="true"
-		file="${main.src.dir}/web.xml" />
+		file="${web.standard.webapp.main.src.dir}/WEB-INF/web.xml" />
     </target>
 
     <target name="release" depends="jar">
       <mkdir dir="${release.dir}" />
-      <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web.xml" >
+      <war warfile="${release.warfile}" basedir="${build.dir}/web" webxml="${web.standard.webapp.main.src.dir}/WEB-INF/web.xml" >
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
         <lib refid="libs.main.fileset" />
@@ -498,7 +498,7 @@
       </war>
       <copy file="${build.dir}/web/WEB-INF/xwiki.cfg" tofile="${build.dir}/web/WEB-INF/xwiki-normal.cfg" overwrite="true" />
       <copy file="${build.dir}/web/WEB-INF/xwiki-exo.cfg" tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${main.src.dir}/web-exo.xml" >
+      <war warfile="${exo.warfile}" basedir="${build.dir}/web" webxml="${web.exo.webapp.main.src.dir}/WEB-INF/web-exo.xml" >
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
           <lib refid="libs.main.fileset" />

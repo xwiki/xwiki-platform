@@ -1881,10 +1881,17 @@ v     * API to check rights on a document for a given user
      * @param newFullName target page name to move the information to
      * @throws XWikiException exception if the rename fails
      */
-    public void renamePage(XWikiDocument doc, String newFullName) throws XWikiException {
-        if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)) {
-            xwiki.renamePage(doc, newFullName, context);
+    public boolean renamePage(Document doc, String newFullName){
+        try {
+            if (xwiki.exists(newFullName, context) && !xwiki.getRightService().hasAccessLevel("delete", context.getUser(), newFullName, context))
+                return false;       
+            if (xwiki.getRightService().hasAccessLevel("edit", context.getUser(), doc.getFullName(), context)) {
+                xwiki.renamePage(doc.getFullName(), newFullName, context);
+            }
+        } catch (XWikiException e) {
+            return false;
         }
+        return true;
     }
 
     /**

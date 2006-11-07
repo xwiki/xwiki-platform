@@ -995,11 +995,15 @@ public class XWikiDocument {
     }
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context) {
+        return display(fieldname, type, "", obj, context);
+    }
+
+    public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context) {
         try {
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
-            String prefix = obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
+            String prefix = pref + obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
             if (pclass.isCustomDisplayed(context)){
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);  
@@ -1059,6 +1063,10 @@ public class XWikiDocument {
     }
 
     public String display(String fieldname, String mode, XWikiContext context) {
+        return display(fieldname, mode, "", context);
+    }
+
+    public String display(String fieldname, String mode, String prefix, XWikiContext context) {
         try {
             BaseObject object = getxWikiObject();
             if (object == null)
@@ -2739,16 +2747,26 @@ public class XWikiDocument {
 
     // This functions adds an object from an new object creation form
     public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException {
-        return addObjectFromRequest(className, 0, context);
+        return addObjectFromRequest(className, "", 0, context);
     }
 
-        // This functions adds multiple objects from an new objects creation form
+    // This functions adds an object from an new object creation form
+    public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException {
+        return addObjectFromRequest(className, prefix, 0, context);
+    }
+
+    // This functions adds multiple objects from an new objects creation form
     public List addObjectsFromRequest(String className, XWikiContext context) throws XWikiException {
+        return addObjectsFromRequest(className, "", context);
+    }
+
+    // This functions adds multiple objects from an new objects creation form
+    public List addObjectsFromRequest(String className, String pref, XWikiContext context) throws XWikiException {
         Map map = context.getRequest().getParameterMap();
         List objectsNumberDone = new ArrayList();
         List objects  = new ArrayList();
         Iterator it = map.keySet().iterator();
-        String start = className + "_";
+        String start = pref + className + "_";
 
         while (it.hasNext()) {
             String name = (String) it.next();
@@ -2758,7 +2776,7 @@ public class XWikiDocument {
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
                 if (!objectsNumberDone.contains(new Integer(num))){
                     objectsNumberDone.add(new Integer(num));
-                    objects.add(addObjectFromRequest(className, num, context));
+                    objects.add(addObjectFromRequest(className, pref, num, context));
                 }
             }
         }
@@ -2767,10 +2785,14 @@ public class XWikiDocument {
 
     // This functions adds object from an new object creation form
     public BaseObject addObjectFromRequest(String className, int num, XWikiContext context) throws XWikiException {
+        return addObjectFromRequest(className, "", num, context);
+    }
+    // This functions adds object from an new object creation form
+    public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context) throws XWikiException {
         int nb = createNewObject(className, context);
         BaseObject oldobject = getObject(className, nb);
         BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_" + num), oldobject);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + num), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
@@ -2779,19 +2801,57 @@ public class XWikiDocument {
 
     // This functions adds an object from an new object creation form
     public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException {
+        return updateObjectFromRequest(className, "", context);
+    }
+
+    // This functions adds an object from an new object creation form
+    public BaseObject updateObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException {
+        return updateObjectFromRequest(className, prefix, 0, context);
+    }
+
+    // This functions adds an object from an new object creation form
+    public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context) throws XWikiException {
         int nb;
-        BaseObject oldobject = getObject(className);
+        BaseObject oldobject = getObject(className, num);
         if (oldobject==null) {
             nb = createNewObject(className, context);
             oldobject = getObject(className, nb);
         } else
            nb = oldobject.getNumber();
         BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), className + "_" + nb), oldobject);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + nb), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
         return newobject;
+    }
+
+    // This functions adds an object from an new object creation form
+    public List  updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException {
+        return updateObjectsFromRequest(className, "", context);
+    }
+
+    // This functions adds multiple objects from an new objects creation form
+    public List updateObjectsFromRequest(String className, String pref, XWikiContext context) throws XWikiException {
+        Map map = context.getRequest().getParameterMap();
+        List objectsNumberDone = new ArrayList();
+        List objects  = new ArrayList();
+        Iterator it = map.keySet().iterator();
+        String start = pref + className + "_";
+
+        while (it.hasNext()) {
+            String name = (String) it.next();
+            if (name.startsWith(start)) {
+                int pos = name.indexOf("_", start.length() + 1);
+                String prefix = name.substring(0, pos);
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
+                if (!objectsNumberDone.contains(new Integer(num))){
+                    objectsNumberDone.add(new Integer(num));
+                    objects.add(updateObjectFromRequest(className, pref, num, context));
+                }
+            }
+        }
+        return objects;
     }
 
     public boolean isAdvancedContent() {

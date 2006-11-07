@@ -749,6 +749,13 @@ public class Document extends Api {
             return doc.display(fieldname, mode, currentObj.getBaseObject(), context);
     }
 
+    public String display(String fieldname, String mode, String prefix) {
+        if (currentObj == null)
+            return doc.display(fieldname, mode, prefix, context);
+        else
+            return doc.display(fieldname, mode, prefix, currentObj.getBaseObject(), context);
+    }
+
     public String display(String fieldname, Object obj) {
         if (obj == null)
             return "";
@@ -759,6 +766,12 @@ public class Document extends Api {
         if (obj == null)
             return "";
         return doc.display(fieldname, mode, obj.getBaseObject(), context);
+    }
+
+    public String display(String fieldname, String mode, String prefix, Object obj) {
+        if (obj == null)
+            return "";
+        return doc.display(fieldname, mode, prefix, obj.getBaseObject(), context);
     }
 
     public String displayForm(String className, String header, String format) {
@@ -1171,7 +1184,15 @@ public class Document extends Api {
     }
 
     public List addObjectsFromRequest(String className) throws XWikiException {
-        List objs = getDoc().addObjectsFromRequest(className, context);
+        return addObjectsFromRequest(className, "");
+    }
+
+    public com.xpn.xwiki.api.Object addObjectFromRequest(String className, String prefix) throws XWikiException {
+        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, prefix, context), context);
+    }
+
+    public List addObjectsFromRequest(String className, String prefix) throws XWikiException {
+        List objs = getDoc().addObjectsFromRequest(className, prefix, context);
         List wrapped = new ArrayList();
         Iterator it = objs.iterator();
         while(it.hasNext()){
@@ -1182,6 +1203,24 @@ public class Document extends Api {
 
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException {
         return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, context), context);
+    }
+
+    public List updateObjectsFromRequest(String className) throws XWikiException {
+        return updateObjectsFromRequest(className, "");
+    }
+
+    public com.xpn.xwiki.api.Object updateObjectFromRequest(String className, String prefix) throws XWikiException {
+        return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, prefix, context), context);
+    }
+
+    public List updateObjectsFromRequest(String className, String prefix) throws XWikiException {
+        List objs = getDoc().updateObjectsFromRequest(className, prefix, context);
+        List wrapped = new ArrayList();
+        Iterator it = objs.iterator();
+        while(it.hasNext()){
+            wrapped.add(new com.xpn.xwiki.api.Object((BaseObject) it.next(), context));
+        }
+        return wrapped;
     }
 
     public boolean isAdvancedContent() {

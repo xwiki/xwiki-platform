@@ -180,7 +180,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
 
     public String inviteToGroup(String name, String firstName, String email, String group, XWikiContext context) throws XWikiException {
         String pageName = context.getWiki().convertUsername(email, context);
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPluginApi("usermanagementtools", context);
+        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         XWikiDocument doc = context.getWiki().getDocument(userTools.getUserSpace(context) + "." + pageName, context);
         if (doc.isNew()) {
             String userDocName = userTools.inviteUser(name, email, context);
@@ -202,12 +202,12 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
     }
 
     public String getUserName(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPluginApi("usermanagementtools", context);
+        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         return userTools.getUserName(userPage, context);
     }
 
     public String getUserEmail(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPluginApi("usermanagementtools", context);
+        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
         return userTools.getEmail(userPage, context);
     }
 
@@ -297,7 +297,7 @@ public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPlu
     }
 
     public void resendInvitation(String userPage, XWikiContext context) throws XWikiException {
-        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPluginApi("usermanagementtools", context);
+        XWikiUserManagementTools userTools = (XWikiUserManagementTools) context.getWiki().getPlugin("usermanagementtools", context);
 
         userTools.resendInvitation(userTools.getEmail(userPage, context), context);
     }

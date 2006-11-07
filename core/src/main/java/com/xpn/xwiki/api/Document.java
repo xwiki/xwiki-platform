@@ -1049,9 +1049,12 @@ public class Document extends Api {
         else
             object = currentObj;
         if (object != null) {
-            //com.xpn.xwiki.objects.classes.PropertyClass pclass = (PropertyClass) object.getBaseObject().getxWikiClass(context).get(fieldName);
-            //return getDoc().displayView(pclass, fieldName, object.getBaseObject(), context);
-            return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
+            try {
+                return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
+            }
+            catch(NullPointerException e){
+                return null;
+            }
         }
         return null;
     }

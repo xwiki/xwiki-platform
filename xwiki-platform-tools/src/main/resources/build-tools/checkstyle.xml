@@ -11,11 +11,6 @@
 <!-- Checkstyle properties for XWiki projects -->
 <module name="Checker">
 
-  <!-- Other modules -->
-  <module name="SuppressionFilter">
-    <property name="file" value="${checkstyle.suppressions.file}"/>
-  </module>
-
   <!--
      ======================================================================================
        Checks that do not require a TreeWalker (sorted alphabetically)
@@ -34,10 +29,6 @@
 
   <!-- We'd like to use this one but there's no option to exclude our internal packages
   <module name="PackageHtml"/>
-  -->
-
-  <!-- We cannot use this rule as it fails on our license headers, considering them as copy-pastes!
-  <module name="StrictDuplicateCode"/>
   -->
 
   <module name="Translation"/>
@@ -74,13 +65,17 @@
     <module name="ClassDataAbstractionCoupling"/>
     -->
 
-    <module name="ClassFanOutComplexity"/>
+    <module name="ClassFanOutComplexity">
+      <property name="severity" value="warning"/>
+    </module>
 
     <module name="ConstantName"/>
 
     <module name="CovariantEquals"/>
 
-    <module name="CyclomaticComplexity"/>
+    <module name="CyclomaticComplexity">
+      <property name="severity" value="warning"/>
+    </module>
 
     <module name="DeclarationOrder"/>
 
@@ -107,7 +102,9 @@
 
     <module name="EqualsHashCode"/>
 
-    <module name="ExecutableStatementCount"/>
+    <module name="ExecutableStatementCount">
+      <property name="severity" value="warning"/>
+    </module>
 
     <module name="ExplicitInitialization"/>
 
@@ -136,11 +133,10 @@
     </module>
 
     <!-- No @author tags -->
-    <!-- We're commenting this out until we have sorted out if we want author tags or not.
     <module name="GenericIllegalRegexp">
       <property name="format" value="@author"/>
       <property name="message" value="No @author tag allowed"/>
-    </module>-->
+    </module>
 
     <!-- Need to put this back when we find a way of making it work
     <module name="Header">
@@ -161,15 +157,21 @@
       <property name="classes" value="java.lang.Boolean, java.lang.String"/>
     </module>
 
+    <!-- Checkstyle 4 check
     <module name="IllegalThrows"/>
+    -->
 
     <!--module name="IllegalToken"/-->
 
     <module name="IllegalTokenText"/>
 
-    <module name="IllegalType"/>
+    <module name="IllegalType">
+      <property name="severity" value="warning"/>
+    </module>
 
-    <!--module name="ImportControl"/-->
+    <!-- Checkstyle 4 check
+    <module name="ImportControl"/>
+    -->
 
     <!--module name="ImportOrder"/-->
 
@@ -184,7 +186,9 @@
       <property name="allowUndeclaredRTE" value="true"/>
     </module>
 
-    <module name="JavadocStyle"/>
+    <module name="JavadocStyle">
+      <property name="severity" value="warning"/>
+    </module>
 
     <module name="JavadocType">
       <property name="scope" value="private"/>
@@ -195,13 +199,14 @@
       <property name="scope" value="private"/>
     </module>
 
+    <!-- Checkstyle 3.5 check. Maven 1.0.2 ships with CS 3.4 dependency.
     <module name="JavaNCSS"/>
+    -->
 
     <module name="JUnitTestCase"/>
 
     <module name="LeftCurly">
       <property name="option" value="nl"/>
-      <property name="tokens" value="CLASS_DEF,INTERFACE_DEF"/>
     </module>
 
     <module name="LineLength">
@@ -236,13 +241,15 @@
 
     <module name="MissingSwitchDefault"/>
 
+    <!-- Checkstyle 3.5 check. Maven 1.0.2 ships with CS 3.4 dependency.
     <module name="ModifiedControlVariable"/>
+    -->
 
     <module name="ModifierOrder"/>
 
-    <module name="MultipleStringLiterals">
-      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")$'/>
-    </module>
+    <!-- Checkstyle 3.5 check. Maven 1.0.2 ships with CS 3.4 dependency.
+    <module name="MultipleStringLiterals"/>
+    -->
 
     <module name="MultipleVariableDeclarations"/>
 
@@ -260,7 +267,9 @@
 
     <module name="NoWhitespaceBefore"/>
 
-    <module name="NPathComplexity"/>
+    <module name="NPathComplexity">
+      <property name="severity" value="warning"/>
+    </module>
 
     <module name="OperatorWrap"/>
 
@@ -292,15 +301,19 @@
 
     <module name="j2ee.RemoteInterface"/>
 
-    <!--module name="RequireThis">
+    <!-- Seems there's a bug in the Checkstyle 3.4 implementation
+    <module name="RequireThis">
       <property name="checkMethods" value="false"/>
-    </module-->
+    </module>
+    -->
 
     <!--module name="RequiredRegexp"/-->
 
     <module name="ReturnCount"/>
 
-    <module name="RightCurly"/>
+    <module name="RightCurly">
+      <property name="option" value="alone"/>
+    </module>
 
     <module name="j2ee.SessionBean"/>
 
@@ -309,6 +322,10 @@
     <module name="SimplifyBooleanReturn"/>
 
     <module name="StaticVariableName"/>
+
+    <!-- Checkstyle 3.5 check. Maven 1.0.2 ships with CS 3.4 dependency.
+    <module name="StrictDuplicateCode"/>
+    -->
 
     <module name="StringLiteralEquality"/>
 
@@ -335,7 +352,7 @@
     <module name="TypecastParenPad"/>
 
     <module name="UncommentedMain">
-      <property name="excludedClasses" value=".*Main$"/>
+      <property name="excludedClasses" value="ResinRun$|\.Main$"/>
     </module>
 
     <!--module name="UnnecessaryParentheses"/-->

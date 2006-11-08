@@ -51,9 +51,41 @@
     <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/</url>
   </scm>
   <modules>
+    <module>build-tools</module>
     <module>core</module>
     <module>web</module>
   </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- Apply checkstyle rules and fail the build in case of errors. The checkstyle config
+             files are taken from the build-tools JAR module.-->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <dependencies>
+            <dependency>
+              <groupId>com.xpn.xwiki</groupId>
+              <artifactId>xwiki-build-tools</artifactId>
+              <version>${version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <consoleOutput>true</consoleOutput>
+            <configLocation>build-tools/checkstyle.xml</configLocation>
+            <headerLocation>build-tools/checkstyle.license</headerLocation>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <repositories>
     <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main
          remote repository. To be removed once we're only using official JARs -->

@@ -217,7 +217,7 @@ public class Group {
             Document doc = context.getWiki().getDocument(userPage, context).newDocument(context);
             doc.use("XWiki.XWikiUsers");
             Integer active = (Integer) doc.getValue("active");
-            if (active.intValue() == 0){
+            if (active == null || active.intValue() == 0){
                 unactivatedMembers.add(userPage);
             }
         }

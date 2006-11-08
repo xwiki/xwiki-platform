@@ -354,5 +354,20 @@
       <!--scope>runtime</scope-->
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file but only for the files
+             that are considered clean. This is because we're in a transition phase to clean all the XWiki source
+             files but this is going to take long and thus we're using a staggered approach. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includes></includes>
+          <excludes>**/*.java</excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
         

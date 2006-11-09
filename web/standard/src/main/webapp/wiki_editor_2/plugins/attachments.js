@@ -214,6 +214,8 @@ WikiEditor.prototype.convertAttachmentExternal = function(regexp, result, conten
 }
 
 WikiEditor.prototype.convertAttachmentInternal = function(regexp, result, content) {
+    result[1] = result[1].replace(/%20/gi, " ");
+    result[3] = result[3].replace(/%20/gi, " ");
     var str;
     if (result[1] == result[3]) str = "{attach:" + result[1] + "}";
     else  if ((result[1] == "undefined") || (this.trimString(result[1]) == "")) str = "{attach:" + result[3] + "}";

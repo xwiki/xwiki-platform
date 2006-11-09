@@ -13,7 +13,8 @@ function insertImage() {
 
 function init() {
     editor_id = tinyMCE.getWindowArg('editor_id');
-    document.forms[0].href.value = tinyMCE.getWindowArg('src');;
+    var href = tinyMCE.getWindowArg('src')
+    document.forms[0].href.value = href.replace(/%20/gi, " ");
     document.forms[0].width.value = tinyMCE.getWindowArg('width');
 	document.forms[0].height.value = tinyMCE.getWindowArg('height');
 

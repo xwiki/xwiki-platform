@@ -17,7 +17,7 @@
                 <tr>
                     #set($bentrydoc = $xwiki.getDocument($item))
                     <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.web' != '$bentrydoc.web') document.forms[0].wiki_space.value='$bentrydoc.web'; else document.forms[0].wiki_space.value=''; return false;">
-                        $bentrydoc.name </a>created by  $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
+                        $bentrydoc.name</a>  $msg.get("lastmodifiedby")  $xwiki.getLocalUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
                      </td>
                  </tr>
             #end

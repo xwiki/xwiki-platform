@@ -121,14 +121,23 @@ if (url != null) {
         spaceEl.innerHTML = '<select id="space" name="space" onchange="loadBrowseList(baseurl, this);">' + e+  '</select>';
         spaceE2.innerHTML = '<select id="search_space" name="search_space" >' + e + '</select>';
     }
-    function loadRecentlyViewedList(baseurl) {
+    function loadRecentlyList(baseurl, action) {
         var url = baseurl + "?xpage=recentdocwysiwyg";
-        executeCommand(url, loadRecentlyViewedCallback);
+        if (action != null && action != "" && action == "view") {
+            url += "&action=" + action;
+            executeCommand(url, loadRecentlyViewedCallback);
+        } else 
+            executeCommand(url, loadRecentlyModifiedCallback);
     }
 
     function loadRecentlyViewedCallback(e) {
         var recentEl = document.getElementById("recentviewed");
         recentEl.innerHTML = e;
+    }
+
+    function loadRecentlyModifiedCallback(e) {
+        var recentE2 = document.getElementById("recentmodified");
+        recentE2.innerHTML = e;
     }
 </script>
 </head>
@@ -181,7 +190,8 @@ if (url != null) {
                                             <ul>
                                                 <li id="browse_tab" class="current"><span><a href="javascript:mcTabs.displayTab('browse_tab','browse_panel');" onmousedown="return false;">{$lang_link_wiki_browse_tab}</a></span></li>
                                                 <li id="search_tab"><span><a href="javascript:mcTabs.displayTab('search_tab','search_panel');" onmousedown="return false;">{$lang_link_wiki_search_tab}</a></span></li>
-                                                <li id="recent_tab"><span><a href="javascript:mcTabs.displayTab('recent_tab','recent_panel');" onmousedown="return false;">{$lang_link_wiki_recent_tab}</a></span></li>
+                                                <li id="recent_viewed_tab"><span><a href="javascript:mcTabs.displayTab('recent_viewed_tab','recent_viewed_panel');" onmousedown="return false;">{$lang_link_wiki_recent_viewed_tab}</a></span></li>
+                                                <li id="recent_modified_tab"><span><a href="javascript:mcTabs.displayTab('recent_modified_tab','recent_modified_panel');" onmousedown="return false;">{$lang_link_wiki_recent_modified_tab}</a></span></li>
                                             </ul>
                                         </div>
 
@@ -242,13 +252,26 @@ if (url != null) {
                                                 </table>
                                             </div>
 
-                                            <div id="recent_panel" class="panel">
+                                            <div id="recent_viewed_panel" class="panel">
                                                 <table border="0" cellpadding="4" cellspacing="0" width="100%">
                                                     <tr>
                                                         <td>
                                                             <div style="margin: 3px" id="recentviewed"></div>
                                                             <script type="text/javascript">
-                                                                loadRecentlyViewedList(baseurl);
+                                                                loadRecentlyList(baseurl, "view");
+                                                            </script>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+
+                                            <div id="recent_modified_panel" class="panel">
+                                                <table border="0" cellpadding="4" cellspacing="0" width="100%">
+                                                    <tr>
+                                                        <td>
+                                                            <div style="margin: 3px" id="recentmodified"></div>
+                                                            <script type="text/javascript">
+                                                                loadRecentlyList(baseurl);
                                                             </script>
                                                         </td>
                                                     </tr>

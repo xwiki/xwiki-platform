@@ -283,8 +283,8 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/xwiki.iml" filepath="$PROJECT_DIR$/xwiki.iml" />
-      <module fileurl="file://$PROJECT_DIR$/xwikibase.iml" filepath="$PROJECT_DIR$/xwikibase.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xwiki-core.iml" filepath="$PROJECT_DIR$/xwiki-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xwiki-standard.iml" filepath="$PROJECT_DIR$/xwiki-standard.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" />

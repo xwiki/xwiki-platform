@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4" relativePaths="true" type="JAVA_MODULE">
+  <component name="ModuleRootManager" />
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/build/xwikibase" />
+    <output-test url="file://$MODULE_DIR$/build/xwikibase_test" />
+    <content url="file://$MODULE_DIR$/core">
+      <sourceFolder url="file://$MODULE_DIR$/core/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/core/src/main/resources" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/src">
+      <sourceFolder url="file://$MODULE_DIR$/src/test/cactus" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Hibernate" level="project" />
+    <orderEntry type="library" name="Jakarta Commons" level="project" />
+    <orderEntry type="library" name="Struts" level="project" />
+    <orderEntry type="library" name="Unit Tests" level="project" />
+    <orderEntry type="library" name="Velocity" level="project" />
+    <orderEntry type="library" name="Ant" level="project" />
+    <orderEntry type="library" name="SecurityFilter" level="project" />
+    <orderEntry type="library" name="Radeox" level="project" />
+    <orderEntry type="library" name="Portlets" level="project" />
+    <orderEntry type="library" name="ExoPlatform" level="project" />
+    <orderEntry type="library" name="XMLRPC" level="project" />
+    <orderEntry type="library" name="Groovy" level="project" />
+    <orderEntry type="library" name="fop" level="project" />
+    <orderEntry type="library" name="LDAP" level="project" />
+    <orderEntry type="library" name="RSS" level="project" />
+    <orderEntry type="library" name="Dom4J" level="project" />
+    <orderEntry type="library" name="JMock" level="project" />
+    <orderEntry type="library" name="WebServices" level="project" />
+    <orderEntry type="library" name="XML" level="project" />
+    <orderEntry type="library" name="JCR" level="project" />
+    <orderEntry type="library" name="Chart" level="project" />
+    <orderEntry type="library" name="cache" level="project" />
+    <orderEntry type="library" name="Jrcs" level="project" />
+    <orderEntry type="library" name="Captcha" level="project" />
+    <orderEntry type="library" name="Servlet API" level="project" />
+    <orderEntryProperties />
+  </component>
+</module>
+

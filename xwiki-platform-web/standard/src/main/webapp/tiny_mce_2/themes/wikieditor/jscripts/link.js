@@ -12,7 +12,7 @@ function init() {
            document.forms[0].web_page.value = href;
         } else if (href.search(/wikiattachment:-:(.*?)/gi) > -1) {
             mcTabs.displayTab('attachments_tab','attachments_panel');
-            document.forms[0].attach.value = href.replace(/wikiattachment:-:/gi, "");
+            document.forms[0].attach.value = href.replace(/wikiattachment:-:/gi, "").replace(/%20/gi, " ");
         } else if (href.search(/mailto:(.*?)/gi) > -1) {
             mcTabs.displayTab('email_tab','email_panel')
             document.forms[0].email.value = href.replace(/mailto:/gi, "");

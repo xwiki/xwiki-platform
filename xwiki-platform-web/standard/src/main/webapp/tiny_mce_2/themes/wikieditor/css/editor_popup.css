@@ -256,7 +256,7 @@ legend {
 }
 
 .innertabs a:link, .tabs a:visited, .tabs a:hover {
-	color: black;
+	color: #6666cc;
 }
 
 .innertabs a:hover {

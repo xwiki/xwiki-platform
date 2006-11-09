@@ -44,8 +44,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
-    // Remove &nbsp;'s
-    this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
+    //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
 
     var charStr = "À|Á|Â|Ã|Ä|Å|" +
                   "Æ|Ç|È|É|Ê|Ë|" +
@@ -815,9 +814,9 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 	var str = "";
 	if(bounds && bounds["start"] > -1) {
 		str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]));
-		return content.substring(0, bounds["start"]) + "\r\n" + str + content.substring(bounds["end"], content.length);
+        return content.substring(0, bounds["start"]) + "\r\n" + str + content.substring(bounds["end"], content.length);
 	}
-	return content;
+    return content;
 }
 
 /*
@@ -835,8 +834,10 @@ WikiEditor.prototype._convertListInternal = function(content) {
 		RegExp.lastIndex = result["index"];  // Reset position so it will find the same tag when replacing
 
 		var tstr = result[2];
+        if (tstr == "<br />") tstr = "&nbsp;<br />";
+        if (tstr == "") tstr = "&nbsp;";
 
-		if(attributes && attributes["wikieditorlisttype"] && attributes["wikieditorlistdepth"]) { // Must have at least 2 wikieditor attributes + the string
+        if(attributes && attributes["wikieditorlisttype"] && attributes["wikieditorlistdepth"]) { // Must have at least 2 wikieditor attributes + the string
 
 			//tstr = this.convertBlockInternal(tstr); // Read line and convert
 

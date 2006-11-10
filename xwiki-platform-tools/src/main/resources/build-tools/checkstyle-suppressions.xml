@@ -5,4 +5,15 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
 
 <suppressions>
+  <!-- As we're currently in a code style migration we are turning off some checks here. The goal
+       is to reduce this list so that all checks are on . For example to exclude all checks for
+       all Java classes, except the Leftcurly check, you would write:
+
+       <suppress checks="(!?LeftCurly)" files=".*\.java"/>
+
+       To exclude all checks for all classes except for the Api.java class you would write:
+
+       <suppress checks=".*" files="(!?Api.java)"/>
+  -->
+  <suppress checks=".*" files=".*"/>
 </suppressions>

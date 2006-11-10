@@ -74,6 +74,8 @@
             <consoleOutput>true</consoleOutput>
             <configLocation>build-tools/checkstyle.xml</configLocation>
             <headerLocation>build-tools/checkstyle.license</headerLocation>
+            <suppressionsLocation>build-tools/checkstyle-suppressions.xml</suppressionsLocation>
+            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
           </configuration>
           <executions>
             <execution>

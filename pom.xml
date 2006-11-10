@@ -94,7 +94,7 @@
     <repository>
       <id>xwiki</id>
       <name>XWiki Maven2 Remote Repository</name>
-      <url>http://laam.xpertnet.biz/~vmassol/repository</url>
+      <url>http://laam.xpertnet.biz/repository/</url>
       <releases>
         <enabled>true</enabled>
       </releases>

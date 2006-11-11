@@ -4199,7 +4199,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String addTooltip(String html, String message, String params, XWikiContext context) {
       StringBuffer buffer = new StringBuffer();
-        buffer.append("<span onmouseover=\"");
+        buffer.append("<span class=\"tooltip_span\" onmouseover=\"");
         buffer.append(params);
         buffer.append("; return escape('");
         buffer.append(message.replaceAll("'","\\'"));

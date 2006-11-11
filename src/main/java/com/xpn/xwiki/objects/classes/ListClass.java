@@ -35,17 +35,13 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class ListClass extends PropertyClass {
 
@@ -77,7 +73,15 @@ public abstract class ListClass extends PropertyClass {
 		setStringValue("displayType", type);
 	}
 
-	public int getSize() {
+    public String getSort() {
+		return getStringValue("sort");
+	}
+
+	public void setSort(String sort) {
+		setStringValue("sort", sort);
+	}
+
+    public int getSize() {
 		return getIntValue("size");
 	}
 
@@ -324,6 +328,29 @@ public abstract class ListClass extends PropertyClass {
 		}
 	}
 
+    protected class MapComparator implements Comparator {
+        protected Map map;
+        public MapComparator(Map map) {
+            this.map = map;
+        }
+
+        public int compare(Object o1, Object o2) {
+            String s1 = (String)map.get(o1);
+            String s2 = (String)map.get(o2);
+
+            if ((s1==null)&&(s2==null))
+             return 0;
+
+            if (s1==null)
+             return -1;
+
+            if (s2==null)
+             return 1;
+            
+            return s1.compareTo(s2);
+        }
+    }
+
     protected void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		select select = new select(prefix + name, 1);
 		select.setMultiple(isMultiSelect());
@@ -333,6 +360,15 @@ public abstract class ListClass extends PropertyClass {
 
 		List list = getList(context);
         Map map = getMap(context);
+
+        String sort = getSort();
+        if (!"none".equals(sort)) {
+            if ("id".equals(sort))
+                Collections.sort(list);
+            if ("value".equals(sort))
+                Collections.sort(list , new MapComparator(map));
+        }
+
 		List selectlist;
 
 		BaseProperty prop = (BaseProperty) object.safeget(name);

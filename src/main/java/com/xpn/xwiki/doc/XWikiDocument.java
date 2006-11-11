@@ -984,7 +984,7 @@ public class XWikiDocument {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String tooltip = pclass.getTooltip();
             if ((tooltip!=null)&&(!tooltip.trim().equals(""))) {
-                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context) + "\" align=\"middle\" />";
+                String img = "<img src=\"" + context.getWiki().getSkinFile("info.gif", context) + "\" class=\"tooltip_image\" align=\"middle\" />";
                 return context.getWiki().addTooltip(img, tooltip, context);
             } else
              return "";

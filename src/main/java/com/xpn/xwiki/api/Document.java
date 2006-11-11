@@ -1303,7 +1303,7 @@ public class Document extends Api {
             filename = filename.replaceAll("\\+"," ");
 
             if ((data != null) && (data.length > 0)){
-                XWikiAttachment attachment = addAttachment(fname, data);
+                XWikiAttachment attachment = addAttachment(filename, data);
                 getDoc().saveAttachmentContent(attachment, context);
                 getDoc().getAttachmentList().add(attachment);
                 attachments.add(attachment);

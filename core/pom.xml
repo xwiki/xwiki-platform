@@ -204,6 +204,16 @@
       <groupId>velocity</groupId>
       <artifactId>velocity</artifactId>
       <version>1.4</version>
+      <exclusions>
+        <!-- We're excluding velocity-dep as it includes a version of ORO that is masking our
+             dependency of ORO that we're using transitively through another dependency. This
+             leads to compilation problems with some code we have. An issues has been raised
+             on http://issues.apache.org/jira/browse/VELOCITY-491 -->
+        <exclusion>
+          <groupId>velocity</groupId>
+          <artifactId>velocity-dep</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -352,6 +362,18 @@
       <!-- TODO: Compilation is failing when the runtime scope is set. We need to investigate why as the servlet
            API should be a runtime dependency -->
       <!--scope>runtime</scope-->
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

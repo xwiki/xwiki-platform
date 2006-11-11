@@ -1294,8 +1294,15 @@ public class Document extends Api {
             if (item.isFormField())
                 continue;
             byte[] data = fileupload.getFileItemData(name, context);
+            String filename;
+            String fname = fileupload.getFileName("filepath", context);
+            int i = fname.indexOf("\\");
+            if (i==-1)
+                i = fname.indexOf("/");
+            filename = fname.substring(i+1);
+            filename = filename.replaceAll("\\+"," ");
+
             if ((data != null) && (data.length > 0)){
-                String fname = fileupload.getFileName(name, context);
                 XWikiAttachment attachment = addAttachment(fname, data);
                 getDoc().saveAttachmentContent(attachment, context);
                 getDoc().getAttachmentList().add(attachment);

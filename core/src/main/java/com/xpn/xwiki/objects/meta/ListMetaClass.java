@@ -66,5 +66,11 @@ public class ListMetaClass extends PropertyMetaClass {
         size_class.setSize(5);
         size_class.setNumberType("integer");
         safeput("size", size_class);
+
+        StaticListClass sort_class = new StaticListClass(this);
+        sort_class.setName("sort");
+        sort_class.setPrettyName("Sort");
+        sort_class.setValues("none|id|value");
+        safeput("sort", sort_class);
     }
 }

@@ -1295,7 +1295,7 @@ public class Document extends Api {
                 continue;
             byte[] data = fileupload.getFileItemData(name, context);
             String filename;
-            String fname = fileupload.getFileName("filepath", context);
+            String fname = fileupload.getFileName(name, context);
             int i = fname.indexOf("\\");
             if (i==-1)
                 i = fname.indexOf("/");

@@ -245,4 +245,48 @@ public class ClassesTest extends TestCase {
         editresult = new String[] {"<select", "multiple", ">France"};
         testDisplayer("category3", obj, bclass, viewresult, editresult);
     }
+
+    /**
+     *
+     * @throws XWikiException
+     */
+    public void testSortedListMapDisplayers() throws XWikiException {
+        XWikiDocument doc = new XWikiDocument();
+        Utils.prepareAdvancedObject(doc);
+        BaseClass bclass = doc.getxWikiClass();
+        ((StaticListClass)bclass.get("category")).setValues("1=France|2=Germany|3=UK|4=USA|5=Other");
+        ((StaticListClass)bclass.get("category")).setSort("id");
+        ((StaticListClass)bclass.get("category2")).setValues("1=France|2=Germany|3=UK|4=USA|5=Other");
+        ((StaticListClass)bclass.get("category2")).setSort("value");
+        BaseObject obj = doc.getObject(bclass.getName(), 0);
+
+        String[] viewresult = {"France"};
+        String[] editresult = {"<select", ">France"};
+        testDisplayer("category", obj, bclass, viewresult, editresult);
+        viewresult = new String[] {"France Germany"};
+        editresult = new String[] {"<select", "multiple", ">France", ">Germany", ">UK"};
+        testDisplayer("category2", obj, bclass, viewresult, editresult);
+
+        XWikiContext context = new XWikiContext();
+        StringBuffer result = new StringBuffer();
+        PropertyClass pclass = (PropertyClass)bclass.get("category");
+        pclass.displayEdit(result,"category", "", obj, context);
+        String res = result.toString();
+
+        int i1 = res.indexOf("UK");
+        int i2 = res.indexOf("Other");
+
+        assertTrue("UK should be before Other", (i1<i2));
+
+        result = new StringBuffer();
+        pclass = (PropertyClass)bclass.get("category2");
+        pclass.displayEdit(result,"category2", "", obj, context);
+        res = result.toString();
+
+        i1 = res.indexOf("UK");
+        i2 = res.indexOf("Other");
+
+        assertFalse("UK should be after Other", (i1<i2));
+    }
+
 }

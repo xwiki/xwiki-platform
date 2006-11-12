@@ -335,8 +335,8 @@ public abstract class ListClass extends PropertyClass {
         }
 
         public int compare(Object o1, Object o2) {
-            String s1 = (String)map.get(o1);
-            String s2 = (String)map.get(o2);
+            ListItem s1 = (ListItem)map.get(o1);
+            ListItem s2 = (ListItem)map.get(o2);
 
             if ((s1==null)&&(s2==null))
              return 0;
@@ -347,7 +347,7 @@ public abstract class ListClass extends PropertyClass {
             if (s2==null)
              return 1;
             
-            return s1.compareTo(s2);
+            return s1.getValue().compareTo(s2.getValue());
         }
     }
 

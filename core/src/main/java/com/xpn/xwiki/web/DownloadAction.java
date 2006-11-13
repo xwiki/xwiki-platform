@@ -78,7 +78,17 @@ public class DownloadAction extends XWikiAction {
         response.addHeader("Content-disposition", "inline; filename=\"" +  ofilename + "\"");
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Sending the content of the attachment
-        byte[] data = attachment.getContent(context);
+        byte[] data;
+        try {
+            data = attachment.getContent(context);
+        }
+        catch(XWikiException e) {
+            Object[] args = { filename };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+                    "Attachment content {0} not found", null, args);
+        }
+
         response.setContentLength(data.length);
         try {
             response.getOutputStream().write(data);

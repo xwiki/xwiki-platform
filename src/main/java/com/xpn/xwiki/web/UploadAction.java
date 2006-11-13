@@ -60,9 +60,9 @@ public class UploadAction extends XWikiAction {
         byte[] data = fileupload.getFileItemData("filepath", context);
         if (filename==null) {
             String fname = fileupload.getFileName("filepath", context);
-            int i = fname.indexOf("\\");
+            int i = fname.lastIndexOf("\\");
             if (i==-1)
-                i = fname.indexOf("/");
+                i = fname.lastIndexOf("/");
             filename = fname.substring(i+1);
         }
         filename = filename.replaceAll("\\+"," ");

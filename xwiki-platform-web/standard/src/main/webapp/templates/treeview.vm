@@ -1,4 +1,4 @@
-{pre}#if(!$treeviewid)
+#if(!$treeviewid)
 #set($treeviewid = 1)
 #else
 #set($treeviewid = 1 + $treeviewid)
@@ -6,12 +6,14 @@
 #if(!$formname)
 #set($formname = "inline")
 #end
+#if($treeviewid == 1)
 <style type="text/css">
 @import "/xwiki/yui/treeview/assets/tree.css";
 </style>
 <script type="text/javascript" src="/xwiki/yui/yahoo/yahoo-min.js" ></script>
 <script type="text/javascript" src="/xwiki/yui/treeview/treeview-min.js" ></script>
 <script type="text/javascript" src="/xwiki/yui/treeview/checknode.js"></script>
+#end
 <div id="treeview${treeviewid}"></div>
 <script type="text/javascript">
 	var tree${treeviewid};
@@ -90,4 +92,4 @@
 
     // Init the tree
     treeInit${treeviewid}();
-</script>{/pre}
+</script>

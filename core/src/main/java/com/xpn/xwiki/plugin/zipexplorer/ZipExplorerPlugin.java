@@ -24,7 +24,6 @@ package com.xpn.xwiki.plugin.zipexplorer;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.ListItem;
@@ -32,8 +31,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -41,28 +38,45 @@ import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
-import java.util.*;
-
+import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Vector;
+import java.util.HashMap;
 
 public class ZipExplorerPlugin extends XWikiDefaultPlugin {
-    private int capacity = 50;
-    private static final Log log = LogFactory.getLog(ZipExplorerPlugin.class);
 
+    /**
+     * {@inheritDoc}
+     * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String, String, com.xpn.xwiki.XWikiContext)
+     */
     public ZipExplorerPlugin(String name, String className, XWikiContext context) {
         super(name, className, context);
         init(context);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
+     */
     public String getName() {
         return "zipexplorer";
     }
 
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, com.xpn.xwiki.XWikiContext) 
+     */
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
         return new ZipExplorerPluginAPI((ZipExplorerPlugin) plugin, context);
     }
 
     /**
-     * @return the file name from the URI
+     * @return the relative file name of a file in the ZIP file from the path representing a URL.
+     *         The URLs that the ZIP plugin manipulates have a format of
+     *         <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example
+     *         above this method would return <code>SomeDirectory/SomeFile.txt</code>.
      */
     public String getFileName(String path, String action) {
         path = path.substring(path.indexOf("/" + action));
@@ -75,7 +89,6 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return path.substring(pos + 1);
     }
 
-    
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
         String url = context.getRequest().getRequestURI();
         String filename;
@@ -118,9 +131,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
         } catch (XWikiException e) {
             e.printStackTrace();
-        }
-
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return newAttachment;
@@ -204,10 +215,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
          return res;
      }
 
-
     String getFileLink(Document doc, String attachmentName, String fileName, XWikiContext context) {
         String link = doc.getAttachmentURL(attachmentName);
         return link + "/" + fileName;
-
     }
 }

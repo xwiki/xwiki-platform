@@ -22,10 +22,12 @@
 package com.xpn.xwiki.test.plugin.zipexplorer;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI;
+import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
@@ -53,7 +55,6 @@ public class ZipExplorerTest extends HibernateTestCase {
 
     List myExpectedList;
 
-
     protected void setUp() throws Exception {
         super.setUp();
         getXWiki().getPluginManager().addPlugin("zipexplorer", "com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin", getXWikiContext());
@@ -66,11 +67,9 @@ public class ZipExplorerTest extends HibernateTestCase {
         doc.setAuthor(author);
         doc.setParent(parent);
 
-
         myExpectedList = new ArrayList();
         myExpectedList.add(filename1);
         myExpectedList.add(filename2);
-
 
         try {
 
@@ -113,7 +112,27 @@ public class ZipExplorerTest extends HibernateTestCase {
         assertEquals("/xwiki/bin/download/Main/ZipExplorerTest/" + filename1,zpa.getFileLink(maindoc, attachment.getFilename(), filename1));
     }
 
-    public void compareList(List myExpectedList, List myResult){
+    public void testGetFileName()
+    {
+        ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
+            ZipExplorerPlugin.class.getName(), new XWikiContext());
+        String fileName = plugin.getFileName(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
+            "download");
+        assertEquals("Directory/File.txt", fileName);
+    }
+
+    public void testGetFileNameWhenInvalidURL()
+    {
+        ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
+            ZipExplorerPlugin.class.getName(), new XWikiContext());
+        String fileName = plugin.getFileName(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip",
+            "download");
+        assertEquals("", fileName);
+    }
+
+    private void compareList(List myExpectedList, List myResult){
         assertEquals(myExpectedList.size(), myResult.size());
         Iterator it = myResult.iterator();
         while(it.hasNext()){

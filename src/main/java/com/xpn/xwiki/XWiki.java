@@ -4031,6 +4031,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1);
     }
 
+    public boolean useWysiwygStyleToolbar(XWikiContext context) {
+        return (context.getWiki().ParamAsLong("xwiki.wysiwyg.use_style_toolbar", 0) == 1);
+    }
+
     public String clearName(String name, XWikiContext context) {
         name = name.replaceAll("[àâä]","a");
         name = name.replaceAll("[éèêë]","e");

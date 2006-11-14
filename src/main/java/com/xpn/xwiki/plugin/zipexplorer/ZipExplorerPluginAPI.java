@@ -29,6 +29,20 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * ZIP-related APIs to list content of a ZIP attachments and to intercept XWiki download requests so that it's possible
+ * to display contents found inside ZIP files. This plugin accepts specially formatted URLs pointing to files inside
+ * ZIP files by using the following syntax:
+ *
+ * <code>http://[...]/download/Document/zipfile.zip/SomeDirectory/SomeFile.txt</code>.
+ *
+ * In this example, the URL points to the <code>SomeFile.txt</code> file located in a directory named
+ * <code>SomeDirectory</code> inside a ZIP file named <code>zipfile.zip</code> and attached to the document named
+ * <code>Document</code>.
+ *
+ * @version $Id: $
+ * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
+ */
 public class ZipExplorerPluginAPI extends Api {
 
     private ZipExplorerPlugin plugin;

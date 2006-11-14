@@ -51,7 +51,7 @@ public class DownloadAction extends XWikiAction {
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
         String filename = Utils.decode(getFileName(path, "download"), context);
-         XWikiAttachment attachment = null;
+         XWikiAttachment attachment;
 
         if (request.getParameter("id")!=null) {
             int id = Integer.parseInt(request.getParameter("id"));

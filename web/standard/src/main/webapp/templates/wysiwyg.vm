@@ -32,6 +32,7 @@
             debug : false,
             remove_linebreaks : false,
             plugins: 'table, contextmenu, paste, searchreplace',
+            wiki_use_style: '$xwiki.useWysiwygStyleToolbar()',
             wiki_images_path : '${request.contextPath}/bin/download/$doc.web/$doc.name/',
             wiki_attach_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
             wiki_macro_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',

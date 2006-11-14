@@ -12,7 +12,9 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
 	this.addInternalProcessor((/\s*<h3\s*([^>]*)>([\s\S]+?)<\/h3>/i), 'convertHeadingInternal');
 
-	this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
+
+    this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
 
 	this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
@@ -116,7 +118,8 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">\s*([\s\S]+?)<\/p>/g,'$1');
-    str = str.replace(/<\/?span\s*([^>]*)>/gi, "");
+    str = str.replace(/<span class="wikilink">\s*([\s\S]+?)<\/span>/g,'$1');
+    str = str.replace(/<span class="wikiexternallink">\s*([\s\S]+?)<\/span>/g,'$1');
     str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n')
     return str;
@@ -570,14 +573,54 @@ WikiEditor.prototype.getTitleToolbar = function() {
 }
 
 WikiEditor.prototype.getTitleControl = function(button_name) {
-	return '<select id="{$editor_id}_titleSelect" name="{$editor_id}_titleSelect" class="mceSelectList" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'Title\',false,this.options[this.selectedIndex].value);wikiEditor.executedCommand(\'Title\');">\
-            <option value="0">{$lang_wiki_title_menu}</option>\
-            <option value="1">{$lang_wiki_title_1}</option>\
-            <option value="2">{$lang_wiki_title_2}</option>\
-            <option value="3">{$lang_wiki_title_3}</option>\
-            <option value="4">{$lang_wiki_title_4}</option>\
-            <option value="5">{$lang_wiki_title_5}</option>\
-           </select>';
+	return '<select id="{$editor_id}_titleSelect" name="{$editor_id}_titleSelect" class="mceSelectList" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'Title\',false,this.options[this.selectedIndex].value);wikiEditor.executedCommand(\'Title\');">' +
+            '<option value="0">{$lang_wiki_title_menu}</option>' +
+            '<option value="1">{$lang_wiki_title_1}</option>' +
+            '<option value="2">{$lang_wiki_title_2}</option>' +
+            '<option value="3">{$lang_wiki_title_3}</option>' +
+            '<option value="4">{$lang_wiki_title_4}</option>' +
+            '<option value="5">{$lang_wiki_title_5}</option>' +
+           '</select>';
+}
+
+WikiEditor.prototype.getStyleToolbar = function() {
+    return this.getStyleControl("fontselect") + this.getStyleControl("fontSizeSelect") + this.getStyleControl("mceForeColor") + this.getStyleControl("mceBackColor");
+}
+
+WikiEditor.prototype.getStyleControl = function(button_name) {
+    switch(button_name) {
+        case 'mceForeColor' :
+            return this.createButtonHTML('forecolor', 'forecolor.gif', 'lang_theme_forecolor_desc', 'mceForeColor', true);
+        case 'fontSizeSelect':
+            return '<select id="{$editor_id}_fontSizeSelect" name="{$editor_id}_fontSizeSelect" onfocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'FontSize\',false,this.options[this.selectedIndex].value);" class="mceSelectList">' +
+                '<option value="0">{$lang_theme_font_size}</option>' +
+				'<option value="1">1 (8 pt)</option>' +
+				'<option value="2">2 (10 pt)</option>' +
+				'<option value="3">3 (12 pt)</option>' +
+				'<option value="4">4 (14 pt)</option>' +
+				'<option value="5">5 (18 pt)</option>' +
+				'<option value="6">6 (24 pt)</option>' +
+				'<option value="7">7 (36 pt)</option>' +
+				'</select>';
+
+        case "fontselect":
+            var fontHTML = '<select id="{$editor_id}_fontNameSelect" name="{$editor_id}_fontNameSelect" onfocus="tinyMCE.addSelectAccessibility(event, this, window);" onchange="tinyMCE.execInstanceCommand(\'{$editor_id}\',\'FontName\',false,this.options[this.selectedIndex].value);" class="mceSelectList"><option value="">{$lang_theme_fontdefault}</option>';
+            var iFonts = 'Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;Georgia=georgia,times new roman,times,serif;Tahoma=tahoma,arial,helvetica,sans-serif;Times New Roman=times new roman,times,serif;Verdana=verdana,arial,helvetica,sans-serif;Impact=impact;WingDings=wingdings';
+            var nFonts = 'Andale Mono=andale mono,times;Arial=arial,helvetica,sans-serif;Arial Black=arial black,avant garde;Book Antiqua=book antiqua,palatino;Comic Sans MS=comic sans ms,sand;Courier New=courier new,courier;Georgia=georgia,palatino;Helvetica=helvetica;Impact=impact,chicago;Symbol=symbol;Tahoma=tahoma,arial,helvetica,sans-serif;Terminal=terminal,monaco;Times New Roman=times new roman,times;Trebuchet MS=trebuchet ms,geneva;Verdana=verdana,geneva;Webdings=webdings;Wingdings=wingdings,zapf dingbats';
+            var fonts = tinyMCE.getParam("theme_advanced_fonts", nFonts).split(';');
+            for (i=0; i<fonts.length; i++) {
+                if (fonts[i] != '') {
+                    var parts = fonts[i].split('=');
+                    fontHTML += '<option value="' + parts[1] + '">' + parts[0] + '</option>';
+                }
+            }
+
+            fontHTML += '</select>';
+            return fontHTML;
+
+       case 'mceBackColor' :
+               return this.createButtonHTML('backcolor', 'backcolor.gif', 'lang_theme_backcolor_desc', 'mceBackColor', true)
+    }
 }
 
 WikiEditor.prototype.getListToolbar = function() {

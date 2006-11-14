@@ -3,6 +3,7 @@ com.xpn.xwiki.render.macro.ImageMacro
 com.xpn.xwiki.render.macro.AttachMacro
 com.xpn.xwiki.render.macro.FormMacro
 com.xpn.xwiki.render.macro.FieldMacro
+com.xpn.xwiki.render.macro.StyleMacro
 com.xpn.xwiki.plugin.laszlo.LaszloMacro
 com.xpn.xwiki.plugin.graphviz.GraphVizMacro
 com.xpn.xwiki.plugin.svg.SVGMacro

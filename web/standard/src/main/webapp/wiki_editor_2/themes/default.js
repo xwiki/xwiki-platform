@@ -14,10 +14,14 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 		<tr><td class="mceToolbar" align="center" height="1">';
 
 	str += this.getTextToolbar() + this.TOOLBAR_SPACER + this.getListToolbar() + this.TOOLBAR_SPACER +
-           this.getTabToolbar() + this.TOOLBAR_SPACER + this.getUndoToolbar() + this.TOOLBAR_SPACER +
-           this.getTitleToolbar() + this.TOOLBAR_SPACER + this.getTableToolbar() + this.TOOLBAR_SPACER +
-           this.getTableRowToolbar() + this.TOOLBAR_SPACER + this.getTableColToolbar() + this.TOOLBAR_SPACER +
-           this.getLinkToolbar();
+           this.getTabToolbar() + this.TOOLBAR_SPACER + this.getUndoToolbar() + this.TOOLBAR_SPACER + this.getTitleToolbar();
+
+    if (this._useStyleToolbar) {
+        str += this.TOOLBAR_SPACER + this.getStyleToolbar();
+    }
+
+    str += this.TOOLBAR_SPACER + this.getTableToolbar() + this.TOOLBAR_SPACER + this.getTableRowToolbar() +
+           this.TOOLBAR_SPACER + this.getTableColToolbar() + this.TOOLBAR_SPACER + this.getLinkToolbar();
     if (this.isPluginLoaded("attachments")) {
         str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
 	}

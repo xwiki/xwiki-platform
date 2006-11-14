@@ -1941,6 +1941,14 @@ v     * API to check rights on a document for a given user
     }
 
     /**
+     * API to check if using the style toolbar in Wysiwyg editor
+     * @return a boolean value
+     */
+    public boolean useWysiwygStyleToolbar() {
+        return xwiki.useWysiwygStyleToolbar(context);
+    }
+
+    /**
      * API to create an object from the request
      * The parameters are the ones that are created from doc.display("field","edit") calls
      * @param className XWiki Class Name to create the object from

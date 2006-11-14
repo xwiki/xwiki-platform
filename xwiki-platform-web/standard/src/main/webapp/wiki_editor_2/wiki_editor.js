@@ -54,8 +54,9 @@ WikiEditor.prototype.init = function(params) {
 	this.core = tinyMCE;
 	this._theme = 'default';
 	this._loadedPlugins = new Array();
-	
-	// Add the necessary plugin
+    this._useStyleToolbar = false;
+
+    // Add the necessary plugin
 	if(params["plugins"] == null) {
 		params["plugins"] = "";
 	}
@@ -75,6 +76,10 @@ WikiEditor.prototype.init = function(params) {
 	if(params["wiki_theme"] && params["wiki_theme"] != "") {
 		this._theme = params["wiki_theme"];
 	}
+
+    if (params["wiki_use_style"] == 'true') {
+        this._useStyleToolbar = params["wiki_use_style"];
+    }
 
     this.core.init(params);
 

@@ -98,6 +98,43 @@ var TinyMCE_WikieditorTheme = {
 
 				return true;
 
+            case "mceForeColor":
+                var template = new Array();
+                var elm = tinyMCE.selectedInstance.getFocusElement();
+                var inputColor = tinyMCE.getAttrib(elm, "color");
+
+                if (inputColor == '')
+                    inputColor = elm.style.color;
+
+                if (!inputColor)
+                    inputColor = "#000000";
+
+                template['file'] = 'color_picker.htm';
+                template['width'] = 220;
+                template['height'] = 190;
+
+                tinyMCE.openWindow(template, {editor_id : editor_id, inline : "yes", command : "forecolor", input_color : inputColor});
+                return true;
+
+            case "mceBackColor":
+				var template = new Array();
+				var elm = tinyMCE.selectedInstance.getFocusElement();
+				var inputColor = elm.style.backgroundColor;
+
+				if (!inputColor)
+					inputColor = "#000000";
+
+				template['file'] = 'color_picker.htm';
+				template['width'] = 220;
+				template['height'] = 190;
+
+				template['width'] += tinyMCE.getLang('lang_theme_advanced_backcolor_delta_width', 0);
+				template['height'] += tinyMCE.getLang('lang_theme_advanced_backcolor_delta_height', 0);
+
+				tinyMCE.openWindow(template, {editor_id : editor_id, inline : "yes", command : "HiliteColor", input_color : inputColor});
+				//mceBackColor
+			    return true;
+
             default :
                 return wikiEditor.execCommand(editor_id, element, command, user_interface, value);
         }

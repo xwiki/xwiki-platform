@@ -89,6 +89,17 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return path.substring(pos + 1);
     }
 
+    /**
+     * For ZIP URLs of the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code> return a new
+     * attachment containing the file pointed to inside the ZIP. If the original attachment does not point to a ZIP
+     * file or if it doesn't specify a location inside the ZIP then do nothing and return the original attachment.
+     *
+     * @param attachment the original attachment
+     * @param context the XWiki context object containing the requested URL
+     * @return a new attachment pointing to the file pointed to by the URL inside the ZIP or the original attachment
+     *         if the requested URL doesn't specify a file inside a ZIP
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#downloadAttachment(com.xpn.xwiki.doc.XWikiAttachment, com.xpn.xwiki.XWikiContext) 
+     */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
         String url = context.getRequest().getRequestURI();
         String filename;

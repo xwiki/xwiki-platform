@@ -21,121 +21,147 @@
  */
 package com.xpn.xwiki.plugin.zipexplorer;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.HibernateTestCase;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiRequest;
+import org.jmock.Mock;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipEntry;
+import java.util.Vector;
 import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipEntry;
+import java.io.ByteArrayOutputStream;
 
-public class ZipExplorerTest extends HibernateTestCase {
+public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
 
-    String zipfilename = "test.zip";
-    String author = "XWiki.LudovicDubost";
-    String parent = "Main.WebHome";
-    String content = "Hello 1\n" + "<Hello> 2\n" + "Hello 3";
+    private ZipExplorerPlugin plugin;
 
-    String filename1 = "test.doc";
-    String filename2 = "test.txt";
-
-    XWikiAttachment attachment;
-    XWikiDocument doc;
-    Document maindoc;
-
-    List myExpectedList;
-
-    protected void setUp() throws Exception {
-        super.setUp();
-        getXWiki().getPluginManager().addPlugin("zipexplorer", "com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin", getXWikiContext());
-        getXWikiContext().setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/", "bin/"));
+    protected void setUp() {
+        this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
     }
 
-    public void init() {
-        doc = new XWikiDocument("Main", "ZipExplorerTest");
-        doc.setContent(content);
-        doc.setAuthor(author);
-        doc.setParent(parent);
+    public void testDownloadAttachmentWithInvalidZipURL() throws Exception {
+        XWikiAttachment originalAttachment = createAttachment("someFile.txt", "Some text".getBytes(),
+            (XWikiDocument) mock(XWikiDocument.class).proxy());
+        XWikiContext context = createXWikiContext("http://server/xwiki/bin/download/Main/Document/someFile.txt");
 
-        myExpectedList = new ArrayList();
-        myExpectedList.add(filename1);
-        myExpectedList.add(filename2);
+        XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
-        try {
-
-            attachment = new XWikiAttachment(doc, zipfilename);
-
-            String attachcontent1 = "Hi i'm here";
-            byte[] stream = attachcontent1.getBytes();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(baos);
-
-            /* Each is the entry to the zip file */
-
-            ZipEntry zipe = new ZipEntry(filename1);
-            zos.putNextEntry(zipe);
-            zos.write(stream, 0, stream.length);
-
-            zipe = new ZipEntry(filename2);
-            zos.putNextEntry(zipe);
-            zos.write(stream, 0, stream.length);
-
-            zos.closeEntry();
-
-            attachment.setContent(baos.toByteArray());
-            doc.saveAttachmentContent(attachment, context);
-
-            doc.getAttachmentList().add(attachment);
-            xwiki.saveDocument(doc, context);
-            maindoc = new Document(doc, context);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        assertSame(originalAttachment, newAttachment);
     }
 
-    public void testZipExplorerTest() throws XWikiException {
-        init();
-        ZipExplorerPluginAPI zpa = (ZipExplorerPluginAPI) xwiki.getPluginApi("zipexplorer", context);
-        compareList(myExpectedList, zpa.getFileList(maindoc, attachment.getFilename()));
-        assertEquals("/xwiki/bin/download/Main/ZipExplorerTest/" + filename1,zpa.getFileLink(maindoc, attachment.getFilename(), filename1));
+    public void testDownloadAttachment() throws Exception {
+        String zipFileContent = "File.txt content";
+        XWikiAttachment originalAttachment = createAttachment("zipfile.zip", createZipFile(zipFileContent),
+            (XWikiDocument) mock(XWikiDocument.class).proxy());
+            
+        XWikiContext context = createXWikiContext(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt");
+
+        XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
+
+        assertEquals("Directory/File.txt", newAttachment.getFilename());
+        assertEquals(zipFileContent.length(), newAttachment.getFilesize());
+        assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }
 
-    public void testGetFileNameFromZipURL()
+    public void testGetFileList() throws Exception {
+        XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
+
+        List entries = this.plugin.getFileList(new Document(document, null), "zipfile.zip", null);
+
+        assertEquals(2, entries.size());
+        assertEquals("Directory/File.txt", (String) entries.get(0));
+        assertEquals("File2.txt", (String) entries.get(1));
+    }
+
+    public void testGetFileTreeList() throws Exception {
+        XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
+
+        Vector entries = this.plugin.getFileTreeList(new Document(document, null), "zipfile.zip", null);
+
+        assertEquals(3, entries.size());
+
+        assertEquals("Directory/", ((ListItem) entries.get(0)).getId());
+        assertEquals("Directory", ((ListItem) entries.get(0)).getValue());
+        assertEquals("", ((ListItem) entries.get(0)).getParent());
+
+        assertEquals("Directory/File.txt", ((ListItem) entries.get(1)).getId());
+        assertEquals("File.txt", ((ListItem) entries.get(1)).getValue());
+        assertEquals("Directory/", ((ListItem) entries.get(1)).getParent());
+
+        assertEquals("File2.txt", ((ListItem) entries.get(2)).getId());
+        assertEquals("File2.txt", ((ListItem) entries.get(2)).getValue());
+        assertEquals("", ((ListItem) entries.get(2)).getParent());
+    }
+
+    public void testGetFileLink() throws Exception {
+        Mock mockDocument = mock(XWikiDocument.class);
+        mockDocument.expects(once()).method("getAttachmentURL").will(
+            returnValue("http://server/xwiki/bin/download/Main/Document/zipfile.zip"));
+        Document document = new Document((XWikiDocument) mockDocument.proxy(), null);
+
+        String link = this.plugin.getFileLink(document, "zipfile.zip", "filename", null);
+
+        assertEquals("http://server/xwiki/bin/download/Main/Document/zipfile.zip/filename", link);
+    }
+
+    public void testGetFileLocationFromZipURL()
     {
-        ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
-            ZipExplorerPlugin.class.getName(), new XWikiContext());
-        String fileName = plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
-            "download");
+        String fileName = this.plugin.getFileLocationFromZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt", "download");
         assertEquals("Directory/File.txt", fileName);
     }
 
-    public void testGetFileNameFromZipURLWhenInvalidURL()
+    public void testGetFileLocationFromZipURLWhenInvalidURL()
     {
-        ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
-            ZipExplorerPlugin.class.getName(), new XWikiContext());
-        String fileName = plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip",
-            "download");
+        String fileName = this.plugin.getFileLocationFromZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download");
         assertEquals("", fileName);
     }
 
-    private void compareList(List myExpectedList, List myResult){
-        assertEquals(myExpectedList.size(), myResult.size());
-        Iterator it = myResult.iterator();
-        while(it.hasNext()){
-            Object value = it.next();
-            assertTrue(myExpectedList.contains(value));
-        }
+    private XWikiDocument createXWikiDocumentWithZipFileAttachment() throws Exception {
+        Mock mockDocument = mock(XWikiDocument.class);
+        XWikiDocument document = (XWikiDocument) mockDocument.proxy();
+        XWikiAttachment attachment = createAttachment("zipfile.zip", createZipFile("Some content"), document);
+        mockDocument.stubs().method("clone").will(returnValue(mockDocument.proxy()));
+        mockDocument.stubs().method("getAttachment").will(returnValue(attachment));
+        return document;         
+    }
+
+    private XWikiContext createXWikiContext(String url) {
+        Mock mockRequest = mock(XWikiRequest.class);
+        mockRequest.expects(once()).method("getRequestURI").will(returnValue(url));
+        XWikiContext context = new XWikiContext();
+        context.setRequest((XWikiRequest) mockRequest.proxy());
+        context.setAction("download");
+        return context;
+    }
+
+    private XWikiAttachment createAttachment(String filename, byte[] content, XWikiDocument document) throws Exception {
+        Mock mockAttachment = mock(XWikiAttachment.class);
+        mockAttachment.stubs().method("getFilename").will(returnValue(filename));
+        mockAttachment.stubs().method("getDoc").will(returnValue(document));
+        mockAttachment.stubs().method("getAuthor").will(returnValue("Vincent"));
+        mockAttachment.stubs().method("getDate").will(returnValue(new Date()));
+        mockAttachment.stubs().method("getContent").will(returnValue(content));
+        return (XWikiAttachment) mockAttachment.proxy();
+    }
+
+    private byte[] createZipFile(String content) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+        ZipEntry zipe = new ZipEntry("Directory/File.txt");
+        zos.putNextEntry(zipe);
+        zos.write(content.getBytes());
+        ZipEntry zipe2 = new ZipEntry("File2.txt");
+        zos.putNextEntry(zipe2);
+        zos.write(content.getBytes());
+        zos.closeEntry();
+        return baos.toByteArray();
     }
 }

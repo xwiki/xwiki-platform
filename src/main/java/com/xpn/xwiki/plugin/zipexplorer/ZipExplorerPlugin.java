@@ -34,8 +34,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipEntry;
 import java.util.List;
@@ -44,6 +42,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.HashMap;
+
+import org.apache.commons.io.IOUtils;
 
 public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
@@ -92,15 +92,9 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     }
 
     /**
-     * For ZIP URLs of the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code> return a new
-     * attachment containing the file pointed to inside the ZIP. If the original attachment does not point to a ZIP
-     * file or if it doesn't specify a location inside the ZIP then do nothing and return the original attachment.
-     *
-     * @return a new attachment pointing to the file pointed to by the URL inside the ZIP or the original attachment
-     *         if the requested URL doesn't specify a file inside a ZIP
-     * @param attachment the original attachment
-     * @param context the XWiki context object containing the requested URL
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#downloadAttachment(com.xpn.xwiki.doc.XWikiAttachment, com.xpn.xwiki.XWikiContext)
+     * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#downloadAttachment(com.xpn.xwiki.doc.XWikiAttachment)}
+     * for documentation. In addition the context parameter represents the XWiki context object containing the
+     * requested URL.
      */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
         String url = context.getRequest().getRequestURI();
@@ -138,7 +132,12 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
                 if (entryName.equals(filename)) {
                     newAttachment.setFilename(entryName);
-                    byte[] data = readFromInputStream(zis);
+
+                    // Note: We're copying the content of the file in the ZIP in memory. This is potentially going to
+                    // cause an error if the file's size is greater than the maximum size of a byte[] array in Java
+                    // or if there's not enough memomry.
+                    byte[] data = IOUtils.toByteArray(zis);
+
                     newAttachment.setFilesize(data.length);
                     newAttachment.setContent(data);
                     break;
@@ -154,33 +153,15 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     }
 
     /**
-     * @return the content of an entry in the zip file
+     * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileList(com.xpn.xwiki.api.Document, String)}
+     * for documentation. In addition the context parameter is not used for now.
      */
-    private byte[] readFromInputStream(InputStream is) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] data = new byte[4096];
-        int count;
-        while ((count = is.read(data, 0, 4096)) != -1) {
-            baos.write(data, 0, count);
-        }
-        return baos.toByteArray();
-    }
-
-    public List getFileList(Document doc, String attachmentName, XWikiContext context) {
+    public List getFileList(Document document, String attachmentName, XWikiContext context) {
         List zipList = null;
 
         if (attachmentName.endsWith(".zip")) {
 
-            Attachment attachment = null;
-            List attachList = doc.getAttachmentList();
-            Iterator itr = attachList.iterator();
-
-            while (itr.hasNext()) {
-                attachment = (Attachment)itr.next();
-                if (attachment.getFilename().equals(attachmentName)) {
-                    break;
-                }
-            }
+            Attachment attachment = document.getAttachment(attachmentName);
 
             zipList = new ArrayList();
             byte[] stream;
@@ -204,8 +185,12 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return zipList;
     }
 
-    public Vector getFileTreeList(Document doc, String attachmentName, XWikiContext context) {
-        List flatList = getFileList(doc, attachmentName, context);
+    /**
+     * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileTreeList(com.xpn.xwiki.api.Document, String)}
+     * for documentation. In addition the context parameter is not used for now.
+     */
+    public Vector getFileTreeList(Document document, String attachmentName, XWikiContext context) {
+        List flatList = getFileList(document, attachmentName, context);
         Map fileTree = new HashMap();
         Iterator it = flatList.iterator();
         Vector res = new Vector();
@@ -229,8 +214,11 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return res;
     }
 
-    String getFileLink(Document doc, String attachmentName, String fileName, XWikiContext context) {
-        String link = doc.getAttachmentURL(attachmentName);
-        return link + "/" + fileName;
+    /**
+     * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileLink(com.xpn.xwiki.api.Document, String, String)}
+     * for documentation. In addition the context parameter is not used for now.
+     */
+    String getFileLink(Document document, String attachmentName, String fileName, XWikiContext context) {
+        return document.getAttachmentURL(attachmentName) + "/" + fileName;
     }
 }

@@ -78,7 +78,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
      *         <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example
      *         above this method would return <code>SomeDirectory/SomeFile.txt</code>.
      */
-    public String getFileName(String path, String action) {
+    protected String getFileNameFromZipURL(String path, String action) {
         path = path.substring(path.indexOf("/" + action));
         int pos = 0;
         for (int i = 0; i < 4; i++) {
@@ -96,7 +96,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         if (!attachment.getFilename().endsWith(".zip"))
             return attachment;
         try {
-            filename = getFileName(url, context.getAction().trim());
+            filename = getFileNameFromZipURL(url, context.getAction().trim());
         }
         catch(Exception e){
             filename = "";

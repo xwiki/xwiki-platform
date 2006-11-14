@@ -112,21 +112,21 @@ public class ZipExplorerTest extends HibernateTestCase {
         assertEquals("/xwiki/bin/download/Main/ZipExplorerTest/" + filename1,zpa.getFileLink(maindoc, attachment.getFilename(), filename1));
     }
 
-    public void testGetFileName()
+    public void testGetFileNameFromZipURL()
     {
         ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
             ZipExplorerPlugin.class.getName(), new XWikiContext());
-        String fileName = plugin.getFileName(
+        String fileName = plugin.getFileNameFromZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
             "download");
         assertEquals("Directory/File.txt", fileName);
     }
 
-    public void testGetFileNameWhenInvalidURL()
+    public void testGetFileNameFromZipURLWhenInvalidURL()
     {
         ZipExplorerPlugin plugin = new ZipExplorerPlugin("zipexplorer",
             ZipExplorerPlugin.class.getName(), new XWikiContext());
-        String fileName = plugin.getFileName(
+        String fileName = plugin.getFileNameFromZipURL(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip",
             "download");
         assertEquals("", fileName);

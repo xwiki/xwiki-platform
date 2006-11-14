@@ -73,13 +73,15 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
     }
 
     /**
-     * @return the relative file name of a file in the ZIP file from the path representing a URL.
-     *         The URLs that the ZIP plugin manipulates have a format of
-     *         <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example
-     *         above this method would return <code>SomeDirectory/SomeFile.txt</code>.
+     * @return the relative file location of a file in the ZIP file pointed to by the passed URL. The ZIP URL
+     *         must be of the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example
+     *         above this method would return <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the
+     *         zip URL passed
+     * @param url the URL to parse and from which to extract the relative file location
+     * @param action the XWiki requested action (for example "download", "edit", "view", etc).
      */
-    protected String getFileNameFromZipURL(String path, String action) {
-        path = path.substring(path.indexOf("/" + action));
+    protected String getFileLocationFromZipURL(String url, String action) {
+        String path = url.substring(url.indexOf("/" + action));
         int pos = 0;
         for (int i = 0; i < 4; i++) {
             pos = path.indexOf("/", pos + 1);
@@ -94,11 +96,11 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
      * attachment containing the file pointed to inside the ZIP. If the original attachment does not point to a ZIP
      * file or if it doesn't specify a location inside the ZIP then do nothing and return the original attachment.
      *
-     * @param attachment the original attachment
-     * @param context the XWiki context object containing the requested URL
      * @return a new attachment pointing to the file pointed to by the URL inside the ZIP or the original attachment
      *         if the requested URL doesn't specify a file inside a ZIP
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#downloadAttachment(com.xpn.xwiki.doc.XWikiAttachment, com.xpn.xwiki.XWikiContext) 
+     * @param attachment the original attachment
+     * @param context the XWiki context object containing the requested URL
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#downloadAttachment(com.xpn.xwiki.doc.XWikiAttachment, com.xpn.xwiki.XWikiContext)
      */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
         String url = context.getRequest().getRequestURI();
@@ -107,7 +109,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         if (!attachment.getFilename().endsWith(".zip"))
             return attachment;
         try {
-            filename = getFileNameFromZipURL(url, context.getAction().trim());
+            filename = getFileLocationFromZipURL(url, context.getAction().trim());
         }
         catch(Exception e){
             filename = "";

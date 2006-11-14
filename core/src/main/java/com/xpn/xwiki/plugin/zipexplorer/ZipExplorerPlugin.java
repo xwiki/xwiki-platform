@@ -104,26 +104,29 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
      */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
         String url = context.getRequest().getRequestURI();
-        String filename;
 
+        // If the requested download URL doesn't point to a zip, return the original attachment
         if (!attachment.getFilename().endsWith(".zip"))
             return attachment;
+
+        // If the URL doesn't point to a file inside the ZIP, return the original attachement. Otherwise, compute the
+        // relative file location inside the ZIP file so that we can extract it content below.
+        String filename;
         try {
             filename = getFileLocationFromZipURL(url, context.getAction().trim());
         }
         catch(Exception e){
             filename = "";
         }
-
         if (filename.length() == 0)
             return attachment;
-        XWikiAttachment newAttachment;
 
-
-        newAttachment = new XWikiAttachment();
+        // Create the new attachment pointing to the file inside the ZIP
+        XWikiAttachment newAttachment = new XWikiAttachment();
         newAttachment.setDoc(attachment.getDoc());
         newAttachment.setAuthor(attachment.getAuthor());
         newAttachment.setDate(attachment.getDate());
+
         try {
             byte[] stream = attachment.getContent(context);
             ByteArrayInputStream bais = new ByteArrayInputStream(stream);
@@ -150,7 +153,6 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return newAttachment;
     }
 
-
     /**
      * @return the content of an entry in the zip file
      */
@@ -163,7 +165,6 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         }
         return baos.toByteArray();
     }
-
 
     public List getFileList(Document doc, String attachmentName, XWikiContext context) {
         List zipList = null;
@@ -203,30 +204,30 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin {
         return zipList;
     }
 
-     public Vector getFileTreeList(Document doc, String attachmentName, XWikiContext context) {
+    public Vector getFileTreeList(Document doc, String attachmentName, XWikiContext context) {
         List flatList = getFileList(doc, attachmentName, context);
-         Map fileTree = new HashMap();
-         Iterator it = flatList.iterator();
-         Vector res = new Vector();
-         while(it.hasNext()){
-             String url = (String) it.next();
-             StringBuffer buf = new StringBuffer(url.length());
-             String parentBuf = "";
-             String[] aUrl = url.split("/");
-             for (int i = 0; i < aUrl.length; i++){
-                 if (i == aUrl.length - 1 && !url.endsWith("/"))
+        Map fileTree = new HashMap();
+        Iterator it = flatList.iterator();
+        Vector res = new Vector();
+        while(it.hasNext()) {
+            String url = (String) it.next();
+            StringBuffer buf = new StringBuffer(url.length());
+            String parentBuf = "";
+            String[] aUrl = url.split("/");
+            for (int i = 0; i < aUrl.length; i++) {
+                if (i == aUrl.length - 1 && !url.endsWith("/"))
                     buf.append(aUrl[i]);
-                 else
+                else
                     buf.append(aUrl[i] + "/");
-                 ListItem item = new ListItem(buf.toString(), aUrl[i], parentBuf);
-                 if (!fileTree.containsKey(buf.toString()))
+                ListItem item = new ListItem(buf.toString(), aUrl[i], parentBuf);
+                if (!fileTree.containsKey(buf.toString()))
                     res.add(item);
-                 fileTree.put(buf.toString(), item);
-                 parentBuf = buf.toString();
-             }
-         }
-         return res;
-     }
+                fileTree.put(buf.toString(), item);
+                parentBuf = buf.toString();
+            }
+        }
+        return res;
+    }
 
     String getFileLink(Document doc, String attachmentName, String fileName, XWikiContext context) {
         String link = doc.getAttachmentURL(attachmentName);

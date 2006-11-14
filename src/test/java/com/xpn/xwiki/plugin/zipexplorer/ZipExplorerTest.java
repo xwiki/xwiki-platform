@@ -19,15 +19,13 @@
  *
  * @author ravenees
  */
-package com.xpn.xwiki.test.plugin.zipexplorer;
+package com.xpn.xwiki.plugin.zipexplorer;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI;
-import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin;
 import com.xpn.xwiki.test.HibernateTestCase;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 

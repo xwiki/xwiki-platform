@@ -55,6 +55,15 @@ public interface XWikiPluginInterface {
     String insidePREHandler(String line, XWikiContext context);
     String endRenderingHandler(String line, XWikiContext context);
     Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context);
-    XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context);
 
+    /**
+     * Plugin extension point allowing the plugin to perform modifications to an attachement when the
+     * user clicks on an attachement in a document. The plugin is passed the original attachement and it has
+     * to return the new modified attachment.
+     *
+     * @param attachment the original attachment
+     * @param context the xwiki context object
+     * @return the modified attachment
+     */
+    XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context);
 }

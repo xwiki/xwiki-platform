@@ -18,6 +18,5 @@ public interface XWikiUserManagementTools {
     public String getUserPage(String email, XWikiContext context);
     public boolean isValidEmail(String email);
     public String getUserName(String userPage, XWikiContext context) throws XWikiException;
-
     public String getEmail(String userPage, XWikiContext context) throws XWikiException;
 }

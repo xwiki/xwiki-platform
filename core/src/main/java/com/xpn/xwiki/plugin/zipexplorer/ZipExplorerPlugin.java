@@ -45,6 +45,11 @@ import java.util.HashMap;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
+ *
+ * @version $Id: $
+ */
 public class ZipExplorerPlugin extends XWikiDefaultPlugin {
 
     /**

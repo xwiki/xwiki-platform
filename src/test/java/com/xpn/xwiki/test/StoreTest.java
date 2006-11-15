@@ -41,6 +41,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -492,4 +493,62 @@ public class StoreTest extends HibernateTestCase {
         StringInputStream is = new StringInputStream(txt);
         archive = new Archive("", is);
     }
+
+
+    public void deleteDocWithBadAttachment1(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
+        XWikiDocument doc3 = new XWikiDocument(web, name);
+        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        store.deleteXWikiDoc(doc3, getXWikiContext());
+
+        XWikiDocument doc4 = new XWikiDocument(web, name);
+        doc4.setContent(Utils.content1);
+        doc4.setAuthor(Utils.author);
+        doc4.setParent(Utils.parent);
+        store.saveXWikiDoc(doc4, getXWikiContext());
+
+        XWikiDocument doc5 = new XWikiDocument(web, name);
+        doc5 = (XWikiDocument) store.loadXWikiDoc(doc5, getXWikiContext());
+        List attachlist = doc5.getAttachmentList();
+        assertEquals("Attachment is still there", 0, attachlist.size());
+    }
+
+    public void testDeleteDocWithBadAttachment1() throws XWikiException, IOException {
+        Utils.setStandardData();
+        attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+
+        getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), "delete from xwikiattachment_content", getXWikiContext());
+        getXWiki().getHibernateStore().endTransaction(getXWikiContext(), true);
+
+        xwiki.flushCache();
+        
+        deleteDocWithAttachment(getXWiki().getStore(), Utils.web, Utils.name);
+    }
+
+    public void testDeleteDocWithBadAttachment2() throws XWikiException, IOException {
+        Utils.setStandardData();
+        attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+
+        getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), "delete from xwikiattachment_archive", getXWikiContext());
+        getXWiki().getHibernateStore().endTransaction(getXWikiContext(), true);
+
+        xwiki.flushCache();
+
+        deleteDocWithAttachment(getXWiki().getStore(), Utils.web, Utils.name);
+    }
+
+    public void testDeleteDocWithBadAttachment3() throws XWikiException, IOException {
+        Utils.setStandardData();
+        attachmentReadWrite(getXWiki().getStore(), Utils.web, Utils.name);
+
+        getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
+        StoreHibernateTest.runSQL(getXWiki().getHibernateStore(), "delete from xwikiattachment", getXWikiContext());
+        getXWiki().getHibernateStore().endTransaction(getXWikiContext(), true);
+
+        xwiki.flushCache();
+
+        deleteDocWithAttachment(getXWiki().getStore(), Utils.web, Utils.name);
+    }
+
 }

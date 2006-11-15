@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/.svn|**/.svn/**|com/xpn/xwiki/test/MyFormAuthentication.java|com/xpn/xwiki/test/ServletAuthTest.java|com/xpn/xwiki/test/ServletVirtualTest.java|com/xpn/xwiki/test/Servleti18nTest.java" kind="src" path="src/main/java"/>
-	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/main/web"/>
 	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/cactus"/>
+	<classpathentry kind="src" path="web/standard/src/main/webapp"/>
+	<classpathentry kind="src" path="core/src/main/java"/>
+	<classpathentry kind="src" path="core/src/test/java"/>
+	<classpathentry kind="src" path="core/src/main/resources"/>
 	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="src/test/resources"/>
@@ -36,7 +38,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-net-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/concurrent.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/derby-10.1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ecs-1.4.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.1.jar"/>
@@ -67,8 +68,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/InlineJavaServer.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/InlineJavaUser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ipresolver-UNKNOWN.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-core-1.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jackrabbit-jcr-commons-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcr-1.0.jar"/>
@@ -93,7 +92,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.diff-0.3.0-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.suigeneris.jrcs.rcs-0.3.0-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oro-2.0.8.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/oscache-2.3.2M.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/qname-1.5.2.jar"/>
@@ -121,8 +119,12 @@
 	<classpathentry exported="true" kind="lib" path="lib/jgroups-2.2.9.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-java5-1.0.1.jar"/>
-	<classpathentry exported="true" sourcepath="lib/xmlrpc-client-3.0-sources.jar" kind="lib" path="lib/xmlrpc-client-3.0.jar"/>
-	<classpathentry exported="true" sourcepath="lib/xmlrpc-common-3.0-sources.jar" kind="lib" path="lib/xmlrpc-common-3.0.jar"/>
-	<classpathentry exported="true" sourcepath="lib/xmlrpc-server-3.0-sources.jar" kind="lib" path="lib/xmlrpc-server-3.0.jar"/>
-	<classpathentry kind="output" path="build/web/WEB-INF/classes"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-3.0.jar" sourcepath="lib/xmlrpc-client-3.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-3.0.jar" sourcepath="lib/xmlrpc-common-3.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-server-3.0.jar" sourcepath="lib/xmlrpc-server-3.0-sources.jar"/>
+	<classpathentry kind="lib" path="lib/derby-10.1.3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jackrabbit-core-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/oscache-2.3.2-xwiki.jar"/>
+	<classpathentry kind="lib" path="lib/jcaptcha-all-1.0-RC3.jar"/>
+	<classpathentry kind="output" path="build/eclipse/web/WEB-INF/classes"/>
 </classpath>

@@ -11,6 +11,7 @@ import org.apache.ecs.xhtml.button;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
+import org.dom4j.Element;
 
 import java.util.*;
 
@@ -154,4 +155,10 @@ public class GroupsClass extends ListClass {
         in.setName(prefix + name);
         buffer.append(in.toString());        
     }
+
+    public BaseProperty newPropertyfromXML(Element ppcel) {
+        String value = ppcel.getText();
+        return fromString(value);
+    }
+
 }

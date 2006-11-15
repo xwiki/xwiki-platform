@@ -120,8 +120,11 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<p class="paragraph">\s*([\s\S]+?)<\/p>/g,'$1');
     str = str.replace(/<span class="wikilink">\s*([\s\S]+?)<\/span>/g,'$1');
     str = str.replace(/<span class="wikiexternallink">\s*([\s\S]+?)<\/span>/g,'$1');
+    str = str.replace(/<span class="bold">([\s\S]+?)<\/span>/g,'$1');
+    str = str.replace(/<span class="italic">([\s\S]+?)<\/span>/g,'$1');
+    str = str.replace(/<span class="strike">([\s\S]+?)<\/span>/g,'$1');    
     str = str.replace(/<\/?p[^>]*>/gi, "");
-    str = str.replace(/<br \/>/g, '\r\n')
+    str = str.replace(/<br \/>/g, '\r\n');
     return str;
 }
 

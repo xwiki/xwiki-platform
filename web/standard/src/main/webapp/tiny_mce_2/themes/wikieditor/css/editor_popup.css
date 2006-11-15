@@ -15,46 +15,75 @@ body {
 
 td {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 11px;
+	font-size: 10px;
 }
 
-input {
-	background: #FFFFFF;
+select, textarea {
 	border: 1px solid #cccccc;
 }
 
-td, input, select, textarea {
+input, select, textarea {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 }
 
-input, select, textarea {
-	border: 1px solid #808080;
+.input_noborder {
+	border: 0px;
 }
 
-.input_noborder {
-	border: 0px solid #808080;
+input.radio {
+	border: 1px none #000000;
+	background-color: transparent;
+	vertical-align: middle;
+}
+
+input.checkbox {
+	border: 1px none #000000;
+	background-color: transparent;
+	vertical-align: middle;
 }
 
 #insert {
+   background: #FFFFFF;
+   border: 1px solid #cccccc;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 10px;
    font-weight: bold;
 }
 
 #cancel {
-   font-weight: bold;
+    background: #FFFFFF;
+	border: 1px solid #cccccc;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+    font-weight: bold;
 }
 
 #search {
-   font-weight: bold;
+    background: #FFFFFF;
+	border: 1px solid #cccccc;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+    font-weight: bold;
 }
 
 #attachment {
+   background: #FFFFFF;
+   border: 1px solid #cccccc;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 10px;
    font-weight: bold;
 }
 
 .title {
 	font-size: 12px;
 	font-weight: bold;
+}
+
+.message {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #FF0000;
 }
 
 table.charmap {
@@ -86,18 +115,6 @@ a.charmap {
 	vertical-align: middle;
 	border: 1px none #000000;
 	background-color: transparent;
-}
-
-input.radio {
-	border: 1px none #000000;
-	background-color: transparent;
-	vertical-align: middle;
-}
-
-input.checkbox {
-	border: 1px none #000000;
-	background-color: transparent;
-	vertical-align: middle;
 }
 
 .mceButtonNormal, .mceButtonOver, .mceButtonDown, .mceSeparator, .mceButtonDisabled, .mceButtonSelected {
@@ -162,7 +179,7 @@ legend {
 .tabs {
 	float: left;
 	width: 100%;
-	line-height: normal;
+    line-height: normal;
     font: bold 11px Verdana, sans-serif;
 }
 

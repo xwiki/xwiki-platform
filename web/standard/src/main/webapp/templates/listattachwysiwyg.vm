@@ -18,9 +18,4 @@
     #set( $counter = $counter + 1)
   #end
   </table>
-  </div>
-  <div class="xwikidatafooter2">
-    <div class="xwikidatafooter1">&nbsp;</div>
-    <div class="xwikidatafooter">&nbsp;</div>
-  </div>
 </div>

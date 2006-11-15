@@ -235,7 +235,7 @@ public class Package {
             XWikiDocument doc = docinfo.getDoc();
             addToZip(doc, zos, withVersions, context);
         }
-        addInfosToZip(zos);
+        addInfosToZip(zos, context);
         zos.finish();
         zos.flush();
         return "";
@@ -256,7 +256,7 @@ public class Package {
             XWikiDocument doc = docinfo.getDoc();
             addToDir(doc, dir, withVersions, context);
         }
-        addInfosToDir(dir);
+        addInfosToDir(dir, context);
         return "";
     }
 
@@ -499,10 +499,10 @@ public class Package {
         return fromXml(XmlFile.toString());
     }
 
-    public String toXml()
+    public String toXml(XWikiContext context)
     {
        OutputFormat outputFormat = new OutputFormat("", true);
-        outputFormat.setEncoding("UTF-8");
+        outputFormat.setEncoding(context.getWiki().getEncoding());
         StringWriter out = new StringWriter();
         XMLWriter writer = new XMLWriter( out, outputFormat );
         try {
@@ -562,12 +562,12 @@ public class Package {
         return doc;
     }
 
-    private void addInfosToZip(ZipOutputStream zos) {
+    private void addInfosToZip(ZipOutputStream zos, XWikiContext context) {
         try  {
         String zipname = DefaultPackageFileName;
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
-        zos.write(toXml().getBytes());
+        zos.write(toXml(context).getBytes(context.getWiki().getEncoding()));
         zos.closeEntry();
         } catch (Exception e) {
             e.printStackTrace();
@@ -582,7 +582,7 @@ public class Package {
                 zipname += "." + language;
             ZipEntry zipentry = new ZipEntry(zipname);
             zos.putNextEntry(zipentry);
-            zos.write(doc.toXML(true, false, true, withVersions, context).getBytes());
+            zos.write(doc.toXML(true, false, true, withVersions, context).getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } catch (Exception e) {
             e.printStackTrace();
@@ -607,7 +607,7 @@ public class Package {
             File file = new File(spacedir, filename);
             String xml = doc.toXML(true, false, true, withVersions, context);
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(xml.getBytes());
+            fos.write(xml.getBytes(context.getWiki().getEncoding()));
             fos.flush();
             fos.close();
         } catch (ExcludeDocumentException e) {
@@ -621,12 +621,12 @@ public class Package {
     }
 
 
-    private void addInfosToDir(File dir) {
+    private void addInfosToDir(File dir, XWikiContext context) {
         try  {
         String filename = DefaultPackageFileName;
         File file = new File(dir, filename);
         FileOutputStream fos = new FileOutputStream(file);
-        fos.write(toXml().getBytes());
+        fos.write(toXml(context).getBytes(context.getWiki().getEncoding()));
         fos.flush();
         fos.close();
         } catch (Exception e) {

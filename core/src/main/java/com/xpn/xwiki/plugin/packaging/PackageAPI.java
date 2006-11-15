@@ -168,7 +168,7 @@ public class PackageAPI   extends Api {
 
     public String toXml()
     {
-        return plugin.toXml();
+        return plugin.toXml(context);
     }
 
     public int install() throws XWikiException {

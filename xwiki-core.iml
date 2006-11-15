@@ -7,6 +7,7 @@
     <content url="file://$MODULE_DIR$/core">
       <sourceFolder url="file://$MODULE_DIR$/core/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/core/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/core/src/test/java" isTestSource="true" />
     </content>
     <content url="file://$MODULE_DIR$/src">
       <sourceFolder url="file://$MODULE_DIR$/src/test/cactus" isTestSource="true" />

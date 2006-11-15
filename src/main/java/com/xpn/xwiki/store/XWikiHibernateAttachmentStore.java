@@ -232,29 +232,29 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 // Delete the three attachement entries
                 try {
                     loadAttachmentContent(attachment, context, false);
+                    try {
+                        session.delete(attachment.getAttachment_content());
+                    } catch (Exception e) {
+                        if (log.isWarnEnabled())
+                            log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                    }
                 } catch (Exception e) {
                     if (log.isWarnEnabled())
                         log.warn("Error loading attachment content when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
                 }
                 try {
-                    session.delete(attachment.getAttachment_content());
-                } catch (Exception e) {
-                    if (log.isWarnEnabled())
-                        log.warn("Error deleting attachment content " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-                }
-                try {
                     loadAttachmentArchive(attachment, context, false);
+                    try {
+                        session.delete(attachment.getAttachment_archive());
+                    } catch (Exception e) {
+                        if (log.isWarnEnabled())
+                            log.warn("Error deleting attachment archive " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
+                    }
                 } catch(XWikiException e){
                     if (log.isWarnEnabled())
                         log.warn("Error loading attachment archive when deleting attachment " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
                 }
 
-                try {
-                    session.delete(attachment.getAttachment_archive());
-                } catch (Exception e) {
-                    if (log.isWarnEnabled())
-                        log.warn("Error deleting attachment archive " + attachment.getFilename() + " of doc " + attachment.getDoc().getFullName());
-                }
 
                 try {
                     session.delete(attachment);

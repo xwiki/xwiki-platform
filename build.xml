@@ -50,8 +50,10 @@
     <property name="core.dir" value="${basedir}/core" />
     <property name="core.src.dir" value="${core.dir}/src" />
     <property name="core.main.src.dir" value="${core.src.dir}/main" />
+    <property name="core.test.src.dir" value="${core.src.dir}/test" />
     <property name="core.java.main.src.dir" value="${core.main.src.dir}/java" />
     <property name="core.resources.main.src.dir" value="${core.main.src.dir}/resources" />
+    <property name="core.test.main.src.dir" value="${core.test.src.dir}/java" />
 
     <property name="web.dir" value="${basedir}/web" />
     <property name="web.standard.dir" value="${web.dir}/standard" />
@@ -330,12 +332,40 @@
         	<src path="${java.test.src.dir}" />
         	<src path="${cactus.test.src.dir}" />
         </javac>
+        <!-- We're currently migrating the unit tests to the core/src/test directory. During this
+             migration we need to compile tests in both locations -->
+        <javac destdir="${tests.build.dir}"
+            classpath="${libs};${libs.tests};${tests.build.dir};${classes.dir}"
+            debug="on" optimize="on" deprecation="on" source="1.4"
+            sourcepath=""
+            encoding="ISO-8859-1" >
+        	<src path="${core.test.main.src.dir}" />
+        </javac>
     </target>
 
     <target name="test.client" depends="xwiki, tests">
         <mkdir dir="${test.reports.dir}" />
 
-    	<!-- TODO: Remove the dir attibute which should not be needed if all tests get
+        <!-- We're currently migrating the unit tests to the core/src/test directory. During this
+             migration we need to run tests in both locations -->
+        <junit printsummary="yes" dir="${tests.build.dir}" haltonfailure="no" fork="on" maxmemory="1400m">
+          <classpath>
+            <pathelement path="${tests.build.dir}" />
+            <pathelement path="${classes.dir}" />
+            <pathelement path="${libs}" />
+            <pathelement path="${libs.tests}" />
+          </classpath>
+          <formatter type="xml" />
+
+          <batchtest todir="${test.reports.dir}">
+            <fileset dir="${core.test.main.src.dir}">
+              <include name="**/*Test.java"/>
+              <exclude name="**/Abstract*.java"/>
+            </fileset>
+          </batchtest>
+      </junit>
+
+        <!-- TODO: Remove the dir attibute which should not be needed if all tests get
     	     their resources from the classpath -->
         <junit printsummary="yes" dir="${tests.build.dir}" haltonfailure="no" fork="on" maxmemory="1400m">
 
@@ -366,6 +396,7 @@
                 </fileset>
             </batchtest>
         </junit>
+
     </target>
 
     <target name="test.server.prepare" depends="release,prepare-tests">

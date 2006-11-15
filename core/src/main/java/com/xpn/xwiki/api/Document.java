@@ -1158,8 +1158,9 @@ public class Document extends Api {
     }
 
     public void save() throws XWikiException {
-        if (hasAccessLevel("edit"))
-            context.getWiki().saveDocument(getDoc(), olddoc, context);
+        if (hasAccessLevel("edit")){
+            saveDocument();
+        }
         else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
@@ -1168,13 +1169,19 @@ public class Document extends Api {
     }
 
     public void saveWithProgrammingRights() throws XWikiException {
-        if (checkProgrammingRights())
-            context.getWiki().saveDocument(getDoc(), olddoc, context);
+        if (checkProgrammingRights()){
+            saveDocument();
+        }
         else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                     "Access denied with no programming rights document {0}", null, args);
         }
+    }
+
+    private void saveDocument() throws XWikiException {
+        context.getWiki().saveDocument(getDoc(), olddoc, context);
+        olddoc = doc;
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException {

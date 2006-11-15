@@ -3,6 +3,7 @@ function init() {
     var href = tinyMCE.getWindowArg('href').toString();
     document.forms[0].wiki_text.value = text;
     document.forms[0].web_text.value = text;
+    document.forms[0].file_text.value = text;
     document.forms[0].attach_text.value = text;
     document.forms[0].email_text.value = text;
 
@@ -16,6 +17,13 @@ function init() {
         } else if (href.search(/mailto:(.*?)/gi) > -1) {
             mcTabs.displayTab('email_tab','email_panel')
             document.forms[0].email.value = href.replace(/mailto:/gi, "");
+        } else if (href.search(/file:(\/\/\/\/\/)(.*?)/gi) > -1) {
+            mcTabs.displayTab('file_tab','file_panel');
+            document.forms[0].filepath.value = href.replace(/file:(\/\/\/\/\/)/gi, "");
+        } else if (href.search(/file:(\/\/)(.*?)/gi) > -1) {
+            mcTabs.displayTab('file_tab','file_panel');
+            alert(href.replace(/file:(\/\/)/gi, ""));
+            document.forms[0].filepath.value = href.replace(/file:(\/\/)/gi, "");
         } else {
             mcTabs.displayTab('wiki_tab','wiki_panel');
             var space = "", whref = href;
@@ -37,6 +45,7 @@ function init() {
 function insertLink() {
     var wikiTabElm = document.getElementById("wiki_tab");
     var webTabElm = document.getElementById("web_tab");
+    var fileTabElm = document.getElementById("file_tab");
     var attachTabElm = document.getElementById("attachments_tab");
     var emailTabElm = document.getElementById("email_tab");
     var dummy;
@@ -57,7 +66,15 @@ function insertLink() {
         var href = document.forms[0].attach.value;
         var text = document.forms[0].attach_text.value;
         tinyMCE.themes['wikieditor'].insertLink("wikiattachment:-:" + href, "", text, "", "", dummy, "");
-
+    } else if (fileTabElm.className == "current") {
+        var text = document.forms[0].file_text.value;
+        var href = document.forms[0].filepath.value;
+        var filepath="";
+        if (":" == href.charAt(href.indexOf("\\") - 1))
+            filepath = "file://" + href.replace(/\\/gi, "/");
+        else if (href.substring(0, 2) == "\\\\")
+            filepath = "file://///" + href.replace(/\\/gi, "/");
+        tinyMCE.themes['wikieditor'].insertLink(filepath, "", text, "", "", dummy, "");
     } else if (emailTabElm.className == "current") {
         var text = document.forms[0].email_text.value;
         var email = document.forms[0].email.value;

@@ -5,6 +5,7 @@
 	<script language="javascript" type="text/javascript" src="../../utils/form_utils.js"></script>
     <script language="javascript" type="text/javascript" src="../../tiny_mce_popup.js"></script>
     <script language="javascript" type="text/javascript" src="jscripts/link.js"></script>
+	<link href="css/editor_popup.css" rel="stylesheet" type="text/css" />
 <base target="_self" />
 <script language="javascript">
     var baseurl = tinyMCE.getParam("wiki_attach_path").toString();
@@ -142,15 +143,17 @@ if (url != null) {
 </script>
 </head>
 <body id="link" onload="tinyMCEPopup.executeOnLoad('init();');"  style="display: none">
-    <p>
-        <span class="title">{$lang_insert_link_title}</span>
-    </p>
     <form onsubmit="insertLink();return false;" action="#">
+        <div class="title">
+            {$lang_insert_link_title}
+        </div>
+        <br />
         <div class="tabs">
             <ul>
                 <li id="wiki_tab" class="current"><span><a href="javascript:mcTabs.displayTab('wiki_tab','wiki_panel');" onmousedown="return false;">{$lang_link_wiki_tab}</a></span></li>
-                <li id="web_tab"><span><a href="javascript:mcTabs.displayTab('web_tab','web_panel');" onmousedown="return false;">{$lang_link_web_tab}</a></span></li>
                 <li id="attachments_tab"><span><a href="javascript:mcTabs.displayTab('attachments_tab','attachments_panel');" onmousedown="return false;">{$lang_link_attachments_tab}</a></span></li>
+                <li id="web_tab"><span><a href="javascript:mcTabs.displayTab('web_tab','web_panel');" onmousedown="return false;">{$lang_link_web_tab}</a></span></li>
+                <li id="file_tab"><span><a href="javascript:mcTabs.displayTab('file_tab','file_panel');" onmousedown="return false;">{$lang_link_file_tab}</a></span></li>
                 <li id="email_tab"><span><a href="javascript:mcTabs.displayTab('email_tab','email_panel');" onmousedown="return false;">{$lang_link_email_tab}</a></span></li>
             </ul>
         </div>
@@ -305,6 +308,32 @@ if (url != null) {
                                 </tr>
                                 <tr>
                                     <td nowrap="nowrap" colspan="2"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div id="file_panel" class="panel">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td align="left" valign="middle">
+                            <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_text_title} :</td>
+                                    <td align="left">
+                                        <input type="text" id="file_text" name="file_text" value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap">{$lang_link_file_title} :</td>
+                                    <td>
+                                        <input type="file" id="filepath" name="filepath" value="dfadsfasdf" size="32" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" colspan="2"><span class="message">{$lang_link_file_warning_title}</span></td>
                                 </tr>
                             </table>
                         </td>

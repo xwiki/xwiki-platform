@@ -591,6 +591,7 @@ public class Package {
 
     public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException {
         try  {
+            filter(doc, context);
             File spacedir = new File(dir, doc.getWeb());
             if (!spacedir.exists()) {
                 if (!spacedir.mkdirs()) {
@@ -609,7 +610,10 @@ public class Package {
             fos.write(xml.getBytes());
             fos.flush();
             fos.close();
-        } catch (Exception e) {
+        } catch (ExcludeDocumentException e) {
+            log.info("Skip the document " + doc.getFullName());
+        }
+        catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getFullName();
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,XWikiException.ERROR_XWIKI_DOC_EXPORT, "Error creating file {0}", e, args);

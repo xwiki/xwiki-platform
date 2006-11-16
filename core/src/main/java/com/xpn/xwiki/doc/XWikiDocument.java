@@ -3117,17 +3117,38 @@ public class XWikiDocument {
         }
     }
 
-    public boolean validate(XWikiContext context) throws XWikiException {
-        boolean isValid = true;
-        for (Iterator it = getxWikiObjects().keySet().iterator(); it.hasNext();) {
-            String classname = (String) it.next();
-            BaseClass bclass = context.getWiki().getClass(classname, context);
-            Vector objects = getObjects(classname);
 
-            for (int i = 0; i < objects.size(); i++) {
-                BaseObject obj = (BaseObject) objects.get(i);
-                if (obj != null) {
-                    isValid &= bclass.validateObject(obj, context);
+    public boolean validate(XWikiContext context) throws XWikiException {
+        return validate(null, context);
+    }
+
+    public boolean validate(String[] classNames, XWikiContext context) throws XWikiException {
+        boolean isValid = true;
+        if ((classNames==null)||(classNames.length==0)) {
+            for (Iterator it = getxWikiObjects().keySet().iterator(); it.hasNext();) {
+                String classname = (String) it.next();
+                BaseClass bclass = context.getWiki().getClass(classname, context);
+                Vector objects = getObjects(classname);
+
+                for (int i = 0; i < objects.size(); i++) {
+                    BaseObject obj = (BaseObject) objects.get(i);
+                    if (obj != null) {
+                        isValid &= bclass.validateObject(obj, context);
+                    }
+                }
+            }
+        } else {
+            for (int i=0;i<classNames.length;i++) {
+                for (Iterator it = getObjects(classNames[i]).iterator(); it.hasNext();) {
+                    Vector objects = (Vector) it.next();
+
+                    for (int j = 0; j < objects.size(); j++) {
+                        BaseObject obj = (BaseObject) objects.get(j);
+                        if (obj != null) {
+                            BaseClass bclass = obj.getxWikiClass(context);
+                            isValid &= bclass.validateObject(obj, context);
+                        }
+                    }
                 }
             }
         }

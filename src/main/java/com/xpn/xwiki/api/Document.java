@@ -1352,4 +1352,9 @@ public class Document extends Api {
     public boolean validate() throws XWikiException {
         return doc.validate(context);
     }
+
+    public boolean validate(String[] classNames) throws XWikiException {
+        return doc.validate(classNames, context);
+    }
+
 }

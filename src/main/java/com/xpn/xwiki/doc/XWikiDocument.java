@@ -3139,15 +3139,12 @@ public class XWikiDocument {
             }
         } else {
             for (int i=0;i<classNames.length;i++) {
-                for (Iterator it = getObjects(classNames[i]).iterator(); it.hasNext();) {
-                    Vector objects = (Vector) it.next();
-
-                    for (int j = 0; j < objects.size(); j++) {
-                        BaseObject obj = (BaseObject) objects.get(j);
-                        if (obj != null) {
-                            BaseClass bclass = obj.getxWikiClass(context);
-                            isValid &= bclass.validateObject(obj, context);
-                        }
+                Vector objects = getObjects(classNames[i]);
+                for (int j = 0; j < objects.size(); j++) {
+                    BaseObject obj = (BaseObject) objects.get(j);
+                    if (obj != null) {
+                        BaseClass bclass = obj.getxWikiClass(context);
+                        isValid &= bclass.validateObject(obj, context);
                     }
                 }
             }

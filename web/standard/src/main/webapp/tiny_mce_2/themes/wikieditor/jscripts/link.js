@@ -22,7 +22,6 @@ function init() {
             document.forms[0].filepath.value = href.replace(/file:(\/\/\/\/\/)/gi, "");
         } else if (href.search(/file:(\/\/)(.*?)/gi) > -1) {
             mcTabs.displayTab('file_tab','file_panel');
-            alert(href.replace(/file:(\/\/)/gi, ""));
             document.forms[0].filepath.value = href.replace(/file:(\/\/)/gi, "");
         } else {
             mcTabs.displayTab('wiki_tab','wiki_panel');
@@ -71,9 +70,9 @@ function insertLink() {
         var href = document.forms[0].filepath.value;
         var filepath="";
         if (":" == href.charAt(href.indexOf("\\") - 1))
-            filepath = "file://" + href.replace(/\\/gi, "/");
+            filepath = "file:\/\/" + href.replace(/\\/gi, "\/");
         else if (href.substring(0, 2) == "\\\\")
-            filepath = "file://///" + href.replace(/\\/gi, "/");
+            filepath = "file:\/\/\/" + href.replace(/\\/gi, "\/");
         tinyMCE.themes['wikieditor'].insertLink(filepath, "", text, "", "", dummy, "");
     } else if (emailTabElm.className == "current") {
         var text = document.forms[0].email_text.value;

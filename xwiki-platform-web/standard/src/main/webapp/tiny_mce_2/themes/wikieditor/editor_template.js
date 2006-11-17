@@ -82,7 +82,7 @@ var TinyMCE_WikieditorTheme = {
                 var template = new Array();
 				template['file'] = 'link.htm';
 				template['width'] = 600;
-				template['height'] = 450;
+				template['height'] = 500;
 
 				// Language specific width and height addons
 				template['width'] += tinyMCE.getLang('lang_insert_link_delta_width', 0);

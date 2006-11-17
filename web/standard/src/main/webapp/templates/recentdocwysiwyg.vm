@@ -24,7 +24,7 @@
 
     <p style="font-weight:bold"> $title : </p>
 
-    <table width="95%">
+    <table width="95%" cellspacing="3px">
         #set($counter=0)
         #foreach ($item in $collect)
             #if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))

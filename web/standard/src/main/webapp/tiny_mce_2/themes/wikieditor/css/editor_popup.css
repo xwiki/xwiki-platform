@@ -175,6 +175,10 @@ legend {
     overflow: visible; /* Should be auto but that breaks Safari */
 }
 
+.panel_result {
+    height: 210px;
+    overflow: auto;
+}
 /* Tab classes */
 .tabs {
 	float: left;

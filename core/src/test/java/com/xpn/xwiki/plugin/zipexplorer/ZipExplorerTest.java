@@ -31,23 +31,54 @@ import org.jmock.Mock;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 import java.io.ByteArrayOutputStream;
 
-public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
-
+public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase
+{
     private ZipExplorerPlugin plugin;
 
-    protected void setUp() {
+    protected void setUp()
+    {
         this.plugin = new ZipExplorerPlugin("zipexplorer", ZipExplorerPlugin.class.getName(), null);
     }
 
+    public void testIsZipFile()
+    {
+        assertTrue(this.plugin.isZipFile("test.zip"));
+        assertFalse(this.plugin.isZipFile("test.txt"));
+        assertFalse(this.plugin.isZipFile("testzip"));
+    }
+
+    public void testIsValidZipURL()
+    {
+        assertTrue(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
+            "download"));
+        assertFalse(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
+            "view"));
+        assertFalse(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download"));
+        assertFalse(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document", "download"));
+
+        // These tests should normally fail but we haven't implemented the check to verify if the
+        // ZIP URL points to a file rather than a dir.
+        assertTrue(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/Dir2/",
+            "download"));
+        assertTrue(this.plugin.isValidZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/Dir2",
+            "download"));
+    }
+
     public void testDownloadAttachmentWithInvalidZipURL() throws Exception {
-        XWikiAttachment originalAttachment = createAttachment("someFile.txt", "Some text".getBytes(),
-            (XWikiDocument) mock(XWikiDocument.class).proxy());
-        XWikiContext context = createXWikiContext("http://server/xwiki/bin/download/Main/Document/someFile.txt");
+        XWikiAttachment originalAttachment = createAttachment("someFile.txt",
+            "Some text".getBytes(), (XWikiDocument) mock(XWikiDocument.class).proxy());
+        XWikiContext context =
+            createXWikiContext("http://server/xwiki/bin/download/Main/Document/someFile.txt");
 
         XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
 
@@ -56,8 +87,8 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
 
     public void testDownloadAttachment() throws Exception {
         String zipFileContent = "File.txt content";
-        XWikiAttachment originalAttachment = createAttachment("zipfile.zip", createZipFile(zipFileContent),
-            (XWikiDocument) mock(XWikiDocument.class).proxy());
+        XWikiAttachment originalAttachment = createAttachment("zipfile.zip",
+            createZipFile(zipFileContent), (XWikiDocument) mock(XWikiDocument.class).proxy());
             
         XWikiContext context = createXWikiContext(
             "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt");
@@ -82,7 +113,8 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
     public void testGetFileTreeList() throws Exception {
         XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
 
-        Vector entries = this.plugin.getFileTreeList(new Document(document, null), "zipfile.zip", null);
+        List entries =
+            this.plugin.getFileTreeList(new Document(document, null), "zipfile.zip", null);
 
         assertEquals(3, entries.size());
 
@@ -112,22 +144,18 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
 
     public void testGetFileLocationFromZipURL()
     {
-        String fileName = this.plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt", "download");
-        assertEquals("Directory/File.txt", fileName);
-    }
-
-    public void testGetFileLocationFromZipURLWhenInvalidURL()
-    {
-        String fileName = this.plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download");
-        assertEquals("", fileName);
+        assertEquals("Directory/File.txt", this.plugin.getFileLocationFromZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
+            "download"));
+        assertEquals("", this.plugin.getFileLocationFromZipURL(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download"));
     }
 
     private XWikiDocument createXWikiDocumentWithZipFileAttachment() throws Exception {
         Mock mockDocument = mock(XWikiDocument.class);
         XWikiDocument document = (XWikiDocument) mockDocument.proxy();
-        XWikiAttachment attachment = createAttachment("zipfile.zip", createZipFile("Some content"), document);
+        XWikiAttachment attachment =
+            createAttachment("zipfile.zip", createZipFile("Some content"), document);
         mockDocument.stubs().method("clone").will(returnValue(mockDocument.proxy()));
         mockDocument.stubs().method("getAttachment").will(returnValue(attachment));
         return document;         
@@ -142,7 +170,9 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
         return context;
     }
 
-    private XWikiAttachment createAttachment(String filename, byte[] content, XWikiDocument document) throws Exception {
+    private XWikiAttachment createAttachment(String filename, byte[] content,
+        XWikiDocument document) throws Exception
+    {
         Mock mockAttachment = mock(XWikiAttachment.class);
         mockAttachment.stubs().method("getFilename").will(returnValue(filename));
         mockAttachment.stubs().method("getDoc").will(returnValue(document));
@@ -152,7 +182,8 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase {
         return (XWikiAttachment) mockAttachment.proxy();
     }
 
-    private byte[] createZipFile(String content) throws Exception {
+    private byte[] createZipFile(String content) throws Exception
+    {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipOutputStream zos = new ZipOutputStream(baos);
         ZipEntry zipe = new ZipEntry("Directory/File.txt");

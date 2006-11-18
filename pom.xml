@@ -382,6 +382,9 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includes>**/ZipExplorer*.java</includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

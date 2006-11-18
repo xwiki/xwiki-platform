@@ -242,7 +242,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      *         the passed filename has been suffixed.
      * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileLink
      */
-    String getFileLink(Document document, String attachmentName, String fileName,
+    public String getFileLink(Document document, String attachmentName, String fileName,
         XWikiContext context)
     {
         return document.getAttachmentURL(attachmentName) + URL_SEPARATOR + fileName;

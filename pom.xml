@@ -24,13 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki</artifactId>
+    <artifactId>xwiki-root</artifactId>
     <version>0.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Core</name>
   <packaging>jar</packaging>
   <description>The main XWiki JAR</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/core</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/core</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/core</url>
+  </scm>
   <dependencies>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->

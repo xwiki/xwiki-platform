@@ -24,7 +24,6 @@
     default="release"
     basedir="." >
 
-
     <!-- Allow any user specific values to override the defaults -->
     <property file="${user.home}/build.properties" />
     <!-- Allow user defaults for this project -->
@@ -43,9 +42,7 @@
     <property name="test.src.dir" value="${src.dir}/test" />
     <property name="java.test.src.dir" value="${test.src.dir}/java" />
     <property name="resources.test.src.dir" value="${test.src.dir}/resources/" />
-	<property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
-
-    <property name="build-tools.dir" value="${basedir}/build-tools" />
+	  <property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
 
     <property name="core.dir" value="${basedir}/core" />
     <property name="core.src.dir" value="${core.dir}/src" />
@@ -279,9 +276,9 @@
         </copy>
     	
         <copy todir="${build.dir}/web/WEB-INF">
-            <fileset includes="${build-tools.dir}/LICENSE.txt"
+            <fileset includes="${basedir}/LICENSE.txt"
                 dir="${basedir}" />
-            <fileset includes="${build-tools.dir}/lgpl.txt"
+            <fileset includes="${basedir}/lgpl.txt"
                 dir="${basedir}/" />
         </copy>
 
@@ -552,7 +549,7 @@
             <tarfileset dir="${release.dir}" prefix="release" excludes="**/CVS/*"  />
             <tarfileset dir="${lib.dir}" prefix="lib" excludes="**/CVS/*" />
             <tarfileset dir="${doc.dir}" prefix="doc" excludes="**/CVS/*" />
-            <tarfileset dir="${build-tools.dir}" includes="LICENSE.txt,lgpl.txt" />
+            <tarfileset dir="${basedir}" includes="LICENSE.txt,lgpl.txt" />
         </tar>
     </target>
 
@@ -566,7 +563,7 @@
             <tarfileset dir="${doc.dir}" prefix="doc" />
             <tarfileset dir="${src.dir}" prefix="src" />
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
-            <tarfileset dir="${build-tools.dir}" includes="LICENSE.txt,lgpl.txt" />
+            <tarfileset dir="${basedir}" includes="LICENSE.txt,lgpl.txt" />
         </tar>
     </target>
 

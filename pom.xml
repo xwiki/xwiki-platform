@@ -22,75 +22,28 @@
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.xpn.xwiki</groupId>
-  <artifactId>xwiki</artifactId>
-  <name>XWiki</name>
+  <parent>
+    <groupId>com.xpn.xwiki</groupId>
+    <artifactId>xwiki</artifactId>
+    <version>0.9-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-root</artifactId>
+  <name>XWiki Root</name>
   <packaging>pom</packaging>
   <version>0.9-SNAPSHOT</version>
-  <url>http://xwiki.org</url>
-  <prerequisites>
-    <!-- It may work with previous versions of Maven but this hasn't been tested so for safety
-         we require Maven 2.0.4 -->
-    <maven>2.0.4</maven>
-  </prerequisites>
-  <inceptionYear>2004</inceptionYear>
-  <issueManagement>
-    <system>jira</system>
-    <url>http://jira.xwiki.org/</url>
-  </issueManagement>
-  <developers/>
-  <contributors/>
-  <dependencies/>
-  <organization>
-    <name>XWiki</name>
-    <url>http://xwiki.org/</url>
-  </organization>
   <scm>
     <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk</connection>
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/</url>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk</url>
   </scm>
   <modules>
-    <module>build-tools</module>
     <module>core</module>
     <module>web</module>
   </modules>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Apply checkstyle rules and fail the build in case of errors. The checkstyle config
-             files are taken from the build-tools JAR module.-->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>com.xpn.xwiki</groupId>
-              <artifactId>xwiki-build-tools</artifactId>
-              <version>${version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <consoleOutput>true</consoleOutput>
-            <configLocation>build-tools/checkstyle.xml</configLocation>
-            <headerLocation>build-tools/checkstyle.license</headerLocation>
-            <suppressionsLocation>build-tools/checkstyle-suppressions.xml</suppressionsLocation>
-            <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
-          </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need to define it
+       here because if com.xpn.xwiki:xwiki is not in the local repository we want to fetch it from the remote
+       repo to provide a seamless build experience -->
   <repositories>
-    <!-- This is XWiki's custom remote repository containing artifacts that are not present on Maven's main
-         remote repository. To be removed once we're only using official JARs -->
     <repository>
       <id>xwiki</id>
       <name>XWiki Maven2 Remote Repository</name>

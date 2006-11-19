@@ -31,6 +31,11 @@
   <name>XWiki Web Exo</name>
   <packaging>war</packaging>
   <description>The Exoplatform XWiki WAR</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/exo</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/exo</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/web/exo</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki</groupId>

@@ -24,13 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki</artifactId>
+    <artifactId>xwiki-root</artifactId>
     <version>0.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web</artifactId>
   <name>XWiki Web</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/web</url>
+  </scm>
   <modules>
     <module>standard</module>
     <module>exo</module>

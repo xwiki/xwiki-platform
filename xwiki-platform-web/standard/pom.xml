@@ -31,6 +31,11 @@
   <name>XWiki Web Standard</name>
   <packaging>war</packaging>
   <description>The standard XWiki WAR</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/standard</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/standard</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/web/standard</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki</groupId>

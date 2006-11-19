@@ -32,9 +32,27 @@
   <packaging>pom</packaging>
   <name>XWiki Plugins</name>
   <description>The XWiki Plugins</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-plugins/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-plugins/trunk</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-plugins/trunk</url>
+  </scm>
   <modules>
     <module>adwords</module>
     <module>alexa</module>
   </modules>
+  <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need to define it
+       here because if com.xpn.xwiki:xwiki is not in the local repository we want to fetch it from the remote
+       repo to provide a seamless build experience -->
+  <repositories>
+    <repository>
+      <id>xwiki</id>
+      <name>XWiki Maven2 Remote Repository</name>
+      <url>http://maven.xwiki.org</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
 </project>
         

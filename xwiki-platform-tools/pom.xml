@@ -4,11 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki</artifactId>
+    <artifactId>xwiki-tools</artifactId>
     <version>0.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-build-tools</artifactId>
   <name>XWiki Build Tools</name>
   <packaging>jar</packaging>
   <description>XWiki Build Tools</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/build-tools</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/build-tools</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-tools/build-tools</url>
+  </scm>
 </project>

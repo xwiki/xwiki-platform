@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<code_scheme name="XWiki" parent="Default">
+<code_scheme name="xWiki" parent="Default">
   <option name="USE_SAME_INDENTS" value="false" />
   <option name="JAVA_INDENT_OPTIONS">
     <value>
@@ -23,13 +23,9 @@
       <option name="LABEL_INDENT_ABSOLUTE" value="false" />
     </value>
   </option>
-  <option name="BRACE_STYLE" value="2" />
+  <option name="BRACE_STYLE" value="5" />
   <option name="CLASS_BRACE_STYLE" value="2" />
   <option name="METHOD_BRACE_STYLE" value="2" />
-  <option name="ELSE_ON_NEW_LINE" value="true" />
-  <option name="WHILE_ON_NEW_LINE" value="true" />
-  <option name="CATCH_ON_NEW_LINE" value="true" />
-  <option name="FINALLY_ON_NEW_LINE" value="true" />
   <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
   <option name="ALIGN_MULTILINE_FOR" value="false" />
   <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="0" />
@@ -60,9 +56,10 @@
   <option name="FOR_BRACE_FORCE" value="3" />
   <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
   <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
-  <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
-  <option name="JD_ADD_BLANK_AFTER_RETURN" value="true" />
   <option name="JD_P_AT_EMPTY_LINES" value="false" />
+  <option name="JD_KEEP_EMPTY_PARAMETER" value="false" />
+  <option name="JD_KEEP_EMPTY_EXCEPTION" value="false" />
+  <option name="JD_KEEP_EMPTY_RETURN" value="false" />
   <option name="XML_ALIGN_ATTRIBUTES" value="false" />
   <option name="METHOD_ANNOTATION_WRAP" value="1" />
   <option name="CLASS_ANNOTATION_WRAP" value="1" />

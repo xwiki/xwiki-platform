@@ -35,14 +35,10 @@
     <property name="app.name" value="xwiki" />
     <property name="pkg" value="com.xpn.xwiki" />
 
-    <property name="src.dir" value="${basedir}/src/" />
-
-    <property name="main.src.dir" value="${src.dir}/main/" />
-
-    <property name="test.src.dir" value="${src.dir}/test" />
-    <property name="java.test.src.dir" value="${test.src.dir}/java" />
-    <property name="resources.test.src.dir" value="${test.src.dir}/resources/" />
-	  <property name="cactus.test.src.dir" value="${test.src.dir}/cactus" />
+    <property name="tests.dir" value="${basedir}/tests/" />
+    <property name="java.tests.dir" value="${tests.dir}/java" />
+    <property name="resources.tests.dir" value="${tests.dir}/resources/" />
+    <property name="cactus.tests.dir" value="${tests.dir}/cactus" />
 
     <property name="core.dir" value="${basedir}/core" />
     <property name="core.src.dir" value="${core.dir}/src" />
@@ -80,7 +76,7 @@
     <property name="doc.dir" value="${basedir}/doc" />
     <property name="javadoc.dir" value="${doc.dir}/api" />
 
-    <property name="tests.filtersfile" value="${resources.test.src.dir}/${jdbc.filter}" />
+    <property name="tests.filtersfile" value="${resources.tests.dir}/${jdbc.filter}" />
     
     <!-- Standalone package properties -->
     <property name="standalone.base.dir" value="${basedir}/standalone"/>
@@ -309,10 +305,10 @@
 
     <target name="prepare-tests">
     	<copy todir="${tests.build.dir}">
-            <fileset dir="${resources.test.src.dir}"/>
+            <fileset dir="${resources.tests.dir}"/>
         </copy>
         <filter filtersfile="${tests.filtersfile}"/>
-        <copy file="${resources.test.src.dir}/hibernate-test-template.cfg.xml"
+        <copy file="${resources.tests.dir}/hibernate-test-template.cfg.xml"
             tofile="${tests.build.dir}/hibernate-test.cfg.xml"
             filtering="true" overwrite="true" />
         <copy file="${tests.build.dir}/hibernate-test.cfg.xml"
@@ -326,8 +322,8 @@
             debug="on" optimize="on" deprecation="on" source="1.4"
             sourcepath=""
             encoding="ISO-8859-1" >
-        	<src path="${java.test.src.dir}" />
-        	<src path="${cactus.test.src.dir}" />
+        	<src path="${java.tests.dir}" />
+        	<src path="${cactus.tests.dir}" />
         </javac>
         <!-- We're currently migrating the unit tests to the core/src/test directory. During this
              migration we need to compile tests in both locations -->
@@ -375,7 +371,7 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}">
-            	<fileset dir="${java.test.src.dir}">
+            	<fileset dir="${java.tests.dir}">
             		<include name="**/*Test.java"/>
                     <exclude name="**/Abstract*.java"/>
                     <!-- Excluded because it throws OutOfMemoryException-->
@@ -398,12 +394,12 @@
 
     <target name="test.server.prepare" depends="release,prepare-tests">
       <!-- Cactify the web-app archive -->
-      <copy file="${resources.test.src.dir}/xwiki.cfg"
+      <copy file="${resources.tests.dir}/xwiki.cfg"
 		tofile="${build.dir}/web/WEB-INF/xwiki.cfg" overwrite="true" />
-      <copy file="${resources.test.src.dir}/hibernate-test.cfg.xml"
+      <copy file="${resources.tests.dir}/hibernate-test.cfg.xml"
 		tofile="${build.dir}/web/WEB-INF/hibernate-test.cfg.xml" overwrite="true" />
       <war warfile="${test.warfile}" basedir="${build.dir}/web"
-		webxml="${main.src.dir}/web-test.xml" >
+		webxml="${tests.dir}/web-test.xml" >
         <classes dir="${tests.build.dir}"/>
         <exclude name="**/web*.xml" />
         <exclude name="**/xwiki-*.cfg" />
@@ -431,7 +427,7 @@
             <formatter type="xml" />
 
             <batchtest todir="${test.reports.dir}" >
-                <fileset dir="${cactus.test.src.dir}">
+                <fileset dir="${cactus.tests.dir}">
                 	<include name="**/ServletAuthTest.java"/>
                 	<include name="**/ServletVirtualTest.java"/>
 
@@ -445,9 +441,9 @@
             </batchtest>
 
             <containerset>
-              <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.test.src.dir}/server.xml"
+              <tomcat4x if="tomcat4x.home" dir="${tomcat4x.home}" serverxml="${resources.tests.dir}/server.xml"
                   port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx512m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
-              <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.test.src.dir}/server.xml"
+              <tomcat5x if="tomcat5x.home" dir="${tomcat5x.home}" serverxml="${resources.tests.dir}/server.xml"
                   port="9080" todir="${test.reports.dir}" jvmArgs="-Xmx512m -Dfile.encoding=iso-8859-1 -Djava.awt.headless=true"/>
             </containerset>
         </cactus>
@@ -561,7 +557,6 @@
         <tar compression="gzip" tarfile="${src.tarfile}">
             <tarfileset dir="${lib.dir}" prefix="lib" />
             <tarfileset dir="${doc.dir}" prefix="doc" />
-            <tarfileset dir="${src.dir}" prefix="src" />
             <tarfileset dir="${basedir}" includes="*.properties,*.xml,*.iml,*.ipr,*.iws" />
             <tarfileset dir="${basedir}" includes="LICENSE.txt,lgpl.txt" />
         </tar>

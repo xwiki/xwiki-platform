@@ -805,10 +805,18 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimString(result[1]);
-    var lines = this._getLines(text);
+    var _lines = this._getLines(text);
     var str = "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
-    for (var i=0; i < lines.length; i++)
-        lines[i] = this.trimString(lines[i].replace(/\r|\n/g, ""));
+    var lines = new Array();
+    var numColumns = 0;
+    for (var i=0; i < _lines.length; i++) {
+        _lines[i] = this.trimString(_lines[i].replace(/\r|\n/g, ""));
+        _lines[i] = _lines[i].replace(/<\/?p[^>]*>/gi, "");
+        if (_lines[i] != "") {
+            lines[numColumns] = _lines[i];
+            numColumns++;
+        }
+    }
     var rows = new Array();  // rows of table
     var rowindex = 0;
     for (var i=0; i < lines.length; i++) {

@@ -15,7 +15,7 @@ WikiEditor.prototype.initAttachmentsPlugin = function() {
 	this.addExternalProcessorBefore("convertTableExternal", (/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
 	this.addInternalProcessor((/<img\s*([^>]*)(class=\"wikiimage\")\s*([^>]*)\/>/i), 'convertImageInternal');
 
-	this.addExternalProcessor((/{\s*attach\s*:\s*(.*?)(\|(.*?))?}/i), 'convertAttachmentExternal');
+	this.addExternalProcessorBefore("convertTableExternal", (/{\s*attach\s*:\s*(.*?)(\|(.*?))?}/i), 'convertAttachmentExternal');
     this.addInternalProcessorBefore('convertLinkInternal', (/<a\s*href=\"wikiattachment:-:(.*?)\"\s*([^>]*)>(.*?)<\/a>/i), 'convertAttachmentInternal');
 
 	this.addToolbarHandler('handleAttachmentsButtons');

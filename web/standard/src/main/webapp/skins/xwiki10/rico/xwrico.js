@@ -108,7 +108,8 @@ Rico.Accordion.prototype.showTab = function( accordionTab, animate, tabHeight ) 
       var accordion = this;
       var lastExpandedTab = this.lastExpandedTab;
 
-      this.lastExpandedTab.content.style.height = (this.options.panelHeight - 1) + 'px';
+      if (this.options.panelHeight)
+        this.lastExpandedTab.content.style.height = (this.options.panelHeight - 1) + 'px';
       accordionTab.content.style.display = '';
 
       accordionTab.titleBar.style.fontWeight = this.options.expandedFontWeight;
@@ -173,7 +174,7 @@ Rico.Effect.AccordionSize.prototype = {
       if (this.isFinished()) {
          // just in case there are round errors or such...
          this.e1.style.height = this.start + "px";
-         this.e2.style.height = this.end + "px";
+        // this.e2.style.height = this.end + "px";
 
          if(this.options.complete)
             this.options.complete(this);

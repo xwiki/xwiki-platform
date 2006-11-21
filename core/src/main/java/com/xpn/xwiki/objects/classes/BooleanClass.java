@@ -45,6 +45,11 @@ public class BooleanClass extends PropertyClass {
 
     public BooleanClass() {
         this(null);
+        setDisplayFormType("select");
+    }
+
+    public void setDisplayType(String type) {
+        setStringValue("displayType", type);
     }
 
     public String getDisplayType() {
@@ -55,16 +60,24 @@ public class BooleanClass extends PropertyClass {
         return dtype;
     }
 
+    public String getDisplayFormType() {
+        String dtype = getStringValue("displayFormType");
+        if ((dtype == null) || (dtype.equals(""))) {
+            return "radio";
+        }
+        return dtype;
+    }
+
+    public void setDisplayFormType(String type) {
+        setStringValue("displayFormType", type);
+    }
+
     public void setDefaultValue(int dvalue) {
         setIntValue("defaultValue", dvalue);
     }
 
     public int getDefaultValue() {
         return getIntValue("defaultValue", -1);
-    }
-
-    public void setDisplayType(String type) {
-        setStringValue("displayType", type);
     }
 
     public BaseProperty fromString(String value) {
@@ -95,10 +108,18 @@ public class BooleanClass extends PropertyClass {
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        String displayFormType = getDisplayFormType();
+
         if (getDisplayType().equals("checkbox")) {
+         displayFormType = "checkbox";
+       }
+
+        if (displayFormType.equals("checkbox")) {
             displayCheckboxEdit(buffer, name, prefix, object, context);
-        } else {
+        } else if (displayFormType.equals("select")) {
             displaySelectEdit(buffer, name, prefix, object, context);
+        } else {
+            displayRadioEdit(buffer, name, prefix, object, context);
         }
     }
 
@@ -106,36 +127,97 @@ public class BooleanClass extends PropertyClass {
         select select = new select(prefix + name, 1);
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);
+        int nb1 = 1;
+        int nb2 = 2;
 
-        option[] options = { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
-        options[0].addElement("---");
-        options[1].addElement(String1);
-        options[2].addElement(String0);
+
+        option[] options;
+
+        if (getDefaultValue()==-1) {
+            options = new option[] { new option("---", ""), new option(String1, "1"), new option(String0, "0") };
+            options[0].addElement("---");
+            options[1].addElement(String1);
+            options[2].addElement(String0);
+        } else {
+            options = new option[] { new option(String1, "1"), new option(String0, "0") };
+            options[0].addElement(String1);
+            options[1].addElement(String0);
+            nb1 = 0;
+            nb2 = 1;
+        }
 
         try {
             IntegerProperty prop = (IntegerProperty) object.safeget(name);
-            if (prop != null) {
-                Integer ivalue = (Integer) prop.getValue();
+            Integer ivalue = (prop==null) ? null : (Integer) prop.getValue();
                 if (ivalue != null) {
                     int value = ivalue.intValue();
                     if (value == 1)
-                        options[1].setSelected(true);
+                        options[nb1].setSelected(true);
                     else if (value == 0)
-                        options[2].setSelected(true);
+                        options[nb2].setSelected(true);
                 } else {
                     int value = getDefaultValue();
                     if (value == 1)
-                        options[1].setSelected(true);
+                        options[nb1].setSelected(true);
                     else if (value == 0)
-                        options[2].setSelected(true);
+                        options[nb2].setSelected(true);
+                    else if (value == -1) {
+                        options[0].setSelected(true);
+                    }
                 }
-            }
         } catch (Exception e) {
             // This should not happen
             e.printStackTrace();
         }
         select.addElement(options);
         buffer.append(select.toString());
+    }
+
+    public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+        String StringNone = getDisplayValue(context, 2);
+        String String0 = getDisplayValue(context, 0);
+        String String1 = getDisplayValue(context, 1);
+        input[] inputs;
+
+        input radio0 = new input(input.radio, prefix + name, "");
+        input radio1 = new input(input.radio, prefix + name, "1");
+        input radio2 = new input(input.radio, prefix + name, "0");
+        radio0.addElement(StringNone);
+        radio1.addElement(String1);
+        radio2.addElement(String0);
+
+        if (getDefaultValue()==-1) {
+            inputs = new input[] { radio0, radio1, radio2 };
+        } else {
+            inputs = new input[] {radio1, radio2 };
+        }
+
+        try {
+            IntegerProperty prop = (IntegerProperty) object.safeget(name);
+            Integer ivalue = (prop==null) ? null : (Integer) prop.getValue();
+            if (ivalue != null) {
+                int value = ivalue.intValue();
+                if (value == 1)
+                    radio1.setChecked(true);
+                else if (value == 0)
+                    radio2.setChecked(true);
+            } else {
+                int value = getDefaultValue();
+                if (value == 1)
+                    radio1.setChecked(true);
+                else if (value == 0)
+                    radio2.setChecked(true);
+                else if (value==-1)
+                    radio0.setChecked(true);
+                }
+        } catch (Exception e) {
+            // This should not happen
+            e.printStackTrace();
+        }
+
+        for(int i=0;i<inputs.length;i++) {
+          buffer.append(inputs[i].toString());
+        }
     }
 
     public void displayCheckboxEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
@@ -174,7 +256,10 @@ public class BooleanClass extends PropertyClass {
             String strname = getDisplayType() + "_" + value;
             String result = msg.get(strname);
             if (result.equals(strname)) {
-                return "" + value;
+                if (value==2)
+                 return "---";
+                else
+                 return "" + value;
             }
             return result;
         } catch (Exception e) {

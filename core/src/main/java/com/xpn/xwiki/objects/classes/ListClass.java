@@ -296,7 +296,10 @@ public abstract class ListClass extends PropertyClass {
 		} else {
 			displaySelectEdit(buffer, name, prefix, object, context);
 		}
-	}
+
+        org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+        buffer.append(hidden);
+    }
 
 	protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		List list = getList(context);
@@ -316,17 +319,20 @@ public abstract class ListClass extends PropertyClass {
 		// Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String value = it.next().toString();
-			input radio = new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
+			input radio = new input((getDisplayType().equals("radio")&&isMultiSelect()) ? input.radio : input.checkbox, prefix + name, value);
 
 			if (selectlist.contains(value))
 				radio.setChecked(true);
 			radio.addElement(getDisplayValue(value, map, context));
+
+            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "\">");
             buffer.append(radio.toString());
-			if (it.hasNext()) {
-				buffer.append("<br/>");
-			}
+            buffer.append("</span>");
 		}
-	}
+
+        org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+        buffer.append(hidden);
+    }
 
     protected class MapComparator implements Comparator {
         protected Map map;

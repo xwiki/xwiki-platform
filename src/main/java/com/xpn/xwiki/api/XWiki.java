@@ -2140,5 +2140,12 @@ v     * API to check rights on a document for a given user
     public String addTooltipJS() {
         return xwiki.addTooltipJS(context);
     }
+
+    /*
+     * Inserts a Mandatory asterix
+     */
+    public String addMandatory() {
+        return xwiki.addMandatory(context);
+    }
 }
 

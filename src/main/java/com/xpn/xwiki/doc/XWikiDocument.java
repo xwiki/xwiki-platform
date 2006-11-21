@@ -947,24 +947,35 @@ public class XWikiDocument {
     }
 
     public String displayPrettyName(String fieldname, XWikiContext context) {
+        return displayPrettyName(fieldname, false, context);
+    }
+
+    public String displayPrettyName(String fieldname, BaseObject obj, XWikiContext context) {
+        return displayPrettyName(fieldname, false, obj, context);
+    }
+
+    public String displayPrettyName(String fieldname, boolean showMandatory, XWikiContext context) {
         try {
             BaseObject object = getxWikiObject();
             if (object == null)
                 object = getFirstObject(fieldname, context);
-            return displayPrettyName(fieldname, object, context);
+            return displayPrettyName(fieldname, showMandatory, object, context);
         } catch (Exception e) {
             return "";
         }
     }
 
-    public String displayPrettyName(String fieldname, BaseObject obj, XWikiContext context) {
+    public String displayPrettyName(String fieldname, boolean showMandatory, BaseObject obj, XWikiContext context) {
         try {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
-            return pclass.getPrettyName();
+            String dprettyName = "";
+            if ((showMandatory)&&(pclass.getValidationRegExp()!=null)&&(!pclass.getValidationRegExp().equals(""))) {
+                dprettyName = context.getWiki().addMandatory(context);
+            }
+            return dprettyName + pclass.getPrettyName();
         }
         catch (Exception e) {
             return "";
-            // return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
         }
     }
 

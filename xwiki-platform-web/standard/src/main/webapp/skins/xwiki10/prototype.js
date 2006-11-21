@@ -1029,8 +1029,9 @@ Abstract.Insertion.prototype = {
       try {
         this.element.insertAdjacentHTML(this.adjacency, this.content);
       } catch (e) {
-        if (this.element.tagName.toLowerCase() == 'tbody') {
-          this.insertContent(this.contentFromAnonymousTable());
+        var tagName = this.element.tagName.toLowerCase();
+ 	    if (tagName == 'tbody' || tagName == 'tr') {
+            this.insertContent(this.contentFromAnonymousTable());
         } else {
           throw e;
         }

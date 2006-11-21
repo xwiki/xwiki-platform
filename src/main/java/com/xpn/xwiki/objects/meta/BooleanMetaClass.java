@@ -27,6 +27,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 public class BooleanMetaClass extends PropertyMetaClass {
 
@@ -35,11 +36,17 @@ public class BooleanMetaClass extends PropertyMetaClass {
         setPrettyName("Boolean Class");
         setName(BooleanClass.class.getName());
 
-        StringClass type_class = new StringClass(this);
-        type_class.setName("displayType");
-        type_class.setPrettyName("Display Type");
-        type_class.setSize(20);
-        safeput("displayType", type_class);
+        StaticListClass type_class = new StaticListClass(this);
+        type_class.setName("displayFormType");
+        type_class.setPrettyName("Display Form Type");
+        type_class.setValues("radio|checkbox|select");
+        safeput("displayFormType", type_class);
+        
+        StringClass value_class = new StringClass(this);
+        value_class.setName("displayType");
+        value_class.setPrettyName("Display Type");
+        value_class.setSize(20);
+        safeput("displayType", value_class);
 
         NumberClass default_value_class = new NumberClass(this);
         default_value_class.setName("defaultValue");

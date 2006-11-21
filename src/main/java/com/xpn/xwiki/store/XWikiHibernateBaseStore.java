@@ -58,7 +58,11 @@ public class XWikiHibernateBaseStore {
         } else {
             try {
                 setHibUrl(context.getEngineContext().getResource(path));
-            } catch (MalformedURLException e) {
+            } catch (Exception e) {
+                try {
+                    setHibUrl(XWiki.class.getClassLoader().getResource(path));
+                } catch (Exception e2) {
+                }
             }
         }
     }

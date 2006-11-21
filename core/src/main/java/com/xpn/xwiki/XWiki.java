@@ -204,6 +204,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         xwikicfgis = new FileInputStream(f);
                     } else {
                         xwikicfgis = econtext.getResourceAsStream(xwikicfg);
+                        if (xwikicfgis==null) {
+                            if (context.getMode()==XWikiContext.MODE_GWT)
+                             xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki-gwt.cfg");
+                            else
+                             xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
+                        }
                     }
                     xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                     econtext.setAttribute(xwikiname, xwiki);

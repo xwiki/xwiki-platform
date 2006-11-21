@@ -4229,4 +4229,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void renamePage(String fullName, String newFullName, XWikiContext context) throws XWikiException {
         renamePage(context.getWiki().getDocument(fullName, context), newFullName, context);
     }
+
+    public String addMandatory(XWikiContext context) {
+        return "<span class=\"mandatoryParenthesis\">(</span><span class=\"mandatoryDot\">*</span><span class=\"mandatoryParenthesis\">)</span>";
+    }
 }

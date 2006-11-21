@@ -291,7 +291,7 @@ public abstract class ListClass extends PropertyClass {
 			input.setName(prefix + name);
 			input.setID(prefix + name);
 			buffer.append(input.toString());
-		} else if (getDisplayType().equals("radio")) {
+		} else if (getDisplayType().equals("radio")||getDisplayType().equals("checkbox")) {
 			displayRadioEdit(buffer, name, prefix, object, context);
 		} else {
 			displaySelectEdit(buffer, name, prefix, object, context);
@@ -316,7 +316,7 @@ public abstract class ListClass extends PropertyClass {
 		// Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String value = it.next().toString();
-			input radio = new input(input.radio, prefix + name, value);
+			input radio = new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
 
 			if (selectlist.contains(value))
 				radio.setChecked(true);
@@ -401,7 +401,7 @@ public abstract class ListClass extends PropertyClass {
     public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context){
         if (getDisplayType().equals("input")) {
             return super.displaySearch(name, prefix, criteria, context);
-        } else if (getDisplayType().equals("radio")) {
+        } else if (getDisplayType().equals("radio")||getDisplayType().equals("checkbox")) {
             return displayRadioSearch(name, prefix, criteria, context);
         } else {
             return displaySelectSearch(name, prefix, criteria, context);
@@ -428,7 +428,7 @@ public abstract class ListClass extends PropertyClass {
         // Add options from Set
         for (Iterator it=list.iterator();it.hasNext();) {
             String value = it.next().toString();
-            input radio = new input(input.radio, prefix + name, value);
+            input radio = new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
 
             if (selectlist.contains(value))
                 radio.setChecked(true);

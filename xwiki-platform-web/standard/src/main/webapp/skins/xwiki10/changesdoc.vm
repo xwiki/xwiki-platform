@@ -17,7 +17,11 @@ $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author), 
 
 <ul>
 #foreach($item in $doc.getMetaDataDiff($origdoc, $newdoc))
+#if($item.field=="author")
+<li>author:  $xwiki.getLocalUserName($item.getPrevvalue()) &gt;  $xwiki.getLocalUserName($item.getNewvalue())</li>
+#else
 <li>$item</li>
+#end
 #end
 </ul>
 

@@ -275,7 +275,7 @@ public class Package {
             bais = new ByteArrayInputStream(file);
             zis = new ZipInputStream(bais);
             while ((entry = zis.getNextEntry()) != null) {
-                if (entry.getName().compareTo(DefaultPackageFileName) == 0)
+                if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory())
                     continue;
                 else {
                     XWikiDocument doc = readFromXML(readFromInputStream(zis));
@@ -468,9 +468,10 @@ public class Package {
     private XWikiDocument readFromXML(String XmlFile) throws XWikiException {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
         if (backupPack && withVersions)
-            doc.fromXML(XmlFile.toString(), true);
-        else
-            doc.fromXML(XmlFile.toString());
+            doc.fromXML(XmlFile, true);
+        else {
+            doc.fromXML(XmlFile);
+        }
         return doc;
     }
 

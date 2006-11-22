@@ -30,15 +30,16 @@ package com.xpn.xwiki.doc;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
@@ -115,6 +116,7 @@ public class XWikiDocument {
     private String defaultLanguage;
     private int translation;
     private String database;
+    private BaseObject tags;
 
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = true;
@@ -1224,6 +1226,46 @@ public class XWikiDocument {
         String parent = eform.getParent();
         if (parent != null)
             setParent(parent);
+
+        String tags = eform.getTags();
+        if (tags != null)
+            setTags(tags, context);
+    }
+
+    /**
+     * add tags to the document.
+     * @param tags
+     */
+    public void setTags(String tags, XWikiContext context) throws XWikiException {
+        if (this.tags == null) {
+            this.tags = getObject(XWikiConstant.TAG_CLASS, true, context);
+        }
+        //StaticListClass tagProp = (StaticListClass) this.tags.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
+        StaticListClass tagProp = (StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
+        StringListProperty propValue = new StringListProperty();
+        tagProp.fromString(tags);
+        this.tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tags));
+    }
+
+    public String getTags(){
+        if (this.tags == null){
+            this.tags = getObject(XWikiConstant.TAG_CLASS);
+        }
+        if (this.tags != null)
+            return ((ListProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).getTextValue();
+        return "";
+    }
+
+    public List getTagsList(){
+        if (this.tags != null)
+            return (List) ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValue();
+        return null;
+    }
+
+    public List getTagsPossibleValues(XWikiContext context){
+        String possibleValues = ((StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValues();
+        return ListClass.getListFromString(possibleValues);
+        //((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).toString();
     }
 
     public void readTranslationMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException {

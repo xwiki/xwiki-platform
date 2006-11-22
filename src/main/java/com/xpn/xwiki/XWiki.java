@@ -278,6 +278,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     getCommentsClass(context);
                     getSkinClass(context);
                     getGlobalRightsClass(context);
+                    getTagClass(context);
                     getPluginManager().virtualInit(context);
                 }
 
@@ -555,6 +556,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (noupdate) {
             getPrefsClass(context);
             getUserClass(context);
+            getTagClass(context);
             getGroupClass(context);
             getRightsClass(context);
             getCommentsClass(context);
@@ -1771,6 +1773,31 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
             }
         }
+    }
+
+    public BaseClass getTagClass(XWikiContext context) throws XWikiException {
+        XWikiDocument doc;
+        boolean needsUpdate = false;
+
+        doc = getDocument(XWikiConstant.TAG_CLASS, context);
+
+        BaseClass bclass = doc.getxWikiClass();
+        if (context.get("initdone") != null)
+            return bclass;
+
+        bclass.setName(XWikiConstant.TAG_CLASS);
+
+        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "");
+
+        String content = doc.getContent();
+        if ((content == null) || (content.equals(""))) {
+            needsUpdate = true;
+            doc.setContent("1 XWiki TagClass");
+        }
+
+        if (needsUpdate)
+            saveDocument(doc, context);
+        return bclass;
     }
 
     public BaseClass getUserClass(XWikiContext context) throws XWikiException {

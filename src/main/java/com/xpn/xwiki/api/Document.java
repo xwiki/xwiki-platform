@@ -599,13 +599,18 @@ public class Document extends Api {
         return getObject(classname, false);
     }
 
+
+    /**
+     * get the object of the given className. If there is no object of this className and
+     * the create parameter at true, the object is created.
+     * 
+     * @param classname
+     * @param create
+     * @return
+     */
     public Object getObject(String classname, boolean create) {
         try {
-            BaseObject obj = getDoc().getObject(classname);
-
-            if ((obj == null) && create) {
-                return newObject(classname);
-            }
+            BaseObject obj = getDoc().getObject(classname, create, context);
 
             if (obj == null)
                 return null;
@@ -1089,6 +1094,18 @@ public class Document extends Api {
      */
     public Map getTOC(int init, int max, boolean numbered) {
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, context);
+    }
+
+    public String getTags(){
+        return doc.getTags();
+    }
+
+    public List getTagList(){
+        return doc.getTagsList();
+    }
+
+    public List getTagsPossibleValues(){
+        return doc.getTagsPossibleValues(context);
     }
 
     public void insertText(String text, String marker) throws XWikiException {

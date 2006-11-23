@@ -1,0 +1,39 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.xpn.xwiki</groupId>
+  <artifactId>xwiki-backup-sample-basic-import</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven XWiki Backup Plugin Basic Import Sample</name>
+  <description>Maven XWiki Backup Plugin Basic Import Sample</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.xpn.xwiki</groupId>
+        <artifactId>xwiki-backup</artifactId>
+        <configuration>
+          <sourceDirectory>${basedir}/src/main/backup</sourceDirectory>
+          <hibernateConfig>${project.build.dir}/classes/hibernate.cfg.xml</hibernateConfig>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

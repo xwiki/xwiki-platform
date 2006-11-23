@@ -1097,11 +1097,11 @@ public class Document extends Api {
     }
 
     public String getTags(){
-        return doc.getTags();
+        return doc.getTags(context);
     }
 
     public List getTagList(){
-        return doc.getTagsList();
+        return doc.getTagsList(context);
     }
 
     public List getTagsPossibleValues(){

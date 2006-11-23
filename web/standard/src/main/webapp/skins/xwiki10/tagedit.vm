@@ -1,0 +1,95 @@
+#if(!$hideTags || $hideTags == 0)
+  <div id="selectedTagsForm">
+   <label for="tags">tags: </label>
+   <input type="text" id="tags" name="tags" value="$!tdoc.tags"/>
+  </div>
+ <style type="text/css" media="all">
+  li.inline {
+  display: inline;
+  padding-left: 3px;
+  padding-right: 7px;
+  border: 1px dotted #066;
+  }
+  </style>
+  <div id="selectedTags">
+  tags for this document (click on the text to delete it)
+  <ul id="tagList" style="display:none">
+    #set($tags = $tdoc.tagList)
+    #foreach($tag in $tags)
+     #if($tag.length() > 0)
+      <li class="inline"><a onclick="deleteTag('$tag')">$tag</a></li>
+     #end
+    #end
+  </ul>
+  </div>
+  #set($possibleTags = $tdoc.tagsPossibleValues)
+  #if($possibleTags && $possibleTags.size() > 0)
+    <div id="tag_possibilities" style="display:none">
+    Available tags:
+    <ul>
+    #foreach($tag in $possibleTags)
+      <li class="inline"><a onclick="addTag('$tag')">$tag</a></li>
+    #end
+    </ul>
+    </div>
+    <script type="text/javascript">
+    function addTag(tagName){
+      if (!isSelected(tagName))
+        $('tagList').innerHTML = $('tagList').innerHTML + "\n<li class='inline'><a onclick='deleteTag(\"" + tagName + "\")'>" + tagName + "</li>";
+      setTagsToForm();
+    }
+
+    function setTagsToForm(){
+      var tags = getTags();
+      $('tags').value = tags;
+    }
+
+    function isSelected(tagName){
+      var tagList = getTagList();
+      for (var i = 0; i < tagList.length; i++){
+        if (tagList[i] == tagName)
+          return true;
+      }
+      return false;
+    }
+
+    function getTags() {
+      var tagList = getTagList();
+      var tagStr = "";
+      for (var i = 0; i < tagList.length; i++){
+        tagStr += tagList[i];
+        if (i <tagList.length - 1)
+          tagStr += "|";
+      }
+      return tagStr;
+    }
+
+    function getTagList(){
+     var els = $('tagList').getElementsByTagName('li');
+     var tags =  new Array();
+     for(var i = 0; i < els.length; i++) {
+      var node = els[i].getElementsByTagName("a");
+	   tags.push(node[0].innerHTML);
+	 }
+     return tags;
+    }
+
+    function deleteTag(tagName){
+     var els = $('tagList').getElementsByTagName('li');
+     for(var i = 0; i < els.length; i++) {
+       var node = els[i].getElementsByTagName("a");
+	   if (node[0].innerHTML == tagName){
+	     els[i].parentNode.removeChild(els[i]); 
+	   }
+	 }
+    }
+
+    function initTagScript(){
+      $('tagList').style.display="";
+      $('tag_possibilities').style.display="";
+      $('selectedTagsForm').style.display="none";
+    }
+    initTagScript();
+    </script>
+  #end
+#end

@@ -1237,32 +1237,43 @@ public class XWikiDocument {
      * @param tags
      */
     public void setTags(String tags, XWikiContext context) throws XWikiException {
-        if (this.tags == null) {
-            this.tags = getObject(XWikiConstant.TAG_CLASS, true, context);
-        }
-        //StaticListClass tagProp = (StaticListClass) this.tags.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
+        loadTags(context);
+        
         StaticListClass tagProp = (StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
-        StringListProperty propValue = new StringListProperty();
         tagProp.fromString(tags);
         this.tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tags));
     }
 
-    public String getTags(){
-        if (this.tags == null){
-            this.tags = getObject(XWikiConstant.TAG_CLASS);
-        }
-        if (this.tags != null)
-            return ((ListProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).getTextValue();
-        return "";
-    }
-
-    public List getTagsList(){
-        if (this.tags != null)
-            return (List) ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValue();
+    public String getTags(XWikiContext context){
+        ListProperty prop = (ListProperty) getTagProperty(context);
+        if (prop != null)
+            return prop.getTextValue();
         return null;
     }
 
+    public List getTagsList(XWikiContext context){
+        List tagList = null;
+
+        BaseProperty prop = getTagProperty(context);
+        if (prop != null)
+            tagList = (List) prop.getValue();
+        
+        return tagList;
+    }
+
+    private BaseProperty getTagProperty(XWikiContext context){
+        loadTags(context);
+        return ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS));
+    }
+
+    private void loadTags(XWikiContext context){
+        if (this.tags == null){
+            this.tags = getObject(XWikiConstant.TAG_CLASS, true, context);
+        }
+    }
+
     public List getTagsPossibleValues(XWikiContext context){
+        loadTags(context);
         String possibleValues = ((StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS)).getValues();
         return ListClass.getListFromString(possibleValues);
         //((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).toString();

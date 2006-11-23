@@ -16,6 +16,7 @@
 $xwiki.getTextArea($tdoc.content)
 </div>
 </div>
+#template("tagedit.vm")
 </div>
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>

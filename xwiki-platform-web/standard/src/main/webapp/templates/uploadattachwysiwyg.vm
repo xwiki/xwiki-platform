@@ -1,0 +1,12 @@
+<div id="xwikiattachmentscontent" class="xwikidatacontent">
+    <input type="hidden" name="xredirect" value="" />
+    <p>
+      $msg.get("choosetargetfilename"):
+      <input type="text" name="filename" value="" size="20" />
+      <br /><br />
+      $msg.get("choosefiletoupload"):
+      <input type="file" name="filepath" value="" size="40"  /> <br /><br />
+      #set($action = $doc.getURL("upload"))
+      <input type="button" id="attachment" name="attachment" onclick="updateAttachName(document.forms.attach); document.forms.attach.action = '$action' ; document.forms.attach.submit();" value="$msg.get("attachthisfile")" />
+    </p>
+</div>

@@ -3,7 +3,7 @@ function chwPositionSelector(property, type, defaultPosition){
   this.type = type;
   /*
     The curently chosen position
-    Possible values: 
+    Possible values:
     - Type 1 (4 positions): Top, Left, Right, Bottom
     - Type 2 (9 positions): TopLeft, TopCenter, TopRight,
                             CenterLeft, CenterCenter, CenterRight,
@@ -177,7 +177,7 @@ Data       => Data sources
 Type       => Chart type
 Titles     => Chart title, Axes names
 Axes       => Displayed values on axes
-Grid       => Gridline options 
+Grid       => Gridline options
 Labels     => Displayed labels (series name, values)
 Legend     => Legend position
 Space      => Element spacing
@@ -509,7 +509,7 @@ function chwWizard(){
       document.getElementById('chw' + elementName + 'Div').className = 'chwHidden';
     }
   }
-  
+
   /*
      Change the source type (Define or Reuse)
    */
@@ -683,15 +683,19 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
      The image element representing the luminance map
    */
   this.lmap        = lmap;
-  /*
-     The "arrow" that points to the apropriate luminance level
-   */
-  this.lpointer    = lpointer;
-  /*
-     The table cell that will contain the
-     "arrow" that points to the apropriate luminance level
-   */
-  this.lpointerContainer = lpointer.parentNode;
+     if (lpointer != null) {
+         /*
+           The "arrow" that points to the apropriate luminance level
+         */
+         this.lpointer    = lpointer;
+         /*
+           The table cell that will contain the
+           "arrow" that points to the apropriate luminance level
+         */
+
+         this.lpointerContainer = lpointer.parentNode;
+
+     }
   /*
      The div element that will get the chosen color
    */
@@ -723,7 +727,7 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
   this.red   = 80;
   this.green = 100;
   this.blue  = 160;
-  
+
   /*
      The stored color code
    */
@@ -734,14 +738,14 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
      Browser dependent
    */
   this.LMB = (window.ActiveXObject ? 1 : 0);
-  
+
   /*
       The element that invoked the color picker,
       which will recieve the picked color code
    */
   this.reqester = null;
-  
-  /* 
+
+  /*
       Positioning data
    */
   this.left = 120;
@@ -837,7 +841,7 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
     var rgb = this.hsl2rgb(H, S, L);
     return this.rgb2code(rgb.red, rgb.green, rgb.blue);
   }
-  
+
   /*
      RGB to HSL conversion
      Allow obtaining the h, s, l values from the
@@ -965,10 +969,10 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
     this.setValues(rgb.red, rgb.green, rgb.blue, hue, sat, this.lum);
     this.setComponents(rgb.red, rgb.green, rgb.blue, hue, sat, this.lum, colorcode);
   }
-  
+
   /*
      The user "picked" a new value for l from the lmap.
-     The color is updated and the lpointer is moved to the apropriate 
+     The color is updated and the lpointer is moved to the apropriate
      position.
    */
   this.lChanged = function(event, elt){
@@ -982,9 +986,9 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
     this.setComponents(this.red, this.green, this.blue, this.hue, this.sat, this.lum, colorcode);
   }
   /*
-     The user entered a custom color code in the 
+     The user entered a custom color code in the
      code display input.
-     Update the colorShow and the luminance 
+     Update the colorShow and the luminance
      pointer.
    */
   this.htmlCodeChanged = function(){
@@ -1057,7 +1061,7 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
       this.lChanged(event, elt);
     }
   }
-  
+
   /*
      Left mouse button pressed.
      Entering "picking mode"...

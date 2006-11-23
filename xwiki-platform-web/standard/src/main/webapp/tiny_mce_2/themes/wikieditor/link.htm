@@ -140,10 +140,20 @@ if (url != null) {
         var recentE2 = document.getElementById("recentmodified");
         recentE2.innerHTML = e;
     }
+
+    function loadUploadAttachs(baseurl) {
+        var url = baseurl + "?xpage=uploadattachwysiwyg";
+        executeCommand(url, loadUploadAttachsCallback);
+    }
+
+    function loadUploadAttachsCallback(e) {
+      var attachEl = document.getElementById("uploadattach");
+      attachEl.innerHTML = e;
+    }
 </script>
 </head>
 <body id="link" onload="tinyMCEPopup.executeOnLoad('init();');"  style="display: none">
-    <form onsubmit="insertLink();return false;" action="#">
+    <form id="attach" name="attach" onsubmit="insertLink(); return false;" action="#" enctype="multipart/form-data" method="post">
         <div class="title">
             {$lang_insert_link_title}
         </div>
@@ -157,7 +167,7 @@ if (url != null) {
                 <li id="email_tab"><span><a href="javascript:mcTabs.displayTab('email_tab','email_panel');" onmousedown="return false;">{$lang_link_email_tab}</a></span></li>
             </ul>
         </div>
-        <div class="panel_wrapper" style="border: 1px solid #d3e3f5;">
+        <div class="panel_wrapper" style="border: 1px solid #d3e3f5;" >
             <div id="wiki_panel" class="panel current">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
@@ -329,7 +339,7 @@ if (url != null) {
                                 <tr>
                                     <td nowrap="nowrap">{$lang_link_file_title} :</td>
                                     <td>
-                                        <input type="file" id="filepath" name="filepath" value="dfadsfasdf" size="32" />
+                                        <input type="file" id="filepaths" name="filepaths" value="" size="32" />
                                     </td>
                                 </tr>
                                 <tr>
@@ -355,7 +365,12 @@ if (url != null) {
                                 <tr>
                                     <td nowrap="nowrap">{$lang_link_attachment_title} :</td>
                                     <td>
-                                        <input type="text" id="attach" name="attach"  value="" style="width: 200px" />
+                                        <input type="text" id="attach_file" name="attach_file"  value="" style="width: 200px" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td nowrap="nowrap" colspan="2"><a href="#" onclick="loadUploadAttachs(baseurl);">{$lang_link_upload_attachment_title}</a>
+                                        <div style="margin: 3px" id="uploadattach"></div>
                                     </td>
                                 </tr>
                                 <tr>

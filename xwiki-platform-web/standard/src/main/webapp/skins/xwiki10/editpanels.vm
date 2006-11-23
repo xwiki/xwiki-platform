@@ -17,9 +17,11 @@
 #if($editor == "wysiwyg")
 <script language="javascript" type="text/javascript">
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
-    var panels = document.getElementById("editPanels");
-    panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
-    document.getElementById("simpleedittoolbar").style.display = "none";
+    var panels = document.getElementById("editPanels");   
+    if(document.getElementById("xwikisyntaxhelppanel"))
+        panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
+    if (document.getElementById("simpleedittoolbar"))
+        document.getElementById("simpleedittoolbar").style.display = "none";
   }
 </script>
 #end

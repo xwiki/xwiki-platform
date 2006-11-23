@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
@@ -37,19 +37,20 @@ import java.io.IOException;
 public class Importer
 {
     /**
-     * Import documents defined in an XML file located in the passed document definition directory into a database
-     * defined by its passed name and by an Hibernate configuration file.
+     * Import documents defined in an XML file located in the passed document definition directory
+     * into a database defined by its passed name and by an Hibernate configuration file.
      *
-     * <p>Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
-     * allowed for method names though.</p>
+     * <p>Note: I would have liked to call this method "import" but it's a reserved keyword...
+     * Strange that it's not allowed for method names though.</p>
      *
-     * @param sourceDirectory the directory where the package.xml file is located and where the documents
-     *        to import are located
+     * @param sourceDirectory the directory where the package.xml file is located and where the
+     *        documents to import are located
      * @param databaseName some database name (TODO: find out what this name is really)
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
-     *        password, etc)
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC
+     *        driver, username and password, etc)
      * @throws XWikiException if the import failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the importation
+     * @todo Replace the Hibernate config file with a list of parameters required for the
+     *       importation
      */
     public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig)
         throws XWikiException

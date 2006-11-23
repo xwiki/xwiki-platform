@@ -19,42 +19,42 @@
  */
 package com.xpn.xwiki.tool.backup;
 
+import com.xpn.xwiki.XWikiException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 
-import com.xpn.xwiki.XWikiException;
-
 /**
  * Maven 2 plugin to import aset of XWiki documents into an existing database.
- * 
- * @goal import
+ *
  * @version $Id$
+ * @goal import
  */
 public class ImportMojo extends AbstractMojo
 {
     /**
      * @parameter default-value = "xwiki"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File) 
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private String databaseName;
 
     /**
      * @parameter default-value = "${basedir}/src/main/backup/hibernate.cfg.xml"
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private File hibernateConfig;
 
     /**
      * @parameter
      * @required
-     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File, String, java.io.File)
+     * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private File sourceDirectory;
 
     /**
+     * {@inheritDoc}
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException

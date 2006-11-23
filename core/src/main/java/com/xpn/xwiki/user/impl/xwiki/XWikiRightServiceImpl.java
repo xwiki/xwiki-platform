@@ -288,7 +288,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
                         for (int ii = 0; ii < userarray.length; ii++) {
                             String value = userarray[ii];
-                            if (value.indexOf("XWiki.") == -1)
+                            if (value.indexOf(".") == -1)
                                 userarray[ii] = "XWiki." + value;
                         }
 

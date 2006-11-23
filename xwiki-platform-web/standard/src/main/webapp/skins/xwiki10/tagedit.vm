@@ -3,40 +3,65 @@
    <label for="tags">tags: </label>
    <input type="text" id="tags" name="tags" value="$!tdoc.tags"/>
   </div>
- <style type="text/css" media="all">
+  #set($possibleTags = $tdoc.tagsPossibleValues)
+  #if($possibleTags && $possibleTags.size() > 0)
+   <style type="text/css" media="all">
   li.inline {
   display: inline;
   padding-left: 3px;
   padding-right: 7px;
-  border: 1px dotted #066;
+  }
+  li.tags {
+    color: rgb(102, 102, 255);
+    cursor: pointer;
+  }
+  li.selected {
+    background-color: #008;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
   }
   </style>
-  <div id="selectedTags">
-  tags for this document (click on the text to delete it)
-  <ul id="tagList" style="display:none">
-    #set($tags = $tdoc.tagList)
-    #foreach($tag in $tags)
-     #if($tag.length() > 0)
-      <li class="inline"><a onclick="deleteTag('$tag')">$tag</a></li>
-     #end
-    #end
-  </ul>
-  </div>
-  #set($possibleTags = $tdoc.tagsPossibleValues)
-  #if($possibleTags && $possibleTags.size() > 0)
+
     <div id="tag_possibilities" style="display:none">
-    Available tags:
+    Available tags for this document
     <ul>
     #foreach($tag in $possibleTags)
-      <li class="inline"><a onclick="addTag('$tag')">$tag</a></li>
+      <li class="inline tag"><a onclick="addTag('$tag')">$tag</a></li>
     #end
     </ul>
     </div>
     <script type="text/javascript">
     function addTag(tagName){
-      if (!isSelected(tagName))
-        $('tagList').innerHTML = $('tagList').innerHTML + "\n<li class='inline'><a onclick='deleteTag(\"" + tagName + "\")'>" + tagName + "</li>";
+      selectTag(tagName);
       setTagsToForm();
+    }
+
+    function selectTag(tagName){
+      var els = $('tag_possibilities').getElementsByTagName('ul')[0].getElementsByTagName('li');
+      var tagName = tagName.toLowerCase();
+      for(var i = 0; i < els.length; i++) {
+        var node = els[i].getElementsByTagName("a");
+	    if (node[0].innerHTML.toLowerCase() == tagName){
+	      if (!isClassExist(els[i], 'selected'))
+	        addClass(els[i], 'selected');
+	      else
+	        rmClass(els[i], 'selected');
+	    }
+	  }
+    }
+
+    function getTags(){
+      var els = $('tag_possibilities').getElementsByTagName('ul')[0].getElementsByTagName('li');
+      var tags =  new Array();
+      for(var i = 0; i < els.length; i++) {
+	      if (isClassExist(els[i], 'selected')) {
+	        var node = els[i].getElementsByTagName("a");
+            tags += node[0].innerHTML;
+            tags += "|";
+           }
+	  }
+      return tags;
     }
 
     function setTagsToForm(){
@@ -44,50 +69,37 @@
       $('tags').value = tags;
     }
 
-    function isSelected(tagName){
-      var tagList = getTagList();
-      for (var i = 0; i < tagList.length; i++){
-        if (tagList[i] == tagName)
-          return true;
-      }
-      return false;
-    }
-
-    function getTags() {
-      var tagList = getTagList();
-      var tagStr = "";
-      for (var i = 0; i < tagList.length; i++){
-        tagStr += tagList[i];
-        if (i <tagList.length - 1)
-          tagStr += "|";
-      }
-      return tagStr;
-    }
-
-    function getTagList(){
-     var els = $('tagList').getElementsByTagName('li');
-     var tags =  new Array();
-     for(var i = 0; i < els.length; i++) {
-      var node = els[i].getElementsByTagName("a");
-	   tags.push(node[0].innerHTML);
-	 }
-     return tags;
-    }
-
-    function deleteTag(tagName){
-     var els = $('tagList').getElementsByTagName('li');
-     for(var i = 0; i < els.length; i++) {
-       var node = els[i].getElementsByTagName("a");
-	   if (node[0].innerHTML == tagName){
-	     els[i].parentNode.removeChild(els[i]); 
-	   }
-	 }
+    function readTags(){
+      var tags = $('tags').value;
+      if (tags && tags.length > 0){
+        var tagTab = tags.split("|");
+        for(var i = 0; i < tagTab.length; i++) {
+          if(tagTab[i] && tagTab[i].length > 0){
+            selectTag(tagTab[i]);
+          }
+        }
+       }
     }
 
     function initTagScript(){
-      $('tagList').style.display="";
       $('tag_possibilities').style.display="";
       $('selectedTagsForm').style.display="none";
+      readTags();
+    }
+
+    function addClass(o, className){
+      if(!isClassExist(o,className))
+        o.className += ' ' + className
+    }
+
+    function isClassExist(o,className){
+        if(!o.className)
+          return false;
+        return new RegExp('\\b' + className + '\\b').test(o.className)
+    }
+
+    function rmClass(o, className){
+      o.className = o.className.replace(new RegExp('\\s*\\b' + className + '\\b'),'')
     }
     initTagScript();
     </script>

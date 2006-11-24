@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.packaging.Package;
@@ -34,7 +32,7 @@ import java.io.IOException;
  *
  * @version $Id$
  */
-public class Importer
+public class Importer extends AbstractPackager
 {
     /**
      * Import documents defined in an XML file located in the passed document definition directory
@@ -55,22 +53,10 @@ public class Importer
     public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig)
         throws XWikiException
     {
-        XWikiContext context = new XWikiContext();
-        context.setUser("XWiki.superadmin");
-        context.setDatabase(databaseName);
-
-        XWikiConfig config = new XWikiConfig();
-        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        config.put("xwiki.store.hibernate.path", hibernateConfig);
-        config.put("xwiki.store.hibernate.updateschema", "1");
-        config.put("xwiki.virtual", "1");
-
-        XWiki xwiki = new XWiki(config, context);
-        context.setWiki(xwiki);
+        XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
 
         Package pack = new Package();
         pack.setWithVersions(false);
-        pack.setBackupPack(true);
 
         // TODO: The readFromDir method should not throw IOExceptions, only PackageException.
         // See http://jira.xwiki.org/jira/browse/XWIKI-458

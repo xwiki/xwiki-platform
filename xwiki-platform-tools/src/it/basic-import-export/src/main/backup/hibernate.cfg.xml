@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC 
+  "-//Hibernate/Hibernate Configuration DTD//EN"
+  "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+<session-factory>
+<property name="show_sql">false</property>
+<property name="use_outer_join">true</property>
+
+<property name="dbcp.defaultAutoCommit">false</property>
+<property name="dbcp.maxActive">50</property>
+<property name="dbcp.maxIdle">5</property>
+<property name="dbcp.maxWait">30000</property>
+<property name="dbcp.whenExhaustedAction">1</property>
+<property name="dbcp.ps.whenExhaustedAction">1</property>
+<property name="dbcp.ps.maxActive">20</property>
+<property name="dbcp.ps.maxWait">120000</property>
+<property name="dbcp.ps.maxIdle">20</property>
+
+<property name="connection.url">jdbc:hsqldb:mem:.</property>
+<property name="connection.username">sa</property>
+<property name="connection.password"></property>
+<property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+<property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+
+<property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+<property name="connection.pool_size">5</property>
+<property name="statement_cache.size">5</property>
+<property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+<!-- Mapping files -->
+<mapping resource="xwiki.hbm.xml"/>
+</session-factory>
+</hibernate-configuration>

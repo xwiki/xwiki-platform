@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>PresentationClassSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.PresentationClass</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712021000</creationDate>
+<date>1107712021000</date>
+<version>1.2</version>
+<content>1 Presentation
+
+#set($redirect = $xwiki.getRequestURL())
+* [Start the Presentation&gt;${doc.name}?xpage=s5b] (click F11 to go full screen).
+* &lt;a href="$doc.getURL("objectadd","classname=XWiki.SlideClass&amp;xredirect=$redirect")"&gt;Add a slide&lt;/a&gt;. 
+* &lt;a href="$doc.getURL("edit","xpage=editobject")"&gt;Edit/Remove slides&lt;/a&gt;.
+
+#set($presobj = $doc.getObject("XWiki.PresentationClass"))
+
+1.1 Presentation Template
+
+Logo: $doc.display("logo", "rendered", $presobj)
+
+Header:
+
+$doc.display("header", "rendered",$presobj)
+
+Footer:
+
+$doc.display("footer", "rendered",$presobj)
+
+#macro(slide $slideobj)
+1.1 Slide $doc.display("number", $slideobj)
+
+Title: $doc.display("title", $slideobj)
+
+Content:
+
+$doc.display("content", "rendered", $slideobj)
+
+Comment (not shown in the presentation):
+
+$doc.display("comment", "rendered", $slideobj)
+#end
+
+#set($objdone = $xwiki.hashMap)
+#set ($thesql = "select obj.number from BaseObject as obj, IntegerProperty as prop where obj.id=prop.id.id and prop.id.name='number' and obj.className='XWiki.SlideClass' and obj.name='${doc.fullName}' order by prop.value asc")
+#foreach($slideobjnb in $xwiki.search($thesql))
+#set($slideobj = $doc.getObject("XWiki.SlideClass", $slideobjnb))
+#set($ok = $objdone.put($slideobj.getNumber(),1))
+#slide($slideobj)
+#end
+#foreach($slideobj in $doc.getObjects("XWiki.SlideClass"))
+#if($objdone.get($slideobj.getNumber())==1)
+
+#else
+#slide($slideobj)
+#end
+#end</content>
+</xwikidoc>

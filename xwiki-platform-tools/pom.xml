@@ -91,7 +91,7 @@
               <debug>true</debug>
               <projectsDirectory>src/it</projectsDirectory>
               <pomIncludes>
-                <pomInclude>**/basic-import/pom.xml</pomInclude>
+                <pomInclude>**/basic-import-export/pom.xml</pomInclude>
               </pomIncludes>
               <postBuildHookScript>verify.bsh</postBuildHookScript>
             </configuration>

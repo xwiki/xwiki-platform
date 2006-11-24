@@ -13,3 +13,10 @@
 #xwikiuseravatar{
   max-width: 150px;
 }
+
+.edit_section {
+  float: right;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+

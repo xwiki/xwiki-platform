@@ -1,1 +1,0 @@
-clean package com.xpn.xwiki:xwiki-backup:import

@@ -92,7 +92,7 @@
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
     <fileset id="libs.hib.fileset" dir="${lib.dir}"
-      includes="hibernate-3.0.3.jar" />
+      includes="hibernate-3.2.0.ga.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
       includes="c3p0-0.8.4.5.jar,

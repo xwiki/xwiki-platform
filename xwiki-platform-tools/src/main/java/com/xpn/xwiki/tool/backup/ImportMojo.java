@@ -41,13 +41,13 @@ public class ImportMojo extends AbstractMojo
     private String databaseName;
 
     /**
-     * @parameter default-value = "${basedir}/src/main/backup/hibernate.cfg.xml"
+     * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private File hibernateConfig;
 
     /**
-     * @parameter default-value = "${basedir}/src/main/backup/documents"
+     * @parameter default-value = "${basedir}/src/main/documents"
      * @see com.xpn.xwiki.tool.backup.Importer#importDocuments(java.io.File,String,java.io.File)
      */
     private File sourceDirectory;

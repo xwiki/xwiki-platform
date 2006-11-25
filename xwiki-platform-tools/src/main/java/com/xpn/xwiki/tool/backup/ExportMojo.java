@@ -42,7 +42,7 @@ public class ExportMojo extends AbstractMojo
     private String databaseName;
 
     /**
-     * @parameter default-value = "${basedir}/src/main/backup/hibernate.cfg.xml"
+     * @parameter default-value = "${basedir}/src/main/packager/hibernate.cfg.xml"
      * @see com.xpn.xwiki.tool.backup.Exporter#exportDocuments(java.io.File, String, java.io.File)
      */
     private File hibernateConfig;
@@ -59,6 +59,7 @@ public class ExportMojo extends AbstractMojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        // Ensure that the export directory exists before performing the export
         this.exportDirectory.mkdirs();
 
         Exporter exporter = new Exporter();

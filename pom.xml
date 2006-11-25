@@ -253,23 +253,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
-      <version>3.0.3</version>
-    </dependency>
-    <!-- Required by Hibernate at runtime.
-         TODO: Check why it's not in the default Hibernate deps  -->
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Required by Hibernate at runtime.
-         TODO: Check why it's not in the default Hibernate deps  -->
-    <dependency>
-      <groupId>ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>1.1</version>
-      <scope>runtime</scope>
+      <version>3.2.0.ga</version>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>

@@ -335,7 +335,7 @@
     <module name="TypecastParenPad"/>
 
     <module name="UncommentedMain">
-      <property name="excludedClasses" value="\.Main$"/>
+      <property name="excludedClasses" value=".*Main$"/>
     </module>
 
     <!--module name="UnnecessaryParentheses"/-->

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Admin</web>
+<name>CopyDocument</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.LudovicDubost</creator>
+<author>xwiki:XWiki.LudovicDubost</author>
+<customClass></customClass>
+<contentAuthor>XWiki.superadmin</contentAuthor>
+<creationDate>1159726608000</creationDate>
+<date>1159734564000</date>
+<contentUpdateDate>1162854346000</contentUpdateDate>
+<version>1.4</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<content>1 Copy a document
+
+#set($sourcedoc = $request.sourcedoc)
+#set($targetdoc = $request.targetdoc)
+#set($language = $request.language)
+
+#if ($targetdoc=="")
+#set($targetdoc = $sourcedoc)
+#end
+
+#set($sourcewiki = "xwiki")
+#set($targetwiki = "xwiki")
+
+#if ($targetdoc)
+Copying document $sourcedoc ($language) from $sourcewiki to $targetwiki: $xwiki.xWiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, $context.context)
+
+[Source doc&gt;$sourcewiki:$sourcedoc?language=$language] [Target doc&gt;$targetwiki:$targetdoc?language=$language]
+#end
+
+&lt;form action=""&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;td&gt;Source Document:&lt;/td&gt;
+&lt;td&gt;&lt;input type="text" name="sourcedoc" value="$!request.sourcedoc"  size="60"/&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Language:&lt;/td&gt;
+&lt;td&gt;&lt;input type="text" name="language" value="$!request.language" size="60" /&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;Target Doc:&lt;/td&gt;
+&lt;td&gt;&lt;input type="text" name="targetdoc" value="$!request.targetdoc" size="60" /&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;input type="submit" value="Copy" /&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/form&gt;</content>
+</xwikidoc>

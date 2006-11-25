@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>SyntaxHelp</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.superadmin</creator>
+<author>xwiki:XWiki.LudovicDubost</author>
+<customClass></customClass>
+<contentAuthor>XWiki.LudovicDubost</contentAuthor>
+<creationDate>1154005999000</creationDate>
+<date>1162690814000</date>
+<contentUpdateDate>1162854463000</contentUpdateDate>
+<version>1.26</version>
+<title>XWiki syntax help</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<attachment>
+<filename>img.png</filename>
+<filesize>959</filesize>
+<author>XWiki.superadmin</author>
+<date>1162854484000</date>
+<version>1.3</version>
+<comment></comment>
+<content>iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAAAAADgE0Q3AAAAAmJLR0QA/4ePzL8AAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfWBxcOEy+3/bdlAAADUElEQVRIx52WTW/cVBSG32tfezxJZiaT0EwnCkVKgVZI3cFAVYkFLEFCKoI/wz9Bgh/ApqqEWLQLFmUHAtJKqKIqMKhSJ50R+aCTTHzPey4L2/PVIru9C8u6Po/f83XtYzxefAUvwcACAMZPjrXc1gfJVm0VgPHA+HCQGmOMKcfQ6jYypeO/jQ1tWAGCng1sHRY4ehzYuBbUwzIojb1nOkmMBf5xNonW46iCUhoxPY3WLPBvEK826lFQAUq8xhawgNrE1muBqZJsFwVQWMAE8Vq0xIxv7a+rjhN38Z3Ezu3HQORgPO6G7VYSLjD9Gx92SJK8e//z15KFF3qJAgBmOZz+d5+ec8455+TSe18/mCw8NEAAPFvXGx9Z55yIiHPr79/suwq9d+fd0ImIc86JuFbrx5EvhwY7LndORCS9uPfo7HkNu7goQiWZXWhOn5wmpZB3M4JK6kTKleAKHVGSozAMKkCS6YiSSh4mjbiyUu4b03qjVpq98eMs3yLihCKj+lpUqvRzV0hRKkmlsjV8epaUKR2tO+co4kQoItJ1fx2Vutc9dCJ5F4mI7FPKO2JrNI+IjNrbjVLovP81s6aIk8HoaXc7KYXsZ40D5hhl8OjC5XNhKWQ2r0ym7k2423urgfLixu2sGZTKk/obVzq2AgRkZVKqnq502hZVoFcPEyU9VVVXl3vo//4aTVJIISmTqBaiktKBcapUVVXWrKkGfdNkjmhkjDcVoOGXJioYjf54uL1iyqDht7+3QdUsD/TRzb2Pdxc/lzAe9+xGM9/t//bLSQuFilIzsvN275VZaC6ag/o//MkVy4Iorqr0Pn7zg0tJsAyN7txn02R29My8o5+iCC/0crkCSm/3NyLmZizc0iIyVQAIbOdarxMUUP2r8wHpqXO+Kf0UmZ7BcOuLTbjIAsDDDQinxpr7VUQ2d2w5fLBZpHzsnV8MfuagLhx1OZjWSZpHupjnWUyLVdxJ84Y1uPa6kJSsRUmhZvdcZnD1kxyqAX6XuX1mKxSKyDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm+QsNjAcwUSSm2vBhYTIlAGk1xmQzinmZcfQ/40v+ffqYGLoAAAAASUVORK5CYII=</content>
+</attachment>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<type>
+<name>type</name>
+<prettyName>Panel type</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separators> ,|</separators>
+<values>view|edit</values>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+<category>
+<name>category</name>
+<prettyName>Category</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separators> ,|</separators>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<description>
+<name>description</name>
+<prettyName>Description</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>3</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<content>
+<name>content</name>
+<prettyName>Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<rows>25</rows>
+<number>4</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<name>
+<name>name</name>
+<prettyName>Name</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Panels.SyntaxHelp</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<property>
+<type>edit</type>
+</property>
+<property>
+<description>Displays information on the XWiki syntax.</description>
+</property>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>&lt;div id="xwikisyntaxhelppanel"&gt;
+#largepanelheader("XWiki syntax help")
+&lt;div id="xwikisyntaxhelp"&gt;
+  &lt;div id="xwikihelptitles"&gt;
+    &lt;div id="xwikihelptitlesHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Titles&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelptitlesContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type")&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1 Heading 1&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1 Heading 1
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1.1 Heading 2&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1.1 Heading 2
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1.1.1 Heading 3&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1.1.1 Heading 3
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1.1.1.1 Heading 4&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1.1.1.1 Heading 4
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1.1.1.1.1.1 Heading 5&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1.1.1.1.1 Heading 5
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;1.1.1.1.1.1.1 Heading 6&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+1.1.1.1.1.1 Heading 6
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelpparagraphs"&gt;
+    &lt;div id="xwikihelpparagraphsHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Paragraphs&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelpparagraphsContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;Here is the first paragraph.&lt;br/&gt;
+This text continues the same paragraph.&lt;/tt&gt;
+
+&lt;tt&gt;This paragraph is a new one.&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;Here is a paragraph.
+This text continues the same paragraph.
+
+This paragraph is a new one.&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelpemph"&gt;
+    &lt;div id="xwikihelpemphHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Emphasizing&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelpemphContent" class="accordionTabContentBox"&gt;
+    &lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt; a *bold* word&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;a &lt;strong class="strong"&gt;bold&lt;/strong&gt; word&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt; a __bold__ word&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;a &lt;b class="bold"&gt;bold&lt;/b&gt; word&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;~~text in italics~~&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;&lt;i class="italic"&gt;text in italics&lt;/i&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;--striked text--&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;&lt;del class="strike"&gt;striked text&lt;/del&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelplists"&gt;
+    &lt;div id="xwikihelplistsHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Lists&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelplistsContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+
+* Level 1&lt;br/&gt;
+** Level 2&lt;br/&gt;
+*** Level 3&lt;br/&gt;
+** Level 2&lt;br/&gt;
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;ul class="star"&gt;
+&lt;li&gt;Level 1&lt;ul class="star"&gt;
+&lt;li&gt;Level 2&lt;ul class="star"&gt;
+&lt;li&gt;Level 3&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Level 2&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+1. Item&lt;br/&gt;
+11.Subitem&lt;br/&gt;
+1. Item&lt;br/&gt;
+1*. Subitem
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;ol&gt;&lt;li&gt;Item&lt;ol&gt;&lt;li&gt;Subitem&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Item&lt;ul class="star"&gt;
+&lt;li&gt;Subitem&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelptables"&gt;
+    &lt;div id="xwikihelptablesHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Tables&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelptablesContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+{table}&lt;br/&gt;
+Category | Sales (KE)&lt;br/&gt;
+Category 1 | 100&lt;br/&gt;
+Category 2 | 50&lt;br/&gt;
+Category 3 | 50&lt;br/&gt;
+Total | =sum(B2:B4)&lt;br/&gt;
+{table}
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;table class="wiki-table" cellpadding="0" cellspacing="0" border="0"&gt;&lt;tr&gt;&lt;th&gt;Category&lt;/th&gt;&lt;th&gt;Sales (KE)&lt;/th&gt;&lt;/tr&gt;&lt;tr class="table-odd"&gt;&lt;td&gt;Category 1&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;/tr&gt;&lt;tr class="table-even"&gt;&lt;td&gt;Category 2&lt;/td&gt;&lt;td&gt;50&lt;/td&gt;&lt;/tr&gt;&lt;tr class="table-odd"&gt;&lt;td&gt;Category 3&lt;/td&gt;&lt;td&gt;50&lt;/td&gt;&lt;/tr&gt;&lt;tr class="table-even"&gt;&lt;td&gt;Total&lt;/td&gt;&lt;td&gt;200&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelplinks"&gt;
+    &lt;div id="xwikihelplinksHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Links&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelplinksContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;[WebHome]&lt;br/&gt;
+[home&gt;WebHome]&lt;br/&gt;
+[Main.WebHome]&lt;br/&gt;
+[home|Main.WebHome]&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;span class="wikilink"&gt;&lt;a href="/xwiki/bin/view/Panels/"&gt;Web Home&lt;/a&gt;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="wikilink"&gt;&lt;a href="/xwiki/bin/view/Panels/"&gt;home&lt;/a&gt;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="wikilink"&gt;&lt;a href="/xwiki/bin/view/Main/"&gt;Web Home&lt;/a&gt;&lt;/span&gt;&lt;br/&gt;
+&lt;span class="wikilink"&gt;&lt;a href="/xwiki/bin/view/Main/"&gt;home&lt;/a&gt;&lt;/span&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;http://www.xwiki.org&lt;br/&gt;
+[http://www.xwiki.org]
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;span class="nobr"&gt;&lt;a href="http://www.xwiki.org&amp;#60;br/&amp;#62;"&gt;http://www.xwiki.org&lt;br/&gt;&lt;/a&gt;&lt;/span&gt;
+&lt;span class="wikiexternallink"&gt;&lt;a href="http://www.xwiki.org"&gt;http://www.xwiki.org&lt;/a&gt;&lt;/span&gt;&lt;br/&gt;
+&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+[To XWiki &gt; http://www.xwiki.org]
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;span class="wikiexternallink"&gt;&lt;a href="http://www.xwiki.org"&gt;To XWiki &lt;/a&gt;&lt;/span&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="xwikihelpimages"&gt;
+    &lt;div id="xwikihelpimagesHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Images&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikihelpimagesContent" class="accordionTabContentBox"&gt;
+&lt;table&gt;
+&lt;tr&gt;&lt;th&gt;$msg.get("type"):&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+{image:img.png}
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;img src="$xwiki.getURL("Panels.SyntaxHelp", "download", "id=0")" alt="img.png"/&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+{image:img.png|30}
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;img src="$xwiki.getURL("Panels.SyntaxHelp", "download", "id=0")" height="30" alt="img.png"/&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+{image:img.png| |20}
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;img src="$xwiki.getURL("Panels.SyntaxHelp", "download", "id=0")" width="20" alt="img.png"/&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
+{image:img.png|30|20}
+&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;img src="$xwiki.getURL("Panels.SyntaxHelp", "download", "id=0")" width="20" height="30" alt="img.png"/&gt;
+&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="xwikihelpsyntax"&gt;$msg.get("helponsyntax") &lt;a href="http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain" onclick="openHelp(); return false;"&gt;$msg.get("xwikisyntax")&lt;/a&gt;&lt;/div&gt;
+#panelfooter()
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;new Rico.Accordion( 'xwikisyntaxhelp', {panelHeight:'max'} );togglePanelVisibility((document.getElementById('xwikisyntaxhelppanel')).getElementsByTagName( 'div').item(0));&lt;/script&gt;</content>
+</property>
+<property>
+<name>Syntax help</name>
+</property>
+</object>
+<content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

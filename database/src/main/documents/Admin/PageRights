@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Admin</web>
+<name>PageRights</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.superadmin</creator>
+<author>xwiki:XWiki.LudovicDubost</author>
+<customClass></customClass>
+<contentAuthor>XWiki.superadmin</contentAuthor>
+<creationDate>1159732935000</creationDate>
+<date>1159733062000</date>
+<contentUpdateDate>1162854346000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<content>#set($page = $request.page)
+#set($placemgr = $xwiki.parseGroovyFromPage("XWiki.RightsGroovy"))
+$placemgr.setContext($context)
+$placemgr.setXWiki($xwiki)
+#xwikimessageboxstart("Rights Manager" "")
+You can update the page rights using this screen. You can choose between Public (any user, includinc anonymous users), Members Only (any user that you have invited), Admin (any user that you have given admin rights to) for the Place and for each space. By default each page inherits the rights from the space or the place.
+#xwikimessageboxend()
+
+#macro(piright $right $space)&lt;input type="radio" name="${right}" value="inherited" #if(!$mrights.contains($right)&amp;&amp;!$grights.contains($right)&amp;&amp;!$arights.contains($right))CHECKED #end /&gt;#end
+#macro(pgright $right $space)&lt;input type="radio" name="${right}" value="public" #if($grights.contains($right))CHECKED #end /&gt;#end
+#macro(pmright $right $space)&lt;input type="radio" name="${right}" value="members" #if($mrights.contains($right)&amp;&amp;!$grights.contains($right))CHECKED #end /&gt;#end
+#macro(ppright $right $space)&lt;input type="radio" name="${right}" value="projectmembers" #if($prights.contains($right))CHECKED #end /&gt;#end
+#macro(paright $right $space)&lt;input type="radio" name="${right}" value="admin" #if(!$prights.contains($right)&amp;&amp;!$grights.contains($right)&amp;&amp;!$mrights.contains($right)&amp;&amp;$arights.contains($right))CHECKED #end /&gt;#end
+
+&lt;form action="PageRightsConfirmation" action="post"&gt;
+&lt;input type="hidden" name="page" value="$request.page" /&gt;
+
+#set($grights = $placemgr.getRights("XWiki.XWikiGuest", true, $page, 2))
+#set($mrights = $placemgr.getRights("XWiki.XWikiAllGroup", false, $page, 2))
+#set($prights = $placemgr.getRights("XWiki.ProjectGroup", false, $page, 2))
+#set($arights = $placemgr.getRights("XWiki.AdminGroup", false, $page, 2))
+
+{table}
+Page $page | View &lt;br /&gt;| Edit | Comment
+Inherited | #piright("view" $page) | #piright("edit" $page) | #piright("comment" $page) 
+
+Public | #pgright("view" $page) | #pgright("edit" $page) | #pgright("comment" $page) 
+
+Members Only | #pmright("view" $page) | #pmright("edit" $page) | #pmright("comment" $page) 
+
+Project Members Only | #ppright("view" $page) | #ppright("edit" $page) | #ppright("comment" $page) 
+
+Admin Only | #paright("view" $page) | #paright("edit" $page) | #paright("comment" $page) 
+
+{table}
+&lt;center&gt;
+&lt;input type="submit" value="Update page rights" /&gt;
+&lt;/form&gt;
+</content></xwikidoc>

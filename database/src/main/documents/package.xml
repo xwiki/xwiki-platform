@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<package>
+<infos>
+<name>xwiki10-default</name>
+<description></description>
+<licence>LGPL</licence>
+<author>xwiki:XWiki.LudovicDubost</author>
+<version></version>
+<backupPack>false</backupPack>
+</infos>
+<files>
+<file defaultAction="0" language="">XWiki.CalendarEvent</file>
+<file defaultAction="0" language="">XWiki.XWikiPreferences</file>
+<file defaultAction="0" language="">XWiki.XWikiUsers</file>
+<file defaultAction="0" language="">XWiki.XWikiGroups</file>
+<file defaultAction="0" language="">XWiki.XWikiRights</file>
+<file defaultAction="0" language="">XWiki.XWikiGlobalRights</file>
+<file defaultAction="0" language="">XWiki.RegisterNewUser</file>
+<file defaultAction="0" language="">XWiki.XWikiUserSheet</file>
+<file defaultAction="0" language="">XWiki.XWikiUserTemplate</file>
+<file defaultAction="0" language="">XWiki.XWikiComments</file>
+<file defaultAction="0" language="">XWiki.XWikiSkins</file>
+<file defaultAction="0" language="">XWiki.MySkin</file>
+<file defaultAction="0" language="">XWiki.XWikiAllGroup</file>
+<file defaultAction="0" language="">XWiki.CategorySheet</file>
+<file defaultAction="0" language="">XWiki.WikiWiki</file>
+<file defaultAction="0" language="">XWiki.ArticleClass</file>
+<file defaultAction="0" language="">XWiki.ArticleClassSheet</file>
+<file defaultAction="0" language="">XWiki.Toolbar</file>
+<file defaultAction="0" language="">XWiki.Menu</file>
+<file defaultAction="0" language="">XWiki.WebPreferences</file>
+<file defaultAction="0" language="">XWiki.ArticleClassTemplate</file>
+<file defaultAction="0" language="">XWiki.XWikiGroupTemplate</file>
+<file defaultAction="0" language="">XWiki.XWikiGroupSheet</file>
+<file defaultAction="0" language="">XWiki.XWikiAdminGroup</file>
+<file defaultAction="0" language="">XWiki.WebHome</file>
+<file defaultAction="0" language="">XWiki.XWikiClasses</file>
+<file defaultAction="0" language="">XWiki.PhotoAlbumClass</file>
+<file defaultAction="0" language="">XWiki.PhotoAlbumClassSheet</file>
+<file defaultAction="0" language="">XWiki.PhotoAlbumClassTemplate</file>
+<file defaultAction="0" language="">XWiki.XWikiCommonJavascript</file>
+<file defaultAction="0" language="">XWiki.PresentationClassTemplate</file>
+<file defaultAction="0" language="">XWiki.EventCalendar</file>
+<file defaultAction="0" language="">XWiki.PresentationClass</file>
+<file defaultAction="0" language="">XWiki.PresentationClassEditSheet</file>
+<file defaultAction="0" language="">XWiki.PresentationClassSheet</file>
+<file defaultAction="0" language="">XWiki.PresentationClassS5Sheet</file>
+<file defaultAction="0" language="">XWiki.SlideClass</file>
+<file defaultAction="0" language="">XWiki.Results</file>
+<file defaultAction="0" language="">Main.WebHome</file>
+<file defaultAction="0" language="">Main.WebRss</file>
+<file defaultAction="0" language="">Main.WhatsNew</file>
+<file defaultAction="0" language="">Main.SpaceIndex</file>
+<file defaultAction="0" language="">Main.WebSearch</file>
+<file defaultAction="0" language="">Main.WikiLaunch</file>
+<file defaultAction="0" language="">Main.Presentations</file>
+<file defaultAction="0" language="">Main.Ouverture</file>
+<file defaultAction="0" language="">Main.FilsRss</file>
+<file defaultAction="0" language="">Main.BlogRss</file>
+<file defaultAction="0" language="">Main.RecentMembers</file>
+<file defaultAction="0" language="">Main.EventCalendar</file>
+<file defaultAction="0" language="">Main.KnowledgeBase</file>
+<file defaultAction="0" language="">Main.ExampleLink1</file>
+<file defaultAction="0" language="">Main.AllDocs</file>
+<file defaultAction="0" language="">Admin.RightsConfirmation</file>
+<file defaultAction="0" language="">Admin.Rights</file>
+<file defaultAction="0" language="">Admin.WebHome</file>
+<file defaultAction="0" language="">Admin.FlushCache</file>
+<file defaultAction="0" language="">Admin.WebPreferences</file>
+<file defaultAction="0" language="">Admin.CopyDocument</file>
+<file defaultAction="0" language="">Admin.ImportExport</file>
+<file defaultAction="0" language="">Admin.PageRights</file>
+<file defaultAction="0" language="">Admin.PageRightsConfirmation</file>
+<file defaultAction="0" language="">Admin.Export</file>
+<file defaultAction="0" language="">Admin.SpaceDelete</file>
+<file defaultAction="0" language="">Sandbox.WebHome</file>
+<file defaultAction="0" language="">Sandbox.WebPreferences</file>
+<file defaultAction="0" language="">Doc.WebHome</file>
+<file defaultAction="0" language="">Doc.XWikiSyntax</file>
+<file defaultAction="0" language="">Blog.Macros</file>
+<file defaultAction="0" language="">Blog.WebHome</file>
+<file defaultAction="0" language="">Blog.TestArticle</file>
+<file defaultAction="0" language="">Blog.Categories</file>
+<file defaultAction="0" language="">Blog.Category</file>
+<file defaultAction="0" language="">Photos.WebHome</file>
+<file defaultAction="0" language="">Photos.NewAlbum</file>
+<file defaultAction="0" language="">Panels.XWikiSyntax</file>
+<file defaultAction="0" language="">Panels.RecentlyVisited</file>
+<file defaultAction="0" language="fr">Panels.RecentlyVisited</file>
+<file defaultAction="0" language="ro">Panels.RecentlyVisited</file>
+<file defaultAction="0" language="">Panels.Shortcuts</file>
+<file defaultAction="0" language="ro">Panels.Shortcuts</file>
+<file defaultAction="0" language="">Panels.Welcome</file>
+<file defaultAction="0" language="ro">Panels.Welcome</file>
+<file defaultAction="0" language="de">Panels.Welcome</file>
+<file defaultAction="0" language="">Panels.Spaces</file>
+<file defaultAction="0" language="ro">Panels.Spaces</file>
+<file defaultAction="0" language="">Panels.IncludedDocuments</file>
+<file defaultAction="0" language="">Panels.SyntaxHelp</file>
+<file defaultAction="0" language="">Panels.PanelEditor</file>
+<file defaultAction="0" language="">Panels.AddClassProperty</file>
+<file defaultAction="0" language="">Panels.ClassSwitcher</file>
+<file defaultAction="0" language="">Panels.ClassEditorWelcome</file>
+<file defaultAction="0" language="">Panels.DocumentInformation</file>
+<file defaultAction="0" language="">Panels.EditTranslations</file>
+<file defaultAction="0" language="">Panels.ObjectEditorWelcome</file>
+<file defaultAction="0" language="">Panels.AddObject</file>
+<file defaultAction="0" language="">Panels.RightsEditorWelcome</file>
+<file defaultAction="0" language="">Panels.RightsHelp</file>
+<file defaultAction="0" language="">Panels.RightsTips</file>
+<file defaultAction="0" language="">Panels.Search</file>
+<file defaultAction="0" language="">Panels.Toolbox</file>
+<file defaultAction="0" language="">Panels.InformationArea</file>
+<file defaultAction="0" language="">Panels.MyInformationArea</file>
+<file defaultAction="0" language="">Panels.WebHome</file>
+<file defaultAction="0" language="">Panels.HomePageEditor</file>
+<file defaultAction="0" language="">Panels.PanelClass</file>
+<file defaultAction="0" language="">Panels.CreatePanel</file>
+<file defaultAction="0" language="">Panels.NewPage</file>
+<file defaultAction="0" language="">Panels.HomePageUpdate</file>
+<file defaultAction="0" language="">Panels.Backlinks</file>
+<file defaultAction="0" language="">Panels.Members</file>
+<file defaultAction="0" language="">Panels.Contribute Content</file>
+<file defaultAction="0" language="">Panels.UselessPanel</file>
+<file defaultAction="0" language="">Panels.New Panel</file>
+<file defaultAction="0" language="">Panels.PanelSheet</file>
+<file defaultAction="0" language="">Panels.PanelTemplate</file>
+<file defaultAction="0" language="">Panels.ToDo</file>
+<file defaultAction="0" language="">Panels.PanelLayoutUpdate</file>
+<file defaultAction="0" language="">Panels.PanelWizard</file>
+<file defaultAction="0" language="">Panels.Recently Created</file>
+<file defaultAction="0" language="">Panels.WebPreferences</file>
+<file defaultAction="0" language="">Panels.WelcomeMember</file>
+</files>
+</package>

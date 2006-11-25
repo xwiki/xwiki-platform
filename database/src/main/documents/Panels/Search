@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>Search</name>
+<language></language>
+<defaultLanguage>fr</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>xwiki:XWiki.LudovicDubost</author>
+<customClass></customClass>
+<contentAuthor>XWiki.LudovicDubost</contentAuthor>
+<creationDate>1155286986000</creationDate>
+<date>1157144859000</date>
+<contentUpdateDate>1162854463000</contentUpdateDate>
+<version>1.4</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<content>#if($searchdoc.isNew()==false)
+#panelheader("Search")
+&lt;div class="centered"&gt;
+&lt;form action="$searchdoc.getURL("view")"&gt;
+&lt;p class="searchp" style="padding: 0px; margin: 0px; margin-top: 20px; margin-bottom: 20px;"&gt;
+&lt;input type="text" name="text" value="" class="panelinput" size="17" /&gt;
+&lt;input type="submit" class="button" value="Search"/&gt;
+&lt;/p&gt;
+&lt;/form&gt;
+&lt;/div&gt;
+#panelfooter()
+#end
+</content></xwikidoc>

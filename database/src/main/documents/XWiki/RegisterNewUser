@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>RegisterNewUser</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>1</translation>
+<parent></parent>
+<creator>xwiki:XWiki.WikiWiki</creator>
+<author>xwiki:XWiki.LudovicDubost</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.LudovicDubost</contentAuthor>
+<creationDate>1106311618000</creationDate>
+<date>1162545014000</date>
+<contentUpdateDate>1162545014000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<content>#set ($add = $request.add)
+#if($add!="2")
+You must answer the magic question. The response to this question is "2". The question is here to avoid spam robots trying to create accounts automaticallt. Please try again.
+#else
+#set ($register = $request.getParameter("register"))
+#if ($register)
+Registration of *$request.getParameter("register_first_name") $request.getParameter("register_last_name")*
+
+#set( $reg= $xwiki.createUser(false, "edit"))
+#if ($reg&gt;0)
+The user [$request.getParameter("xwikiname")] has been correctly registered.
+#else
+An error occured during the registration process ($reg).
+#end
+#else
+#set($reg=0)
+#end
+
+#if ($reg&lt;=0)
+1.1 Information about you
+
+&lt;form id="register" name="register" action="" method="get"&gt;
+#includeTopic("xwiki:XWiki.RegisterJS")
+&lt;p&gt;
+&lt;input type="hidden" name="template" value="XWiki.XWikiUserTemplate" /&gt;
+&lt;input type="hidden" name="register" value="1"&gt;
+&lt;input type="hidden" name="password" value="$password"&gt;
+#set( $class = $xwiki.getDocument("XWiki.XWikiUsers").xWikiClass)
+#set( $obj = $class.newObject() )
+&lt;/p&gt;
+&lt;table class="block" cellspacing="5px"&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+#set($prop = $class.first_name)
+   &lt;td&gt;First Name
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+#set($prop = $class.last_name)
+   &lt;td&gt;Last Name
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+&lt;tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+ &lt;tr&gt;
+   &lt;td&gt;Wiki Name (this is also your login):&lt;/td&gt;
+   &lt;td&gt;
+    &lt;input name="xwikiname" type="text" size="20" onfocus=" prepareName(document.forms.register);" /&gt; 
+   &lt;/td&gt;
+#set($prop = $class.email)
+   &lt;td&gt;e-Mail Address
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+   &lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;
+   &lt;/tr&gt;
+ &lt;tr&gt;
+#set($prop = $class.password)
+   &lt;td&gt;Password
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+   &lt;td&gt;Password (again)
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register2_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+&lt;tr&gt;
+#set($prop = $class.company)
+   &lt;td&gt;Company
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+#set($prop = $class.department)
+   &lt;td&gt;Department
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+#set($prop = $class.city)
+   &lt;td&gt;City
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+#set($prop = $class.country)
+   &lt;td&gt;Country
+   &lt;/td&gt;
+     &lt;td&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+&lt;tr&gt;
+#set($prop = $class.blog)
+   &lt;td&gt;Blog URL
+   &lt;/td&gt;
+     &lt;td colspan="3"&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+&lt;tr&gt;
+#set($prop = $class.blogfeed)
+   &lt;td&gt;Blog Feed (RSS/Atom)
+   &lt;/td&gt;
+     &lt;td colspan="3"&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+&lt;tr&gt;
+#set($prop = $class.comment)
+   &lt;td&gt;Profile
+   &lt;/td&gt;
+     &lt;td colspan="3"&gt;$doc.displayEdit($prop, "register_",  $obj)
+     &lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+   &lt;td&gt;How much is 1+1&lt;/td&gt;
+   &lt;td&gt;
+    &lt;input name="add" type="text" size="3" /&gt;
+   &lt;/td&gt; 
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+ &lt;/table&gt;
+&lt;center&gt;
+&lt;input type="submit" value="Register this account"&gt;
+&lt;/center&gt;
+&lt;/form&gt;
+#end
+#end</content>
+</xwikidoc>

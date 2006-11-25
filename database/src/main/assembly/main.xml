@@ -1,0 +1,10 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.directory}/database</directory>
+    </fileSet>
+  </fileSets>
+</assembly>

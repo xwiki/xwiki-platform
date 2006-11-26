@@ -53,30 +53,31 @@
             <version>1.8.0.1</version>
           </dependency>
         </dependencies>
-        <executions>
+        <!--executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>import</goal>
             </goals>
           </execution>
-        </executions>
+        </executions-->
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assemble/database.xml</descriptor>
+            <descriptor>src/main/assembly/database.xml</descriptor>
           </descriptors>
         </configuration>
-        <executions>
+        <!--executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
           </execution>
-        </executions>
+        </executions-->
       </plugin>
     </plugins>
   </build>

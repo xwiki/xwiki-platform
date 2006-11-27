@@ -136,4 +136,7 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
         return toXMLString();
     }
 
+    public Object getCustomMappingValue() {
+        return getValue();
+    }
 }

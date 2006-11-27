@@ -465,12 +465,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return toXMLString();
     }
 
-    public Map getMap() throws XWikiException {
+    public Map getCustomMappingMap() throws XWikiException {
         Map map = new HashMap();
         for (Iterator it = fields.keySet().iterator();it.hasNext();) {
             String name = (String) it.next();
             BaseProperty property = (BaseProperty) get(name);
-            map.put(name, property.getValue());
+            map.put(name, property.getCustomMappingValue());
         }
         map.put("id", new Integer(getId()));
         return map;

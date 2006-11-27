@@ -949,32 +949,43 @@ public class XWikiDocument {
     }
 
     public String displayPrettyName(String fieldname, XWikiContext context) {
-        return displayPrettyName(fieldname, false, context);
-    }
-
-    public String displayPrettyName(String fieldname, BaseObject obj, XWikiContext context) {
-        return displayPrettyName(fieldname, false, obj, context);
+        return displayPrettyName(fieldname, false, true, context);
     }
 
     public String displayPrettyName(String fieldname, boolean showMandatory, XWikiContext context) {
+        return displayPrettyName(fieldname, false, true, context);
+    }
+
+    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, XWikiContext context) {
         try {
             BaseObject object = getxWikiObject();
             if (object == null)
                 object = getFirstObject(fieldname, context);
-            return displayPrettyName(fieldname, showMandatory, object, context);
+            return displayPrettyName(fieldname, showMandatory, before, object, context);
         } catch (Exception e) {
             return "";
         }
     }
 
+    public String displayPrettyName(String fieldname, BaseObject obj, XWikiContext context) {
+        return displayPrettyName(fieldname, false, true, obj, context);
+    }
+
     public String displayPrettyName(String fieldname, boolean showMandatory, BaseObject obj, XWikiContext context) {
+        return displayPrettyName(fieldname, showMandatory, true, obj, context);
+    }
+
+    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, BaseObject obj, XWikiContext context) {
         try {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String dprettyName = "";
             if ((showMandatory)&&(pclass.getValidationRegExp()!=null)&&(!pclass.getValidationRegExp().equals(""))) {
                 dprettyName = context.getWiki().addMandatory(context);
             }
-            return dprettyName + pclass.getPrettyName();
+            if (before)
+             return dprettyName + pclass.getPrettyName();
+            else
+             return pclass.getPrettyName() + dprettyName;
         }
         catch (Exception e) {
             return "";

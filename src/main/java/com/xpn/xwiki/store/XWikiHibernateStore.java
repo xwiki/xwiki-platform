@@ -587,7 +587,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             List handledProps = new ArrayList();
             if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
                 // save object using the custom mapping
-                Map objmap = object.getMap();
+                Map objmap = object.getCustomMappingMap();
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 query = session.createQuery("select obj.id from " + bclass.getName() + " as obj where obj.id = :id");
@@ -803,9 +803,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 handledProps = bclass.getCustomMappingPropertyList(context);
                 Session dynamicSession = session.getSession(EntityMode.MAP);
                 Object map = dynamicSession.get((String) bclass.getName(),new Integer(object.getId()));
-                if (evict)
-                    dynamicSession.evict(map);
-                dynamicSession.delete((Object) map);
+                if (map!=null) {
+                    if (evict)
+                        dynamicSession.evict(map);
+                    dynamicSession.delete((Object) map);
+                }
             }
 
             if (!object.getClassName().equals("internal")) {

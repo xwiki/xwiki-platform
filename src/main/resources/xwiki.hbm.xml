@@ -6,7 +6,7 @@
 
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
-        <id name="id" type="long" unsaved-value="any">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWD_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -98,7 +98,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiDocumentArchive" table="xwikidoc">
-        <id name="id" type="long" unsaved-value="any">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWD_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -108,7 +108,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
-        <id name="docId" type="long" unsaved-value="any">
+        <id name="docId" type="long" unsaved-value="undefined">
             <column name="XWL_DOC_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -121,7 +121,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLink" table="xwikilinks">
-        <composite-id unsaved-value="any">
+        <composite-id unsaved-value="undefined">
             <key-property name="docId" column="XWL_DOC_ID" type="long" />
             <key-property name="link" column="XWL_LINK" type="string"  length="255" />
         </composite-id>
@@ -131,7 +131,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachment" table="xwikiattachment">
-        <id name="id" type="long" unsaved-value="any">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWA_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -166,7 +166,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentContent" table="xwikiattachment_content">
-        <id name="id" type="long" unsaved-value="any">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWA_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -177,7 +177,7 @@
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiAttachmentArchive" table="xwikiattachment_archive">
-        <id name="id" type="long" unsaved-value="any">
+        <id name="id" type="long" unsaved-value="undefined">
             <column name="XWA_ID" not-null="true"/>
             <generator class="assigned" />
         </id>
@@ -187,7 +187,7 @@
     </class>
 
     <class name="com.xpn.xwiki.objects.classes.PropertyClass" table="xwikiclassesprop">
-        <composite-id unsaved-value="any">
+        <composite-id unsaved-value="undefined">
             <key-property name="id" column="XWP_ID" type="integer" />
             <key-property name="name" column="XWP_NAME" type="string" />
         </composite-id>
@@ -344,7 +344,7 @@
     </class>
 
     <class name="com.xpn.xwiki.objects.classes.BaseClass" table="xwikiclasses">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWO_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -364,7 +364,7 @@
 
 
     <class name="com.xpn.xwiki.objects.BaseProperty" table="xwikiproperties">
-        <composite-id unsaved-value="any">
+        <composite-id unsaved-value="undefined">
             <key-property name="id" column="XWP_ID" type="integer" />
             <key-property name="name" column="XWP_NAME" type="string" />
         </composite-id>
@@ -468,7 +468,7 @@
         </joined-subclass>
     </class>
     <class name="com.xpn.xwiki.objects.BaseObject" table="xwikiobjects">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWO_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -484,7 +484,7 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.DocumentStats" table="xwikistatsdoc">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWS_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -521,7 +521,7 @@
     </class>
 
     <class name="com.xpn.xwiki.stats.impl.RefererStats" table="xwikistatsreferer">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWR_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -551,7 +551,7 @@
 
 
     <class name="com.xpn.xwiki.stats.impl.VisitStats" table="xwikistatsvisit">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWV_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -605,7 +605,7 @@
 
     <!-- XWikiPreferences custom mapping -->
     <class entity-name="XWiki.XWikiPreferences" table="xwikipreferences">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWP_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -739,7 +739,7 @@
 
     <!-- XWikiComments custom mapping -->
     <class entity-name="XWiki.XWikiComments" table="xwikicomments">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWC_ID" not-null="true" />
             <generator class="assigned" />
         </id>
@@ -763,7 +763,7 @@
     <!-- XWikiPreferences custom mapping -->
     <!--
     <class entity-name="XWiki.XWikiUsers" table="xwikiusers">
-        <id name="id" type="integer" unsaved-value="any">
+        <id name="id" type="integer" unsaved-value="undefined">
             <column name="XWU_ID" not-null="true" />
             <generator class="assigned" />
         </id>

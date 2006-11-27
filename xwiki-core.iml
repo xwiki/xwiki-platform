@@ -9,10 +9,10 @@
       <sourceFolder url="file://$MODULE_DIR$/core/src/main/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/core/src/test/java" isTestSource="true" />
     </content>
-    <content url="file://$MODULE_DIR$/src">
-      <sourceFolder url="file://$MODULE_DIR$/src/test/cactus" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+    <content url="file://$MODULE_DIR$/tests">
+      <sourceFolder url="file://$MODULE_DIR$/tests/cactus" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/resources" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

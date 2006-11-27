@@ -25,6 +25,10 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 public class StringListProperty extends ListProperty {
 
+    public Object getCustomMappingValue() {
+        return getTextValue();
+    }
+
     public void setTextValue(String value) {
         setList(ListClass.getListFromString(value));
     }

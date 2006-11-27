@@ -4264,6 +4264,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String addMandatory(XWikiContext context) {
-        return "<span class=\"mandatoryParenthesis\">(</span><span class=\"mandatoryDot\">*</span><span class=\"mandatoryParenthesis\">)</span>";
+        String star = "<span class=\"mandatoryParenthesis\">&nbsp;(</span><span class=\"mandatoryDot\">&lowast;</span><span class=\"mandatoryParenthesis\">)&nbsp;</span>";
+        return context.getWiki().getXWikiPreference("mandatory_display", star, context);
     }
 }

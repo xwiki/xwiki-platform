@@ -364,6 +364,7 @@
         <root url="jar://$PROJECT_DIR$/lib/commons-net-1.4.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.13.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/slf4j-log4j12-1.0.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.1.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -388,8 +389,8 @@
         <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-3.1.7-bin.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/jta-1.0.1B.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.8.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.0.3.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/cglib-2.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.2.0.ga.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

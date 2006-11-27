@@ -740,6 +740,19 @@ public class Document extends Api {
         return doc.displayPrettyName(fieldname, showMandatory, obj.getBaseObject(), context);
     }
 
+    public String displayPrettyName(String fieldname, boolean showMandatory,  boolean before) {
+        if (currentObj == null)
+            return doc.displayPrettyName(fieldname, showMandatory, before, context);
+        else
+            return doc.displayPrettyName(fieldname, showMandatory, before, currentObj.getBaseObject(), context);
+    }
+
+    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, Object obj) {
+        if (obj == null)
+            return "";
+        return doc.displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(), context);
+    }
+
     public String displayTooltip(String fieldname) {
         if (currentObj == null)
             return doc.displayTooltip(fieldname, context);

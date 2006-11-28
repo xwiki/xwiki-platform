@@ -15,6 +15,7 @@ Rico.Accordion.prototype.initialize = function(container, options) {
 
       if (this.options.panelHeight == 'auto'){
           var tabToCheck = (this.options.onloadShowTab === 0)? 1 : 0;
+          if (this.accordionTabs && this.accordionTabs.length > 0)
           var titleBarSize = parseInt(RicoUtil.getElementsComputedStyle(this.accordionTabs[tabToCheck].titleBar, 'height'));
           if (isNaN(titleBarSize))
             titleBarSize = this.accordionTabs[tabToCheck].titleBar.offsetHeight;
@@ -29,7 +30,8 @@ Rico.Accordion.prototype.initialize = function(container, options) {
         this.flexible = true;
         this.tabHeight = new Object();
         var tabToCheck = (this.options.onloadShowTab === 0)? 1 : 0;
-          var titleBarSize = parseInt(RicoUtil.getElementsComputedStyle(this.accordionTabs[tabToCheck].titleBar, 'height'));
+          if (this.accordionTabs && this.accordionTabs.length > 0)
+            var titleBarSize = parseInt(RicoUtil.getElementsComputedStyle(this.accordionTabs[tabToCheck].titleBar, 'height'));
           if (isNaN(titleBarSize))
             titleBarSize = this.accordionTabs[tabToCheck].titleBar.offsetHeight;
 

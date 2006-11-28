@@ -391,7 +391,7 @@ public abstract class ListClass extends PropertyClass {
 		for (Iterator it = list.iterator(); it.hasNext();) {
 			String value = it.next().toString();
 			String display = getDisplayValue(value, map, context);
-			option option = new option(value, value);
+			option option = new option(display, value);
 			option.addElement(display);
 			if (selectlist.contains(value))
 				option.setSelected(true);
@@ -474,8 +474,9 @@ public abstract class ListClass extends PropertyClass {
         // Add options from Set
         for (Iterator it=list.iterator();it.hasNext();) {
             String value = it.next().toString();
-            option option = new option(value, value);
-            option.addElement(getDisplayValue(value, getMap(context), context));
+            String display = getDisplayValue(value, getMap(context), context);
+            option option = new option(display, value);
+            option.addElement(display);
             if (selectlist.contains(value))
                 option.setSelected(true);
             select.addElement(option);

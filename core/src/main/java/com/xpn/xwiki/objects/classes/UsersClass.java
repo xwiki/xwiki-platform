@@ -120,8 +120,9 @@ public class UsersClass extends ListClass {
         // Add options from Set
         for (Iterator it=list.iterator();it.hasNext();) {
             String value = it.next().toString();
-            option option = new option(value, value);
-            option.addElement(getText(value, context));
+            String display = getText(value, context);
+            option option = new option(display, value);
+            option.addElement(display);
             if (selectlist.contains(value))
                 option.setSelected(true);
             select.addElement(option);

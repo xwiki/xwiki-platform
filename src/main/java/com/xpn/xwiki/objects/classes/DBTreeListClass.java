@@ -164,7 +164,7 @@ public class DBTreeListClass extends DBListClass {
             for (int i=0;i<list.size();i++) {
                 ListItem item = (ListItem) list.get(i);
                 String display = level + getDisplayValue(item.getId(), map, context);
-                option option = new option(item.getId(), item.getId());
+                option option = new option(display, item.getId());
                 option.addElement(display);
                 if (selectlist.contains(item.getId()))
                     option.setSelected(true);

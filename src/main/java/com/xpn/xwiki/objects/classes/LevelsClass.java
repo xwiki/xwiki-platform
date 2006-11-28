@@ -105,8 +105,9 @@ public class LevelsClass extends ListClass {
         // Add options from Set
         for (Iterator it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
-            option option = new option(value, value);
-            option.addElement(getText(value, context));
+            String display = getText(value, context);
+            option option = new option(display, value);
+            option.addElement(display);
             // If we don't have this option in the list then add it
             if (!list.contains(value))
                     list.add(value);

@@ -90,6 +90,7 @@ public class UsersClass extends ListClass {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
+        select.setID(prefix + name);
         List list;
         if (isUsesList())
             list = getList(context);

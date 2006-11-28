@@ -63,6 +63,7 @@ public class PasswordClass extends StringClass {
 
         input.setType("password");
         input.setName(prefix + name);
+        input.setID(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());
     }

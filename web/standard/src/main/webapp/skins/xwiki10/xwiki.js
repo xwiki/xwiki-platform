@@ -97,6 +97,21 @@ function updateAttachName(form, msg) {
   return true;
 }
 
+function addClass(o, className){
+  if(!isClassExist(o,className))
+    o.className += ' ' + className
+}
+
+function isClassExist(o,className){
+    if(!o.className)
+      return false;
+    return new RegExp('\\b' + className + '\\b').test(o.className)
+}
+
+function rmClass(o, className){
+  o.className = o.className.replace(new RegExp('\\s*\\b' + className + '\\b'),'')
+}
+
 function openURL(url) {
   win = open( url, "win", "titlebar=0,width=750,height=480,resizable,scrollbars");
   if( win ) {

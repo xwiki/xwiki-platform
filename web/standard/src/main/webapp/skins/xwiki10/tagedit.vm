@@ -86,21 +86,6 @@
       $('selectedTagsForm').style.display="none";
       readTags();
     }
-
-    function addClass(o, className){
-      if(!isClassExist(o,className))
-        o.className += ' ' + className
-    }
-
-    function isClassExist(o,className){
-        if(!o.className)
-          return false;
-        return new RegExp('\\b' + className + '\\b').test(o.className)
-    }
-
-    function rmClass(o, className){
-      o.className = o.className.replace(new RegExp('\\s*\\b' + className + '\\b'),'')
-    }
     initTagScript();
     </script>
   #end

@@ -25,11 +25,13 @@ package com.xpn.xwiki.plugin.image;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.PluginException;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,6 +69,10 @@ public class ImagePlugin extends XWikiDefaultPlugin {
     public void init(XWikiContext context) {
         super.init(context);
         initCache(context);
+    }
+
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+        return new ImagePluginAPI((ImagePlugin) plugin, context);
     }
 
     public void initCache(XWikiContext context) {
@@ -256,4 +262,13 @@ public class ImagePlugin extends XWikiDefaultPlugin {
             return 0;
     }
 
+    public int getWidth(XWikiAttachment attachment, XWikiContext context) throws InterruptedException, XWikiException {
+        Image imgOri = getImage(attachment, context);
+        return imgOri.getWidth(null);
+    }
+
+    public int getHeight(XWikiAttachment attachment, XWikiContext context) throws InterruptedException, XWikiException {
+        Image imgOri = getImage(attachment, context);
+        return imgOri.getHeight(null);           
+    }
 }

@@ -4267,4 +4267,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String star = "<span class=\"mandatoryParenthesis\">&nbsp;(</span><span class=\"mandatoryDot\">&lowast;</span><span class=\"mandatoryParenthesis\">)&nbsp;</span>";
         return context.getWiki().getXWikiPreference("mandatory_display", star, context);
     }
+
+    public boolean hasVersioning(String fullName, XWikiContext context) {
+        return ("1".equals(context.getWiki().Param("xwiki.store.versioning","1")));
+    }
 }

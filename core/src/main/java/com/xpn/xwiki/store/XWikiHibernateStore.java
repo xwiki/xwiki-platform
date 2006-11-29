@@ -236,17 +236,20 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     doc.setContentAuthor(doc.getAuthor());
                 }
                 doc.incrementVersion();
-                context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
+                if (context.getWiki().hasVersioning(doc.getFullName(), context))
+                 context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
             } else {
                 if (doc.getDocumentArchive()!=null) {
                     // Let's make sure we save the archive if we have one
                     // This is especially needed if we load a document from XML
-                    context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(),false, context);
+                    if (context.getWiki().hasVersioning(doc.getFullName(), context))
+                     context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(),false, context);
                 } else {
                     // Make sure the getArchive call has been made once
                     // with a valid context
                     try {
-                        doc.getDocumentArchive(context);
+                        if (context.getWiki().hasVersioning(doc.getFullName(), context))
+                         doc.getDocumentArchive(context);
                     } catch (XWikiException e) {
                         // this is a non critical error
                     }

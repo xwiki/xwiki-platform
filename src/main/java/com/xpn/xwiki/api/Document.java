@@ -1079,6 +1079,10 @@ public class Document extends Api {
             object = new Object(getDoc().getFirstObject(fieldName, context), context);
         else
             object = currentObj;
+        return getValue(fieldName, object);
+    }
+
+    public java.lang.Object getValue(String fieldName, Object object) {
         if (object != null) {
             try {
                 return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
@@ -1174,9 +1178,12 @@ public class Document extends Api {
             obj = currentObj;
         else
             obj = getFirstObject(fieldname);
+        set(fieldname, value, obj);
+    }
+
+    public void set(String fieldname, java.lang.Object value, Object obj) {
         if (obj == null)
             return;
-
         obj.set(fieldname, value);
     }
 

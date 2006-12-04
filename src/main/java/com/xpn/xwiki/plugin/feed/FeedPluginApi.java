@@ -25,9 +25,16 @@ package com.xpn.xwiki.plugin.feed;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.api.Api;
 
 import java.io.IOException;
+import java.util.Vector;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 
 public class FeedPluginApi extends Api {
         private FeedPlugin plugin;
@@ -67,6 +74,36 @@ public class FeedPluginApi extends Api {
 
     public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException {
         return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, context);
+    }
+
+    public int updateFeeds() throws XWikiException {
+        return updateFeeds("XWiki.FeedList");
+    }
+
+    public int updateFeeds(String feedDoc) throws XWikiException {
+        return updateFeeds(feedDoc, true);
+    }
+
+    public int updateFeeds(String feedDoc, boolean fullContent) throws XWikiException {
+        return updateFeeds(feedDoc, fullContent, true);
+    }
+
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException {
+        if (checkProgrammingRights())
+         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, context);
+        else
+         return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl) {
+        return plugin.updateFeed(feedname, feedurl, true, context);
+    }
+
+    public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry) {
+        if (checkProgrammingRights())
+         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, context);
+        else
+         return -1;
     }
 
 }

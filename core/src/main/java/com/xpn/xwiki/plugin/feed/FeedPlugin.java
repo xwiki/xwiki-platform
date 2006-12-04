@@ -34,6 +34,7 @@ import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.logging.Log;
@@ -234,60 +235,178 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             }
         }
 
-    public void updateFeeds(XWikiContext context) throws XWikiException {
-        updateFeeds("XWiki.FeedList", context);
+    public int updateFeeds(XWikiContext context) throws XWikiException {
+        return updateFeeds("XWiki.FeedList", context);
     }
 
-    public void updateFeeds(String feedDoc, XWikiContext context) throws XWikiException {
+    public int updateFeeds(String feedDoc, XWikiContext context) throws XWikiException {
+        return updateFeeds(feedDoc, true, context);
+    }
+
+    public int updateFeeds(String feedDoc, boolean fullContent, XWikiContext context) throws XWikiException {
+        return updateFeeds(feedDoc, fullContent, true, context);
+    }
+
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, XWikiContext context) throws XWikiException {
+        // Make sure we have this class
+        getAggregatorURLClass(context);
+
         XWikiDocument doc = context.getWiki().getDocument(feedDoc, context);
         Vector objs = doc.getObjects("XWiki.AggregatorURLClass");
+        if (objs==null)
+         return 0;
+
         Iterator it = objs.iterator();
-        SyndFeed feed = null;
+        int total = 0;
         while(it.hasNext())
         {
-            try {
-                BaseObject obj = (BaseObject) it.next();
-                String url = obj.getStringValue("url");
-                String guid = obj.getStringValue("guid");
-                try {
-                    feed = getFeedForce(url, true, context);
-                } catch (IOException e) {}
-                if (feed != null)
-                    saveFeed(guid, feed, context);
-            }
-            catch(Exception e)
-            {
-                Map map = (Map) context.get("updateFeedError");
-                if (map==null) {
-                    map = new HashMap();
-                    context.put("updateFeedError", map);
-                }
-                map.put(feedDoc, e);
-            }
+            BaseObject obj = (BaseObject) it.next();
+            String feedurl = obj.getStringValue("url");
+            String feedname = obj.getStringValue("name");
+            total += updateFeed(feedname, feedurl, oneDocPerEntry, context);
         }
+        return total;
     }
 
-    private void saveFeed(String guid, SyndFeed feed,XWikiContext context) throws XWikiException {
-        XWikiDocument doc = context.getWiki().getDocument("XWiki.feed_" + guid, context);
+    public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry, XWikiContext context) {
+        return updateFeed(feedname, feedurl, true, oneDocPerEntry, context);
+    }
 
-        Vector objs = doc.getObjects("XWiki.FeedEntryClass");
+    public int updateFeed(String feedname, String feedurl, boolean fullContent,  boolean oneDocPerEntry, XWikiContext context) {
+        try {
+            // Make sure we have this class
+            getFeedEntryClass(context);
+
+            SyndFeed feed = getFeedForce(feedurl, true, context);
+            if (feed != null) {
+                saveFeed(feedname, feedurl, feed, fullContent, oneDocPerEntry, context);
+                return feed.getEntries().size();
+            } else
+             return 0;
+        }
+        catch(Exception e)
+        {
+            Map map = (Map) context.get("updateFeedError");
+            if (map==null) {
+                map = new HashMap();
+                context.put("updateFeedError", map);
+            }
+            map.put(feedurl, e);
+        }
+        return 0;
+    }
+
+    private void saveFeed(String feedname, String feedurl, SyndFeed feed, boolean oneDocPerEntry, XWikiContext context) throws XWikiException {
+        saveFeed(feedname, feedurl, "Feeds", feed, true, oneDocPerEntry, context);
+    }
+
+    private void saveFeed(String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry, XWikiContext context) throws XWikiException {
+        saveFeed(feedname, feedurl, "Feeds", feed, fullContent, oneDocPerEntry, context);
+    }
+
+    private void saveFeed(String feedname, String feedurl, String space, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry, XWikiContext context) throws XWikiException {
+        XWikiDocument doc = null;
+        Vector objs = null;
+
+        String prefix = space + ".Feed";
+        if (!oneDocPerEntry) {
+          doc = context.getWiki().getDocument(prefix + "_" + context.getWiki().clearName(feedname, context), context);
+          objs = doc.getObjects("XWiki.FeedEntryClass");
+          if (doc.getContent().equals(""))
+              doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\"");
+        }
+
 
         Iterator it = feed.getEntries().iterator();
         while (it.hasNext())
         {
             SyndEntry entry = (SyndEntry) it.next();
+            if (oneDocPerEntry) {
+                String hashCode = "" + entry.getUri().hashCode();
+                String pagename = feedname  + "_" + hashCode.replace("-","") + "_" + entry.getTitle();
+                doc = context.getWiki().getDocument(prefix + "_" + context.getWiki().clearName(pagename, context), context);
+                doc.setDate(entry.getPublishedDate());
+                doc.setCreationDate(entry.getPublishedDate());
+                if (doc.getContent().equals(""))
+                    doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\"");
+                objs = doc.getObjects("XWiki.FeedEntryClass");
+            }
             if (!postExist(objs, entry))
-                saveEntry(guid, entry, doc, context);
+                saveEntry(feedname, feedurl, entry, doc, fullContent, context);
 
+            if (oneDocPerEntry)
+                context.getWiki().saveDocument(doc, context);
         }
 
-        context.getWiki().saveDocument(doc, context);
+        if (!oneDocPerEntry)
+         context.getWiki().saveDocument(doc, context);
     }
 
-    private void saveEntry(String guid, SyndEntry entry, XWikiDocument doc, XWikiContext context) throws XWikiException {
+    public BaseClass getAggregatorURLClass(XWikiContext context) throws XWikiException {
+        XWikiDocument doc;
+        boolean needsUpdate = false;
+
+        doc = context.getWiki().getDocument("XWiki.AggregatorURLClass", context);
+
+        BaseClass bclass = doc.getxWikiClass();
+        if (context.get("initdone") != null)
+            return bclass;
+
+        bclass.setName("XWiki.AggregatorURLClass");
+
+        needsUpdate |= bclass.addTextField("name", "Name", 80);
+        needsUpdate |= bclass.addTextField("url", "url", 80);
+
+        String content = doc.getContent();
+        if ((content == null) || (content.equals(""))) {
+            needsUpdate = true;
+            doc.setContent("#includeForm(\"XWiki.ClassSheet\"");
+        }
+
+        if (needsUpdate)
+            context.getWiki().saveDocument(doc, context);
+        return bclass;
+    }
+
+    public BaseClass getFeedEntryClass(XWikiContext context) throws XWikiException {
+        XWikiDocument doc;
+        boolean needsUpdate = false;
+
+        doc = context.getWiki().getDocument("XWiki.FeedEntryClass", context);
+
+        BaseClass bclass = doc.getxWikiClass();
+        if (context.get("initdone") != null)
+            return bclass;
+
+        bclass.setName("XWiki.FeedEntryClass");
+
+        needsUpdate |= bclass.addTextField("title", "Title", 80);
+        needsUpdate |= bclass.addTextField("author", "Author", 40);
+        needsUpdate |= bclass.addTextField("feedurl", "Feed URL", 80);
+        needsUpdate |= bclass.addTextField("feedname", "Feed Name", 40);
+        needsUpdate |= bclass.addTextField("url", "URL", 80);
+        needsUpdate |= bclass.addTextField("category", "Category", 255);
+        needsUpdate |= bclass.addTextAreaField("content", "Content", 80, 10);
+        needsUpdate |= bclass.addTextAreaField("fullContent", "Full Content", 80, 10);
+        needsUpdate |= bclass.addTextAreaField("xml", "XML", 80, 10);
+        needsUpdate |= bclass.addDateField("date", "Date", "dd/MM/yyyy");
+
+        String content = doc.getContent();
+        if ((content == null) || (content.equals(""))) {
+            needsUpdate = true;
+            doc.setContent("#includeForm(\"XWiki.ClassSheet\"");
+        }
+
+        if (needsUpdate)
+            context.getWiki().saveDocument(doc, context);
+        return bclass;
+
+    }
+
+    private void saveEntry(String feedname, String feedurl, SyndEntry entry, XWikiDocument doc, boolean fullContent, XWikiContext context) throws XWikiException {
         int id = doc.createNewObject("XWiki.FeedEntryClass", context);
         BaseObject obj = doc.getObject("XWiki.FeedEntryClass", id);
-        obj.setStringValue("feedguid", guid);
+        obj.setStringValue("feedname", feedname);
         obj.setStringValue("title", entry.getTitle());
         List categList = entry.getCategories();
         StringBuffer categs = new StringBuffer("");
@@ -321,9 +440,26 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
 
         obj.setDateValue("date", entry.getPublishedDate());
-
         obj.setStringValue("url", entry.getUri());
+        obj.setStringValue("author", entry.getAuthor());
+        obj.setStringValue("feedurl", feedurl);
 
+        // TODO: need to get entry xml or serialization
+        obj.setLargeStringValue("xml", entry.toString());
+
+        if (fullContent) {
+            String url = entry.getUri();
+            if ((url!=null)&&(!url.trim().equals(""))) {
+                try {
+                    String sfullContent = context.getWiki().getURLContent(url);
+                    obj.setLargeStringValue("fullContent", sfullContent);
+                } catch (Exception e) {
+                    obj.setLargeStringValue("fullContent", "Exception while reading fullContent: " + e.getMessage());
+                }
+            } else {
+                obj.setLargeStringValue("fullContent", "No url");                
+            }
+        }
     }
 
     private boolean postExist(Vector objs, SyndEntry entry)

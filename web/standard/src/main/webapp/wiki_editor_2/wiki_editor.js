@@ -332,8 +332,6 @@ WikiEditor.prototype.convertFontsInternal = function(content) {
                 newNode.appendChild(childNodes[j].cloneNode(true));
                 parent.insertBefore(newNode, node);
             } else {
-                var childAtts = childNodes[j].style;
-                alert(childAtts)
                 newNode = childNodes[j].cloneNode(true);
                 parent.insertBefore(newNode, node);
                 newNode = node.cloneNode(false);

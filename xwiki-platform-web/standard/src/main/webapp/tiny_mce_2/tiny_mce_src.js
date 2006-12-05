@@ -148,10 +148,10 @@ TinyMCE_Engine.prototype = {
 		this._def("merge_styles_invalid_parents", "");
 		this._def("force_hex_style_colors", true);
 		this._def("trim_span_elements", true);
-		this._def("convert_fonts_to_spans", false);
+		this._def("convert_fonts_to_spans", true);
 		this._def("doctype", '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">');
 		this._def("font_size_classes", '');
-		this._def("font_size_style_values", 'xx-small,x-small,small,medium,large,x-large,xx-large', true);
+		this._def("font_size_style_values", '8px,10px,12px,14px,18px,24px,36px', true);
 		this._def("event_elements", 'a,img', true);
 		this._def("convert_urls", true);
 		this._def("table_inline_editing", false);
@@ -3866,10 +3866,10 @@ TinyMCE_Engine.prototype.convertSpansToFonts = function(doc) {
 };
 
 TinyMCE_Engine.prototype.convertFontsToSpans = function(doc) {
-	var sizes = tinyMCE.getParam('font_size_style_values').replace(/\s+/, '').split(',');
+    var sizes = tinyMCE.getParam('font_size_style_values').replace(/\s+/, '').split(',');
 
-	var h = doc.body.innerHTML;
-	h = h.replace(/<font/gi, '<span');
+    var h = doc.body.innerHTML;
+    h = h.replace(/<font/gi, '<span');
 	h = h.replace(/<\/font/gi, '</span');
 	doc.body.innerHTML = h;
 

@@ -209,6 +209,10 @@ legend {
     background: #d3e3f5;
 }
 
+.tabs li:hover {
+    background-color: #FFD;
+}
+
 .tabs span {
 	float: left;
 	display: block;
@@ -219,19 +223,7 @@ legend {
 	text-decoration: none;
 	font-family: Verdana, Arial;
 	font-size: 10px;
-}
-
-.tabs a:link, .tabs a:visited, .tabs a:hover {
-	color: black;
-}
-
-.tabs a:hover {
-}
-
-.tabs .current {
-}
-
-.tabs .current a, .tabs .current a:link, .tabs .current a:visited {
+    color: black;
 }
 
 /* Inner tags classes */
@@ -278,15 +270,6 @@ legend {
 
 .innertabs a:link, .tabs a:visited, .tabs a:hover {
 	color: #6666cc;
-}
-
-.innertabs a:hover {
-}
-
-.innertabs .current {
-}
-
-.innertabs .current a, .tabs .current a:link, .tabs .current a:visited {
 }
 
 

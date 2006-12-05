@@ -23,6 +23,9 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
+    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertFontExternal');
+    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertFontInternal');
+
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
 
@@ -914,3 +917,66 @@ WikiEditor.prototype._convertListInternal = function(content) {
 
 	return str;
 }
+
+WikiEditor.prototype.convertFontExternal = function(regexp, result, content) {
+    var str = "";
+    var tag = "font";
+    var atts = result[1].split("|");
+    for (var i=0; i < atts.length; i++) {
+        var att = atts[i].substring(0, atts[i].indexOf("="));
+        var value = atts[i].substring(atts[i].indexOf("=") + 1, atts[i].length);
+        if (att == "size") att = "font-size";
+        if (att == "face") att = "font-family";
+        if (i==0) {
+            if (att == "type") {
+                tag = value;
+                str = "<" + tag + " ";
+            } else {
+                str = "<" + tag + " style=\"" + att + ":" + value + ";";
+            }
+        } else if (i < atts.length) {
+            if (i == 1) str += "style=\"";
+            str += " " + att + ":" + value + ";";
+            if (i == atts.length - 1) str += "\""
+        }
+        if (atts.length == 1) {
+            str += "\"";
+        }
+    }
+    str += ">";
+    str += result[2];
+    str += "</" + tag + ">";
+    return content.replace(regexp, str) ;
+}
+
+WikiEditor.prototype.convertFontInternal = function(regexp, result, content) {
+    var type = result[1];
+    var str = "";
+    switch (type) {
+        case "font" :
+            var attributes = this.readAttributes(result[2]);
+            break;
+        case "span" :
+            var attributes = this.readAttributes(result[2]);
+            str += "{style:type=span";
+            if (attributes["style"]) {
+                var atts = attributes["style"].split(";");
+                for (var i=0; i < atts.length ; i++) {
+                    var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
+                    var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
+                    if (att == "font-size") att = "size";
+                    if (att == "font-family") att = "face";
+                    str += "|" + att + "=" + value;
+                }
+            }
+            str += "}";
+            str += result[3];
+            str += "{style}";   
+            break;
+        case "div" :
+            break;
+    }
+    // alert("str = " + str);
+    return content.replace(regexp, str);
+}
+

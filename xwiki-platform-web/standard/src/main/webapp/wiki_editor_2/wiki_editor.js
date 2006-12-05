@@ -343,7 +343,6 @@ WikiEditor.prototype.convertFontsInternal = function(content) {
                         }
                     }
                     if (overlap) {
-                         alert("'"+parentAtts[k] +"'");
                         switch (parentAtts[k]) {
                             case "color" :
                                 newNode.style.color = s[i].style.color;

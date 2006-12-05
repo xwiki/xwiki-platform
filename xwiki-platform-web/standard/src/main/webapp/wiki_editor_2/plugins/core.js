@@ -952,29 +952,20 @@ WikiEditor.prototype.convertFontExternal = function(regexp, result, content) {
 WikiEditor.prototype.convertFontInternal = function(regexp, result, content) {
     var type = result[1];
     var str = "";
-    switch (type) {
-        case "font" :
-            var attributes = this.readAttributes(result[2]);
-            break;
-        case "span" :
-            var attributes = this.readAttributes(result[2]);
-            str += "{style:type=span";
-            if (attributes["style"]) {
-                var atts = attributes["style"].split(";");
-                for (var i=0; i < atts.length ; i++) {
-                    var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
-                    var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
-                    if (att == "font-size") att = "size";
-                    if (att == "font-family") att = "face";
-                    str += "|" + att + "=" + value;
-                }
+    if (type == "span" || type =="div") {
+        var attributes = this.readAttributes(result[2]);
+        str += "{style:type=" + type;
+        if (attributes["style"]) {
+            var atts = attributes["style"].split(";");
+            for (var i=0; i < atts.length ; i++) {
+                var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
+                var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
+                str += "|" + att + "=" + value;
             }
-            str += "}";
-            str += result[3];
-            str += "{style}";   
-            break;
-        case "div" :
-            break;
+        }
+        str += "}";
+        str += result[3];
+        str += "{style}";
     }
     // alert("str = " + str);
     return content.replace(regexp, str);

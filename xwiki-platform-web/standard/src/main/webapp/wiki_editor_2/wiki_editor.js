@@ -332,7 +332,35 @@ WikiEditor.prototype.convertFontsInternal = function(content) {
                 newNode.appendChild(childNodes[j].cloneNode(true));
                 parent.insertBefore(newNode, node);
             } else {
+                var childAtts = childNodes[j].style;
                 newNode = childNodes[j].cloneNode(true);
+
+                for (var k=0; k < parentAtts.length; k++) {
+                    var overlap = new Boolean("true");
+                    for (var kk=0 ; kk < childAtts.length; kk++) {
+                        if (this.trimString(parentAtts[k]) == this.trimString(childAtts[kk])) {
+                            overlap = false;
+                        }
+                    }
+                    if (overlap) {
+                         alert("'"+parentAtts[k] +"'");
+                        switch (parentAtts[k]) {
+                            case "color" :
+                                newNode.style.color = s[i].style.color;
+                                break;
+                            case "background-color" :
+                                newNode.style.backgroundColor = s[i].style.backgroundColor;
+                                break;
+                            case "font-family" :
+                                newNode.style.fontFamily = s[i].style.fontFamily;
+                                break;
+                            case "font-size" :
+                                newNode.style.fontSize = s[i].style.fontSize;
+                                break;
+                        }
+                    }
+
+                }
                 parent.insertBefore(newNode, node);
                 newNode = node.cloneNode(false);
             }

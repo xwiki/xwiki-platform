@@ -29,6 +29,7 @@ $xwiki.getTextArea($tdoc.content)
             content_css: "$xwiki.getSkinFile("style.css")",
             debug : false,
             remove_linebreaks : false,
+            wiki_use_style: '$xwiki.useWysiwygStyleToolbar()',
             plugins: 'table, contextmenu, paste, searchreplace',
             wiki_images_path : '${request.contextPath}/bin/download/$doc.web/$doc.name/',
             wiki_attach_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',

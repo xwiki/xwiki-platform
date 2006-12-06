@@ -1458,6 +1458,8 @@ public class XWikiDocument {
             XWikiAttachment attachment = (XWikiAttachment) attit.next();
             XWikiAttachment newattachment = (XWikiAttachment) attachment.clone();
             newattachment.setDoc(this);
+            newattachment.getAttachment_archive().setAttachment(newattachment);
+            newattachment.getAttachment_content().setContentDirty(true);
             getAttachmentList().add(newattachment);
         }
     }
@@ -2626,11 +2628,12 @@ public class XWikiDocument {
         loadAttachments(context);
         loadArchive(context);
 
-        if (oldname.equals(docname))
-            return this;
+/*        if (oldname.equals(docname))
+            return this;    */
 
         XWikiDocument newdoc = (XWikiDocument) clone();
         newdoc.setFullName(docname, context);
+        newdoc.setContentDirty(true);
         newdoc.getxWikiClass().setName(docname);
         Vector objects = newdoc.getObjects(oldname);
         if (objects != null) {

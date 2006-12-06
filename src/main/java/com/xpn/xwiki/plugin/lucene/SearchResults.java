@@ -1,0 +1,205 @@
+/*
+ * 
+ * ===================================================================
+ *
+ * Copyright (c) 2005 Jens Krämer, All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details, published at
+ * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
+ * root folder of this distribution.
+ *
+ * Created on 01.02.2005
+ *
+ */
+package com.xpn.xwiki.plugin.lucene;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.apache.lucene.search.Hits;
+
+import com.xpn.xwiki.api.XWiki;
+
+/**
+ * Container for the results of a search.
+ * <p>
+ * This class handles paging through search results and enforces the xwiki
+ * rights management by only returning search results the user executing the
+ * search is allowed to view.
+ * </p>
+ * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
+ */
+public class SearchResults
+{
+    private final XWiki         xwiki;
+    private final Hits          hits;
+    private static final Logger LOG = Logger.getLogger (SearchResults.class);
+
+    private List                relevantResults;
+
+    /**
+     * @param hits
+     *            Lucene search results
+     * @param beginIndex
+     *            index of first result to show (zero-based)
+     * @param endIndex
+     *            index of last result to show
+     * @param xwiki
+     *            xwiki instance for access rights checking
+     */
+    public SearchResults (Hits hits, XWiki xwiki)
+    {
+        this.hits = hits;
+        this.xwiki = xwiki;
+    }
+
+    private List getRelevantResults ()
+    {
+        if (relevantResults == null)
+        {
+            relevantResults = new ArrayList ();
+            final int hitcount = hits.length ();
+            for (int i = 0; i < hitcount; i++)
+            {
+                SearchResult result = null;
+                try
+                {
+                    result = new SearchResult (hits.doc (i), hits.score (i), xwiki);
+                    String pageName = null;
+                    if (result.isWikiContent ())
+                        pageName = result.getWeb () + "." + result.getName ();
+                    if (result != null && result.isWikiContent() && xwiki.checkAccess (pageName, "view") && xwiki.exists(pageName)) {
+                        relevantResults.add (result);
+                    }
+                } catch (Exception e) {
+                    LOG.error ("error getting search result", e);
+                    e.printStackTrace ();
+                }
+            }
+        }
+        return relevantResults;
+    }
+
+    /**
+     * @param beginIndex
+     * @param items
+     * @return true when there are more results than currently displayed.
+     */
+    public boolean hasNext (String beginIndex, String items)
+    {
+        final int itemCount = Integer.parseInt (items);
+        final int begin = Integer.parseInt (beginIndex);
+        return begin + itemCount - 1 < getRelevantResults ().size ();
+    }
+
+    /**
+     * @param beginIndex
+     * @return true when there is a page before the one currently displayed,
+     *         that is, when <code>beginIndex > 1</code>
+     */
+    public boolean hasPrevious (String beginIndex)
+    {
+        return Integer.parseInt (beginIndex) > 1;
+    }
+
+    /**
+     * @param beginIndex
+     * @param items
+     * @return the value to be used for the firstIndex URL parameter to build a
+     *         link pointing to the next page of results
+     */
+    public int getNextIndex (String beginIndex, String items)
+    {
+        final int itemCount = Integer.parseInt (items);
+        final int resultcount = getRelevantResults ().size ();
+        int retval = Integer.parseInt (beginIndex) + itemCount;
+        return retval > resultcount ? (resultcount - itemCount + 1) : retval;
+    }
+
+    /**
+     * @param beginIndex
+     * @param items
+     * @return the value to be used for the firstIndex URL parameter to build a
+     *         link pointing to the previous page of results
+     */
+    public int getPreviousIndex (String beginIndex, String items)
+    {
+        int retval = Integer.parseInt (beginIndex) - Integer.parseInt (items);
+        return 0 < retval ? retval : 1;
+    }
+
+    /**
+     * @param beginIndex
+     * @param items
+     * @return the index of the last displayed search result
+     */
+    public int getEndIndex (String beginIndex, String items)
+    {
+        int retval = Integer.parseInt (beginIndex) + Integer.parseInt (items) - 1;
+        final int resultcount = getRelevantResults ().size ();
+        if (retval > resultcount)
+        {
+            return resultcount;
+        }
+        return retval;
+    }
+
+    /**
+     * Helper method for use in velocity templates, takes string values instead
+     * of ints. See {@link #getResults(int, int)}.
+     * @param beginIndex
+     * @param items
+     * @return
+     */
+    public List getResults (String beginIndex, String items)
+    {
+        return getResults (Integer.parseInt (beginIndex), Integer.parseInt (items));
+    }
+
+    /**
+     * Returns a list of search results. According to beginIndex and endIndex,
+     * only a subset of the results is returned. To get the first ten results,
+     * one would use beginIndex=1 and items=10.
+     * @param beginIndex
+     *            1-based index of first result to return.
+     * @param items
+     *            number of items to return
+     * @return List of SearchResult instances starting at
+     *         <code>beginIndex</code> and containing up to
+     *         <code>items</code> elements.
+     */
+    public List getResults (int beginIndex, int items)
+    {
+        final int listStartIndex = beginIndex - 1;
+        final int listEndIndex = listStartIndex + items;
+        final List results = getRelevantResults();
+        final int resultcount = results.size ();
+        return getRelevantResults ().subList (listStartIndex,
+                                              listEndIndex < resultcount ? listEndIndex : resultcount);
+    }
+
+    /**
+     * @return all search results in one list.
+     */
+    public List getResults ()
+    {
+        return getRelevantResults ();
+    }
+
+    /**
+     * @return total number of searchresults the user is allowed to view
+     */
+    public int getHitcount ()
+    {
+        return getRelevantResults ().size ();
+    }
+}

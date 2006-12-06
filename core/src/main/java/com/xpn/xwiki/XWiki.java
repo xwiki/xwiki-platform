@@ -2695,6 +2695,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException {
         String db = context.getDatabase();
+        if (sourceWiki==null)
+         sourceWiki = db;
+
         try {
             if (sourceWiki != null)
                 context.setDatabase(sourceWiki);
@@ -2703,6 +2706,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (log.isInfoEnabled())
                     log.info("Copying document: " + docname + " (default) to " + targetdocname + " on wiki " + targetWiki);
 
+                // Let's switch to the other database to  verify if the document already exists
                 if (targetWiki != null)
                     context.setDatabase(targetWiki);
                 XWikiDocument tdoc = getDocument(targetdocname, context);
@@ -2715,6 +2719,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                      return false;
                     }
                 }
+
+                // Let's switch back again to the original db
+                if (sourceWiki != null)
+                    context.setDatabase(sourceWiki);
 
                 if (wikilanguage == null) {
                     tdoc = sdoc.copyDocument(targetdocname, context);
@@ -2762,14 +2770,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (ttdoc != tdoc)
                             return false;
 
-                        //Do we have attachments in traductions? I don't think so.
-                        // Make sure attachments are loaded
-                        stdoc.loadAttachments(context);
+                        // Let's switch back again to the original db
+                        if (sourceWiki != null)
+                            context.setDatabase(sourceWiki);
 
-                        if (docname.equals(targetdocname))
-                            ttdoc = (XWikiDocument) stdoc.clone();
-                        else
-                            ttdoc = stdoc.copyDocument(targetdocname, context);
+                        ttdoc = stdoc.copyDocument(targetdocname, context);
 
                         // forget past versions
                         if (reset) {
@@ -2788,23 +2793,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                             txda.setId(ttdoc.getId());
                             getVersioningStore().saveXWikiDocArchive(txda, true, context);
                         }
-
                     }
                 } else {
                     // We want only one language in the end
-                    if (sourceWiki != null)
-                        context.setDatabase(sourceWiki);
                     XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilanguage, context);
-                    if (targetWiki != null)
-                        context.setDatabase(targetWiki);
 
-                    // Make sure attachments are loaded
-                    stdoc.loadAttachments(context);
+                    tdoc = stdoc.copyDocument(targetdocname, context);
 
-                    if (docname.equals(targetdocname))
-                        tdoc = (XWikiDocument) stdoc.clone();
-                    else
-                        tdoc = stdoc.renameDocument(targetdocname, context);
                     // forget language
                     tdoc.setDefaultLanguage(wikilanguage);
                     tdoc.setLanguage("");

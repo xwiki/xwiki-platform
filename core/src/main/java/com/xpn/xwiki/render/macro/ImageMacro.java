@@ -37,12 +37,15 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 /**
  * Macro that displays images.
  * 
- * Syntax: {image:text|height|width|align|document|alt|title|link|fromIncludingDoc}
+ * Syntax: {image:text|height|width|align|halign|float|document|alt|title|link|fromIncludingDoc}
  * <ul>
  * <li>text: The target filename.</li>
  * <li>height: The height attribute of the img.</li>
  * <li>width: The width attribute of the img.</li>
  * <li>align: The align attribute of the img.</li>
+ * <li>halign: Horizontal alignment for the image. If missing, 
+ *   the image is displayed inline. Accepted values:
+ *   floatleft, left, center, right, floatright</li>
  * <li>document: The document to which the file is attached. If missing, 
  *   the current document is used.</li>
  * <li>alt: The alt attribute of the link. If missing, title is used.
@@ -83,23 +86,27 @@ public class ImageMacro extends BaseLocaleMacro {
         if (null == align || align.indexOf("=") != -1) {
             align = null;
         }
-        String document = params.get("document", 4);
+        String halign = params.get("halign", 4);
+        if (null == align || align.indexOf("=") != -1) {
+            align = null;
+        }
+        String document = params.get("document", 5);
         if (null == document || document.indexOf("=") != -1) {
             document = null;
         }
-        String alt = params.get("alt", 5);
+        String alt = params.get("alt", 6);
         if (null == alt || alt.indexOf("=") != -1) {
             alt = null;
         }
-        String title = params.get("title", 6);
+        String title = params.get("title", 7);
         if (null == title || title.indexOf("=") != -1) {
             title = null;
         }
-        String link = params.get("link", 7);
+        String link = params.get("link", 8);
         if (null == link || link.indexOf("=") != -1 || link.toLowerCase().startsWith("f")) {
             link = null;
         }
-        String useIncluder = params.get("fromIncludingDoc", 8);
+        String useIncluder = params.get("fromIncludingDoc", 9);
         if (null == useIncluder || useIncluder.indexOf("=") != -1 || useIncluder.toLowerCase().startsWith("f")) {
             useIncluder = null;
         }
@@ -134,6 +141,9 @@ public class ImageMacro extends BaseLocaleMacro {
 
         // Create the img code
         StringBuffer str = new StringBuffer();
+        if (halign != null && !halign.equals("none")){
+            str.append("<div class=\"img" + halign.trim() + "\">");
+        }
         if (link != null) {
             str.append("<a href=\"" + doc.getAttachmentURL(img, "download", xcontext) + "\">");
         }
@@ -162,7 +172,9 @@ public class ImageMacro extends BaseLocaleMacro {
         if (link != null) {
             str.append("</a>");
         }
-
+        if (halign != null && !halign.equals("none")){
+            str.append("</div>");
+        }
         // All done, flush the StringBufer
         writer.write(str.toString());
     }

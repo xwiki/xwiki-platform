@@ -111,11 +111,11 @@
       <error-code>500</error-code>
       <location>/error.jsp</location>
     </error-page>
+    -->
     <error-page>
       <error-code>404</error-code>
-      <location>/error.jsp</location>
+      <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>
     </error-page>
-    -->
 
     <!-- Example Application Tag Library Descriptor
 <taglib>

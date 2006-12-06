@@ -2717,12 +2717,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
 
                 if (wikilanguage == null) {
-                    // Make sure attachments are loaded
-                    sdoc.loadAttachments(context);
-                    if (docname.equals(targetdocname))
-                        tdoc = (XWikiDocument) sdoc.clone();
-                    else
-                        tdoc = sdoc.copyDocument(targetdocname, context);
+                    tdoc = sdoc.copyDocument(targetdocname, context);
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
@@ -2767,6 +2762,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (ttdoc != tdoc)
                             return false;
 
+                        //Do we have attachments in traductions? I don't think so.
                         // Make sure attachments are loaded
                         stdoc.loadAttachments(context);
 

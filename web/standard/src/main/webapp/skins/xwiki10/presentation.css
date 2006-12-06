@@ -57,9 +57,6 @@ Global header
 #companylogo img {
   text-decoration: none;
   border: none;
-  background-repeat: no-repeat;
-  width: 136px;
-  height: 91px;
 }
 
 .breadcrumbspace{
@@ -128,9 +125,6 @@ Menu
 Panels
 ---------------------------------------
 */
-.panel{
-  border: 1px solid;
-}
 .xwikipaneltitle{
   padding: 0px 4px;
   margin: 0px;
@@ -224,4 +218,21 @@ Misc
 .currentspace a{
   text-decoration: none !important;
   padding: 2px;
+}
+.imgfloatleft{
+  float: left;
+  margin-right: 8px;
+}
+.imgfloatright{
+  float:right;
+  margin-left: 8px;
+}
+.imgleft{
+  text-align: left;
+}
+.imgcenter{
+  text-align: center;
+}
+.imgright{
+  text-align: right;
 }

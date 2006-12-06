@@ -75,3 +75,20 @@ body {
 .dom-tree dd {
   font-style: italic;
 }
+.imgfloatleft{
+  float: left;
+  margin-right: 8px;
+}
+.imgfloatright{
+  float:right;
+  margin-left: 8px;
+}
+.imgleft{
+  text-align: left;
+}
+.imgcenter{
+  text-align: center;
+}
+.imgright{
+  text-align: right;
+}

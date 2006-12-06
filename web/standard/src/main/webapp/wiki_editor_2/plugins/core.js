@@ -23,8 +23,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
-    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertFontExternal');
-    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertFontInternal');
+    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
+    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
 
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
@@ -918,7 +918,7 @@ WikiEditor.prototype._convertListInternal = function(content) {
 	return str;
 }
 
-WikiEditor.prototype.convertFontExternal = function(regexp, result, content) {
+WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     var str = "";
     var tag = "font";
     var atts = result[1].split("|");
@@ -949,13 +949,13 @@ WikiEditor.prototype.convertFontExternal = function(regexp, result, content) {
     return content.replace(regexp, str) ;
 }
 
-WikiEditor.prototype.convertFontInternal = function(regexp, result, content) {
+WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     var type = result[1];
     var str = "";
     if (type == "span" || type =="div") {
         var attributes = this.readAttributes(result[2]);
         str += "{style:type=" + type;
-        if (attributes["style"]) {
+        if (attributes && attributes["style"]) {
             var atts = attributes["style"].split(";");
             for (var i=0; i < atts.length ; i++) {
                 var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));

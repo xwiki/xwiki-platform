@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki</groupId>
     <artifactId>xwiki-root</artifactId>
-    <version>0.9-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web</artifactId>
   <name>XWiki Web</name>

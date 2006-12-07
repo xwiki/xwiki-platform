@@ -10,9 +10,9 @@
       <sourceFolder url="file://$MODULE_DIR$/core/src/test/java" isTestSource="true" />
     </content>
     <content url="file://$MODULE_DIR$/tests">
-      <sourceFolder url="file://$MODULE_DIR$/tests/cactus" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/tests/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/tests/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/cactus" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/resources" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -41,6 +41,7 @@
     <orderEntry type="library" name="Jrcs" level="project" />
     <orderEntry type="library" name="Captcha" level="project" />
     <orderEntry type="library" name="Servlet API" level="project" />
+    <orderEntry type="library" name="Lucene" level="project" />
     <orderEntryProperties />
   </component>
 </module>

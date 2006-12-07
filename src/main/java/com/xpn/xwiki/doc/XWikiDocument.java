@@ -1458,8 +1458,10 @@ public class XWikiDocument {
             XWikiAttachment attachment = (XWikiAttachment) attit.next();
             XWikiAttachment newattachment = (XWikiAttachment) attachment.clone();
             newattachment.setDoc(this);
-            newattachment.getAttachment_archive().setAttachment(newattachment);
-            newattachment.getAttachment_content().setContentDirty(true);
+            if (newattachment.getAttachment_archive()!=null)
+             newattachment.getAttachment_archive().setAttachment(newattachment);
+            if (newattachment.getAttachment_content()!=null)
+             newattachment.getAttachment_content().setContentDirty(true);
             getAttachmentList().add(newattachment);
         }
     }

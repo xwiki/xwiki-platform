@@ -133,12 +133,14 @@ public class ObjectData extends IndexData {
 
             while (itObj.hasNext()) {
                 baseObject = (BaseObject) itObj.next();
-                Object[] propertyNames = baseObject.getPropertyNames();
-                for (int i = 0; i < propertyNames.length; i++) {
-                    try {
-                        indexProperty(luceneDoc, baseObject, (String) propertyNames[i], context);
-                    } catch (Exception e) {
-                        LOG.error("error extracting fulltext for document " + this, e);
+                if (baseObject!=null) {
+                    Object[] propertyNames = baseObject.getPropertyNames();
+                    for (int i = 0; i < propertyNames.length; i++) {
+                        try {
+                            indexProperty(luceneDoc, baseObject, (String) propertyNames[i], context);
+                        } catch (Exception e) {
+                            LOG.error("error extracting fulltext for document " + this, e);
+                        }
                     }
                 }
             }

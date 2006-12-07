@@ -1,11 +1,11 @@
-#if(!$hideTags || $hideTags == 0)
+#set($tags = $xwiki.getXWikiPreference("tagPage", "no"))
+#if($tags != "no" && (!$hideTags || $hideTags == 0))
   <div id="selectedTagsForm">
    <label for="tags">tags: </label>
    <input type="text" id="tags" name="tags" value="$!tdoc.tags"/>
   </div>
-  #set($possibleTags = $tdoc.tagsPossibleValues)
-  #if($possibleTags && $possibleTags.size() > 0)
-   <style type="text/css" media="all">
+
+  <style type="text/css" media="all">
   li.inline {
   display: inline;
   padding-left: 3px;
@@ -22,6 +22,64 @@
     cursor: pointer;
   }
   </style>
+
+  #set($possibleTags = $tdoc.tagsPossibleValues)
+
+  #if($tags == "checkbox" && $possibleTags && $possibleTags.size() > 0)
+    <div id="tag_possibilities" style="display:none">
+    $msg.get("chooseassociatedtags")
+    <ul>
+    #foreach($tag in $possibleTags)
+      <li class="inline tag"><input type="checkbox" id="tag_$tag" name="tag_$tag" value="$tag" onchange="addTag('$tag')"/><label forname="tag_$tag">$tag</label></li>
+    #end
+    </ul>
+    </div>
+    <script type="text/javascript">
+
+    function addTag($tag) {
+      setTagsToForm();
+    }
+
+
+    function getTags(){
+      var els = $('tag_possibilities').getElementsByTagName('ul')[0].getElementsByTagName('li');
+      var tags =  new Array();
+      for(var i = 0; i < els.length; i++) {
+          var tagName = els[i].getElementsByTagName("label")[0].innerHTML;
+	      if (isSelected(tagName)) {
+            tags += tagName;
+            tags += "|";
+           }
+	  }
+      return tags;
+    }
+
+    function readTags(){
+      var tags = $('tags').value;
+      if (tags && tags.length > 0){
+        var tagTab = tags.split("|");
+        for(var i = 0; i < tagTab.length; i++) {
+          if(tagTab[i] && tagTab[i].length > 0){
+            selectTag(tagTab[i]);
+          }
+        }
+      }
+    }
+
+    function isSelected(tagName){
+      return $("tag_" + tagName).checked;
+
+    }
+
+    function selectTag(tagName){
+      $("tag_" + tagName).checked = true;
+    }
+
+
+    </script>
+
+  #end
+  #if($tags == "default" && $possibleTags && $possibleTags.size() > 0)
 
     <div id="tag_possibilities" style="display:none">
     Available tags for this document
@@ -57,16 +115,10 @@
       for(var i = 0; i < els.length; i++) {
 	      if (isClassExist(els[i], 'selected')) {
 	        var node = els[i].getElementsByTagName("a");
-            tags += node[0].innerHTML;
-            tags += "|";
+            tags.push(node[0].innerHTML);
            }
 	  }
-      return tags;
-    }
-
-    function setTagsToForm(){
-      var tags = getTags();
-      $('tags').value = tags;
+      return tags.join("|");
     }
 
     function readTags(){
@@ -81,6 +133,15 @@
        }
     }
 
+  </script>
+  #end
+  <script type="text/javascript">
+
+    function setTagsToForm(){
+      var tags = getTags();
+      $('tags').value = tags;
+    }
+
     function initTagScript(){
       $('tag_possibilities').style.display="";
       $('selectedTagsForm').style.display="none";
@@ -88,5 +149,4 @@
     }
     initTagScript();
     </script>
-  #end
 #end

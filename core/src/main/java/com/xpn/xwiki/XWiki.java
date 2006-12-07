@@ -2747,6 +2747,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     }
 
+                    if (targetWiki != null)
+                        context.setDatabase(targetWiki);
                     List attachlist = tdoc.getAttachmentList();
                     if (attachlist.size() > 0) {
                         for (int i = 0; i < attachlist.size(); i++) {
@@ -2825,6 +2827,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     }
 
+                    if (targetWiki != null)
+                        context.setDatabase(targetWiki);
                     List attachlist = tdoc.getAttachmentList();
                     if (attachlist.size() > 0) {
                         for (int i = 0; i < attachlist.size(); i++) {

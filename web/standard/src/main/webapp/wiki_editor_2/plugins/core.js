@@ -59,10 +59,10 @@ WikiEditor.prototype.initCorePlugin = function() {
                   "â|ã|ä|å|æ|ç|" +
                   "è|é|ê|ë|ì|í|" +
                   "î|ï|ñ|ò|ó|ô|" +
-                  "?|õ|ö|ø|ù|ú|" +
+                  "œ|õ|ö|ø|ù|ú|" +
                   "û|ü|ÿ|" +
                   // Commercial symbols:
-                  "?|©|®|¢|?|¥|" +
+                  "™|©|®|¢|€|¥|" +
                   "£|¤|" +
                   //Other characters
                   ">|<|&|\"";

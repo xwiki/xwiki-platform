@@ -30,6 +30,7 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.hibernate.HibernateException;
 
@@ -43,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.filter.XWikiLinkFilter;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
@@ -398,4 +400,66 @@ public class XWikiTest extends HibernateTestCase {
         text = "HelloJohnWayne";
         assertEquals("Replacement failed" + text, "Hello John Wayne", XWikiLinkFilter.convertWikiWords(text));
     }
+
+    public void testVirtualCopyDocument() throws XWikiException, HibernateException {
+        this.config.put("xwiki.virtual", "1");
+        Utils.createDoc(getXWiki().getHibernateStore(), "XWiki", "XWikiServerXwikitest2", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", getXWikiContext());
+
+        getXWikiContext().setDatabase("xwikitest2");
+        // TODO: Split into several tests if you need a new clean up.
+        StoreHibernateTest.cleanUp(getXWiki().getHibernateStore(), false, true, getXWikiContext());
+        getXWikiContext().setDatabase("xwikitest");
+        Utils.createDoc(getXWiki().getHibernateStore(), "Main", "CopyTest", getXWikiContext());
+        XWikiDocument sourcedoc = getXWiki().getDocument("Main.CopyTest", getXWikiContext());
+
+        getXWiki().copyDocument("Main.CopyTest", "Main.CopyTest","xwikitest", "xwikitest2", "en", true, false, getXWikiContext());
+        getXWiki().flushCache();
+
+        getXWikiContext().setDatabase("xwikitest2");
+        XWikiDocument targetdoc = getXWiki().getDocument("Main.CopyTest", getXWikiContext());
+
+        assertEquals("Content of doc is different", sourcedoc.getContent(), targetdoc.getContent());
+    }
+
+    public void testVirtualCopyDocumentWithAttachment() throws XWikiException, HibernateException, IOException {
+        this.config.put("xwiki.virtual", "1");
+        Utils.createDoc(getXWiki().getHibernateStore(), "XWiki", "XWikiServerXwikitest2", getXWikiContext());
+        Utils.setStringValue("XWiki.XWikiServerXwikitest2", "XWiki.XWikiServerClass", "server", "127.0.0.1", getXWikiContext());
+
+        getXWikiContext().setDatabase("xwikitest2");
+        StoreHibernateTest.cleanUp(getXWiki().getHibernateStore(), false, true, getXWikiContext());
+
+        getXWikiContext().setDatabase("xwikitest");
+        Utils.createDoc(getXWiki().getHibernateStore(), "Main", "CopyTest", getXWikiContext());
+        XWikiDocument sourcedoc = getXWiki().getDocument("Main.CopyTest", getXWikiContext());
+
+        XWikiAttachment attachment1 = new XWikiAttachment(sourcedoc, Utils.afilename);
+        byte[] attachcontent1 = Utils.getDataAsBytes(new File(Utils.filename));
+        attachment1.setContent(attachcontent1);
+        sourcedoc.saveAttachmentContent(attachment1, getXWikiContext());
+        sourcedoc.getAttachmentList().add(attachment1);
+        getXWiki().saveDocument(sourcedoc, getXWikiContext());
+
+        getXWiki().copyDocument("Main.CopyTest", "Main.CopyTest","xwikitest", "xwikitest2", "en", true, false, getXWikiContext());
+
+        getXWiki().flushCache();
+        getXWikiContext().setDatabase("xwikitest2");
+        XWikiDocument targetdoc = getXWiki().getDocument("Main.CopyTest", getXWikiContext());
+
+        assertEquals("Content of doc is different", sourcedoc.getContent(), targetdoc.getContent());
+
+        List attachlist = targetdoc.getAttachmentList();
+        assertEquals("Attachment is not listed", 1, attachlist.size());
+        XWikiAttachment attachment2 = (XWikiAttachment) attachlist.get(0);
+        assertEquals("Attachment name is not correct", Utils.afilename, attachment2.getFilename());
+        assertEquals("Attachment version is not correct", "1.1", attachment2.getVersion());
+        byte[] attachcontent2 = attachment2.getContent(getXWikiContext());
+        assertEquals("Attachment content size is not correct", attachcontent1.length, attachcontent2.length);
+        for (int i=0;i<attachcontent1.length;i++) {
+            assertEquals("Attachment content byte " + i + " is not correct", attachcontent1[i], attachcontent2[i]);
+        }
+
+    }
+
 }

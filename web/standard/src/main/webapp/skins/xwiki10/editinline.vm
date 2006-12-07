@@ -27,6 +27,7 @@ $msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 ##<div id="xwikicontent">
 $cdoc.getRenderedContent()
 ##</div>
+#template("tagedit.vm")
 <div class="bottombuttons">#template("editactions.vm")</div>
 #end
 </form>

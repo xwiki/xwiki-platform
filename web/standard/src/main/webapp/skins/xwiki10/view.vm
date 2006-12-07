@@ -27,7 +27,7 @@
 #end
 <h3 class="hidden">$msg.get("docdata")</h3>
 <ul class="xwikitabbar">
-<li id="xwikicomments"#if($show == "comments") class="active"#end><a href="$doc.getURL("view", "show=comments")#xwikicomments" title="$msg.get("showcomments")">$msg.get("comments")</a></li><li id="xwikiattachments"#if($show == "attachments") class="active"#end><a href="$doc.getURL("view", "show=attachments")#xwikiattachments" title="$msg.get("showattachments")">$msg.get("attachments")</a></li><li id="xwikihistory"#if($show == "history") class="active"#end><a href="$doc.getURL("view", "show=history")#xwikihistory" title="$msg.get("showhistory")">$msg.get("history")</a></li><li #if($show == "comments") class="active"#end><a href="$doc.getURL("view", "show=attributes")#xwikiattributes" title="$msg.get("showattributes")">$msg.get("attributes")</a></li>
+<li id="xwikicomments"#if($show == "comments") class="active"#end><a href="$doc.getURL("view", "show=comments")#xwikicomments" title="$msg.get("showcomments")">$msg.get("comments")</a></li><li id="xwikiattachments"#if($show == "attachments") class="active"#end><a href="$doc.getURL("view", "show=attachments")#xwikiattachments" title="$msg.get("showattachments")">$msg.get("attachments")</a></li><li id="xwikihistory"#if($show == "history") class="active"#end><a href="$doc.getURL("view", "show=history")#xwikihistory" title="$msg.get("showhistory")">$msg.get("history")</a></li><li #if($show == "attributes") class="active"#end><a href="$doc.getURL("view", "show=attributes")#xwikiattributes" title="$msg.get("showattributes")">$msg.get("attributes")</a></li>
 </ul>
 <div id="xwikidatacontents">
 #if($show == "comments")

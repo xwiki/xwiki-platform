@@ -1914,6 +1914,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addBooleanField("renderXWikiGroovyRenderer", "Render Groovy code", "yesno");
         needsUpdate |= bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
 
+        //for tags
+        needsUpdate |= bclass.addStaticListField("tagPage", "Activate the tagging", "no|default|checkbox");
+
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);

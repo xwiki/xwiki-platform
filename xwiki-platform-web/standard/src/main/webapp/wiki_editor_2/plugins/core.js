@@ -920,29 +920,22 @@ WikiEditor.prototype._convertListInternal = function(content) {
 
 WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     var str = "";
-    var tag = "font";
+    var tag = "font", style = "", class = "", id = "", name = "";
     var atts = result[1].split("|");
     for (var i=0; i < atts.length; i++) {
-        var att = atts[i].substring(0, atts[i].indexOf("="));
-        var value = atts[i].substring(atts[i].indexOf("=") + 1, atts[i].length);
-        if (att == "size") att = "font-size";
-        if (att == "face") att = "font-family";
-        if (i==0) {
-            if (att == "type") {
-                tag = value;
-                str = "<" + tag + " ";
-            } else {
-                str = "<" + tag + " style=\"" + att + ":" + value + ";";
-            }
-        } else if (i < atts.length) {
-            if (i == 1) str += "style=\"";
-            str += " " + att + ":" + value + ";";
-            if (i == atts.length - 1) str += "\""
-        }
-        if (atts.length == 1) {
-            str += "\"";
-        }
+        var att = this.trimString(atts[i].substring(0, atts[i].indexOf("=")));
+        var value = this.trimString(atts[i].substring(atts[i].indexOf("=") + 1, atts[i].length));
+        if (att == "class") class = value;
+        else if (att == "id") id = value;
+        else if (att == "name") name = value;
+        else if (att == "type") tag = value;
+        else style += att + ":" + value + ";";
     }
+    str += "<" + tag;
+    if (id != "") str += " id=\"" + id + "\"";
+    if (class != "") str += " class=\"" + class + "\"";
+    if (name != "") str += " name=\"" + name + "\"";
+    if (style != "") str += " style=\"" + style + "\"";
     str += ">";
     str += result[2];
     str += "</" + tag + ">";
@@ -955,6 +948,19 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     if (type == "span" || type =="div") {
         var attributes = this.readAttributes(result[2]);
         str += "{style:type=" + type;
+
+        if (attributes && attributes["id"]) {
+            str += "|id=" + attributes["id"] ;
+        }
+
+        if (attributes && attributes["class"]) {
+            str += "|class=" + attributes["class"] ;
+        }
+
+        if (attributes && attributes["name"]) {
+            str += "|name=" + attributes["name"] ;
+        }
+
         if (attributes && attributes["style"]) {
             var atts = attributes["style"].split(";");
             for (var i=0; i < atts.length ; i++) {

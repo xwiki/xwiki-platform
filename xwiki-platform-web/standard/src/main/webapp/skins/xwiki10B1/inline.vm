@@ -1,8 +1,0 @@
-#set($editor = "inline")
-##
-## Header
-##
-#template("startpage.vm")
-#template("menuview.vm")
-#template("edit${editor}.vm")
-#template("endpage.vm")

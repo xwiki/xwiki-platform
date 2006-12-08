@@ -1,7 +1,0 @@
-###
-### Admin mode tabs
-###
-###
-<ul class="xwikitabbar">
-<li id="xwikiadminprefs"#if($editor == "prefs") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&amp;global=1")">$msg.get("adminprefs")</a></li><li id="xwikiadminglobalrights"#if($editor == "globalrights") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&amp;global=1")">$msg.get("adminglobalrights")</a></li><li id="xwikiadminspacerights"#if($editor == "spacerights") class="active"#end><a href="$xwiki.getDocument("${doc.web}.WebPreferences").getURL("admin", "editor=spacerights")">$msg.get("adminspacerights")</a></li><li id="xwikiadmingroups"#if($editor == "groups") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups")">$msg.get("admingroups")</a></li><li id="xwikiadminusers"#if($editor == "users") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users")">$msg.get("adminusers")</a></li><li id="xwikiadminskin"#if($editor == "skin") class="active"#end><a href="$xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin")">$msg.get("adminskin")</a></li>
-</ul>

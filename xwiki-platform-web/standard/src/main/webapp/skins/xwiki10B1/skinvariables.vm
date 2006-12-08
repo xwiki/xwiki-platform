@@ -1,4 +1,0 @@
-#template("xwikivars.vm")
-#template("layoutvars.vm")
-#set($skindoc = $xwiki.getDocument($xwiki.getSkin()))
-#set($colors = $skindoc.getObject("XWiki.XWikiSkin", 0))

@@ -1,2 +1,0 @@
-#set($showactions = 0)
-#template("code.vm")

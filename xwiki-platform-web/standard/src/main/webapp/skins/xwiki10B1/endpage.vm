@@ -1,9 +1,0 @@
-      </div>## main
-    </div>## contentcolumn
-#template("leftpanels.vm")
-#template("rightpanels.vm")
-<div class="clearfloats"></div>
-  </div>## contentcontainerinner
-</div>## contentcontainer
-#template("footer.vm")
-#template("htmlfooter.vm")

@@ -1,0 +1,33 @@
+###
+### Disambiguation template
+###
+### Needed because IE without JavaScript cannot tell which submit button was pressed
+###
+##
+## Header
+##
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+#template("header.vm")
+<div class="layoutsection">
+##
+## Content
+##
+#xwikimessageboxstart($msg.get("disambiguation") "$msg.get('actionnotunderstood') <a href='$xwiki.getDocument('Doc.Disambiguation').getURL('view')' style='font-weight: 100; text-decoration: none;'>[$msg.get('whyamiseeingthis')]</a>")
+<div class="bottombuttons centered">
+<form style="display: inline;" action="$tdoc.getURL("cancel")" method="post"><div style="display: inline;"><button class="button" type="submit">$msg.get("cancel")</button></div></form>
+<form style="display: inline;" action="$tdoc.getURL("preview")" method="post"><div style="display: inline;">
+#foreach($param in $request.getParameterNames())<input type="hidden" name="$param" value="$xwiki.getFormEncoded($request.getParameter($param))"/>#end
+<button class="button" type="submit">$msg.get("preview")</button></div></form>
+<form style="display: inline;" action="$tdoc.getURL("saveandcontinue")" method="post"><div style="display: inline;">
+#foreach($param in $request.getParameterNames())<input type="hidden" name="$param" value="$xwiki.getFormEncoded($request.getParameter($param))"/>#end
+<button class="button" type="submit">$msg.get("saveandcontinue")</button></div></form>
+<form style="display: inline;" action="$tdoc.getURL("save")" method="post"><div style="display: inline;">
+#foreach($param in $request.getParameterNames())<input type="hidden" name="$param" value="$xwiki.getFormEncoded($request.getParameter($param))"/>#end
+<button class="button" type="submit">$msg.get("save")</button></div></form>
+</div>
+#xwikimessageboxend()
+</div>
+#template("footer.vm")
+#template("htmlfooter.vm")

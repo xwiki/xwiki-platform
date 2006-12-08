@@ -1,0 +1,22 @@
+###
+### Code page in the "view" mode
+###
+###
+<h2>$xwiki.parseMessage("viewcodetitle")</h2>
+#set($ln = $request.getParameter("showlinenumbers"))
+#if((!$ln) || ($ln == "1"))
+<a href="$doc.getURL("view", "viewer=code&showlinenumbers=0&$docvariant")">$msg.get("hidelinenumbers")</a>
+#set($content = $tdoc.translatedContent.split("\n"))
+<br />
+<br />
+<textarea readonly="readonly" style="width: 100%; height: 300px;">
+#foreach($line in $content)
+$velocityCount: $line
+#end
+</textarea>
+#else
+<a href="$doc.getURL("view", "viewer=code&showlinenumbers=1&$docvariant")">$msg.get("showlinenumbers")</a>
+<br />
+<br />
+<textarea readonly="readonly" style="width: 100%; height: 300px;">$tdoc.translatedContent</textarea>
+#end

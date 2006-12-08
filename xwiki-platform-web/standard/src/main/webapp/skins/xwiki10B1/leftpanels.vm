@@ -1,0 +1,7 @@
+#if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+<div id="leftPanels" class="panels left"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
+#foreach($panel in $leftPanels)
+#displaypanel($panel)
+#end
+</div>
+#end

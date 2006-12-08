@@ -1,0 +1,30 @@
+.xwikisep, .xwikisep2 {
+   display: none;
+}
+.clear, .clearfloats {
+  clear: both;
+}
+.none, .hidden {
+  display: none;
+}
+.currentspace{
+  font-weight: 900;
+  margin-top: 2px;
+}
+.extern{
+  background-image: url("corner.png");
+  background-repeat: no-repeat;
+  background-position: right top;
+}
+.centered {
+  margin: auto;
+  text-align: center;
+}
+.xwikipanelarrow{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 50px;
+  height: 10px;
+  visibility: hidden;
+}

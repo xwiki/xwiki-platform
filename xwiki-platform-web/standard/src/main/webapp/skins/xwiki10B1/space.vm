@@ -1,0 +1,21 @@
+#macro(breadcrumb $doc $string)
+#set($parent = $doc.parent)
+#if($parent != "")
+#set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
+#set($pdocurl = $pdoc.getURL("view"))
+#set($nstring = "<a href='$pdocurl'>${pdoc.displayTitle}</a> &gt; $string")
+#breadcrumb($pdoc $nstring)
+#else
+$string
+#end
+#end
+#if($context.getMode()==0) ## Visible only in a page
+<div id="headerspace" class="layoutsection">
+<hr/>
+  <div id="breadcrumbs">
+    <span class="breadcrumbspace"><a href="$spaceviewurl">$doc.web</a>: </span>
+#breadcrumb($doc "<a href='$doc.getURL('view')'>$doc.displayTitle</a>")
+  </div>
+<hr/>
+</div>
+#end

@@ -1,0 +1,27 @@
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
+<div id="headerglobal" class="layoutsection">
+  <div id="companylogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
+#set($logo = $!prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.gif"))
+      <img src="$logourl" alt="Netcipia" style="width: 215px;height: 74px;"/>
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+      <img src="$logourl" alt="XWiki"/>
+#end
+    </a>
+  </div>
+</div>
+<div id="xwikicontent-header">
+<div class="leftcorner"></div>
+</div>
+<div id="contentcontainer" class="layoutsection">
+  <div id="contentcolumn" class="contenthidelefthideright">
+$context.setLinksQueryString("xpage=popup")
+#template("contentview.vm")
+$context.unsetLinksQueryString()
+<div class="clearfloats"></div>
+#template("endpage.vm")

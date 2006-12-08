@@ -1,0 +1,46 @@
+#template("xwikivars.vm")
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>New chart wizard</title>
+<meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
+<meta http-equiv="imagetoolbar" content="no"/>
+$!xwiki.getWebPreference("meta") 
+<link href="$xwiki.getSkinFile("chwSkin.css")" rel="stylesheet" type="text/css"/>
+#template("stylesheets.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
+</head>
+<body onload='window.wizard.initialize("$xwiki.getSkinFile("")", "$msg.get("chwshow")", "$msg.get("chwhide")");'>
+#template("header.vm")
+<form id="chwForm" action="$doc.getURL("createchart")" method="post" onsubmit="alert('submit');">
+<div id="chartWizard">
+  <table id="chwWizard" summary="Chart Wizard Content">
+    <tbody>
+      <tr>
+        <td colspan="2" id="chwNavigation">
+#template("chw/navigationimages.vm")
+      </td>
+    </tr>
+    <tr>
+      <td id="chwPreview">
+        <img id="chwPreviewImg" src="$xwiki.getSkinFile("chwSampleBarChart.png")" alt="Chart Type: Bars" title="Chart Type: Bars"/>
+      </td>
+      <td id="chwOptions">
+#template("chw/datapage.vm")
+#template("chw/typepage.vm")
+#template("chw/titlepage.vm")
+#template("chw/axispage.vm")
+      </td>
+    </tr>
+    <tr>
+      <td id="chwButtons" colspan="2"><a href="#" onclick="history.go(-1); return false;" title="Cancel the chart creation process and return to the previous page" class="chwButton">Cancel</a><a id="chwBackButton" href="#" onclick="window.wizard.showPrevPage(); return false;" title="Go to previous wizard page" accesskey="b" class="chwButtonDisabled">Back</a><a id="chwNextButton" href="#" onclick="window.wizard.showNextPage(); return false;" title="Go to next wizard page" accesskey="n" class="chwButtonDisabled">Next</a><a id="chwFinishButton" href="#" onclick="window.wizard.finish(); return false;" title="Done!" class="chwButtonDisabled">Finish</a></td>
+    </tr>
+  </tbody>
+  </table>
+</div>
+</form>
+#template("chw/colorpicker.vm")
+</body>
+</html>

@@ -1,0 +1,45 @@
+<div class="layoutsubsection">
+#set($classname = "XWiki.XWikiSkin")
+#set($class = $xwiki.getDocument($classname).xWikiClass)
+#set($redirect = "$xwiki.getRequestURL()&amp;editor=skin")
+<div class="overflowcontainer">
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div>#template("adminactions.vm")</div>
+<div>
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+#set($nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+#set($obj = $doc.getObject(${class.name}, 0))
+#if(!$obj)
+<br /><br />
+#xwikimessageboxstart($msg.get("skin") $msg.get("noskin"))
+#xwikimessageboxend()
+<br /><br />
+#else
+#set($class = $obj.xWikiClass)
+<table summary="">
+#foreach($prop in $class.properties)
+<tr><td class="label"><label for="${class.name}_${obj.number}_${prop.name}">$prop.prettyName:</label></td>
+<td>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)
+<script type="text/javascript">
+//<!--
+//document.write("<a href=\"#\" onclick=\"openColorPicker(); return false\">$msg.get("colorpicker")<"+"/a>");
+document.write("<span class=\"chwColorPickerInvoker\" title=\"$msg.get("chwinvokecolorpickertitle")\" onclick=\"window.colorPicker.show(document.getElementById('${class.name}_${obj.number}_${prop.name}'));\">$msg.get("chwinvokecolorpicker")<"+"/span>");
+//-->
+</script>
+</td>
+</tr>
+#end
+<!--tr>
+<td><label for="${class.name}_0_textcolor">$msg.get("textcolor")</label></td>
+<td><input size='30' value='$obj.get("textcolor")' id='${class.name}_0_textcolor' name='${class.name}_0_textcolor' type='text'/>
+</td>
+ </tr-->
+</table>
+</div>
+#end
+<div>#template("adminactions.vm")</div>
+</form>
+#template("chw/colorpicker.vm")
+</div>
+</div>

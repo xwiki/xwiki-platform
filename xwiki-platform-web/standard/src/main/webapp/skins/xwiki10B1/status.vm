@@ -1,0 +1,106 @@
+<html>
+<head>
+<title>Database Status</title>
+<script type="text/javascript">
+<!--
+function switchView(divname) {
+ var divel = document.getElementById(divname);
+ if (divel.style.display=='block')
+  divel.style.display = 'none';
+ else
+  divel.style.display = 'block';
+}
+// -->
+</script>
+</head>
+<body>
+<h1>Memory and Database Status</h1>
+<h2>Memory</h2>
+<ul>
+<li>Max: $xwiki.maxMemory()</li>
+<li>Free: $xwiki.freeMemory()</li>
+<li>Total: $xwiki.totalMemory()</li>
+</ul>
+<h2>Active Connections</h2>
+<ul>
+<li />Active: $xwiki.store.store.nbConnections
+<li />Map Size: $xwiki.store.store.connections.size()
+</ul>
+<br /><br />
+
+#foreach ($mconn in $xwiki.store.store.connections)
+<h3>$mconn</h3>
+#set($pconn = $mconn.connection)
+<ul>
+<li /><a href="" onclick="switchView('$mconn'); return false;">Time: $mconn.date</a>
+<div id="$mconn" style="display: none">
+The database connection was assigned in the following page:<br />
+$mconn.url
+<br /><br />
+StackTrace: <br />
+<pre>
+$mconn.exception.getStackTraceAsString()
+</pre>
+</div>
+<li />Closed: $pconn.isClosed()
+#if ( $pconn.closed==false)
+<li />Catalog: $!pconn.catalog
+<li />AutoCommit: $!pconn.autoCommit
+<li />ReadOnline: $!pconn.readOnly
+<li />Warnings: $!pconn.warnings
+#end
+</ul>
+#end
+
+
+#set($provider = $xwiki.store.store.sessionFactory.connectionProvider)
+#set($pool = $xwiki.getPrivateField($provider,"connectionPool"))
+
+#if ($pool)
+<h2>Current Pool</h2>
+
+
+<h3>Before gc</h3>
+<ul>
+<li />Max Active: $pool.maxActive
+<li />Max Idle: $pool.maxIdle
+<li />Max Wait: $pool.maxWait
+<li />Active: $pool.numActive
+<li />Idle: $pool.numIdle
+</ul>
+
+$xwiki.gc()
+$xwiki.gc()
+$xwiki.gc()
+
+<h3>After gc</h3>
+<ul>
+<li />Max Active: $pool.maxActive
+<li />Max Idle: $pool.maxIdle
+<li />Max Wait: $pool.maxWait
+<li />Active: $pool.numActive
+<li />Idle: $pool.numIdle
+</ul>
+
+
+#set($list = $xwiki.getPrivateField($pool,"_pool"))
+#foreach ($element in $list)
+#set($pconn = $xwiki.getPrivateField($element, "value"))
+#set($timea = $xwiki.currentDate.time)
+#set($timeb = $xwiki.getPrivateField($element, "tstamp"))
+<h3>$pconn</h3>
+#set($conn = $pconn.delegate.delegate)
+<ul>
+<li />CurrentTime: $timea
+<li />LastActiveTime: $timeb
+<li />$conn
+<li />Closed: $conn.isClosed()
+#if ( $conn.closed==false)
+<li />Catalog: $!conn.catalog
+<li />AutoCommit: $!conn.autoCommit
+<li />ReadOnline: $!conn.readOnly
+<li />Warnings: $!conn.warnings
+#end
+</ul>
+#end
+#end

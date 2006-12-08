@@ -1,0 +1,7 @@
+###
+### Direct rendering of the content
+###
+### TODO: This is disabled in Java. Why?
+###
+#template("xwikivars.vm")
+$cdoc.getRenderedContent()

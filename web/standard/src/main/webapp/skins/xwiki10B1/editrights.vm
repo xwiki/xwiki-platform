@@ -1,0 +1,36 @@
+#set($formname = "update")
+#set($saveaction = "save")
+#if ( $request.getParameter("global").equals("1"))
+#set ($classname = "XWiki.XWikiGlobalRights")
+#else
+#set ($classname = "XWiki.XWikiRights")
+#end
+#set( $class = $xwiki.getDocument($classname).xWikiClass)
+#set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
+<div style="overflow:auto">
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div class="topbuttons">#template("editactions.vm")</div>
+<div>
+#set ($first = 1)
+#set($nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+<table id="xwikirightstable">
+ <tr>
+#*<th>$msg.get("Right")</th>*#<th>$msg.get("Users")</th><th>$msg.get("Groups")</th><th>$msg.get("Level")</th><th>$msg.get("Allow-Deny")</th><th>$msg.get("Remove")</th>
+ </tr>
+#foreach ($obj in $doc.getObjects($class.name))
+#set($class = $obj.xWikiClass)
+    <tr>
+##        <td align="center">$!{obj.number}</td>
+        <td>$!doc.displayEdit($class.users,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.groups,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.levels,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.allow,"${class.name}_${obj.number}_",$obj)</td>
+        <td class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${xwiki.getURLEncoded($redirect)}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("Remove")</a></td>
+    </tr>
+#end
+  </table>
+ </div>
+<div class="bottombuttons">#template("editactions.vm")</div>
+</form>
+</div>

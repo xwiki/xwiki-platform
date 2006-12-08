@@ -1,0 +1,12 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("thistemplatedoesnotexist"))
+$!exception
+#xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
+</div>
+#template("endpage.vm")

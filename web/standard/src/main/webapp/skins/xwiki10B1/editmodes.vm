@@ -1,0 +1,18 @@
+###
+### Edit mode tabs
+###
+###
+#set($param = "")
+#if($request.getParameter("section"))
+    #set($sectionNumbers = $request.getParameter("section"))
+    #set($param = "section=$sectionNumbers")
+#end
+#if ($sectionNumber != 0)
+    #set($param = "section=$sectionNumber")    
+#end
+<ul class="xwikitabbar">
+<li id="xwikieditwysiwyg"#if($editor == "wysiwyg") class="active"#end><a href="$doc.getURL("edit", "editor=wysiwyg&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wysiwyg&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editVisual")</a></li>
+<li id="xwikieditfullscreen"#if($editor == "fullscreen") class="active"#end><a href="$doc.getURL("edit", "editor=fullscreen&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=fullscreen&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editFullScreen")</a></li>
+<li id="xwikieditwiki"#if($editor == "wiki") class="active"#end><a href="$doc.getURL("edit", "editor=wiki&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wiki&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editWiki")</a></li>
+<li id="xwikieditobject"#if($editor == "object") class="active"#end><a href="$doc.getURL("edit", "editor=object&amp;$param")">$msg.get("editObject")</a></li>
+</ul>

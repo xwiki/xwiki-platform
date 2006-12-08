@@ -1,0 +1,59 @@
+###
+### List document comments
+###
+### TODO: web service?
+###
+## #if(!$showcomments)
+## #set($showcomments = $xwiki.getWebPreference("showcomments"))
+## #end
+## #if($showcomments!="no")
+#if($xwiki.getWebPreferenceAsInt("commentsorder",1)==1)
+#set($comments = $doc.getComments())
+#else
+#set($comments = $doc.getComments(false))
+#end
+  <div id="commentscontent" class="xwikiintracontent">
+  <h2 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno">$comments.size()</span></h2>
+#if($comments.size()>0)
+#set($count=0)
+#foreach($comment in $comments)
+#if($count > 0)    <hr/>
+#end
+#set($count=$count+1)
+    <div id="xwikicomment_${count}" class="xwikicomment">
+##      <div class="commentavatar">#useravatar($comment.author)</div>
+      <div class="commentheader"><span class="commentauthor">$!xwiki.getLocalUserName($doc.display('author','view',$comment))</span>#set($date = $doc.display("date","view",$comment))
+#if($date != "") &ndash; <span class="commentdate">$date</span>#end
+#if($hasedit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
+    onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
+      </div>
+      <div class="commentcontent">$doc.getRenderedContent($doc.display("comment","view",$comment))      </div>
+    </div>
+#end
+#else
+$msg.get("nocomments")
+#end
+#if($xwiki.hasAccessLevel("comment"))
+#set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())
+#set($comment = $cclass.newObject())
+      <form action="$doc.getURL("commentadd")" method="post">
+        <fieldset class="expanded" id="commentform">
+        <legend onclick="toggleForm(this.form)">$msg.get("addcomment")<span class="expands">...</span></legend>
+        <input type="hidden" name="xredirect" value="${doc.getURL("view")}" />
+        <input type="hidden" name="XWiki.XWikiComments_author" value="$context.user"/>
+        <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
+        <div><textarea id='XWiki.XWikiComments_comment' rows='5' name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
+        <div>
+        <input type="submit" value="$msg.get("addcomment")" class="button"/>
+        <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+        </div>
+        </fieldset>
+      </form>
+      <script type="text/javascript">
+//<!--
+document.getElementById("commentform").className = "collapsed";
+//-->
+      </script>
+#end
+  </div>
+## #end

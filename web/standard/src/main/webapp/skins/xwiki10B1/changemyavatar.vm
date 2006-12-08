@@ -1,0 +1,29 @@
+###
+### Change a user's avatar
+###
+### Upload file form
+### TODO: Check extension
+###
+#template("startpage.vm")
+#if($doc.getObject("XWikiUsers", 0))
+#if($context.user == $doc.fullName || $hasadmin)
+  <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }">
+#xwikimessageboxstart("Avatar" $msg.get("changephoto"))
+    <input type="hidden" name="xredirect" value="$doc.getURL("view", "xpage=changeavatar")"/>
+    <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("uploadavatarfile"):</label></div>
+    <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
+    <div class="padded">
+    <input type="submit" value="$msg.get("setthisavatar")" class="button"/>
+    <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+    </div>
+#xwikimessageboxend()
+  </form>
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#xwikimessageboxend()
+#end
+#else
+#xwikimessageboxstart($msg.get("avatar") $msg.get("notauser"))
+#xwikimessageboxend()
+#end
+#template("endpage.vm")

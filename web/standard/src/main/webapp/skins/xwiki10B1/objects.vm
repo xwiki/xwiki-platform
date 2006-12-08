@@ -1,0 +1,16 @@
+<div id="xwikiobjects" class="xwikidata">
+<div class="xwikidatatitle2">
+<div class="xwikidatatitle1">&nbsp;</div>
+<div class="xwikidatatitle">
+<a href="" onclick="showhide('xwikiobjectscontent'); return false">$msg.get("Forms")</a>:
+Forms display not implemented yet.
+</div>
+</div>
+<div id="xwikiobjectscontent" class="xwikidatacontent" style="display:none">
+This will contain the forms that have been attached to this document..
+</div>
+<div class="xwikidatafooter2">
+<div class="xwikidatafooter1">&nbsp;</div>
+<div class="xwikidatafooter">&nbsp;</div>
+</div>
+</div>

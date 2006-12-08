@@ -1,0 +1,53 @@
+#set($showactions = 0)
+<div id="historycontent" class="xwikiintracontent">
+    <h4 class="xwikiintratitle">$msg.get("history")</h4>
+    <form action="$doc.getURL("edit", "editor=changes&amp;$docvariant")" method="post">
+      <div>
+      <div class="centered">
+##      <h4>$msg.get("dochistory")</h4>
+      <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">
+        <tr>
+          <th>$msg.get("from")</th>
+          <th>$msg.get("to")</th>
+          <th>$msg.get("version")</th>
+          <th>$msg.get("reveditor")</th>
+          <th>$msg.get("date")</th>
+#if($hasedit || $hasadmin)
+          <th></th>
+#end
+        </tr>
+#if(!$revisionscount)
+#set($revisionscount = 0)
+#end
+#if ($tdoc.realLanguage!="")
+#set($lang = "&amp;language=${tdoc.realLanguage}")
+#else
+#set($lang = "")
+#end
+#foreach ($version in $tdoc.getRecentRevisions($revisionscount))
+#set($origdoc = "")
+#set($newdoc = "")
+#set($nextversion = $version)
+#set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+        <tr class="row#if($velocityCount % 2 == 1) even #else odd #end">
+          <td><input type="radio" name="rev1" value="$nextversion" /></td>
+          <td><input type="radio" name="rev2" value="$nextversion" /></td>
+          <td><a href="$tdoc.getURL("viewrev","rev=$nextversion")">$nextversion</a></td>
+#if($newdoc=="")
+          <td>&ndash;</td>
+          <td>&ndash;</td>
+#else
+          <td>$xwiki.getLocalUserName($newdoc.author)</td>
+          <td>$xwiki.formatDate($newdoc.date, "dd/MM/yyyy hh:mm")</td>
+#end
+#if($hasedit || $hasadmin)
+          <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
+#end
+        </tr>
+#end
+</table>
+      <div class="buttons"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
+      </div>
+    </div>
+  </form>
+  </div>

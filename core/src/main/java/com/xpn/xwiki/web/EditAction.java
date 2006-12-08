@@ -40,6 +40,7 @@ public class EditAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
         String content = request.getParameter("content");
+        String title = request.getParameter("title");
         XWikiDocument doc = context.getDoc();
         XWiki xwiki = context.getWiki();
         XWikiForm form = context.getForm();
@@ -116,11 +117,15 @@ public class EditAction extends XWikiAction {
             }
 
             XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
-            if (content != null) tdoc2.setContent(content);
+            if (content != null) {
+                tdoc2.setContent(content);
+                tdoc2.setTitle(title);
+            }
             if(sectionContent != null && !sectionContent.equals("")) {
                 if(content != null) tdoc2.setContent(content);
                 else tdoc2.setContent(sectionContent);
-                tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
+                if(title != null) tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
+                else tdoc2.setTitle(title);
             }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", tdoc2.newDocument(context));

@@ -1,9 +1,0 @@
-#if($context.getMode()==0)## Visible only in a page
-<div id="actionmenu" class="layoutsubsection">
-<div class="centered">
-<div class="editinfo">
-$msg.get("editing"): $doc.name
-</div>
-</div>
-</div>
-#end

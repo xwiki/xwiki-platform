@@ -1,0 +1,38 @@
+#if($context.getMode()==0)
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>
+#set($title = $!doc.display("title", "view", $doc.getObject("XWiki.XWikiHTML",0)))
+#if ( $title != "")
+#set( $title = $!xwiki.getWebPreference("title"))
+#end
+#if ( $title != "")
+$xwiki.parseContent($title)
+#else
+XWiki . $!doc.web . $!doc.name
+#end
+</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="20041130" />
+<meta name="author" content="Ludovic Dubost, Olivier Seres" />
+<meta name="company" content="XPertNet" />
+<meta name="slideshow" content="yes" />
+<link rel="stylesheet" href="/xwiki/s5/ui2/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="/xwiki/s5/ui2/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="/xwiki/s5/ui2/opera.css" type="text/css" media="projection" id="operaFix" />
+<link rel="stylesheet" href="/xwiki/s5/ui2/print.css" type="text/css" media="print" id="slidePrint" />
+<script src="/xwiki/s5/ui2/slides.js" type="text/javascript"></script>
+</head>
+<body>
+<style type="text/css">
+$!xwiki.getWebPreference("style")
+</style>
+<style type="text/css">
+$!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
+</style>
+#end

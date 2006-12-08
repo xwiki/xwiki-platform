@@ -1,0 +1,524 @@
+body{
+  overflow: auto;
+}
+#chwForm{
+  clear: both; /* I've noticed strange behavior in DeerPark Alpha 2 if I don't put this */
+  margin: auto;
+}
+#chartWizard{
+  margin: auto;
+  text-align: center;
+}
+
+#chwWizard{
+  width: 700px;
+	height: 470px;
+  border: #DDD 1px solid;
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin: 5px;
+  margin: auto;
+  text-align: left;
+}
+
+.chwTitle{
+  color: #5368A6;
+  font-size: 17px;
+  font-style: italic;
+}
+
+#chwNavigation{
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border-style: hidden;
+}
+
+#chwNavigationButtons{
+  height: 20px;
+  background-color: #B6C5F2;
+  border: black 1px solid;
+  border-color: #FFF #FFF #5368A6 #FFF;
+  margin: 0px 0px 0px 0px;
+  padding-left: 4px;
+}
+
+#chwNavigationButtons > p{
+  display: none;
+}
+
+img.chwNavigationImage, img.chwNavigationImageDisabled, img.chwNavigationImageHidden{
+	margin: 3px 4px 2px 3px;
+	height: 16px;
+  vertical-align: middle;
+}
+
+img.chwNavigationImage{
+  cursor: pointer;
+}
+
+img.chwNavigationImageHidden{
+  display: none;
+}
+
+.chwButton, .chwButtonDisabled{
+  text-decoration: none;
+  color: #FFF;
+  padding: 2px 15px 2px 15px;
+  margin: 5px 5px 5px 5px;
+}
+.chwButton{
+  background-color: #5368A6;
+}
+a.chwButton{
+  background-color: #369;
+  color: #FFF;
+}
+.chwButtonDisabled{
+  background-color: #888;
+  cursor: default;
+}
+
+td{
+  vertical-align: top;
+/*  border: black 1px solid;*/
+}
+#chwPreview{
+  width: 300px;
+  height: 420px;
+  border: #DDD 1px solid;
+  text-align: center;
+}
+#chwPreviewImg{
+  width: 256px;
+}
+
+#chwOptions{
+  width: 385px;
+  height: 420px;
+  overflow: auto;
+}
+
+fieldset.chwLargeFieldset, fieldset.chwSmallFieldset{
+  border: #5368A6 1px solid;
+  margin: 0px 8px 8px;
+  padding: 6px;
+  padding-bottom: 16px;
+}
+
+fieldset.chwSmallFieldset{
+  border: #BBB 1px solid;
+}
+
+legend.chwLargeLegend, legend.chwSmallLegend{
+  color: #5368A6;
+  background-color: #B6C5F2;
+  background-color: #FFF;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 2px 4px 2px 4px;
+  cursor: pointer;
+}
+legend.chwLargeLegend{
+  border: #5368A6 1px solid;
+}
+
+legend.chwSmallLegend{
+  font-size: 12px;
+  font-weight: 600;
+}
+
+legend label{
+  margin-left: 0px;
+}
+
+input{
+  margin-bottom: 0px;
+}
+
+label{
+  /*margin-left: 8px;*/
+}
+
+#chwButtons{
+	padding: 8px 12px 8px 12px;
+  text-align: right;
+}
+
+.chwActivePage, .chwInactivePage{
+  overflow: auto;
+  width: 400px;
+  height: 420px;
+  padding: 10px;
+}
+
+.chwActivePage, .chwVisible{
+  display: block;
+}
+
+.chwInline{
+  display: inline;
+}
+
+.chwInactivePage, .chwHidden{
+  display: none;
+}
+
+.chwCentered{
+  text-align: center;
+  margin: auto;
+}
+.chwAction{
+  cursor: pointer;
+}
+.chwNotice{
+  display: block;
+  color: #5368A6;
+  font-size: larger;
+}
+.chwLimited{
+  max-width: 350px;
+}
+#chwColorPicker input, #chwColorPicker select{
+  margin: 5px;
+  margin-bottom: 10px;
+  vertical-align: middle;
+}
+
+.chwLargeField{
+  width: 95%;
+}
+
+#chwPreview{
+}
+
+
+/*
+  Position selector table
+ */
+.chwPositionSelector{
+  margin: auto;
+}
+.chwPositionSelector td{
+ border: navy 2px outset;
+ cursor: pointer;
+}
+
+td.chwDisabledCell{
+  background-color: #DDD;
+  border: none;
+  cursor: default;
+}
+
+.chwNormalCell{
+  background-color: transparent;
+}
+.chwNormalCellHighlighted{
+  background-color: #b6c5f2;
+}
+.chwSelectedCell{
+ background-color: #5368a6;
+}
+.chwSelectedCellHighlighted{
+ background-color: #c82;
+}
+
+.chwNormalBlockDiv{
+  width: 16px;
+  height: 16px;
+}
+.chwLargeBlockDiv{
+  height: 16px;
+}
+
+/*
+  Color chooser style
+ */
+
+.chwTransparent {
+  color: black;
+}
+.chwBlack {
+  color: black;
+}
+.chwWhite {
+  color: black;
+}
+.chwSilver {
+  color: silver
+}
+.chwGray {
+  color: gray;
+}
+.chwMaroon {
+  color: maroon;
+}
+.chwRed {
+  color: red;
+}
+.chwPurple {
+  color: purple;
+}
+.chwFuchsia {
+  color: fuchsia;
+}
+.chwGreen {
+  color: green;
+}
+.chwLime {
+  color: lime;
+}
+.chwOlive {
+  color: olive;
+}
+.chwOrange {
+  color: orange;
+}
+.chwYellow {
+  color: yellow;
+}
+.chwNavy {
+  color: navy;
+}
+.chwBlue {
+  color: blue;
+}
+.chwTeal {
+  color: teal;
+}
+.chwAqua {
+  color: aqua;
+}
+
+.chwCustomColorGroup{
+  display: none;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+.chwCustomColor{
+}
+
+.chwCustomColorGroup input{
+  width: 56px;
+}
+
+/*
+  Margin selector
+ */
+.chwMarginSelector{
+  margin: auto;
+  border: #BBB 1px dashed;
+  border-spacing: 0px;
+  border-collapse: collapse;
+  vertical-align: middle;
+}
+.chwMarginSelector td{
+  vertical-align: middle;
+}
+.chwFontFamily{
+  max-width: 240px;
+}
+.chwLargeInput{
+  text-align: center;
+  width: 100%;
+  margin: 0px;
+}
+.chwNormalInput{
+  text-align: center;
+  width: 32px;
+  margin: 0px;
+  vertical-align: text-top;
+}
+.chwSmallInput{
+  width: 32px;
+  margin-right: 0px;
+}
+.chwMarginCenter{
+  font-size: 28px;
+  padding: 0px;
+  color: #BBB;
+  border: #BBB 1px dashed;
+}
+
+td.chwLowered{
+  vertical-align: text-bottom;
+}
+
+td.chwFormLabelCell{
+  vertical-align: middle;
+}
+
+table.chwTitlePositioningLayout{
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0px;  
+}
+
+td.chwTitlePositioningUnitLeft{
+  border-right: #BBB 1px solid;
+  width: 50%;
+}
+
+td.chwTitlePositioningUnitRight{
+  border-left: #BBB 1px solid;
+}
+
+
+
+.chwColorPickerInvoker, .chwDatSourceWizardInvoker{
+  text-decoration: none;
+  color: #FFF;
+  padding: 4px 5px 1px;
+  margin: 0px 4px;
+  cursor: pointer;
+  background-color: #369;
+}
+#chwColorPicker{
+  position: absolute;
+  z-index: 1199;
+  display: none;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+#chwColorPickerFieldset{
+  margin: 0px;
+  position: relative;
+  z-index: 1200;
+  left: 200px;
+  top: 100px;
+  width: 275px;
+  background-color: #fdfdfd;
+  padding-bottom: 0px;
+  border: 2px solid #369;
+  border-top: 8px solid #369;
+}
+
+#chwColorPickerScreen{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+}
+html > body #chwColorPickerScreen{
+  opacity: 0.6;
+  background-color: #FFF;
+}
+
+#chwColorPickerFieldset legend{
+  background-color: #369;
+  color: #FFF;
+  cursor: default;
+}
+
+#chwColorpickerControlsTable{
+  width: 265px;
+  margin-bottom: 12px;
+}
+
+.chwColorpickerHSDiv{
+  border: inset 1px;
+  padding: 0px;
+  margin: 0px;
+}
+.chwColorpickerHSImg{
+  cursor: crosshair;
+  width: 240px;
+  height: 241px;
+  margin: 0px;
+  padding: 0px;
+  display: block;
+}
+
+.chwColorpickerLDiv{
+  border: inset 1px;
+  padding: 0px;
+  margin: 0px;
+}
+.chwColorpickerLImg{
+  width: 10px;
+  height: 241px;
+  cursor: crosshair;
+  margin: 0px;
+  padding: 0px;
+  display: block;
+  background-color: #5064A0;
+}
+
+.chwColorpickerShow{
+  width: 56px;
+  height: 45px;
+  margin-top: 5px;
+  background-color: #5064A0;
+  border: inset 2px;
+  display: block;
+  float: none;
+  clear: both;
+}
+#chwColorPickerShow, #chwColorCodeDisplay{
+  width: 64px;
+}
+.chwColorpickerLPointerImg{
+  width: 10px;
+  height: 241px;
+  padding: 0px;
+  border: none;
+  border-width: 0px;
+  margin: 0px;
+  line-height: 1px;
+  clear: both;
+}
+
+.chwColorpickerLPointerContainer{
+  vertical-align: top;
+  padding: 0px;
+  background-repeat: repeat-x;
+  background-position: 0px 120px;
+  width: 10px;
+  height: 241px;
+  line-height: 1px;
+}
+
+.chwColorpickerHtmlCode{
+  width: 56px;
+  display: block;
+  float: none;
+  clear: both;
+  margin: 5px 0px 0px;
+}
+.chwColorpickerComponents{
+  text-align: right;
+  border: 0px solid red;
+  vertical-align: middle;
+  border: 0px solid red;
+  width: 100px;
+}
+.chwColorInput{
+  margin: 5px 0px 0px;
+  width: 48px;
+}
+
+#chwColorpickerButtons{
+  text-align: right;
+  margin-right: 8px;
+}
+.chwColorpickerButton{
+  padding-top: 10px;
+  text-align: center;
+}
+.chwColorpickerButton .chwButton{
+}
+
+#chwColorpickerShowContainer{
+  text-align: left;
+  border: 0px solid red;
+  width: 64px;
+}
+
+select{
+  z-index: -10;
+}

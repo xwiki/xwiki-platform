@@ -1,0 +1,39 @@
+#set($tocreate=$request.getParameter("tocreate"))
+#set($title = $request.getParameter("title"))
+#set($template = $request.getParameter("template"))
+#if($tocreate=="panel")
+#set($docname=$title.replace("/", "%2F"))
+#if(!$template)
+#set($template="Panels.PanelTemplate")
+#end
+#set($newdoc=$xwiki.getDocument($docname))
+#if($newdoc.isNew())
+#set($pcontent = "#")
+#set($pcontent = $pcontent.concat("panelheader('${title}')${xwiki.getNl()}${xwiki.getNl()}#"))
+#set($pcontent = $pcontent.concat("panelfooter()"))
+#set($pcontent = $xwiki.getURLEncoded($pcontent))
+$pcontent
+$response.sendRedirect($newdoc.getURL("inline", "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent"))
+#else
+$response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
+#end
+#elseif($tocreate=="page")
+#set($docname=$title.replace("/", "."))
+#elseif($tocreate=="space")
+#set($title=$title.replace(" \\.\\/", ""))
+#set($docname="${title}.WebHome")
+#elseif($tocreate=="post")
+#set($docname="Blog.${title.replace(' ', '')}")
+#end
+#*
+#set($newdoc=$xwiki.getDocument($docname))
+#if($newdoc.isNew())
+#if($tocreate == "post")
+$response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$title"))
+#else
+$response.sendRedirect($newdoc.getURL("edit", "template=${template}"))
+#end
+#else
+$response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
+#end
+*#

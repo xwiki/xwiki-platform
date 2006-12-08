@@ -1,0 +1,40 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikicontent">
+<h2>$xwiki.parseMessage("availableversionsattachment")</h2>
+<p>
+#if ($tdoc.realLanguage!="")
+#set($lang = "&language=${tdoc.realLanguage}")
+#else
+#set($lang = "")
+#end
+<ul class="star">
+<table border="1" cellpadding="4" cellspacing="0" width="50%">
+    <tr>
+        <th></th><th><b>$msg.get("version")</b> </th><th> <b>$msg.get("size")</b></th>
+        <th> <b>$msg.get("author")</b> </th><th><b>$msg.get("date")</b></th>
+    </tr>
+    #foreach ($version in $attachment.getVersions())
+    <tr>
+    #set($attachrev = $attachment.getAttachmentRevision($version.toString()))
+    #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}, "width=80"))
+        <td>
+             #if ($attachment.isImage())
+                <img src="${url}" alt="${attachment.filename}" width="80" />
+             #end
+        </td>
+        <td align="center"><a href="" onclick="location='${url}'; return false;">$version</a> </td>
+        <td align="center">$attachrev.getFilesize()</td>
+        <td align="center">$xwiki.getLocalUserName($attachrev.getAuthor())</td>
+        <td align="center">$xwiki.formatDate($attachrev.getDate())</td>
+    </tr>
+#end
+</table>
+<br/>
+</ul>
+</p>
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

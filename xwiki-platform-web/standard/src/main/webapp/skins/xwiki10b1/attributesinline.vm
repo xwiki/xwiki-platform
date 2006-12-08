@@ -1,0 +1,8 @@
+<div id="xwikidata" class="layoutsubsection">
+#set($tags = $doc.getTagList())
+tags:
+<ul id="tag_list">
+#foreach($tag in $tags)
+<li class="tag">$tag</li>
+#end
+</div>

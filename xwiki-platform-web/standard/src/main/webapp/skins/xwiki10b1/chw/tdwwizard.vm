@@ -1,0 +1,114 @@
+#template("xwiki.vm")
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Table data source wizard</title>
+<meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
+<meta http-equiv="imagetoolbar" content="no"/>
+$!xwiki.getWebPreference("meta") 
+<link href="$xwiki.getSkinFile("tdwSkin.css")" rel="stylesheet" type="text/css"/>
+#template("stylesheets.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("tdwScripts.js")"></script>
+</head>
+#set($saveAddress = $xwiki.getURL("Main.WebHome", "objectadd"))
+#set($saveAddress = $saveAddress.substring(0, $saveAddress.indexOf("Main/WebHome")))
+#set($baseAddress = $xwiki.getURL("Main.WebHome", "gettables"))
+#set($baseAddress = $baseAddress.substring(0, $baseAddress.indexOf("Main/WebHome")))
+<body onload="window.wizard.initialize('$baseAddress', '$xwiki.getSkinFile("")', '$saveAddress');">
+<div id="tableWizard">
+  <table id="tdwWizard" summary="Table Datasource Wizard Content">
+    <tbody>
+      <tr>
+        <td id="tdwNavigation">
+#template("chw/tdwnavigationimages.vm")
+      </td>
+    </tr>
+    <tr>
+      <td id="tdwOptions">
+        <div id="tdwDocWizard" class="tdwInactivePage">
+          <fieldset id="tdwDocWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwDocOptionsLegend" class="tdwLargeLegend">$msg.get("tdwdoclegend")</legend>
+            <div id="tdwDocOptionsDiv" class="tdwVisible">
+              <label for="tdwPageInput">$msg.get("tdwdocselectlabel")</label>
+              <select id="tdwPageInput" class="tdwListbox" size="16" onchange="window.wizard.change()">
+#set($currentPage = $doc.getFullName())
+#foreach($page in $xwiki.searchDocuments("where doc.content like '%{table}%'"))
+#if($currentPage == "$page")
+                <option value="$page" selected="selected">$page</option>
+#else
+                <option value="$page">$page</option>
+#end
+#end
+              </select>
+            </div>
+          </fieldset>
+        </div>
+        <div id="tdwRangeWizard" class="tdwInactivePage">
+          <fieldset id="tdwRangeWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwRangeOptionsLegend" class="tdwLargeLegend">$msg.get("tdwrangelegend")</legend>
+            <span id="tdwWaiting" class="tdwHidden">$msg.get("tdwwaitingmsg")</span>
+            <span id="tdwRequestError" class="tdwHidden">$msg.get("tdwrequesterrormsg")</span>
+            <span id="tdwNoTables" class="tdwHidden">$msg.get("tdwnotablesmsg")</span>
+            <span id="tdwSelectRange" class="tdwHidden">$msg.get("tdwslectrangemsg")</span>
+            <div id="tdwRangeOptionsDiv" class="tdwVisible">
+              <div id="tdwTables" class='tdwTables'></div>
+            </div>
+          </fieldset>
+        </div>
+        <div id="tdwExtraWizard" class="tdwInactivePage">
+          <fieldset id="tdwExtraWizardFieldset" class="tdwLargeFieldset">
+            <legend id="tdwExtraOptionsLegend" class="tdwLargeLegend">$msg.get("tdwextralegend")</legend>
+            <div id="tdwHasHeaderColumn">
+              <fieldset class="tdwSmallFieldset">
+                <legend id="tdwHeadersLegend" class="tdwSmallLegend">$msg.get("tdwheaderslegend")</legend>
+                <div id="tdwHeadersDiv" class="chwVisible">
+                  <div id="tdwRowHeaderDiv">
+                    <input type="checkbox" id="tdwRowHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderRow() == "true") checked="checked" #end/>
+                    <label for="tdwRowHeaderInput">$msg.get("tdwrowheader")</label>
+                  </div>
+                  <div id="tdwColumnHeaderDiv">
+                    <input type="checkbox" id="tdwColumnHeaderInput" #if($datasourceDefaults.getDefaultHasHeaderColumn() == "true") checked="checked" #end/>
+                    <label for="tdwColumnHeaderInput">$msg.get("tdwcolumnheader")</label>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="tdwSmallFieldset">
+                <legend id="tdwFormatLegend" class="tdwSmallLegend">$msg.get("tdwformatlegend")</legend>
+                <div id="tdwFormatDiv" class="chwVisible">
+                  <div id="tdwIgnoreAlphaDiv">
+                    <input type="checkbox" id="tdwIgnoreAlphaInput" #if($datasourceDefaults.getDefaultIgnoreAlpha() == "true") checked="checked" #end/>
+                    <label for="tdwIgnoreAlphaInput">$msg.get("tdwignorealpha")</label>
+                  </div>
+                  <div id="tdwDecimalSymbolDiv">
+                    <input type="checkbox" id="tdwDecimalSymbolInput" #if($datasourceDefaults.getDefaultDecimalSymbol() == "comma") checked="checked" #end/>
+                    <label for="tdwDecimalSymbolInput">$msg.get("tdwdecimalsymbol")</label>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset class="tdwSmallFieldset">
+                <legend id="tdwSaveOptionsLegend" class="tdwSmallLegend">$msg.get("tdwsavelegend")</legend>
+                <div id="tdwSaveOptionsDiv" class="tdwVisible">
+                  <input type="checkbox" id="tdwSaveInput" onclick="window.wizard.flipVisible('Save', this.checked);" onchange="window.wizard.flipVisible('Save', this.checked);"/>
+                  <label for="tdwSaveInput">$msg.get("tdwsavesource")</label>
+                  <div id="tdwSaveDiv" class="tdwHidden">
+                    <label for="tdwSaveNameInput">$msg.get("tdwsavename")</label>
+                    <input type="text" id="tdwSaveNameInput"/>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </fieldset>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td id="tdwButtons"><a href="#" onclick="window.close(); return false;" title="$msg.get("tdwcanceltitle")" class="tdwButton">$msg.get("tdwcancel")</a><a id="tdwBackButton" href="#" onclick="window.wizard.showPrevPage(); return false;" title="$msg.get("tdwbacktitle")Go to previous wizard page" accesskey="b" class="tdwButtonDisabled">$msg.get("tdwback")</a><a id="tdwNextButton" href="#" onclick="window.wizard.showNextPage(); return false;" title="$msg.get("tdwnexttilte")Go to next wizard page" accesskey="n" class="tdwButton">$msg.get("tdwnext")</a><a id="tdwFinishButton" href="#" onclick="window.wizard.finish(); return false;" title="$msg.get("tdwfinishtitle")" class="tdwButtonDisabled">$msg.get("tdwfinish")</a></td>
+    </tr>
+  </tbody>
+  </table>
+  <span style="display:none;" id="tdwSaveNoNameMsg">$msg.get("tdwnonamedata")</span>
+</div>
+</body>
+</html>

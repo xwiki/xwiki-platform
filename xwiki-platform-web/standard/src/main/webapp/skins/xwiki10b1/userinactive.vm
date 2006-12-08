@@ -1,0 +1,23 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("baseheader.vm")
+<div id="xwikicontent">
+#if ($cause == "disabled")
+$msg.get("accountdisabled")
+#else
+$msg.get("accountnotactive")
+<br />
+$msg.get("accountnotactive_email")
+<br />
+#set($confirmdoc = $xwiki.getDocument("XWiki.RegisterNewUserConfirmation")) 
+<form action="$confirmdoc.getURL("view")" method="post">
+<input type="hidden" name="xwikiname" value="$context.user" />
+<input type="text" name="validkey" size="16" />
+<input type="submit" value="$msg.get("confirmaccount")" />
+</form>
+#end
+
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

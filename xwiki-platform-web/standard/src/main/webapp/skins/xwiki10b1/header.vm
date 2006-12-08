@@ -1,0 +1,7 @@
+###
+### Document headers
+###
+### Contains the global and space zones
+###
+#template("global.vm")
+#template("space.vm")

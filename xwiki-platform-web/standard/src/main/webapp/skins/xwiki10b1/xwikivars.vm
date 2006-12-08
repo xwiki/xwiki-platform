@@ -1,0 +1,48 @@
+#template("fudocs.vm")
+#template("macros.vm")
+#set($isguest = $context.getUser().equals("XWiki.XWikiGuest"))
+#set($hasedit = $xwiki.hasAccessLevel("edit"))
+#set($hasadmin = $xwiki.hasAccessLevel("admin"))
+#set($isReadOnly = $xwiki.isReadOnly())
+#set($spaceviewurl = $spaceDoc.getURL("view"))
+#set($viewurl = $doc.getURL("view"))
+#set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
+#set($parent ="<a href='$doc.getParentURL()'>${doc.parent.title}</a>")
+#if($tdoc)
+#set($headertitle = "<a href='$viewurl'>${tdoc.displayTitle}</a>")
+#else
+#set($headertitle = "<a href='$viewurl'>${doc.displayTitle}</a>")
+#end
+#set($skin=$xwiki.getSkin())
+#set($copyright=$xwiki.getWebCopyright())
+#set($xwikimode=$context.getMode())
+#set($logredir = $xwiki.getFormEncoded($xwiki.getRequestURL()))
+##
+#if($xwiki.exists("XWiki.MaintenanceInfo"))
+#set($maintenanceinfo = "XWiki.MaintenanceInfo")
+#else
+#if($xwiki.exists("xwiki:XWiki.MaintenanceInfo"))
+#set($maintenanceinfo = "xwiki:XWiki.MaintenanceInfo")
+#end
+#end
+## Check language option
+#set($languageparams = "")
+#if(($xwiki.isMultiLingual()==true)&&($tdoc.realLanguage!=""))
+#set($languageparams="language=${tdoc.realLanguage}")
+#end
+## Check revision option
+#if ($request.rev)
+#set($revparams="rev=${request.rev}")
+#else
+#set($revparams = "")
+#end
+#set($docvariant = "")
+#if($revparams != "")
+#if($languageparams != "")
+#set($docvariant = "$languageparams&amp;$revparams")
+#else
+#set($docvariant = "$revparams")
+#end
+#elseif($languageparams != "")
+#set($docvariant = "$languageparams")
+#end

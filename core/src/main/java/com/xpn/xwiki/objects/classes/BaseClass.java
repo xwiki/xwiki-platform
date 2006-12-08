@@ -421,6 +421,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values) {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, values, null);
+    }
+
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values, String displayType) {
         if (get(fieldName)==null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -428,6 +432,8 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
             list_class.setValues(values);
+            if (displayType!=null)
+             list_class.setDisplayType(displayType);
             list_class.setObject(this);
             put(fieldName, list_class);
             return true;

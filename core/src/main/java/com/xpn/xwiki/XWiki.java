@@ -1787,8 +1787,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         bclass.setName(XWikiConstant.TAG_CLASS);
 
-        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "");
-
+        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
+        StaticListClass tagClass = (StaticListClass) bclass.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
+        if (tagClass.isRelationalStorage()==false) {
+            tagClass.setRelationalStorage(true);
+            needsUpdate = true;
+        }
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
@@ -1915,7 +1919,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
 
         //for tags
-        needsUpdate |= bclass.addStaticListField("tagPage", "Activate the tagging", "no|default|checkbox");
+        needsUpdate |= bclass.addBooleanField("tags", "Activate the tagging", "yesno");
+
+        //for backlinks
+        needsUpdate |= bclass.addBooleanField("backlinks", "Activate the backlinks", "yesno");
 
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
@@ -3903,6 +3910,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if ("0".equals(bl))
             return false;
         return "1".equals(Param("xwiki.backlinks", "0"));
+    }
+
+    public boolean hasTags(XWikiContext context) {
+        String bl = getXWikiPreference("tags", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.tags", "0"));
     }
 
     public boolean hasCustomMappings() {

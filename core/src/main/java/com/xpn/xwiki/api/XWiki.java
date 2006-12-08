@@ -1874,6 +1874,16 @@ v     * API to check rights on a document for a given user
     }
 
     /**
+     * API to check if the tags  functionality is active
+     * Backlinks are activated in xwiki.cfg or in the XWiki Preferences
+     * @return true is the tags are active
+     * @throws XWikiException exception is the preference could not be retrieved
+     */
+    public boolean hasTags() throws XWikiException {
+        return xwiki.hasTags(context);
+    }
+
+    /**
      * API to rename a page (experimental)
      * Rights are necessary to edit the source and target page
      * All objects and attachments ID are modified in the process to link to the new page name

@@ -1,5 +1,5 @@
-#set($tags = $xwiki.getXWikiPreference("tagPage", "no"))
-#if($tags != "no" && (!$hideTags || $hideTags == 0))
+#set($tags = $xwiki.hasBacklinks())
+#if($tags && (!$hideTags || $hideTags == 0))
   <div id="selectedTagsForm">
    <label for="tags">tags: </label>
    <input type="text" id="tags" name="tags" value="$!tdoc.tags"/>
@@ -25,7 +25,7 @@
 
   #set($possibleTags = $tdoc.tagsPossibleValues)
 
-  #if($tags == "checkbox" && $possibleTags && $possibleTags.size() > 0)
+  #if($possibleTags && $possibleTags.size() > 0)
     <div id="tag_possibilities" style="display:none">
     $msg.get("chooseassociatedtags")
     <ul>

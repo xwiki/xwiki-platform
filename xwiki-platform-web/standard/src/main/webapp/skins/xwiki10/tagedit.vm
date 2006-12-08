@@ -1,10 +1,9 @@
-#set($tags = $xwiki.hasBacklinks())
+#set($tags = $xwiki.hasTags())
 #if($tags && (!$hideTags || $hideTags == 0))
   <div id="selectedTagsForm">
    <label for="tags">tags: </label>
-   <input type="text" id="tags" name="tags" value="$!tdoc.tags"/>
+   <input type="text" id="tags" name="tags" size="60" value="$!tdoc.tags"/>
   </div>
-
   <style type="text/css" media="all">
   li.inline {
   display: inline;
@@ -24,9 +23,10 @@
   </style>
 
   #set($possibleTags = $tdoc.tagsPossibleValues)
-
-  #if($possibleTags && $possibleTags.size() > 0)
-    <div id="tag_possibilities" style="display:none">
+  #set($mode = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty("displayType").value)
+  #if($possibleTags && ($mode=="checkbox") &&  $possibleTags.size() > 0)
+  #if($mode=="checkbox")
+    <div id="tag_possibilities">
     $msg.get("chooseassociatedtags")
     <ul>
     #foreach($tag in $possibleTags)
@@ -77,12 +77,10 @@
 
 
     </script>
-
   #end
-  #if($tags == "default" && $possibleTags && $possibleTags.size() > 0)
-
-    <div id="tag_possibilities" style="display:none">
-    Available tags for this document
+  #if($mode=="select")
+    <div id="tag_possibilities">
+    $msg.get("chooseassociatedtags")
     <ul>
     #foreach($tag in $possibleTags)
       <li class="inline tag"><a onclick="addTag('$tag')">$tag</a></li>
@@ -149,4 +147,5 @@
     }
     initTagScript();
     </script>
-#end
+  #end
+ #end

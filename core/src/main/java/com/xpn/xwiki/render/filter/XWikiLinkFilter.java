@@ -77,52 +77,76 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
             WikiRenderEngine wikiEngine = (WikiRenderEngine) engine;
             Writer writer = new StringBufferWriter(buffer);
 
-            String name = result.group(1);
-            if (name != null) {
-
+            String str = result.group(1);
+            if (str != null) {
             	// TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
                 // trim the name and unescape it
-                name = Encoder.unescape(name.trim());
+                str = Encoder.unescape(str.trim());
+                String text = null, href = null, target = null;
+                boolean specificText = false;
 
                 // Is there an alias like [alias|link] ?
-                int pipeIndex = name.indexOf('|');
+                int pipeIndex = str.indexOf('|');
                 int pipeLength = 1;
-                if (pipeIndex==-1)
-                    pipeIndex = name.indexOf('>');
-                if (pipeIndex==-1)  {
-                    pipeIndex = name.indexOf("&gt;");
+                if (pipeIndex==-1) {
+                    pipeIndex = str.indexOf('>');
+                }
+                if (pipeIndex==-1) {
+                    pipeIndex = str.indexOf("&gt;");
                     pipeLength = 4;
                 }
-                String alias ="";
                 if (-1 != pipeIndex) {
-                    alias = name.substring(0, pipeIndex);
-                    name = name.substring(pipeIndex + pipeLength);
+                    text = str.substring(0, pipeIndex).trim();
+                    str = str.substring(pipeIndex + pipeLength);
+                    specificText = true;
                 }
 
-                int protocolIndex = name.indexOf("://");
-                if (((protocolIndex>=0)&&(protocolIndex<10))
-                    ||(name.indexOf("mailto:")==0)) {
-                    // External link
-                    String view = name;
-                        if (-1 != pipeIndex) {
-                            view = alias;
-                        }
+                // Is there a target like [alias|link|target] ?
+                pipeIndex = str.indexOf('|');
+                pipeLength = 1;
+                if (pipeIndex==-1) {
+                    pipeIndex = str.indexOf('>');
+                }
+                if (pipeIndex==-1) {
+                    pipeIndex = str.indexOf("&gt;");
+                    pipeLength = 4;
+                }
+                if (-1 != pipeIndex) {
+                    target = str.substring(pipeIndex + pipeLength).trim();
+                    str = str.substring(0, pipeIndex);
+                }
+                // Done splitting
 
+                // Fill in missing components
+                href = str.trim();
+                if (text == null) {
+                    text = href;
+                }
+                // Done, now print the link
+
+                // Determine target type: external, interwiki, internal
+                int protocolIndex = href.indexOf("://");
+                if (((protocolIndex>=0)&&(protocolIndex<10))
+                    ||(href.indexOf("mailto:")==0)) {
+                    // External link
                     buffer.append("<span class=\"wikiexternallink\"><a href=\"");
-                    buffer.append(name.trim());
-                    buffer.append("\">");
-                    buffer.append(Encoder.toEntity(view.charAt(0)) + view.substring(1));
+                    buffer.append(href);
+                    buffer.append("\"");
+                    if(target != null){
+                        buffer.append(" target=\"" + target + "\"");
+                    }
+                    buffer.append(">");
+                    buffer.append(Encoder.toEntity(text.charAt(0)) + text.substring(1));
                     buffer.append("</a></span>");
                     return;
                 }
 
-
-                int hashIndex = name.lastIndexOf('#');
-
+                int hashIndex = href.lastIndexOf('#');
                 String hash = "";
-                if (-1 != hashIndex && hashIndex != name.length() -1) {
-                    hash = name.substring(hashIndex + 1);
-                    name = name.substring(0, hashIndex);
+
+                if (-1 != hashIndex && hashIndex != href.length() -1) {
+                    hash = href.substring(hashIndex + 1);
+                    href = href.substring(0, hashIndex);
                 }
 
                 /*
@@ -135,24 +159,19 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                 }
                 */
 
-                int atIndex = name.lastIndexOf('@');
-                // InterWiki link ?
+                int atIndex = href.lastIndexOf('@');
+                // InterWiki link
                 if (-1 != atIndex) {
-                    String extSpace = name.substring(atIndex + 1);
-                    // known extarnal space ?
+                    String extSpace = href.substring(atIndex + 1);
+                    // Kown extarnal space?
                     InterWiki interWiki = InterWiki.getInstance();
                     if (interWiki.contains(extSpace)) {
-                        String view = name;
-                        if (-1 != pipeIndex) {
-                            view = alias;
-                        }
-
-                        name = name.substring(0, atIndex);
+                        href = href.substring(0, atIndex);
                         try {
                             if (-1 != hashIndex) {
-                                interWiki.expand(writer, extSpace, name, view, hash);
+                                interWiki.expand(writer, extSpace, href, text, hash);
                             } else {
-                                interWiki.expand(writer, extSpace, name, view);
+                                interWiki.expand(writer, extSpace, href, text);
                             }
                         } catch (IOException e) {
                             log.debug("InterWiki " + extSpace + " not found.");
@@ -164,30 +183,31 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                     }
                 } else {
                     // internal link
-
-                    if (wikiEngine.exists(name)) {
-                        String view = getWikiView(name);
-                        if (-1 != pipeIndex) {
-                            view = alias;
-                        }
-                        // Do not add hash if an alias was given
-                        if (-1 != hashIndex ) {
-                            wikiEngine.appendLink(buffer, name, view, hash);
+                    if (wikiEngine.exists(href)) {
+                        if(specificText == false) {
+                            text = getWikiView(href);
+                            wikiEngine.appendLink(buffer, href, text);
                         } else {
-                            wikiEngine.appendLink(buffer, name, view);
+                            // Do not add hash if an alias was given
+                            wikiEngine.appendLink(buffer, href, text, hash);
                         }
                     } else if (wikiEngine.showCreate()) {
-                        String view = getWikiView(name);
-                        if (-1 != pipeIndex) {
-                            view = alias;
+                        if(specificText == false) {
+                            text = getWikiView(href);
                         }
-                        wikiEngine.appendCreateLink(buffer, name, view);
+                        wikiEngine.appendCreateLink(buffer, href, text);
                         // links with "create" are not cacheable because
                         // a missing wiki could be created
                         context.getRenderContext().setCacheable(false);
                     } else {
                         // cannot display/create wiki, so just display the text
-                        buffer.append(name);
+                        buffer.append(text);
+                    }
+                    if(target != null){
+                        int where = buffer.lastIndexOf(" href=\"");
+                        if(where >= 0) {
+                            buffer.insert(where, " target=\"" + target + "\"");
+                        }
                     }
                 }
             } else {
@@ -204,7 +224,6 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
      *
      * @return view The view of the wiki name
      */
-
     protected String getWikiView(String name) {
         return convertWikiWords(name);
     }

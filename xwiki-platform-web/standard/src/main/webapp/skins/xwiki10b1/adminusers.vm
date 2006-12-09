@@ -1,0 +1,7 @@
+#set($formname = "update")
+#set($saveaction = "save")
+<div class="layoutsubsection">
+<div style="overflow:auto">
+$xwiki.parseMessage("editusersredirect")
+</div>
+</div>

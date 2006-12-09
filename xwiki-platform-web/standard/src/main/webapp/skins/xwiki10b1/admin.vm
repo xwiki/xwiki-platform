@@ -22,23 +22,29 @@
 #elseif($doc.name == $xwiki.getXWikiPreference("skin"))
 #set($editor = "skin")
 #else
-#set($editor = "spacerights")
+#set($editor = "prefs")
 #end
 #end
+#end
+#set($space = $request.space)
+#if(!$space)
+#set($space = $doc.web)
 #end
 #set($redirecturl = "")
 #if($editor == "prefs" && ($doc.fullName != "XWiki.XWikiPreferences" || $global != 1))
-#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&global=1"))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&global=1&space=$space"))
+#elseif($editor == "spaceprefs" && (($doc.name != "WebPreferences")||($doc.web!=$space)))
+#set($redirecturl = $xwiki.getDocument("${space}.WebPreferences").getURL("admin", "editor=spaceprefs&global=1&space=$space"))
 #elseif($editor == "globalrights" && (($doc.fullName != "XWiki.XWikiPreferences") || $global != 1))
-#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&global=1"))
-#elseif($editor == "spacerights" && $doc.name != "WebPreferences")
-#set($redirecturl = $xwiki.getDocument("${doc.web}.WebPreferences").getURL("admin", "editor=spacerights"))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&global=1&space=$space"))
+#elseif($editor == "spacerights" && (($doc.name != "WebPreferences")||($doc.web!=$space)))
+#set($redirecturl = $xwiki.getDocument("${space}.WebPreferences").getURL("admin", "editor=spacerights&global=1&space=$space"))
 #elseif($editor == "groups" && $doc.fullName != "XWiki.XWikiGroups")
-#set($redirecturl = $xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups"))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups&space=$space"))
 #elseif($editor == "users" && $doc.fullName != "XWiki.XWikiUsers")
-#set($redirecturl = $xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users"))
+#set($redirecturl = $xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users&space=$space"))
 #elseif($editor == "skin" && ($doc.fullName != $xwiki.getXWikiPreference("skin")) && ($doc.name != $xwiki.getXWikiPreference("skin")))
-#set($redirecturl = $xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin"))
+#set($redirecturl = $xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin&space=$space"))
 #end
 #if($redirecturl != "")
 $response.sendRedirect($redirecturl)
@@ -59,7 +65,7 @@ $response.sendRedirect($redirecturl)
 #xwikimessageboxend()
 #elseif (($tdoc.getLocked()==true)&&(!$force))
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-<a href="$doc.getURL("edit", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL("admin", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()
 #else
 <h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>

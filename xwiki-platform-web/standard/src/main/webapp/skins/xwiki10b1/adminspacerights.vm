@@ -9,6 +9,14 @@
 <div>#template("adminactions.vm")</div>
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<div id="xwikichangespace">
+$msg.get("changespace"): <select name="space" onchange="location='?editor=spacerights&global=1&space=' + this.value;">
+<option value="" label="">---</option>
+#foreach($spaceitem in $xwiki.spaces)
+<option value="$spaceitem" label="$spaceitem">$spaceitem</option>
+#end
+</select>
+</div>
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />

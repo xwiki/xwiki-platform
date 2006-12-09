@@ -1,0 +1,9 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikieditcontent">
+$xwiki.getTextArea($tdoc.translatedContent)
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

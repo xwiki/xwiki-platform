@@ -1,0 +1,121 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+#if($message)
+<div id="xwikimessage">
+$message
+</div>
+#end
+<div id="xwikicontent">
+#set($versiontodiff= $request.get("version"))
+#set($topic = $request.get("topic"))
+#if(!$topic)
+#set($topic = "Main.WebHome")
+#end
+#if($request.get("type"))
+#set($type= $request.get("type"))
+#else
+#set($type = "html")
+#end
+#if ($tdoc.realLanguage!="")
+#set($lang = "&language=${tdoc.realLanguage}")
+#else
+#set($lang = "")
+#end
+#if($versiontodiff)
+#set($other="$lang")
+#else
+#set($other="&version=$versiontodiff$lang")
+#end
+$msg.get("currentdiffyype"): $type (
+<a href="$doc.getURL("view", "xpage=diff&type=wiki$other")">$msg.get("wikidiff")</a>
+<a href="$doc.getURL("view", "xpage=diff&type=source$other")">$msg.get("sourcediff")</a>
+<a href="$doc.getURL("view", "xpage=diff&type=html$other")">$msg.get("htmldiff")</a>
+)&nbsp;&nbsp;<a href="$doc.getURL("view", "xpage=diff&type=html&version=all&$lang")">$msg.get("showalldiff")</a>
+#set($firstrev = $tdoc.getVersion())
+#set($nextversion = $firstrev)
+#foreach ($version in $tdoc.getRecentRevisions(0))
+#if($version != $firstrev)
+#set($origdoc = "")
+#set($newdoc = "")
+#set($origdoc = $xwiki.getDocument($tdoc, $version))
+#set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+<div style="width: 100%; background-color: #DDDDDD">
+<h3>$msg.get("From") version $version $msg.get("to") $nextversion
+#if(($origdoc=="")||($newdoc==""))
+#if($newdoc!="")
+$msg.get("by") $xwiki.getLocalUserName($newdoc.author),$doc) $xwiki.formatDate($newdoc.date)
+#end
+ ($msg.get("cannotreaddocumentversion") $nextversion)</h3>
+#else
+$msg.get("by") $xwiki.getLocalUserName($newdoc.author) $msg.get("on") $xwiki.formatDate($newdoc.date)
+(<a href="$doc.getURL("view", "xpage=diff&type=html&version=$version&$lang")">$msg.get("showdiff")</a>)
+</h3>
+</div>
+#if(($versiontodiff=="all")||($versiontodiff==$version))
+<ul>
+#foreach($item in $doc.getMetaDataDiff($origdoc, $newdoc))
+<li>$item</li>
+#end
+</ul>
+
+<ul>
+#foreach($item in $doc.getClassDiff($origdoc, $newdoc))
+<li>$item</li>
+#end
+</ul>
+
+<ul>
+#foreach($item in $doc.getObjectDiff($origdoc, $newdoc))
+<li>$item</li>
+#end
+</ul>
+
+
+#if($type=="wiki")
+#set($deltas= $tdoc.getRenderedContentDiff($origdoc, $newdoc))
+#end
+
+#if($type=="xml")
+#set($deltas= $tdoc.getXMLDiff($origdoc, $newdoc))
+#else
+#set($deltas= $tdoc.getContentDiff($origdoc, $newdoc))
+#end
+
+#foreach($delta in $deltas)
+#set($chunk = $delta.revised)
+#if ($chunk.size()>0)
+<div style="border-left: 8px solid #00FF00">
+#if (($type == "source")||($type == "xml"))
+<pre>
+$xwiki.renderChunk($chunk, true, $tdoc)
+</pre>
+#else
+$xwiki.renderChunk($chunk, $tdoc)
+#end
+</div>
+#end
+
+#set($chunk = $delta.original)
+#if ($chunk.size()>0)
+<div style="border-left: 8px solid #FF0000">
+#if (($type == "source")||($type == "xml"))
+<pre>
+$xwiki.renderChunk($chunk, true, $tdoc)
+</pre>
+#else
+$xwiki.renderChunk($chunk, $tdoc)
+#end
+</div>
+#end
+#end
+#end
+#end
+
+#set($nextversion = $version)
+#end
+#end
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

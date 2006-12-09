@@ -1,3 +1,6 @@
+#if($request.xpage=="editobject")
+$response.sendRedirect($doc.getURL("edit", "editor=object"))
+#else
 #set($formname = "update")
 #set($saveaction = "save")
 #set($classes = $doc.getxWikiClasses())
@@ -39,3 +42,4 @@
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 <script type="text/javascript">new Rico.Accordion( 'xwikiobjects', {panelHeight:'flex'} );</script>
+#end

@@ -1,0 +1,8 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+<div class="xwiki${xwikimode}b" id="xwikinav_header">
+<div class="xwikiactions">
+#template("editactions.vm")
+</div>
+</div>

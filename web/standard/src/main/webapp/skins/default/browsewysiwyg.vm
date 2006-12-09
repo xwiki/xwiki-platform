@@ -1,0 +1,32 @@
+<div class="xwikidatacontent">
+    #set($rsvc= $xwiki.xWiki.getRightService())
+    #if ($request.getParameter("text"))
+        #set ($text = $request.getParameter("text"))
+    #else
+        #set($text = "")
+    #end
+    <p style="font-weight:bold"> $msg.get("listofallexistspages") : </p>
+
+    #set ($sql = "where doc.web like '%$text%'  order by doc.date desc")
+    #set ($start = 0)
+    #set ($nb = 50)
+
+    <div class="panel_result">
+        #if ($xwiki.searchDocuments($sql , $nb , $start).size() > 0)
+            <table width="95%" cellspacing="3px">
+                #foreach ($item in $xwiki.searchDocuments($sql , $nb , $start))
+                    #if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+                        <tr>
+                            #set($bentrydoc = $xwiki.getDocument($item))
+                            <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.web' != '$bentrydoc.web') document.forms[0].wiki_space.value='$bentrydoc.web'; else document.forms[0].wiki_space.value=''; return false;">
+                                $bentrydoc.name</a>  $msg.get("lastmodifiedby")  $xwiki.getLocalUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
+                             </td>
+                         </tr>
+                    #end
+                #end
+            </table>
+        #else
+            $msg.get("nopagesatthemoment")
+        #end
+    </div>
+</div>

@@ -1,0 +1,82 @@
+#if($context.getMode()==0)
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>
+#set( $title = $!xwiki.getWebPreference("title"))
+#if ( $title != "")
+$xwiki.parseContent($title)
+#else
+XWiki . $!doc.web . $!doc.displayTitle
+#end
+</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+$!xwiki.getWebPreference("meta")
+#template("stylesheets.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("prototype.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
+</head>
+#if(($context.action=="inline")||($context.action=="edit"))
+<script type="text/javascript">
+ var cancelEditNextOnunload;
+ var cancelCancelEditFlag = true;
+ var  lockEditFlag = false;
+
+ function cancelEditResponse(){
+ }
+
+ function cancelEdit(){
+     if (cancelCancelEditFlag) {
+       var surl = "$doc.getExternalURL("cancel")";
+       var myAjax = new Ajax.Request(
+                 surl,
+                 {
+                     method: 'get',
+                     parameters: "",
+                     asynchronous: false
+                 });
+        cancelCancelEditFlag = false;
+     }
+     if (cancelEditNextOnunload!=null)
+           cancelEditNextOnunload();
+ }
+
+ function lockEdit(){
+    if (lockEditFlag==false) {
+#if($context.action=="inline")
+      var surl = "$doc.getExternalURL("lock")?action=inline&language=$!{request.language}";
+#else
+      var surl = "$doc.getExternalURL("lock")?language=$!{request.language}";
+#end
+      var myAjax = new Ajax.Request(
+                surl,
+                {
+                    method: 'get',
+                    parameters: "",
+                    asynchronous: false
+                });
+       lockEditFlag = false;
+    }
+ }
+
+ function prepareCancelEdit() {
+     cancelEditNextOnunload = document.onunload;
+     document.onunload = cancelEdit;
+     lockEdit();
+ }
+ function cancelCancelEdit() {
+     cancelCancelEditFlag = false;
+ }
+</script>
+<body onUnload="cancelEdit()" onLoad="prepareCancelEdit()">
+#else
+<body>
+#end
+#else
+#template("stylesheets2.vm")
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+#end

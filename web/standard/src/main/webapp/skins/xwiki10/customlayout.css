@@ -171,6 +171,11 @@ Panels
 Rico Acordeon
 ----------------------------------
 */
+.accordionTabContentBox {
+ height: 400px;
+ max-height: 400px;
+}
+
 #editPanels .accordionTabContentBox{
   width: ${editpanelwidthcontent}px;
 }

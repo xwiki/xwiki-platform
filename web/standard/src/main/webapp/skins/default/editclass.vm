@@ -1,0 +1,134 @@
+#set($showactions=0)
+#template("editheader.vm")
+<div id="xwikicontent" class="large">
+#set( $class = $doc.getxWikiClass())
+#set( $redirect = $xwiki.getRequestURL())
+<script type="text/javascript">
+<!--
+var currentfield = "";
+function show(fieldname) {
+  if (currentfield!="")
+    document.getElementById("field_" + currentfield).style.display="none";
+  document.getElementById("field_" + fieldname).style.display="block";
+  currentfield = fieldname;
+}
+// -->
+</script>
+       <div id="columns">
+        <div class="cols-wrapper">
+          <div class="float-wrapper">
+            <div id="col-a">
+              <div class="main-content">
+<form id="propupdate" method="post" action="$doc.getURL("propupdate")" onsubmit="cancelCancelEdit()">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<div id="intro">
+$msg.get("welcometoclasseditor")
+<br />
+</div>
+
+#set ( $first = 1)
+#foreach ($field in $class.properties)
+<div id="field_$field.name" style="display: #if ($first==1) block #else none #end;">
+#if ($first==1)
+<script type="text/javascript">
+<!--
+currentfield = "$field.name";
+// -->
+</script>
+#set ($first = 0)
+#end
+<h3>$msg.get("editfield") $field.prettyName</h3>
+
+<table border="0">
+#foreach ($classprop in $field.xWikiClass.propertyNames)
+<tr><td>$field.xWikiClass.get("$classprop").getPrettyName()</td>
+<td>$doc.displayEdit($field.xWikiClass.get("$classprop"), "${field.name}_" , $field)
+</td>
+</tr>
+#end
+</table>
+</div>
+#end
+</form>
+#includeHelp("EditClassHelp")
+         </div>
+            </div>
+            <div id="col-b" class="sidecol">
+              <div class="box">
+              </div>
+            </div>
+          </div>
+          <div id="col-c" class="sidecol">
+         <div class="box">
+<h2>$msg.get("classeditor")</h2>
+<br />
+<p style="text-align: center">
+<input type="button" value="$msg.get("saveclass")" onclick="document.forms.propupdate.submit()" />
+<br />
+<h3>$msg.get("currentproperties")</h3>
+#foreach ($field in $class.properties)
+<a href="" onclick="show('$field.name'); return false;">$field.prettyName</a><br />
+#end
+<br />
+<h3>$msg.get("addproperty")</h3>
+<form id="propadd" method="post" action="$doc.getURL("propadd")" onsubmit="cancelCancelEdit()">
+<p style="text-align: center">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+$msg.get("propname"): <input type="text" name="propname" value="" size="20" />
+<br /><br />
+<select name="proptype" size="1">
+<option value="---">$msg.get("selectproptype")</option>
+#foreach($prop in $xwiki.metaclass.properties)
+<option value="$prop.name">$prop.prettyName</option>
+#end
+</select>
+<br /><br />
+<input type="submit" value="$msg.get("addproperty")" />
+</p>
+</form>
+<br />
+<br />
+<h3>$msg.get("editanotherclass")</h3>
+#set($rsvc= $xwiki.xWiki.getRightService())
+<form id="changeclass" method="post" action="">
+<p style="text-align: center">
+<select name="classname" size="1">
+<option value="---">$msg.get("selectclass")</option>
+#foreach ($classname in $xwiki.classList)
+#!if ($xwiki.hasAccessLevel("edit", $classname))
+#set($classdoc = $xwiki.getDocument($classname))
+<option value="$classdoc.getURL("edit", "xpage=editclass")">$classname</option>
+#!end
+#end
+</select>
+<script type="text/javascript">
+function gotoclass(dest) {
+ if (dest!="---") {
+   location = dest;
+   }
+   return false;
+}
+</script>
+<br />
+<br />
+<input type="submit" value="$msg.get("changeclass")" onClick="return gotoclass(this.form.classname.value)" />
+</p>
+</form>
+#if($xwiki.exists("xwiki:XWiki.EditClassHelp"))
+#set($edithelpdoc = $xwiki.getDocument("xwiki:XWiki.EditClassHelp"))
+#else
+#if($xwiki.exists("XWiki.EditClassHelp"))
+#set($edithelpdoc = $xwiki.getDocument("XWiki.EditClassHelp"))
+#end
+#end
+#if($edithelpdoc)
+$edithelpdoc.getRenderedContent()
+#end
+          </div>
+          </div>
+          <div class="clear" id="em"></div>
+          </div>
+          </div>
+</div>
+</div>
+#template("editfooter.vm")

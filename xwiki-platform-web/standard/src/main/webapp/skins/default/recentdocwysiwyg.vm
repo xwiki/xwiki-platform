@@ -1,0 +1,44 @@
+<div class="xwikidatacontent">
+    #set($rsvc= $xwiki.xWiki.getRightService())
+
+    #if ($request.getParameter("action"))
+        #set ($action = $request.getParameter("action") )
+    #else
+        #set($action = "")
+    #end
+
+    #set ($start = 0)
+    #set ($nb = 50)
+
+    #if ($action == "view")
+        #set ($collect = $xwiki.getRecentActions("view", 13))
+        #set ($title = $msg.get("listofrecentlyviewedpages"))
+    #else
+        #set ($text = "")
+        #set ($sql = "where doc.name like '%$text%' order by doc.date desc")
+        #set ($start = 0)
+        #set ($nb = 50)
+        #set ($collect = $xwiki.searchDocuments($sql , $nb , $start))
+        #set ($title = $msg.get("listofrecentlymodifiedpages"))
+    #end
+
+    <p style="font-weight:bold"> $title : </p>
+
+    <table width="95%" cellspacing="3px">
+        #set($counter=0)
+        #foreach ($item in $collect)
+            #if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+                #if($counter < 13)
+                    <tr>
+                        #set($bentrydoc = $xwiki.getDocument($item))
+                        <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.web' != '$bentrydoc.web') document.forms[0].wiki_space.value='$bentrydoc.web'; else document.forms[0].wiki_space.value=''; return false;">
+                                $bentrydoc.name</a>  $msg.get("inspace") $bentrydoc.web $msg.get("wikiweb"), $msg.get("lastmodifiedby")
+                                $xwiki.getLocalUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
+                        </td>
+                    </tr>
+                #end
+            #end
+            #set( $counter = $counter + 1)
+        #end
+    </table>
+</div>

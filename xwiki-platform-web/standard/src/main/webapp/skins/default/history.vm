@@ -1,0 +1,39 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikicontent">
+<h2>$msg.get("documenthistory")</h2>
+<form action="$doc.getURL("view")" method="post">
+<input type="hidden" name="xpage" value="changes" />
+<p>
+<input type="submit" accesskey="v" value="$msg.get("compare")" />
+<input type="button" accesskey="a" value="$msg.get("allchanges")" onclick="location='$doc.getURL("view","xpage=changesall")'" />
+#if ($tdoc.realLanguage!="")
+#set($lang = "&language=${tdoc.realLanguage}")
+#else
+#set($lang = "")
+#end
+<ul class="star">
+#foreach ($version in $tdoc.getRecentRevisions(0))
+#set($origdoc = "")
+#set($newdoc = "")
+#set($nextversion = $version)
+#set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+<li>
+$msg.get("version") <a href="" onclick="location='$tdoc.getURL("viewrev","rev=$nextversion")'; return false;">$nextversion</a> (<a href="" onclick="if (confirm('$msg.get("readytorollback") $nextversion')) location='$tdoc.getURL("rollback","confirm=1&rev=$nextversion$lang")'; return false;">$msg.get("rollback")</a>)
+<input type="radio" name="rev2" value="$nextversion" />
+<input type="radio" name="rev1" value="$nextversion" />
+#if($newdoc=="")
+($msg.get("cannotreaddocumentversion") $nextversion)</h3>
+#else
+$msg.get("editedby") $xwiki.getLocalUserName($newdoc.author) $msg.get("on") $xwiki.formatDate($newdoc.date)
+#end
+</li>
+#end
+</ul>
+</p>
+</form>
+</div>
+#template("basefooter.vm")
+#template("footer.vm")

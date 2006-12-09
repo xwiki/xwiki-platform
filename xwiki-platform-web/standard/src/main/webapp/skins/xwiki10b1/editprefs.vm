@@ -1,3 +1,6 @@
+#if($request.xpage=="editprefs")
+$response.sendRedirect($doc.getURL("admin", "editor=prefs"))
+#else
 #set( $redirect = $xwiki.getRequestURL())
 <script type="text/javascript">
 <!--
@@ -110,5 +113,6 @@ currentfield = "${section}";
 #foreach ($section in $sections)
 <a href="" onclick="show('${section}'); return false;">$msg.get($section)</a>
 <br />
+#end
 #end
 #end

@@ -1,3 +1,6 @@
+#if($request.xpage=="editclass")
+$response.sendRedirect($doc.getURL("admin", "editor=class"))
+#else
 #set($formname = "propupdate")
 #set($saveaction = "propupdate")
 #set( $class = $doc.getxWikiClass())

@@ -1,3 +1,10 @@
+#if($request.xpage=="editrights")
+#if($request.global=="1")
+$response.sendRedirect($doc.getURL("admin", "editor=rights&global=1"))
+#else
+$response.sendRedirect($doc.getURL("edit", "editor=rights"))
+#end
+#else
 #set($formname = "update")
 #set($saveaction = "save")
 #if ( $request.getParameter("global").equals("1"))

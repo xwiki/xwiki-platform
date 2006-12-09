@@ -1,0 +1,11 @@
+<h2>Properties</h2>
+<table border="0">
+#foreach($obj in $doc.xWikiObjects)
+<tr><td>$obj.xWikiClass.name</td></tr>
+#foreach($prop in $obj.xWikiClass.properties)
+<tr><td>$prop.prettyName</td>
+<td>$doc.displayView($prop, "${obj.xWikiClass.name}_",  $obj)
+</td></tr>
+#end
+#end
+</table>

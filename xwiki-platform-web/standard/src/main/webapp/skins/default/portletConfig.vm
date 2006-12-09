@@ -1,0 +1,4 @@
+<form action="$response.createActionURL()" method="post">
+  Root space name: <input type="text" name="rootSpace" value="$request.getPreferences().getValue( "rootTopic", "")" />
+  <br/><input type="submit" />
+</form>

@@ -1,0 +1,10 @@
+#set($viewurl = $doc.getURL("view"))
+#set($parent ="<a href='$doc.getParentURL()'>${doc.parent}</a>")
+#if($tdoc)
+#set($headertitle = "<a href='$viewurl'>${tdoc.displayTitle}</a>")
+#else
+#set($headertitle = "<a href='$viewurl'>${doc.displayTitle}</a>")
+#end
+#set($skin=$xwiki.getSkin())
+#set($copyright=$xwiki.getWebCopyright())
+#set($xwikimode=$context.getMode())

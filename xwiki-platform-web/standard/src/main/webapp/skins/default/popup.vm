@@ -1,0 +1,23 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("printheader.vm")
+<div id="xwikicontent">
+$context.setLinksQueryString("xpage=popup")
+$cdoc.getRenderedContent()
+$context.unsetLinksQueryString()
+</div>
+#if ($request.get("comments")=="1")
+#template("comments2.vm")
+#end
+#if ($request.get("attachments")=="1")
+<div id="xwikiattachments">
+#foreach ($attach in $doc.attachmentList)
+#if ($attach.isImage())
+<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" />
+<br />
+#end
+#end
+</div>
+#end
+#template("basefooter.vm")
+#template("footer.vm")

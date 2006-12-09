@@ -1,0 +1,6 @@
+<div class="xwiki${xwikimode}b" id="xwikinav_header">
+<div class="xwikiactions">
+<a href="$doc.getURL("view")">$msg.get("view")</a><span> | </span>
+<a href="" onclick="this.href='$doc.getURL("rollback", "confirm=1&rev=$request.rev")'">$msg.get("rollback")</a>
+</div>
+</div>

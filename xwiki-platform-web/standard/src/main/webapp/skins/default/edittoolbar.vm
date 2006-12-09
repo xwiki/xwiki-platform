@@ -1,0 +1,48 @@
+#if($request.xpage!="wyswiyg")
+<div class="xwikimenutitle">Basic Syntax</div>
+<div class="xwikimenulinks">
+<pre>
+1 Level 1 Title
+1.1 Level 2 Title
+*Bold*
+~~Italics~~
+-- Striked--
+</pre>
+</div>
+<div class="xwikimenutitle">Lists</div>
+<div class="xwikimenulinks">
+<pre>
+* List item level 1
+** List item level 2
+** List item level 2
+*** List item level 3
+
+# Numbered list item
+# Numbered list item
+</pre>
+</div>
+#end
+<div class="xwikimenutitle">Links</div>
+<div class="xwikimenulinks">
+<pre>
+[PageName]
+[linktext>PageName]
+[linktext>Space.PageName]
+[linktext>http://...]
+</pre>
+</div>
+<div class="xwikimenutitle">Images and Attachments</div>
+<div class="xwikimenulinks">
+{image:filename.gif} inserts an image
+{attach:filename.doc} creates a link
+</div>
+<div class="xwikimenutitle">Tables</div>
+<div class="xwikimenulinks">
+<pre>
+{table}
+Header1|Header2
+item1|item2
+item3|item4
+{table}
+</pre>
+</div>

@@ -1,0 +1,6 @@
+<div class="xwiki${xwikimode}b" id="xwikinav_header">
+<div class="xwikiactions">
+<a href="$doc.getURL("view")">$msg.get("view")</a><span> | </span>
+<a href="" onclick="if (confirm('$msg.get("confirmdelete2")')==false) { return false; } else { location='$doc.getURL("delete", "confirm=1")'; return false; }">$msg.get("delete")</a>
+</div>
+</div>

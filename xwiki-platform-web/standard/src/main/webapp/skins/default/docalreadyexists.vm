@@ -1,0 +1,19 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+<div id="xwikicontent">
+    #if($xwiki.exists("XWiki.DocumentAlreadyExist"))
+    $xwiki.includeForm("XWiki.DocumentAlreadyExist",false)
+    #else
+    <center><h2>
+        $msg.get("thispagealreadyexists")
+    </h2>
+    </center>
+    <br/><br/>
+    #end
+</div>
+#template("basefooter.vm")
+#template("footer.vm")
+
+

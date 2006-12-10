@@ -41,3 +41,4 @@ $response.sendRedirect($doc.getURL("edit", "editor=rights"))
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 </div>
+#end

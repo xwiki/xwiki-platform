@@ -4,7 +4,6 @@
 #set($redirect = "$xwiki.getRequestURL()&amp;editor=skin")
 <div class="overflowcontainer">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div>#template("adminactions.vm")</div>
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set($nb = $doc.getObjectNumbers("${class.name}"))
@@ -38,7 +37,7 @@ document.write("<span class=\"chwColorPickerInvoker\" title=\"$msg.get("chwinvok
 </table>
 </div>
 #end
-<div>#template("adminactions.vm")</div>
+<div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
 #template("chw/colorpicker.vm")
 </div>

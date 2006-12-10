@@ -63,7 +63,6 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #set($redirect = "$xwiki.getRequestURL()")
 <div style="overflow:auto;">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div>#template("adminactions.vm")</div>
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="hidden" name="classname" value="XWiki.XWikiPreferences" />
@@ -75,8 +74,7 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 </div>
 <script type="text/javascript">new Rico.Accordion( 'xwikiprefs', {panelHeight:'max'} );</script>
 </div>
-## <div class="bottombuttons">#template("editactions.vm")</div>
-<div>#template("adminactions.vm")</div>
+<div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
 </div>
 </div>

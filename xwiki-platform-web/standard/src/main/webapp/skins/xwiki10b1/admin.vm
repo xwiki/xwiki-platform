@@ -14,7 +14,7 @@
 #if($doc.fullName == "XWiki.XWikiPreferences")
 #set($editor = "prefs")
 #elseif($doc.name == "WebPreferences")
-#set($editor = "spacerights")
+#set($editor = "spaceprefs")
 #elseif($doc.fullName == "XWiki.XWikiGroups")
 #set($editor = "groups")
 #elseif($doc.fullName == "XWiki.XWikiUsers")

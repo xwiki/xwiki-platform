@@ -196,8 +196,8 @@ $doc.display("content", $obj)
 ### @param actionurl The URL this entry points to
 ### @param linktext The menu item text
 ###
-#macro(xwikitopmenuentrystart $actionurl $linktext)
-<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);"><a href="$actionurl"><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
+#macro(xwikitopmenuentrystart $actionurl $linktext $id)
+<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);" id="$id"><a class="tme" href="$actionurl"><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
 #end
 
 ###

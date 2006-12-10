@@ -6,6 +6,11 @@
 ###
 #if($context.getMode()==0) ## Visible only in a page
 <div id="headerglobal" class="layoutsection">
+#if($context.action == "view")
+<div class="minwidthb"></div>
+#else
+<div class="minwidthd"></div>
+#end
   <div id="company">
   <div id="companylogo">
     <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">

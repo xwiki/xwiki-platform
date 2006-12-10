@@ -9,21 +9,36 @@ body#body{
   width: 100%; 
   padding: 0;
   margin: 0 ;  /* padding et margin nul pour emulation min width*/
-  overflow: auto;
+  min-width: 760px;
 }
 
 #xwikimaincontainer{
-  min-width: 720px;
-  width: auto;
   margin: 0px 40px;
   text-align: center;
   margin-bottom: 40px;
+}
+html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
+  display: none;
+}
+.minwidth, .minwidthb, .minwidthc{
+  width: 720px;
+  height: 0px;
+}
+* html .minwidth, * html .minwidthb, * html .minwidthc{
+  height: 1px !important;
+  overflow: hidden;
+}
+.minwidthb{
+  width: 520px;
+}
+.minwidthc{
+  width: 438px;
 }
 .layoutsection{
   clear: both;
 }
 #xwikimaincontainerinner{
-	text-align: left;
+  text-align: left;
 }
 #contentcontainer{
   border-right:200px solid ;
@@ -83,21 +98,21 @@ Global header
   text-align: right;
 }
 #globalmenu a {
-display: block;
-text-decoration: none;
-font-size: 0.8em;
-font-weight: bold;
+  display: block;
+  text-decoration: none;
+  font-size: 0.8em;
+  font-weight: bold;
 }
 #globalmenu span {
-display: none;
+  display: none;
 }
 
 
 #company{
-	height: 8em;
-	float: left;
-	width: 100%;
-	 }
+  height: 8em;
+  float: left;
+  width: 100%;
+}
 
 #companylogo{
 padding: 3em 0 0 40px;
@@ -136,34 +151,36 @@ padding: 3em 0 0 40px;
 Space header, footer
 ---------------------------------------
 */
-#headerspace {
-height: 1.5em;
+#headerspace, #footerglobal {
+  height: 1.5em;
 }
 #footerglobal {
-	display: block;
-padding: 1em 0px;
-text-align: center;
+  padding: 1em 0px;
+  text-align: center;
 }
 
 #headerspace hr, #footerglobal hr{
-/*display: none;*/
-visibility: hidden;
-width: 400px;
-margin: 0px;
-padding: 0px;
-
+  display: none;
 }
 #breadcrumbs {
-	margin-left: 40px;}
-	
-#footerglobal, #headerspace {clear:both;}
+  padding-left: 40px;
+}
+* html #breadcrumbs {
+  width: 100%;
+}
+
+#footerglobal, #headerspace {
+  clear:both;
+}
 #xwikilicence {
   float: right;
   clear: right;
   margin-right: 5px;
 }
 
-#xwikidocinfo {}
+#xwikidocinfo {
+  width: 100%;
+}
 
 /*
 ---------------------------------------
@@ -171,13 +188,16 @@ Content
 ---------------------------------------
 */
 #contentcontainerinner, #xwikieditorinner {
-width: 100%;
-background-color: #FFF;
+  width: 100%;
+  background-color: #FFF;
 }
 
 #contentcolumn {
   float: left;
   width: 100%;
+}
+* html #contentcolumn {
+  width: auto;
 }
 .content{}
 .main { padding: 0px 40px 0 40px;}
@@ -221,7 +241,6 @@ Zone for Comments, attachments, History...
 #xwikidatacontents{
 }
 .xwikiintratitle{
-  display: none;
 }
 .xwikiintracontent{
   margin: 0px;
@@ -282,6 +301,55 @@ Comments
 */
 .xwikicomment {
 }
+
+#commentscontent{
+  background: #E5F0FE url("icons/black-bg-comments-left.png") left top no-repeat;
+  border-bottom: 1px solid #000;
+}
+.xwikititlewrapper{
+  cursor: pointer;
+}
+#commentscontent .xwikititlewrapper{
+  background: transparent url("icons/black-bg-comments-right.png") right top no-repeat;
+}
+#attw{
+  background: transparent url("icons/black-bg-attach-right.png") right bottom no-repeat;
+}
+.xwikiintratitle{
+  background: transparent url("icons/black-content-more.png") right center no-repeat;
+  font-size: 200%;
+  font-weight: 400;
+  font-style: normal;
+  margin: 0px 24px;
+  padding: 16px 0px 16px;
+}
+.exp .xwikiintratitle{
+  background: transparent url("icons/black-content-less.png") right center no-repeat;
+}
+#attachmentscontent {
+  background: #E4F6FF url("icons/black-bg-attach-left.png") left bottom no-repeat;
+}
+#attachmentscontent table{
+  border: none;
+}
+.mime{
+  text-align: center;
+}
+.xwikicomment{
+  padding: 10px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.commentspacer{
+  display: none;
+}
+#comments .odd{
+  background-color: #FFF;
+}
+#comments .even{
+  background-color: #E5F0FE;
+}
+
 .commentavatar{
   position: absolute;
   left: 0px;
@@ -294,7 +362,15 @@ Comments
   margin: auto;
 }
 .commentheader{
-
+  padding: 6px 0px;
+}
+.commentauthor{
+  font-size: 130%;
+  font-weight: 900;
+}
+.commentauthor a{
+  text-decoration: none;
+  color: #000 !important;
 }
 .commentcontent{
 
@@ -317,7 +393,7 @@ table.xwikidatatable td{
   padding: 2px 8px;
 }
 .xwikiintracontent{
-  margin: 8px;
+  margin: 0px 8px;
 }
 
 .xwikiintracontent legend{
@@ -351,6 +427,15 @@ html > body .xwikiintracontent legend{
   display: none;
 }
 
+.commentsno, .attachmentsno{
+  font-size: 60%;
+  background: transparent url("icons/black-comment2.png") center no-repeat;
+  padding: 10px 24px 14px;
+  font-weight: 900;
+}
+.attachmentsno{
+  background: transparent url("icons/black-doc2.png") center no-repeat;
+}
 /*
 ---------------------------------------
 Menu
@@ -371,11 +456,12 @@ Menu
 }
 
 html > body #actionmenu{
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	}
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
 #actionmenu a{
   text-decoration: none;
 }
@@ -509,8 +595,6 @@ Panels
 ---------------------------------------
 */
 
-
-
 #globalsearch {
   text-align: center;
   margin: 0px;
@@ -528,13 +612,13 @@ Panels
   padding: 0px;
 }
 
-
 #rightPanels {
   position: relative;
   float: left;
   width: 200px;
   margin-right: -200px;
   background-color: #FFFF66;
+  padding-top: 20px;
 }
 
 
@@ -859,7 +943,7 @@ html>body #xwikieditcontent{
   line-height: 2em;
 }
 #edit{
-  pading: 0px;
+  padding: 0px;
   margin: 0px;
   border: none;
 }
@@ -874,4 +958,7 @@ html>body #xwikieditcontent{
 #xwikidoctitleinput{
   width: 100%;
   font-size: 150%;
+}
+* html form{
+  margin-top: 0px;
 }

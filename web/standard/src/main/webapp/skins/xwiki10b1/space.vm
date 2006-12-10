@@ -11,6 +11,7 @@ $string
 #end
 #if($context.getMode()==0) ## Visible only in a page
 <div id="headerspace" class="layoutsection">
+<div class="minwidth"></div>
 <hr/>
   <div id="breadcrumbs">
     <span class="breadcrumbspace"><a href="$spaceviewurl">$doc.web</a>: </span>

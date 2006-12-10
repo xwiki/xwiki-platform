@@ -1,0 +1,15 @@
+##
+##
+## Extra data: comments, attachments ...
+##
+<div id="xwikidata" class="layoutsubsection">
+#set($show = $!request.getParameter("show"))
+#if(!$show || ($show != "comments" && $show != "attachments" && $show != "history" && $show != "attributes"))
+#set($show = "comments")
+#end
+<h3 class="hidden">$msg.get("docdata")</h3>
+<div id="xwikidatacontents">
+#template("commentsinline.vm")
+#template("attachmentsinline.vm")
+</div> ## xwikidatacontents
+</div>  ## xwikidata

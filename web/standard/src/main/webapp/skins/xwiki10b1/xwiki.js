@@ -97,6 +97,14 @@ function updateAttachName(form, msg) {
   return true;
 }
 
+function toggleClass(o, className){
+  if(!isClassExist(o,className)) {
+    o.className += ' ' + className
+  }
+  else {
+    rmClass(o, className);
+  }
+}
 function addClass(o, className){
   if(!isClassExist(o,className))
     o.className += ' ' + className

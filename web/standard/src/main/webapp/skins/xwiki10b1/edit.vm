@@ -50,8 +50,7 @@
 <label>$msg.get("titlefield"):
 <input type="text" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/></label>
 #end
-<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
-<div class="floatcontainer">#template("editmodes.vm")</div>
+#template("editmodes.vm")
 #template("edit${editor}.vm")
 </div> ## alleditcontent
 </div> ## editcolumn

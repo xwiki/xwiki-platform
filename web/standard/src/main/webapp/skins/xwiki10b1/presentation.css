@@ -138,7 +138,6 @@ Panels
 }
 .xwikipaneltitle:hover{
   cursor: pointer;
-  sbackground-image: url("collapseh.png") 
 }
 .collapsed .xwikipaneltitle:hover{
   background-image: url("icons/black-more-3.png") 

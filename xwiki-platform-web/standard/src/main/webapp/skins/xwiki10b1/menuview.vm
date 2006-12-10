@@ -13,7 +13,7 @@
 #else
 #set($editaction = "edit")
 #end
-#xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("edit"))
+#xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("edit") "tmEdit")
 #submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("editwiki"))
 #submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("editvisual"))
 #submenuitem($doc.getURL("inline", "$languageparams") $msg.get("editform"))
@@ -27,7 +27,7 @@
 ##
 ## Show menu
 ##
-#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show"))
+#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show")  "tmShow")
 #submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("viewcode"))
 #submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("viewxml"))
 #submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("viewcomments"))
@@ -38,7 +38,7 @@
 ##
 ## Print menu
 ##
-#xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("print"))
+#xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("print") "tmPrint")
 #submenuitem($doc.getURL("pdf", $docvariant) $msg.get("pdf"))
 #submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("preview"))
 #xwikitopmenuentryend()
@@ -48,13 +48,13 @@
 ## TODO: Write me!
 ##
 ## #if($context.user != "XWiki.XWikiGuest")
-## #xwikitopmenuentry($doc.getURL("watch", "xredirect=${request.getRequestURL()}") $msg.get("watch"))
+## #xwikitopmenuentry($doc.getURL("watch", "xredirect=${request.getRequestURL()}") $msg.get("watch") "tmWatch")
 ## #end
 ##
 ## Delete menu
 ##
 #if($hasadmin)
-#xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("delete"))
+#xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("delete") "tmDelete")
 #end
 </div>
 </div>

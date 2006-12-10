@@ -119,8 +119,8 @@ Rico.Accordion.prototype.showTab = function( accordionTab, animate, tabHeight ) 
 
       if (this.options.panelHeight)
         this.lastExpandedTab.content.style.height = (this.options.panelHeight - 1) + 'px';
-      accordionTab.content.style.display = '';
 
+      //accordionTab.content.style.display = "";
       accordionTab.titleBar.style.fontWeight = this.options.expandedFontWeight;
 
       if ( doAnimate ) {
@@ -134,7 +134,7 @@ Rico.Accordion.prototype.showTab = function( accordionTab, animate, tabHeight ) 
       }
       else {
          this.lastExpandedTab.content.style.height = "1px";
-         accordionTab.content.style.height = newHeight + "-2px";
+         accordionTab.content.style.height = newHeight + "px";
          this.lastExpandedTab = accordionTab;
          this.showTabDone(lastExpandedTab);
       }
@@ -174,41 +174,44 @@ Rico.Effect.AccordionSize.prototype = {
       this.duration = duration;
       this.steps    = steps;
       this.options  = arguments[6] || {};
-      this.accordionSize();
       this.totalsteps = steps;
+      this.accordionSize();
    },
 
    accordionSize: function() {
+      //return;
       if (this.isFinished()) {
-         // just in case there are round errors or such...
-         this.e1.style.height = this.start + "px";
-         this.e2.style.height = this.end + "px";
-
-         if(this.options.complete)
-            this.options.complete(this);
-         return;
+        if (this.timer){
+          clearInterval(this.timer);
+        }
+        // just in case there are round errors or such...
+        this.e1.style.height = this.start + "px";
+        this.e2.style.height = this.end + "px";
+        if(this.options.complete)
+          this.options.complete(this);
+        return;
       }
 
-      if (this.timer)
-         clearTimeout(this.timer);
-
-      var stepDuration = Math.round(this.duration/this.steps) ;
+      this.steps--;
+      var stepDuration = Math.round(this.duration/this.totalsteps) ;
 
       // var diff = this.steps > 0 ? (parseInt(this.e1.offsetHeight) - this.end2)/this.steps : 0;
       // var diff2 = this.steps > 0 ? (this.end - parseInt(this.e2.offsetHeight))/this.steps : 0;
       // this.resizeBy(diff, diff2);
-      var h1 = this.steps > 0 ? this.steps * (this.start2 - this.end2) / this.totalsteps : 0;
+      var h1 = this.steps > 0 ? this.steps * (this.start2 - this.end2) / this.totalsteps - 1: 0;
+      if(window.ActiveXObject){
+        h1 += 2;
+      }
       var h2 = this.steps > 0 ? this.end - this.steps * (this.end - this.start) / this.totalsteps : this.end;
       this.resizeTo(h1, h2);
 
-      this.duration -= stepDuration;
-      this.steps--;
-
-      this.timer = setTimeout(this.accordionSize.bind(this), stepDuration);
+      if(!this.timer){
+        this.timer = setInterval(this.accordionSize.bind(this), stepDuration);
+      }
    },
 
    isFinished: function() {
-      return this.steps <= 0;
+      return this.steps <= 1;
    },
 
    resizeBy: function(diff, diff2) {
@@ -226,6 +229,8 @@ Rico.Effect.AccordionSize.prototype = {
    resizeTo: function(h1, h2) {
      this.e1.style.height = h1 + "px";
      this.e2.style.height = h2 + "px";
+     this.e1.style.display = '';
+     this.e2.style.display = '';
    }
 };
 

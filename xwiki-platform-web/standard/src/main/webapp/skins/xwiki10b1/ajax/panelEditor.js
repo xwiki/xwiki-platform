@@ -505,9 +505,8 @@ function panelEditorInit(){
   nb = 0;
 
   layoutMaquetes = null;
-
-  leftPanels    = document.getElementById("leftPanels");
-  rightPanels   = document.getElementById("rightPanels");
+  window.leftPanels    = document.getElementById("leftPanels");
+  window.rightPanels   = document.getElementById("rightPanels");
   allPanels     = document.getElementById("allviewpanels");
   mainContent   = document.getElementById("contentcolumn");
   mainContainer = document.getElementById("contentcontainer");

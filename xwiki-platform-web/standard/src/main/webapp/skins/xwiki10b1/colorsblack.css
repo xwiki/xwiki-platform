@@ -33,8 +33,8 @@
 	background-repeat: no-repeat;
 }
 #globallinks {
-background-image: url("headerperso-bg.jpg");
-background-position: bottom left;
+  background-image: url("headerperso-bg.jpg");
+  background-position: bottom left;
 }
 #globallinks a,#globallinks a:link,#globallinks a:visited,#globallinks a:active {
 	color: #000;}
@@ -129,7 +129,7 @@ table.xwikidatatable th{
 }
 
 .xwikiintracontent fieldset.collapsed legend{
-  background-color: #EEE;
+  background-color: transparent;
 }
 
 /*
@@ -149,16 +149,54 @@ Menu
 	  color:#333; 
 }
 .topmenuentry{
- 		border-color: #333; 
-	  background:transparent;  
+   border-color: #333; 
+   background:transparent right center no-repeat;
+}
+.tme{
+  background: transparent url("icons/black-arrow-ab.png") right center no-repeat;
 }
 .topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active {
 	color:#333; 
 }
-.topmenuentry a:hover {
-background-image: url("actionbar-bg2.png");
-background-repeat: repeat-x;
+.topmenuentry:hover {
+  background-image: url("actionbar-bg2.png") !important;
+  background-repeat: repeat-x;
 }
+.topmenuentry a strong{
+   background:transparent left center no-repeat;
+   padding: 0px 20px;
+}
+#tmEdit a strong{
+  background-image: url(icons/black-edit-ab.png);
+}
+#tmShow a strong{
+  background-image: url(icons/black-view-ab.png);
+}
+#tmPrint a strong{
+  background-image: url(icons/black-print-ab.png);
+}
+#tmWatch a strong{
+  background-image: url(icons/black-fav-ab.png);
+}
+#tmDelete a strong{
+  background-image: url(icons/black-delete.png);
+}
+#tmEdit a:hover strong{
+  background-image: url(icons/black-edit-ab2.png);
+}
+#tmShow a:hover strong{
+  background-image: url(icons/black-view-ab2.png);
+}
+#tmPrint a:hover strong{
+  background-image: url(icons/black-print-ab2.png);
+}
+#tmWatch a:hover strong{
+  background-image: url(icons/black-fav-ab2.png);
+}
+#tmDelete a:hover strong{
+  background-image: url(icons/black-delete2.png);
+}
+
 .submenu{
   border: 2px solid #000;
   background-color: #E8F1FF;
@@ -202,7 +240,6 @@ input.button:hover, button.button:hover{
   background: transparent url("icons/black-button24r.png") right center no-repeat;
   color: #FFF;
   padding: 4px 4px;
-  a-moz-border-radius: 8px;
   border: none;
 }
 .topbuttons button:hover, .bottombuttons button:hover{
@@ -364,10 +401,10 @@ a:visited{
 }
 
 tr.row.odd{
-  background-color: #CDF;
+  background-color: #FFF;
 }
 tr.row.even{
-  background-color: #FFF;
+  background-color: #E4F6FF;
 }
 th{
   background-color: #CDF;
@@ -410,7 +447,7 @@ th{
 
 .article_footer {
   color: #777;
-  border-color: 777;
+  border-color: #777;
 }
 
 .xwikiuserblog .rssfeed {
@@ -473,13 +510,13 @@ th{
   color: #2E5A87 !important;
 }
 
-.panel .tbexpanded{
+#body .panel .tbexpanded{
   background-color: #FFF !important;
   border-top: 1px solid #D6D6D6 !important;
   border-bottom: 1px solid #384554 !important;
 }
 
-.panel .tbexpanded h6{
+#body .panel .tbexpanded h6{
   color: #384554 !important;
   border-bottom: 2px solid #DFE5E4 !important;
   border-top: 1px solid #DFE5E4;
@@ -593,7 +630,6 @@ input[type=checkbox], input[type=radio]{
 }
 
 #commentscontent{
-  background-color: #E5F0FE;
 }
 /*
 .commentsno{
@@ -604,13 +640,10 @@ input[type=checkbox], input[type=radio]{
 #attachmentscontent{
   background-color: #E4F6FF;
 }
-*/
 /*
-.attachmentsno{
+.attachmentsno {
   background: transparent url(icons/black-doc2.png) center center no-repeat;
-}
-
-*/
+} */
 .xwikiintratitle{
   display: block !important;
 }
@@ -625,4 +658,15 @@ a.deletelink{
 a.deletelink:hover{
   color: #900;
   text-decoration: underline;
+}
+
+
+
+/*-----------------------------*/
+
+#resizeta{
+  height: 4px;
+  background-color: #DDD;
+  border: 1px #DDD outset;
+  cursor: s-resize;
 }

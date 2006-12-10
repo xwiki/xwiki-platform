@@ -13,17 +13,20 @@
 #set($comments = $doc.getComments(false))
 #end
   <div id="commentscontent" class="xwikiintracontent">
-  <h2 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno">$comments.size()</span></h2>
+    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>
+    <div id="comments">
 #if($comments.size()>0)
-#set($count=0)
 #foreach($comment in $comments)
-#if($count > 0)    <hr/>
+#if($velocityCount > 1)    <hr class="commentspacer"/>
 #end
-#set($count=$count+1)
-    <div id="xwikicomment_${count}" class="xwikicomment">
+    <div id="xwikicomment_${velocityCount}" class="xwikicomment #if($velocityCount % 2 == 1) odd #else even #end">
 ##      <div class="commentavatar">#useravatar($comment.author)</div>
-      <div class="commentheader"><span class="commentauthor">$!xwiki.getLocalUserName($doc.display('author','view',$comment))</span>#set($date = $doc.display("date","view",$comment))
-#if($date != "") &ndash; <span class="commentdate">$date</span>#end
+      <div class="commentheader"><span class="commentauthor">$!xwiki.getLocalUserName($doc.display('author','view', $comment))</span>
+## #set($date = $doc.display("date","view",$comment))
+#set($date = $comment.getProperty("date").value)
+#if($date)
+ | <span class="commentdate">$xwiki.formatDate($date, "dd.MM.yyyy") $msg.get("at") $xwiki.formatDate($date, "hh:mm a")</span>
+#end
 #if($hasedit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
     onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
       </div>
@@ -49,11 +52,13 @@ $msg.get("nocomments")
         </div>
         </fieldset>
       </form>
+#end
+    </div> ## comments
+  </div> ## commentscontent
+## #end
       <script type="text/javascript">
 //<!--
 document.getElementById("commentform").className = "collapsed";
+document.getElementById("comments").className += " hidden";
 //-->
       </script>
-#end
-  </div>
-## #end

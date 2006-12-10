@@ -1,6 +1,6 @@
 @import "elements.css";
 @import "classes.css";
-@import "chwSkin.css";
+/* @import "chwSkin.css";*/
 @import "xwiki.css"; 
 @import "wiki.css";  
 @import "page.css"; 
@@ -9,3 +9,51 @@
 @import "presentation.css"; 
 @import "colorsblack.css";
 /*@import "ie.css";   masque temporairement : modif spécifique IE à réintéger*/
+
+
+#rightPanels{
+  background-color: #384554;
+  color: #fff;
+}
+.panel 
+{
+margin: 0;
+}
+.buttonwrapper /*temp pour voir les bouton*/
+{
+background-color: #555;
+}
+#headerspace hr {
+display:none; /* hidden modifie la hauteur sous IE */
+}
+.rightmenu a {
+font-size : 90%; /* presentation.css add font-size : 110%;  */
+margin-right : 2px;
+
+}
+ /* mimer les panels de nav */
+.expanded .xwikipaneltitle {
+        background-color: #fff;
+        color: #384554;
+
+        }
+
+.xwikipaneltitle:hover {
+        cursor: pointer;
+        sbackground-image: url("collapseh.png");
+        }
+.collapsed .wikipaneltitle {
+        border-top: 1px solid #fff;}
+.xwikipaneltitle {
+        padding: 0px 10px;
+        margin: 0px;
+        font-size: 1em;
+        background: url("icons/black-less.png") no-repeat right center;
+        border: 4px solid #384554;
+        border-width: 0px 4px;
+        cursor: pointer;
+        }
+.panel .accordionTabTitleBar h6 {
+border-top: 1px solid #999;
+}
+#xwikinav {border-bottom: 1px solid #999;}

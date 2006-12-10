@@ -4088,7 +4088,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         name = name.replaceAll("[îï]","i");
         name = name.replaceAll("[ôö]","o");
         name = name.replaceAll("[ùûü]","u");
-        name = name.replaceAll("[\"!?]","");
+        name = name.replaceAll("[\"!?\\.]","");
         name = name.replaceAll("[_':,;\\\\/]"," ");
         name = name.replaceAll("\\s+","");
         name = name.replaceAll("[\\(\\)]"," ");

@@ -190,3 +190,4 @@ function addGroup(form, prefix) {
         select.options[length] = new Option(dgroupname, xgroupname, true);
     }
 }
+

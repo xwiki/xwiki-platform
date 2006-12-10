@@ -13,9 +13,14 @@
 <h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
 <div class="floatcontainer">
 <ul class="xwikitabbar">
-<li id="xwikieditwysiwyg"#if($editor == "wysiwyg") class="active"#end><a href="$doc.getURL("edit", "editor=wysiwyg&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wysiwyg&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editVisual")</a></li>
-<li id="xwikieditfullscreen"#if($editor == "fullscreen") class="active"#end><a href="$doc.getURL("edit", "editor=fullscreen&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=fullscreen&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editFullScreen")</a></li>
-<li id="xwikieditwiki"#if($editor == "wiki") class="active"#end><a href="$doc.getURL("edit", "editor=wiki&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wiki&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editWiki")</a></li>
-<li id="xwikieditobject"#if($editor == "object") class="active"#end><a href="$doc.getURL("edit", "editor=object&amp;$param")">$msg.get("editObject")</a></li>
-</ul>
+<li id="xwikieditwysiwyg"#if($editor == "wysiwyg") class="active"#end><a href="$doc.getURL("edit", "editor=wysiwyg&amp;$param")" onclick="if (checkAdvancedContent('$msg.get("checkadvancedcontent")')==false) return false; document.forms.edit.action='$doc.getURL("edit", "editor=wysiwyg&amp;$languageparams&amp;$param")'; if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editVisual")</a>
+</li><li id="xwikieditwiki"#if($editor == "wiki") class="active"#end><a href="$doc.getURL("edit", "editor=wiki&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=wiki&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editWiki")</a>
+</li><li id="xwikieditobject"#if($editor == "object") class="active"#end><a href="$doc.getURL("edit", "editor=object&amp;$param")">$msg.get("editObject")</a>
+</li><li id="xwikieditclass"#if($editor == "class") class="active"#end><a href="$doc.getURL("edit", "editor=class&amp;$param")">$msg.get("editClass")</a>
+</li><li id="xwikieditrights"#if($editor == "rights") class="active"#end><a href="$doc.getURL("edit", "editor=rights&amp;$param")">$msg.get("editRights")</a>
+</li><li id="xwikiedithistory"#if($editor == "history") class="active"#end><a href="$doc.getURL("edit", "editor=history&amp;$docvariant&amp;$param")">$msg.get("editHistory")</a>
+</li><li id="xwikieditcode#if($editor == "code") class="active"#end><a href="$doc.getURL("edit", "editor=code&amp;$docvariant")">$msg.get("viewcode")</a>
+</li></ul>
 </div>
+## Full Screen editor not yet ready
+#* </li><li id="xwikieditfullscreen"#if($editor == "fullscreen") class="active"#end><a href="$doc.getURL("edit", "editor=fullscreen&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=fullscreen&amp;$languageparams&amp;$param")';if (document.forms.edit.onsubmit) document.forms.edit.onsubmit(); document.forms.edit.submit(); return false;">$msg.get("editFullScreen")</a> *#

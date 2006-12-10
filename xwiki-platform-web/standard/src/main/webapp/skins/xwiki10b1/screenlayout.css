@@ -968,3 +968,12 @@ html>body #xwikieditcontent{
 * html form{
   margin-top: 0px;
 }
+
+.xwiki-form-listclass input[type="checkbox"] {
+  float: none;
+  display: inline;
+  margin-right: 2px;
+}
+.xwiki-form-listclass {
+  margin-right: 10px;
+}

@@ -208,8 +208,8 @@ $doc.display("content", $obj)
 ### @param actionurl The URL this entry points to
 ### @param linktext The menu item text
 ###
-#macro(xwikitopmenuentry $actionurl $linktext)
-<div class="topmenuentry"><a href="$actionurl"><strong>$linktext</strong></a></div>
+#macro(xwikitopmenuentry $actionurl $linktext $id)
+<div class="topmenuentry" id="$id"><a href="$actionurl"><strong>$linktext</strong></a></div>
 #end
 
 ###

@@ -15,8 +15,8 @@
 #set($showactions = 0)
 #set($attachments = $doc.attachmentList)
     <div id="attachmentscontent" class="xwikiintracontent">
+    <div id="attw">
     <div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
-      <div id="attw">
       <div id="attachments">
 #if($attachments.size()>0)
       <table class="xwikidatatable" summary="$msg.get("document") ${doc.displayTitle} &mdash; $msg.get("attachments")">
@@ -29,7 +29,7 @@
 #if($hasedit || $hasadmin)
         <col class="attachmentdelete"/>
 #end
-        <tr>
+#*        <tr>
           <th></th>
           <th>$msg.get("filename")</th>
           <th>$msg.get("author")</th>
@@ -40,6 +40,7 @@
           <th></th>
 #end
         </tr>
+*#
 #foreach ($attach in $attachments)
         <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
           <td class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</td>

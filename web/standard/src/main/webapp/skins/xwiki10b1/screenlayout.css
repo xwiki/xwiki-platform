@@ -328,6 +328,7 @@ Comments
 }
 #attachmentscontent {
   background: #E4F6FF url("icons/black-bg-attach-left.png") left bottom no-repeat;
+  margin-bottom: 16px;
 }
 #attachmentscontent table{
   border: none;
@@ -428,7 +429,7 @@ html > body .xwikiintracontent legend{
 }
 
 .commentsno, .attachmentsno{
-  font-size: 60%;
+  font-size: 50%;
   background: transparent url("icons/black-comment2.png") center no-repeat;
   padding: 10px 24px 14px;
   font-weight: 900;
@@ -561,6 +562,7 @@ ul.xwikitabbar{
   border: 1px solid;
   border-bottom: none;
   margin-right: 2px;
+  margin-top: 2px;
 }
 html > body .xwikitabbar li{
   padding: 5px 0px;
@@ -731,15 +733,13 @@ Misc
   font-weight: 100;
   padding: 0px 4px;
 }
+.accordionTabContentBox {
+  height: 400px;
+  max-height: 400px;
+}
 .accordionTabContentBox div{
   padding: 8px;
 }
-
-.accordionTabContentBox {
- height: 400px;
- max-height: 400px;
-}
-
 td.label{
   text-align: right;
   padding-right: 4px;

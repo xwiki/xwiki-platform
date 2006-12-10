@@ -26,3 +26,4 @@ $response.sendRedirect($doc.getURL("admin", "editor=class"))
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 <script type="text/javascript">new Rico.Accordion( 'xwikiclassproperties', {panelHeight:'flex'} );</script>
+#end

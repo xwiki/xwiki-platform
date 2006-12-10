@@ -6,7 +6,6 @@
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <div style="overflow:auto">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div>#template("adminactions.vm")</div>
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <div id="xwikichangespace">
@@ -37,7 +36,7 @@ $msg.get("changespace"): <select name="space" onchange="location='?editor=spacer
 #end
   </table>
  </div>
-<div>#template("adminactions.vm")</div>
+<div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
 </div>
 </div>

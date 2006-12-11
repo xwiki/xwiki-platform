@@ -25,7 +25,6 @@ $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 #elseif($tocreate=="post")
 #set($docname="Blog.${title.replace(' ', '')}")
 #end
-#*
 #set($newdoc=$xwiki.getDocument($docname))
 #if($newdoc.isNew())
 #if($tocreate == "post")
@@ -36,4 +35,3 @@ $response.sendRedirect($newdoc.getURL("edit", "template=${template}"))
 #else
 $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 #end
-*#

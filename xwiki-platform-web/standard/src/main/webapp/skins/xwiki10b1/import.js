@@ -78,8 +78,7 @@ function showPackageInfos(res)
     var xml = res.responseXML;
     var name = getXmlValue("name", xml);
 
-    // clean-up area
-    deleteDocs(true);
+    $('selectedDocs').innerHTML = "no files";
 
     var nodes = xml.getElementsByTagName("file");
     for (var i = 0; i < nodes.length; i++)

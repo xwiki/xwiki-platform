@@ -50,6 +50,8 @@ XWiki.prototype = {
 
 function selectPackage(name)
 {
+    var str = "<input type=\"hidden\" name=\"name\" value=\"" +  name +  "\" />";
+    $('importDocName').innerHTML = str;
     var pars = "action=getPackageInfos&name="+name+"&xpage=plain";
     var myAjax = new Ajax.XWikiRequest( "XWiki", "Import", {method: 'get', parameters: pars, onComplete: showPackageInfos} , "import");
 }
@@ -93,15 +95,13 @@ function showPackageInfos(res)
         insertNewDoc("selectedDocs", pageName, language);
     }
 
-    var str = "<input type=\"hidden\" name=\"name\" value=\"" +  name +  "\" />";
-    $('importDocName').innerHTML = str;
     show("importDocs");
     show("selectDocsActions");
     hide("noSelectedDocs)");
 }
 
 function insertNewDoc(id, value, language)
-{var str = "<div class='exportDocName'>";
+{var str = "<div class='importDoc'>";
     str += "<input type='checkBox' name='pages' value='" + value + "' class='selCheckedDoc' id='sel_" + value + "' checked />";
 
     // Add language

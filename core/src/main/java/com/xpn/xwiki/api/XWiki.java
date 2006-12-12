@@ -764,7 +764,7 @@ public class XWiki extends Api {
      */
     public void flushCache() {
         if (hasProgrammingRights())
-            xwiki.flushCache();
+            xwiki.flushCache(context);
     }
 
     /**

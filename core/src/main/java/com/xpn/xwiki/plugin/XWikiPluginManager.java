@@ -149,11 +149,11 @@ public class XWikiPluginManager {
         }
     }
 
-    public void flushCache() {
+    public void flushCache(XWikiContext context) {
         Vector plugins = getPlugins("flushCache");
         for (int i=0;i<plugins.size();i++) {
             try {
-                ((XWikiPluginInterface)plugins.get(i)).flushCache();
+                ((XWikiPluginInterface)plugins.get(i)).flushCache(context);
             } catch (Exception e)
             {}
         }

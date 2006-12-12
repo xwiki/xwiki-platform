@@ -406,7 +406,7 @@ public class Package {
         int status = DocumentInfo.INSTALL_OK;
         for (int i = 0;i<classFiles.size();i++)
         {
-            if (installDocument(((DocumentInfo)files.get(i)), isAdmin, context)==DocumentInfo.INSTALL_ERROR)
+            if (installDocument(((DocumentInfo)classFiles.get(i)), isAdmin, context)==DocumentInfo.INSTALL_ERROR)
              status = DocumentInfo.INSTALL_ERROR;
         }
 

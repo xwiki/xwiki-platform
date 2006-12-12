@@ -38,11 +38,11 @@
 }
 #globallinks a,#globallinks a:link,#globallinks a:visited,#globallinks a:active {
 	color: #000;}
-#globallinks 	a:hover {
+#globallinks a:hover {
 	color: #0066FF;
 }
 
-#headeruser, #headeradmin, #headerlogin, #headerlogout, #headerlanguages{
+#headeruser, #headeradmin, #headerlogin, #headerlogout, #headerlanguages, #headerregister{
   padding-right: 20px;
   background: transparent right center no-repeat;
 }
@@ -54,6 +54,9 @@
 }
 #headerlogin{
   background-image: url("icons/black-budy.png");
+}
+#headerregister{
+  background-image: url("icons/black-register.png");
 }
 #headerlogout{
   background-image: url("icons/black-logout.png");
@@ -161,16 +164,20 @@ Menu
 .tme{
   background: transparent url("icons/black-arrow-ab.png") right center no-repeat;
 }
-.topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active {
+.topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active, .rightmenu a, .rightmenu a:hover {
 	color:#333; 
 }
-.topmenuentry:hover {
+.topmenuentry:hover, .rightmenu:hover {
   background-image: url("actionbar-bg2.png") !important;
   background-repeat: repeat-x;
 }
-.topmenuentry a strong{
-   background:transparent left center no-repeat;
-   padding: 0px 20px;
+.rightmenu{
+  z-index: 100;
+}
+.topmenuentry a strong, .rightmenu a strong{
+  background:transparent left center no-repeat;
+  padding: 0px 20px;
+  color: #333 !important;
 }
 #tmEdit a strong{
   background-image: url(icons/black-edit-ab.png);
@@ -183,6 +190,12 @@ Menu
 }
 #tmWatch a strong{
   background-image: url(icons/black-fav-ab.png);
+}
+#tmDoc strong{
+  background-image: url(icons/black-doc-ab.png);
+}
+#tmDoc:hover strong{
+  background-image: url(icons/black-doc-ab2.png);
 }
 #tmDelete a strong{
   background-image: url(icons/black-delete.png);
@@ -241,14 +254,14 @@ input.button, button.button{
 input.button:hover, button.button:hover{
   color: #369;
 }
-.topbuttons button, .bottombuttons button{
+#body .buttonwrapper *{
   background-color: transparent;
   background: transparent url("icons/black-button24r.png") right center no-repeat;
   color: #FFF;
   padding: 4px 4px;
   border: none;
 }
-.topbuttons button:hover, .bottombuttons button:hover{
+#body .buttonwrapper *:hover{
   background-image: url("icons/black-button24r-hover.png")
 }
 .topbuttons, .bottombuttons{
@@ -269,10 +282,10 @@ Editors
 }
 
 .xwikitabbar li a{
-  color: #000 !important;
+  color: #FFF !important;
 }
 .xwikitabbar li.active a{
-  color: #000 !important;
+  color: #FFF !important;
 }
 
 .xwikitabbar li.active{
@@ -310,6 +323,10 @@ background-color: #384554;}
 .panel{
   border-color: #DDD;
   background-color: #384554;
+  background-color: transparent;
+}
+.xwikipanelcontents{
+  background-color: #384554;
 }
 .expanded .xwikipaneltitle{
   background-color: #fff;
@@ -318,6 +335,7 @@ background-color: #384554;}
 .collapsed .xwikipaneltitle{
   background-color: #384554;
   color: #fff;
+  -moz-border-radius: 50px;
 }
 
 .expanded .xwikipaneltitle:hover{
@@ -515,6 +533,9 @@ th{
 .panel .accordionTabContentBox a{
   color: #2E5A87 !important;
 }
+.panel .accordionTabContentBox a:hover{
+  color: #D70 !important;
+}
 
 #body .panel .tbexpanded{
   background-color: #FFF !important;
@@ -548,6 +569,10 @@ input.button{
   color: #fff;
   font-weight: bold;
   padding: 2px;
+}
+
+input.button:hover{
+  background-color: #98BFE6;
 }
 
 input[type=submit]{
@@ -607,13 +632,14 @@ input[type=checkbox], input[type=radio]{
   min-height: 24px !important;
   float: left;
   display: block;
-  margin-left: 10px;
+  margin: 10px 0px 10px 10px;
 }
 .buttonwrapper:hover{
   background-image: url("icons/black-button24l-hover.png");
 }
-.buttonwrapper button{
+.buttonwrapper *{
   min-height: 24px;
+  margin-top: 0px;
 }
 
 .important{
@@ -694,4 +720,12 @@ a.deletelink:hover{
 #footerglobal a{
   color: #CDE;
   text-decoration: none;
+}
+#footerglobal a:hover{
+  color: #D70;
+}
+
+a:hover{
+  color: #C82;
+  color: #D70;
 }

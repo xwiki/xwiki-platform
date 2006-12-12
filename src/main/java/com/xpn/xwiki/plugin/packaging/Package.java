@@ -57,6 +57,7 @@ public class Package {
     private String  authorName = "XWiki";
     private List    files = null;
     private List    customMappingFiles = null;
+    private List    classFiles = null;
     private boolean backupPack = false;
     private boolean withVersions = true;
     private List    documentFilters = new ArrayList();
@@ -141,6 +142,7 @@ public class Package {
     {
         files = new ArrayList();
         customMappingFiles = new ArrayList();
+        classFiles = new ArrayList();
     }
 
     public boolean add(XWikiDocument doc, int defaultAction, XWikiContext context) throws XWikiException {
@@ -168,6 +170,9 @@ public class Package {
             docinfo.setAction(defaultAction);
             files.add(docinfo);
             BaseClass bclass =  doc.getxWikiClass();
+            if (bclass.getProperties().length>0) {
+                classFiles.add(docinfo);
+            }
             if (bclass.getCustomMapping()!=null)
                 customMappingFiles.add(docinfo);
             return true;
@@ -352,7 +357,7 @@ public class Package {
         }
     }
 
-    public int testInstall(XWikiContext context)
+    public int testInstall(boolean isAdmin, XWikiContext context)
     {
         if (log.isDebugEnabled())
             log.debug("Package test install");
@@ -362,11 +367,11 @@ public class Package {
             if (files.size() == 0)
                 return result;
 
-            result = ((DocumentInfo)files.get(0)).testInstall(context);
+            result = ((DocumentInfo)files.get(0)).testInstall(isAdmin, context);
             for (int i = 1; i < files.size(); i++)
             {
                 DocumentInfo docInfo = ((DocumentInfo)files.get(i));
-                int res = docInfo.testInstall(context);
+                int res = docInfo.testInstall(isAdmin, context);
                 if (res < result)
                     result = res;
             }
@@ -380,7 +385,9 @@ public class Package {
 
 
     public int install(XWikiContext context) throws XWikiException {
-        if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
+        boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
+
+        if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
@@ -397,16 +404,25 @@ public class Package {
             context.getWiki().getStore().injectUpdatedCustomMappings(context);
 
         int status = DocumentInfo.INSTALL_OK;
+        for (int i = 0;i<classFiles.size();i++)
+        {
+            if (installDocument(((DocumentInfo)files.get(i)), isAdmin, context)==DocumentInfo.INSTALL_ERROR)
+             status = DocumentInfo.INSTALL_ERROR;
+        }
+
         for (int i = 0; i < files.size(); i++)
         {
-            if (installDocument(((DocumentInfo)files.get(i)),context)==DocumentInfo.INSTALL_ERROR)
-             status = DocumentInfo.INSTALL_ERROR;
+            DocumentInfo di = (DocumentInfo)files.get(i);
+            if (!classFiles.contains(di)) {
+                if (installDocument(di,isAdmin, context)==DocumentInfo.INSTALL_ERROR)
+                    status = DocumentInfo.INSTALL_ERROR;
+            }
         }
         setStatus(status, context);
         return status;
     }
 
-    private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
+    private int installDocument(DocumentInfo doc, boolean isAdmin, XWikiContext context) throws XWikiException {
         int result = DocumentInfo.INSTALL_OK;
 
         if (log.isDebugEnabled())
@@ -417,7 +433,7 @@ public class Package {
             return  DocumentInfo.INSTALL_OK;
         }
 
-        int status = doc.testInstall(context);
+        int status = doc.testInstall(isAdmin, context);
         if (status == DocumentInfo.INSTALL_IMPOSSIBLE) {
             addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;

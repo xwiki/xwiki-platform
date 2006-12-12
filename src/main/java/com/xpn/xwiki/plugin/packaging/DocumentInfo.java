@@ -99,7 +99,7 @@ public class DocumentInfo
         return installable;
     }
 
-    public int testInstall(XWikiContext context)
+    public int testInstall(boolean isAdmin, XWikiContext context)
     {
         if (log.isDebugEnabled())
          log.debug("Package test install document " + ((doc==null) ? "" : getFullName()) + " " + ((doc==null)? "":getLanguage()));
@@ -110,7 +110,7 @@ public class DocumentInfo
             if (this.doc == null)
                 return installable;
             try {
-                if (!context.getWiki().checkAccess("edit", this.doc, context))
+                if ((!isAdmin)&&(!context.getWiki().checkAccess("edit", this.doc, context)))
                     return installable;
                 XWikiDocument doc1 = context.getWiki().getDocument(doc.getFullName(), context);
                 boolean isNew = doc1.isNew();

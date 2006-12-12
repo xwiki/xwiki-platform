@@ -2175,7 +2175,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             String parent = request.getParameter("parent");
             String validkey = null;
 
-            if (!password.equals(password2)) {
+            if ((!password.equals(password2))||(password.trim().equals(""))) {
                 // TODO: throw wrong password exception
                 return -2;
             }

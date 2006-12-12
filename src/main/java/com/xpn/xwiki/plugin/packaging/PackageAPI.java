@@ -169,7 +169,12 @@ public class PackageAPI   extends Api {
 
     public int testInstall()
     {
-        return plugin.testInstall(context);
+        return plugin.testInstall(false, context);
+    }
+
+    public int testInstall(boolean isAdmin)
+    {
+        return plugin.testInstall(isAdmin, context);
     }
 
     public void backupWiki() throws XWikiException, IOException {

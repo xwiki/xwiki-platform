@@ -1532,7 +1532,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
-            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc where doc.xWikiClassXML is not null");
+            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc where (doc.xWikiClassXML is not null and doc.xWikiClassXML<>'')");
             Iterator it = query.list().iterator();
             List list = new ArrayList();
             while (it.hasNext()) {

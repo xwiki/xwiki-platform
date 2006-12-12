@@ -193,11 +193,11 @@ var XWikiAjax = {
 
 function updateName(field1, field2, removeclass) {
   var name = field1.value;
-  name = name.replace(/[Ã Ã¢Ã¤]/gi,"a")
-  name = name.replace(/[Ã©Ã¨ÃªÃ«]/gi,"e")
-  name = name.replace(/[Ã®Ã¯]/gi,"i")
-  name = name.replace(/[Ã´Ã¶]/gi,"o")
-  name = name.replace(/[Ã¹Ã»Ã¼]/gi,"u")
+  name = name.replace(/[àâä]/gi,"a")
+  name = name.replace(/[éèêë]/gi,"e")
+  name = name.replace(/[îï]/gi,"i")
+  name = name.replace(/[ôö]/gi,"o")
+  name = name.replace(/[ùûü]/gi,"u")
   name = name.replace(/["!?]/g,"");
   name = name.replace(/[_':,;]/g," ");
   name = name.replace(/[\.]/g,"");
@@ -219,11 +219,11 @@ function updateName(field1, field2, removeclass) {
 }
 
 function noaccent(chaine) {
-  temp = chaine.replace(/[Ã Ã¢Ã¤]/gi,"a")
-  temp = temp.replace(/[Ã©Ã¨ÃªÃ«]/gi,"e")
-  temp = temp.replace(/[Ã®Ã¯]/gi,"i")
-  temp = temp.replace(/[Ã´Ã¶]/gi,"o")
-  temp = temp.replace(/[Ã¹Ã»Ã¼]/gi,"u")
+  temp = chaine.replace(/[àâä]/gi,"a")
+  temp = temp.replace(/[éèêë]/gi,"e")
+  temp = temp.replace(/[îï]/gi,"i")
+  temp = temp.replace(/[ôö]/gi,"o")
+  temp = temp.replace(/[ùûü]/gi,"u")
   temp = temp.replace(/["!?]/g,"");
   temp = temp.replace(/[_':]/g," ");
   if (navigator.userAgent.indexOf("Safari")==-1) {
@@ -249,3 +249,4 @@ function prepareName(form) {
    cxwikiname.value  =  noaccent(fname + lname);
  }
 }
+

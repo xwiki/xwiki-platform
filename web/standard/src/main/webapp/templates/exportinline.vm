@@ -1,0 +1,14 @@
+<h1>$msg.get("export")</h1>
+
+<form action="" method="post">
+<label for="name"><i>$msg.get("export_packagename")</i></label><br /><input type="text" name="name" id="name" value=""><br /><br />
+<label for="description"><i>$msg.get("export_description")</i></label><br /><textarea name="description" id="description"></textarea><br /><br />
+<label for="licence"><i>$msg.get("export_licence")</i></label><br /><input type="text" name="licence" id="licence" value=""><br /><br />
+<label for="author"><i>$msg.get("export_author")</i></label><br /><input type="text" name="author" id="author" value="$context.user"><br /><br />
+<label for="version"><i>$msg.get("export_version")</i></label><br /><input type="text" name="version" id="version" value=""><br /><br />
+<label for="history"><i>$msg.get("export_addhistory")</i><input type="checkbox" name="history" id="history" value="true"></label><br />
+<label for="backup"><i>$msg.get("export_backuppack") ($msg.get("export_authorpreserved"))</i><input type="checkbox" name="backup" id="backup" value="true"></label> 
+<br /><br />
+
+<input type="submit" value="$msg.get("export")" />
+</form>

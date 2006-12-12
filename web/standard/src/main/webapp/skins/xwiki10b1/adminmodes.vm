@@ -10,4 +10,6 @@
 </li><li id="xwikiadmingroups"#if($editor == "groups") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups&space=$space")")">$msg.get("admingroups")</a>
 </li><li id="xwikiadminusers"#if($editor == "users") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users&space=$space")")">$msg.get("adminusers")</a>
 </li><li id="xwikiadminskin"#if($editor == "skin") class="active"#end><a href="$xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin&space=$space")")">$msg.get("adminskin")</a>
+</li><li id="xwikiadminexport"#if($editor == "export") class="active"#end><a href="$xwiki.getDocument("XWiki.Export").getURL("export", "editor=export&space=$space")")">$msg.get("adminexport")</a>
+</li><li id="xwikiadminimport"#if($editor == "import") class="active"#end><a href="$xwiki.getDocument("XWiki.Import").getURL("import", "editor=import&space=$space")")">$msg.get("adminimport")</a>
 </li></ul>

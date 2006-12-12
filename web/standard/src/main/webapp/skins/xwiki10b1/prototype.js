@@ -1030,7 +1030,7 @@ Abstract.Insertion.prototype = {
         this.element.insertAdjacentHTML(this.adjacency, this.content);
       } catch (e) {
         var tagName = this.element.tagName.toLowerCase();
- 	    if (tagName == 'tbody' || tagName == 'tr') {
+         if (tagName == 'tbody' || tagName == 'tr') {
             this.insertContent(this.contentFromAnonymousTable());
         } else {
           throw e;

@@ -144,6 +144,17 @@ public class PackageAPI   extends Api {
         }
     }
 
+    public void setDocumentAction(String docFullName, String language, int action)
+    {
+        Iterator it = plugin.getFiles().iterator();
+        while (it.hasNext())
+        {
+            DocumentInfo docInfos = (DocumentInfo)it.next();
+            if ((docInfos.getFullName().compareTo(docFullName) == 0)&&(language.equals(docInfos.getLanguage())))
+                docInfos.setAction(action);
+        }
+    }
+
 
     public String export() throws IOException, XWikiException {
         context.getResponse().setContentType("application/zip");
@@ -173,5 +184,21 @@ public class PackageAPI   extends Api {
 
     public int install() throws XWikiException {
         return plugin.install(context);
+    }
+
+    public List getErrors() {
+        return plugin.getErrors(context);
+    }
+
+    public List getSkipped() {
+        return plugin.getSkipped(context);
+    }
+
+    public List getInstalled() {
+        return plugin.getInstalled(context);
+    }
+
+    public int getStatus() {
+        return plugin.getStatus(context);
     }
 }

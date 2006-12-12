@@ -31,22 +31,28 @@
   <div id="globallinks">
     <div id="globalmenu">
 #if (!$isguest)
-##      <a href="$xwiki.getURL($context.user, "view")">$xwiki.parseMessage("myhomepage")</a> #sep()
-      <a href="$xwiki.getURL($context.user, "view")" id="headeruser">$xwiki.getUserName($context.user, false)</a> #sep()
-#end
-#if($hasadmin)
-      <a href="$xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$msg.get("admin")</a> #sep()
+      <a class="glink" href="$xwiki.getURL($context.user, "view")" id="headeruser">$xwiki.getUserName($context.user, false)</a> #sep()
 #end
 #if ($context.action != "loginerror")
 #if ($isguest)
 #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))
-      <a href="$loginurl" id="headerlogin">$msg.get("login")</a>#sep()
+      <a class="glink" href="$loginurl" id="headerlogin">$msg.get("login")</a>#sep()
 #else
 #set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
-      <a href="$logouturl" id="headerlogout">$msg.get("logout")</a>#sep()
+      <a class="glink" href="$logouturl" id="headerlogout">$msg.get("logout")</a>#sep()
 #end
 #end
-      <a href="#" id="headerlanguages">en / fr / es</a>#sep()
+#if($hasadmin)
+      <a class="glink" href="$xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$msg.get("admin")</a> #sep()
+#end
+#if($xwiki.isMultiLingual())
+  <span class="glink" id="headerlanguages">
+  <a href="$doc.getURL("view", "language=$doc.getDefaultLanguage()")">$doc.getDefaultLanguage()</a>
+  #foreach($lang in $doc.translationList)
+    / <a href="$doc.getURL("view", "language=$lang")">$lang</a>
+  #end
+  </span>
+#end
 ## #set($regurl = $xwiki.getURL("XWiki.RegisterNewUser"))
 ##       <a href="$regurl">$msg.get("register")</a>#sep()
 ##       <a href="$xwiki.getURL("Doc.WebHome","view")">$msg.get("doc")</a>

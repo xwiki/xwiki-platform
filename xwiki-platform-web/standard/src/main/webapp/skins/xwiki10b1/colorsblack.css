@@ -20,7 +20,7 @@
 }
 
 
-#contentcontainer, #headerglobal, #xwikieditor{
+#body #contentcontainer, #headerglobal, #xwikieditor{
   border-color: #676D73; /* couleur de fond de la sidebar*/
 }
 
@@ -80,9 +80,14 @@ Space header, footer
 Content
 ---------------------------------------
 */
-#contentcolumn, #editcolumn{
-  background-image: url("content-bg.png");
+.content #contentcolumn, .contenthideleft #contentcolumn, #editcolumn{
+  background-image: url("icons/content-bg-r.png");
   background-position: right top;
+  background-repeat: no-repeat;
+}
+.content #contentcontainerinner, .contenthideright #contentcontainerinner{
+  background-image: url("icons/content-bg-l.png");
+  background-position: left top;
   background-repeat: no-repeat;
 }
 .main{
@@ -119,9 +124,10 @@ table.xwikidatatable, table.xwikidatatable th{
   border-color: #DDD;
 }
 table.xwikidatatable th{
-  color: #CDF;
-  background-color: #369;
-  border-color: #369;
+  color: #000;
+  background-color: transparent;
+  border-color: #CCC;
+  border: none;
 }
 
 .xwikiintracontent legend, .xwikiintracontent fieldset{
@@ -287,8 +293,8 @@ Editors
 Panels
 ---------------------------------------
 */
-#rightPanels{
-  background-color: #384554;
+#leftPanels, #rightPanels{
+  border-top: 20px solid #384554;
   background-color: #676D73;
   color: #fff;
 }
@@ -561,34 +567,23 @@ textarea {
   padding: 2px;
 }
 
-input[type=text]{
-  background-image: url("black-textareabg.png");
-  background-position: 0px 0px;
-  background-repeat: no-repeat;
-  background-color: #e6eaee;
+input[type=text], input[type=password], input[type=checkbox], input[type=file], select{
+  background: #e6eaee url("black-textareabg.png") 0px 0px no-repeat;
   border: 1px solid #000;
   padding: 2px;
 }
 
 /*ie nescessite de passer par une classe ou un selecteur sinon il pose des problemes*/
 input.ie{
-  background-image: url("black-textareabg.png");
-  background-position: 0px 0px;
-  background-repeat: no-repeat;
-  background-color: #e6eaee;
+  background: #e6eaee url("black-textareabg.png") 0px 0px no-repeat;
   border: 1px solid #000;
   padding: 2px;
 }
 
 input:focus, textarea:focus {
   background-image: url("black-textareabg1.png");
-  background-position: 0px 0px;
-  background-repeat: no-repeat;
-  background-color: #F4FDFF;
-  border: 1px solid #000;
-  padding: 2px;
 }
-	
+
 label {
   display: block;
 }
@@ -598,7 +593,7 @@ form label {
 }
 
 form input {
-  display: block;
+  /* display: block;*/
   margin-top: 3px;
 }
 
@@ -637,13 +632,27 @@ input[type=checkbox], input[type=radio]{
 }
 */
 
-#attachmentscontent{
+#xwikidata #attachmentscontent{
   background-color: #E4F6FF;
 }
-/*
-.attachmentsno {
-  background: transparent url(icons/black-doc2.png) center center no-repeat;
-} */
+#xwikidata form{
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+#comments, #attachments{
+  padding-bottom: 10px;
+}
+
+#xwikidata form{
+  width: 90%;
+  margin: auto;
+}
+* html #attachments form{
+  width: 100%;
+  margin-left: 5%;
+  margin-right: 5%;
+
+}
 .xwikiintratitle{
   display: block !important;
 }
@@ -669,4 +678,20 @@ a.deletelink:hover{
   background-color: #DDD;
   border: 1px #DDD outset;
   cursor: s-resize;
+}
+
+.about, #footerglobal{
+  font-variant: small-caps;
+  font-size: 90%;
+}
+.about{
+  color: #888;
+}
+.about a{
+  color: #333;
+  text-decoration: none;
+}
+#footerglobal a{
+  color: #CDE;
+  text-decoration: none;
 }

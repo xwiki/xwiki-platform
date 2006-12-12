@@ -3,6 +3,7 @@
 ## Extra data: comments, attachments ...
 ##
 <div id="xwikidata" class="layoutsubsection">
+#set($inline = true)
 #set($show = $!request.getParameter("show"))
 #if(!$show || ($show != "comments" && $show != "attachments" && $show != "history" && $show != "attributes"))
 #set($show = "comments")

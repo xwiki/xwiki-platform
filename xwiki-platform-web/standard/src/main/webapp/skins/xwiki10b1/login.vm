@@ -5,7 +5,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <form id="loginForm" action="$doc.getURL("loginsubmit")" method="post">
-<input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
+<div class="hidden"><input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" /></div>
 #xwikimessageboxstart($msg.get("login") "")
 #set($message = $msg.get($xwiki.parseMessage()))
 #if($message)

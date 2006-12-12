@@ -29,7 +29,6 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
@@ -65,6 +64,9 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     private Searcher[] searchers;
     private String indexDirs;
     private IndexRebuilder indexRebuilder;
+
+    public DocChangeRule docChangeRule = null;
+    public XWikiActionRule xwikiActionRule = null;
 
     public LucenePlugin(String name, String className, XWikiContext context) {
         super(name, className, context);
@@ -232,9 +234,34 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         indexUpdaterThread.start();
         indexRebuilder = new IndexRebuilder();
         indexRebuilder.setIndexUpdater(indexUpdater);
-        context.getWiki().getNotificationManager().addGeneralRule(new DocChangeRule(indexUpdater));
-        context.getWiki().getNotificationManager().addGeneralRule(new XWikiActionRule(indexUpdater));
+
+        docChangeRule = new DocChangeRule(indexUpdater);
+        xwikiActionRule = new XWikiActionRule(indexUpdater);
+
+        context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
+        context.getWiki().getNotificationManager().addGeneralRule(xwikiActionRule);
         LOG.info("lucene plugin initialized.");
+    }
+
+    public void flushCache(XWikiContext context){
+        context.getWiki().getNotificationManager().removeGeneralRule(xwikiActionRule);
+        context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
+
+        indexRebuilder = null;
+
+        indexUpdaterThread.stop();
+
+        try {
+            closeSearchers(this.searchers);
+        } catch (IOException e) {
+            LOG.warn("cannot close searchers");
+        }
+        indexUpdater = null;
+        analyzer = null;
+
+
+        init(context);
+
     }
 
     public String getName() {

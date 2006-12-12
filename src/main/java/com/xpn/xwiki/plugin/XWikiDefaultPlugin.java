@@ -41,7 +41,12 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface {
     public void virtualInit(XWikiContext context) {
     }
 
+    public void flushCache(XWikiContext context) {
+        flushCache();
+    }
+
     public void flushCache() {
+
     }
 
     public String commonTagsHandler(String line, XWikiContext context) {

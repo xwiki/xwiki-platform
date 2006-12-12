@@ -1679,6 +1679,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public void flushCache() {
+        flushCache(null);
+    }
+
+    public void flushCache(XWikiContext context) {
         // We need to flush the virtual wiki list
         virtualWikiList = new ArrayList();
         // We need to flush the server Cache
@@ -1703,7 +1707,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         XWikiPluginManager pmanager = getPluginManager();
         if (pmanager != null)
-            pmanager.flushCache();
+            pmanager.flushCache(context);
 
     }
 

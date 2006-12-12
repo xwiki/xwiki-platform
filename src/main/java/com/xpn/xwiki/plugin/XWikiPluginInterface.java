@@ -39,6 +39,12 @@ public interface XWikiPluginInterface {
     /*
     Called to flush cache
     */
+    void flushCache(XWikiContext context);
+
+    /**
+     * @deprecated use flushCache(XWikiContext context) instead
+     * @see flushCache(XWikiContext context)
+     */
     void flushCache();
     /*
     Called at the begin of each request

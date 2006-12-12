@@ -69,8 +69,8 @@
         <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
         <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
         <div>
-        <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/>
-        <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/></span>
+        <span class="buttonwrapper"><input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/></span>
         </div>
         </fieldset>
 </div>

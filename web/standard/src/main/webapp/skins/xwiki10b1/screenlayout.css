@@ -17,6 +17,7 @@ body#body{
   text-align: center;
   margin-bottom: 40px;
 }
+
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
   display: none;
 }
@@ -77,9 +78,9 @@ Global header
 }
 
 #globalmenu {
-  padding: 2.1em 0.5em 0.5em 0.5em;
+  padding: 1.8em 0.5em 0.5em 0.5em;
   text-align: right;
-  font-size: 120%;
+  font-size: 115%;
   line-height: 1em;
 }
 #globalmenu .glink {
@@ -513,13 +514,20 @@ line-height:1.9em;
   
 }
 
-.topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active {
+.topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active{
 display:block;
 font-size:1em;
 text-decoration:none; 
 width:7em; 
 height:2em; 
 line-height:1.9em;
+}
+
+.rightmenu a{
+height:2em; 
+line-height:1.9em;
+font-size:1em;
+text-decoration:none; 
 }
 
 .submenu .submenuitem{

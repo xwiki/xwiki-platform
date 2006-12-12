@@ -47,8 +47,8 @@ $msg.get("nocomments")
         <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
         <div><textarea id='XWiki.XWikiComments_comment' rows='5' cols="80" name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
         <div>
-        <input type="submit" value="$msg.get("addcomment")" class="button"/>
-        <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get("addcomment")" class="button"/></span>
+        <span class="buttonwrapper"><input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/></span>
         </div>
         </fieldset>
       </form>

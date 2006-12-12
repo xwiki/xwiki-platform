@@ -12,15 +12,15 @@
 
 .heading-1 {
   margin-top: 5px;
-  font-size: 2.4em;
-	line-height: 1.1em;
-	margin: 50px 0 30px 0;
-  border-bottom: 1px solid;
+  font-size: 2.6em;
+  line-height: 1.1em;
+  margin: 50px 0 30px 0;
+  border-bottom: 0px solid;
 }
 
 .heading-1-1 {
    	margin: 30px 0 15px 0;
-  	border-bottom: 0px solid;
+  	border-bottom: 1px solid;
 	font-weight:bold;
 	font-style: normal;
 	font-size: 2.2em;

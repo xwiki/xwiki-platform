@@ -1,7 +1,7 @@
 #if($context.getMode()==0)## Visible only in a page
 <div id="actionmenu" class="layoutsubsection">
 <h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
-<div class="rightmenu"><a href='$xwiki.getURL("Doc.PageMenu")' onclick="openURL('$xwiki.getURL("Doc.PageMenu", "view", "xpage=plain")'); return false;">$msg.get("documentation")</a></div>
+<div class="rightmenu"><a id="tmDoc" href='http://xwikiorg10.xwiki.com/xwiki/bin/view/Main/Documentation' onclick="openURL('http://xwikiorg10.xwiki.com/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("documentation")</strong></a></div>
 <div class="leftmenu">
 ##
 ## Edit menu

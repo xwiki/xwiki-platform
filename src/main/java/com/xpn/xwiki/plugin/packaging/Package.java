@@ -381,6 +381,7 @@ public class Package {
 
     public int install(XWikiContext context) throws XWikiException {
         if (testInstall(context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
+            setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
 
@@ -395,11 +396,14 @@ public class Package {
         if (hasCustomMappings)
             context.getWiki().getStore().injectUpdatedCustomMappings(context);
 
+        int status = DocumentInfo.INSTALL_OK;
         for (int i = 0; i < files.size(); i++)
         {
-            installDocument(((DocumentInfo)files.get(i)),context);
+            if (installDocument(((DocumentInfo)files.get(i)),context)==DocumentInfo.INSTALL_ERROR)
+             status = DocumentInfo.INSTALL_ERROR;
         }
-        return DocumentInfo.INSTALL_OK;
+        setStatus(status, context);
+        return status;
     }
 
     private int installDocument(DocumentInfo doc, XWikiContext context) throws XWikiException {
@@ -408,11 +412,14 @@ public class Package {
         if (log.isDebugEnabled())
          log.debug("Package installing document " + doc.getFullName() + " " + doc.getLanguage());
 
-        if (doc.getAction() == DocumentInfo.ACTION_SKIP_INSTALL)
+        if (doc.getAction() == DocumentInfo.ACTION_SKIP) {
+            addToSkipped(doc.getFullName() + ":" + doc.getLanguage(), context);
             return  DocumentInfo.INSTALL_OK;
+        }
 
         int status = doc.testInstall(context);
         if (status == DocumentInfo.INSTALL_IMPOSSIBLE) {
+            addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
         }
         if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST && doc.getAction() == DocumentInfo.ACTION_OVERWRITE)
@@ -425,6 +432,7 @@ public class Package {
                 } catch (Exception e) {
                     // let's log the error but not stop
                     result = DocumentInfo.INSTALL_ERROR;
+                    addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                     if (log.isErrorEnabled())
                      log.error("Failed to delete document " + deleteddoc.getFullName());
                     if (log.isDebugEnabled())
@@ -441,9 +449,11 @@ public class Package {
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
 
+                addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
             } catch (XWikiException e) {
+                addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                 if (log.isErrorEnabled())
                  log.error("Failed to save document " + doc.getFullName());
                 if (log.isDebugEnabled())
@@ -454,7 +464,57 @@ public class Package {
         return result;
     }
 
+    private List getList(String name, XWikiContext context) {
+        List list = (List) context.get(name);
+        if (list==null) {
+            list = new ArrayList();
+            context.put(name, list);
+        }
+        return list;
+    }
 
+    private void addToErrors(String fullName, XWikiContext context) {
+        if (fullName.endsWith(":"))
+         fullName = fullName.substring(0, fullName.length()-1);
+        getList("install_errors", context).add(fullName);
+    }
+
+    private void addToSkipped(String fullName, XWikiContext context) {
+        if (fullName.endsWith(":"))
+         fullName = fullName.substring(0, fullName.length()-1);
+        getList("install_skipped", context).add(fullName);
+    }
+
+    private void addToInstalled(String fullName, XWikiContext context) {
+        if (fullName.endsWith(":"))
+         fullName = fullName.substring(0, fullName.length()-1);
+        getList("install_installed", context).add(fullName);
+    }
+
+    private void setStatus(int status, XWikiContext context) {
+        context.put("install_status", new Integer((status)));
+    }
+
+    public List getErrors(XWikiContext context) {
+        return getList("install_errors", context);
+    }
+
+    public List getSkipped(XWikiContext context) {
+        return getList("install_skipped", context);
+    }
+
+    public List getInstalled(XWikiContext context) {
+        return getList("install_installed", context);
+    }
+
+    public int getStatus(XWikiContext context) {
+        Integer status = (Integer)context.get("install_status");
+        if (status==null)
+          return -1;
+        else
+          return status.intValue();
+    }
+    
     private String readFromInputStream(InputStream is) throws IOException {
         byte[] data = new byte[4096];
         StringBuffer buffer = new StringBuffer();

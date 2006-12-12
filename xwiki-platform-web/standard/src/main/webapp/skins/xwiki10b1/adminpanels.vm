@@ -1,0 +1,9 @@
+#if(($editor == "globalrights")||($editor=="spacerights"))
+#set($adminPanels = "Panels.GlobalRightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
+#end
+#set($adminPanels = $adminPanels.split(","))
+<div id="editPanels" class="panels editor">
+#foreach($panel in $adminPanels)
+#displaypanel($panel)
+#end
+</div>

@@ -113,3 +113,56 @@ function prepareName(form) {
    cxwikiname.value  =  noaccent(fname + lname);
  }
 }
+
+Ajax.XWikiRequest = Class.create();
+
+Object.extend(Object.extend(Ajax.XWikiRequest.prototype, Ajax.Request.prototype), {
+  initialize: function(space, docName, options, action) {
+
+    this.transport = Ajax.getTransport();
+    this.setOptions(options);
+    if (action)
+      this.action = action;
+    else
+      this.action = "view";
+    this.baseUrl = "/xwiki/bin/" + action;
+
+    var onComplete = this.options.onComplete || Prototype.emptyFunction;
+    this.options.onComplete = (function() {
+      this.returnValue(onComplete);
+      //onComplete(this.transport);
+    }).bind(this);
+
+    this.request(this.generateUrl(space, docName));
+  },
+
+    generateUrl: function(space, docName){
+        return this.baseUrl + "/" + space + "/" + docName;
+  },
+
+  returnValue: function(callBack) {
+
+    if (callBack)
+        callBack(this.transport);
+    else
+        alert("error, callback");
+  }
+});
+
+
+
+var XWiki = Class.create();
+
+XWiki.prototype = {
+        initialize: function(wikiUrl){this.wikiUrl = wikiUrl;},
+        getSpaces: function(callBack){
+            var params = '';
+            var myAjax = new Ajax.XWikiRequest( "Ajax", "getSpaces", {method: 'get', parameters: params, onComplete: getSpacesCallBack} );
+        },
+
+        getSpacesCallBack: function(ajaxResponse){
+            var xml = ajaxResponse.responseXML;
+
+        }
+}
+

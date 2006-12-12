@@ -1,0 +1,97 @@
+<style type="text/css">
+input[type="checkbox"] {
+ float: none;
+}
+</style>
+#if($request.action=="import")
+<h1>$msg.get("import")</h1>
+
+#macro(showfilelist $list $text)
+#if($list.size()>0)
+<h2>$msg.get("import_listof${text}files")</h2>
+<ul>
+#foreach($item in $list)
+<li>$item</li>
+#end
+</ul>
+#end
+#end
+$msg.get("importing") $!request.name: $msg.get("import_install_${xwiki.package.status}")
+<br />
+<ul>
+<li>$xwiki.package.installed.size() $msg.get("import_documentinstalled")
+<li>$xwiki.package.skipped.size() $msg.get("import_documentskipped")
+<li>$xwiki.package.errors.size() $msg.get("import_documenterrors")
+</ul>
+
+#showfilelist($xwiki.package.installed "installed")
+#showfilelist($xwiki.package.skipped "skipped")
+#showfilelist($xwiki.package.errors "errors")
+#else
+<h2>$msg.get("availablefilestoimport")</h2>
+$msg.get("selectfiletoimport"):
+
+#set($attachments = $doc.attachmentList)
+<div id="attachments">
+#if($attachments.size()>0)
+      <table class="xwikidatatable" summary="$msg.get("document") ${doc.displayTitle} &mdash; $msg.get("attachments")">
+        <col class="attachmentname"/>
+        <col class="attachmentauthor"/>
+        <col class="attachmentversion"/>
+        <col class="attachmentdate"/>
+        <col class="attachmentsize"/>
+        <col class="attachmentdelete"/>
+#foreach ($attach in $attachments)
+        <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
+          <td><a href="javascript:void()" title="$msg.get("choosethispackage")" onclick="selectPackage('$attach.filename'); return false;">#packName($attach.filename)</a></td>
+          <td>$xwiki.getLocalUserName($attach.author)</td>
+          <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
+          <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
+          <td>$attach.filesize</td>
+#if($hasedit || $hasadmin)
+          <td class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+#end
+        </tr>
+#end
+      </table>
+#else
+$msg.get("noattachments")
+#end
+</div>
+<h2>$msg.get("selectdocumentstoimport")</h2>
+  <span id="selectDocsActions" style="display: none;">$msg.get("select")
+  <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get("none")</a>, <a  href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a></span>
+  <form action="" method="post">
+  <input type="hidden" name="action" value="import" />
+  <div id="selectedDocs">
+
+  </div>
+  <span id="importDocName"></span>
+  <span id="importDocs" style="display: none;"><input type="submit" value="$msg.get("import")" /></span>
+  </form>
+  <span id="noSelectedDocs"><br /><h3 id="noSelectedDocsTxt">$msg.get("nodocuments")</h3></span>
+
+<h2>$msg.get("uploadnewarchivetoimport")</h2>
+#if($request.xredirect)
+#set( $redirect = $request.xredirect)
+#else
+#set( $redirect = $xwiki.getRequestURL())
+#end
+<script type="text/javascript" src="$xwiki.getSkinFile("import.js")"></script>
+<form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<fieldset class="expanded" id="attachform">
+<legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
+  <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
+  <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
+  <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
+  <div>
+  <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/>
+  <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+  </div>
+</fieldset>
+</form>
+#end
+<div id="loading" style="display: none; position: absolute; top: 0px; right: 0px;">
+$msg.get("loading")...
+</div>

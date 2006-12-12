@@ -360,15 +360,31 @@
             <forward name="admin" path="/templates/admin.vm"/>
         </action>
 
+        <action path="/export/"
+                type="com.xpn.xwiki.web.ExportAction"
+                name="export"
+                scope="request">
+            <forward name="export" path="/templates/export.vm"/>
+        </action>
+
+
+        <action path="/import/"
+                type="com.xpn.xwiki.web.ImportAction"
+                name="import"
+                scope="request">
+            <forward name="import" path="/templates/import.vm"/>
+        </action>
+
+
+        <action path="/jcaptcha/"
+                type="com.octo.captcha.module.struts.image.RenderImageCaptchaAction">
+        </action>
+
         <action path="/unknown/"
                 type="com.xpn.xwiki.web.UnknownAction"
                 name="unknown"
                 unknown="true"
                 scope="request">
-        </action>
-
-        <action path="/jcaptcha/"
-                type="com.octo.captcha.module.struts.image.RenderImageCaptchaAction">
         </action>
 
     </action-mappings>

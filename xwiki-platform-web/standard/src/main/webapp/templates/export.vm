@@ -1,0 +1,13 @@
+#template("xwiki.vm")
+#template("httpheader.vm")
+#template("header.vm")
+#template("viewheader.vm")
+#if($xwiki.exists("XWiki.Export"))
+$xwiki.includeForm("XWiki.Export",false)
+#else
+<div id="xwikicontent">
+#template("exportinline.vm")
+</div>
+#end
+#template("basefooter.vm")
+#template("footer.vm")

@@ -194,10 +194,10 @@ public class PackageTest extends HibernateTestCase {
         doc.setContent("test overwrite");
         getXWiki().saveDocument(doc, getXWikiContext());
 
-        int ret = pack.testInstall(getXWikiContext());
+        int ret = pack.testInstall(false, getXWikiContext());
         assertEquals(ret, DocumentInfo.INSTALL_ALREADY_EXIST);
         for (int i = 0; i < pack.getFiles().size(); i++)
-            assertEquals(((DocumentInfo)pack.getFiles().get(i)).testInstall(getXWikiContext()), DocumentInfo.INSTALL_ALREADY_EXIST);
+            assertEquals(((DocumentInfo)pack.getFiles().get(i)).testInstall(false, getXWikiContext()), DocumentInfo.INSTALL_ALREADY_EXIST);
         ret = pack.install(getXWikiContext());
         assertEquals(ret, DocumentInfo.INSTALL_OK);
 

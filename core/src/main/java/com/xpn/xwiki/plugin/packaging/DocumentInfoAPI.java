@@ -78,7 +78,12 @@ public class DocumentInfoAPI extends Api
 
     public int testInstall(XWikiContext context)
     {
-        return doc.testInstall(context);
+        return doc.testInstall(false, context);
+    }
+
+    public int testInstall(boolean isAdmin, XWikiContext context)
+    {
+        return doc.testInstall(isAdmin, context);
     }
 
     public static String installStatusToString(int status)

@@ -80,7 +80,7 @@ public class DocumentInfoTest extends HibernateTestCase {
         doc.setContent("overwrite impossible");
         DocumentInfo docInfo = new DocumentInfo(doc);
 
-        assertEquals("testinstall must say impossible", docInfo.testInstall(getXWikiContext()), DocumentInfo.INSTALL_IMPOSSIBLE);
+        assertEquals("testinstall must say impossible", docInfo.testInstall(false, getXWikiContext()), DocumentInfo.INSTALL_IMPOSSIBLE);
 
         XWikiDocument doctest = getXWikiContext().getWiki().getDocument(doc.getFullName(), getXWikiContext());
         assertTrue("document content must be not equals", doc.getContent().compareTo(doctest.getContent()) != 0);

@@ -72,6 +72,12 @@ Rico.Accordion.prototype.initialize = function(container, options) {
         }
       }
 
+      if(this.options.maxHeight) {
+        if(this.options.panelHeight > this.options.maxHeight) {
+          this.options.panelHeight = this.options.maxHeight;
+        }
+      }
+      
       this.lastExpandedTab.content.style.height = this.options.panelHeight + "px";
       this.lastExpandedTab.showExpanded();
       this.lastExpandedTab.titleBar.style.fontWeight = this.options.expandedFontWeight;
@@ -123,6 +129,11 @@ Rico.Accordion.prototype.showTab = function( accordionTab, animate, tabHeight ) 
       //accordionTab.content.style.display = "";
       accordionTab.titleBar.style.fontWeight = this.options.expandedFontWeight;
 
+      if(this.options.maxHeight) {
+        if(newHeight > this.options.maxHeight) {
+          newHeight = this.options.maxHeight;
+        }
+      }
       if ( doAnimate ) {
          new Rico.Effect.AccordionSize( this.lastExpandedTab.content,
                                    accordionTab.content,
@@ -157,7 +168,8 @@ Rico.Accordion.prototype.setOptions = function(options) {
      onHideTab           : setCollapsedClass,
      onShowTab           : setExpandedClass,
      onLoadShowTab       : 0,
-     doAnimate           : true
+     doAnimate           : true,
+     maxHeight           : false
   }
   Object.extend(this.options, options || {});
 }

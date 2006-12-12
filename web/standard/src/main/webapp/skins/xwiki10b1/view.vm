@@ -14,7 +14,6 @@
 #set($viewer = "view")
 #end
 #if($viewer == "view")
-## #template("menuview.vm")
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
 #template("contentview.vm")
@@ -26,5 +25,6 @@
 #template("${viewer}.vm")
 <div class="clearfloats"></div></div>
 #end
+</div>## main
 #template("endpage.vm")
 #end

@@ -1,6 +1,7 @@
-      </div>## main
+##      </div>## main
     </div>## contentcolumn
 #template("leftpanels.vm")
+  </div>## leftsidecolumns
 #template("rightpanels.vm")
 <div class="clearfloats"></div>
   </div>## contentcontainerinner

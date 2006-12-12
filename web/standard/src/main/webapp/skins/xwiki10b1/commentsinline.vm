@@ -13,7 +13,7 @@
 #set($comments = $doc.getComments(false))
 #end
   <div id="commentscontent" class="xwikiintracontent">
-    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>
+#if($inline == true)    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>#end
     <div id="comments">
 #if($comments.size()>0)
 #foreach($comment in $comments)
@@ -45,7 +45,7 @@ $msg.get("nocomments")
         <input type="hidden" name="xredirect" value="${doc.getURL("view")}" />
         <input type="hidden" name="XWiki.XWikiComments_author" value="$context.user"/>
         <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
-        <div><textarea id='XWiki.XWikiComments_comment' rows='5' name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
+        <div><textarea id='XWiki.XWikiComments_comment' rows='5' cols="80" name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
         <div>
         <input type="submit" value="$msg.get("addcomment")" class="button"/>
         <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
@@ -56,9 +56,11 @@ $msg.get("nocomments")
     </div> ## comments
   </div> ## commentscontent
 ## #end
+#if($inline == true)
       <script type="text/javascript">
 //<!--
 document.getElementById("commentform").className = "collapsed";
 document.getElementById("comments").className += " hidden";
 //-->
       </script>
+#end

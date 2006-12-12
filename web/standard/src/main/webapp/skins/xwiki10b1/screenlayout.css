@@ -41,24 +41,7 @@ html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
   text-align: left;
 }
 #contentcontainer{
-  border-right:200px solid ;
   z-index: 1;
-}
-#contentcontainer.hidenone{
-  border-right:200px solid ;
-  border-left:200px solid ;
-}
-#contentcontainer.hideleft{
-  border-right:200px solid ;
-  border-left:0px solid ;
-}
-#contentcontainer.hideright{
-  border-left:200px solid ;
-  border-right:0px solid ;
-}
-#contentcontainer.hidelefthideright{
-  border-right:0px solid ;
-  border-left:0px solid ;
 }
 #xwikieditor{
   border-right: 310px solid;
@@ -94,14 +77,19 @@ Global header
 }
 
 #globalmenu {
-  padding: 2.5em 0.5em 0.5em 0.5em;
+  padding: 2.1em 0.5em 0.5em 0.5em;
   text-align: right;
+  font-size: 120%;
+  line-height: 1em;
 }
-#globalmenu a {
+#globalmenu .glink {
   display: block;
   text-decoration: none;
   font-size: 0.8em;
   font-weight: bold;
+}
+#globalmenu #headerlanguages a{
+  text-transform: capitalize;
 }
 #globalmenu span {
   display: none;
@@ -193,17 +181,35 @@ Content
 }
 
 #contentcolumn {
-  float: left;
-  width: 100%;
+  float: right;
+  padding: 0px;
 }
 * html #contentcolumn {
   width: auto;
 }
-.content{}
-.main { padding: 0px 40px 0 40px;}
-.contenthideleft{}
-.contenthideright{}
-.contenthidelefthideright{}
+.main {
+  padding: 20px 40px 20px 40px;
+}
+.leftsidecolumns{
+  float: left;
+  width: 100%;
+}
+.content{
+  border-right: 200px solid;
+  border-left: 200px solid;
+}
+.contenthideleft{
+  border-right: 200px solid ;
+  border-left: 0px solid ;
+}
+.contenthideright{
+  border-right: 0px solid ;
+  border-left: 200px solid;
+}
+#contentcontainer.contenthidelefthideright{
+  border-right: 0px solid ;
+  border-left: 0px solid ;
+}
 
 #editcolumn{
   width: 100%;
@@ -217,8 +223,6 @@ Content
   width: 100%;
 }
 .layoutsubsection{}
-
-.layoutsubsection.main{}
 
 .layoutsubsection.about{
   border: none;
@@ -239,6 +243,7 @@ Zone for Comments, attachments, History...
   border: none;
 }
 #xwikidatacontents{
+  margin: 24px;
 }
 .xwikiintratitle{
 }
@@ -302,22 +307,26 @@ Comments
 .xwikicomment {
 }
 
-#commentscontent{
+#xwikidata #commentscontent{
   background: #E5F0FE url("icons/black-bg-comments-left.png") left top no-repeat;
   border-bottom: 1px solid #000;
 }
-.xwikititlewrapper{
+#comments, #attachments {
+  padding: 0px 20px;
+  sbackground: #FFF;
+}
+#xwikidata .xwikititlewrapper{
   cursor: pointer;
 }
-#commentscontent .xwikititlewrapper{
+#xwikidata #commentscontent .xwikititlewrapper{
   background: transparent url("icons/black-bg-comments-right.png") right top no-repeat;
 }
-#attw{
+#xwikidata #attw{
   background: transparent url("icons/black-bg-attach-right.png") right bottom no-repeat;
 }
 .xwikiintratitle{
   background: transparent url("icons/black-content-more.png") right center no-repeat;
-  font-size: 200%;
+  font-size: 160%;
   font-weight: 400;
   font-style: normal;
   margin: 0px 24px;
@@ -326,9 +335,8 @@ Comments
 .exp .xwikiintratitle{
   background: transparent url("icons/black-content-less.png") right center no-repeat;
 }
-#attachmentscontent {
-  background: #E4F6FF url("icons/black-bg-attach-left.png") left bottom no-repeat;
-  margin-bottom: 16px;
+#xwikidata #attachmentscontent {
+  background: url("icons/black-bg-attach-left.png") left bottom no-repeat;
 }
 #attachmentscontent table{
   border: none;
@@ -393,9 +401,6 @@ table.xwikidatatable, table.xwikidatatable th{
 table.xwikidatatable td{
   padding: 2px 8px;
 }
-.xwikiintracontent{
-  margin: 0px 8px;
-}
 
 .xwikiintracontent legend{
   border: 1px solid #ddd;
@@ -431,7 +436,7 @@ html > body .xwikiintracontent legend{
 .commentsno, .attachmentsno{
   font-size: 50%;
   background: transparent url("icons/black-comment2.png") center no-repeat;
-  padding: 10px 24px 14px;
+  padding: 11px 24px 13px;
   font-weight: 900;
 }
 .attachmentsno{
@@ -614,15 +619,18 @@ Panels
   padding: 0px;
 }
 
-#rightPanels {
+#rightPanels, #leftPanels {
   position: relative;
   float: left;
   width: 200px;
-  margin-right: -200px;
-  background-color: #FFFF66;
-  padding-top: 20px;
+  padding-top: 0px;
 }
-
+#rightPanels{
+  margin-right: -200px;
+}
+#leftPanels {
+  margin-left: -200px;
+}
 
 .panels{
 }
@@ -646,6 +654,9 @@ html > body .panels{
   margin: 0px 0px 20px 0px;
   padding: 0px;
   border: 0px solid;
+}
+.placeholder{
+  width: 200px;
 }
 #xwikinavcontainer{
   margin-bottom: 20px;
@@ -673,7 +684,16 @@ span.panelitem{
 span.pitemseparator{
   display: none;
 }
-
+.panelcontainer{
+ height: 200px;
+  overflow: hidden;
+}
+.panelitemc{
+  height: 256px;
+  margin: 0px 10px;
+  width: 210px;
+  float: left;
+}
 /*
 ----------------------------------
 Rico Acordeon
@@ -732,10 +752,6 @@ Misc
   font-size: 150%;
   font-weight: 100;
   padding: 0px 4px;
-}
-.accordionTabContentBox {
-  height: 400px;
-  max-height: 400px;
 }
 .accordionTabContentBox div{
   padding: 8px;

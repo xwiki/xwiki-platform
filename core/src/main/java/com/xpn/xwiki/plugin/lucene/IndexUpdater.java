@@ -101,6 +101,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 List oldDocs = new ArrayList();
 
                 while (!queue.isEmpty()) {
+                    XWikiContext context = (XWikiContext) this.context.clone();
+                    context.put("hibsession", null);
+                    context.getWiki().getStore().cleanUp(context);
                     IndexData data = queue.remove();
 
                     try {
@@ -111,6 +114,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                         LOG.error("error retrieving doc from own context: " + e.getMessage(), e);
                         e.printStackTrace();
                     }
+                    context.put("hibsession", null);
+                    context.getWiki().getStore().cleanUp(context);
                 }
                 closeWriter();
                 // the following searcher close/open cycle is necessary because

@@ -1,14 +1,22 @@
-<h1>$msg.get("export")</h1>
-
+<h3 class="heading-1-1">$msg.get("export")</h3>
 <form action="" method="post">
-<label for="name"><i>$msg.get("export_packagename")</i></label><br /><input type="text" name="name" id="name" value=""><br /><br />
-<label for="description"><i>$msg.get("export_description")</i></label><br /><textarea name="description" id="description"></textarea><br /><br />
-<label for="licence"><i>$msg.get("export_licence")</i></label><br /><input type="text" name="licence" id="licence" value=""><br /><br />
-<label for="author"><i>$msg.get("export_author")</i></label><br /><input type="text" name="author" id="author" value="$context.user"><br /><br />
-<label for="version"><i>$msg.get("export_version")</i></label><br /><input type="text" name="version" id="version" value=""><br /><br />
-<label for="history"><i>$msg.get("export_addhistory")</i><input type="checkbox" name="history" id="history" value="true"></label><br />
-<label for="backup"><i>$msg.get("export_backuppack") ($msg.get("export_authorpreserved"))</i><input type="checkbox" name="backup" id="backup" value="true"></label> 
-<br /><br />
-
-<input type="submit" value="$msg.get("export")" />
+<div>
+<dl>
+<dt><label for="name"><i>$msg.get("export_packagename")</i></label></dt>
+  <dd><input type="text" name="name" id="name" value=""/></dd>
+<dt><label for="description"><i>$msg.get("export_description")</i></label></dt>
+  <dd><textarea name="description" id="description" rows="6" cols="40"></textarea></dd>
+<dt><label for="licence"><i>$msg.get("export_licence")</i></label></dt>
+  <dd><input type="text" name="licence" id="licence" value=""/></dd>
+<dt><label for="author"><i>$msg.get("export_author")</i></label></dt>
+  <dd><input type="text" name="author" id="author" value="$context.user"/></dd>
+<dt><label for="version"><i>$msg.get("export_version")</i></label></dt>
+  <dd><input type="text" name="version" id="version" value=""/></dd>
+</dl>
+<label><input type="checkbox" name="history" id="history" value="true"/><i>$msg.get("export_addhistory")</i></label><br/>
+<label><input type="checkbox" name="backup" id="backup" value="true"/><i>$msg.get("export_backuppack") ($msg.get("export_authorpreserved"))</i></label><br/>
+<div class="floatcontainer">
+<span class="buttonwrapper"><input type="submit" value="$msg.get("export")" /></span>
+</div>
+</div>
 </form>

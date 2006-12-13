@@ -3,7 +3,6 @@
 #set($previewenabled = true)
 #set($xredirect=$!request.getParameter("xredirect"))
 ## <div class="topbuttons">#template("editactions.vm")</div>
-## <form id="edit" method="post" action="$doc.getURL("preview")" >
 <div>
 <div class="hidden">
 <input type="hidden" name="template" value="$!request.template" />
@@ -11,7 +10,7 @@
 <input type="hidden" name="language" value="$!tdoc.language" />
 ## <input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>
 ## <input type="hidden" id="xwikidocparentinput" name="parent" value="$!tdoc.parent"/>
-</div>
+</div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">
 #template("simpleedittoolbar.vm")
@@ -29,9 +28,8 @@ function endresize(){
 </script>
 <div id="resizeta" onstartdrag="startresize()" onenddrag="endresize()" ></div>
 *#
-</div>
-</div>
+</div> ## xwikieditcontent
+</div> ## xwikitext
 ## #template("tagedit.vm")
-</div>
+</div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
-## </form>

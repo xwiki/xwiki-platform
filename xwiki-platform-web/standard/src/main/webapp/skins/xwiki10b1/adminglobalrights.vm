@@ -1,11 +1,11 @@
 #set($formname = "update")
 #set($saveaction = "save")
-<div class="layoutsubsection">
 #set ($classname = "XWiki.XWikiGlobalRights")
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
-<div style="overflow:auto">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div id="xwikieditcontent">
+<div style="overflow:auto">
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ($first = 1)
@@ -27,8 +27,8 @@
     </tr>
 #end
   </table>
- </div>
+</div> ## noname
+</div> ## overflow
+</div> ## xwikieditcontent
 <div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
-</div>
-</div>

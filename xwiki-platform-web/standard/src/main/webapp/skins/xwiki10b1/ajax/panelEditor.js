@@ -267,7 +267,9 @@ function start1() {
       el.displayHeight = panelsInList[i].offsetHeight-2;
       el.placeholder.style.height = (el.displayHeight) +"px";
       el.placeholder.style.display = "block";
-      panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+      if(panelsInList[i].parentNode) {
+        panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+      }
     }
     panelsInList[i].fullname=window.allPanelsPlace[i].fullname;
   }
@@ -293,7 +295,7 @@ function start1() {
       }
     }
   }
-  new Rico.Accordion('panellistaccordion', {panelHeight:'max'} );
+  new Rico.Accordion('panellistaccordion', {panelHeight:512, backgroundColor: "#676D73", textColor: "#FFF", collapsedBg: "#384554", expandedBg: "#384554", hoverBg: "#384554", expandedTextColor: "#FFF", collapsedTextColor: "#EEE", hoverTextColor: "#C0D4E7"} );
   window.activeWizardPage = document.getElementById("PageLayoutSection");
   window.activeWizardTab  = document.getElementById("firstwtab");
   document.getElementById("PanelListSection").style.display = "none";
@@ -412,8 +414,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-      mainContent.className = "contenthidelefthideright";
-      mainContainer.className = "hidelefthideright";
+//      mainContent.className = "contenthidelefthideright";
+      mainContainer.className = "contenthidelefthideright";
       break;
     case 1:
       //show left; hide right;
@@ -427,8 +429,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-      mainContent.className = "contenthideright";
-      mainContainer.className = "hideright";
+//      mainContent.className = "contenthideright";
+      mainContainer.className = "contenthideright";
       break;
     case 2:
       //hide left; show right;
@@ -442,8 +444,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-      mainContent.className = "contenthideleft";
-      mainContainer.className = "hideleft";
+//      mainContent.className = "contenthideleft";
+      mainContainer.className = "contenthideleft";
       break;
     case 3:
       //show left; show right;
@@ -457,8 +459,8 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-      mainContent.className = "content";
-      mainContainer.className = "hidenone";
+//      mainContent.className = "content";
+      mainContainer.className = "content";
       break;
     default:
       // ignore

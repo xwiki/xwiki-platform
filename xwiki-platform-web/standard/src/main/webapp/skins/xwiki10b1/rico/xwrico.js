@@ -157,6 +157,8 @@ Rico.Accordion.prototype.setOptions = function(options) {
      expandedBg          : '#EEE',
      hoverBg             : '#FFD',
      collapsedBg         : '#EEE',
+     backgroundColor     : '#FFF',
+     textColor           : '#000',
      expandedTextColor   : '#000',
      expandedFontWeight  : 'bold',
      hoverTextColor      : '#000',
@@ -174,6 +176,18 @@ Rico.Accordion.prototype.setOptions = function(options) {
   Object.extend(this.options, options || {});
 }
 
+Rico.Accordion.Tab.prototype._attachBehaviors = function() {
+  this.content.style.border = "1px solid " + this.accordion.options.borderColor;
+  this.content.style.borderTopWidth    = "0px";
+  this.content.style.borderBottomWidth = "0px";
+  this.content.style.margin            = "0px";
+  this.content.style.backgroundColor   = this.accordion.options.backgroundColor;
+  this.content.style.color   = this.accordion.options.textColor;
+
+  this.titleBar.onclick     = this.titleBarClicked.bindAsEventListener(this);
+  this.titleBar.onmouseover = this.hover.bindAsEventListener(this);
+  this.titleBar.onmouseout  = this.unhover.bindAsEventListener(this);
+}
 
 Rico.Effect.AccordionSize.prototype = {
    initialize: function(e1, e2, start1, end1, duration, steps, options, start2, end2) {

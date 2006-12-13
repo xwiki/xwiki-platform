@@ -9,9 +9,7 @@
 #end
 #set($editorPanels = $editorPanels.split(","))
 <div id="editPanels" class="panels editor">
-<div id="panelsBackground"></div>
 #foreach($panel in $editorPanels)
-##$xwiki.includeForm("$panel",false)
 #displaypanel($panel)
 #end
 </div>

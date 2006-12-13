@@ -34,7 +34,6 @@
   border: 4px solid #384554;
   border-width: 0px;
   cursor: pointer;
-  -moz-border-radius: 50px 50px 0px 0px;
 }
 .panel .accordionTabTitleBar h6 {
   border-top: 1px solid #999;
@@ -45,4 +44,19 @@
 #contentcolumn {
   width: 100% !important;
   overflow: hidden;
+}
+li.inline {
+  display: inline;
+  padding-left: 3px;
+  padding-right: 7px;
+}
+li.tags {
+  color: rgb(102, 102, 255);
+  cursor: pointer;
+}
+li.selected {
+  background-color: #008;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
 }

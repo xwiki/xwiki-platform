@@ -314,7 +314,6 @@ Comments
 }
 #comments, #attachments {
   padding: 0px 20px;
-  sbackground: #FFF;
 }
 #xwikidata .xwikititlewrapper{
   cursor: pointer;
@@ -693,14 +692,19 @@ span.pitemseparator{
   display: none;
 }
 .panelcontainer{
- height: 200px;
+  height: 200px;
   overflow: hidden;
+  border: 1px inset #444;
+  padding: 3px;
 }
 .panelitemc{
   height: 256px;
   margin: 0px 10px;
   width: 210px;
   float: left;
+}
+.panelitemc .label, .panelitemc .xwikibuttonlink{
+  text-align: center;
 }
 /*
 ----------------------------------
@@ -1000,4 +1004,10 @@ html>body #xwikieditcontent{
 }
 .xwiki-form-listclass {
   margin-right: 10px;
+}
+.qqpanel{
+  margin-top: -20px !important;
+  margin-bottom: 40px !important;
+  z-index: 200;
+  position: relative;
 }

@@ -56,10 +56,11 @@ $response.sendRedirect($redirecturl)
 ##
 ## Header
 ##
+#template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
 #template("header.vm")
-<div class="layoutsection">
+#template("menuadmin.vm")
 ##
 ## Content
 ##
@@ -68,25 +69,32 @@ $response.sendRedirect($redirecturl)
 #xwikimessageboxstart($msg.get("error") $msg.get('notallowed'))
 #xwikimessageboxend()
 #elseif (($tdoc.getLocked()==true)&&(!$force))
+<div class="layoutsection">
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-<a href="$doc.getURL("admin", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL($context.action, "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()
-#else
-<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
-#template("adminmodes.vm")
 </div>
+#else
 <div id="xwikieditor" class="layoutsection">
+<div id="xwikieditorinner">
+<div class="leftsidecolumns">
 <div id="editcolumn" class="editor">
+<div class="alleditcontent">
+#template("adminmodes.vm")
 #set($formname = "update")
 #set($saveaction = "save")
 #template("admin${editor}.vm")
-</div>
+</div> ## alleditcontent
+</div> ## editcolumn
+<div class="clearfloats"></div>
+</div> ## leftsidecolumns
 #template("adminpanels.vm")
 <div class="clearfloats"></div>
+#end
 ##
 ## Footer
 ##
-#end
-</div>
+</div> ## xwikieditorinner
+</div> ## xwikieditor
 #template("footer.vm")
 #template("htmlfooter.vm")

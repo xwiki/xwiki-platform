@@ -258,7 +258,7 @@ input.button:hover, button.button:hover{
   background-color: transparent;
   background: transparent url("icons/black-button24r.png") right center no-repeat;
   color: #FFF;
-  padding: 4px 4px;
+  padding: 4px 8px;
   border: none;
 }
 #body .buttonwrapper *:hover{
@@ -306,7 +306,7 @@ Editors
 Panels
 ---------------------------------------
 */
-#leftPanels, #rightPanels{
+#leftPanels, #rightPanels, #editPanels{
   border-top: 20px solid #384554;
   background-color: #676D73;
   color: #fff;
@@ -335,7 +335,6 @@ background-color: #384554;}
 .collapsed .xwikipaneltitle{
   background-color: #384554;
   color: #fff;
-  -moz-border-radius: 50px;
 }
 
 .expanded .xwikipaneltitle:hover{
@@ -554,7 +553,7 @@ th{
 
 
 .placeholder{
-  background-color: #DDD;
+  background-color: #555;
   border: 1px dotted #CCC;
 }
 
@@ -638,8 +637,10 @@ input[type=checkbox], input[type=radio]{
   background-image: url("icons/black-button24l-hover.png");
 }
 .buttonwrapper *{
-  min-height: 24px;
-  margin-top: 0px;
+  min-height: 24px !important;
+  margin: 0px !important;
+  display: block;
+  line-height: 1.6em !important;
 }
 
 .important{

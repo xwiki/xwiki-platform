@@ -1,21 +1,21 @@
 #set($formname = "update")
 #set($saveaction = "save")
-<div class="layoutsubsection">
 #set ($classname = "XWiki.XWikiRights")
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
-<div style="overflow:auto">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<div id="xwikieditcontent">
 <div id="xwikichangespace">
-$msg.get("changespace"): <select name="space" onchange="location='?editor=spacerights&global=1&space=' + this.value;">
+<p>$msg.get("editrightsforspace"): $space</p>
+<p>$msg.get("changespace"): <select name="space" onchange="location='?editor=spacerights&amp;global=1&amp;space=' + this.value;">
 <option value="" label="">---</option>
 #foreach($spaceitem in $xwiki.spaces)
 <option value="$spaceitem" label="$spaceitem">$spaceitem</option>
 #end
-</select>
-</div>
+</select></p>
+</div> ## xwikichangespace
+<div>
+<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />
@@ -35,8 +35,7 @@ $msg.get("changespace"): <select name="space" onchange="location='?editor=spacer
     </tr>
 #end
   </table>
- </div>
+ </div> ## noname
+</div> ## xwikieditcontents
 <div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
-</div>
-</div>

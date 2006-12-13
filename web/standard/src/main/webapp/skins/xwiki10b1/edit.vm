@@ -38,7 +38,7 @@
 #if (($tdoc.getLocked()==true)&&(!$force))
 <div class="layoutsection">
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-<a href="$doc.getURL("edit", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL($action, "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()
 </div>
 #else
@@ -55,14 +55,16 @@
 #template("edit${editor}.vm")
 </div> ## alleditcontent
 </div> ## editcolumn
+<div class="clearfloats"></div>
+</div> ## leftsidecolumns
 #template("editpanels.vm")
 <div class="clearfloats"></div>
-</div>
+</div> ## xwikieditorinner
 #end
 ##
 ## Footer
 ##
-</div>
+</div> ## xwikieditor
 #if($editor == "wiki" || $editor == "wysiwyg")
 </form>
 #end

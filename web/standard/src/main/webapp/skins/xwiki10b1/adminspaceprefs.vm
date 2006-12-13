@@ -3,7 +3,7 @@
 ###
 ###
 ##
-## Define sections
+## Check if there is a valid XWikiPreferences object
 ##
 #set($obj = $doc.getObject("XWiki.XWikiPreferences"))
 #if(!$obj)
@@ -20,18 +20,29 @@ document.forms.objectadd.submit();
 -->
 </script>
 #end
+#####
+##
+## Surrounding divs
+##
+#set($formname = "update")
+#set($saveaction = "save")
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div id="xwikieditcontent">
+##
+## Space changer
+##
 <div id="xwikichangespace">
-<br />
-$msg.get("editprefsforspace"): $space
-<br />
-$msg.get("changespace"): <select name="space" onchange="location='?editor=spaceprefs&global=1&space=' + this.value;">
+<p>$msg.get("editprefsforspace"): $space</p>
+<p>$msg.get("changespace"): <select name="space" onchange="location='?editor=spaceprefs&amp;global=1&amp;space=' + this.value;">
 <option value="" label="">---</option>
 #foreach($spaceitem in $xwiki.spaces)
 <option value="$spaceitem" label="$spaceitem">$spaceitem</option>
 #end
-</select>
-<br />
-</div>
+</select></p>
+</div> ## xwikichangespace
+##
+## Define sections
+##
 #set($class = $obj.xWikiClass)
 #set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
 #set($sectionitemsmap = $xwiki.hashMap)
@@ -41,8 +52,9 @@ $msg.get("changespace"): <select name="space" onchange="location='?editor=spacep
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
 #set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages" ])
 #set($sectionitemsmap.registration = [ "use_email_verification", "admin_email", "smtp_server", "validation_email_content",  "confirmation_email_content", "invitation_email_content"])
+#####
 ##
-## Define the macro that displays the 
+## Define the macro that displays the options in a category
 ##
 #macro(showsection $section $sectionitemsmap)
   <div id="xwikiprefs${section}">
@@ -78,18 +90,16 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
     </div>
   </div>
 #end
+## End macro
+##
+#####
 ##
 ## Content
 ##
-#set($formname = "update")
-#set($saveaction = "save")
-<div class="layoutsubsection">
 #set ($classname = "XWiki.XWikiPreferences")
 #set($class = $xwiki.getDocument($classname).xWikiClass)
 #set($obj = $doc.getObject($classname, 0))
 #set($redirect = "$xwiki.getRequestURL()")
-<div style="overflow:auto;">
-<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <input type="hidden" name="classname" value="XWiki.XWikiPreferences" />
@@ -98,10 +108,9 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #foreach($section in $sections)
 #showsection($section $sectionitemsmap)
 #end
-</div>
-<script type="text/javascript">new Rico.Accordion( 'xwikiprefs', {panelHeight:'max'} );</script>
-</div>
+</div> ## xwikiprefs
+<script type="text/javascript">new Rico.Accordion( 'xwikiprefs', {panelHeight:'max', maxHeight: 320} );</script>
+</div> ## noname
+</div> ## xwikieditcontent
 <div class="bottombuttons">#template("adminactions.vm")</div>
 </form>
-</div>
-</div>

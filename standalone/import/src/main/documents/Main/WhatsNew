@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WhatsNew</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.LaurentLunati</author>
+<customClass></customClass>
+<contentAuthor>XWiki.LaurentLunati</contentAuthor>
+<creationDate>1107752577000</creationDate>
+<date>1165499528000</date>
+<contentUpdateDate>1165499528000</contentUpdateDate>
+<version>1.7</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<name>tags</name>
+<prettyName>Tags</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<size>30</size>
+<separators> ,|</separators>
+<values></values>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Main.WhatsNew</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+</object>
+<content>1 What's New
+
+keep you and your users informed of changes to the site:
+* This page is an automatically generated list of recently changed pages.
+* An [RSS Feed&gt;Main.WebRss?xpage=rdf]  provides this recent changes to RSS readers. 
+
+
+#set ($sql = "where 1=1 order by doc.date desc")
+&lt;style&gt;
+.grid {
+	MARGIN: 2px 0px 5px; BORDER-COLLAPSE: collapse
+}
+.grid TH {
+	BORDER-RIGHT: #ccc 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: #ccc 1px solid; PADDING-LEFT: 4px; BACKGROUND: #f0f0f0; PADDING-BOTTOM: 2px; BORDER-LEFT: #ccc 1px solid; PADDING-TOP: 2px; BORDER-BOTTOM: #ccc 1px solid; TEXT-ALIGN: center;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 11px;
+}
+.grid TD {
+	BORDER-RIGHT: #ccc 1px solid; PADDING-RIGHT: 4px; BORDER-TOP: #ccc 1px solid; PADDING-LEFT: 4px; PADDING-BOTTOM: 3px; BORDER-LEFT: #ccc 1px solid; PADDING-TOP: 3px; BORDER-BOTTOM: #ccc 1px solid
+}
+.gridHover {
+	BACKGROUND-COLOR: #f9f9f9
+}
+&lt;/style&gt;
+#set($showdata = 0)
+#if(!$nb)
+#set($nb = 30)
+#end
+#set($formatDate = "yyyy MMMM dd, HH:mm")
+#set ($list = $xwiki.searchDocuments($sql , $nb , 0))
+&lt;table class="grid" cellSpacing=0 cellpadding="0" border="1"&gt;
+&lt;TR&gt;
+&lt;TH&gt;Page&lt;/TH&gt;
+&lt;TH width="150"&gt;Date&lt;/TH&gt;
+&lt;TH width="150"&gt;Last Author&lt;/TH&gt;
+#if($xwiki.hasAdminRights())
+&lt;TH width="150"&gt;Copy&lt;/TH&gt;
+#end
+&lt;/TR&gt;
+#foreach ($item in $list)
+#set($troubi ="non")
+#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
+#set($bentrydoc = $xwiki.getDocument($item))
+#set($cclass = $xwiki.getDocument("XWiki.XWikiComments").getxWikiClass())
+#set($comment = $cclass.newObject())
+#if($xwiki.getWebPreferenceAsInt("commentsorder",1)==0)
+#set($comments = $bentrydoc.getComments())
+#else
+#set($comments = $bentrydoc.getComments(false))
+#end
+#set($createur = $xwiki.getUserName($bentrydoc.author)   )
+&lt;tr&gt;&lt;td align=left&gt;
+#if($comments.size()&gt;0)  
+#set($i = 0)  
+#set($cobj = $comments.get($i))  
+#set($comment = $bentrydoc.display("comment", "view", $cobj))  
+#set($date = $cobj.getXWikiObject().get("date").value)
+#if($date)
+#set($date2 = $!xwiki.formatDate($date,"yyyy MM dd HH:mm:ss")  )
+#end
+#if($bentrydoc)
+#set($date1 = $!xwiki.formatDate($!bentrydoc.date,"yyyy MM dd HH:mm:ss") )
+#end
+#if($date1.equals($date2) )
+[$bentrydoc.name&gt;${bentrydoc.web}.$bentrydoc.name] &lt;em&gt;- 1 new comment&lt;/em&gt;
+#set($troubi ="oui")
+#set($desc = $cobj.getXWikiObject().get("comment").value)
+#else
+[$bentrydoc.name in $bentrydoc.web&gt;${bentrydoc.web}.$bentrydoc.name]
+#end
+#else  
+#set($comment = "")  
+[$bentrydoc.name in $bentrydoc.web&gt;${bentrydoc.web}.$bentrydoc.name.replaceAll("@","%40")]
+#end   
+&lt;/td&gt;&lt;td align=middle&gt;
+$xwiki.formatDate($bentrydoc.date,"yyyy MMM dd") at $xwiki.formatDate($bentrydoc.date,"HH:mm")&lt;/td&gt;&lt;td align=middle&gt;
+#if($troubi =="oui")
+#set($createur = $xwiki.getUserName($cobj.author)   )
+#end
+#if ($createur == "XWikiGuest")
+Visiteur
+#else
+$createur
+#end
+&lt;/td&gt;
+#if($xwiki.hasAdminRights())
+&lt;td&gt;
+&lt;a href="$xwiki.getURL("Admin.CopyDocument", "view", "sourcedoc=${bentrydoc.fullName}")"&gt;Copy&lt;/a&gt; - &lt;a href="$bentrydoc.getURL("delete")"&gt;Delete&lt;/a&gt; - &lt;a href="$xwiki.getURL("Admin.PageRights", "view","page=${bentrydoc.fullName}")"&gt;Rights&lt;/a&gt;
+&lt;/td&gt;
+#end
+&lt;/tr&gt;
+#end
+#end
+&lt;/table&gt;</content>
+</xwikidoc>

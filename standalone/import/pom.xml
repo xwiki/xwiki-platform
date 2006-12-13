@@ -1,0 +1,34 @@
+<project>
+  <repositories>
+    <repository>
+      <id>xwiki</id>
+      <name>XWiki Maven2 Remote Repository</name>
+      <url>http://maven.xwiki.org</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+  </repositories>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.xpn.xwiki</groupId>
+  <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
+  <packaging>pom</packaging>
+  <name>Maven XWiki Backup Plugin Basic Import/EXport Sample</name>
+  <description>Maven XWiki Backup Plugin Basic Import/EXport Sample</description>
+  <version>1.0-SNAPSHOT</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.xpn.xwiki</groupId>
+        <artifactId>xwiki-packager</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>1.8.0.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+</project>

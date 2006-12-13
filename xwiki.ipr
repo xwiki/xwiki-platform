@@ -320,7 +320,9 @@
     <custom-packaging allow="false" />
   </component>
   <component name="UI designer component loader factory" />
-  <component name="VssVcs" />
+  <component name="VssVcs">
+    <SourceSafePersistencyRemovedFolder>$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/wiki_editor_2</SourceSafePersistencyRemovedFolder>
+  </component>
   <component name="WebManager">
     <option enabled="true" />
   </component>

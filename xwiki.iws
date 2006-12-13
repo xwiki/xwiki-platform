@@ -580,74 +580,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ApplicationResources_fr.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/resources/ApplicationResources_fr.properties">
-          <provider editor-type-id="ResourceBundle">
+      <file leaf-file-name="wiki_editor.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/wiki_editor.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="60" column="31" selection-start="1666" selection-end="1666" vertical-scroll-proportion="0.4718045">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="struts-config.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/struts-config.xml">
+          <provider editor-type-id="com.intellij.struts.diagram.DiagramEditorProvider">
             <state />
           </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state line="292" column="87" selection-start="10556" selection-end="10556" vertical-scroll-proportion="0.43392506">
+            <state line="98" column="18" selection-start="3644" selection-end="3644" vertical-scroll-proportion="0.3448276">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="preview.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/preview.vm">
+      <file leaf-file-name="core.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="0" selection-start="106" selection-end="106" vertical-scroll-proportion="0.093235835">
+            <state line="976" column="53" selection-start="35124" selection-end="35124" vertical-scroll-proportion="0.9266917">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="previewactions.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/previewactions.vm">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="99" selection-start="963" selection-end="963" vertical-scroll-proportion="0.5206767">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiServletURLFactory.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="XWikiServletURLFactory.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiServletURLFactory.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="137" column="33" selection-start="4847" selection-end="4847" vertical-scroll-proportion="0.35150376">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiAction.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="136" column="69" selection-start="5473" selection-end="5473" vertical-scroll-proportion="0.43510056">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="XWikiDocument.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="576" column="38" selection-start="17012" selection-end="17018" vertical-scroll-proportion="0.46052632">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="editactions.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editactions.vm">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="2" selection-start="471" selection-end="499" vertical-scroll-proportion="0.63909775">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="startpage.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/startpage.vm">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
@@ -655,19 +619,61 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="inline.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/inline.vm">
+      <file leaf-file-name="wysiwyg.vm" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/templates/wysiwyg.vm">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="0" selection-start="41" selection-end="92" vertical-scroll-proportion="0.18647167">
+            <state line="6" column="15" selection-start="143" selection-end="143" vertical-scroll-proportion="0.19172932">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="editinline.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editinline.vm">
+      <file leaf-file-name="ApplicationResources.properties" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/src/main/resources/ApplicationResources.properties">
+          <provider editor-type-id="ResourceBundle">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="24" selection-start="838" selection-end="862" vertical-scroll-proportion="0.6215722">
+            <state line="528" column="20" selection-start="18137" selection-end="18157" vertical-scroll-proportion="0.33333334">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ApplicationResources_fr.properties" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/core/src/main/resources/ApplicationResources_fr.properties">
+          <provider editor-type-id="ResourceBundle">
+            <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="360" column="158" selection-start="13122" selection-end="13122" vertical-scroll-proportion="0.33333334">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="editactions.vm" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/templates/editactions.vm">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="color_picker.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/themes/wikieditor/jscripts/color_picker.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="link.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/themes/wikieditor/jscripts/link.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -874,7 +880,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\web\standard\src\main\webapp\skins" />
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\web\standard\src\main\webapp\templates" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -893,10 +899,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\web\standard\src\main\webapp\skins" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\web\standard\src\main\webapp\skins\xwiki10b1" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -939,6 +941,84 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src\main\resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src\main" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src\main\resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Resource Bundle 'ApplicationResources'" />
+          <option name="myItemType" value="com.intellij.lang.properties.projectView.ResourceBundleNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki.ipr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:C:\dev\java\xwikisvn\xwiki\trunk\core\src\main" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -2161,7 +2241,7 @@
         <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
-        <option name="myExternalizedOptions" />
+        <option name="myExternalizedOptions" value="&#13;&#10;snapshots-dir=&#13;&#10;" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
@@ -2334,7 +2414,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-4" y="-4" width="1688" height="1028" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3409091" order="21" />
@@ -2342,7 +2422,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30877742" order="6" />
       <window_info id="Checkstyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33006135" order="0" x="-87" y="100" width="469" height="491" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5028313" order="1" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24242425" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22168285" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.37485972" order="17" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4006462" order="5" />
@@ -2352,7 +2432,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="6" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27931595" order="1" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="16" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32323232" order="2" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32323232" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15110683" order="2" />
       <window_info id="Struts Assistant" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="6" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="11" />
@@ -2507,12 +2587,96 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/core/src/main/resources/ApplicationResources_en.properties">
-      <provider editor-type-id="ResourceBundle">
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/tiny_mce_src.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="233" column="17" selection-start="12704" selection-end="12704" vertical-scroll-proportion="0.5254545">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/themes/default.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="30" selection-start="464" selection-end="478" vertical-scroll-proportion="0.46363637">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editwysiwyg.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="76" selection-start="910" selection-end="910" vertical-scroll-proportion="0.43510056">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/tiny_mce.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2310" column="48" selection-start="73556" selection-end="73556" vertical-scroll-proportion="0.41541353">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/themes/wikieditor/jscripts/color_picker.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor/wiki_editor.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="457" column="0" selection-start="12763" selection-end="12763" vertical-scroll-proportion="0.81454545">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/tiny_mce_2/themes/wikieditor/jscripts/link.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/wiki_editor.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="60" column="31" selection-start="1666" selection-end="1666" vertical-scroll-proportion="0.4718045">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="976" column="53" selection-start="35124" selection-end="35124" vertical-scroll-proportion="0.9266917">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiServletURLFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/templates/editactions.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/templates/wysiwyg.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="15" selection-start="143" selection-end="143" vertical-scroll-proportion="0.19172932">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/struts-config.xml">
+      <provider editor-type-id="com.intellij.struts.diagram.DiagramEditorProvider">
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="578" column="0" selection-start="20014" selection-end="20014" vertical-scroll-proportion="0.79881656">
+        <state line="98" column="18" selection-start="3644" selection-end="3644" vertical-scroll-proportion="0.3448276">
           <folding />
         </state>
       </provider>
@@ -2522,49 +2686,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="449" column="0" selection-start="15497" selection-end="15668" vertical-scroll-proportion="0.40039447">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/contentview.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/docextra.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/view.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/startpage.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/inline.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="0" selection-start="41" selection-end="92" vertical-scroll-proportion="0.18647167">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editinline.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="24" selection-start="838" selection-end="862" vertical-scroll-proportion="0.6215722">
+        <state line="528" column="20" selection-start="18137" selection-end="18157" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>
@@ -2574,49 +2696,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="292" column="87" selection-start="10556" selection-end="10556" vertical-scroll-proportion="0.43392506">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/preview.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="0" selection-start="106" selection-end="106" vertical-scroll-proportion="0.093235835">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editactions.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="2" selection-start="471" selection-end="499" vertical-scroll-proportion="0.63909775">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/previewactions.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="99" selection-start="963" selection-end="963" vertical-scroll-proportion="0.5206767">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="576" column="38" selection-start="17012" selection-end="17018" vertical-scroll-proportion="0.46052632">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="136" column="69" selection-start="5473" selection-end="5473" vertical-scroll-proportion="0.43510056">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiServletURLFactory.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="137" column="33" selection-start="4847" selection-end="4847" vertical-scroll-proportion="0.35150376">
+        <state line="360" column="158" selection-start="13122" selection-end="13122" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>

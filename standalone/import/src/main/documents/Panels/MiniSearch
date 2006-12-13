@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>MiniSearch</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.LaurentLunati</creator>
+<author>xwiki:XWiki.sdumitriu</author>
+<customClass></customClass>
+<contentAuthor>xwiki:XWiki.sdumitriu</contentAuthor>
+<creationDate>1165613130000</creationDate>
+<date>1165940505000</date>
+<contentUpdateDate>1165940505000</contentUpdateDate>
+<version>1.7</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<type>
+<name>type</name>
+<prettyName>Panel type</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separators> ,|</separators>
+<values>view|edit</values>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+<category>
+<name>category</name>
+<prettyName>Category</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separators> ,|</separators>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<description>
+<name>description</name>
+<prettyName>Description</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>3</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<content>
+<name>content</name>
+<prettyName>Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<rows>25</rows>
+<number>4</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<name>
+<name>name</name>
+<prettyName>Name</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Panels.MiniSearch</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<property>
+<type>view</type>
+</property>
+<property>
+<description>mini search panel with no title</description>
+</property>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>#panelhiddenheader("Search")
+  &lt;form action="/xwiki/bin/view/Main/WebSearch"&gt;
+    &lt;div id="globalsearch"&gt;
+      &lt;input id="globalsearchinput" type="text" name="text" value="$msg.get('Search')" size="15" onfocus="if (this.value == '$msg.get('Search')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('Search')'; this.blur()"/&gt;
+&amp;nbsp;
+      &lt;input class="button" value="Search" type="image" src="$xwiki.getSkinFile("go.png")"/&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#panelfooter()</content>
+</property>
+<property>
+<name>MiniSearch</name>
+</property>
+</object>
+<content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

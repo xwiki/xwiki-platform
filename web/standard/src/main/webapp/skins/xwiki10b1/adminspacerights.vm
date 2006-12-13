@@ -1,6 +1,6 @@
 #set($formname = "update")
 #set($saveaction = "save")
-#set ($classname = "XWiki.XWikiRights")
+#set ($classname = "XWiki.XWikiGlobalRights")
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">

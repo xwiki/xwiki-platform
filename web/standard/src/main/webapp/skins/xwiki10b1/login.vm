@@ -1,3 +1,10 @@
+#if($context.user!="XWiki.XWikiGuest")
+#if($request.xredirect)
+$response.sendRedirect($request.xredirect)
+#else
+$response.sendRedirect($xwiki.getURL("Main.WebHome"))
+#end
+#else
 ###
 ### Login page
 ###
@@ -31,3 +38,4 @@ Login Error: $message
 </form>
 </div>
 #template("endpage.vm")
+#end

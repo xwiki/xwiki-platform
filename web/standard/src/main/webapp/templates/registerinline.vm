@@ -1,0 +1,83 @@
+<h1>$msg.get("Registration")</h1>
+#if(!$reg||$reg<0 )
+$msg.get("registerwelcome")
+<br /><br />
+#end
+#if($reg<=0)
+<span class="registrationerror" style="color: red">
+#if($reg==-2)
+$msg.get("passwordmismatch")
+#elseif($reg==-3)
+$msg.get("useralreadyexists")
+#else
+$msg.get("registerfailed") ($msg.get("registerfailedcode) $reg)
+#end
+<br /><br />
+</span>
+#else
+$msg.get("registersuccessful")
+#end
+#if(!$reg||$reg<0 )
+<form id="register" name="register" action="" action="" method="post">
+<p>
+<input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
+<input type="hidden" name="register" value="1">
+#set( $class = $xwiki.getDocument("XWiki.XWikiUsers").xWikiClass)
+#set( $serverclass = $xwiki.getDocument("XWiki.XWikiServerClass").xWikiClass)
+#set( $obj = $class.newObject() )
+#set( $serverobj = $class.newObject() )
+#set( $ok = $doc.use("XWiki.XWikiUsers"))
+#if($request.register_first_name)
+$doc.set("first_name", $request.register_first_name)
+#end
+#if($request.register_last_name)
+$doc.set("last_name", $request.register_last_name)
+#end
+</p>
+<table class="block" cellspacing="5px">
+ <tbody>
+ <tr>
+#set($prop = $class.first_name)
+   <td>$msg.get("firstname")
+   </td>
+     <td>$doc.displayEdit($prop, "register_",  $obj)
+     </td>
+#set($prop = $class.last_name)
+   <td>$msg.get("lastname")
+   </td>
+     <td>$doc.displayEdit($prop, "register_",  $obj)
+     </td>
+ </tr>
+<tr>
+#set($prop = $class.email)
+   <td>$msg.get("email")
+   </td>
+     <td>$doc.displayEdit($prop, "register_",  $obj)
+     </td>
+ </tr>
+<tr>
+</tr>
+<td></td>
+ <tr>
+#set($prop = $class.password)
+   <td>$msg.get("password")
+   </td>
+     <td>$doc.displayEdit($prop, "register_",  $obj)
+     </td>
+   <td>$msg.get("passwordrepeat")
+   </td>
+     <td>$doc.displayEdit($prop, "register2_",  $obj)
+     </td>
+ </tr>
+<tr><td></td></tr>
+ <tr>
+   <td>$msg.get("loginid")</td>
+   <td>
+    <input name="xwikiname" type="text" size="20" onfocus=" prepareName(document.forms.register);" />
+   </td>
+ </tr>
+ </tbody>
+ </table>
+<input type="submit" value="$msg.get("iregister")">
+</form>
+#end

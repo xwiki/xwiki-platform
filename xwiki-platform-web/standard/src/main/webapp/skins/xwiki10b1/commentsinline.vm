@@ -59,7 +59,9 @@ $msg.get("nocomments")
 #if($inline == true)
       <script type="text/javascript">
 //<!--
-document.getElementById("commentform").className = "collapsed";
+if(document.getElementById("commentform")) {
+  document.getElementById("commentform").className = "collapsed";
+}
 document.getElementById("comments").className += " hidden";
 //-->
       </script>

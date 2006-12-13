@@ -92,7 +92,7 @@
     <fileset id="libs.xwiki.fileset" dir="${release.dir}" includes="xwiki.jar" />
 
     <fileset id="libs.hib.fileset" dir="${lib.dir}"
-      includes="hibernate-3.2.0.ga.jar" />
+      includes="hibernate-3.2.1.ga.jar" />
 
     <fileset id="libs.main.fileset" dir="${lib.dir}"
       includes="c3p0-0.8.4.5.jar,
@@ -166,12 +166,7 @@
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar,
 	jcaptcha-all-1.0-RC3.jar,
-	lucene-core-2.0.0.jar,
-	PDFBox-0.7.2.jar,
-	poi-3.0-alpha1-20050704.jar,
-	poi-scratchpad-3.0-alpha1-20050704.jar,
-	xpp3-1.1.3.4-RC8_min.jar
-        "/>
+lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpad-3.0-alpha1-20050704.jar,xpp3-1.1.3.4-RC8_min.jar"/>
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />

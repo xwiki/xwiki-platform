@@ -920,27 +920,47 @@ WikiEditor.prototype._convertListInternal = function(content) {
 
 WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     var str = "";
-    var tag = "font", style = "", class = "", id = "", name = "";
     var atts = result[1].split("|");
+    var tag = "font", style = "", myclass = "", id = "", name = "";
     for (var i=0; i < atts.length; i++) {
         var att = this.trimString(atts[i].substring(0, atts[i].indexOf("=")));
         var value = this.trimString(atts[i].substring(atts[i].indexOf("=") + 1, atts[i].length));
-        if (att == "class") class = value;
-        else if (att == "id") id = value;
-        else if (att == "name") name = value;
-        else if (att == "type") tag = value;
-        else style += att + ":" + value + ";";
+        if (att == "class") {
+            myclass = value;
+        }
+        else if (att == "id") {
+            id = value;
+        }
+        else if (att == "name") {
+            name = value;
+        }
+        else if (att == "type") {
+            tag = value;
+        }
+        else {
+            style += att + ":" + value + ";";
+        }
     }
     str += "<" + tag;
-    if (id != "") str += " id=\"" + id + "\"";
-    if (class != "") str += " class=\"" + class + "\"";
-    if (name != "") str += " name=\"" + name + "\"";
-    if (style != "") str += " style=\"" + style + "\"";
+    if (id != "") {
+        str += " id=\"" + id + "\"";
+    }
+
+    if (myclass != "") {
+        str += " class=\"" + myclass + "\"";
+    }
+    if (name != "") {
+        str += " name=\"" + name + "\"";
+    }
+    if (style != "") {
+        str += " style=\"" + style + "\"";
+    }
     str += ">";
     str += result[2];
     str += "</" + tag + ">";
     return content.replace(regexp, str) ;
 }
+
 
 WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     var type = result[1];
@@ -976,4 +996,3 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     // alert("str = " + str);
     return content.replace(regexp, str);
 }
-

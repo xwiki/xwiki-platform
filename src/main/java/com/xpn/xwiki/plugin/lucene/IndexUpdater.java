@@ -102,7 +102,6 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
                 while (!queue.isEmpty()) {
                     XWikiContext context = (XWikiContext) this.context.clone();
-                    context.put("hibsession", null);
                     context.getWiki().getStore().cleanUp(context);
                     IndexData data = queue.remove();
 
@@ -114,7 +113,6 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                         LOG.error("error retrieving doc from own context: " + e.getMessage(), e);
                         e.printStackTrace();
                     }
-                    context.put("hibsession", null);
                     context.getWiki().getStore().cleanUp(context);
                 }
                 closeWriter();

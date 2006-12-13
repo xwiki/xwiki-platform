@@ -390,7 +390,7 @@
         <root url="jar://$PROJECT_DIR$/lib/jta-1.0.1B.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/hsqldb-1.8.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/lib/cglib-2.1.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.2.1.ga.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/hibernate-3.1.2.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

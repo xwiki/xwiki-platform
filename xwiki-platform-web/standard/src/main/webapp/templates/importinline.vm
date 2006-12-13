@@ -1,14 +1,11 @@
-<style type="text/css">
-input[type="checkbox"] {
- float: none;
-}
-</style>
 #if($request.action=="import")
-<h1>$msg.get("import")</h1>
-
+##
+## Importing files
+##
+<h3 class="heading-1-1">$msg.get("import")</h3>
 #macro(showfilelist $list $text)
 #if($list.size()>0)
-<h2>$msg.get("import_listof${text}files")</h2>
+<h4 class="heading-1-1-1">$msg.get("import_listof${text}files")</h4>
 <ul>
 #foreach($item in $list)
 <li>$item</li>
@@ -17,20 +14,24 @@ input[type="checkbox"] {
 #end
 #end
 $msg.get("importing") $!request.name: $msg.get("import_install_${xwiki.package.status}")
-<br />
+<br/>
 <ul>
 <li>$xwiki.package.installed.size() $msg.get("import_documentinstalled")
 <li>$xwiki.package.skipped.size() $msg.get("import_documentskipped")
 <li>$xwiki.package.errors.size() $msg.get("import_documenterrors")
 </ul>
-
 #showfilelist($xwiki.package.installed "installed")
 #showfilelist($xwiki.package.skipped "skipped")
 #showfilelist($xwiki.package.errors "errors")
+##
+##
+##
 #else
-<h2>$msg.get("availablefilestoimport")</h2>
+##
+## Browsing archives
+##
+<h3 class="heading-1-1">$msg.get("availablefilestoimport")</h3>
 $msg.get("selectfiletoimport"):
-
 #set($attachments = $doc.attachmentList)
 <div id="attachments">
 #if($attachments.size()>0)
@@ -62,16 +63,18 @@ $msg.get("noattachments")
   <span id="selectDocsActions" style="display: none;">$msg.get("select")
   <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get("none")</a>, <a  href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a></span>
   <form action="" method="post">
+  <div>
   <input type="hidden" name="action" value="import" />
   <div id="selectedDocs">
 
   </div>
   <span id="importDocName"></span>
   <span id="importDocs" style="display: none;"><input type="submit" value="$msg.get("import")" /></span>
+  </div>
   </form>
-  <span id="noSelectedDocs"><br /><h3 id="noSelectedDocsTxt">$msg.get("nodocuments")</h3></span>
+  <div id="noSelectedDocs"><h4 class="heading-1-1-1" id="noSelectedDocsTxt">$msg.get("nodocuments")</h4></div>
 
-<h2>$msg.get("uploadnewarchivetoimport")</h2>
+<h4 class="heading-1-1-1">$msg.get("uploadnewarchivetoimport")</h4>
 #if($request.xredirect)
 #set( $redirect = $request.xredirect)
 #else
@@ -79,9 +82,9 @@ $msg.get("noattachments")
 #end
 <script type="text/javascript" src="$xwiki.getSkinFile("import.js")"></script>
 <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 <fieldset class="expanded" id="attachform">
 <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
+  <div class="hidden"><input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" /></div>
   <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
   <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
   <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>

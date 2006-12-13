@@ -1,3 +1,6 @@
+#if(!$formname)
+#set($formname = "edit")
+#end
 #set($showactions=1)
 #template("editheader.vm")
 #if($xwiki.exists("EditToolbar"))

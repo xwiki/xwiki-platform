@@ -1,5 +1,5 @@
-<div class="layoutsubsection">
-<div style="overflow:auto; padding-left: 20px;">
+<div id="xwikieditcontent">
+<div class="padded">
 #template("exportinline.vm")
 </div>
 </div>

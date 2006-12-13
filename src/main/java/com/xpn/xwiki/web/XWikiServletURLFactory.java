@@ -174,7 +174,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
 
     private void addAction(StringBuffer newpath, String action, XWikiContext context) {
         boolean showViewAction = context.getWiki().showViewAction(context);
-        if ((!action.equals("view")||(showViewAction))) {
+        if ((!"view".equals(action)||(showViewAction))) {
             newpath.append(action);
             newpath.append("/");
         }
@@ -184,7 +184,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
         boolean useDefaultWeb = context.getWiki().useDefaultWeb(context);
         if (useDefaultWeb) {
            String defaultWeb = context.getWiki().getDefaultWeb(context);
-           useDefaultWeb = (web.equals(defaultWeb))&&(action.equals("view"));
+           useDefaultWeb = (web.equals(defaultWeb))&&("view".equals(action));
         }
         if (!useDefaultWeb) {
             newpath.append(encode(web, context));
@@ -195,7 +195,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory {
     private void addName(StringBuffer newpath, String name, String action, XWikiContext context) {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
-                ||(!name.equals(xwiki.getDefaultPage(context))||(!action.equals("view")))) {
+                ||(!name.equals(xwiki.getDefaultPage(context))||(!"view".equals(action)))) {
             newpath.append(encode(name, context));
         }
     }

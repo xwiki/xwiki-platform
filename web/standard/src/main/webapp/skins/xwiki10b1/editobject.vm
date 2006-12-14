@@ -5,6 +5,7 @@ $response.sendRedirect($doc.getURL("edit", "editor=object"))
 #set($saveaction = "save")
 #set($classes = $doc.getxWikiClasses())
 #set($redirect = $xwiki.getRequestURL())
+<div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 ## <div class="topbuttons">#template("editactions.vm")</div>
 <div id="xwikieditcontent">

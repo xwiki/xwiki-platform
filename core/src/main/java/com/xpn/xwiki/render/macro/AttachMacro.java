@@ -96,9 +96,7 @@ public class AttachMacro extends BaseLocaleMacro {
             text = filename;
         } else if (text != null && filename == null) {
             filename = text;
-        } else {
-            return;
-        }
+        } 
         text = Encoder.escape(text);
 
         XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getContext();

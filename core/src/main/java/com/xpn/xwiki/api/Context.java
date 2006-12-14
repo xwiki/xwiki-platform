@@ -193,6 +193,10 @@ public class Context extends Api {
             return null;
     }
 
+    public java.lang.Object getEditorWysiwyg() {
+            return context.getEditorWysiwyg();
+    }
+
     public void put(String key, java.lang.Object value) {
         if (checkProgrammingRights())
             context.put(key, value);

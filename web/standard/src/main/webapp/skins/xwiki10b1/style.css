@@ -60,6 +60,6 @@ li.selected {
   text-decoration: none;
   cursor: pointer;
 }
-.accordionTabTitleBar h6 {
+#xwikieditcontent .accordionTabTitleBar h6 {
   width: 100%;
 }

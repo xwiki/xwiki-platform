@@ -4,7 +4,7 @@
 #if((!$showactions)||($showactions==1))
 <script type="text/javascript">
 function checkDocumentContent() {
-  if (document.forms.${formname}.content) {
+  if ((document.forms.${formname}.content)&&(wikiEditor!=null)&&(wikiEditor.getContent()=="")) {
     var content = document.forms.${formname}.content.value;
     if (content == null || content == "") {
       alert("$msg.get('wikicontentcannotbeempty')");

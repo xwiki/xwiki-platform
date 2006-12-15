@@ -1006,9 +1006,3 @@ html>body #xwikieditcontent{
 .xwiki-form-listclass {
   margin-right: 10px;
 }
-.qqpanel{
-  margin-top: -20px !important;
-  margin-bottom: 40px !important;
-  z-index: 200;
-  position: relative;
-}

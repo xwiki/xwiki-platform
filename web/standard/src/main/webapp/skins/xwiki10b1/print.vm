@@ -1,13 +1,15 @@
 #template("xwikivars.vm")
 #template("layoutvars.vm")
+#set($showLeftPanels = "0")
+#set($showRightPanels = "0")
 #template("htmlheader.vm")
-<div id="headerglobal" class="layoutsection">
+<div id="printheader" class="layoutsection">
   <div id="companylogo">
     <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
 #set($logo = $!prefdoc.getAttachment("logo"))
 #if(!$logo)
-#set($logourl = $xwiki.getSkinFile("logo.gif"))
-      <img src="$logourl" alt="Netcipia" style="width: 215px;height: 74px;"/>
+#set($logourl = $xwiki.getSkinFile("logo.png"))
+      <img src="$logourl" alt="XWiki" style="width: 215px;height: 74px;"/>
 #else
 #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
       <img src="$logourl" alt="XWiki"/>
@@ -15,11 +17,8 @@
     </a>
   </div>
 </div>
-<div id="xwikicontent-header">
-<div class="leftcorner"></div>
-</div>
-<div id="contentcontainer" class="layoutsection">
-  <div id="contentcolumn" class="contenthidelefthideright">
+<div id="printcontainer" style="overflow: visible; border: none; padding: 10px; text-align: justify;">
 #template("contentview.vm")
 <div class="clearfloats"></div>
-#template("endpage.vm")
+</div>## printcontainer
+#template("htmlfooter.vm")

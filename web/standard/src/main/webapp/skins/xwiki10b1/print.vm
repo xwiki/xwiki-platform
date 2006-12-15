@@ -9,10 +9,10 @@
 #set($logo = $!prefdoc.getAttachment("logo"))
 #if(!$logo)
 #set($logourl = $xwiki.getSkinFile("logo.png"))
-      <img src="$logourl" alt="XWiki" style="width: 215px;height: 74px;"/>
+      <img src="$logourl" alt="XWiki logo" style="width: 215px;height: 74px;"/>
 #else
 #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
-      <img src="$logourl" alt="XWiki"/>
+      <img src="$logourl" alt="XWiki logo"/>
 #end
     </a>
   </div>

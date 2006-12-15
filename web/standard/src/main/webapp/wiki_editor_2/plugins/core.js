@@ -152,9 +152,9 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
             href = href.replace(/%20/g," ");
-            if ((href.toLowerCase() == txt.toLowerCase()) && !att["target"]) {
+            if ((href.toLowerCase() == txt.toLowerCase()) && (!att["target"] || (att["target"] == "_self"))) {
                 str = "[" + txt + "]";
-            } else if(att["target"]) {
+            } else if(att["target"] && att["target"] != "_self") {
                 target = this.trimString(att["target"]);
                 str = "[" + txt + ">" + href + "&gt;" + target + "]";
             } else
@@ -800,6 +800,7 @@ WikiEditor.prototype.LINK_INTERNAL_CLASS_NAME = "wikilink";
 WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 	var text = result[1];
 	var url = (result[3])?(result[3]):(text);
+    var target = this.trimString(result[5]);
     var classname;
 	var str;
     if(this.isExternalLink(url)) {
@@ -808,7 +809,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 		classname = this.LINK_INTERNAL_CLASS_NAME;
 	}
 	str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
-    if ((result[5] != null) && (result[5] != "undefined") && (this.trimString(result[5]) != "")) {
+    if ((target != "undefined") && (target != "") && (target != "_self")) {
         str += " target=\"" + result[5] + "\"";
     }
     str += ">" + text + "<\/a>";

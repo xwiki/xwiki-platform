@@ -38,7 +38,7 @@
 #if (($tdoc.getLocked()==true)&&(!$force))
 <div class="layoutsection">
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-<a href="$doc.getURL($action, "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL($context.action, "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()
 </div>
 #else

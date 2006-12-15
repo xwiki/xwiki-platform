@@ -51,7 +51,6 @@ $msg.get("nocomments")
 #end
     </div> ## comments
   </div> ## commentscontent
-## #end
 #if($inline == true)
       <script type="text/javascript">
 //<!--

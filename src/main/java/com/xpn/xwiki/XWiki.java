@@ -4087,15 +4087,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String clearName(String name, XWikiContext context) {
+        return clearName(name, true, context);
+    }
+
+    public String clearName(String name, boolean stripDots, XWikiContext context) {
         name = name.replaceAll("[àâä]","a");
         name = name.replaceAll("[éèêë]","e");
         name = name.replaceAll("[îï]","i");
         name = name.replaceAll("[ôö]","o");
         name = name.replaceAll("[ùûü]","u");
-        name = name.replaceAll("[\"!?\\.]","");
+        name = name.replaceAll("[\"!?]","");
         name = name.replaceAll("[_':,;\\\\/]"," ");
         name = name.replaceAll("\\s+","");
         name = name.replaceAll("[\\(\\)]"," ");
+
+        if (stripDots)
+            name = name.replaceAll("[\\.]","");
+
         if (name.length() > 250)
             name = name.substring(0, 250);
         return name;

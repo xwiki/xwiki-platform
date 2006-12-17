@@ -33,7 +33,9 @@ public class DeleteAction extends XWikiAction {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-
+        if(doc.isNew()){
+        	return true;
+        }
         String confirm = request.getParameter("confirm");
         if ((confirm!=null)&&(confirm.equals("1"))) {
             String language = xwiki.getLanguagePreference(context);
@@ -55,7 +57,7 @@ public class DeleteAction extends XWikiAction {
             }
         }
 	}
-	
+
 	public String render(XWikiContext context) throws XWikiException {
         XWikiRequest request = context.getRequest();
         String confirm = request.getParameter("confirm");

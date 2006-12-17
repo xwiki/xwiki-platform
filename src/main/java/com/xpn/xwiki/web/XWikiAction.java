@@ -82,7 +82,6 @@ public abstract class XWikiAction extends Action {
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
         XWikiContext context = null;
-        boolean wikidoesnotexist = false;
 
         try {
             XWikiRequest request = new XWikiServletRequest(req);
@@ -146,7 +145,7 @@ public abstract class XWikiAction extends Action {
                 }
 
                 if (renderResult != null) {
-                    if ((doc.isNew() && ("view".equals(context.getAction())))) {
+                    if ((doc.isNew() && ("view".equals(action) || "delete".equals(action)))) {
                         String page = Utils.getPage(request, "docdoesnotexist");
                         Utils.parseTemplate(page, context);
                     } else {

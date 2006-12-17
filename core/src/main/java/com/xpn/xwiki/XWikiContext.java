@@ -341,4 +341,8 @@ public class XWikiContext extends Hashtable {
     public List getDisplayedFields() {
         return displayedFields;
     }
+
+    public Object getEditorWysiwyg() {
+        return get("editor_wysiwyg");
+    }
 }

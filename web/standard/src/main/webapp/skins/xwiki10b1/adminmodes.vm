@@ -2,18 +2,18 @@
 ### Admin mode tabs
 ###
 ###
-<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
+##<h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>
 <div class="floatcontainer">
 <ul class="xwikitabbar">
 <li id="xwikiadminprefs"#if($editor == "prefs") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&amp;global=1&amp;space=$space")">$msg.get("adminprefs")</a>
 </li><li id="xwikiadminspaceprefs"#if($editor == "spaceprefs") class="active"#end><a href="$xwiki.getDocument("${doc.web}.WebPreferences").getURL("admin", "editor=spaceprefs&amp;space=$space")">$msg.get("adminspaceprefs")</a>
 </li><li id="xwikiadminglobalrights"#if($editor == "globalrights") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&amp;global=1&amp;space=$space")">$msg.get("adminglobalrights")</a>
 </li><li id="xwikiadminspacerights"#if($editor == "spacerights") class="active"#end><a href="$xwiki.getDocument("${doc.web}.WebPreferences").getURL("admin", "editor=spacerights&amp;space=$space")">$msg.get("adminspacerights")</a>
-## </li><li id="xwikiadmingroups"#if($editor == "groups") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups&amp;space=$space")">$msg.get("admingroups")</a>
-## </li><li id="xwikiadminusers"#if($editor == "users") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users&amp;space=$space")">$msg.get("adminusers")</a>
 </li><li id="xwikiadminusers"#if($editor == "users" || $editor == "groups") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users&amp;space=$space")">$msg.get("adminusersandgroups")</a>
 </li><li id="xwikiadminexport"#if($editor == "export") class="active"#end><a href="$xwiki.getDocument("XWiki.Export").getURL("export", "editor=export&amp;space=$space")">$msg.get("adminexport")</a>
 </li><li id="xwikiadminimport"#if($editor == "import") class="active"#end><a href="$xwiki.getDocument("XWiki.Import").getURL("import", "editor=import&amp;space=$space")">$msg.get("adminimport")</a>
-## </li><li id="xwikiadminskin"#if($editor == "skin") class="active"#end><a href="$xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin&amp;space=$space")">$msg.get("adminskin")</a>
 </li></ul>
 </div>
+## </li><li id="xwikiadmingroups"#if($editor == "groups") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiGroups").getURL("admin", "editor=groups&amp;space=$space")">$msg.get("admingroups")</a>
+## </li><li id="xwikiadminusers"#if($editor == "users") class="active"#end><a href="$xwiki.getDocument("XWiki.XWikiUsers").getURL("admin", "editor=users&amp;space=$space")">$msg.get("adminusers")</a>
+## </li><li id="xwikiadminskin"#if($editor == "skin") class="active"#end><a href="$xwiki.getDocument($xwiki.getXWikiPreference("skin")).getURL("admin", "editor=skin&amp;space=$space")">$msg.get("adminskin")</a>

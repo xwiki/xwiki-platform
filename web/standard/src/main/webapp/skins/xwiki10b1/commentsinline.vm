@@ -3,10 +3,6 @@
 ###
 ### TODO: web service?
 ###
-## #if(!$showcomments)
-## #set($showcomments = $xwiki.getWebPreference("showcomments"))
-## #end
-## #if($showcomments!="no")
 #if($xwiki.getWebPreferenceAsInt("commentsorder",1)==1)
 #set($comments = $doc.getComments())
 #else
@@ -55,7 +51,6 @@ $msg.get("nocomments")
 #end
     </div> ## comments
   </div> ## commentscontent
-## #end
 #if($inline == true)
       <script type="text/javascript">
 //<!--

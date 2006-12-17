@@ -59,6 +59,7 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 ##
 #set($formname = "update")
 #set($saveaction = "save")
+<div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
 #set ($classname = "XWiki.XWikiPreferences")
@@ -75,7 +76,7 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #showsection($section $sectionitemsmap)
 #end
 </div> ## xwikiprefs
-<script type="text/javascript">new Rico.Accordion( 'xwikiprefs', {panelHeight:'max', maxHeight: 320} );</script>
+<script type="text/javascript">new Rico.Accordion( 'xwikiprefs', { panelHeight:'max', maxHeight: 320} );</script>
 </div> ## noname
 </div> ## overflow
 </div> ## xwikieditcontent

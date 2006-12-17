@@ -23,7 +23,8 @@
 ## #template("viewmodes.vm")
 <div class="main layoutsubsection">
 #template("${viewer}.vm")
-<div class="clearfloats"></div>
+<div class="clearfloats">
+</div>
 #end
 </div>## main
 #template("endpage.vm")

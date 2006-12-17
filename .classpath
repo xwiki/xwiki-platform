@@ -60,7 +60,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/graffito-jcr-mapping-1.0-a1-amelentev-dev.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/graffito-jcr-mapping-1.0-a1-amelentev-dev-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/groovy-all-1.0-jsr-06.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-tools-2.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hsqldb-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpunit-1.6.jar"/>
@@ -81,7 +80,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ldap-UNKNOWN.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lucene-1.4.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mx4j-jmx-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-3.1.7-bin.jar"/>
@@ -126,5 +124,11 @@
 	<classpathentry kind="lib" path="lib/jackrabbit-core-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/oscache-2.3.2-xwiki.jar"/>
 	<classpathentry kind="lib" path="lib/jcaptcha-all-1.0-RC3.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-3.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-core-2.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/xpp3-1.1.3.4-RC8_min.jar"/>
+	<classpathentry kind="lib" path="lib/PDFBox-0.7.2.jar"/>
+	<classpathentry kind="lib" path="lib/poi-3.0-alpha1-20050704.jar"/>
+	<classpathentry kind="lib" path="lib/poi-scratchpad-3.0-alpha1-20050704.jar"/>
 	<classpathentry kind="output" path="build/eclipse/web/WEB-INF/classes"/>
 </classpath>

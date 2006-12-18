@@ -55,13 +55,13 @@
 &lt;div&gt;
 &lt;div id="webhomeblogdisplay" style="float:left; width: 50%;"&gt;
 &lt;div style="padding-right:20px;"&gt;
-&lt;h2 class="heading-1-1-1"&gt; Blog &lt;a href="$xwiki.getURL("Main.BlogRss", "view", "xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile("black-rss-mini.png")"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 class="heading-1-1-1"&gt; Blog &lt;a href="$xwiki.getURL("Main.BlogRss", "view", "xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile("icons/black-rss-mini.png")"&gt;&lt;/a&gt;&lt;/h2&gt;
 #set($nbstart = $request.nbstart)
 #set($category = "")
 #set($nbitems = "10")
 #includeMacros("Blog.Macros")&lt;/div&gt;&lt;/div&gt;
 &lt;div id="webhomeNewsdisplay" style="float:left; width: 50%;"&gt;&lt;div style="padding-left: 20px;"&gt;
-&lt;h2 class="heading-1-1-1"&gt;Recent changes&lt;a href="$xwiki.getURL("Main.WebRss", "view", "xpage=rdf")")" style=""&gt;&lt;img src="$xwiki.getSkinFile("black-rss-mini.png")"&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 class="heading-1-1-1"&gt;Recent changes&lt;a href="$xwiki.getURL("Main.WebRss", "view", "xpage=rdf")")" style=""&gt;&lt;img src="$xwiki.getSkinFile("icons/black-rss-mini.png")"&gt;&lt;/a&gt;&lt;/h2&gt;
 #set ($sql = "where 1=1 order by doc.date desc")
 #set($showdata = 1)
 #if(!$nb)

@@ -29,7 +29,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
 
-    this.addExternalProcessor((/\[(.*?)(>(.*?))?\]/i), 'convertLinkExternal');
+    this.addExternalProcessor((/\[(.*?)(>(.*?))?(>(.*?))?\]/i), 'convertLinkExternal');
 	this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
     this.addExternalProcessor((/\{table\}([\s\S]+?)\{table\}/i), 'convertTableExternal');
@@ -146,17 +146,21 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
     var txt;
     var str="";
     var href;
+    var target;
     if( (txt = this.trimString(result[4])) != "") {
         var att = this.readAttributes(result[1] + " " + result[3]);
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
             href = href.replace(/%20/g," ");
-            if(href.toLowerCase() == txt.toLowerCase()) {
+            if ((href.toLowerCase() == txt.toLowerCase()) && (!att["target"] || (att["target"] == "_self"))) {
                 str = "[" + txt + "]";
-            } else {
+            } else if(att["target"] && att["target"] != "_self") {
+                target = this.trimString(att["target"]);
+                str = "[" + txt + ">" + href + "&gt;" + target + "]";
+            } else
                 str = "[" + txt + ">" + href + "]";
-            }
         }
+
     }
     return content.replace(regexp, str);
 }
@@ -796,13 +800,19 @@ WikiEditor.prototype.LINK_INTERNAL_CLASS_NAME = "wikilink";
 WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 	var text = result[1];
 	var url = (result[3])?(result[3]):(text);
-	var classname;
-	if(this.isExternalLink(url)) {
+    var target = this.trimString(result[5]);
+    var classname;
+	var str;
+    if(this.isExternalLink(url)) {
 		classname = this.LINK_EXTERNAL_CLASS_NAME;
 	} else {
 		classname = this.LINK_INTERNAL_CLASS_NAME;
 	}
-	var str = "<a class=\"" + classname + "\" href=\"" + url + "\">" + text + "<\/a>";
+	str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
+    if ((target != "undefined") && (target != "") && (target != "_self")) {
+        str += " target=\"" + result[5] + "\"";
+    }
+    str += ">" + text + "<\/a>";
 	return content.replace(regexp, str);
 }
 

@@ -1,6 +1,7 @@
 function init() {
     var text = tinyMCE.getWindowArg('text').toString();
     var href = tinyMCE.getWindowArg('href').toString();
+    var target = tinyMCE.getWindowArg('target').toString();
     document.forms[0].wiki_text.value = text;
     document.forms[0].web_text.value = text;
     document.forms[0].file_text.value = text;
@@ -11,6 +12,7 @@ function init() {
 	    if (href.search(/(https?|ftp):\/\/[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]/gi)>-1) {
            mcTabs.displayTab('web_tab','web_panel');
            document.forms[0].web_page.value = href;
+           document.forms[0].web_target.value = target;
         } else if (href.search(/wikiattachment:-:(.*?)/gi) > -1) {
             mcTabs.displayTab('attachments_tab','attachments_panel');
             document.forms[0].attach_file.value = href.replace(/wikiattachment:-:/gi, "").replace(/%20/gi, " ");
@@ -30,6 +32,7 @@ function init() {
             }
             document.forms[0].wiki_space.value = space;
             document.forms[0].wiki_page.value = whref;
+            document.forms[0].wiki_target.value = target;
         }
     }
 
@@ -52,12 +55,14 @@ function insertLink() {
         var href = document.forms[0].wiki_page.value;
         var space = document.forms[0].wiki_space.value;
         var wikitext = document.forms[0].wiki_text.value;
-        tinyMCE.themes['wikieditor'].insertLink(href, "", wikitext, space, "", dummy, "");
+        var target = document.forms[0].wiki_target.value;
+        tinyMCE.themes['wikieditor'].insertLink(href, target, wikitext, space, "", dummy, "");
 
     } else if (webTabElm.className == "current") {
         var webtext = document.forms[0].web_text.value;
         var href = document.forms[0].web_page.value;
-        tinyMCE.themes['wikieditor'].insertLink(href, "", webtext, "", "", dummy, "");
+        var target = document.forms[0].web_target.value;
+        tinyMCE.themes['wikieditor'].insertLink(href, target , webtext, "", "", dummy, "");
 
     } else if (attachTabElm.className == "current") {
         var href = document.forms[0].attach_file.value;

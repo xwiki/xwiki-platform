@@ -1318,7 +1318,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             XWikiDocument userdoc = getDocument(user, context);
             if (userdoc != null) {
                 String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
-                if (!result.equals(""))
+                if ((!result.equals(""))&&(!result.equals("---")))
                     return result;
             }
         } catch (Exception e) {

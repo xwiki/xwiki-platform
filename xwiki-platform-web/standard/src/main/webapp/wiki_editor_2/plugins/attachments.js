@@ -12,8 +12,8 @@ WikiEditor.prototype.initAttachmentsPlugin = function() {
 		return;
 	}
 	
-	this.addExternalProcessorBefore("convertTableExternal", (/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
-	this.addInternalProcessor((/<img\s*([^>]*)(class=\"wikiimage\")\s*([^>]*)\/>/i), 'convertImageInternal');
+	this.addExternalProcessorBefore("convertTableExternal", (/{\s*image\s*:\s*(.*?)(\|(.*?))?(\|(.*?))?(\|(.*?))?(\|(.*?))?}/i), 'convertImageExternal');
+	this.addInternalProcessorBefore("convertStyleInternal", (/(<div\s*class=\"img(.*?)\"\s*>\s*)?<img\s*([^>]*)(class=\"wikiimage\")\s*([^>]*)\/>(<\/div>)?/i), 'convertImageInternal');
 
 	this.addExternalProcessorBefore("convertTableExternal", (/{\s*attach\s*:\s*(.*?)(\|(.*?))?}/i), 'convertAttachmentExternal');
     this.addInternalProcessorBefore('convertLinkInternal', (/<a\s*href=\"wikiattachment:-:(.*?)\"\s*([^>]*)>(.*?)<\/a>/i), 'convertAttachmentInternal');
@@ -47,7 +47,7 @@ WikiEditor.prototype.attachmentCommand = function(editor_id, element, command, u
 }
 
 WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_interface, value) {
-    var src = "", alt = "", border = "", hspace = "", vspace = "", width = "", height = "", align = "";
+    var src = "", alt = "", border = "", hspace = "", vspace = "", width = "", height = "", align = "", halign = "";
     var title = "", onmouseover = "", onmouseout = "", action = "insert";
     var img = tinyMCE.imgElement;
     var inst = tinyMCE.getInstanceById(editor_id);
@@ -55,6 +55,11 @@ WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_i
     if (tinyMCE.selectedElement != null && tinyMCE.selectedElement.nodeName.toLowerCase() == "img") {
         img = tinyMCE.selectedElement;
         tinyMCE.imgElement = img;
+        var parent = tinyMCE.selectedElement.parentNode;
+        var parentClassName = parent.className;
+        if (parent.nodeName.toLowerCase() == "div") {
+            halign = parentClassName.substring(3, parentClassName.length);
+        } 
     }
 
     if (img) {
@@ -86,6 +91,7 @@ WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_i
         width = tinyMCE.getAttrib(img, 'width');
         height = tinyMCE.getAttrib(img, 'height');
         align = tinyMCE.getAttrib(img, 'align');
+
         onmouseover = tinyMCE.getAttrib(img, 'onmouseover');
         onmouseout = tinyMCE.getAttrib(img, 'onmouseout');
         title = tinyMCE.getAttrib(img, 'title');
@@ -124,7 +130,7 @@ WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_i
         if (returnVal && returnVal['src'])
             TinyMCE_WikieditorTheme.insertImage(returnVal['src'], returnVal['width'], returnVal['height'], returnVal['align']);
     } else {
-        tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes', resizable : 'no', mce_windowresize: false, src : src, alt : alt, border : border, hspace : hspace, vspace : vspace, width : width, height : height, align : align, title : title, onmouseover : onmouseover, onmouseout : onmouseout, action : action, inline : "yes"});
+        tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes', resizable : 'no', mce_windowresize: false, src : src, alt : alt, border : border, hspace : hspace, vspace : vspace, width : width, height : height, align : align, halign : halign, title : title, onmouseover : onmouseover, onmouseout : onmouseout, action : action, inline : "yes"});
     }
 
     return this.dummyCommand();
@@ -132,8 +138,14 @@ WikiEditor.prototype.imageCommand = function(editor_id, element, command, user_i
 
 WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
     var str="";
-    var attributes = this.trimString(result[1] + " " + result[3]);
+    var href;
+    var halign = "";
+    var attributes = this.trimString(result[3] + " " + result[5]);
     var att = this.readAttributes(attributes);
+    
+    if (result[2] && this.trimString(result[2]) != "") {
+        halign = this.trimString(result[2]);
+    }
     if(att && (href = att["src"]) != null) {
         href = this.trimString(href);
         href = "/xwiki/bin/" + href.substring(href.indexOf("/",3) + 1);
@@ -145,9 +157,13 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
             var width=att["width"] ? this.trimString(att["width"]) : "";
 			var height=att["height"] ? this.trimString(att["height"]) : "";
             var align=att["align"] ? this.trimString(att["align"]) : "";
-            if (width != "" || height != "" || align != "") {
+            if (width != "" || height != "" || align != "" || halign != "") {
 				str += "|" + (height ? height : " ") + "|" + (width ? width : " ");
-                if (align != "") str += "|" + (align ? align : "");
+                if (halign && halign != "") {
+                    str += "|" + (align ? align : " ") + "|" + (halign ? halign : "");
+                } else if (align != "") {
+                    str += "|" + (align ? align : "");
+                }
             }
 
             str += "}";
@@ -159,8 +175,17 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
 WikiEditor.prototype.IMAGE_CLASS_NAME = "wikiimage";
 
 WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
-	var str = "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";
-	var width, height, align;
+    var width, height, align;
+    var halign; this.trimString(result[9]);
+    var str = "";
+    if (result[9]) {
+        halign = this.trimString(result[9]);
+    } else {
+        halign = "";
+    }
+    str += "<div class=\"img" + halign + "\">"
+
+    str += "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";
 	if( result[5] && (width = this.trimString(result[5])) != "") {
 		str += "width=\"" + width + "\" ";
 	}
@@ -171,9 +196,13 @@ WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
     if( result[7] && (align = this.trimString(result[7])) != "") {
 		str += "align=\"" + align + "\" ";
 	}
+    if(halign != "") {
+		str += "halign=\"" + halign + "\" ";
+	}
 
     str += "\/>";
 
+    str += "<\/div>";
     return content.replace(regexp, str);
 }
 

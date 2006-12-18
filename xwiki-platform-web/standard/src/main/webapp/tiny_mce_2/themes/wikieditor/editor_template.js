@@ -152,11 +152,11 @@ var TinyMCE_WikieditorTheme = {
         return true;
     },
 
-    insertImage : function(src, width, height, align) {
-        this._insertImage(wikiEditor.getImagePath() + src, "", "", "", "", width, height, align, "", "", "")
+    insertImage : function(src, width, height, align, halign) {
+        this._insertImage(wikiEditor.getImagePath() + src, "", "", "", "", width, height, align, halign , "", "", "")
     },
 
-   _insertImage : function(src, alt, border, hspace, vspace, width, height, align, title, onmouseover, onmouseout) {
+   _insertImage : function(src, alt, border, hspace, vspace, width, height, align, halign, title, onmouseover, onmouseout) {
 		tinyMCE.execCommand('mceBeginUndoLevel');
 
 		if (src == "")
@@ -164,22 +164,47 @@ var TinyMCE_WikieditorTheme = {
 
 		if (!tinyMCE.imgElement && tinyMCE.isSafari) {
 			var html = "";
-
+            if (halign != null && (halign != "none")){
+                html += "<div class=\"img" + halign.trim() + "\">" ;
+            } else {
+                html += "<div class=\"img\">" ;
+            }
 			html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
 			html += ' border="' + border + '" hspace="' + hspace + '"';
 			html += ' vspace="' + vspace + '" width="' + width + '"';
-			html += ' height="' + height + '" align="' + align + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout + '" />';
+			html += ' height="' + height + '" align="' + align + '" halign="' + halign + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout;
 
-			tinyMCE.execCommand("mceInsertContent", false, html);
+            //if (halign != null && (halign !="none")){
+                html += "</div>" ;
+            //}
+            html += '" />'
+            tinyMCE.execCommand("mceInsertContent", false, html);
 		} else {
-			if (!tinyMCE.imgElement && tinyMCE.selectedInstance) {
-				if (tinyMCE.isSafari)
-					tinyMCE.execCommand("mceInsertContent", false, '<img src="' + tinyMCE.uniqueURL + '" />');
-				else
-					tinyMCE.selectedInstance.contentDocument.execCommand("insertimage", false, tinyMCE.uniqueURL);
+            if (!tinyMCE.imgElement && tinyMCE.selectedInstance) {
+                if (tinyMCE.isSafari)
+                    tinyMCE.execCommand("mceInsertContent", false, '<img src="' + tinyMCE.uniqueURL + '" />');
+                else {
+                     // tinyMCE.selectedInstance.contentDocument.execCommand("insertimage", false, tinyMCE.uniqueURL);
+                    var html = "";
+                    if (halign != null && (halign != "none")){
+                        html += "<div class=\"img" + halign + "\">" ;
+                    }
+                    html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
+                    html += ' border="' + border + '" hspace="' + hspace + '"';
+                    html += ' vspace="' + vspace + '" width="' + width + '"';
+                    html += ' height="' + height + '" align="' + align + '" halign="' + halign + '" title="' + title ;
 
-				tinyMCE.imgElement = tinyMCE.getElementByAttributeValue(tinyMCE.selectedInstance.contentDocument.body, "img", "src", tinyMCE.uniqueURL);
-			}
+                    html += '" />'
+
+                    //if (halign != null && (halign !="none")){
+                        html += "</div>" ;
+                    //}
+
+                    tinyMCE.execCommand("mceInsertContent", false, html);
+                }
+
+                tinyMCE.imgElement = tinyMCE.getElementByAttributeValue(tinyMCE.selectedInstance.contentDocument.body, "img", "src", tinyMCE.uniqueURL);
+            }
 		}
 
 		if (tinyMCE.imgElement) {
@@ -210,15 +235,19 @@ var TinyMCE_WikieditorTheme = {
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'alt', alt);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'title', title);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'align', align);
-			tinyMCE.setAttrib(tinyMCE.imgElement, 'border', border, true);
+            tinyMCE.setAttrib(tinyMCE.imgElement, 'border', border, true);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'hspace', hspace, true);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'vspace', vspace, true);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'width', width, true);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'height', height, true);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'onmouseover', onmouseover);
 			tinyMCE.setAttrib(tinyMCE.imgElement, 'onmouseout', onmouseout);
+            var parent = tinyMCE.imgElement.parentNode;
+            if ((parent.nodeName.toLowerCase() == "div") && (halign != "")) {
+                parent.className = "img" + halign;
+            }
 
-			// Fix for bug #989846 - Image resize bug
+            // Fix for bug #989846 - Image resize bug
 			if (width && width != "")
 				tinyMCE.imgElement.style.pixelWidth = width;
 
@@ -282,9 +311,9 @@ var TinyMCE_WikieditorTheme = {
 		if (!tinyMCE.linkElement && tinyMCE.selectedInstance) {
             if (tinyMCE.isSafari) {
                 tinyMCE.execCommand("mceInsertContent", false, '<a href="' + tinyMCE.uniqueURL + '">' + tinyMCE.selectedInstance.selection.getSelectedHTML() + '</a>');
-			} else
-				tinyMCE.selectedInstance.contentDocument.execCommand("createlink", false, tinyMCE.uniqueURL);
-
+			} else {
+                tinyMCE.selectedInstance.contentDocument.execCommand("createlink", false, tinyMCE.uniqueURL);
+            }
 			tinyMCE.linkElement = tinyMCE.getElementByAttributeValue(tinyMCE.selectedInstance.contentDocument.body, "a", "href", tinyMCE.uniqueURL);
 
 			var elementArray = tinyMCE.getElementsByAttributeValue(tinyMCE.selectedInstance.contentDocument.body, "a", "href", tinyMCE.uniqueURL);

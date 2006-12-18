@@ -142,7 +142,6 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
     var halign = "";
     var attributes = this.trimString(result[3] + " " + result[5]);
     var att = this.readAttributes(attributes);
-    
     if (result[2] && this.trimString(result[2]) != "") {
         halign = this.trimString(result[2]);
     }
@@ -183,8 +182,9 @@ WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
     } else {
         halign = "";
     }
-    str += "<div class=\"img" + halign + "\">"
-
+    if (halign != "") {
+        str += "<div class=\"img" + halign + "\">"
+    }
     str += "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";
 	if( result[5] && (width = this.trimString(result[5])) != "") {
 		str += "width=\"" + width + "\" ";
@@ -201,8 +201,10 @@ WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
 	}
 
     str += "\/>";
-
-    str += "<\/div>";
+    
+    if (halign != "") {
+        str += "</div>";
+    }
     return content.replace(regexp, str);
 }
 

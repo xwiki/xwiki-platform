@@ -2,7 +2,7 @@
 ### Code page in the "view" mode
 ###
 ###
-<h2>$xwiki.parseMessage("viewcodetitle")</h2>
+<div id="xwikieditcontent" class="clear">
 #set($ln = $request.getParameter("showlinenumbers"))
 #if((!$ln) || ($ln == "1"))
 <a href="$doc.getURL("edit", "editor=code&showlinenumbers=0&$docvariant")">$msg.get("hidelinenumbers")</a>
@@ -20,3 +20,4 @@ $velocityCount: $line
 <br />
 <textarea readonly="readonly" style="width: 100%; height: 300px;">$tdoc.translatedContent</textarea>
 #end
+</div>

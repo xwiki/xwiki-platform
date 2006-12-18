@@ -166,18 +166,15 @@ var TinyMCE_WikieditorTheme = {
 			var html = "";
             if (halign != null && (halign != "none")){
                 html += "<div class=\"img" + halign.trim() + "\">" ;
-            } else {
-                html += "<div class=\"img\">" ;
             }
 			html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
 			html += ' border="' + border + '" hspace="' + hspace + '"';
 			html += ' vspace="' + vspace + '" width="' + width + '"';
 			html += ' height="' + height + '" align="' + align  + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout;
-
-            //if (halign != null && (halign !="none")){
-                html += "</div>" ;
-            //}
             html += '" />'
+            if (halign != null && (halign !="none")){
+                html += "</div>" ;
+            }
             tinyMCE.execCommand("mceInsertContent", false, html);
 		} else {
             if (!tinyMCE.imgElement && tinyMCE.selectedInstance) {
@@ -188,8 +185,6 @@ var TinyMCE_WikieditorTheme = {
                     var html = "";
                     if (halign != null && (halign != "none") && (halign != "")){
                         html += "<div class=\"img" + halign + "\">" ;
-                    } else {
-                        html += "<div class=\"img\">" ;
                     }
                     html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
                     html += ' border="' + border + '" hspace="' + hspace + '"';
@@ -204,9 +199,9 @@ var TinyMCE_WikieditorTheme = {
 
                     html += '" />'
 
-                    //if (halign != null && (halign !="none")){
+                    if (halign != null && (halign !="none")){
                         html += "</div>" ;
-                    //}
+                    }
 
                     tinyMCE.execCommand("mceInsertContent", false, html);
                 }
@@ -253,6 +248,13 @@ var TinyMCE_WikieditorTheme = {
             var parent = tinyMCE.imgElement.parentNode;
             if ((parent.nodeName.toLowerCase() == "div") && (halign != "")) {
                 parent.className = "img" + halign;
+            } else if(halign != "") {
+                var divNode = tinyMCE.selectedInstance.getDoc().createElement("div");
+                var imgNode = tinyMCE.imgElement;
+                divNode.appendChild(imgNode.cloneNode(true));
+                divNode.className = "img" + halign;
+                parent.insertBefore(divNode, imgNode);
+                parent.removeChild(imgNode);
             }
 
             // Fix for bug #989846 - Image resize bug

@@ -3,7 +3,7 @@
 <package>
 <infos>
 <name>Backup</name>
-<description>on Wed Dec 13 12:03:26 CET 2006 by XWiki.Admin</description>
+<description>on Sun Dec 17 01:11:33 CET 2006 by XWiki.Admin</description>
 <licence></licence>
 <author>XWiki.Admin</author>
 <version></version>
@@ -49,7 +49,6 @@
 <file defaultAction="0" language="">XWiki.ClassItemTemplate</file>
 <file defaultAction="0" language="">XWiki.ClassTemplate</file>
 <file defaultAction="0" language="">XWiki.ClassItemSheet</file>
-<file defaultAction="0" language="">XWiki.Skin10fixes</file>
 <file defaultAction="0" language="">XWiki.BlogRssCode</file>
 <file defaultAction="0" language="">Main.WebRss</file>
 <file defaultAction="0" language="">Main.WhatsNew</file>
@@ -71,7 +70,6 @@
 <file defaultAction="0" language="">Sandbox.TableTraining</file>
 <file defaultAction="0" language="">Blog.Macros</file>
 <file defaultAction="0" language="">Blog.WebHome</file>
-<file defaultAction="0" language="">Blog.TestArticle</file>
 <file defaultAction="0" language="">Blog.Categories</file>
 <file defaultAction="0" language="">Blog.Category</file>
 <file defaultAction="0" language="">Admin.WebHome</file>

@@ -3,16 +3,17 @@ function insertImage() {
     var width = document.forms[0].width.value;
     var height = document.forms[0].height.value;
     var align = document.forms[0].align.options[document.forms[0].align.selectedIndex].value;
+    var halign = document.forms[0].halign.options[document.forms[0].halign.selectedIndex].value;
 
     tinyMCEPopup.restoreSelection();
 
-    tinyMCE.themes['wikieditor'].insertImage(src, width, height, align);
+    tinyMCE.themes['wikieditor'].insertImage(src, width, height, align, halign);
 
     tinyMCEPopup.close();
 }
 
 function init() {
-    editor_id = tinyMCE.getWindowArg('editor_id');
+    var editor_id = tinyMCE.getWindowArg('editor_id');
     var href = tinyMCE.getWindowArg('src')
     document.forms[0].href.value = href.replace(/%20/gi, " ");
     document.forms[0].width.value = tinyMCE.getWindowArg('width');
@@ -21,6 +22,11 @@ function init() {
     for (var i=0; i<document.forms[0].align.options.length; i++) {
 		if (document.forms[0].align.options[i].value == tinyMCE.getWindowArg('align'))
 			document.forms[0].align.options.selectedIndex = i;
+	}
+
+    for (var i=0; i<document.forms[0].halign.options.length; i++) {
+		if (document.forms[0].halign.options[i].value == tinyMCE.getWindowArg('halign'))
+			document.forms[0].halign.options.selectedIndex = i;
 	}
 
     document.forms[0].insert.value = tinyMCE.getLang('lang_' + tinyMCE.getWindowArg('action'), 'Insert', true);

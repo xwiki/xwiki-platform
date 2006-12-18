@@ -14,9 +14,8 @@ $response.sendRedirect($doc.getURL("edit", "editor=rights"))
 #end
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
-<div style="overflow:auto">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div class="topbuttons">#template("editactions.vm")</div>
+<div id="xwikieditcontent" class="clear">
 <div>
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
@@ -37,8 +36,8 @@ $response.sendRedirect($doc.getURL("edit", "editor=rights"))
     </tr>
 #end
   </table>
- </div>
+ </div> ## noname
+</div> ## xwikieditcontent
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
-</div>
 #end

@@ -1,1 +1,3 @@
-#template("history.vm")
+<div id="xwikieditcontent" class="clear">
+#template("historyinline.vm")
+</div>

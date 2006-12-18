@@ -96,7 +96,7 @@ public class AttachMacro extends BaseLocaleMacro {
             text = filename;
         } else if (text != null && filename == null) {
             filename = text;
-        } else {
+        } else if (text == null && filename == null) {
             return;
         }
         text = Encoder.escape(text);

@@ -2,7 +2,6 @@
 #set($saveaction = "save")
 #set($previewenabled = true)
 #set($xredirect=$!request.getParameter("xredirect"))
-## <div class="topbuttons">#template("editactions.vm")</div>
 <div>
 <div class="hidden">
 <input type="hidden" name="template" value="$!request.template" />

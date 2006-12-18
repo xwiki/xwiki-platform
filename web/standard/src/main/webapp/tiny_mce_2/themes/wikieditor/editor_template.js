@@ -172,7 +172,7 @@ var TinyMCE_WikieditorTheme = {
 			html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
 			html += ' border="' + border + '" hspace="' + hspace + '"';
 			html += ' vspace="' + vspace + '" width="' + width + '"';
-			html += ' height="' + height + '" align="' + align + '" halign="' + halign + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout;
+			html += ' height="' + height + '" align="' + align  + '" title="' + title + '" onmouseover="' + onmouseover + '" onmouseout="' + onmouseout;
 
             //if (halign != null && (halign !="none")){
                 html += "</div>" ;
@@ -186,13 +186,21 @@ var TinyMCE_WikieditorTheme = {
                 else {
                      // tinyMCE.selectedInstance.contentDocument.execCommand("insertimage", false, tinyMCE.uniqueURL);
                     var html = "";
-                    if (halign != null && (halign != "none")){
+                    if (halign != null && (halign != "none") && (halign != "")){
                         html += "<div class=\"img" + halign + "\">" ;
+                    } else {
+                        html += "<div class=\"img\">" ;
                     }
                     html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
                     html += ' border="' + border + '" hspace="' + hspace + '"';
-                    html += ' vspace="' + vspace + '" width="' + width + '"';
-                    html += ' height="' + height + '" align="' + align + '" halign="' + halign + '" title="' + title ;
+                    html += ' vspace="' + vspace + '"';
+                    if (width != "") {
+                        html += ' width="' + width + '"';
+                    }
+                    if (height != "") {
+                        html += ' height="' + height + '"';
+                    }
+                    html += '" align="' + align + '" title="' + title ;
 
                     html += '" />'
 

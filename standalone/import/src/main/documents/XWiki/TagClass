@@ -32,7 +32,7 @@
 <prettyName>Tags</prettyName>
 <multiSelect>1</multiSelect>
 <values></values>
-<displayType>select</displayType>
+<displayType>input</displayType>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
 <separators> ,|</separators>

@@ -37,7 +37,7 @@ $xwiki.getTextArea($tdoc.content)
             wiki_attach_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
             wiki_macro_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
             wiki_plugins: 'core,attachments,macros',
-            entity_encoding: "numeric"
+            entity_encoding: "raw"
 });
 } else {
         alert("$msg.get('browsernoncompatible')");

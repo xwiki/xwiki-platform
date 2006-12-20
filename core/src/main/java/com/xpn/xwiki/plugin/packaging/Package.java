@@ -468,8 +468,9 @@ public class Package {
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
 
-                if (doc.getDoc().getDocumentArchive() == null){
-                         doc.getDoc().resetArchive(context);
+                if ((doc.getDoc().getDocumentArchive()==null)||(doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
+                    doc.getDoc().setVersion("1.1");     
+                    doc.getDoc().resetArchive(context);
                 }
 
             } catch (XWikiException e) {

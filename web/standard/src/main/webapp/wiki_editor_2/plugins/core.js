@@ -51,44 +51,6 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
 
-    var charStr = "À|Á|Â|Ã|Ä|Å|" +
-                  "Æ|Ç|È|É|Ê|Ë|" +
-                  "Ì|Í|Î|Ï|Ñ|Ò|" +
-                  "Ó|Ô|Õ|Ö|Ø|Ù|" +
-                  "Ú|Û|Ü|ß|à|á|" +
-                  "â|ã|ä|å|æ|ç|" +
-                  "è|é|ê|ë|ì|í|" +
-                  "î|ï|ñ|ò|ó|ô|" +
-                  "œ|õ|ö|ø|ù|ú|" +
-                  "û|ü|ÿ|" +
-                  // Commercial symbols:
-                  "™|©|®|¢|€|¥|" +
-                  "£|¤|" +
-                  //Other characters
-                  ">|<|&|\"";
-    var characterEntityStr = "&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Auml;|&Aring;|" +
-                             "&AElig;|&Ccedil;|&Egrave;|&Eacute;|&Ecirc;|&Euml;|" +
-                             "&Igrave;|&Iacute;|&Icirc;|&Iuml;|&Ntilde;|&Ograve;|" +
-                             "&Oacute;|&Ocirc;|&Otilde;|&Ouml;|&Oslash;|&Ugrave;|" +
-                             "&Uacute;|&Ucirc;|&Uuml;|&szlig;|&agrave;|&aacute;|" +
-                             "&acirc;|&atilde;|&auml;|&aring;|&aelig;|&ccedil;|" +
-                             "&egrave;|&eacute;|&ecirc;|&euml;|&igrave;|&iacute;|" +
-                             "&icirc;|&iuml;|&ntilde;|&ograve;|&oacute;|&ocirc;|" +
-                             "&oelig;|&otilde;|&ouml;|&oslash;|&ugrave;|&uacute;|" +
-                             "&ucirc;|&uuml;|&yuml;|" +
-                             // Commercial symbols:
-                             "&trade;|&copy;|&reg;|&cent;|&euro;|&yen;|" +
-                             "&pound;|&curren;|" +
-                             //Other characters
-                             "&gt;|&lt;|&amp;|&quot;"
-
-    var characterEntitys = characterEntityStr.split("|");
-    var chars = charStr.split("|");
-    for (var i= 0; i< characterEntitys.length; i++) {
-        var regExp = new RegExp(characterEntitys[i],'g');
-        this.addInternalProcessor((regExp), chars[i]);
-    }
-
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
     this.setHtmlTagRemover('removeSpecialHtmlTags');
     // Toolbar handlers
@@ -156,7 +118,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
                 str = "[" + txt + "]";
             } else if(att["target"] && att["target"] != "_self") {
                 target = this.trimString(att["target"]);
-                str = "[" + txt + ">" + href + "&gt;" + target + "]";
+                str = "[" + txt + ">" + href + ">" + target + "]";
             } else
                 str = "[" + txt + ">" + href + "]";
         }

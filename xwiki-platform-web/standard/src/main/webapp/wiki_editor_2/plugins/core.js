@@ -65,7 +65,7 @@ WikiEditor.prototype.initCorePlugin = function() {
                   "™|©|®|¢|€|¥|" +
                   "£|¤|" +
                   //Other characters
-                  ">|<|&|\"";
+                  ">|<|&|\"|'";
     var characterEntityStr = "&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Auml;|&Aring;|" +
                              "&AElig;|&Ccedil;|&Egrave;|&Eacute;|&Ecirc;|&Euml;|" +
                              "&Igrave;|&Iacute;|&Icirc;|&Iuml;|&Ntilde;|&Ograve;|" +
@@ -80,7 +80,7 @@ WikiEditor.prototype.initCorePlugin = function() {
                              "&trade;|&copy;|&reg;|&cent;|&euro;|&yen;|" +
                              "&pound;|&curren;|" +
                              //Other characters
-                             "&gt;|&lt;|&amp;|&quot;"
+                             "&gt;|&lt;|&amp;|&quot;|&#39;"
 
     var characterEntitys = characterEntityStr.split("|");
     var chars = charStr.split("|");

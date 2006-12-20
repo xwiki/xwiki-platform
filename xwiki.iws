@@ -32,8 +32,12 @@
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
       <change type="DELETED" beforePath="C:\dev\xwiki\trunks-dev\xwiki\xwiki.iml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xwiki.ipr" afterPath="$PROJECT_DIR$/xwiki.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/textarea_wysiwyg.vm" afterPath="$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/textarea_wysiwyg.vm" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editwysiwyg.vm" afterPath="$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editwysiwyg.vm" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xwiki.iws" afterPath="$PROJECT_DIR$/xwiki.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/xwiki.ipr" afterPath="$PROJECT_DIR$/xwiki.ipr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/version.properties" afterPath="$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/version.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java" afterPath="$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java" />
       <change type="NEW" beforePath="" afterPath="C:\dev\xwiki\trunks-dev\xwiki\XWiki Standard.iml" />
     </list>
   </component>
@@ -243,7 +247,7 @@
         <option name="CONDITION" value="((DocumentInfo)classFiles.get(i)).getFullName().equals(&quot;Main.WebHome&quot;)" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java" line="471" class="com.xpn.xwiki.plugin.packaging.Package" package="com.xpn.xwiki.plugin.packaging">
+      <breakpoint url="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java" line="475" class="com.xpn.xwiki.plugin.packaging.Package" package="com.xpn.xwiki.plugin.packaging">
         <option name="ENABLED" value="true" />
         <option name="SUSPEND_POLICY" value="SuspendAll" />
         <option name="LOG_ENABLED" value="false" />
@@ -606,28 +610,46 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="hibernate.cfg.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/hibernate.cfg.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="core.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js">
           <provider selected="true" editor-type-id="text-editor">
+            <state line="135" column="67" selection-start="6390" selection-end="6470" vertical-scroll-proportion="0.2620865">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wiki_editor.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/wiki_editor.js">
+          <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="edit.vm" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/edit.vm">
+      <file leaf-file-name="editwysiwyg.vm" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editwysiwyg.vm">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="12" column="29" selection-start="329" selection-end="346" vertical-scroll-proportion="0.5">
+            <state line="39" column="1" selection-start="1926" selection-end="1959" vertical-scroll-proportion="0.8854962">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="textarea_wysiwyg.vm" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/textarea_wysiwyg.vm">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="48" selection-start="592" selection-end="592" vertical-scroll-proportion="0.38235295">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Package.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="473" column="0" selection-start="17359" selection-end="17359" vertical-scroll-proportion="0.9389313">
               <folding />
             </state>
           </provider>
@@ -636,16 +658,16 @@
       <file leaf-file-name="XWiki.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/XWiki.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1320" column="66" selection-start="49921" selection-end="49921" vertical-scroll-proportion="0.5868056">
+            <state line="1795" column="21" selection-start="66995" selection-end="66995" vertical-scroll-proportion="0.45801526">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UnknownAction.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="UnknownAction.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/UnknownAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="393" selection-end="393" vertical-scroll-proportion="0.63366336">
+            <state line="19" column="0" selection-start="429" selection-end="429" vertical-scroll-proportion="0.5588235">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -653,28 +675,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="XWikiAction.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="84" column="58" selection-start="3182" selection-end="3182" vertical-scroll-proportion="1.1980197">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MyFormAuthentication.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/java/com/xpn/xwiki/test/MyFormAuthentication.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="276" column="49" selection-start="9233" selection-end="9233" vertical-scroll-proportion="0.9166667">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="SVGAction.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/SVGAction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="29" column="13" selection-start="1096" selection-end="1096" vertical-scroll-proportion="0.1980198">
+            <state line="29" column="13" selection-start="1096" selection-end="1096" vertical-scroll-proportion="0.15267175">
               <folding />
             </state>
           </provider>
@@ -683,16 +687,16 @@
       <file leaf-file-name="XWikiDocument.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2233" column="36" selection-start="79357" selection-end="79357" vertical-scroll-proportion="0.5034722">
+            <state line="2940" column="19" selection-start="107106" selection-end="107106" vertical-scroll-proportion="0.37659034">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BaseCollection.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/objects/BaseCollection.java">
+      <file leaf-file-name="Document.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/api/Document.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="125" column="37" selection-start="3921" selection-end="3921" vertical-scroll-proportion="0.33680555">
+            <state line="1286" column="29" selection-start="42620" selection-end="42620" vertical-scroll-proportion="0.28498727">
               <folding />
             </state>
           </provider>
@@ -878,21 +882,11 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki-core" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki.ipr" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemId" value="xwiki-standard" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -902,15 +896,15 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemId" value="xwiki-standard" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -920,19 +914,19 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemId" value="xwiki-standard" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp/skins" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -942,27 +936,15 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="xwiki-core" />
+          <option name="myItemId" value="xwiki-standard" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main/java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki" />
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/web/standard/src/main/webapp/skins" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -974,36 +956,12 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="xwiki-core" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main/java" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
-    <option name="STATE" value="0" />
+    <option name="STATE" value="1" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="0.5" version="1" splitterProportion="0.5">
@@ -1089,7 +1047,7 @@
     <option name="referencePos" value="0" />
   </component>
   <component name="RestoreUpdateTree">
-    <UpdateInfo date="17/12/06 22:21" ActionInfo="Inte_grate">
+    <UpdateInfo date="18/12/06 21:32" ActionInfo="_Update">
       <UpdatedFiles>
         <FILE-GROUP>
           <option name="myUpdateName" value="Updated from server" />
@@ -1103,6 +1061,12 @@
             <option name="mySupportsDeletion" value="false" />
             <option name="myCanBeAbsent" value="false" />
             <option name="myId" value="UPDATED" />
+            <PATH>$PROJECT_DIR$/core/src/main/resources/ApplicationResources_es.properties</PATH>
+            <PATH>$PROJECT_DIR$/core/src/main/resources/ApplicationResources_fr.properties</PATH>
+            <PATH>$PROJECT_DIR$/core/src/main/resources/ApplicationResources.properties</PATH>
+            <PATH>$PROJECT_DIR$/core/src/main/resources/ApplicationResources_pt.properties</PATH>
+            <PATH>$PROJECT_DIR$/core/src/main/resources/ApplicationResources_en.properties</PATH>
+            <PATH>$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/menuview.vm</PATH>
           </FILE-GROUP>
           <FILE-GROUP>
             <option name="myUpdateName" value="Created" />
@@ -1160,7 +1124,6 @@
           <option name="mySupportsDeletion" value="true" />
           <option name="myCanBeAbsent" value="false" />
           <option name="myId" value="UNKNOWN" />
-          <PATH>$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js</PATH>
         </FILE-GROUP>
         <FILE-GROUP>
           <option name="myUpdateName" value="Locally added" />
@@ -2483,15 +2446,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="58" width="1420" height="811" extended-state="0" />
-    <editor active="false" />
+    <frame x="26" y="37" width="1420" height="811" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="CVS" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3409091" order="21" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30812326" order="6" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.329927" order="0" x="-87" y="100" width="469" height="491" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22268908" order="1" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38759124" order="0" x="-87" y="100" width="469" height="491" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29691878" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22168285" order="1" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4257703" order="17" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4006462" order="5" />
@@ -2500,11 +2463,11 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="6" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27931595" order="1" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913166" order="16" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4789916" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3487395" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15110683" order="2" />
       <window_info id="Struts Assistant" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="6" />
       <window_info id="File View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="11" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.49579832" order="3" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.49579832" order="3" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40038684" order="0" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="9" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913166" order="12" />
@@ -2659,9 +2622,83 @@
     <option name="multicastPort" value="3274" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/textarea_wysiwyg.vm">
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/hibernate.cfg.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="0" selection-start="45" selection-end="45" vertical-scroll-proportion="0.030303031" />
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/objects/BaseCollection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="125" column="37" selection-start="3921" selection-end="3921" vertical-scroll-proportion="0.4092827">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/edit.vm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="29" selection-start="329" selection-end="346" vertical-scroll-proportion="0.6075949">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="58" selection-start="3182" selection-end="3182" vertical-scroll-proportion="0.9236641">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/java/com/xpn/xwiki/test/MyFormAuthentication.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="276" column="49" selection-start="9233" selection-end="9233" vertical-scroll-proportion="0.67175573">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/UnknownAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="0" selection-start="429" selection-end="429" vertical-scroll-proportion="0.5588235">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/XWiki.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1795" column="21" selection-start="66995" selection-end="66995" vertical-scroll-proportion="0.45801526">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/SVGAction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="13" selection-start="1096" selection-end="1096" vertical-scroll-proportion="0.15267175">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/api/Document.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1286" column="29" selection-start="42620" selection-end="42620" vertical-scroll-proportion="0.28498727">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2940" column="19" selection-start="107106" selection-end="107106" vertical-scroll-proportion="0.37659034">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="135" column="67" selection-start="6390" selection-end="6470" vertical-scroll-proportion="0.2620865">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/wiki_editor.js">
@@ -2671,96 +2708,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/api/Context.java">
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/editwysiwyg.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="196" column="33" selection-start="4665" selection-end="4665" vertical-scroll-proportion="0.03809524">
+        <state line="39" column="1" selection-start="1926" selection-end="1959" vertical-scroll-proportion="0.8854962">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/XWikiContext.java">
+    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/textarea_wysiwyg.vm">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="344" column="34" selection-start="8609" selection-end="8625" vertical-scroll-proportion="1.8095238">
+        <state line="13" column="48" selection-start="592" selection-end="592" vertical-scroll-proportion="0.38235295">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/objects/classes/TextAreaClass.java">
+    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/plugin/packaging/Package.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="0" selection-start="3238" selection-end="3238" vertical-scroll-proportion="0.24170616">
+        <state line="473" column="0" selection-start="17359" selection-end="17359" vertical-scroll-proportion="0.9389313">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/WEB-INF/hibernate.cfg.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/wiki_editor_2/plugins/core.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/doc/XWikiDocument.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2233" column="36" selection-start="79357" selection-end="79357" vertical-scroll-proportion="0.5034722">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/objects/BaseCollection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="125" column="37" selection-start="3921" selection-end="3921" vertical-scroll-proportion="0.33680555">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/web/standard/src/main/webapp/skins/xwiki10b1/edit.vm">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="29" selection-start="329" selection-end="346" vertical-scroll-proportion="0.5">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/SVGAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="13" selection-start="1096" selection-end="1096" vertical-scroll-proportion="0.1980198">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/XWiki.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1320" column="66" selection-start="49921" selection-end="49921" vertical-scroll-proportion="0.5868056">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/XWikiAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="58" selection-start="3182" selection-end="3182" vertical-scroll-proportion="1.1980197">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/java/com/xpn/xwiki/test/MyFormAuthentication.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="276" column="49" selection-start="9233" selection-end="9233" vertical-scroll-proportion="0.9166667">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/core/src/main/java/com/xpn/xwiki/web/UnknownAction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="393" selection-end="393" vertical-scroll-proportion="0.63366336">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

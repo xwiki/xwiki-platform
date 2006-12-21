@@ -140,7 +140,7 @@ TinyMCE_Engine.prototype = {
 		this._def("remove_linebreaks", true);
 		this._def("button_tile_map", false);
 		this._def("submit_patch", true);
-		this._def("browsers", "msie,safari,gecko,opera", true);
+		this._def("browsers", "msie, safari, gecko,opera", true);
 		this._def("dialog_type", "window");
 		this._def("accessibility_warnings", true);
 		this._def("accessibility_focus", true);
@@ -4169,7 +4169,7 @@ TinyMCE_Cleanup.prototype = {
 			s.extended_valid_elements = '';
 		}
 
-		this.fillStr = s.entity_encoding == "named" ? "&nbsp;" : "&#160;";
+		this.fillStr = s.entity_encoding == "named" ? "&nbsp;" : "&nbsp;";
 		this.idCount = 0;
 	},
 

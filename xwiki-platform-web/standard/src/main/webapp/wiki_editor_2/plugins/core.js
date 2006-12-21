@@ -50,7 +50,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
     //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
-    
+
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
     this.setHtmlTagRemover('removeSpecialHtmlTags');
     // Toolbar handlers
@@ -863,9 +863,12 @@ WikiEditor.prototype._convertListInternal = function(content) {
 		RegExp.lastIndex = result["index"];  // Reset position so it will find the same tag when replacing
 
 		var tstr = result[2];
-        if (tstr == "<br />") tstr = "&nbsp;<br />";
-        if (tstr == "") tstr = "&nbsp;";
 
+        if (tstr == "<br />") {
+            tstr = "&nbsp;<br />";
+        } else if (this.trimString(tstr) == "") {
+            tstr = "&nbsp;";
+        }
         if(attributes && attributes["wikieditorlisttype"] && attributes["wikieditorlistdepth"]) { // Must have at least 2 wikieditor attributes + the string
 
 			//tstr = this.convertBlockInternal(tstr); // Read line and convert

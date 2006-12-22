@@ -33,7 +33,7 @@
 #submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("viewcomments"))
 #submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("viewattachments"))
 #submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("viewhistory"))
-#submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("viewattributes"))
+## #submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("viewattributes"))
 #xwikitopmenuentryend()
 ##
 ## Print menu

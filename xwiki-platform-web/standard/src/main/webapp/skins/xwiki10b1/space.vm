@@ -1,10 +1,11 @@
-#macro(breadcrumb $doc $string)
+#macro(breadcrumb $doc $string $level)
 #set($parent = $doc.parent)
-#if($parent != "")
+#if(($parent != "")&&($level<5))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
 #set($nstring = "<a href='$pdocurl'>${pdoc.displayTitle}</a> &gt; $string")
-#breadcrumb($pdoc $nstring)
+#set($level = $level + 1)
+#breadcrumb($pdoc $nstring $level)
 #else
 $string
 #end
@@ -15,7 +16,7 @@ $string
 <hr/>
   <div id="breadcrumbs">
     <span class="breadcrumbspace"><a href="$spaceviewurl">$doc.web</a>: </span>
-#breadcrumb($doc "<a href='$doc.getURL('view')'>$doc.displayTitle</a>")
+#breadcrumb($doc "<a href='$doc.getURL('view')'>$doc.displayTitle</a>" 0)
   </div>
 <hr/>
 </div>

@@ -1,16 +1,8 @@
 #template("startpage.vm")
-#template("menuview.vm")
-<div class="topbuttons">#template("previewactions.vm")
-</div>
 <div class="main layoutsubsection">
+<div class="topbuttons">#template("previewactions.vm")</div>
 $tdoc.getRenderedContent($tdoc.content)
-</div>
-<div class="bottombuttons">#template("previewactions.vm")
-</div>
-</div>
-<div class="clearfloats"></div>
-##
-## Footer
-##
-</div>
+<div class="bottombuttons">#template("previewactions.vm")</div>
+## <div class="clearfloats"></div>
+</div> ## main
 #template("endpage.vm")

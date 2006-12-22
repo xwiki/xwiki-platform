@@ -7,14 +7,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent></parent>
-<creator></creator>
-<author>xwiki:XWiki.LudovicDubost</author>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>xwiki:XWiki.LudovicDubost</contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1159568426000</creationDate>
-<date>1165975469000</date>
-<contentUpdateDate>1165975469000</contentUpdateDate>
-<version>1.38</version>
+<date>1166177443000</date>
+<contentUpdateDate>1166177443000</contentUpdateDate>
+<version>1.44</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -144,14 +144,6 @@
 <number>35</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_anonymous>
-<skin>
-<name>skin</name>
-<prettyName>Skin</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>20</size>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</skin>
 <registration_registered>
 <name>registration_registered</name>
 <prettyName>Registered</prettyName>
@@ -165,15 +157,14 @@
 <number>36</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_registered>
-<renderXWikiVelocityRenderer>
-<name>renderXWikiVelocityRenderer</name>
-<prettyName>Render velocity code</prettyName>
+<skin>
+<name>skin</name>
+<prettyName>Skin</prettyName>
 <unmodifiable>0</unmodifiable>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<number>41</number>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiVelocityRenderer>
+<size>20</size>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</skin>
 <renderXWikiGroovyRenderer>
 <name>renderXWikiGroovyRenderer</name>
 <prettyName>Render Groovy code</prettyName>
@@ -183,6 +174,15 @@
 <number>42</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </renderXWikiGroovyRenderer>
+<renderXWikiVelocityRenderer>
+<name>renderXWikiVelocityRenderer</name>
+<prettyName>Render velocity code</prettyName>
+<unmodifiable>0</unmodifiable>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<number>41</number>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</renderXWikiVelocityRenderer>
 <rightPanels>
 <name>rightPanels</name>
 <prettyName>Panels displayed on the right</prettyName>
@@ -470,22 +470,6 @@
 <number>15</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </validation_email_content>
-<macros_wiki2>
-<name>macros_wiki2</name>
-<prettyName>Macros for new Wiki Parser</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<number>29</number>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_wiki2>
-<macros_languages>
-<name>macros_languages</name>
-<prettyName>Macros Languages</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<number>26</number>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_languages>
 <authenticate_edit>
 <name>authenticate_edit</name>
 <prettyName>Authenticate On Edit</prettyName>
@@ -495,6 +479,22 @@
 <number>7</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </authenticate_edit>
+<macros_languages>
+<name>macros_languages</name>
+<prettyName>Macros Languages</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>26</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_languages>
+<macros_wiki2>
+<name>macros_wiki2</name>
+<prettyName>Macros for new Wiki Parser</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<number>29</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_wiki2>
 </class>
 <name>Admin.WebPreferences</name>
 <number>0</number>
@@ -563,10 +563,10 @@
 <confirmation_email_content></confirmation_email_content>
 </property>
 <property>
-<registration_registered></registration_registered>
+<skin></skin>
 </property>
 <property>
-<skin></skin>
+<registration_registered></registration_registered>
 </property>
 <property>
 <renderXWikiVelocityRenderer></renderXWikiVelocityRenderer>
@@ -617,10 +617,10 @@
 <validation_email_content></validation_email_content>
 </property>
 <property>
-<macros_languages></macros_languages>
+<macros_wiki2></macros_wiki2>
 </property>
 <property>
-<macros_wiki2></macros_wiki2>
+<macros_languages></macros_languages>
 </property>
 <property>
 <macros_groovy></macros_groovy>

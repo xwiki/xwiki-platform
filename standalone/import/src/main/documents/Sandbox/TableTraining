@@ -7,14 +7,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Sandbox.WebHome</parent>
-<creator>XWiki.LaurentLunati</creator>
-<author>XWiki.LaurentLunati</author>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.LaurentLunati</contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165913378000</creationDate>
-<date>1165915411000</date>
-<contentUpdateDate>1165915411000</contentUpdateDate>
-<version>1.2</version>
+<date>1166177447000</date>
+<contentUpdateDate>1166177447000</contentUpdateDate>
+<version>1.6</version>
 <title>Table Training</title>
 <template></template>
 <defaultTemplate></defaultTemplate>

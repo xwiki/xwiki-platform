@@ -49,8 +49,13 @@ public class TextExtractor
         textExtractors.put ("application/pdf", new PDFTextExtractor());
 //        textExtractors.put ("application/vnd.sun.xml.writer", new OpenOfficeTextExtractor ());
         textExtractors.put ("application/msword", new MSWordTextExtractor ());
+        textExtractors.put ("application/ms-word", new MSWordTextExtractor ());
+        textExtractors.put ("application/vnd.msword", new MSWordTextExtractor ());
+        textExtractors.put ("application/vnd.ms-word", new MSWordTextExtractor ());
+        textExtractors.put ("application/vnd.ms-powerpoint", new MSPowerPointTextExtractor());
         textExtractors.put ("application/ms-powerpoint", new MSPowerPointTextExtractor());
         textExtractors.put ("application/ms-excel", new MSExcelTextExtractor());
+        textExtractors.put ("application/vnd.ms-excel", new MSExcelTextExtractor());
     }
 
     /**

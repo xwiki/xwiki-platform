@@ -11,7 +11,8 @@
 		debug : false,
 		remove_linebreaks : false,
 		plugins: 'table, contextmenu, paste, searchreplace',
-		wiki_plugins: 'core'
+		wiki_plugins: 'core, attachments, macros',
+		entity_encoding: "raw"
 	});
 </script>
 #end

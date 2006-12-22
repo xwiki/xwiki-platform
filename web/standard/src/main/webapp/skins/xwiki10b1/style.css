@@ -11,8 +11,8 @@
 /*@import "ie.css";   masque temporairement : modif spécifique IE à réintéger*/
 
 .rightmenu a {
-  font-size : 90%; /* presentation.css add font-size : 110%;  */
   margin-right : 2px;
+  font-size: 100%;
 }
 
 .expanded .xwikipaneltitle {

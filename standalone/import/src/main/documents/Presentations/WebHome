@@ -7,14 +7,14 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Main.Notes</parent>
-<creator>XWiki.LaurentLunati</creator>
-<author>xwiki:XWiki.LudovicDubost</author>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>xwiki:XWiki.LudovicDubost</contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165858848000</creationDate>
-<date>1165963103000</date>
-<contentUpdateDate>1165963103000</contentUpdateDate>
-<version>1.6</version>
+<date>1166196375000</date>
+<contentUpdateDate>1166196375000</contentUpdateDate>
+<version>1.11</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -63,14 +63,14 @@ We used a slightly modified version of the S5 model done by [Human Factor&gt;htt
 To create a new presentation, you should first choose a name for your presentation.
 
 &lt;form action="" id="newdoc"&gt;
-&lt;input type="hidden" name="parent" value="Main.Presentations"&gt;
-&lt;input type="hidden" name="template" value="XWiki.PresentationClassTemplate"&gt;
-&lt;input type="hidden" name="sheet" value="1"&gt;
-&lt;input type="hidden" name="webname" value="Presentations" size="8"&gt;
+&lt;input type="hidden" name="parent" value="Main.Presentations"/&gt;
+&lt;input type="hidden" name="template" value="XWiki.PresentationClassTemplate"/&gt;
+&lt;input type="hidden" name="sheet" value="1"/&gt;
+&lt;input type="hidden" name="webname" value="Presentations" size="8"/&gt;
 Document: &lt;input type="text" name="name" value="Name of your presentation" size="60" /&gt;
 &lt;br /&gt;
 &lt;br /&gt;
-&lt;input type="button" value="Create this presentation" onclick='if (updateName(this.form.name)) {this.form.action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }'&gt;
+&lt;input type="button" value="Create this presentation" onclick='if (updateName(this.form.name)) {this.form.action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }'/&gt;
 &lt;/form&gt;
 
 1.1 Existing Presentations

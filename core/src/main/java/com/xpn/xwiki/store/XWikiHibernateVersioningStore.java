@@ -213,7 +213,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             Session session = getSession(context);
 
             XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
-            archivedoc.resetArchive(doc.getFullName(), doc.getContent(), doc.getVersion());
+            archivedoc.resetArchive(doc.getFullName(), doc.toXML(context), doc.getVersion());
             saveXWikiDocArchive(archivedoc, bTransaction, context);
             if (bTransaction) {
                 endTransaction(context, true, false);

@@ -477,23 +477,22 @@ html > body #actionmenu{
 	margin-right: 40px;
 }
 .rightmenu a{
- float: left;
+  float: left;
   width: 200px;
-  height: 2em;
   text-align: center;
   border:1px solid; 
-border-width:0px 1px;  
-margin-right: -1px;
-font-size:1em;
-text-decoration:none; 
-height:2em; 
-line-height:1.9em;
+  border-width:0px 1px;  
+  margin-right: -1px;
+  font-size:1em;
+  text-decoration:none; 
+  height:2em;
+  line-height:1.9em;
 }
 
 .leftmenu{
-	position: absolute;
-	left: 40px;
-	}
+  position: absolute;
+  left: 42px;
+}
 .topmenuentry{
   float: left;
   width: 7em;
@@ -504,9 +503,9 @@ line-height:1.9em;
   margin-right: -1px;
 }
 .submenu{
-	display: block;
-	width: 12em;
-	text-align: left;
+  display: block;
+  width: 12em;
+  text-align: left;
   position: absolute;
   margin-top: -1px;
   margin-left: 0px;
@@ -965,6 +964,7 @@ div.pagelayoutoptions td{
 #xwikieditcontent{
   border: 2px solid #3381CC;
   padding: 3px;
+  overflow: auto;
 }
 html>body #xwikieditcontent{
   padding: 3px 8px 3px 3px;
@@ -1004,10 +1004,4 @@ html>body #xwikieditcontent{
 }
 .xwiki-form-listclass {
   margin-right: 10px;
-}
-.qqpanel{
-  margin-top: -20px !important;
-  margin-bottom: 40px !important;
-  z-index: 200;
-  position: relative;
 }

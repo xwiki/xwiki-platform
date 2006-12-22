@@ -181,7 +181,7 @@ public class RSSMacro extends BaseLocaleMacro {
         if (paramObj.isFull() && entry.getDescription() != null)
         {
             buf.append(NEWLINE).append("{quote}")
-               .append(NEWLINE).append(entry.getDescription())
+               .append(NEWLINE).append(entry.getDescription().getValue())
                .append(NEWLINE).append("{quote}");
         }
     }
@@ -214,7 +214,7 @@ public class RSSMacro extends BaseLocaleMacro {
         if (paramObj.isFull() && entry.getDescription() != null)
         {
             buf.append(NEWLINE).append("<div class='rssitemdescription'>")
-               .append(NEWLINE).append(entry.getDescription())
+               .append(NEWLINE).append(entry.getDescription().getValue())
                .append(NEWLINE).append("</div>"); // close rss.item.description
         }
         buf.append(NEWLINE).append("</div>"); // close rss.item

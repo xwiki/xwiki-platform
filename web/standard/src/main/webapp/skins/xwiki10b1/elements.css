@@ -145,7 +145,7 @@ hr {}
 iframe {}
 
 /* Section 17: Forms */
-form {}
+form { margin: 0px; }
 input {}
 input:focus {}
 button {}

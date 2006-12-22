@@ -17,14 +17,14 @@ import org.hibernate.impl.SessionImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +36,7 @@ import java.util.Map;
 public class XWikiHibernateBaseStore {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
 
-    private Map connections = new HashMap();
+    private Map connections = new ConcurrentHashMap();
     private int nbConnections = 0;
     private SessionFactory sessionFactory;
     private Configuration configuration;

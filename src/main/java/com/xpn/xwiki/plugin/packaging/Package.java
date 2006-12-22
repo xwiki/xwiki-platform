@@ -461,13 +461,18 @@ public class Package {
 
                 // We don't want date and version to change
                 // So we need to cancel the dirty status
-                // TODO check pb with version
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
 
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
+
+                if ((doc.getDoc().getDocumentArchive()==null)||(doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
+                    doc.getDoc().setVersion("1.1");     
+                    doc.getDoc().resetArchive(context);
+                }
+
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                 if (log.isErrorEnabled())

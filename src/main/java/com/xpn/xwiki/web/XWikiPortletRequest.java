@@ -203,12 +203,26 @@ public class XWikiPortletRequest implements XWikiRequest {
     * Implemented Servlet Function for Portlets
     * This will only work if the portlet implementation
     * makes PortletRequest extends HttpServletRequest
+    *
+    * Modified getHttpServletRequest to work with WebLogic Portal Implementation
     */
 
     public HttpServletRequest getHttpServletRequest() {
-        if (request instanceof HttpServletRequest)
-            return (HttpServletRequest) getPortletRequest();
-        return null;
+    	HttpServletRequest req = null;
+
+    	if (request instanceof HttpServletRequest) {
+        	req = (HttpServletRequest)getPortletRequest();
+        }
+        else {
+        	// WLP impl
+        	req = (HttpServletRequest)getPortletRequest().getAttribute("javax.servlet.request");
+        }
+
+        if (req == null) {
+        	throw new UnsupportedOperationException();
+        }
+
+        return req;
     }
 
     public String getPathInfo() {

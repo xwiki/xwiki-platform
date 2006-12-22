@@ -29,7 +29,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.plugin.charts.actions.ChartingAction;
+import com.xpn.xwiki.plugin.charts.actions.PreviewChartAction;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.octo.captcha.module.struts.image.RenderImageCaptchaAction;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -263,7 +266,7 @@ public class XWikiPortlet extends GenericPortlet {
 
             if (action.equals("edit")
                     || action.equals("inline"))
-                form = new PrepareEditForm();
+                form = new EditForm();
             else if (action.equals("preview"))
                 form = new EditForm();
 
@@ -306,9 +309,15 @@ public class XWikiPortlet extends GenericPortlet {
                 renderResult = (new LoginErrorAction()).render(context);
             } else if (action.equals("register")) {
                 renderResult = (new RegisterAction()).render(context);
+            } else if (action.equals("skin")) {
+                renderResult = (new SkinAction()).render(context);
+            } else if (action.equals("export")) {
+                renderResult = (new ExportAction()).render(context);
+            } else if (action.equals("import")) {
+                renderResult = (new ImportAction()).render(context);
             } else if (action.equals("portletConfig")) {
                 renderResult = "portletConfig";
-            }
+            } 
             if (renderResult != null) {
                 String page = Utils.getPage(request, renderResult);
                 Utils.parseTemplate(page, context);

@@ -20,8 +20,6 @@
  * @author ludovic
  * @author sdumitriu
  */
-
-
 package com.xpn.xwiki.store;
 
 import org.apache.commons.dbcp.BasicDataSource;
@@ -104,11 +102,17 @@ public class DBCPConnectionProvider implements ConnectionProvider {
             dbcpProperties.put("driverClassName", jdbcDriverClass);
             dbcpProperties.put("url", jdbcUrl);
 
-            // Username / password
+            // Username / password. Only put username and password if they're not null. This allows
+            // external authentication support (OS authenticated). It'll thus work if the hibernate
+            // config does not specify a username and/or password.
             String username = props.getProperty(Environment.USER);
+            if (username != null) {
+                dbcpProperties.put("username", username);
+            }
             String password = props.getProperty(Environment.PASS);
-            dbcpProperties.put("username", username);
-            dbcpProperties.put("password", password);
+            if (password != null) {
+                dbcpProperties.put("password", password);
+            }
 
             // Isolation level
             String isolationLevel = props.getProperty(Environment.ISOLATION);

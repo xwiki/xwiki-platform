@@ -83,7 +83,7 @@ $response.sendRedirect($redirecturl)
 #template("adminmodes.vm")
 #set($formname = "update")
 #set($saveaction = "save")
-<div class="alladmincontent" style="float: none">
+<div class="alladmincontent" style="float: none; clear: both;">
 #template("admin${editor}.vm")
 </div>
 </div> ## alleditcontent

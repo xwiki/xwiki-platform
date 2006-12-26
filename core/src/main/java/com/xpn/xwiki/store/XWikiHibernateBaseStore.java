@@ -203,7 +203,6 @@ public class XWikiHibernateBaseStore {
         updateSchema(context, false);
     }
 
-
     /**
      * Allows to update the schema to match the hibernate mapping
      * @param context
@@ -211,20 +210,19 @@ public class XWikiHibernateBaseStore {
      * @throws HibernateException
      */
     public synchronized void updateSchema(XWikiContext context, boolean force) throws HibernateException {
+
+        // We don't update the schema if the XWiki hibernate config parameter says not to update
+        if ((!force) && (context.getWiki() != null) && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
+            if (log.isDebugEnabled())
+                log.debug("Schema update deactivated for wiki " + context.getDatabase());
+            return;
+        }
+        
+        if (log.isInfoEnabled()) {
+            log.info("Updating schema update for wiki " + context.getDatabase() + " ...");
+        }
+
         try {
-            // No updating of schema if we have a config parameter saying so
-            try {
-                if ((!force)&&(context.getWiki()!=null)&&("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-                    if (log.isInfoEnabled())
-                        log.info("Schema update deactivated for wiki " + context.getDatabase());
-                    return;
-                }
-
-                if (log.isInfoEnabled())
-                    log.info("Schema update for wiki " + context.getDatabase());
-
-            } catch (Exception e) {}
-
             String fullName = ((context!=null)&&(context.getWiki()!=null)&&(context.getWiki().isMySQL())) ?  "concat('xwd_web','.','xwd_name)" : "xwd_fullname";
             String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
             String[] addSQL = {
@@ -250,9 +248,9 @@ public class XWikiHibernateBaseStore {
 
             updateSchema(sql, context);
         } finally {
-
-            if (log.isInfoEnabled())
+            if (log.isInfoEnabled()) {
                 log.info("Schema update for wiki " + context.getDatabase() + " done");
+            }
         }
     }
 

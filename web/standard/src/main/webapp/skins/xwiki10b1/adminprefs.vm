@@ -59,7 +59,6 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 ##
 #set($formname = "update")
 #set($saveaction = "save")
-<div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
 #set ($classname = "XWiki.XWikiPreferences")

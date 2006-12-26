@@ -20,7 +20,6 @@
 #template("docextra.vm")
 <div class="clearfloats"></div>
 #else
-## #template("viewmodes.vm")
 <div class="main layoutsubsection">
 #template("${viewer}.vm")
 <div class="clearfloats">

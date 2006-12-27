@@ -23,9 +23,6 @@ WikiEditor.prototype.initCorePlugin = function() {
     // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
-    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
-    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
-
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
 
@@ -49,10 +46,13 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
-    //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
+    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
+    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
 
+    //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
     this.setHtmlTagRemover('removeSpecialHtmlTags');
+
     // Toolbar handlers
 	this.addToolbarHandler('handleTextButtons');
 	this.addToolbarHandler('handleListButtons');
@@ -722,8 +722,8 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 	var _content = content;
 	RegExp.lastIndex = 0;
 	while( (r = regexp.exec(_content)) && r["index"] == 0) {
-		str += "<li>" + this.trimString(r[3]) + "<\/li>\r\n";
-		//alert("d: " + r[0]);
+        str += "<li>" + this.trimString(r[3]) + "<\/li>\r\n";
+		alert("r[0]: " + r[0] + "===== r[3]:" + r[3]);
 		_content = _content.substring(r[0].length, _content.length);
 		RegExp.lastIndex = 0;
 	}
@@ -938,6 +938,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
 
 
 WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
+    content = content.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
+    content = content.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
+    content = content.replace(/<span class="(bold|italic|strike)">([\s\S]+?)<\/span>/g,'$2');
     var type = result[1];
     var str = "";
     if (type == "span" || type =="div") {

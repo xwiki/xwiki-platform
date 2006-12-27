@@ -385,6 +385,8 @@
       <artifactId>lucene-core</artifactId>
       <version>2.0.0</version>
     </dependency>
+    <!-- Note: The POI POM seems invalid and generates warnings in the console. An issue has been raised:
+         http://jira.codehaus.org/browse/MEV-479 -->
     <dependency>
       <groupId>poi</groupId>
       <artifactId>poi</artifactId>

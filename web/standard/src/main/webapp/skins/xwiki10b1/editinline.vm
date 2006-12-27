@@ -19,16 +19,16 @@ $msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 </div>
 #else
 <div class="topbuttons">#template("editactions.vm")</div>
+<div class="clear">
 #foreach($class in $doc.xWikiClasses)
 #set( $nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />
 #end
-</div>
-##<div id="xwikicontent">
 $cdoc.getRenderedContent()
-##</div>
+</div>  ## clear
 <div class="bottombuttons">#template("editactions.vm")</div>
 #end
+</div> ## form
 </form>
 #template("textarea_wysiwyg.vm")
 </div>

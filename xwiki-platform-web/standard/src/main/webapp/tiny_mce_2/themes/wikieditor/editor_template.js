@@ -82,9 +82,13 @@ var TinyMCE_WikieditorTheme = {
                 var template = new Array();
 				template['file'] = 'link.htm';
 				template['width'] = 600;
-				template['height'] = 500;
+				if (tinyMCE.isMSIE) {
+                    template['height'] = 550;
+                } else {
+                    template['height'] = 530;
+                }
 
-				// Language specific width and height addons
+                // Language specific width and height addons
 				template['width'] += tinyMCE.getLang('lang_insert_link_delta_width', 0);
 				template['height'] += tinyMCE.getLang('lang_insert_link_delta_height', 0);
 

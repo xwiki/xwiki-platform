@@ -46,8 +46,8 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
-    this.addExternalProcessor((/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
-    this.addInternalProcessor((/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
+    this.addExternalProcessorBefore('convertTableExternal', (/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
+    this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
 
     //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
     this.setHtmlTagRemover('removeHtmlTags_Groovy');

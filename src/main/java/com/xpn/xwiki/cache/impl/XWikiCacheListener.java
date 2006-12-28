@@ -76,12 +76,12 @@ public class XWikiCacheListener implements CacheEntryEventListener
                     doc.setLanguage(parts[3]);
                 case 3:
                     doc.setDatabase(parts[0]);
-                    doc.setWeb(parts[1]);
+                    doc.setSpace(parts[1]);
                     doc.setName(parts[2]);
                     doc = xwiki.getStore().loadXWikiDoc(doc, context);
                     break;
                 case 2:
-                    doc.setWeb(parts[0]);
+                    doc.setSpace(parts[0]);
                     doc.setName(parts[1]);
                     doc = xwiki.getStore().loadXWikiDoc(doc, context);
                     break;

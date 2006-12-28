@@ -796,7 +796,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiDocument newdoc;
         try {
             if ((revision == null) || revision.equals("")) {
-                newdoc = new XWikiDocument(doc.getWeb(), doc.getName());
+                newdoc = new XWikiDocument(doc.getSpace(), doc.getName());
             } else if (revision.equals(doc.getVersion())) {
                 newdoc = doc;
             } else {
@@ -804,7 +804,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         } catch (XWikiException e) {
             if (revision.equals("1.1") || revision.equals("1.0"))
-                newdoc = new XWikiDocument(doc.getWeb(), doc.getName());
+                newdoc = new XWikiDocument(doc.getSpace(), doc.getName());
             else {
                 throw e;
             }
@@ -1064,7 +1064,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return null;
     }
 
-
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
      * templates; works by creating a RequestDispatcher, buffering the output,
@@ -1145,7 +1144,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (object != null) {
                     String content = object.getStringValue(filename);
                     if ((content != null) && (!content.equals(""))) {
-                        URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), doc.getDatabase(), context);
+                        URL url = urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc.getDatabase(), context);
                         return urlf.getURL(url, context);
 
                     }
@@ -1158,7 +1157,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 attachment = doc.getAttachment(shortname);
 
                 if (attachment != null) {
-                    URL url = urlf.createSkinURL(filename, doc.getWeb(), doc.getName(), doc.getDatabase(), context);
+                    URL url = urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc.getDatabase(), context);
                     return urlf.getURL(url, context);
                 }
             }
@@ -1291,7 +1290,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getWebPreference(String prefname, String default_value, XWikiContext context) {
         XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
-        return getWebPreference(prefname, (currentdoc==null) ? null : currentdoc.getWeb(), default_value, context);
+        return getWebPreference(prefname, (currentdoc==null) ? null : currentdoc.getSpace(), default_value, context);
     }
 
     public String getWebPreference(String prefname, String space, String default_value, XWikiContext context) {
@@ -1971,7 +1970,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc = getDocument("XWiki.XWikiGroups", context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            doc.setWeb("XWiki");
+            doc.setSpace("XWiki");
             doc.setName("XWikiGroups");
         }
         BaseClass bclass = doc.getxWikiClass();
@@ -2000,7 +1999,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc = getDocument("XWiki." + pagename, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            doc.setWeb("XWiki");
+            doc.setSpace("XWiki");
             doc.setName(pagename);
         }
         BaseClass bclass = doc.getxWikiClass();
@@ -2520,9 +2519,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             gcurrenttdoc = (Document) gcontext.get("tdoc");
         }
 
-
         try {
-
             XWikiDocument doc = null;
             try {
                 log.debug("Including Topic " + topic);
@@ -2552,7 +2549,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 } catch (Exception e) {
                 }
 
-                doc = getDocument(((XWikiDocument) context.get("doc")).getWeb(), topic, context);
+                doc = getDocument(((XWikiDocument) context.get("doc")).getSpace(), topic, context);
 
                 if (checkAccess("view", doc, context) == false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -2618,7 +2615,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void deleteDocument(XWikiDocument doc, XWikiContext context) throws XWikiException {
         getStore().deleteXWikiDoc(doc, context);
-        getNotificationManager().verify(doc, new XWikiDocument(doc.getWeb(), doc.getName()), XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        getNotificationManager().verify(doc, new XWikiDocument(doc.getSpace(), doc.getName()), XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
     public String getDatabase() {
@@ -3052,7 +3049,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullname, context);
 
-        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), action, null, null, doc.getDatabase(), context);
+        URL url = context.getURLFactory().createURL(doc.getSpace(), doc.getName(), action, null, null, doc.getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -3060,7 +3057,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullname, context);
 
-        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(),
+        URL url = context.getURLFactory().createURL(doc.getSpace(), doc.getName(),
                 action, querystring, null, doc.getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }

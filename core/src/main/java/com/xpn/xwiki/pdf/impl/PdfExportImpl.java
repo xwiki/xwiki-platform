@@ -182,7 +182,7 @@ public class PdfExportImpl implements PdfExport {
     }
 
     public static void main(String[] argv) throws IOException, XWikiException {
-        String param = (String) argv[0];
+        String param = argv[0];
         String inputfile;
         String outputfile;
         String content;
@@ -190,29 +190,29 @@ public class PdfExportImpl implements PdfExport {
 
         if (param.equals("-html2xhtml")) {
             // HTML TO XHTML
-            inputfile = (String) argv[1];
-            outputfile = (String) argv[2];
+            inputfile = argv[1];
+            outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
             byte[] xhtml = pdf.convertToStrictXHtml(content.getBytes());
             saveFile(outputfile, xhtml);
         } else if (param.equals("-html2xmlfo")) {
-            inputfile = (String) argv[1];
-            outputfile = (String) argv[2];
+            inputfile = argv[1];
+            outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
             // XHTML TO XMLFO
             byte[] xhtml = pdf.convertXHtmlToXMLFO(pdf.convertToStrictXHtml(content.getBytes()));
             saveFile(outputfile, xhtml);
         } else if (param.equals("-xmlfo2pdf")) {
-            inputfile = (String) argv[1];
-            outputfile = (String) argv[2];
+            inputfile = argv[1];
+            outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
             // XML-FO2 PDF
             FileOutputStream fos = new FileOutputStream(new File(outputfile));
             pdf.exportXMLFO(content.getBytes(), fos,PdfExportImpl.PDF);
             fos.close();
         } else if (param.equals("-html2pdf")) {
-            inputfile = (String) argv[1];
-            outputfile = (String) argv[2];
+            inputfile = argv[1];
+            outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
             // PDF
             FileOutputStream fos = new FileOutputStream(new File(outputfile));
@@ -220,7 +220,7 @@ public class PdfExportImpl implements PdfExport {
             fos.close();
         } else {
             inputfile = param;
-            outputfile = (String) argv[1];
+            outputfile = argv[1];
             content = Util.getFileContent(new File(inputfile));
             // PDF
                 FileOutputStream fos = new FileOutputStream(new File(outputfile));

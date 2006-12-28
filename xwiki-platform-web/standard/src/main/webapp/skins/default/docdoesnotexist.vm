@@ -1,3 +1,4 @@
+$response.setStatus(404)
 #template("xwiki.vm")
 #template("httpheader.vm")
 #template("header.vm")

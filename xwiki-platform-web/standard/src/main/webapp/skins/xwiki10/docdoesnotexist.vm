@@ -2,6 +2,7 @@
 ### Document does not exist messge
 ###
 ###
+$response.setStatus(404)
 #template("startpage.vm")
 <div class="main layoutsubsection">
 #if($xwiki.exists("XWiki.DocumentDoesNotExist"))

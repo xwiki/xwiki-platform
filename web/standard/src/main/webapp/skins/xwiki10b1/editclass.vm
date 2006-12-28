@@ -14,7 +14,7 @@ $response.sendRedirect($doc.getURL("admin", "editor=class"))
 <div id="field_${field.name}_content" class="accordionTabContentBox"><div>
 <dl>
 #foreach ($classprop in $field.xWikiClass.propertyNames)
-<dt><td class="label"><label for="${field.name}_$classprop">$field.xWikiClass.get("$classprop").getPrettyName():</label></dt>
+<dt><label for="${field.name}_$classprop">$field.xWikiClass.get("$classprop").getPrettyName():</label></dt>
 <dd>$doc.displayEdit($field.xWikiClass.get("$classprop"), "${field.name}_" , $field)</dd>
 #end
 </dl>

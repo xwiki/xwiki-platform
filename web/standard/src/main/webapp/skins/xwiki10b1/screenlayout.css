@@ -765,7 +765,7 @@ Misc
   padding: 0px 4px;
 }
 .accordionTabContentBox div{
-  padding: 8px;
+  padding: 0px;
 }
 td.label{
   text-align: right;

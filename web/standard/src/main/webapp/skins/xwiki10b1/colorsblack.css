@@ -608,11 +608,7 @@ input:focus, textarea:focus {
   background-image: url("black-textareabg1.png");
 }
 
-label {
-  display: block;
-}
 form label {
-  display: block;
   padding: 0px;
 }
 
@@ -622,7 +618,7 @@ form input {
 }
 
 input[type=checkbox], input[type=radio]{
-  float: left;
+  /*float: left;*/
   margin-right: 0.75em;
 }
 

@@ -5,6 +5,9 @@
 #else
 <link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" title="default" />
 #end
+#if($printss)
+<link href="$xwiki.getSkinFile("print.css")" rel="stylesheet" type="text/css"/>
+#end
 #if ($stylesheets != "")
 #set( $stylenb = 1)
 #foreach ( $stylesheet in $xwiki.split($stylesheets, ","))

@@ -2,6 +2,7 @@
 #template("layoutvars.vm")
 #set($showLeftPanels = "0")
 #set($showRightPanels = "0")
+#set($printss = true)
 #template("htmlheader.vm")
 <div id="printheader" class="layoutsection">
   <div id="companylogo">

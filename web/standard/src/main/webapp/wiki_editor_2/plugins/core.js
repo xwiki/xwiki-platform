@@ -14,7 +14,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
 
-    this.addExternalProcessor((/^\s*((\*+)|#)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*((\*+)|#|(1\.))\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
 
 	this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
@@ -701,19 +701,23 @@ WikiEditor.prototype._hasHTML = function(str) {
 
 WikiEditor.prototype.LIST_NORMAL_CLASS_NAME = "star";
 WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME = "";
+WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME_1 = "norder";
 
 WikiEditor.prototype.convertListExternal = function(regexp, result, content) {
 	var subContent = content.substring(result["index"], content.length);
 	var str = "";
-	switch (result[1].charAt(0)) {
+    switch (result[1].charAt(0)) {
 		case '*':
 			str = this._convertRecursiveListExternal(regexp, subContent, 0);
 			break;
 		case '#':
-			str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME);
+            str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME);
 			break;
-	}
-	return content.substring(0, result["index"]) + "\r\n" + str;
+        case '1':
+            str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME_1);
+            break;
+    }
+    return content.substring(0, result["index"]) + "\r\n" + str;
 }
 
 WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tagname, classname) {
@@ -721,9 +725,8 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 	var r;
 	var _content = content;
 	RegExp.lastIndex = 0;
-	while( (r = regexp.exec(_content)) && r["index"] == 0) {
-        str += "<li>" + this.trimString(r[3]) + "<\/li>\r\n";
-		alert("r[0]: " + r[0] + "===== r[3]:" + r[3]);
+    while( (r = regexp.exec(_content)) && r["index"] == 0) {
+        str += "<li>" + this.trimString(r[4]) + "<\/li>\r\n";
 		_content = _content.substring(r[0].length, _content.length);
 		RegExp.lastIndex = 0;
 	}
@@ -747,7 +750,7 @@ WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, d
 	}
 
 	if(currdepth > 0) {
-		str += "<li>" + this.trimString(r[3]) + "<\/li>\r\n";
+		str += "<li>" + this.trimString(r[4]) + "<\/li>\r\n";
 		str += this._convertRecursiveListExternal(regexp, subContent, currdepth);
 	} else {
 		str += content;
@@ -840,9 +843,14 @@ WikiEditor.prototype.convertHeadingExternal = function(regexp, result, content) 
 
 WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
     var bounds = this.replaceMatchingTag(content, result[1], null);
-	var str = "";
+    var lclass = "";
+    var attributes = this.readAttributes(result[2]);
+    if (attributes && attributes["class"]) {
+        lclass = attributes["class"];
+    }
+    var str = "";
 	if(bounds && bounds["start"] > -1) {
-		str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]));
+        str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]), lclass);
         return content.substring(0, bounds["start"]) + "\r\n" + str + content.substring(bounds["end"], content.length);
 	}
     return content;
@@ -853,7 +861,7 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 
 	TODO: can be optimized with String.match() function
 */
-WikiEditor.prototype._convertListInternal = function(content) {
+WikiEditor.prototype._convertListInternal = function(content, lclass) {
 	var list_regexp = /<\s*li\s*([^>]*)>(.*?)<\/\s*li\s*>/gi;
 	var result;
 	var str = "";
@@ -882,8 +890,12 @@ WikiEditor.prototype._convertListInternal = function(content) {
 					break;
 				case 'ol':
 					// Numeric list
-					str += "# " + tstr + "\r\n";
-					break;
+                    if ((lclass != null) && (lclass == "norder")) {
+                        str += "1. " + tstr + "\r\n";
+                    } else {
+                        str += "# " + tstr + "\r\n";
+                    }
+                    break;
 			}
 		} else {
 			// This construct is not valid, get rid of it.

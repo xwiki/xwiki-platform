@@ -4,6 +4,7 @@
 #if((!$showactions)||($showactions==1))
 <script type="text/javascript">
 function checkDocumentContent() {
+// <![CDATA[
   if ((document.forms.${formname}.content)&&(wikiEditor!=null)&&(wikiEditor.getContent()=="")) {
     var content = document.forms.${formname}.content.value;
     if (content == null || content == "") {
@@ -13,6 +14,7 @@ function checkDocumentContent() {
   }
   return true;
 }
+// ]]>
 </script>
 #set($param = "")
 #if ($sectionNumber != 0)

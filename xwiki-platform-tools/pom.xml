@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-packager</artifactId>
-  <name>XWiki Packager Tool</name>
+  <name>XWiki Tool - Packager</name>
   <packaging>maven-plugin</packaging>
   <description>
     A packager tool to import/export XWiki pages into/from a database. This tool can be used either as a Maven2 plugin

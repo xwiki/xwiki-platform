@@ -167,13 +167,16 @@
 #macro(displaypanel $name)
 #set($obj = "")
 #set($paneldoc = $xwiki.getDocument($name))
+#if($paneldoc.fullName==$name)
 #set($obj = $paneldoc.getObject("Panels.PanelClass"))
-#if($obj == "")
+#if(!$obj)
 ## discarded
 #else
 $paneldoc.display("content", "view", $obj)
 #end
 #end
+#end
+
 #macro(displayPropName $prop)
 #if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
 $prop.prettyName#else

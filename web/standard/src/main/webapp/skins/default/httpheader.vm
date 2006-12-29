@@ -19,7 +19,7 @@ $!xwiki.getWebPreference("meta")
 <script type="text/javascript" src="$xwiki.getSkinFile("prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
-</head>
+#template("analytics.vm")
 #if(($context.action=="inline")||($context.action=="edit"))
 <script type="text/javascript">
  var cancelEditNextOnunload;
@@ -72,8 +72,10 @@ $!xwiki.getWebPreference("meta")
      cancelCancelEditFlag = false;
  }
 </script>
+</head>
 <body onUnload="cancelEdit()" onLoad="prepareCancelEdit()">
 #else
+</head>
 <body>
 #end
 #else

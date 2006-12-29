@@ -28,7 +28,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web-exo</artifactId>
-  <name>XWiki Web Exo</name>
+  <name>XWiki Web - Exo</name>
   <packaging>war</packaging>
   <description>The Exoplatform XWiki WAR</description>
   <scm>

@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-plugin-adwords</artifactId>
   <version>0.1-SNAPSHOT</version>
-  <name>XWiki Adwords Plugin</name>
+  <name>XWiki Plugins - Adwords</name>
   <packaging>jar</packaging>
   <description>XWiki Adwords Plugin</description>
   <dependencies>

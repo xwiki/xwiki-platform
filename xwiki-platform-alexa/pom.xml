@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-plugin-alexa</artifactId>
   <version>0.1-SNAPSHOT</version>
-  <name>XWiki Alexa Plugin</name>
+  <name>XWiki Plugins - Alexa</name>
   <packaging>jar</packaging>
   <description>XWiki Alexa Plugin</description>
   <dependencies>

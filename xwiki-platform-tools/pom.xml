@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-build-verifications</artifactId>
-  <name>XWiki Build Tools - Shared Verification Resources</name>
+  <name>XWiki Tools - Build - Shared Verification Resources</name>
   <packaging>jar</packaging>
   <description>XWiki Build Tools - Shared Verification Resources (Checkstyle files, etc)</description>
   <scm>

@@ -566,11 +566,32 @@ public class XWiki extends Api {
      * This function will find the right preference object associated to the current active language
      * If no preference is found it will look in the XWiki Preferences
      * @param prefname Preference name
-     * @param default_value  default value to return if the prefenrece does not exist or is empty
+     * @param default_value  default value to return if the preference does not exist or is empty
      * @return The preference for this wiki and the current language
      */
     public String getWebPreference(String prefname, String default_value) {
         return xwiki.getWebPreference(prefname, default_value, context);
+    }
+
+    /**
+     * API to access a Skin Preference
+     * The skin object is the current user's skin
+     * @param prefname Preference name
+     * @return The preference for the current skin
+     */
+    public String getSkinPreference(String prefname) {
+        return xwiki.getSkinPreference(prefname, context);
+    }
+
+    /**
+     * API to access a Skin Preference
+     * The skin object is the current user's skin
+     * @param prefname Preference name
+     * @param default_value  default value to return if the preference does not exist or is empty
+     * @return The preference for the current skin
+     */
+    public String getSkinPreference(String prefname, String default_value) {
+        return xwiki.getSkinPreference(prefname, default_value, context);
     }
 
     /**

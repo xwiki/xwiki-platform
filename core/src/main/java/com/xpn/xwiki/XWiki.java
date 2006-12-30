@@ -310,7 +310,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 host = requestURL.getHost();
             } catch (Exception e) {
             }
-            ;
 
             if (host.equals(""))
                 return xwiki;
@@ -1167,7 +1166,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return null;
     }
 
-
     public String getSkin(XWikiContext context) {
         String skin = "";
         try {
@@ -1203,6 +1201,37 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return skin;
     }
 
+    public String getSkinPreference(String prefname, XWikiContext context) {
+        return getSkinPreference(prefname, "", context);
+    }
+
+    public String getSkinPreference(String prefname, String default_value, XWikiContext context) {
+        try {
+            String skin = getSkin(context);
+            String oldskin = skin;
+            String value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
+            if (value == null || "".equals(value)) {
+                skin = getBaseSkin(context);
+                if (!oldskin.equals(skin)) {
+                    value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
+                    oldskin = skin;
+                }
+            }
+            if (value == null || "".equals(value)) {
+                skin = getDefaultBaseSkin(context);
+                if (!oldskin.equals(skin)) {
+                    value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
+                }
+            }
+            if (value == null || "".equals(value)) {
+                value = default_value;
+            }
+            return value;
+        } catch (XWikiException ex) {
+            log.warn("", ex);
+        }
+        return default_value;
+    }
 
     public String getDefaultBaseSkin(XWikiContext context) {
         String defaultbaseskin = Param("xwiki.defaultbaseskin", "");

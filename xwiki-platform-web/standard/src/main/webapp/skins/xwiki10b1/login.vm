@@ -4,6 +4,13 @@ $response.sendRedirect($request.xredirect)
 #else
 $response.sendRedirect($xwiki.getURL("Main.WebHome"))
 #end
+#elseif($doc.fullName != "XWiki.XWikiLogin")
+#set($qs = "")
+#set($qs = $request.queryString)
+#if(!$request.getParameter("xredirect"))
+#set($qs = "xredirect=$doc.getURL('view')&${qs}")
+#end
+$response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #else
 ###
 ### Login page
@@ -12,7 +19,7 @@ $response.sendRedirect($xwiki.getURL("Main.WebHome"))
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <form id="loginForm" action="$doc.getURL("loginsubmit")" method="post">
-<div class="hidden"><input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" /></div>
+<div class="hidden"><input type="hidden" name="xredirect" value="$!request.xredirect" /></div>
 #xwikimessageboxstart($msg.get("login") "")
 #set($message = $msg.get($xwiki.parseMessage()))
 #if($message)

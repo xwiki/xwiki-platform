@@ -375,7 +375,7 @@ public class XWiki extends Api {
     private List wrapDocs(List docs) {
         List result = new ArrayList();
         if (docs != null) {
-            for (Iterator iter = result.iterator(); iter.hasNext();) {
+            for (Iterator iter = docs.iterator(); iter.hasNext(); ) {
                 XWikiDocument doc = (XWikiDocument) iter.next();
                 Document wrappedDoc = doc.newDocument(context);
                 result.add(wrappedDoc);

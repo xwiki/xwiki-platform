@@ -125,7 +125,7 @@ public class XWikiDocument {
 
     public static final int HAS_ATTACHMENTS = 1;
     public static final int HAS_OBJECTS = 2;
-    private static final int HAS_CLASS = 4;
+    public static final int HAS_CLASS = 4;
 
     private int elements = HAS_OBJECTS | HAS_ATTACHMENTS;
 
@@ -540,27 +540,27 @@ public class XWikiDocument {
     }
 
     public String getAttachmentURL(String filename, String action, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, null, getDatabase(), context);
+        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentURL(filename, getWeb(), getName(), action, querystring, getDatabase(), context);
+        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, null, getDatabase(), context);
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getWeb(), getName(), revision, querystring, getDatabase(), context);
+        URL url = context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, querystring, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getURL(String action, boolean redirect, XWikiContext context) {
-        URL url = context.getURLFactory().createURL(getWeb(), getName(), action, null, null, getDatabase(), context);
+        URL url = context.getURLFactory().createURL(getSpace(), getName(), action, null, null, getDatabase(), context);
         if (redirect) {
             if (url == null)
                 return null;
@@ -575,19 +575,19 @@ public class XWikiDocument {
     }
 
     public String getURL(String action, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createURL(getWeb(), getName(), action,
+        URL url = context.getURLFactory().createURL(getSpace(), getName(), action,
                 querystring, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalURL(String action, XWikiContext context) {
-        URL url = context.getURLFactory().createExternalURL(getWeb(), getName(), action,
+        URL url = context.getURLFactory().createExternalURL(getSpace(), getName(), action,
                 null, null, getDatabase(), context);
         return url.toString();
     }
 
     public String getExternalURL(String action, String querystring, XWikiContext context) {
-        URL url = context.getURLFactory().createExternalURL(getWeb(), getName(), action,
+        URL url = context.getURLFactory().createExternalURL(getSpace(), getName(), action,
                 querystring, null, getDatabase(), context);
         return url.toString();
     }
@@ -596,7 +596,7 @@ public class XWikiDocument {
     public String getParentURL(XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(getParent(), context);
-        URL url = context.getURLFactory().createURL(doc.getWeb(), doc.getName(), "view", null, null, getDatabase(), context);
+        URL url = context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -902,7 +902,7 @@ public class XWikiDocument {
                     bobj.setNumber(objects.size() - 1);
                 }
             } else {
-                Vector tobjects = (Vector) templatedoc.getObjects(name);
+                Vector tobjects = templatedoc.getObjects(name);
                 objects = new Vector();
                 for (int i = 0; i < tobjects.size(); i++) {
                     BaseObject bobj1 = (BaseObject) tobjects.get(i);
@@ -922,7 +922,7 @@ public class XWikiDocument {
         Iterator itobjects = templatedoc.getxWikiObjects().keySet().iterator();
         while (itobjects.hasNext()) {
             String name = (String) itobjects.next();
-            Vector tobjects = (Vector) templatedoc.getObjects(name);
+            Vector tobjects = templatedoc.getObjects(name);
             Vector objects = new Vector();
             objects.setSize(tobjects.size());
             for (int i = 0; i < tobjects.size(); i++) {
@@ -1069,7 +1069,6 @@ public class XWikiDocument {
         }
         catch (Exception e) {
         }
-        ;
         if (type == null)
             type = "view";
         return display(fieldname, type, obj, context);
@@ -1128,7 +1127,6 @@ public class XWikiDocument {
             return "";
 
         StringBuffer result = new StringBuffer();
-        XWikiVelocityRenderer renderer = new XWikiVelocityRenderer();
         VelocityContext vcontext = new VelocityContext();
         vcontext.put("formatter", new VelocityFormatter(vcontext));
         for (Iterator it = fields.iterator(); it.hasNext();) {
@@ -1409,46 +1407,46 @@ public class XWikiDocument {
         XWikiDocument doc = null;
         try {
             doc = (XWikiDocument) getClass().newInstance();
+
+            doc.setDatabase(getDatabase());
+            doc.setRCSVersion(getRCSVersion());
+            doc.setDocumentArchive(getDocumentArchive());
+            doc.setAuthor(getAuthor());
+            doc.setContentAuthor(getContentAuthor());
+            doc.setContent(getContent());
+            doc.setContentDirty(isContentDirty());
+            doc.setCreationDate(getCreationDate());
+            doc.setDate(getDate());
+            doc.setCustomClass(getCustomClass());
+            doc.setContentUpdateDate(getContentUpdateDate());
+            doc.setTitle(getTitle());
+            doc.setFormat(getFormat());
+            doc.setFromCache(isFromCache());
+            doc.setElements(getElements());
+            doc.setId(getId());
+            doc.setMeta(getMeta());
+            doc.setMetaDataDirty(isMetaDataDirty());
+            doc.setMostRecent(isMostRecent());
+            doc.setName(getName());
+            doc.setNew(isNew());
+            doc.setStore(getStore());
+            doc.setTemplate(getTemplate());
+            doc.setWeb(getWeb());
+            doc.setParent(getParent());
+            doc.setCreator(getCreator());
+            doc.setDefaultLanguage(getDefaultLanguage());
+            doc.setDefaultTemplate(getDefaultTemplate());
+            doc.setValidationScript(getValidationScript());
+            doc.setLanguage(getLanguage());
+            doc.setTranslation(getTranslation());
+            doc.setxWikiClass((BaseClass) getxWikiClass().clone());
+            doc.setxWikiClassXML(getxWikiClassXML());
+            doc.clonexWikiObjects(this);
+            doc.copyAttachments(this);
+            doc.elements = elements;
         } catch (Exception e) {
             // This should not happen
         }
-
-        doc.setDatabase(getDatabase());
-        doc.setRCSVersion(getRCSVersion());
-        doc.setDocumentArchive(getDocumentArchive());
-        doc.setAuthor(getAuthor());
-        doc.setContentAuthor(getContentAuthor());
-        doc.setContent(getContent());
-        doc.setContentDirty(isContentDirty());
-        doc.setCreationDate(getCreationDate());
-        doc.setDate(getDate());
-        doc.setCustomClass(getCustomClass());
-        doc.setContentUpdateDate(getContentUpdateDate());
-        doc.setTitle(getTitle());
-        doc.setFormat(getFormat());
-        doc.setFromCache(isFromCache());
-        doc.setElements(getElements());
-        doc.setId(getId());
-        doc.setMeta(getMeta());
-        doc.setMetaDataDirty(isMetaDataDirty());
-        doc.setMostRecent(isMostRecent());
-        doc.setName(getName());
-        doc.setNew(isNew());
-        doc.setStore(getStore());
-        doc.setTemplate(getTemplate());
-        doc.setWeb(getWeb());
-        doc.setParent(getParent());
-        doc.setCreator(getCreator());
-        doc.setDefaultLanguage(getDefaultLanguage());
-        doc.setDefaultTemplate(getDefaultTemplate());
-        doc.setValidationScript(getValidationScript());
-        doc.setLanguage(getLanguage());
-        doc.setTranslation(getTranslation());
-        doc.setxWikiClass((BaseClass) getxWikiClass().clone());
-        doc.setxWikiClassXML(getxWikiClassXML());
-        doc.clonexWikiObjects(this);
-        doc.copyAttachments(this);
-        doc.elements = elements;
         return doc;
     }
 

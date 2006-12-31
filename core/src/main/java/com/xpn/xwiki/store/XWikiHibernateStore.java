@@ -330,7 +330,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
         //To change body of implemented methods use Options | File Templates.
-        BufferedReader fr = null;
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -1704,8 +1703,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction = false;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
+            if(selectColumns == null) {
+                selectColumns = "";
+            }
+            else {
+                selectColumns = selectColumns.trim();
+            }
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
-            if (!selectColumns.trim().equals("")) {
+            if (!selectColumns.equals("")) {
                 sql.append(",");
                 sql.append(selectColumns);
             }
@@ -1724,7 +1729,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             sql.append(" from XWikiDocument as doc");
 
-            wheresql.trim();
+            wheresql = wheresql.trim();
             if (!wheresql.equals("")) {
                 if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
                     sql.append(" where ");
@@ -1773,12 +1778,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
+    public List searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
             StringBuffer sql;
-            if (distinctbyname)
+            if (distinctbylanguage)
                 sql = new StringBuffer("select distinct doc.web, doc.name, doc.language from XWikiDocument as doc");
             else
                 sql = new StringBuffer("select distinct doc.web, doc.name from XWikiDocument as doc");
@@ -1825,9 +1830,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
 
                 String name = doc.getFullName();
-                if (distinctbyname) {
-                    list.add(context.getWiki().getDocument(name, context));
-                } else {
+                if (distinctbylanguage) {
                     String language = (String) result[2];
                     if ((language==null)||(language.equals("")))
                         list.add(context.getWiki().getDocument(name, context));
@@ -1835,6 +1838,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         XWikiDocument doc2 = context.getWiki().getDocument(name, context);
                         list.add(doc2.getTranslatedDocument(language, context));
                     }
+                } else {
+                    list.add(context.getWiki().getDocument(name, context));
                 }
             }
             if (bTransaction)

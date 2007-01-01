@@ -39,7 +39,6 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import org.suigeneris.jrcs.diff.Chunk;
 
 import java.awt.image.BufferedImage;
@@ -369,16 +368,28 @@ public class XWiki extends Api {
 
     /**
      * Function to wrap a list of XWikiDocument into Document objects
+     * 
      * @param docs list of XWikiDocument
      * @return list of Document objects
      */
-    private List wrapDocs(List docs) {
+    public List wrapDocs(List docs) {
         List result = new ArrayList();
         if (docs != null) {
-            for (Iterator iter = docs.iterator(); iter.hasNext(); ) {
-                XWikiDocument doc = (XWikiDocument) iter.next();
-                Document wrappedDoc = doc.newDocument(context);
-                result.add(wrappedDoc);
+            for (Iterator iter = docs.iterator(); iter.hasNext();) {
+                Object obj = iter.next();
+                try {
+                    if (obj instanceof XWikiDocument) {
+                        XWikiDocument doc = (XWikiDocument) obj;
+                        Document wrappedDoc = doc.newDocument(context);
+                        result.add(wrappedDoc);
+                    } else if (obj instanceof Document) {
+                        result.add(obj);
+                    } else if (obj instanceof String) {
+                        Document doc = getDocument(obj.toString());
+                        result.add(doc);
+                    }
+                } catch (XWikiException ex) {
+                }
             }
         }
         return result;
@@ -386,6 +397,7 @@ public class XWiki extends Api {
 
     /**
      * API allowing to parse a text content to evaluate velocity scripts
+     * 
      * @param content
      * @return evaluated content if the content contains velocity scripts
      */
@@ -934,7 +946,7 @@ public class XWiki extends Api {
      */
     public void addToAllGroup(String fullwikiname) throws XWikiException {
         if (checkProgrammingRights())
-            xwiki.SetUserDefaultGroup(context, fullwikiname);
+            xwiki.setUserDefaultGroup(fullwikiname, context);
     }
 
     /**
@@ -1113,8 +1125,8 @@ public class XWiki extends Api {
      */
     public String includeTopic(String topic, boolean pre) throws XWikiException {
         if (pre)
-            return "{pre}" + xwiki.include(topic, context, false) + "{/pre}";
-		return xwiki.include(topic, context, false);
+            return "{pre}" + xwiki.include(topic, false, context) + "{/pre}";
+		return xwiki.include(topic, false, context);
     }
 
     /**
@@ -1129,8 +1141,8 @@ public class XWiki extends Api {
      */
     public String includeForm(String topic, boolean pre) throws XWikiException {
         if (pre)
-            return "{pre}" + xwiki.include(topic, context, true) + "{/pre}";
-		return xwiki.include(topic, context, true);
+            return "{pre}" + xwiki.include(topic, true, context) + "{/pre}";
+		return xwiki.include(topic, true, context);
     }
 
     /**
@@ -2179,4 +2191,3 @@ v     * API to check rights on a document for a given user
         return xwiki.addMandatory(context);
     }
 }
-

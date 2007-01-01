@@ -152,7 +152,6 @@ public abstract class XWikiAction extends Action {
                         String page = Utils.getPage(request, renderResult);
                         Utils.parseTemplate(page, !page.equals("direct"), context);
                     }
-
                 }
                 return null;
             } catch (Throwable e) {

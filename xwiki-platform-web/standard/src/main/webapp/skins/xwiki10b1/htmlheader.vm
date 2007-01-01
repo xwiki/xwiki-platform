@@ -17,7 +17,7 @@ $title
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
-$!xwiki.getWebPreference("meta")
+$xwiki.parseContent($!xwiki.getWebPreference("meta"))
 #template("stylesheets.vm")
 <meta http-equiv="imagetoolbar" content="no"/>
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>

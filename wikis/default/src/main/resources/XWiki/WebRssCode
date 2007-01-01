@@ -114,16 +114,16 @@ $request.serverName
 #set ($length = 255)
 #end
 &lt;item rdf:about="$url"&gt;
-&lt;title&gt;${currentdoc.displayTitle}&lt;/title&gt;
+&lt;title&gt;$xwiki.getXMLEncoded(${currentdoc.displayTitle})&lt;/title&gt;
 &lt;link&gt;$url&lt;/link&gt;
-&lt;description&gt;Version $currentdoc.version edited by $xwiki.getUserName($currentdoc.author, false) on $currentdoc.date&lt;/description&gt;
+&lt;description&gt;Version $currentdoc.version edited by $xwiki.getXMLEncoded($xwiki.getUserName($currentdoc.author, false)) on $currentdoc.date&lt;/description&gt;
 #set($tz = $xwiki.formatDate($currentdoc.date, "Z"))
 #set($tz = "${tz.substring(0, 3)}:${tz.substring(3)}")
 &lt;dc:date&gt;$xwiki.formatDate($currentdoc.date, "yyyy-MM-dd")T$xwiki.formatDate($currentdoc.date, "hh:mm:ss")$tz&lt;/dc:date&gt;
-&lt;dc:creator&gt;$xwiki.getUserName($currentdoc.creator, false)&lt;/dc:creator&gt;
+&lt;dc:creator&gt;$xwiki.getXMLEncoded($xwiki.getUserName($currentdoc.creator, false))&lt;/dc:creator&gt;
 &lt;dc:contributor&gt;
 &lt;rdf:Description link=""&gt;
-&lt;rdf:value&gt;$xwiki.getUserName($currentdoc.author, false)&lt;/rdf:value&gt;
+&lt;rdf:value&gt;$xwiki.getXMLEncoded($xwiki.getUserName($currentdoc.author, false))&lt;/rdf:value&gt;
 &lt;/rdf:Description&gt;
 &lt;/dc:contributor&gt;
 &lt;/item&gt;

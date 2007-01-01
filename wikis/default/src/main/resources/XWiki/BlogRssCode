@@ -131,19 +131,18 @@ $request.serverName
 #end
 #end
 #set($desc = $xwiki.getXMLEncoded($doc.getRenderedContent($content)))
-## #set($desc = "&lt;![CDATA[${desc}]]&gt;")
 &lt;item rdf:about="$url"&gt;
-&lt;title&gt;$currentdoc.display("title", "view", $currentobj)&lt;/title&gt;
+&lt;title&gt;$xwiki.getXMLEncoded($currentdoc.display("title", "view", $currentobj))&lt;/title&gt;
 &lt;link&gt;$url&lt;/link&gt;
 &lt;description&gt;$desc&lt;/description&gt;
-&lt;dc:subject&gt;$currentdoc.display("category", "view", $currentobj)&lt;/dc:subject&gt;
+&lt;dc:subject&gt;$xwiki.getXMLEncoded($currentdoc.display("category", "view", $currentobj))&lt;/dc:subject&gt;
 #set($tz = $xwiki.formatDate($currentdoc.date, "Z"))
 #set($tz = "${tz.substring(0, 3)}:${tz.substring(3)}")
 &lt;dc:date&gt;$xwiki.formatDate($currentdoc.date, "yyyy-MM-dd")T$xwiki.formatDate($currentdoc.date, "hh:mm:ss")$tz&lt;/dc:date&gt;
-&lt;dc:creator&gt;$xwiki.getUserName($currentdoc.creator, false)&lt;/dc:creator&gt;
+&lt;dc:creator&gt;$xwiki.getXMLEncoded($xwiki.getUserName($currentdoc.creator, false))&lt;/dc:creator&gt;
 &lt;dc:contributor&gt;
 &lt;rdf:Description link=""&gt;
-&lt;rdf:value&gt;$xwiki.getUserName($currentdoc.author, false)&lt;/rdf:value&gt;
+&lt;rdf:value&gt;$xwiki.getXMLEncoded($xwiki.getUserName($currentdoc.author, false))&lt;/rdf:value&gt;
 &lt;/rdf:Description&gt;
 &lt;/dc:contributor&gt;
 &lt;/item&gt;

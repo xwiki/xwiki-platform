@@ -70,7 +70,13 @@ $request.serverName
 #end
 &lt;/description&gt;
 #set($logourl = $xwiki.getSkinFile($xwiki.getSkinPreference('logo', 'logo.png')))
-#set($logourl = "${request.scheme}://${request.serverName}:${request.serverPort}$logourl")
+#set($port = "")
+#if(($request.scheme == "http") &amp;&amp; ($request.serverPort != 80))
+#set($port = ":${request.serverPort}")
+#elseif(($request.scheme == "https") &amp;&amp; ($request.serverPort != 443))
+#set($port = ":${request.serverPort}")
+#end
+#set($logourl = "${request.scheme}://${request.serverName}${port}$logourl")
 &lt;image rdf:resource="$logourl"/&gt;
 &lt;dc:language&gt;$doc.defaultLanguage&lt;/dc:language&gt;
 &lt;dc:rights&gt;$xwiki.getXMLEncoded($xwiki.webCopyright.replace('&lt;', '&lt;html:').replace('&lt;html:/', '&lt;/html:'))&lt;/dc:rights&gt;

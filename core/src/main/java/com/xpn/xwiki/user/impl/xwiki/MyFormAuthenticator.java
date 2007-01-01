@@ -56,12 +56,9 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
     }
 
-
-
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception {
         return processLogin(request, response, null);
     }
-
 
     private String convertUsername(String username, XWikiContext context) {
         return context.getWiki().convertUsername(username, context);

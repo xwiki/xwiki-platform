@@ -23,12 +23,8 @@ package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class LoginAction extends XWikiAction {
-    private static final Log log = LogFactory.getLog(LoginAction.class);
-    
 	public String render(XWikiContext context) throws XWikiException {
 		context.getResponse().setStatus(401);
         return "login";

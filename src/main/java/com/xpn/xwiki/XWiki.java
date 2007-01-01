@@ -1063,6 +1063,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return null;
     }
 
+     public String renderTemplate(String template, String skin, XWikiContext context){
+         try{
+             return getRenderingEngine().getRenderer("wiki").render(parseTemplate(template, skin, context), context.getDoc(), context.getDoc(), context);
+         }
+         catch(Exception ex){
+             log.error(ex);
+             return parseTemplate(template, skin, context);
+         }
+     }
+
+     public String renderTemplate(String template, XWikiContext context){
+         try{
+             return getRenderingEngine().getRenderer("wiki").render(parseTemplate(template, context), context.getDoc(), context.getDoc(), context);
+         }
+         catch(Exception ex){
+             log.error(ex);
+             return parseTemplate(template, context);
+         }
+     }
+
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
      * templates; works by creating a RequestDispatcher, buffering the output,
@@ -2425,7 +2445,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
 
         try {
-            XWikiGroupService gservice = (XWikiGroupService) getGroupService(context);
+            XWikiGroupService gservice = getGroupService(context);
             gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup", context);
         } catch (Exception e) {
             e.printStackTrace();

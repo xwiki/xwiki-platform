@@ -454,6 +454,17 @@ public class XWiki extends Api {
     }
 
     /**
+     * API to render a velocity template provided by the current Skin
+     * The template is first looked in the skin active for the user, the space or the wiki.
+     * If the template does not exist in that skin, the template is looked up in the "parent skin" of the skin
+     * @param template Template name ("view", "edit", "comment")
+     * @return Evaluated content from the template
+     */
+    public String renderTemplate(String template) {
+        return xwiki.renderTemplate(template, context);
+    }
+
+    /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity
      * templates; works by creating a RequestDispatcher, buffering the output,
      * then returning it as a string.

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165962911000</creationDate>
-<date>1166177448000</date>
-<contentUpdateDate>1166177448000</contentUpdateDate>
-<version>1.6</version>
+<date>1167611629000</date>
+<contentUpdateDate>1167611629000</contentUpdateDate>
+<version>1.8</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -51,89 +51,93 @@
 </property>
 </object>
 <content>{pre}
+$context.setCacheDuration(1800)
 #set($cal = $xwiki.calendar.calendar)
 #set($ok = $cal.add(10, 1))
 #set($ok = $response.setDateHeader("Expires", $cal.time.time))
-$context.setCacheDuration(1800)
+&lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/" xmlns:html="http://www.w3.org/1999/xhtml"&gt;
+&lt;channel rdf:about="$baseurl"&gt;
+&lt;title&gt;
+#if($title)
+$title
+#else
+$request.serverName
+#end
+&lt;/title&gt;
+&lt;link&gt;$baseurl&lt;/link&gt;
+&lt;description&gt;
+#if($description)
+$description
+#else
+$request.serverName
+#end
+&lt;/description&gt;
+#set($logourl = $xwiki.getSkinFile($xwiki.getSkinPreference('logo', 'logo.png')))
+#set($logourl = "${request.scheme}://${request.serverName}:${request.serverPort}$logourl")
+&lt;image rdf:resource="$logourl"/&gt;
+&lt;dc:language&gt;$doc.defaultLanguage&lt;/dc:language&gt;
+&lt;dc:rights&gt;$xwiki.getXMLEncoded($xwiki.webCopyright.replace('&lt;', '&lt;html:').replace('&lt;html:/', '&lt;/html:'))&lt;/dc:rights&gt;
+&lt;dc:publisher&gt;$xwiki.getUserName($doc.author, false)&lt;/dc:publisher&gt;
+&lt;dc:creator&gt;$xwiki.getUserName($doc.author, false)&lt;/dc:creator&gt;
+&lt;items&gt;
+&lt;rdf:Seq&gt;
+#if(!$list)
 #if(!$sql)
 #if($request.category)
 #set($category = $request.category)
 #end
 #if((!$category)||($category==""))
-#set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' order by doc.creationDate desc")
+#set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' order by doc.creationDate desc")
 #else
-#set ($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' and obj.id=prop.id.id and prop.id.name='category' and list = '$category' order by doc.creationDate desc")
+#set($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' and obj.id=prop.id.id and prop.id.name='category' and list = '$category' order by doc.creationDate desc")
 #end
 #end
-#set($list = $xwiki.searchDocuments($sql,20,0))
-&lt;rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:wiki="http://purl.org/rss/1.0/modules/wiki/"&gt;
-&lt;channel rdf:about="$baseurl"&gt;
-&lt;title&gt;$title&lt;/title&gt;
-&lt;link&gt;$baseurl&lt;/link&gt;
-&lt;description&gt;
-$description
-&lt;/description&gt;
-&lt;image rdf:resource="${baseurl}/xwiki/skins/default/logobleu.jpg" /&gt;
-&lt;dc:language&gt;$doc.defaultLanguage&lt;/dc:language&gt;
-&lt;dc:rights&gt;$xwiki.webCopyright.replaceAll("&lt;.*?&gt;", "").replaceAll("&lt;/.*?&gt;","")&lt;/dc:rights&gt;
-&lt;dc:publisher&gt;$doc.author&lt;/dc:publisher&gt;
-#set($memberdoc = $xwiki.getDocument($doc.author))
-#set($cobj = $memberdoc.getObject("XWiki.XWikiUsers",0))
-#set($fname = $memberdoc.display("first_name","view",$cobj))
-#set($lname = $memberdoc.display("last_name","view",$cobj))
-&lt;dc:creator&gt;$!fname $!lname&lt;/dc:creator&gt;
-&lt;items&gt;
-&lt;rdf:Seq&gt;
-#foreach ($item in $list)
-#if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
-#set ($currentdoc = $xwiki.getDocument($item))
-&lt;rdf:li rdf:resource="${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}" /&gt;
+#set($list = $xwiki.searchDocuments($sql, 20, 0))
+#end
+#set($list = $xwiki.wrapDocs($list))
+#foreach ($currentdoc in $list)
+#if($xwiki.hasAccessLevel("view", "${context.database}:${currentdoc.fullName}"))
+&lt;rdf:li rdf:resource="$currentdoc.getExternalURL('view', "language=${currentdoc.realLanguage}")" /&gt;
 #end
 #end
 &lt;/rdf:Seq&gt;
 &lt;/items&gt;
 &lt;/channel&gt;
-&lt;image rdf:about="${baseurl}/xwiki/skins/default/logobleu.jpg"&gt;
-  &lt;title&gt;XWiki.com&lt;/title&gt;
+&lt;image rdf:about="$logourl"&gt;
+  &lt;title&gt;XWiki Logo&lt;/title&gt;
   &lt;link&gt;${baseurl}&lt;/link&gt;
-  &lt;url&gt;${baseurl}/xwiki/skins/default/logobleu.jpg&lt;/url&gt;
+  &lt;url&gt;$logourl&lt;/url&gt;
 &lt;/image&gt;
-#foreach ($item in $list)
-#if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
-#set ($currentdoc = $xwiki.getDocument($item))
-#set ($url = "${baseurl}/xwiki/bin/view/${currentdoc.web}/${currentdoc.name}")
-#set($currentobj = $currentdoc.getObject("XWiki.ArticleClass",0))
-#set($content = $currentdoc.display("extract", "view", $currentobj))
+#foreach ($currentdoc in $list)
+#if($xwiki.hasAccessLevel("view", "${context.database}:${currentdoc.fullName}"))
+
+#set ($url = $currentdoc.getExternalURL('view', "language=${currentdoc.realLanguage}"))
+#set($currentobj = $currentdoc.getObject("XWiki.ArticleClass"))
+#set($content = "")
+#set($content = $currentdoc.extract)
 #if($content=="")
 #set($content = $currentdoc.display("content", "view", $currentobj))
 #if($content.length()&gt;=400)
-#set($i = $content.lastIndexOf(" ",400))
+#set($i = $content.indexOf(" ", 400))
 #set($i = $i + 1)
-#set($content = "${content.substring(0,$i)}")
-#set($quote = '"')
-#set($surl = "${quote}${url}${quote}")
-#set($content = "${content}... &lt;a href=${surl} &gt;continue&lt;/a&gt;")
+#set($content = "${content.substring(0, $i)}")
+#set($content = $content.concat('&lt;a href="${url}"&gt;...&lt;/a&gt;'))
 #end
 #end
-#set($content = $!currentdoc.getRenderedContent($content))
-#set ($desc = "&lt;![CDATA[${content}]]&gt;")
+#set($desc = $xwiki.getXMLEncoded($doc.getRenderedContent($content)))
+## #set($desc = "&lt;![CDATA[${desc}]]&gt;")
 &lt;item rdf:about="$url"&gt;
 &lt;title&gt;$currentdoc.display("title", "view", $currentobj)&lt;/title&gt;
 &lt;link&gt;$url&lt;/link&gt;
-&lt;description&gt;
-$desc
-&lt;/description&gt;
-&lt;dc-subject&gt;$currentdoc.display("category", "view", $currentobj)&lt;/dc-subject&gt;
-#set($cdate=$currentdoc.date)
-&lt;dc:date&gt;$xwiki.formatDate($cdate, "yyyy-MM-dd")&lt;/dc:date&gt;
-#set($memberdoc = $xwiki.getDocument($currentdoc.author))
-#set($cobj = $memberdoc.getObject("XWiki.XWikiUsers",0))
-#set($fname = $memberdoc.display("first_name","view",$cobj))
-#set($lname = $memberdoc.display("last_name","view",$cobj))
-&lt;dc:creator&gt;$!fname $!lname&lt;/dc:creator&gt;
+&lt;description&gt;$desc&lt;/description&gt;
+&lt;dc:subject&gt;$currentdoc.display("category", "view", $currentobj)&lt;/dc:subject&gt;
+#set($tz = $xwiki.formatDate($currentdoc.date, "Z"))
+#set($tz = "${tz.substring(0, 3)}:${tz.substring(3)}")
+&lt;dc:date&gt;$xwiki.formatDate($currentdoc.date, "yyyy-MM-dd")T$xwiki.formatDate($currentdoc.date, "hh:mm:ss")$tz&lt;/dc:date&gt;
+&lt;dc:creator&gt;$xwiki.getUserName($currentdoc.creator, false)&lt;/dc:creator&gt;
 &lt;dc:contributor&gt;
 &lt;rdf:Description link=""&gt;
-&lt;rdf:value&gt;$currentdoc.author&lt;/rdf:value&gt;
+&lt;rdf:value&gt;$xwiki.getUserName($currentdoc.author, false)&lt;/rdf:value&gt;
 &lt;/rdf:Description&gt;
 &lt;/dc:contributor&gt;
 &lt;/item&gt;

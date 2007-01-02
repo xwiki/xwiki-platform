@@ -8,6 +8,7 @@ com.xpn.xwiki.render.filter.XWikiListFilter
 org.radeox.filter.StrikeThroughFilter
 org.radeox.filter.NewlineFilter
 org.radeox.filter.ParagraphFilter
+com.xpn.xwiki.render.filter.UnderlineFilter
 com.xpn.xwiki.render.filter.StrongFilter
 # org.radeox.filter.BoldFilter
 org.radeox.filter.ItalicFilter

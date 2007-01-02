@@ -46,6 +46,9 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
+    this.addExternalProcessor((/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
+    this.addInternalProcessorBefore('convertStyleInternal', (/<span\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)<\/span>/i), 'convertVelocityCommentInternal');
+
     this.addExternalProcessorBefore('convertTableExternal', (/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
     this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
 
@@ -984,5 +987,30 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
         str += "{style}";
     }
     // alert("str = " + str);
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.VELOCITY_COMMENT_CLASS_NAME = "vcomment";
+
+WikiEditor.prototype.convertVelocityCommentExternal = function(regexp, result, content) {
+    var str = "";
+    var vcomment = "";
+    if ((result[1] != null) && (result[1] != "undefined") && (result[1] != "")) {
+        vcomment = result[1];
+    } else if ((result[3] != null) && (result[3] != "undefined") && (result[3] != "")) {
+        vcomment = result[3];
+    }
+    str = "<span class='" + this.VELOCITY_COMMENT_CLASS_NAME + "'>" + vcomment + "</span>";
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, content) {
+    var str = "";
+    var vcomment = result[3];
+    if (vcomment.indexOf("\n") > -1) {
+        str = "#*" + vcomment + "*#";
+    } else {
+        str = "##" + vcomment;
+    }
     return content.replace(regexp, str);
 }

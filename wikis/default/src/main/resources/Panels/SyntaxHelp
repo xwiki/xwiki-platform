@@ -155,7 +155,7 @@ This paragraph is a new one.&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
     &lt;table&gt;
 &lt;tr&gt;&lt;th&gt;$msg.get("type")&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre} a *bold* word{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;a *bold* word&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre} a __bold__ word{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;a __bold__ word&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre} an __underlined__ word{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;an __underlined__ word&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre}~~text in italics~~{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;~~text in italics~~&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre}--striked text--{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;--striked text--&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;

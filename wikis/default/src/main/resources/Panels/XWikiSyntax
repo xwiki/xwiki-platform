@@ -179,7 +179,7 @@ There are two ways to mark text as bold.
 &lt;pre&gt;
 
 Here is some text with a *bold* word.
-Here is some text with a __bold__ word.
+Here is some text with an __underlined__ word.
 
 &lt;/pre&gt;
 &lt;/td&gt;

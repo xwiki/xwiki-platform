@@ -24,8 +24,8 @@ package com.xpn.xwiki.render.filter;
 import org.radeox.filter.CacheFilter;
 import org.radeox.filter.regex.LocaleRegexReplaceFilter;
 
-public class StrongFilter extends LocaleRegexReplaceFilter implements CacheFilter {
+public class UnderlineFilter extends LocaleRegexReplaceFilter implements CacheFilter {
     protected String getLocaleKey() {
-        return "filter.strong";
+        return "filter.underline";
     }
 }

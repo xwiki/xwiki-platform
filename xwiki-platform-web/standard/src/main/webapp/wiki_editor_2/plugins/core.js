@@ -34,13 +34,13 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
     this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
-    this.addInternalProcessor((/<strong[^>]*>(.*?)<\/strong>/gi), '*$1*');
+    this.addInternalProcessor((/<strong[^>]*>(\n?)(.*?)(\n?)<\/strong>/gi), '$1*$2*$3');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
-	this.addInternalProcessor((/<em[^>]*>(.*?)<\/em>/gi), '~~$1~~');
+	this.addInternalProcessor((/<em[^>]*>(\n?)(.*?)(\n?)<\/em>/gi), '$1~~$2~~$3');
 
 	this.addExternalProcessor((/--(.+?)--/gi),  '<strike class="strike">$1<\/strike>');
-	this.addInternalProcessor((/<strike[^>]*>(.*?)<\/strike>/gi), '--$1--');
+	this.addInternalProcessor((/<strike[^>]*>(\n?)(.*?)(\n?)<\/strike>/gi), '$1--$2--$3');
 
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
 
@@ -86,11 +86,8 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">\s*([\s\S]+?)<\/p>/g,'$1');
-    str = str.replace(/<span class="wikilink">\s*([\s\S]+?)<\/span>/g,'$1');
-    str = str.replace(/<span class="wikiexternallink">\s*([\s\S]+?)<\/span>/g,'$1');
-    str = str.replace(/<span class="bold">([\s\S]+?)<\/span>/g,'$1');
-    str = str.replace(/<span class="italic">([\s\S]+?)<\/span>/g,'$1');
-    str = str.replace(/<span class="strike">([\s\S]+?)<\/span>/g,'$1');    
+    str = str.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
+    str = str.replace(/<span class="(bold|italic|strike)">([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n');
     return str;

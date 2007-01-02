@@ -40,16 +40,6 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <!-- This JAR has been modified by Sergiu Dumitriu to generate valid xhtml. TODO: create a patch and send it
-         to the radeox project. Other solution: extract the modifications outside of the radeox jar and into XWiki
-         source tree. See http://jira.xwiki.org/jira/browse/XWIKI-377 -->
-    <dependency>
-      <groupId>radeox</groupId>
-      <artifactId>radeox</artifactId>
-      <version>UNKNOWN</version>
-      <classifier>xwiki</classifier>
-    </dependency>
-
     <!-- Exo POMs seems to have a problem. See http://jira.exoplatform.org/browse/PLT-24. When this is resolved,
          get the Exo JARS from the ObjectWeb remote repo (or from the central repository when ObjectWeb
          is synced to there. -->
@@ -396,6 +386,11 @@
       <groupId>pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
       <version>0.7.1</version>
+    </dependency>
+    <dependency>
+      <groupId>radeox</groupId>
+      <artifactId>radeox</artifactId>
+      <version>1.0-b2</version>
     </dependency>
   </dependencies>
   <build>

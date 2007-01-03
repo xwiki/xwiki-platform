@@ -1,10 +1,14 @@
-#macro(breadcrumb $doc $string)
+#set($parents = $xwiki.arrayList)
+#set($discard = $parents.add($doc.fullName))
+#macro(breadcrumb $doc $string $level)
 #set($parent = $doc.parent)
-#if($parent != "")
+#if(($parent != "") && ($level < 6) && (!$parents.contains($parent)))
+#set($discard = $parents.add($parent))
 #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
 #set($pdocurl = $pdoc.getURL("view"))
 #set($nstring = "<a href='$pdocurl'>${pdoc.displayTitle}</a> &gt; $string")
-#breadcrumb($pdoc $nstring)
+#set($level = $level + 1)
+#breadcrumb($pdoc $nstring $level)
 #else
 $string
 #end

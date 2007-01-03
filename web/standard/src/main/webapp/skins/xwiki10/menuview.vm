@@ -29,7 +29,7 @@
 ##
 #xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show"))
 #submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("viewcode"))
-#submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("viewxml"))
+## #submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("viewxml"))
 #submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("viewcomments"))
 #submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("viewattachments"))
 #submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("viewhistory"))

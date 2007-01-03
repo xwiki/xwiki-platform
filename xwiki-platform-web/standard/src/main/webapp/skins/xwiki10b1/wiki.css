@@ -103,35 +103,37 @@
 
 /* special formatting of a wiki table */
 .wiki-table {
-  margin: auto;
+  margin: 20px auto;
   empty-cells: show;
   width: 80%;
   font-size:100%;
   text-align:left;
-  border: 1px solid #5b5b5b;
-  border-width: 1px;
-  border-style: outset;
+  border: 20px solid #E5F0FE !important;
+  background-color: #E5F0FE;
   border-collapse: collapse;
 }
 
 .wiki-table td {
-  border: 1px solid #5b5b5b;
-  border-width: 1px;
+  border: 0px solid #5b5b5b;
+  border-width: 0px;
   border-style: inset;
-  padding: 2px;
+  padding: 8px;
   text-align:left;
 }
 
 .wiki-table th {
-  border: 1px solid;
-  border-width: 1px;
+  border: 0px solid;
+  border-width: 0px;
   border-style: inset;
   text-align: left;
-  font-weight: bold;
-  padding: 2px;
+  font-weight: 100;
+  font-size: 160%;
+  padding: 8px;
+  background-color: #E5F0FE;
 }
 
 .wiki-table .table-odd {
+  background-color: #fff;
 }
 
 .wiki-table .table-even {
@@ -228,4 +230,8 @@ ol.HEBREW { list-style-type: hebrew; }
  font-size: 75%;
  font-weight: bold;
  color: gray;
+}
+
+.underline{
+  text-decoration: underline;
 }

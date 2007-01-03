@@ -211,13 +211,51 @@ Articles
 
 /*
 ---------------------------------------
-Misc
+Messages
 ---------------------------------------
 */
-.currentspace a{
-  text-decoration: none !important;
-  padding: 2px;
+.error{
+  color: #F00;
 }
+
+.fatalerror{
+  background-color: #F00;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.warning{
+  color: #c82;
+}
+
+div.errormessage, div.warningmessage, div.infomessage{
+  margin: 4px 0px 4px;
+  border: 1px solid #DDD;
+  padding: 8px 8px 8px 28px;
+  background: #F5F5F5 url(icons/msg.png) 8px 10px no-repeat;
+  text-align: left;
+}
+
+div.infomessage{
+  background-image: url(icons/msginfo.png);
+  color: #000;
+}
+div.warningmessage{
+  background-image: url(icons/msgwarning.png);
+  color: #c82;
+}
+div.errormessage{
+  background-image: url(icons/msgerror.png);
+  color: #F00;
+}
+
+/*
+---------------------------------------
+Images
+---------------------------------------
+*/
+
 .imgfloatleft{
   float: left;
   margin-right: 8px;
@@ -234,4 +272,45 @@ Misc
 }
 .imgright{
   text-align: right;
+}
+/*
+---------------------------------------
+Misc
+---------------------------------------
+*/
+
+.currentspace a{
+  text-decoration: none !important;
+  padding: 2px;
+}
+
+span.floatleft{
+  display: block;
+  float: left;
+}
+
+a#adduser, a#modifygroup{
+  background: transparent url(icons/black-register.png) center no-repeat;
+  display: block;
+  height: 20px;
+  width: 20px;
+  overflow: hidden;
+  border: 1px solid #000;
+  margin-left: 8px;
+}
+
+a#modifygroup{
+  background-image: url(icons/black-edit.png);
+  border: none;
+}
+
+.small{
+  font-size: 75%;
+}
+
+.smaller{
+  font-size: 60%;
+}
+.smallest{
+  font-size: 50%;
 }

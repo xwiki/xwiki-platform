@@ -725,11 +725,9 @@ Rico Acordeon
 #editPanels .accordionTabContentBox{
   border: none;
   overflow: auto;
-  width: 280px;
 }
 
 #editPanels .accordionTabContentBox table{
-  width: 100%;
   border: none;
 }
 .accordionTabContentBox table th{

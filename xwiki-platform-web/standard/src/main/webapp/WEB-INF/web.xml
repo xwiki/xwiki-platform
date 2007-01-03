@@ -53,6 +53,10 @@
         <load-on-startup>2</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>redirectHome</servlet-name>
+        <servlet-class>com.xpn.xwiki.web.HomePageRedirect</servlet-class>
+    </servlet>
 
     <servlet>
         <servlet-name>velocity</servlet-name>
@@ -101,10 +105,15 @@
         <url-pattern>/xmlrpc/*</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>redirectHome</servlet-name>
+        <url-pattern>/index.redirect</url-pattern>
+    </servlet-mapping>
+
     <!-- The Usual Welcome File List -->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.redirect</welcome-file>
     </welcome-file-list>
 
     <!--

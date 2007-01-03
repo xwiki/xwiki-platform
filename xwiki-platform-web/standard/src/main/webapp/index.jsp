@@ -1,1 +1,0 @@
-<% response.sendRedirect("bin/view/Main/"); %>

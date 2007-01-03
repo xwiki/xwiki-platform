@@ -92,7 +92,7 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
         } catch (XWikiException e) {
          doc = new XWikiDocument();
          doc.setName(topic);
-         doc.setWeb(web);
+         doc.setSpace(web);
         }
 
         output.append(start);

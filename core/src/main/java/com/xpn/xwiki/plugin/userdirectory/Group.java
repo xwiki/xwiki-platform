@@ -284,7 +284,7 @@ public class Group {
             doc = xwiki.getDocument("XWiki.XWikiGroups", context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            doc.setWeb("XWiki");
+            doc.setSpace("XWiki");
             doc.setName("XWikiGroups");
             needsUpdate = true;
         }
@@ -315,7 +315,7 @@ public class Group {
             doc = xwiki.getDocument("XWiki.DirectoryGroupClass", context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            doc.setWeb("XWiki");
+            doc.setSpace("XWiki");
             doc.setName("DirectoryGroupClass");
             needsUpdate = true;
         }
@@ -345,7 +345,7 @@ public class Group {
             doc = xwiki.getDocument("XWiki.GroupRelationClass", context);
         } catch (Exception e) {
             doc = new XWikiDocument();
-            doc.setWeb("XWiki");
+            doc.setSpace("XWiki");
             doc.setName("GroupRelationClass");
             needsUpdate = true;
         }

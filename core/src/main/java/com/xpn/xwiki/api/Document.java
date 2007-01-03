@@ -131,7 +131,7 @@ public class Document extends Api {
      * @return
      */
     public String getWeb() {
-        return doc.getWeb();
+        return doc.getSpace();
     }
 
 
@@ -866,9 +866,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return doc.getContentDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return doc.getContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return doc.getContentDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return doc.getContentDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return doc.getContentDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -887,9 +887,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return doc.getXMLDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return doc.getXMLDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return doc.getXMLDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return doc.getXMLDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return doc.getXMLDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -908,9 +908,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return doc.getRenderedContentDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return doc.getRenderedContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return doc.getRenderedContentDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return doc.getRenderedContentDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return doc.getRenderedContentDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -929,9 +929,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return doc.getMetaDataDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return doc.getMetaDataDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return doc.getMetaDataDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return doc.getMetaDataDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return doc.getMetaDataDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -950,9 +950,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return getDoc().getObjectDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return getDoc().getObjectDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return getDoc().getObjectDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return getDoc().getObjectDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return getDoc().getObjectDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -971,9 +971,9 @@ public class Document extends Api {
             if ((origdoc == null) && (newdoc == null))
                 return new ArrayList();
             if (origdoc == null)
-                return doc.getClassDiff(new XWikiDocument(newdoc.getWeb(), newdoc.getName()), newdoc.getDoc(), context);
+                return doc.getClassDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(), context);
             if (newdoc == null)
-                return doc.getClassDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getWeb(), origdoc.getName()), context);
+                return doc.getClassDiff(origdoc.getDoc(), new XWikiDocument(origdoc.getSpace(), origdoc.getName()), context);
 
             return doc.getClassDiff(origdoc.getDoc(), newdoc.getDoc(), context);
         } catch (Exception e) {
@@ -996,7 +996,7 @@ public class Document extends Api {
     }
 
     public DocumentStats getCurrentMonthWebStats(String action) {
-        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getWeb(), action, new Date(), context);
+        return context.getWiki().getStatsService(context).getDocMonthStats(doc.getSpace(), action, new Date(), context);
     }
 
     public List getCurrentMonthRefStats() throws XWikiException {

@@ -658,7 +658,7 @@ public class Package {
 
     public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException {
         try  {
-            String zipname = doc.getWeb() + "/" + doc.getName();
+            String zipname = doc.getSpace() + "/" + doc.getName();
             String language = doc.getLanguage();
             if ((language!=null)&&(!language.equals("")))
                 zipname += "." + language;
@@ -674,7 +674,7 @@ public class Package {
     public void addToDir(XWikiDocument doc, File dir, boolean withVersions, XWikiContext context) throws XWikiException {
         try  {
             filter(doc, context);
-            File spacedir = new File(dir, doc.getWeb());
+            File spacedir = new File(dir, doc.getSpace());
             if (!spacedir.exists()) {
                 if (!spacedir.mkdirs()) {
                     Object[] args = new Object[1];
@@ -812,7 +812,7 @@ public class Package {
                 if (log.isDebugEnabled())
                  log.debug("Package adding document " + docName + " with language " + language);
 
-                File space = new File(dir, doc.getWeb());
+                File space = new File(dir, doc.getSpace());
                 String filename = doc.getName();
                 if ((doc.getLanguage()!=null)&&(!doc.getLanguage().equals("")))
                  filename += "." + doc.getLanguage();

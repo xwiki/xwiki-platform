@@ -153,7 +153,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
-        XWikiDocument doc = new XWikiDocument(basedoc.getWeb(), basedoc.getName());
+        XWikiDocument doc = new XWikiDocument(basedoc.getSpace(), basedoc.getName());
         doc.setDatabase(basedoc.getDatabase());
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -189,7 +189,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             // Make sure the document has the same name
             // as the new document (in case there was a name change
             doc.setName(basedoc.getName());
-            doc.setWeb(basedoc.getWeb());
+            doc.setSpace(basedoc.getSpace());
         } catch (Exception e) {
             if (e instanceof XWikiException)
              throw (XWikiException) e;

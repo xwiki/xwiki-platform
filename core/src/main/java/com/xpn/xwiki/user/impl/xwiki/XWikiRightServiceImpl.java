@@ -706,7 +706,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         if (!hasAdmin) {
             try {
                 hasAdmin = hasAccessLevel("admin", context.getUser(),
-                        context.getDoc().getWeb() + ".WebPreferences", context);
+                        context.getDoc().getSpace() + ".WebPreferences", context);
             } catch (Exception e) {
                 e.printStackTrace();
             }

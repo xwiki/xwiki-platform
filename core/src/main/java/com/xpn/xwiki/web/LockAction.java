@@ -24,7 +24,7 @@ public class LockAction extends XWikiAction {
         } else {
             tdoc = doc.getTranslatedDocument(language, context);
             if (tdoc == doc) {
-                tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
+                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                 tdoc.setLanguage(language);
                 tdoc.setStore(doc.getStore());
             }

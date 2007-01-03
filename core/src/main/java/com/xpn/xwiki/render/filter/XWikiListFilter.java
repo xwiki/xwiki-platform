@@ -105,7 +105,6 @@ public class XWikiListFilter extends ListFilter implements CacheFilter {
    * @param reader Input is read from this Reader
    */
   private void addList(StringBuffer buffer, BufferedReader reader) throws IOException {
-      log.error("XWikiList");
     char[] lastBullet = new char[0];
     String line = null;
     while ((line = reader.readLine()) != null) {

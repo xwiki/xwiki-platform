@@ -193,8 +193,8 @@ public class XWikiDocument {
 
 
     public String getSpace() {
-            return web;
-        }
+        return web;
+    }
 
     public void setSpace(String space) {
         this.web = space;
@@ -319,7 +319,7 @@ public class XWikiDocument {
 
     public String getFullName() {
         StringBuffer buf = new StringBuffer();
-        buf.append(getWeb());
+        buf.append(getSpace());
         buf.append(".");
         buf.append(getName());
         return buf.toString();
@@ -1334,7 +1334,7 @@ public class XWikiDocument {
     String template = eform.getTemplate();
     if ((template!=null)&&(!template.equals(""))) {
     if (template.indexOf('.')==-1) {
-    template = getWeb() + "." + template;
+    template = getSpace() + "." + template;
     }
     XWiki xwiki = context.getWiki();
     XWikiDocument templatedoc = xwiki.getDocument(template, context);
@@ -1364,7 +1364,7 @@ public class XWikiDocument {
                         "Cannot add a template to document {0} because it already has content", null, args);
             } else {
                 if (template.indexOf('.') == -1) {
-                    template = getWeb() + "." + template;
+                    template = getSpace() + "." + template;
                 }
                 XWiki xwiki = context.getWiki();
                 XWikiDocument templatedoc = xwiki.getDocument(template, context);
@@ -1431,7 +1431,7 @@ public class XWikiDocument {
             doc.setNew(isNew());
             doc.setStore(getStore());
             doc.setTemplate(getTemplate());
-            doc.setWeb(getWeb());
+            doc.setSpace(getSpace());
             doc.setParent(getParent());
             doc.setCreator(getCreator());
             doc.setDefaultLanguage(getDefaultLanguage());
@@ -1478,7 +1478,7 @@ public class XWikiDocument {
         if (!getName().equals(doc.getName()))
             return false;
 
-        if (!getWeb().equals(doc.getWeb()))
+        if (!getSpace().equals(doc.getSpace()))
             return false;
 
         if (!getAuthor().equals(doc.getAuthor()))
@@ -1591,7 +1591,7 @@ public class XWikiDocument {
 
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException {
         try {
-            String zipname = getWeb() + "/" + getName();
+            String zipname = getSpace() + "/" + getName();
             String language = getLanguage();
             if ((language != null) && (!language.equals("")))
                 zipname += "." + language;
@@ -1631,7 +1631,7 @@ public class XWikiDocument {
         doc.setRootElement(docel);
 
         Element el = new DOMElement("web");
-        el.addText(getWeb());
+        el.addText(getSpace());
         docel.add(el);
 
         el = new DOMElement("name");
@@ -1841,7 +1841,7 @@ public class XWikiDocument {
 
         Element docel = domdoc.getRootElement();
         setName(getElement(docel, "name"));
-        setWeb(getElement(docel, "web"));
+        setSpace(getElement(docel, "web"));
         setParent(getElement(docel, "parent"));
         setCreator(getElement(docel, "creator"));
         setAuthor(getElement(docel, "author"));
@@ -2054,7 +2054,7 @@ public class XWikiDocument {
                 try {
                     String name = (String) list.get(i);
                     if (name.indexOf(".") == -1) {
-                        list.set(i, getWeb() + "." + name);
+                        list.set(i, getSpace() + "." + name);
                     }
                 } catch (Exception e) {
                     // This should never happen
@@ -2072,7 +2072,7 @@ public class XWikiDocument {
     }
 
     public List getIncludedMacros(XWikiContext context) {
-        return context.getWiki().getIncludedMacros(getWeb(), getContent(), context);
+        return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
     }
 
     public List getLinkedPages(XWikiContext context) {
@@ -2111,14 +2111,14 @@ public class XWikiDocument {
 
                     // If it is a local link let's add the space
                     if (newname.indexOf(".") == -1) {
-                        newname = getWeb() + "." + name;
+                        newname = getSpace() + "." + name;
                     }
                     if (context.getWiki().exists(newname, context)) {
                         name = newname;
                     } else {
                         // If it is a local link let's add the space
                         if (name.indexOf(".") == -1) {
-                            name = getWeb() + "." + name;
+                            name = getSpace() + "." + name;
                         }
                     }
 
@@ -2348,7 +2348,7 @@ public class XWikiDocument {
         } else {
             if (i1 == -1) {
                 try {
-                    web = context.getDoc().getWeb();
+                    web = context.getDoc().getSpace();
                 } catch (Exception e) {
                     web = "XWiki";
                 }
@@ -2417,7 +2417,7 @@ public class XWikiDocument {
         XWikiDocument tdoc = this;
 
         if (!((language == null) || (language.equals("")) || language.equals(defaultLanguage))) {
-            tdoc = new XWikiDocument(getWeb(), getName());
+            tdoc = new XWikiDocument(getSpace(), getName());
             tdoc.setLanguage(language);
             String database = context.getDatabase();
             try {
@@ -2538,8 +2538,8 @@ public class XWikiDocument {
             list.add(new MetaDataDiff("parent", origdoc.getParent(), newdoc.getParent()));
         if (!origdoc.getAuthor().equals(newdoc.getAuthor()))
             list.add(new MetaDataDiff("author", origdoc.getAuthor(), newdoc.getAuthor()));
-        if (!origdoc.getWeb().equals(newdoc.getWeb()))
-            list.add(new MetaDataDiff("web", origdoc.getWeb(), newdoc.getWeb()));
+        if (!origdoc.getSpace().equals(newdoc.getSpace()))
+            list.add(new MetaDataDiff("web", origdoc.getSpace(), newdoc.getSpace()));
         if (!origdoc.getName().equals(newdoc.getName()))
             list.add(new MetaDataDiff("name", origdoc.getName(), newdoc.getName()));
         if (!origdoc.getLanguage().equals(newdoc.getLanguage()))

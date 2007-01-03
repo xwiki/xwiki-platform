@@ -70,9 +70,9 @@ public class DocumentInfo
 
     public void changeSpace(String Space)
     {
-        if (doc.getWeb().compareTo("XWiki") != 0)
+        if (doc.getSpace().compareTo("XWiki") != 0)
             return;
-        doc.setWeb(Space);
+        doc.setSpace(Space);
         installable = INSTALL_IMPOSSIBLE;
     }
 

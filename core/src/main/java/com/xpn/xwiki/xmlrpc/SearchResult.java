@@ -45,7 +45,7 @@ public class SearchResult {
     public SearchResult(XWikiDocument document) {
         setTitle(document.getFullName());
         setId(document.getFullName());
-        setUrl("http://127.0.0.1:9080/xwiki/bin/view/" + document.getWeb() + "/" + document.getName());
+        setUrl("http://127.0.0.1:9080/xwiki/bin/view/" + document.getSpace() + "/" + document.getName());
         setType("page");
         String content = document.getContent();
         if (content.length()<=256)

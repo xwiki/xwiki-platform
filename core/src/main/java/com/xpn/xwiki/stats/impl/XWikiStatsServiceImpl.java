@@ -225,10 +225,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             }
 
         addPageView(doc.getFullName(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-        addPageView(doc.getWeb(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
+        addPageView(doc.getSpace(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
         addPageView("", action, XWikiStats.PERIOD_MONTH, store, context, vobject);
         addPageView(doc.getFullName(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
-        addPageView(doc.getWeb(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
+        addPageView(doc.getSpace(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
         addPageView("", action, XWikiStats.PERIOD_DAY, store, context, vobject);
 
         // In case of a "view" action we want to store referer info

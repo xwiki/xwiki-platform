@@ -133,16 +133,16 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                     sectionNumber++;
                     StringBuffer editparams = new StringBuffer();
                     if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg"))
-                        editparams.append("xpage=wysiwyg&section=").append(sectionNumber);
+                        editparams.append("xpage=wysiwyg&amp;section=").append(sectionNumber);
                     else
                         editparams.append("section=").append(sectionNumber);
                     try {
                         if ((xcontext.getWiki().isMultiLingual(xcontext)) && (doc.getRealLanguage(xcontext) != null))
-                            editparams.append("&language=").append(doc.getRealLanguage(xcontext));
+                            editparams.append("&amp;language=").append(doc.getRealLanguage(xcontext));
                     } catch (XWikiException e) { }
 
                     String url = doc.getURL("edit", editparams.toString(), xcontext);
-                    return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
+                    return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text.replace("'", "&#39;")+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
                 }
             }
         }

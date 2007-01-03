@@ -43,19 +43,13 @@ public class XWikiPageNotification implements XWikiActionNotificationInterface {
         try {
             XWiki xwiki = context.getWiki();
             XWikiDocument pagedoc = xwiki.getDocument(page, context);
-            if (xwiki.getRightService().hasProgrammingRights(pagedoc, context))
+            if (xwiki.getRightService().hasProgrammingRights(pagedoc, context)) {
                 notif = (XWikiActionNotificationInterface) xwiki.parseGroovyFromString(pagedoc.getContent(), context);
+                notif.notify(rule, doc, action, context);
+            }
         } catch (Throwable e) {
             Object[] args = { page };
-            XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_GROOVY, XWikiException.ERROR_XWIKI_GROOVY_COMPILE_FAILED, "Error parsing groovy notification for page {0}", e, args);
-            if (log.isErrorEnabled())
-                log.error(e2.getFullMessage());
-        }
-        try {
-            notif.notify(rule, doc, action, context);
-        } catch (Throwable e) {
-            Object[] args = { page };
-            XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_GROOVY, XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED, "Error executing groovy notification for page {0}", e, args);
+            XWikiException e2 = new XWikiException(XWikiException.MODULE_XWIKI_GROOVY, XWikiException.ERROR_XWIKI_GROOVY_EXECUTION_FAILED, "Error parsing groovy notification for page {0}", e, args);
             if (log.isErrorEnabled())
                 log.error(e2.getFullMessage());
         }

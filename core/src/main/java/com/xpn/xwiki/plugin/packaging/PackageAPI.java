@@ -40,7 +40,7 @@ public class PackageAPI   extends Api {
     public PackageAPI(Package plugin, XWikiContext context) throws PackageException {
         super(context);
         if (!hasAdminRights())
-            throw new PackageException(PackageException.ERROR_XWIKI_ACCESS_DENIED, "Admin right is needed to use this plugin");
+            throw new PackageException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, "Admin right is needed to use this plugin");
         setPlugin(plugin);
     }
 

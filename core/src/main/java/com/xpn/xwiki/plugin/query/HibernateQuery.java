@@ -23,6 +23,35 @@
 
 package com.xpn.xwiki.plugin.query;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.jackrabbit.core.query.AndQueryNode;
+import org.apache.jackrabbit.core.query.DefaultQueryNodeVisitor;
+import org.apache.jackrabbit.core.query.DerefQueryNode;
+import org.apache.jackrabbit.core.query.ExactQueryNode;
+import org.apache.jackrabbit.core.query.LocationStepQueryNode;
+import org.apache.jackrabbit.core.query.NAryQueryNode;
+import org.apache.jackrabbit.core.query.NodeTypeQueryNode;
+import org.apache.jackrabbit.core.query.NotQueryNode;
+import org.apache.jackrabbit.core.query.OrQueryNode;
+import org.apache.jackrabbit.core.query.OrderQueryNode;
+import org.apache.jackrabbit.core.query.PathQueryNode;
+import org.apache.jackrabbit.core.query.QueryConstants;
+import org.apache.jackrabbit.core.query.QueryNode;
+import org.apache.jackrabbit.core.query.QueryRootNode;
+import org.apache.jackrabbit.core.query.RelationQueryNode;
+import org.apache.jackrabbit.core.query.TextsearchQueryNode;
+import org.apache.jackrabbit.name.NameFormat;
+import org.apache.jackrabbit.name.QName;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -34,15 +63,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.query.HibernateQuery.XWikiHibernateQueryTranslator.ObjProperty;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.jackrabbit.name.NameFormat;
-import org.apache.jackrabbit.name.QName;
-import org.apache.jackrabbit.core.query.*;
-import org.hibernate.Query;
-import org.hibernate.Session;
-
-import java.util.*;
 /** Query implementation for Hibernate */
 public class HibernateQuery extends DefaultQuery {
 	private static final Log log = LogFactory.getLog(HibernateQuery.class);
@@ -52,7 +72,7 @@ public class HibernateQuery extends DefaultQuery {
 		super(tree, qf);
 	}
 	public XWikiHibernateStore getHibernateStore() {
-		return (XWikiHibernateStore) getContext().getWiki().getHibernateStore();
+		return getContext().getWiki().getHibernateStore();
 	}
 	
 	/** @return true, if something added */
@@ -166,7 +186,7 @@ public class HibernateQuery extends DefaultQuery {
 		}
 		
 		public Object visit(PathQueryNode node, Object data) {
-			final QueryNode[] ps = (QueryNode[]) node.getOperands();
+			final QueryNode[] ps = node.getOperands();
 			if (ps.length < 1)
 				throw new TranslateException("path must be");
 			
@@ -237,7 +257,7 @@ public class HibernateQuery extends DefaultQuery {
 					continue;
 				if (qn_xwiki_attachment.equals(qncl) && qname!=null) {
 					lsqn.addPredicate( new RelationQueryNode(
-						lsqn, fromJCRName("filename"), qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+						lsqn, fromJCRName("filename"), qname.getLocalName(), QueryConstants.OPERATION_EQ_GENERAL
 					));
 				}
 				if (qncl!=null ) { // space
@@ -249,11 +269,11 @@ public class HibernateQuery extends DefaultQuery {
 					if (qn_xwiki_document.equals(qncl)) {
 						if (qspace!=null)
 							lsqn.addPredicate( new RelationQueryNode(
-									lsqn, fromJCRName("web"), qspace.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+									lsqn, fromJCRName("web"), qspace.getLocalName(), QueryConstants.OPERATION_EQ_GENERAL
 							));
 						if (qname!=null)
 							lsqn.addPredicate( new RelationQueryNode(
-									lsqn, fromJCRName("name"), qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL
+									lsqn, fromJCRName("name"), qname.getLocalName(), QueryConstants.OPERATION_EQ_GENERAL
 							));
 					} else if (qn_xwiki_object.equals(qncl)) {
 						final RelationQueryNode rqn = getXWikiQNameRelation(lsqn, "className", qspace, qname);
@@ -568,11 +588,11 @@ public class HibernateQuery extends DefaultQuery {
 			if (qspace==null && qname==null) {
 				return null;
 			} else if (qspace!=null && qname!=null) {
-				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+"."+qname.getLocalName(), RelationQueryNode.OPERATION_EQ_GENERAL);
+				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+"."+qname.getLocalName(), QueryConstants.OPERATION_EQ_GENERAL);
 			} else if (qspace!=null && qname==null) {
-				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+".%", RelationQueryNode.OPERATION_LIKE);
+				return new RelationQueryNode(par, fromJCRName(prop), qspace.getLocalName()+".%", QueryConstants.OPERATION_LIKE);
 			} else if (qspace==null && qname!=null) {
-				return new RelationQueryNode(par, fromJCRName(prop), "%."+qname.getLocalName(), RelationQueryNode.OPERATION_LIKE);
+				return new RelationQueryNode(par, fromJCRName(prop), "%."+qname.getLocalName(), QueryConstants.OPERATION_LIKE);
 			}
 			return null;			
 		}

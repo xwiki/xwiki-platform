@@ -24,11 +24,9 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.util.Date;
 
-import org.apache.commons.lang.time.FastDateFormat;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
@@ -56,7 +54,7 @@ public abstract class IndexData
     public IndexData (final XWikiDocument doc, final XWikiContext context)
     {
         setDocumentName (doc.getName ());
-        setDocumentWeb (doc.getWeb ());
+        setDocumentWeb (doc.getSpace());
         setWiki (context.getDatabase ());
         setFullName (new StringBuffer (wiki).append (":").append (documentWeb).append (".")
                 .append (documentName).toString ());

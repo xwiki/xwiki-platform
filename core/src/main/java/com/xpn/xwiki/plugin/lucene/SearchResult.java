@@ -25,19 +25,15 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Result of a search. The Plugin will return a collection of these for display
  * on the search page.
  * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
  */
-public class SearchResult
-{
+public class SearchResult {
     private float               score;
     private String              name;
     private String              wiki;

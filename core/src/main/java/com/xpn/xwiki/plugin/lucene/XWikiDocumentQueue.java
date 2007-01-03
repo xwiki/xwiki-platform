@@ -27,8 +27,6 @@ import java.util.Map;
 import org.apache.commons.collections.Buffer;
 import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
  * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
  */

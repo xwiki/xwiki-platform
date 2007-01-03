@@ -72,7 +72,9 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         tempDir = new File(dir, "dot");
         try {
             tempDir.mkdirs();
-        } catch (Exception e) {};
+        } catch (Exception ex) {
+            mLogger.warn("Failed to create temporary file", ex);
+        }
 
         dotPath = context.getWiki().Param("xwiki.plugin.graphviz.dotpath", "dot");
         if (!dotPath.equals("dot")) {

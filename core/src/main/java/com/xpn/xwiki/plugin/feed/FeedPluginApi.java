@@ -23,18 +23,12 @@
 
 package com.xpn.xwiki.plugin.feed;
 
+import java.io.IOException;
+
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.api.Api;
-
-import java.io.IOException;
-import java.util.Vector;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 
 public class FeedPluginApi extends Api {
         private FeedPlugin plugin;

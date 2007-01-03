@@ -22,21 +22,21 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.log4j.Logger;
-import org.apache.lucene.document.Field;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.ListItem;
-
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
+
+import org.apache.log4j.Logger;
+import org.apache.lucene.document.Field;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListItem;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Hold the property values of the XWiki.ArticleClass Objects.

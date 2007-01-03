@@ -1,40 +1,31 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-#template("viewheader.vm")
-<div id="xwikicontent">
-<h2>$xwiki.parseMessage("availableversionsattachment")</h2>
-<p>
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<h4 class="heading-1-1-1">$xwiki.parseMessage("availableversionsattachment")</h4>
 #if ($tdoc.realLanguage!="")
 #set($lang = "&language=${tdoc.realLanguage}")
 #else
 #set($lang = "")
 #end
-<ul class="star">
-<table border="1" cellpadding="4" cellspacing="0" width="50%">
+<table class="wiki-table" cellpadding="0" cellspacing="0" border="0">
     <tr>
-        <th></th><th><b>$msg.get("version")</b> </th><th> <b>$msg.get("size")</b></th>
-        <th> <b>$msg.get("author")</b> </th><th><b>$msg.get("date")</b></th>
+        <th></th><th>$msg.get("version")</th><th>$msg.get("size")</th>
+        <th>$msg.get("author")</th><th>$msg.get("date")</th>
     </tr>
-    #foreach ($version in $attachment.getVersions())
-    <tr>
-    #set($attachrev = $attachment.getAttachmentRevision($version.toString()))
-    #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}, "width=80"))
-        <td>
-             #if ($attachment.isImage())
-                <img src="${url}" alt="${attachment.filename}" width="80" />
-             #end
+#foreach ($version in $attachment.getVersions())
+    <tr#if($velocityCount % 2 == 1) class="table-odd"#else class="table-even"#end>
+#set($attachrev = $attachment.getAttachmentRevision($version.toString()))
+#set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
+#if ($attachment.isImage())
+        <td><img src="${url}" alt="${attachment.filename}" width="80" />#else
+        <td class="mime">#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase())
+#end
         </td>
-        <td align="center"><a href="" onclick="location='${url}'; return false;">$version</a> </td>
-        <td align="center">$attachrev.getFilesize()</td>
-        <td align="center">$xwiki.getLocalUserName($attachrev.getAuthor())</td>
-        <td align="center">$xwiki.formatDate($attachrev.getDate())</td>
+        <td><a href="$url">$version</a></td>
+        <td>$attachrev.getFilesize()</td>
+        <td>$xwiki.getLocalUserName($attachrev.getAuthor())</td>
+        <td>$xwiki.formatDate($attachrev.getDate())</td>
     </tr>
 #end
 </table>
-<br/>
-</ul>
-</p>
-</div>
-#template("basefooter.vm")
-#template("footer.vm")
+</div> ## main
+#template("endpage.vm")

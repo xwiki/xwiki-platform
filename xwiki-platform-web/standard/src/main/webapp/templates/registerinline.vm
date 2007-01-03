@@ -14,7 +14,7 @@ $msg.get("registerfailed") ($msg.get("registerfailedcode) $reg)
 #end
 <br /><br />
 </span>
-#else
+#elseif($reg)
 $msg.get("registersuccessful")
 #end
 #if(!$reg||$reg<0 )

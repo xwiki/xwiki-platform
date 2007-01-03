@@ -90,7 +90,7 @@
         #else
           #xwikiitem($doc.getURL("viewrev","xpage=code&$!{revparams}") "raw")
         #end
-        #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
+##        #xwikiitem($doc.getExternalURL("view","xpage=xml&$!{revparams}") "xml")
 ## Edit section
         #if($hasedit)
           <div class="xwikimenutitle">$msg.get("edit")</div>

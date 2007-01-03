@@ -27,17 +27,12 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class FlickrPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.flickr.FlickrPlugin.class);
-
-        public FlickrPlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
+    public FlickrPlugin(String name, String className, XWikiContext context) {
+        super(name, className, context);
+        init(context);
+    }
 
     public String getName() {
         return "flickr";

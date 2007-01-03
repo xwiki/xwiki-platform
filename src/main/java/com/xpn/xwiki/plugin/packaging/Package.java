@@ -276,7 +276,7 @@ public class Package {
         try {
             description = ReadZipInfoFile(zis);
             if (description == null)
-                throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
+                throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Could not find the package definition");
             bais = new ByteArrayInputStream(file);
             zis = new ZipInputStream(bais);
             while ((entry = zis.getNextEntry()) != null) {
@@ -289,7 +289,7 @@ public class Package {
                         if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(), description))
                             this.add(doc, context);
                         else
-                            throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "document " + doc.getFullName() + " does not exist in package definition");
+                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "document " + doc.getFullName() + " does not exist in package definition");
                     } catch (ExcludeDocumentException e) {
                         log.info("Skip the document '" + doc.getFullName() + "'");
                     }
@@ -297,7 +297,7 @@ public class Package {
             }
             updateFileInfos(description);
         } catch (DocumentException e) {
-            throw new PackageException(PackageException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
+            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN, "Error when reading the XML");
         }
         return "";
     }

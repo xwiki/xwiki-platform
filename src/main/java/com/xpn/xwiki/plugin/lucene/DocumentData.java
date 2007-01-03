@@ -22,10 +22,7 @@
 
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.log4j.Logger;
-
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -34,10 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * rebuilding an index for a big wiki.
  * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
  */
-public class DocumentData extends IndexData
-{
-    private static final Logger LOG = Logger.getLogger (DocumentData.class);
-
+public class DocumentData extends IndexData {
     public DocumentData (final XWikiDocument doc, final XWikiContext context)
     {
         super (doc, context);

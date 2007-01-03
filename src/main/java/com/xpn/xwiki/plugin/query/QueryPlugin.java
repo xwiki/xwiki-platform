@@ -70,7 +70,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         return getContext().getWiki().getStore();
     }
 
-    ValueFactory valueFactory = null;;
+    ValueFactory valueFactory = null;
     public ValueFactory getValueFactory() {
         if (valueFactory==null) {
             valueFactory = ValueFactoryImpl.getInstance();

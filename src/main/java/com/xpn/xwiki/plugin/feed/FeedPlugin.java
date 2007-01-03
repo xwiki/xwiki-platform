@@ -24,7 +24,22 @@
 
 package com.xpn.xwiki.plugin.feed;
 
-import com.sun.syndication.feed.synd.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import com.sun.syndication.feed.synd.SyndCategory;
+import com.sun.syndication.feed.synd.SyndContent;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.fetcher.FeedFetcher;
 import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 import com.xpn.xwiki.XWikiContext;
@@ -37,17 +52,8 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
 
 public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-        private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.feed.FeedPlugin.class);
-
         private XWikiCache feedCache;
         private int refreshPeriod;
 

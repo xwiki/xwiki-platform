@@ -74,8 +74,9 @@ public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         tempDir = new File(dir, "svg");
         try {
             tempDir.mkdirs();
-        } catch (Exception e) {};
-
+        } catch (Exception ex) {
+            mLogger.warn("Cannot create temporary files", ex);
+        }
     }
 
     public byte[] getSVGImage(String content, int height, int width) throws IOException, SVGConverterException {

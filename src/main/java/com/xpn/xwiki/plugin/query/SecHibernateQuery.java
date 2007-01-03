@@ -155,7 +155,7 @@ public class SecHibernateQuery extends HibernateQuery {
 		// wrapping
 		final List result = new ArrayList();
 		for (Iterator iter = lst.iterator(); iter.hasNext();) {
-			final Object element = (Object) iter.next();
+			final Object element = iter.next();
 			if (element instanceof XWikiDocument) {
 				XWikiDocument doc = (XWikiDocument) element;
 				doc = getStore().loadXWikiDoc(doc, getContext());

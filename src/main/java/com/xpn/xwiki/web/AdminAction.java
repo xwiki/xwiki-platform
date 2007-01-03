@@ -82,7 +82,7 @@ public class AdminAction extends XWikiAction {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
                 if ((tdoc==doc)) {
-                    tdoc = new XWikiDocument(doc.getWeb(), doc.getName());
+                    tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
                     tdoc.setAuthor(context.getUser());

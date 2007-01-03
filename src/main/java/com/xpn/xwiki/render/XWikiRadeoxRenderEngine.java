@@ -116,7 +116,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             name = name.replace('+',' ');
             String newname = noaccents(name);
             XWikiDocument doc = new XWikiDocument(
-                    (currentdoc!=null) ? currentdoc.getWeb() : "Main",
+                    (currentdoc!=null) ? currentdoc.getSpace() : "Main",
                     newname);
             boolean exists = context.getWiki().exists(doc.getFullName(), context);
 
@@ -126,7 +126,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
             // if the document does not exists then we check the one not converted
             doc = new XWikiDocument(
-                    (currentdoc!=null) ? currentdoc.getWeb() : "Main",
+                    (currentdoc!=null) ? currentdoc.getSpace() : "Main",
                      name);
             return context.getWiki().exists(doc.getFullName(), context);
         }
@@ -180,7 +180,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 if (newname.indexOf(".")!=-1) {
                         newdoc.setFullName(newname, context);
                 } else {
-                    newdoc.setWeb(context.getDoc().getWeb());
+                    newdoc.setSpace(context.getDoc().getSpace());
                     newdoc.setName(newname);
                 }
 
@@ -189,7 +189,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     if (name.indexOf(".")!=-1) {
                             newdoc.setFullName(name, context);
                     } else {
-                        newdoc.setWeb(context.getDoc().getWeb());
+                        newdoc.setSpace(context.getDoc().getSpace());
                         newdoc.setName(name);
                     }
                 }
@@ -198,7 +198,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 if ((db==null)||(database.equals(db)))
                  addLinkToContext(newdoc.getFullName(), context);
 
-                URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
+                URL url = context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(),
                         "view", querystring, anchor, context);
                 buffer.append(context.getURLFactory().getURL(url, context));
                 buffer.append("\">");
@@ -266,7 +266,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if (newname.indexOf(".")!=-1) {
                     newdoc.setFullName(newname, context);
             } else {
-                newdoc.setWeb(context.getDoc().getWeb());
+                newdoc.setSpace(context.getDoc().getSpace());
                 newdoc.setName(newname);
             }
 
@@ -283,7 +283,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if ((!editor.equals("")&&(!editor.equals("text")))&&(!editor.equals("---")))
                 querystring += "&editor=" + editor;
 
-            URL url = context.getURLFactory().createURL(newdoc.getWeb(), newdoc.getName(),
+            URL url = context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(),
                     "edit", querystring, null, context);
             String surl = context.getURLFactory().getURL(url, context);
             buffer.append("<a class=\"wikicreatelink\" href=\"");

@@ -75,12 +75,12 @@ public class WikiNameSubstitution extends WikiSubstitution {
                                                        matchResult.group(4), true, getContext(),getUtil());
                     break;
                 case TYPE_THREE:
-                    XWikiWikiBaseRenderer.internalLink(stringBuffer, matchResult.group(1), getDoc().getWeb(),
+                    XWikiWikiBaseRenderer.internalLink(stringBuffer, matchResult.group(1), getDoc().getSpace(),
                                                        matchResult.group(2), matchResult.group(2) + matchResult.group(3),
                                                        matchResult.group(3), true, getContext(),getUtil());
                     break;
                 case TYPE_FOUR:
-                    XWikiWikiBaseRenderer.internalLink(stringBuffer, matchResult.group(1), getDoc().getWeb(),
+                    XWikiWikiBaseRenderer.internalLink(stringBuffer, matchResult.group(1), getDoc().getSpace(),
                                                        matchResult.group(2), matchResult.group(2),
                                                        "", true, getContext(),getUtil());
                     break;

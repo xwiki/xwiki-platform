@@ -39,7 +39,7 @@ public class PDFAction extends XWikiAction {
             
         try {
          context.getResponse().setContentType("application/pdf");
-         context.getResponse().addHeader("Content-disposition", "attachment; filename=" + Utils.encode(doc.getWeb(), context) + "_" + Utils.encode(doc.getName(), context) + ".pdf");
+         context.getResponse().addHeader("Content-disposition", "attachment; filename=" + Utils.encode(doc.getSpace(), context) + "_" + Utils.encode(doc.getName(), context) + ".pdf");
 
          pdfexport.exportToPDF(doc, context.getResponse().getOutputStream(), context);
         } catch (IOException e) {

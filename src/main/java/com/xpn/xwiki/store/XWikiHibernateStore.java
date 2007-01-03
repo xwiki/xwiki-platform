@@ -26,7 +26,6 @@
  */
 package com.xpn.xwiki.store;
 
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,7 +54,6 @@ import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 
-import java.io.BufferedReader;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -595,9 +593,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 query = session.createQuery("select obj.id from " + bclass.getName() + " as obj where obj.id = :id");
                 query.setInteger("id", object.getId());
                 if (query.uniqueResult()==null)
-                    dynamicSession.save((String) bclass.getName(), objmap);
+                    dynamicSession.save(bclass.getName(), objmap);
                 else
-                    dynamicSession.update((String) bclass.getName(), objmap);
+                    dynamicSession.update(bclass.getName(), objmap);
 
                 // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
             }
@@ -696,7 +694,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 if ((bclass!=null)&&(bclass.hasCustomMapping())&&context.getWiki().hasCustomMappings()) {
                     Session dynamicSession = session.getSession(EntityMode.MAP);
-                    Object map = dynamicSession.load((String) bclass.getName(),new Integer(object.getId()));
+                    Object map = dynamicSession.load(bclass.getName(),new Integer(object.getId()));
                     // Let's make sure to look for null fields in the dynamic mapping
                     bclass.fromValueMap((Map)map, object);
                     handledProps = bclass.getCustomMappingPropertyList(context);
@@ -712,7 +710,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
 
             if (!className.equals("internal")) {
-                HashMap map = new HashMap();
                 Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id");
                 query.setInteger("id", object.getId());
                 List list = query.list();
@@ -1703,17 +1700,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction = false;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
-            if(selectColumns == null) {
-                selectColumns = "";
-            }
-            else {
-                selectColumns = selectColumns.trim();
-            }
             StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
-            if (!selectColumns.equals("")) {
-                sql.append(",");
-                sql.append(selectColumns);
-            }
 
             if (wheresql==null)
                 wheresql = "";
@@ -1778,6 +1765,107 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    protected List searchDocumentsNamesAdvanced(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException {
+        boolean bTransaction = false;
+        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
+        try {
+            if(selectColumns == null) {
+                selectColumns = "";
+            }
+            else {
+                selectColumns = selectColumns.trim();
+            }
+            StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
+            if (!selectColumns.equals("")) {
+                sql.append(",");
+                sql.append(selectColumns);
+            }
+
+            if (wheresql==null)
+                wheresql = "";
+
+            int orderPos = wheresql.toLowerCase().indexOf("order by");
+            if (orderPos >= 0)
+            {
+                orderPos += "order by".length();
+                String orderStatement = wheresql.substring(orderPos + 1);
+                orderStatement = orderStatement.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
+                sql.append(", ").append(orderStatement);
+            }
+
+            sql.append(" from XWikiDocument as doc");
+
+            wheresql = wheresql.trim();
+            if (!wheresql.equals("")) {
+                if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
+                    sql.append(" where ");
+                else
+                    sql.append(" ");
+
+                sql.append(wheresql);
+            }
+            String ssql = sql.toString();
+
+            // Start monitoring timer
+            if (monitor!=null)
+                monitor.startTimer("hibernate", ssql);
+
+            checkHibernate(context);
+            bTransaction = beginTransaction(false, context);
+            Session session = getSession(context);
+            Query query = session.createQuery(ssql);
+            if (start!=0)
+                query.setFirstResult(start);
+            if (nb!=0)
+                query.setMaxResults(nb);
+            Iterator it = query.list().iterator();
+            List list = new ArrayList();
+            if(selectColumns.equals("")) {
+                while (it.hasNext()) {
+                    Object[] result = (Object[]) it.next();
+                    String name = (String) result[0] + "." + (String)result[1];
+                    list.add(name);
+                }
+            }
+            else {
+                HashMap map;
+                StringTokenizer tok = new StringTokenizer(selectColumns, ", ");
+                String[] columns = new String[tok.countTokens()];
+                int i = 0;
+                while(tok.hasMoreTokens()) {
+                    columns[i++] = tok.nextToken();
+                }
+                while (it.hasNext()) {
+                    Object[] result = (Object[]) it.next();
+                    map = new HashMap();
+                    String name = (String) result[0] + "." + (String)result[1];
+                    map.put("docname", name);
+                    for(int k = 0; k < i; ++k) {
+                        map.put(columns[k], result[k+2]);
+                    }
+                    list.add(map);
+                }
+            }
+            return list;
+        }
+        catch (Exception e) {
+            Object[] args = { wheresql  };
+            // Object[] args = { ((wheresql==null) ? "" : wheresql)  };
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                    "Exception while searching documents with sql {0}", e, args);
+        } finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, false, false);
+            } catch (Exception e) {}
+
+            // End monitoring timer
+            if (monitor!=null)
+                monitor.endTimer("hibernate");
+        }
+    }
+
+    
     public List searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
@@ -2098,7 +2186,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
 		List result = new ArrayList();
         String hql = "select doc.language from XWikiDocument as doc where doc.web = '"
-                + Utils.SQLFilter(doc.getWeb()) + "' and doc.name = '" + Utils.SQLFilter(doc.getName()) + "' and doc.language <> ''";
+                + Utils.SQLFilter(doc.getSpace()) + "' and doc.name = '" + Utils.SQLFilter(doc.getName()) + "' and doc.language <> ''";
 
         List list = context.getWiki().search(hql, context);
         if ((list == null) || (list.size() == 0)) {

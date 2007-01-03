@@ -56,7 +56,7 @@ public class PageSummary  {
 
     public PageSummary(XWikiDocument doc, XWikiContext context) {
         this.setId(doc.getFullName());
-        this.setSpace(doc.getWeb());
+        this.setSpace(doc.getSpace());
         this.setParentId(doc.getParent());
         this.setTitle(doc.getFullName());
         this.setUrl(doc.getURL("view", context));

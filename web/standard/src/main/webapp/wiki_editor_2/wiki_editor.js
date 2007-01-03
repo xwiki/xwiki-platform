@@ -284,7 +284,6 @@ WikiEditor.prototype.convertExternal = function(content) {
 	and returning a Wiki Syntax equivalent.
 */
 WikiEditor.prototype.convertInternal = function(content) {
-    this.splitOverlapSpans(content);
 	var regexp, r;
 	var lines;
 	var lastIndex;
@@ -315,61 +314,6 @@ WikiEditor.prototype.convertInternal = function(content) {
 	}
 	content = this.trimString(this._removeHtmlTags(content));
 	return content;
-}
-
-// This function to convert Fonts from Wiki syntax to internal html representation
-WikiEditor.prototype.splitOverlapSpans = function(content) {
-    var doc = this.core.selectedInstance.getDoc();
-    var s = doc.getElementsByTagName("span");
-    for (var i = s.length - 1; i >= 0 ; i--) {
-        var node = s[i];
-        var childNodes = node.childNodes;
-        var parent = node.parentNode;
-        var newNode = node.cloneNode(false);
-        var parentAtts = s[i].style;
-        for (var j=0; j < childNodes.length; j++) {
-            if (childNodes[j].nodeName.toLowerCase() != "span") {
-                newNode.appendChild(childNodes[j].cloneNode(true));
-                parent.insertBefore(newNode, node);
-            } else {
-                var childAtts = childNodes[j].style;
-                newNode = childNodes[j].cloneNode(true);
-
-                if (parentAtts != null) {
-                    for (var k=0; k < parentAtts.length; k++) {
-                        var overlap = new Boolean("true");
-                        if (childAtts != null)
-                            for (var kk=0 ; kk < childAtts.length; kk++) {
-                                if (this.trimString(parentAtts[k]) == this.trimString(childAtts[kk]))
-                                    overlap = false;                        
-                            }
-                        else overlap = false;
-
-                        if (overlap) {
-                            switch (parentAtts[k]) {
-                                case "color" :
-                                    newNode.style.color = s[i].style.color;
-                                    break;
-                                case "background-color" :
-                                    newNode.style.backgroundColor = s[i].style.backgroundColor;
-                                    break;
-                                case "font-family" :
-                                    newNode.style.fontFamily = s[i].style.fontFamily;
-                                    break;
-                                case "font-size" :
-                                    newNode.style.fontSize = s[i].style.fontSize;
-                                    break;
-                            }
-                        }
-                    }
-                }
-                parent.insertBefore(newNode, node);
-                newNode = node.cloneNode(false);
-            }
-            parent.insertBefore(newNode, node);
-        }
-        parent.removeChild(node);
-    }
 }
 
 /*

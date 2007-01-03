@@ -11,7 +11,8 @@
 		debug : false,
 		remove_linebreaks : false,
 		plugins: 'table, contextmenu, paste, searchreplace',
-		wiki_plugins: 'core'
+        wiki_use_style: '$xwiki.useWysiwygStyleToolbar()',    
+        wiki_plugins: 'core'
 	});
 </script>
 #end

@@ -569,13 +569,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (stats)
                  session.save(object);
                 else
-                 session.save((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+                 session.save("com.xpn.xwiki.objects.BaseObject", object);
             }
             else {
                 if (stats)
                  session.update(object);
                 else
-                 session.update((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
+                 session.update("com.xpn.xwiki.objects.BaseObject", object);
             }
 /*
             if (stats)

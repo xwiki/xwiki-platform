@@ -20,16 +20,11 @@
  */
 package com.xpn.xwiki.api;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * @author Phung Hai Nam (phunghainam@xwiki.com)
  * @version 25 Aug 2006
  */
 public class DocumentSection {
-    private static final Log log = LogFactory.getLog(DocumentSection.class);
-
     private int sectionNumber;
     private int sectionIndex;
     private String sectionLevel;

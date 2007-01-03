@@ -236,6 +236,9 @@ $doc.display("content", $obj)
 </span></div>
 #end
 
+###
+###    Message box
+###
 #macro(xwikimessageboxstart $title $message)
     <div class="centered">
     <fieldset class="xwikimessage">
@@ -270,6 +273,27 @@ $html
 <input type="submit" value="$submittext" />
 </div>
 #end
+
+
+###
+###    message
+###
+
+#macro(warningmessage $text)
+<div class="warningmessage"><span class="hidden">$msg.get("warning"): </span>$text</div>
+#end
+
+#macro(errormessage $text)
+<div class="errormessage"><span class="hidden">$msg.get("error"): </span>$text</div>
+#end
+
+#macro(infomessage $text)
+<div class="infomessage">$text</div>
+#end
+
+###
+###    CSS properties
+###
 
 #macro(csscolorproperty $csspropname $fieldname)
 #set($objcolor = $colors.get($fieldname))

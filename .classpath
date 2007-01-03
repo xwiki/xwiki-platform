@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/cactus"/>
-	<classpathentry kind="src" path="web/standard/src/main/webapp"/>
-	<classpathentry kind="src" path="core/src/main/java"/>
-	<classpathentry kind="src" path="core/src/test/java"/>
-	<classpathentry kind="src" path="core/src/main/resources"/>
-	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="src/test/java"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="web/standard/src/main/webapp"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="core/src/main/java"/>
+	<classpathentry excluding="**/.svn|**/.svn/**" kind="src" path="core/src/test/java"/>
+	<classpathentry excluding="**/.svn/**" kind="src" path="core/src/main/resources"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="src/test/resources"/>
 	<classpathentry exported="true" kind="lib" path="lib/alexa-UNKNOWN-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-1.6.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.5.jar"/>
@@ -93,7 +90,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/portlet-api-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/qname-1.5.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/radeox-UNKNOWN-xwiki.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-fetcher-0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saaj-1.2.jar"/>
@@ -130,5 +126,6 @@
 	<classpathentry kind="lib" path="lib/PDFBox-0.7.2.jar"/>
 	<classpathentry kind="lib" path="lib/poi-3.0-alpha1-20050704.jar"/>
 	<classpathentry kind="lib" path="lib/poi-scratchpad-3.0-alpha1-20050704.jar"/>
+	<classpathentry kind="lib" path="lib/radeox-1.0-b2.jar"/>
 	<classpathentry kind="output" path="build/eclipse/web/WEB-INF/classes"/>
 </classpath>

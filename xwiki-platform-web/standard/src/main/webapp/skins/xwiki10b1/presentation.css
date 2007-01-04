@@ -314,3 +314,18 @@ a#modifygroup{
 .smallest{
   font-size: 50%;
 }
+
+.pagingLinks{
+  font-variant: small-caps;
+  font-size: 90%;
+  margin: 5px 30px;
+  border: 1px solid #999;
+  overflow: hidden;
+  padding: 2px 10px;
+}
+.pagingLinks .prevPage{
+  float: left;
+}
+.pagingLinks .nextPage{
+  float: right;
+}

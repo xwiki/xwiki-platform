@@ -51,62 +51,67 @@
 </property>
 </object>
 <content>#macro(blog $category $nbitems $nbstart)
+#if(!$maxchars)
+#set($maxchars = 400)
+#end
+&lt;div class="hfeed"&gt;
 #if($category=='')
 #set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' order by doc.creationDate desc")
 #else
-#set($category = $category.replaceAll("'","''"))
 #set ($sql = ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name&lt;&gt;'XWiki.ArticleClassTemplate' and obj.id=prop.id.id and prop.id.name='category'  and list='${category}' order by doc.creationDate desc")
+## TODO: feed category
 #end
 #set($cdate = "")
 #set($inbitems = $xwiki.parseInt($nbitems))
 #set($inbstart = $xwiki.parseInt($nbstart))
-#set($counter = 0)
 #foreach ($item in $xwiki.searchDocuments($sql, $inbitems, $inbstart))
-#if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
-#set($counter = $counter+1)
 #set($bentrydoc = $xwiki.getDocument($item))
+#if($bentrydoc.fullName == $item)
 #set($bentryobj = $bentrydoc.getObject("XWiki.ArticleClass"))
-#set($creationDate = $xwiki.formatDate($bentrydoc.creationDate,"MMMM dd, yyyy"))
+#set($creationDate = $xwiki.formatDate($bentrydoc.creationDate, "MMMM dd, yyyy"))
 #if($cdate!=$creationDate)
-&lt;div class="article_date"&gt;
-$creationDate
-&lt;/div&gt;
+&lt;div class="article_date"&gt;$creationDate&lt;/div&gt;
 #set ($cdate = $creationDate)
 #end
-#set($title = $!bentrydoc.display("title","view", $bentryobj)) 
-#if($title == "")
-#set($title = "&amp;nbsp;")
-#end
-1.1.1 [$title&gt;$bentrydoc.fullName]
-&lt;div class="article_content" &gt;
+&lt;div class="hentry"&gt;
+&lt;h4 class="heading-1-1-1 entry-title"&gt;$bentrydoc.display("title","view", $bentryobj)&lt;/h4&gt;
+&lt;div class="article_content entry-summary"&gt;
 #set($content = $bentrydoc.display("extract", "view", $bentryobj))
 #if($content=="")
 #set($content = $bentrydoc.display("content", "view", $bentryobj))
 #if($content.length()&gt;400)
-#set($i = $content.lastIndexOf(" ",400))
+#set($i = $content.lastIndexOf(" ", $maxchars))
 #set($i = $i + 1)
-#set($content = "${content.substring(0,$i)} ... [continue reading&gt;${bentrydoc.fullName}]")
+#set($content = "${content.substring(0,$i)} [...&gt;${bentrydoc.fullName}]")
 #end
 #else
-#set($content = "${content} ... [continue reading&gt;${bentrydoc.fullName}]")
+#set($content = "${content} [...&gt;${bentrydoc.fullName}]")
 #end
 $bentrydoc.getRenderedContent($content)
-&lt;/div&gt;
-&lt;div class="article_footer" &gt;
-Posted by $xwiki.getLocalUserName($bentrydoc.creator) on $xwiki.formatDate($bentrydoc.creationDate, "MMM dd, yyyy HH:mm") in $!bentrydoc.display("category","view", $bentryobj) | Modified by $xwiki.getLocalUserName($bentrydoc.author) on $xwiki.formatDate($bentrydoc.date, "MMM dd, yyyy HH:mm") | [$bentrydoc.comments.size() Comment(s)&gt;${bentrydoc.fullName}?xpage=comments] | [Permalink&gt;$bentrydoc.fullName]
-&lt;/div&gt;
-#if($counter==$inbitems)
-&lt;div style="float: right; margin-right: 30px"&gt;
+&lt;/div&gt; ## entry-content
+&lt;div class="article_footer"&gt;
+#set($bcategories = $bentryobj.getProperty("category").value)
+Posted by &lt;address class="author vcard"&gt;#userfn($bentrydoc.creator)&lt;/address&gt; at &lt;abbr class="published" title="#formatdateISO($bentrydoc.creationDate)"&gt;$xwiki.formatDate($bentrydoc.creationDate, "MMM dd, yyyy HH:mm")&lt;/abbr&gt;#if($bcategories.size() &gt; 0) in #foreach($bcategory in $bcategories)&lt;a rel="tag" href="$xwiki.getURL("Blog.Category", "view", "category=${bcategory}")"&gt;$bcategory&lt;/a&gt; #end#end #if($bentrydoc.date != $bentrydoc.creationDate) | Modified by &lt;address class="author vcard"&gt;#userfn($bentrydoc.author)&lt;/address&gt; at &lt;abbr class="updated" title="#formatdateISO($bentrydoc.date)"&gt;$xwiki.formatDate($bentrydoc.date, "MMM dd, yyyy HH:mm")&lt;/abbr&gt; #end | [$bentrydoc.comments.size() Comment(s)&gt;${bentrydoc.fullName}?xpage=comments] | &lt;a href="$bentrydoc.getURL("view")" rel="bookmark"&gt;Permalink&lt;/a&gt;
+&lt;/div&gt; ## article_footer
+&lt;/div&gt; ## hentry
+#end
+#end
+##
+## prev/next links
+#if(($inbstart != 0) || ($velocityCount==$inbitems))
+&lt;div class="pagingLinks"&gt;
 #if ($inbstart!=0)
 #set($iprev = $inbstart - $inbitems)
-[Previous&gt;$doc.name?category=$!{request.category}&amp;nbstart=${iprev}]
+&lt;span class="prevPage"&gt;[Previous&gt;$doc.name?nbstart=${iprev}]&lt;/span&gt;
 #end
+#if($velocityCount==$inbitems)
 #set($inext = $inbstart + $inbitems)
-[Next&gt;$doc.name?category=$!{request.category}&amp;nbstart=${inext}]
-&lt;/div&gt;
+&lt;span class="nextPage"&gt;[Next&gt;$doc.name?nbstart=${inext}]&lt;/span&gt;
 #end
+&lt;span class="clear"&gt;&lt;/span&gt;
+&lt;/div&gt; ## pagingLinks
 #end
-#end
+&lt;/div&gt; ## hfeed
 #end
 #blog($category $nbitems $nbstart)</content>
 </xwikidoc>

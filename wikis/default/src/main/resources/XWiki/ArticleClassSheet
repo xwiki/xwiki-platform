@@ -50,59 +50,43 @@
 <tags/>
 </property>
 </object>
-<content>#set($obj = $doc.getObject("XWiki.ArticleClass",0))
-
-&lt;div class="article_title"&gt;
-1.1 $doc.display("title", "view", $obj)
-&lt;/div&gt;
-#if($context.action!="inline")
-&lt;div class="article_content"&gt;
+<content>#set($obj = "")
+#set($obj = $doc.getObject("XWiki.ArticleClass"))
+#if($obj == "")
+#warningmessage("This is not an article!")
+#elseif($context.action!="inline")
+&lt;div class="hfeed"&gt;
+&lt;div class="hentry"&gt;
+&lt;h3 class="heading-1-1 entry-title"&gt;$doc.display("title","view", $obj)&lt;/h3&gt;
+&lt;div class="article_content entry-content"&gt;
 $doc.display("content", "rendered", $obj)
-&lt;/div&gt;
-&lt;div class="article_footer" &gt;
-Posted by $xwiki.getLocalUserName($doc.creator) on $xwiki.formatDate($doc.creationDate, "MMM dd, yyyy HH:mm") in $!doc.display("category","view",$obj) | Modified by $xwiki.getLocalUserName($doc.author) on $xwiki.formatDate($doc.date, "MMM dd, yyyy HH:mm") | [$doc.comments.size() Comment(s)&gt;${doc.fullName}?xpage=comments] | [Permalink&gt;$doc.fullName]
-&lt;/div&gt;
+&lt;/div&gt; ## entry-content
+&lt;div class="article_footer"&gt;
+#set($bcategories = $obj.getProperty("category").value)
+Posted by &lt;address class="author vcard"&gt;#userfn($doc.creator)&lt;/address&gt; at &lt;abbr class="published" title="#formatdateISO($doc.creationDate)"&gt;$xwiki.formatDate($doc.creationDate, "MMM dd, yyyy HH:mm")&lt;/abbr&gt;#if($bcategories.size() &gt; 0) in #foreach($bcategory in $bcategories)&lt;a rel="tag" href="$xwiki.getURL("Blog.Category", "view", "category=${bcategory}")"&gt;$bcategory&lt;/a&gt; #end#end #if($doc.date != $doc.creationDate) | Modified by &lt;address class="author vcard"&gt;#userfn($doc.author)&lt;/address&gt; at &lt;abbr class="updated" title="#formatdateISO($doc.date)"&gt;$xwiki.formatDate($doc.date, "MMM dd, yyyy HH:mm")&lt;/abbr&gt; #end | [$doc.comments.size() Comment(s)&gt;${doc.fullName}?xpage=comments] | &lt;a href="$doc.getURL("view")" rel="bookmark"&gt;Permalink&lt;/a&gt;
+&lt;/div&gt; ## article_footer
+&lt;/div&gt; ## hentry
+&lt;/div&gt; ## hfeed
 #else
-&lt;table border="0"&gt;
-&lt;tr&gt;
-&lt;td&gt;
-Title:
-&lt;/td&gt;
-&lt;td&gt;
-$doc.display("title", "edit", $obj)
-&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;
-Category:
-&lt;/td&gt;
-&lt;td&gt;
-$doc.display("category", "edit", $obj)
-&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;
-Content:
-&lt;/td&gt;
-&lt;td&gt;
-$doc.display("content", "edit", $obj)
-&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;
-Extract:
-&lt;/td&gt;
-&lt;td&gt;
-$doc.display("extract", "edit", $obj)
-&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-
-#if($context.action=="inline")
+&lt;dl&gt;
+&lt;dt&gt;Title:&lt;/dt&gt;
+&lt;dd&gt;$doc.display("title", "edit", $obj)&lt;/dd&gt;
+&lt;dt&gt;Category:&lt;/dt&gt;
+&lt;dd&gt;$doc.display("category", "edit", $obj)&lt;/dd&gt;
+&lt;dt&gt;Content:&lt;/dt&gt;
+&lt;dd&gt;$doc.display("content", "edit", $obj)&lt;/dd&gt;
+&lt;dt&gt;Extract:&lt;/dt&gt;
+&lt;dd&gt;$doc.display("extract", "edit", $obj)&lt;/dd&gt;
+&lt;/dl&gt;
 #set($newtitle = $request.title)
 #if($newtitle)
 #set($newtitle = $newtitle.replace('"',"'"))
 &lt;script type="text/javascript"&gt;
 var title = "${newtitle}";
 {pre}
-document.forms.edit["XWiki.ArticleClass_0_title"].value = title;
+document.forms.inline["XWiki.ArticleClass_0_title"].value = title;
 {/pre}
 &lt;/script&gt;
-#end
 #end
 #end</content>
 </xwikidoc>

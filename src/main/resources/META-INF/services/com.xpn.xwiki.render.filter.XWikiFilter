@@ -2,6 +2,7 @@ org.radeox.filter.ParamFilter
 com.xpn.xwiki.render.filter.MacroFilter
 com.xpn.xwiki.render.filter.MacroFilter
 com.xpn.xwiki.render.filter.XWikiHeadingFilter
+com.xpn.xwiki.render.filter.XWikiLinkFilter
 org.radeox.filter.LineFilter
 # org.radeox.filter.ListFilter
 com.xpn.xwiki.render.filter.XWikiListFilter
@@ -12,7 +13,6 @@ com.xpn.xwiki.render.filter.UnderlineFilter
 com.xpn.xwiki.render.filter.StrongFilter
 # org.radeox.filter.BoldFilter
 org.radeox.filter.ItalicFilter
-com.xpn.xwiki.render.filter.XWikiLinkFilter
 org.radeox.filter.UrlFilter
 org.radeox.filter.MarkFilter
 org.radeox.filter.KeyFilter

@@ -1,104 +1,169 @@
 Product: Clover
-License: 30 day Evaluation License, 0.x, 1.x
-Issued: Sat Aug 19 2006 13:55:25 CDT
-Expiry: Mon Sep 18 2006 13:55:25 CDT
+License: Open Source License, 0.x, 1.x
+Issued: Sun Aug 20 2006 19:27:55 CDT
+Expiry: Never
 Maintenance Expiry: Never
-Key: af8c49b01336a71d734c
+Key: 4ebc2a3daafd5338cff7c3b79
 Name: Sergiu Dumitriu
-Org: "A. I. Cuza" University
-Certificate: AAACSm+Ow8B7/zEbxOMqqKwwrdpP+b9RI3QpJp1v5GYes34b0LfcEcNcI
-BFgt6wjtL/gk5sjqJJjkPuEZJj3job+JBdaIXxV5rXhQTJduOJDa/7G1s0R0xErGa03c25
-/hSgrb4R+POg2hP64ZtUCeu/HVo7ge7/eRICnRjBlA3PNI/QjB6YrTIPrnUPpUT0Rd53YZ
-ODqpcHYffXJcO+l7THY/MeGqnIfOWApBqze9AgUTrf9UyTnztDNRdoAOBWxPStURMNGPSC
-VaTH9VZnw61rISmm3hkSKuX+eyVyfvkIieEx5jBa1M0voOkzF9opBoFsmAXfY+TL16fDUw
-2zi3znAp84t1+fNyeFpAD0YJhPh6ewTAk7T+FN46MDKxgzrCj0ZySh/ByvdUT4ziH95rG7
-BtLQ1yhgp88NYm6ktooJknL5RdiITN8g7pXBL8ChFkOWbT6ZGchRgz/R95aa4wd80/98gy
-r7rMJiF1sO9ZwY+czgc7bqlOBheq65TfOvDzMJF9hcmXK8tdQEgwEd7dYBoZP0nhu73Wt5
-ZUO/STYf9K6nKWPmzTjosV2XZP9Y4R/U9WYHi0lK7XTduadT+d+/1tY7FZ+nSNcfxv2WDu
-ZKX/D1dZSF/Qoi39w8DSrr6C1rmytjQVL8OIQ+qMDYMOsdSYTLObDPvcZXi607PFnTkyU3
-LtDD70F+Hqko4MUI3wDO/NUD1LE3F8opUukE9CiXS+zLC6r/WyWaQyznAqeAn06HS061mB
-jN7KEjjhq1rH0Kq+l5+58OE10PqHUKYA/P0gayTKnWjFLm5wMaOC7m+M4PYUluZrD4GMY0
-IQqDEVbwncxrn8vP+y1mGJYkbF2q4VByBvktwi3+oBDg58KLx5Y2hqj5SP9TsT28XGHU1/
-tf2Cf7cXGzFx8Ti9XYyeHK7V3f79SUauu1Odfqas9I2+Dqmpl6DF7ck2ZMyjA==
-License Agreement: CENQUA CLOVER EVALUATION SOFTWARE LICENSE AGREEMENT
+Org: XWiki
+Certificate: AAAB3m+Ow8B7/zEbxOMqqKwwrdpP+a1COmJGHco7sCNLjHkHnajPF+dQW
+Ct12PMy0uml0s9xuus5wKngJ9OFk5DFeh01dzQF66bhXH1HsO1TZPnKl85Q9hY8Obs0fxY
+3jhJRbYV9eewtg+KPUM0ZP/Wbb5ulMfvsUoa5QDMxb37PP7IjS6Y7TILtnFKsWjcAJcnyM
+vXutYD0Q/PMOYOc/Dvc6sHS4So7OHs/Ve69+wQZWLyuWWyq7NXMR/oKaBWwZGYWIcVLP3i
+FOzD3f4Xy9U/VBS6n0kiO4Du+yVifpFM7dE1jjDW6cHbRIEKMpIBIpVF8bm/b/i/19KXFp
+mL/1TLMv+tpwv3Xw8VmBjN3Igbn+vEFSh/ouQI/gN/W0EX6ADgVsT0rbjrWUDZ0j3ow8TC
+Yuo9Xzho2utJSnqVVo9JRzr9RI3Qpf8UpqCBK4HRdl/GKLKVBMQFrzvg86PWj1clwp5Zhl
+vq/Zoa/lZP8MltacSMb9rX7FUp7tetXee+Pz8pC9gxoFLcwZl5hnFUsas94IfYug+arXNU
+aeuHJUsutMKnaHZqlRTljTnbYM7M+DucrRpDwz2WlRyQBd5OXfujltc7fcbTXJcGg5zff6
+5/HnWBlOHs/Aeqg9Q1KX6v7UwAl9ZtdysPIwz/B4NiDlVm0wIkq+pumbnESfluRuwLmPLD
+ZPAfj/jrnKSxI75Nll/S/RW3DZ4umvIWM680GHeafd9o1/4B0++AjvrgCpCU0HR3NMYdhh
+COQ1svUsFnOgOCeNTasHgYoCoWFkQnw1vbIs7+Mx1LgnjX2X+VFZZt7xw==
+License Agreement: CLOVER VERSION 1 (ONE) SOFTWARE LICENSE AGREEMENT
 
-CENQUA IS WILLING TO LICENSE CLOVER AND ACCOMPANYING DOCUMENTATION
-(THE "SOFTWARE") TO YOU (THE "EVALUATOR") FOR EVALUATION PURPOSES ONLY
-UPON THE CONDITION THAT YOU ACCEPT ALL OF THE TERMS OF THIS LICENSE
-AGREEMENT.  PLEASE READ THESE TERMS CAREFULLY BEFORE INSTALLING OR
-USING THE SOFTWARE.  BY INSTALLING OR USING THE SOFTWARE, YOU ARE
-CONSENTING TO BE BOUND BY AND ARE BECOMING A PARTY TO THIS AGREEMENT.
+1. Licenses and Software
 
-1. Software: The licensed Software is "Clover Evaluation Edition".
+Cenqua Pty Ltd, an Australian Proprietary Limited Company ("CENQUA") 
+hereby grants to the purchaser (the "LICENSEE") a limited, revocable, 
+worldwide, non-exclusive, nontransferable, non-sublicensable license 
+to use the Clover version 1 (one) software (the "Software"), 
+including any minor upgrades thereof during the Term (hereinafter 
+defined) up to, but not including the next major version of the 
+Software. The licensee shall not, or knowingly allow others to, 
+reverse engineer, decompile, disassemble, modify, adapt, create 
+derivative works from or otherwise attempt to derive source code from 
+the Software provided. And, in accordance with the terms and 
+conditions of this Software License Agreement (the "Agreement"), the 
+Software shall be used solely by the licensed users in accordance 
+with the following edition specific conditions:
 
-2. Grant of License: Cenqua Pty Ltd ("CENQUA") hereby grants to 
-   Evaluator, for 30 days (the "Evaluation Period") following the
-   execution of this Agreement (the "Agreement"), a limited,
-   nontransferable, nonexclusive, nonsublicensable, revocable,
-   worldwide license to use the Software for the purposes of internal
-   evaluation and testing for suitability for commercial licensing
-   ("Evaluation") by Evaluator. Title to the Software shall remain with
-   CENQUA at all times.
+a) Server Edition
 
-3. Exclusions: Evaluator shall not: (a) copy any part of the Software
-   except to make one copy for back-up purposes only; (b) reverse
-   compile or reverse assemble any portion of the Software where the
-   source code is not freely accessible; (c) distribute, disclose,
-   market, rent, lease, or transfer the Software; (d) export the
-   Software; or (e) allow others to make or obtain copies of the
-   Software.
+A Server Edition license entitles the Licensee to execute one 
+instance of Clover Server Edition on one (1) machine for the purposes 
+of instrumententing source code and generating reports. There are no 
+limitations on the use of the instrumented source code or generated 
+reports produced by Server Edition.
 
-4. Support: CENQUA may, during the Evaluation Period, make
-   available updates, enhancements, and/or modifications to the
-   Software and may provide such updates to Evaluator, but is under no
-   obligation to do so. The provision by CENQUA to Evaluator of
-   such updates, enhancements, and/or modifications to the Software
-   shall be subject to all terms and conditions of this Agreement and
-   shall expire at the end of the Evaluation Period.
+b) Workstation Edition
 
-5. Specific Disclaimer of Warranty and Limitation of Liability:
+A Workstation Edition license entitles the licensee to use Clover 
+Workstation Edition on one (1) machine by one (1) individual end 
+user. Workstation Edition does not permit the generation of reports 
+for distribution.
 
-THE SOFTWARE IS PROVIDED WITHOUT WARRANTY OF ANY KIND. CENQUA
-DISCLAIMS ALL WARRANTIES, EXPRESSED OR IMPLIED, INCLUDING BUT NOT
-LIMITED TO THE WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-PARTICULAR PURPOSE. CENQUA WILL NOT BE LIABLE FOR ANY DAMAGES
-ASSOCIATED WITH THE SOFTWARE, INCLUDING, WITHOUT LIMITATION, ORDINARY,
-INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES OF ANY KIND, INCLUDING
-BUT NOT LIMITED TO DAMAGES RELATING TO LOST DATA OR LOST PROFITS, EVEN
-IF CENQUA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+c) Team Edition
 
-6. Termination: Evaluator's license to use the Software shall
-   terminate on the earlier of (i) written notice by either CENQUA
-   or Evaluator, or (ii) expiration of the Evaluation Period. Upon
-   termination of the license as provided above, Evaluator shall
-   promptly destroy the Software and any back-up copy of the Software
-   made during the Evaluation Period. Evaluator shall also promptly
-   return all materials provided by CENQUA in connection with the
-   Software.
+A Team Edition license entitles the licensee to use Clover Team 
+edition on any number of machines solely by the licensed number of 
+users. Reports generated by Clover Team Edition are strictly for use 
+only by the licensed number of individual end users.
 
-7. Warranties and Representations; Indemnification. Evaluator warrants
-   and represents that Evaluator's actions with regard to the Software
-   will be in compliance with all applicable laws; and Evaluator will
-   indemnify, defend, and hold CENQUA harmless from and against any
-   and all liabilities, damages, losses, claims, costs, and expenses
-   (including legal fees) arising out of or resulting from Evaluator's
-   failure to observe the use restrictions set forth herein.
+2. License Fee
 
-8. Governing Law: This Agreement shall be governed by the laws of New
-   South Wales, Australia.
+In exchange for the License(s), the Licensee shall pay to CENQUA a 
+one-time, up front, non-refundable license fee. At the sole 
+discretion of CENQUA this fee will be waived for non-commercial 
+projects. Notwithstanding the Licensee's payment of the License Fee, 
+CENQUA reserves the right to terminate the License if CENQUA 
+discovers that the Licensee and/or the Licensee's use of the Software 
+is in breach of this Agreement.
 
-9. Independent Contractors; Assignment: The parties are independent
-   contractors with respect to each other, and nothing in this
-   Agreement shall be construed as creating an employer-employee
-   relationship, a partnership, agency relationship or a joint venture
-   between the parties. This Agreement is not assignable or
-   transferable by Evaluator.
+3. Proprietary Rights
 
-10.Entire Agreement: This Agreement constitutes the entire agreement
-   between the parties concerning Evaluator's use of the
-   Software. This Agreement supersedes any prior verbal understanding
-   between the parties and any Evaluator purchase order or other
-   ordering document, regardless of whether such document is received
-   by CENQUA before or after execution of this Agreement. This
-   Agreement may be amended only in writing by CENQUA.
+CENQUA will retain all right, title and interest in and to the 
+Software, all copies thereof, and CENQUA website(s), software, and 
+other intellectual property, including, but not limited to, ownership 
+of all copyrights, look and feel, trademark rights, design rights, 
+trade secret rights and any and all other intellectual property and 
+other proprietary rights therein. The Licensee will not directly or 
+indirectly obtain or attempt to obtain at any time, any right, title 
+or interest by registration or otherwise in or to the trademarks, 
 
+service marks, copyrights, trade names, symbols, logos or 
+designations or other intellectual property rights owned or used by 
+CENQUA. All technical manuals or other information provided by CENQUA 
+to the Licensee shall be the sole property of CENQUA.
+
+4. Term and Termination
+
+Subject to the other provisions hereof, this Agreement shall commence 
+upon the Licensee's opting into this Agreement and continue until the 
+Licensee discontinues use of the Software or the Agreement terminates 
+automatically upon the Licensee's breach of any term or condition of 
+this Agreement (the "Term"). Upon any such termination, the Licensee 
+will delete the Software immediately.
+
+5. Copying & Transfer
+
+The Licensee may copy the Software for back-up purposes only. The 
+
+Licensee may not assign or otherwise transfer the Software to any 
+third party.
+
+6. Specific Disclaimer of Warranty and Limitation of Liability
+
+THE SOFTWARE IS PROVIDED WITHOUT WARRANTY OF ANY KIND. CENQUA 
+DISCLAIMS ALL WARRANTIES, EXPRESSED OR IMPLIED, INCLUDING BUT NOT 
+LIMITED TO THE WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
+PARTICULAR PURPOSE. CENQUA WILL NOT BE LIABLE FOR ANY DAMAGES 
+ASSOCIATED WITH THE SOFTWARE, INCLUDING, WITHOUT LIMITATION, 
+ORDINARY, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES OF ANY KIND, 
+INCLUDING BUT NOT LIMITED TO DAMAGES RELATING TO LOST DATA OR LOST 
+PROFITS, EVEN IF CENQUA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH 
+DAMAGES.
+
+7. Warranties and Representations
+
+Licensee Indemnification. CENQUA agrees to indemnify, defend and hold 
+the Licensee harmless from and against any and all liabilities, 
+damages, losses, claims, costs, and expenses (including reasonable 
+legal fees) arising out of or resulting from the Software or the use 
+thereof infringing upon, misappropriating or violating any patents, 
+copyrights, trademarks, or trade secret rights or other proprietary 
+rights of persons, firms or entities who are not parties to this 
+Agreement.
+
+CENQUA Indemnification. The Licensee warrants and represents that the 
+Licensee's actions with regard to the Software will be in compliance 
+with all applicable laws; and the Licensee agrees to indemnify, 
+defend, and hold CENQUA harmless from and against any and all 
+liabilities, damages, losses, claims, costs, and expenses (including 
+reasonable legal fees) arising out of or resulting from the 
+Licensee's failure to observe the use restrictions set forth herein.
+
+8. Publicity
+
+The Licensee grants permission for CENQUA to use Licensee's name 
+solely in customer lists. CENQUA shall not, without prior consent in 
+writing, use the Licensee's name, or that of its affiliates, in any 
+form with the specific exception of customer lists. CENQUA agrees to 
+remove Licensee's name from any and all materials within 7 days if 
+notified by the Licensee in writing.
+
+9. Governing Law
+
+This Agreement shall be governed by the laws of New South Wales, 
+Australia.
+
+10.Independent Contractors
+
+The parties are independent contractors with respect to each other, 
+and nothing in this Agreement shall be construed as creating an 
+employer-employee relationship, a partnership, agency relationship or 
+a joint venture between the parties.
+
+11. Assignment
+
+This Agreement is not assignable or transferable by the Licensee. 
+CENQUA in its sole discretion may transfer a license to a third party 
+at the written request of the Licensee.
+
+12. Entire Agreement
+
+This Agreement constitutes the entire agreement between the parties 
+concerning the Licensee's use of the Software. This Agreement 
+supersedes any prior verbal understanding between the parties and any 
+Licensee purchase order or other ordering document, regardless of 
+whether such document is received by CENQUA before or after execution 
+of this Agreement. This Agreement may be amended only in writing by 
+CENQUA.

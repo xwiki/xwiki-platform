@@ -38,7 +38,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
 	this.addInternalProcessor((/<em[^>]*>(\n?)(.*?)(\n?)<\/em>/gi), '$1~~$2~~$3');
 
-    this.addExternalProcessor((/__(.+?)__/gi), '<u class="underline">$1<\/u>');
+    this.addExternalProcessor((/__(.+?)__/gi), '<u>$1<\/u>');
     this.addInternalProcessor((/<u[^>]*>(\n?)(.*?)(\n?)<\/u>/gi), '$1__$2__$3');
 
     this.addExternalProcessor((/--(.+?)--/gi),  '<strike class="strike">$1<\/strike>');

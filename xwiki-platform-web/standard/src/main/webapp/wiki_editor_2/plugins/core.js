@@ -89,7 +89,7 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     str = str.replace(/<p class="paragraph">\s*([\s\S]+?)<\/p>/g,'$1');
     str = str.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
-    str = str.replace(/<span class="(bold|italic|strike)">([\s\S]+?)<\/span>/g,'$2');
+    str = str.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<\/?p[^>]*>/gi, "");
     str = str.replace(/<br \/>/g, '\r\n');
     return str;
@@ -412,7 +412,8 @@ WikiEditor.prototype.handleTextButtons = function(editor_id, node, undo_index, u
 	// Reset old states
 	this.core.switchClass(editor_id + '_bold', 'mceButtonNormal');
 	this.core.switchClass(editor_id + '_italic', 'mceButtonNormal');
-	this.core.switchClass(editor_id + '_strikethrough', 'mceButtonNormal');
+    this.core.switchClass(editor_id + '_underline', 'mceButtonNormal');
+    this.core.switchClass(editor_id + '_strikethrough', 'mceButtonNormal');
 
 	// Handle elements
 	do
@@ -430,7 +431,11 @@ WikiEditor.prototype.handleTextButtons = function(editor_id, node, undo_index, u
 				this.core.switchClass(editor_id + '_italic', 'mceButtonSelected');
 			break;
 
-			case "strike":
+            case "u":
+				this.core.switchClass(editor_id + '_underline', 'mceButtonSelected');
+			break;
+
+            case "strike":
 				this.core.switchClass(editor_id + '_strikethrough', 'mceButtonSelected');
 			break;
 		}
@@ -957,7 +962,7 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
 WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     content = content.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     content = content.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
-    content = content.replace(/<span class="(bold|italic|strike)">([\s\S]+?)<\/span>/g,'$2');
+    content = content.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
     var type = result[1];
     var str = "";
     if (type == "span" || type =="div") {

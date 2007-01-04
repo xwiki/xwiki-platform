@@ -25,7 +25,9 @@
 #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))
 #set($regurl = $xwiki.getURL("XWiki.RegisterNewUser"))
 <a href="$loginurl">$msg.get("login")</a><br />
+#if($context.user == "XWiki.XWikiGuest")
 <a href="$regurl">$msg.get("register")</a>
+#end
 #else
 #set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
 #set($docuser = $xwiki.getDocument($context.user))

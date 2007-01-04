@@ -33,13 +33,15 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(.+?)\*/gi), '<b class="bold">$1<\/b>');
-    this.addExternalProcessor((/__(.+?)__/gi), '<b class="bold">$1<\/b>');
     this.addInternalProcessor((/<strong[^>]*>(\n?)(.*?)(\n?)<\/strong>/gi), '$1*$2*$3');
 
 	this.addExternalProcessor((/~~(.+?)~~/gi), '<i class="italic">$1<\/i>');
 	this.addInternalProcessor((/<em[^>]*>(\n?)(.*?)(\n?)<\/em>/gi), '$1~~$2~~$3');
 
-	this.addExternalProcessor((/--(.+?)--/gi),  '<strike class="strike">$1<\/strike>');
+    this.addExternalProcessor((/__(.+?)__/gi), '<u class="underline">$1<\/u>');
+    this.addInternalProcessor((/<u[^>]*>(\n?)(.*?)(\n?)<\/u>/gi), '$1__$2__$3');
+
+    this.addExternalProcessor((/--(.+?)--/gi),  '<strike class="strike">$1<\/strike>');
 	this.addInternalProcessor((/<strike[^>]*>(\n?)(.*?)(\n?)<\/strike>/gi), '$1--$2--$3');
 
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
@@ -611,11 +613,11 @@ WikiEditor.prototype.getListControls = function(button_name) {
 			break;
 	}
 
-	return str;
+	return str;                      
 }
 
 WikiEditor.prototype.getTextToolbar = function() {
-	return this.getTextControls('bold') + this.getTextControls('italic') + this.getTextControls('strikeout');
+	return this.getTextControls('bold') + this.getTextControls('italic') + this.getTextControls('underline') + this.getTextControls('strikeout');
 }
 
 WikiEditor.prototype.getTextControls = function(button_name) {
@@ -627,7 +629,10 @@ WikiEditor.prototype.getTextControls = function(button_name) {
 		case 'italic':
 			str = this.createButtonHTML('italic', '{$lang_italic_img}', 'lang_italic_desc', 'Italic');
 			break;
-		case 'strikeout':
+        case 'underline':
+            str = this.createButtonHTML('underline', '{$lang_underline_img}', 'lang_underline_desc', 'Underline');
+            break;
+        case 'strikeout':
 			str = this.createButtonHTML('strikethrough', 'strikethrough.gif', 'lang_striketrough_desc', 'Strikethrough');
 			break;
 	}

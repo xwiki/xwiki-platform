@@ -81,7 +81,9 @@ public class StyleMacro extends BaseLocaleMacro {
             str.append("background-color:" + bgcolor.trim() + "; ");
         }
         str.append("\" >");
-        str.append(text);
+        if ((!"none".equals(text)) && (text != null) && (!"".equals(text.trim()))) {
+            str.append(text);
+        }
         str.append("</" + type + ">");
 
         writer.write(str.toString());

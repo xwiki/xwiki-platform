@@ -38,8 +38,10 @@
       <a href="$logouturl">$msg.get("logout")</a>#sep()
 #end
 #end
+#if($isguest)
 #set($regurl = $xwiki.getURL("XWiki.RegisterNewUser"))
       <a href="$regurl">$msg.get("register")</a>#sep()
+#end
       <a href="$xwiki.getURL("Doc.WebHome","view")">$msg.get("doc")</a>
     </div>
 #if($searchdoc.isNew()==false)

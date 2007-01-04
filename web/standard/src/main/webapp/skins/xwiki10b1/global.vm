@@ -43,8 +43,10 @@
       <a class="glink" href="$logouturl" id="headerlogout">$msg.get("logout")</a>#sep()
 #end
 #end
+#if($isguest)
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
       <a class="glink" href="$regurl" id="headerregister">$msg.get("register")</a>#sep()
+#end
 #if($hasadmin)
       <a class="glink" href="$xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$msg.get("admin")</a> #sep()
 #end

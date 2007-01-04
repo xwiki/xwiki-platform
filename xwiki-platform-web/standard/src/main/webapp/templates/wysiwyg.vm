@@ -23,8 +23,8 @@
 #if ($sectionNumber != 0)
    #set($switchParam = "section=$sectionNumber")
 #end
-<script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce_2/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor_2/wiki_editor.js"></script>
+<script language="javascript" type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
 <script language="javascript" type="text/javascript">
     if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
         wikiEditor.init({

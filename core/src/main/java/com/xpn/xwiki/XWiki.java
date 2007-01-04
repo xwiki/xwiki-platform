@@ -2223,6 +2223,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             String parent = request.getParameter("parent");
             String validkey = null;
 
+            try {
+                if(!context.getUtil().match(this.Param("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"), xwikiname)) {
+                    return -4;
+                }
+            } catch (RuntimeException ex) {
+                log.warn("Invalid regular expression for xwiki.validusername", ex);
+                if(!context.getUtil().match("/^[a-zA-Z0-9_]+$/", xwikiname)) {
+                    return -4;
+                }
+            }
+
             if ((!password.equals(password2))||(password.trim().equals(""))) {
                 // TODO: throw wrong password exception
                 return -2;

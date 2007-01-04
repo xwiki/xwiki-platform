@@ -2407,7 +2407,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc.setParent(parent);
             doc.setContent(content);
 
-            ProtectUserPage(context, fullwikiname, userRights, doc);
+            protectUserPage(fullwikiname, userRights, doc, context);
 
             saveDocument(doc, null, context);
 
@@ -2415,7 +2415,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 log.warn("createUser: before get All Group");
 
             // Now let's add the user to XWiki.XWikiAllGroup
-            SetUserDefaultGroup(context, fullwikiname);
+            setUserDefaultGroup(fullwikiname, context);
 
 
             return 1;
@@ -3482,7 +3482,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     int i1 = host.indexOf(senginerule.getHost());
                     if (i1 != -1) {
                         String query = context.getUtil().substitute(senginerule.getRegEx(), url.getQuery());
-                        if ((query != null) || (!query.equals(""))) {
+                        if ((query != null) && (!query.equals(""))) {
                             // We return the query text instead of the full referer
                             return host.substring(i1) + ":" + query;
                         }
@@ -3552,7 +3552,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     text = userdoc.getName();
                 }
             } else {
-
                 VelocityContext vcontext = new VelocityContext();
                 for (Iterator it = proplist.iterator(); it.hasNext();) {
                     String propname = (String) it.next();
@@ -3568,10 +3567,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         } catch (Exception e) {
             e.printStackTrace();
-            if (userdoc != null)
+            if (userdoc != null) {
                 return userdoc.getName();
-            else
-                return user;
+            }
+            return user;
         }
     }
 
@@ -3703,18 +3702,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         for (int i = 0; i < pluginlist.size(); i++) {
             String pluginname = (String) pluginlist.get(i);
             if (pluginname.equals(name)) {
-                return (XWikiPluginInterface) plugins.getPlugin(pluginname);
+                return plugins.getPlugin(pluginname);
             }
         }
         return null;
     }
 
     public Api getPluginApi(String name, XWikiContext context) {
-        XWikiPluginInterface plugin = (XWikiPluginInterface) getPlugin(name, context);
+        XWikiPluginInterface plugin = getPlugin(name, context);
         if (plugin != null)
             return plugin.getPluginApi(plugin, context);
-        else
-            return null;
+        return null;
     }
 
     public static Map getThreadMap() {
@@ -3947,6 +3945,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     	} else if (getNotCacheStore() instanceof XWikiJcrStore) {
     		docs = ((XWikiJcrStore) getNotCacheStore()).getAllDocuments(context);
     	}
+        else {
+            return;
+        }
     	for (int i = 0; i < docs.size(); i++) {
 			XWikiDocument myDoc = this.getDocument((String) docs.get(i), context);
 			myDoc.getStore().saveLinks(myDoc, context, true);

@@ -48,8 +48,8 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
-    this.addExternalProcessor((/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
-    this.addInternalProcessorBefore('convertStyleInternal', (/<span\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)<\/span>/i), 'convertVelocityCommentInternal');
+    this.addExternalProcessorBefore('convertParagraphExternal', (/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
+    this.addInternalProcessorBefore('convertStyleInternal', (/<span\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)(\r?\n?)<\/span>/i), 'convertVelocityCommentInternal');
 
     this.addExternalProcessorBefore('convertTableExternal', (/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
     this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
@@ -1014,10 +1014,13 @@ WikiEditor.prototype.convertVelocityCommentExternal = function(regexp, result, c
 WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, content) {
     var str = "";
     var vcomment = result[3];
-    if (vcomment.indexOf("\n") > -1) {
+    if ((vcomment.indexOf("\n") > -1) || (vcomment.indexOf("<p") > -1)) {
         str = "#*" + vcomment + "*#";
     } else {
         str = "##" + vcomment;
+    }
+    if (result[4] != null) {
+        str += result[4];
     }
     return content.replace(regexp, str);
 }

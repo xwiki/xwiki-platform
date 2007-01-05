@@ -36,7 +36,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 /**
  * Created by IntelliJ IDEA.
  * User: HAL_2005
- * Date: 11 ao�t 2005
+ * Date: 11 august 2005
  * Time: 12:30:26
  * To change this template use File | Settings | File Templates.
  */

@@ -42,7 +42,7 @@ public class DefaultDataSourceTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		headerRow = new String[1];
-		headerRow[0] = "Sales (K€)";
+		headerRow[0] = "Sales (K)";
 
 		headerColumn = new String[4];
 		headerColumn[0] = "Category 1";
@@ -229,7 +229,7 @@ public class DefaultDataSourceTest extends TestCase {
 			noHeaderSource.getHeaderRowValue(0);
 			Assert.fail("NoHeaderRowException not thrown");
 		} catch (NoHeaderRowException e) { /* empty */ }
-		Assert.assertEquals("Sales (K€)", source.getHeaderRowValue(0));
+		Assert.assertEquals("Sales (K)", source.getHeaderRowValue(0));
 		try {
 			source.getHeaderRowValue(1);
 			Assert.fail("ColumnIndexOutOfBoundsException not thrown");

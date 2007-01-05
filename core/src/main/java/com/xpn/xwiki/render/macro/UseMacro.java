@@ -17,22 +17,20 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 25 août 2004
+ * Date: 25 august 2004
  * Time: 13:43:19
  */
 package com.xpn.xwiki.render.macro;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import java.io.IOException;
+import java.io.Writer;
+
 import org.apache.velocity.VelocityContext;
-import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 
-import java.io.IOException;
-import java.io.Writer;
+import com.xpn.xwiki.api.Document;
 
 public class UseMacro extends BaseLocaleMacro {
   public String getLocaleKey() {
@@ -43,8 +41,6 @@ public class UseMacro extends BaseLocaleMacro {
       throws IllegalArgumentException, IOException {
 
     RenderContext context = params.getContext();
-    RenderEngine engine = context.getRenderEngine();
-    XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
     VelocityContext vcontext = (VelocityContext) context.get("vcontext");
     Document doc = (Document) vcontext.get("doc");
     com.xpn.xwiki.api.Object obj;

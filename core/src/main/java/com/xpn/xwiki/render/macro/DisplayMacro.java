@@ -17,7 +17,7 @@
 
  * Created by
  * User: Ludovic Dubost
- * Date: 25 août 2004
+ * Date: 25 august 2004
  * Time: 13:43:19
  */
 package com.xpn.xwiki.render.macro;

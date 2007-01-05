@@ -53,7 +53,7 @@ public class RadeoxHelperTest extends TestCase {
         this.context.setWiki(this.xwiki);
         this.doc = new XWikiDocument("XWiki", "Document");
         
-        table0 = "Category | Sales (K€)\n" +
+        table0 = "Category | Sales (K)\n" +
 			"Category 1 | 100\n" +
 			"Category 2 | 50\n" +
 			"Category $var | 50\n" +
@@ -87,7 +87,7 @@ public class RadeoxHelperTest extends TestCase {
 		Table[] tables = rhelper.getTables();
 		Assert.assertEquals(2, tables.length);
 		Assert.assertEquals("Category", tables[0].getXY(0, 0).toString());
-		Assert.assertEquals("Sales (K€)", tables[0].getXY(1, 0).toString());
+		Assert.assertEquals("Sales (K)", tables[0].getXY(1, 0).toString());
 		Assert.assertEquals("Category 1", tables[0].getXY(0, 1).toString());
 		Assert.assertEquals("100", tables[0].getXY(1, 1).toString());
 		Assert.assertEquals("Category 2", tables[0].getXY(0, 2).toString());

@@ -7,7 +7,7 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 /**
  * Created by IntelliJ IDEA.
  * User: ldubost
- * Date: 11 déc. 2006
+ * Date: 11 dec. 2006
  * Time: 17:18:05
  * To change this template use File | Settings | File Templates.
  */
@@ -55,7 +55,7 @@ public class ExportAction extends XWikiAction {
             if (version!=null)
                 export.setVersion(version);
 
-            if ((name==null)||(name.trim().equals(""))) {
+            if (name.trim().equals("")) {
                 if (isBackup)
                     name = "backup";
                 else

@@ -33,16 +33,16 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(\s*)(.+?)(\s*)\*/gi), '$1<b class="bold">$2<\/b>$3');
-    this.addInternalProcessor((/<strong[^>]*>(\n?)(.*?)(\n?)<\/strong>/gi), '$1*$2*$3');
+    this.addInternalProcessor((/<strong[^>]*>(\s*)(.*?)(\s*)<\/strong>/gi), '$1*$2*$3');
 
 	this.addExternalProcessor((/~~(\s*)(.+?)(\s*)~~/gi), '$1<i class="italic">$2<\/i>$3');
-	this.addInternalProcessor((/<em[^>]*>(\n?)(.*?)(\n?)<\/em>/gi), '$1~~$2~~$3');
+	this.addInternalProcessor((/<em[^>]*>(\s*)(.*?)(\s*)<\/em>/gi), '$1~~$2~~$3');
 
     this.addExternalProcessor((/__(\s*)(.+?)(\s*)__/gi), '$1<u>$2<\/u>$3');
-    this.addInternalProcessor((/<u[^>]*>(\n?)(.*?)(\n?)<\/u>/gi), '$1__$2__$3');
+    this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/gi), '$1__$2__$3');
 
     this.addExternalProcessor((/--(\s*)(.+?(\s*))--/gi),  '$1<strike class="strike">$2<\/strike>$3');
-	this.addInternalProcessor((/<strike[^>]*>(\n?)(.*?)(\n?)<\/strike>/gi), '$1--$2--$3');
+	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/gi), '$1--$2--$3');
 
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
 

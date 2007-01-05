@@ -272,5 +272,9 @@ legend {
 	color: #6666cc;
 }
 
+.loadingAjax {
+    font-weight: bold;
+    background-color: #00ccff;
+}
 
 

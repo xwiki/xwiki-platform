@@ -12,7 +12,7 @@
                     <table cellspacing="0" cellpadding="0" width="100%" style="border: 0px">
                          <tr>
                             <td>
-                                <select id="selmacro" name="selmacro" style="border: 1px solid #808080; width:100%;" size="7" onchange="inputMacro();">
+                                <select id="selmacro" name="selmacro" style="border: 1px solid #d3e3f5; width:100%;" size="7" onchange="inputMacro();">
                                     #foreach ($macro in $macros)
                                         #if (!$macro.trim().equals(""))
                                             #set($macroname = $macro.toString().substring(0,$macro.indexOf("=")))
@@ -27,7 +27,7 @@
             </tr>
         </table>
     </div>
-    <hr />
+
     <div id="input">
     </div>
     #foreach ($macro in $macros)
@@ -45,7 +45,7 @@
                     #if($counparam == 2)
                         #set($macroparam = $paramnum)
                         <div>
-                        <fieldset>
+                        <fieldset style="border: 1px solid #d3e3f5;">
                             <legend>$msg.get("macro") $macroname</legend>
                             <table width="100%" border="0" cellspacing="4" cellpadding="0">
                                 #foreach ($infoMacro in $infoArr)

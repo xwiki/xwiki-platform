@@ -2,7 +2,7 @@
  *
  * ===================================================================
  *
- * Copyright (c) 2005 Jens Kr�mer, All rights reserved.
+ * Copyright (c) 2005 Jens Kramer, All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

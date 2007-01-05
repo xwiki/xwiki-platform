@@ -74,6 +74,8 @@
 
     function loadMacroListCallback(e) {
       var macroEl = document.getElementById("macros");
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("action").style.display = "block";
       macroEl.innerHTML = e;
     }
 
@@ -125,18 +127,17 @@
 </head>
 <body onload="init();">
 <div id="macros"></div>
+<div id="loading"><span class="loadingAjax">{$lang_loading_macros}</span></div>
 <script type="text/javascript">
     loadMacroList(baseurl);
 </script>
-<div>
-    <table width="95%" border="0" cellspacing="0" cellpadding="0">
-        <tr align="center">
-            <td align="center"><input type="button" id="insert" name="insert" value="{$lang_insert_macro}" onclick="if(checkForm()){setMacro(); insertMacro();}" >
-            </td>
-            <td align="left"><input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onClick="cancelAction();"></td>
-            <td></td>
-        </tr>
-    </table>
+<div id="action" class="mceActionPanel"  style="display:none">
+    <div style="float: left">
+        <input type="button" id="insert" name="insert" value="{$lang_insert_macro}" onclick="if(checkForm()){setMacro(); insertMacro();}" >
+    </div>
+    <div style="float: right">
+          <input type="button" id="cancel" name="cancel" value="{$lang_cancel}" onClick="cancelAction();">
+    </div>
 </div>
 </body>
 </html>

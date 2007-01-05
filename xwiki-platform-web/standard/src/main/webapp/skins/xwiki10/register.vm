@@ -1,21 +1,21 @@
 #set ($register = $request.getParameter("register"))
 #if ($register)
-Tentative d'inscription de *$request.getParameter("register_first_name") $request.getParameter("register_last_name")*
+Registration of *$request.getParameter("register_first_name") $request.getParameter("register_last_name")*
 
 #set( $reg= $xwiki.createUser(false))
 #if ($reg>0)
-L'utilisateur [$request.getParameter("xwikiname")] a été correctement enregistré.
+The user [$request.getParameter("xwikiname")] has been registered.
 #else
-Une erreur est survenue pendant l'enregistrement.
+An error occured during the registration.
 #end
 #else
 #set($reg=0)
 #end
 
 #if ($reg<=0)
-Bienvenue sur le formulaire d'inscription à XWiki. Ceci vous permettra d'éditer les pages de ce wiki (si l'administrateur du wiki vous donne les droits).
+Welcome to the registration form. This will allow you to edit pages, once the admin gives you appropriate rights
 
-1.1 Inscription
+1.1 Register
 
 <form id="register" name="register" action="" method="post">
 #includeTopic("xwiki:XWiki.RegisterJS")
@@ -31,19 +31,19 @@ Bienvenue sur le formulaire d'inscription à XWiki. Ceci vous permettra d'éditer 
  <tbody>
  <tr>
 #set($prop = $class.first_name)
-   <td>Prénom
+   <td>First name
    </td>
      <td>$doc.displayEdit($prop, "register_",  $obj)
      </td>
 #set($prop = $class.last_name)
-   <td>Nom
+   <td>Last name
    </td>
      <td>$doc.displayEdit($prop, "register_",  $obj)
      </td>
  </tr>
 <tr>
 #set($prop = $class.email)
-   <td>Adresse e-Mail
+   <td>e-Mail Address
    </td>
      <td>$doc.displayEdit($prop, "register_",  $obj)
      </td>
@@ -53,18 +53,18 @@ Bienvenue sur le formulaire d'inscription à XWiki. Ceci vous permettra d'éditer 
 <td></td>
  <tr>
 #set($prop = $class.password)
-   <td>Mot de passe
+   <td>Password
    </td>
      <td>$doc.displayEdit($prop, "register_",  $obj)
      </td>
-   <td>Répétition du mot de passe
+   <td>Password (again)
    </td>
      <td>$doc.displayEdit($prop, "register2_",  $obj)
      </td>
  </tr>
 <tr><td></td></tr>
  <tr>
-   <td>Nom Wiki (il s'agit aussi de votre login):</td>
+   <td>Wiki username</td>
    <td>
     <input name="xwikiname" type="text" size="20" onfocus=" prepareName(document.forms.register);" />
    </td>
@@ -72,8 +72,7 @@ Bienvenue sur le formulaire d'inscription à XWiki. Ceci vous permettra d'éditer 
  </tbody>
  </table>
 <center>
-<input type="submit" value="Je m'inscris">
+<input type="submit" value="Register me">
 </center>
 </form>
 #end
-

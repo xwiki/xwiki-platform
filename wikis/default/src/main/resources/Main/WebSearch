@@ -52,19 +52,20 @@
 </object>
 <content>1 Search
 
-&lt;form action=""&gt;
-&lt;table&gt;
-  &lt;tr&gt;
-    &lt;td&gt;
-      &lt;input type="text" name="text" value="$!request.text" size="20"/&gt;
-    &lt;/td&gt;
-    &lt;td&gt;
-      &lt;input type="submit" value="Search"/&gt;
-    &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/table&gt;
-&lt;/form&gt;
 
+
+#set($formatDate = "MMMM dd, yyyy HH:mm")
+#if ($request.getParameter("text"))
+{pre}#set ($text = $request.getParameter("text")){/pre}
+#else
+#set($text = "")
+#end
+&lt;div class="centered"&gt;
+&lt;form action="WebSearch"&gt;
+{pre}&lt;input type="text" name="text" value="$!text.replace('"', '&amp;quot;')" size="20"&gt;&amp;nbsp;&lt;input type="submit" name="search" value="Search"&gt;{/pre}
+&lt;/form&gt;
+&lt;/div&gt;
+#set ($text = $text.replace("'", "''"))
 #set($allresults = $xwiki.hashMap)
 
 ## -----------------------------------------------------------
@@ -91,7 +92,7 @@
 ## -----------------------------------------------------------
 ## Search in page content
 ## -----------------------------------------------------------
-#set ($sql = "where $webClause doc.content like '%$!request.text%' order by doc.date desc")
+#set ($sql = "where $webClause doc.content like '%$text%' order by doc.date desc")
 #includeInContext("XWiki.Results")
 
 1.1 Search in properties
@@ -99,7 +100,7 @@
 ## -----------------------------------------------------------
 ## Search in text fields (simple String properties)
 ## -----------------------------------------------------------
-#set($sql= ", BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!request.text%'")
+#set($sql= ", BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!text%'")
 #includeInContext("XWiki.Results")
 
 1.1 Search in text fields
@@ -107,6 +108,6 @@
 ## -----------------------------------------------------------
 ## Search in big text fields (textarea properties)
 ## -----------------------------------------------------------
-#set($sql= ", BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!request.text%'")
+#set($sql= ", BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!text%'")
 #includeInContext("XWiki.Results")</content>
 </xwikidoc>

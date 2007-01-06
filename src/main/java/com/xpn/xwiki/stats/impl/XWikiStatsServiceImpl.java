@@ -293,6 +293,22 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     }
 
 
+    /**
+      * Try to find the visiting session of the current request, or create a new one
+      * if this request is not part of a visit.
+      *
+      * The session is searched in the following way:
+      * <ol><li>the java session is searched for the visit object</li>
+      * <li>try to find the stored session using the cookie</li>
+      * <li>try to find the session by matching the IP and User Agent</li></ol>
+      * The session is invalidated if:
+      * <ul><li>the cookie is not the same as the stored cookie</li>
+      * <li>more than 30 minutes have elapsed from the previos request</li>
+      * <li>the user is not the same</li></ul>
+      *
+      * @param context The context of this request.
+      * @return The visiting session, retrieved from the database or created.
+      */
     private VisitStats findVisit(XWikiContext context) {
         XWikiRequest request = context.getRequest();
         HttpSession session = request.getSession(true);
@@ -308,25 +324,6 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         if (cookie==null) {
             cookie = addCookie(context);
             newcookie = true;
-        }
-
-        if (vobject!=null) {
-            // Let's verify if the session is valid
-            // If the cookie is not the same
-            if (!vobject.getCookie().equals(cookie.getValue())) {
-                // Let's log a message here
-                // Since the session is also maintained using a cookie
-                // then there is something wrong here
-                if (log.isDebugEnabled())
-                  log.debug("Found visit with cookie " + vobject.getCookie() + " in session "
-                           + session.getId() + " for request with cookie " + cookie.getValue());
-                // And forget about this session
-                vobject = null;
-            } else if ((nowDate.getTime() - vobject.getEndDate().getTime()) > 30 * 60 * 1000) {
-                // If session is longer than 30 minutes we should invalidate it
-                // and create a new one
-                vobject = null;
-            }
         }
 
         if (vobject==null) {
@@ -347,10 +344,28 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
            }
         }
-        if(vobject != null && !context.getUser().equals(vobject.getName())) {
-            // If the user is not the same, we should invalidate the session
-            // and create a new one
-            vobject = null;
+
+        if (vobject!=null) {
+            // Let's verify if the session is valid
+            // If the cookie is not the same
+            if (!vobject.getCookie().equals(cookie.getValue())) {
+                // Let's log a message here
+                // Since the session is also maintained using a cookie
+                // then there is something wrong here
+                if (log.isDebugEnabled())
+                  log.debug("Found visit with cookie " + vobject.getCookie() + " in session "
+                           + session.getId() + " for request with cookie " + cookie.getValue());
+                // And forget about this session
+                vobject = null;
+            } else if ((nowDate.getTime() - vobject.getEndDate().getTime()) > 30 * 60 * 1000) {
+                // If session is longer than 30 minutes we should invalidate it
+                // and create a new one
+                vobject = null;
+            } else if(vobject != null && !context.getUser().equals(vobject.getName())) {
+                // If the user is not the same, we should invalidate the session
+                // and create a new one
+                vobject = null;
+            }
         }
 
         if (vobject==null) {
@@ -410,7 +425,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     	Date cdate = new Date();
         cdate = new Date(cdate.getTime() - 30 * 60 * 1000);
     	if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
-    		XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();    		
+    		XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();
     		try {
     			QueryManager qm = store.getObjectQueryManager(context);
 				Filter filter = qm.createFilter(VisitStats.class)

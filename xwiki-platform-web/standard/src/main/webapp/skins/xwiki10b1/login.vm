@@ -24,7 +24,7 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #set($message = $msg.get($xwiki.parseMessage()))
 #if($message)
 <!-- previous login errors -->
-#errormessage($message)
+#error($message)
 #end
 <table class="xwikilogintable" summary="$msg.get("loginform")">
 <tr><th><label for="j_username">$msg.get("username"):</label></th>

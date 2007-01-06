@@ -13,6 +13,24 @@
 #else
 #set($editaction = "edit")
 #end
+##
+## Create menu
+##
+#if($hasedit)
+## #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("create") "tmCreate")
+#xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("create") "tmCreate")
+#submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("createpage"))
+#submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("createspace"))
+#submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("createblogpost"))
+#if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("createevent"))#end
+#if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("createpanel"))#end
+#xwikitopmenuentryend()
+#end
+
+##
+## Edit menu
+##
+#if($isAdvancedUser)
 #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("edit") "tmEdit")
 #submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("editwiki"))
 #submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("editvisual"))
@@ -23,17 +41,22 @@
 #submenuitem($doc.getURL("edit", "editor=rights") $msg.get("editrights"))
 #end
 #xwikitopmenuentryend()
+#else ## !isAdvanced
+#xwikitopmenuentry($doc.getURL($editaction, $languageparams) $msg.get("edit") "tmEdit")
+#end
 #end
 ##
 ## Show menu
 ##
 #xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show")  "tmShow")
+#if($isAdvancedUser)
 #submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("viewcode"))
 ## #submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("viewxml"))
+## #submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("viewattributes"))
+#end
 #submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("viewcomments"))
 #submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("viewattachments"))
 #submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("viewhistory"))
-## #submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("viewattributes"))
 #xwikitopmenuentryend()
 ##
 ## Print menu

@@ -664,6 +664,9 @@ html > body .panels{
 .placeholder{
   width: 200px;
 }
+html > body #dragbox {
+  width: 198px !important;
+}
 #xwikinavcontainer{
   margin-bottom: 20px;
 }
@@ -698,7 +701,7 @@ span.pitemseparator{
 }
 .panelitemc{
   height: 256px;
-  margin: 0px 10px;
+  margin: 0px 4px;
   width: 210px;
   float: left;
 }
@@ -753,7 +756,7 @@ Misc
 #xwikihelplistsContent ul, #xwikihelplistsContent ol{
   margin: 0px;
 }
-#contentcolumn .large.panel{
+#contentcolumn .panel.large{
   width: 290px;
 }
 .accordionTabTitleBar tt{
@@ -762,9 +765,9 @@ Misc
   font-weight: 100;
   padding: 0px 4px;
 }
-.accordionTabContentBox div{
+/*.accordionTabContentBox div{
   padding: 0px;
-}
+}*/
 td.label{
   text-align: right;
   padding-right: 4px;

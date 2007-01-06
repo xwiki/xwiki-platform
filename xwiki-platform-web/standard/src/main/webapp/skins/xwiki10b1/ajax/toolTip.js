@@ -1,5 +1,5 @@
 /***********************************************
-* Cool DHTML tooltip script- copyright Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* Cool DHTML tooltip script-  Dynamic Drive DHTML code library (www.dynamicdrive.com)
 * This notice MUST stay intact for legal use
 * Visit Dynamic Drive at http://www.dynamicdrive.com/ for full source code
 ***********************************************/
@@ -59,6 +59,7 @@ function positiontip(e){
 }
 
 function hideddrivetip(){
+  if(!window.enabletip) return;
 	document.onmousemove=null;
 	if (ns6||ie){
 		enabletip=false
@@ -67,4 +68,11 @@ function hideddrivetip(){
 		tipobj.style.backgroundColor=''
 		tipobj.style.width=''
 	}
+}
+
+if (window.addEventListener) {
+  window.addEventListener("load",function() {document.getElementById("body").appendChild(tipobj);},false);
+}
+else if (window.attachEvent) {
+  window.attachEvent("onload",function() {document.getElementById("body").appendChild(tipobj);});
 }

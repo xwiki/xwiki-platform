@@ -52,6 +52,9 @@
   line-height: 1.1em;
 }
 
+.heading-1, .heading-1-1, .heading-1-1-1, .heading-1-1-1-1, .heading-1-1-1-1-1, .heading-1-1-1-1-1-1{
+  clear: both;
+}
 
 .quote {
   font-style: italic;

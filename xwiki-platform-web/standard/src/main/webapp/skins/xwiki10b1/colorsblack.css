@@ -179,6 +179,9 @@ Menu
   padding: 0px 20px;
   color: #333 !important;
 }
+#tmCreate a strong{
+  background-image: url(icons/black-create-ab.png);
+}
 #tmEdit a strong{
   background-image: url(icons/black-edit-ab.png);
 }
@@ -199,6 +202,9 @@ Menu
 }
 #tmDelete a strong{
   background-image: url(icons/black-delete.png);
+}
+#tmCreate a:hover strong{
+  background-image: url(icons/black-create-ab2.png);
 }
 #tmEdit a:hover strong{
   background-image: url(icons/black-edit-ab2.png);
@@ -551,7 +557,6 @@ th{
   background-image: none !important;
 }
 
-
 .placeholder{
   background-color: #555;
   border: 1px dotted #CCC;
@@ -560,6 +565,10 @@ th{
 #dragbox{
   background-color: #c82 !important;
   border: 1px dotted #fff !important;
+}
+
+.dropTarget .accordionTabContentBox{
+  background-color: #777 !important;
 }
 
 input.button{

@@ -98,7 +98,7 @@ function updateAttachName(form, msg) {
 }
 
 function toggleClass(o, className){
-  if(!isClassExist(o,className)) {
+  if(!eltHasClass(o,className)) {
     o.className += ' ' + className
   }
   else {
@@ -106,14 +106,14 @@ function toggleClass(o, className){
   }
 }
 function addClass(o, className){
-  if(!isClassExist(o,className))
+  if(!eltHasClass(o,className))
     o.className += ' ' + className
 }
 
-function isClassExist(o,className){
-    if(!o.className)
-      return false;
-    return new RegExp('\\b' + className + '\\b').test(o.className)
+function eltHasClass(o,className){
+  if(!o.className)
+    return false;
+  return new RegExp('\\b' + className + '\\b').test(o.className)
 }
 
 function rmClass(o, className){

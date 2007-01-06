@@ -20,7 +20,12 @@ function isPanel(el){
 
 function getX(el) {
   if (el.offsetParent) {
-    return el.offsetLeft + getX(el.offsetParent); 
+    if(window.ActiveXObject) {
+      return el.offsetLeft + getX(el.offsetParent) + el.clientLeft;
+    }
+    else {
+      return el.offsetLeft + getX(el.offsetParent) + (el.scrollWidth - el.clientWidth); 
+    }
   }
   else {
     if (el.x) {
@@ -32,8 +37,14 @@ function getX(el) {
 }
 
 function getY(el) {
-  if (el.offsetParent)
-    return el.offsetTop + getY(el.offsetParent); 
+  if (el.offsetParent) {
+    if(window.ActiveXObject) {
+      return el.offsetTop + getY(el.offsetParent) + el.clientTop;
+    }
+    else {
+      return el.offsetTop + getY(el.offsetParent) + (el.scrollHeight - el.clientHeight); 
+    }
+  }
   else {
     if (el.y)
       return el.y;
@@ -87,14 +98,20 @@ function getClosestDropTarget(x, y, w, h) {
 
 function onDragStart(el,x,y) {
   if (el.isDragging) return;
+  hideddrivetip();
+  window.isDraggingPanel = true;
   if (enabletip==true) hideddrivetip();
   realParent = el.parentNode;
   parentNode = el.parentNode;
   var isAdded = (realParent != leftPanels && realParent != rightPanels);
   var x = getX(el);
   var y = getY(el);
-  //dragel.style.height = (el.offsetHeight-2) +"px";
-  dragel.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
+  if(window.ActiveXObject) {
+    dragel.style.height = (el.offsetHeight ? (el.offsetHeight) : el.displayHeight) + "px";
+  }
+  else {
+    dragel.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
+  }
   dragel.style.display = "block";
   // Make the current absolute
   el.style.left = x + "px";
@@ -103,47 +120,53 @@ function onDragStart(el,x,y) {
 
   if (isAdded){
     parentNode = allPanels;
-    //debugwrite("y");
     el.placeholder = document.createElement("div");
     el.placeholder.className="placeholder";
-    //el.placeholder.style.height = (el.offsetHeight-2) +"px";
-    el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
+    if(window.ActiveXObject) {
+      el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight) : el.displayHeight) + "px";
+    }
+    else {
+      el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
+    }
     realParent.replaceChild(el.placeholder, el);
     el.placeholder.style.display = "block";
-    allPanels.appendChild(dragel);
-    allPanels.style.backgroundColor = "#EEE";
-    //realParent.insertBefore(el.placeHolder, dragel);
+    addClass(allPanels, "dropTarget");
   }
   else {
     realParent.replaceChild(dragel, el);
   }
+  // Make the current absolute
   el.style.position = "absolute";
   document.body.appendChild(el);
   el.isDragging = true;
   prevcolumn = parentNode;
-  //dragel.style.height = (el.offsetHeight-2) +"px";
-  dragel.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
 }
 
 function onDrag(el,x,y) {
   if (enabletip==true) hideddrivetip();
   parentNode = getClosestDropTarget(x,y, el.offsetWidth, el.offsetHeight);
   if(parentNode != prevcolumn){
-    prevcolumn.removeChild(dragel);
+    if(prevcolumn != allPanels) {
+      prevcolumn.removeChild(dragel);
+    }
     if (parentNode != allPanels){
       parentNode.appendChild(dragel);
-      allPanels.style.backgroundColor = "#FFF";
+      rmClass(allPanels, "dropTarget");
     }
     else{
-      allPanels.style.backgroundColor = "#EEE";
+      addClass(allPanels, "dropTarget");
     }
   }
   prevcolumn = parentNode;
   var list = getBlocList(parentNode);
   var pos = getDragBoxPos(list, y);
-  if(pos == -1) return;
+  if(pos == -1) {
+    return;
+  }
   if (list.length==0){
-    parentNode.appendChild(dragel);
+      if (parentNode != allPanels){
+        parentNode.appendChild( dragel); 
+      }
   }
   else if (pos!=0 && y<=getY(list[pos-1])) {
     parentNode.insertBefore(dragel, list[pos-1]);
@@ -152,19 +175,24 @@ function onDrag(el,x,y) {
     if (list[pos+2]) {
       parentNode.insertBefore(dragel, list[pos+2]);
     } else {
-      parentNode.appendChild( dragel); 
+      if (parentNode != allPanels){
+        parentNode.appendChild( dragel); 
+      }
+      else {
+        dragel.parentNode.removeChild(dragel);
+      }
     }
   }
 }
 
 function onDragEnd(el,x,y) {
   el.isDragging = false;
+  window.isDraggingPanel = false;
   el.style.position = "static";
   if (parentNode == allPanels){
     el.placeholder.parentNode.replaceChild(el, el.placeholder);
     el.placeholder = undefined;
-    dragel.parentNode.removeChild(dragel);
-    allPanels.style.backgroundColor = "#FFF";
+    rmClass(allPanels, "dropTarget");
   }
   else{
     parentNode.replaceChild(el, dragel);
@@ -181,8 +209,6 @@ function executeCommand(url, callback) {
     // using these means the local variables retain their values after the outer function
     // has returned. this is useful for thread safety, so
     // reassigning the onreadystatechange function doesn't stomp over earlier requests.
-
-
   function ajaxBindCallback() {
     if (ajaxRequest.readyState == 4) {
       if (ajaxRequest.status == 200) {
@@ -196,8 +222,6 @@ function executeCommand(url, callback) {
       }
     }
   }
-
-  // addMessage(url);
   // use a local variable to hold our request and callback until the inner function is called...
   var ajaxRequest = null;
   var ajaxCallback = callback;
@@ -226,7 +250,6 @@ function executeCommand(url, callback) {
   }
 }
 
-
 function start1() {
   var i;
   var j;
@@ -241,9 +264,9 @@ function start1() {
     }
   }
   //replacing used panels in the list with placeholders and attaching placeholders
-  var panelsInList  = getAllPanels(allPanels);
-  var panelsOnLeft  = getBlocList(leftPanels);
-  var panelsOnRight = getBlocList(rightPanels);
+  window.panelsInList  = getAllPanels(allPanels);
+  window.panelsOnLeft  = getBlocList(leftPanels);
+  window.panelsOnRight = getBlocList(rightPanels);
   //
   var el;
   for (i = 0; i < panelsInList.length; i++){
@@ -253,7 +276,12 @@ function start1() {
       el.fullname=window.allPanelsPlace[i].fullname;
       el.placeholder = document.createElement("div");
       el.placeholder.className="placeholder";
-      el.displayHeight = panelsInList[i].offsetHeight-2;
+      if(window.ActiveXObject) {
+        el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
+      }
+      else {
+        el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
+      }
       el.placeholder.style.height = (el.displayHeight) +"px";
       el.placeholder.style.display = "block";
       panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
@@ -264,7 +292,12 @@ function start1() {
       el.fullname=window.allPanelsPlace[i].fullname;
       el.placeholder = document.createElement("div");
       el.placeholder.className="placeholder";
-      el.displayHeight = panelsInList[i].offsetHeight-2;
+      if(window.ActiveXObject) {
+        el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
+      }
+      else {
+        el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
+      }
       el.placeholder.style.height = (el.displayHeight) +"px";
       el.placeholder.style.display = "block";
       if(panelsInList[i].parentNode) {
@@ -296,18 +329,18 @@ function start1() {
     }
   }
   new Rico.Accordion('panellistaccordion', {panelHeight:512, backgroundColor: "#676D73", textColor: "#FFF", collapsedBg: "#384554", expandedBg: "#384554", hoverBg: "#384554", expandedTextColor: "#FFF", collapsedTextColor: "#EEE", hoverTextColor: "#C0D4E7"} );
-  window.activeWizardPage = document.getElementById("PageLayoutSection");
+  window.activeWizardPage = document.getElementById("PanelListSection");
   window.activeWizardTab  = document.getElementById("firstwtab");
-  document.getElementById("PanelListSection").style.display = "none";
-  //document.getElementById("CreateSection").style.display = "none";
-
+  document.getElementById("PageLayoutSection").style.display = "none";
 }
 
 function attachDragHandler(el){
   el.ondblclick = function(ev) {};
   Drag.init(el,el);
   el.onDragStart = function (x,y) { onDragStart(this,x,y);};
-  el.onDrag = function (x,y) { onDrag(this,x,y);};
+  el.onDrag = function (x,y) { 
+    onDrag(this,x,y);
+  };
   el.onDragEnd = function (x,y) { onDragEnd(this,x,y);};
   var titlebar = el.getElementsByTagName("h5").item(0);
   if(titlebar){
@@ -333,22 +366,19 @@ function getBlocNameList(el) {
 }
 
 function save() {
-  var res = true;//confirm("The Panel Layout saving is in Beta. Please confirm you want to save your layout");
-  if (res==true) {
   url = window.ajaxurl;
-    var leftPanelsList = getBlocNameList(leftPanels);
-    url += "&leftPanels=" + leftPanelsList;
-    url += "&showLeftPanels=" + window.showLeftColumn;
-    var rightPanelsList = getBlocNameList(rightPanels);
-    url += "&rightPanels=" + rightPanelsList;
-    url += "&showRightPanels=" + window.showRightColumn;
-    executeCommand(url, saveResult);
-  }
+  var leftPanelsList = getBlocNameList(leftPanels);
+  url += "&leftPanels=" + leftPanelsList;
+  url += "&showLeftPanels=" + window.showLeftColumn;
+  var rightPanelsList = getBlocNameList(rightPanels);
+  url += "&rightPanels=" + rightPanelsList;
+  url += "&showRightPanels=" + window.showRightColumn;
+  executeCommand(url, saveResult);
 }
 
 function saveResult(html) {
   if(html=="SUCCESS"){
-    alert("Panels Layout have been saved propertly")
+    alert(window.panelsavesuccess)
     //this is for the "revert" button:
     leftPanels.savedPanelList = getBlocList(leftPanels);
     rightPanels.savedPanelList = getBlocList(rightPanels);
@@ -356,7 +386,7 @@ function saveResult(html) {
     rightPanels.isVisible = window.showRightColumn;
   }
   else {
-    alert("An error occured while trying to save the panel layout")
+    alert(window.panelsaveerror)
     alert(html)
   }
 }
@@ -391,8 +421,12 @@ function revertPanels(column){
 function restorePanel(el, column){
   el.placeholder = document.createElement("div");
   el.placeholder.className="placeholder";
-  //el.placeholder.style.height = (el.offsetHeight-2) +"px";
-  el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : el.displayHeight) + "px";
+  if(window.ActiveXObject) {
+    el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight) : 0);
+  }
+  else {
+    el.placeholder.style.height = (el.offsetHeight ? (el.offsetHeight-2) : 0);
+  }
   el.placeholder.style.display = "block";
   el.parentNode.replaceChild(el.placeholder, el);
   column.appendChild(el);
@@ -414,7 +448,6 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-//      mainContent.className = "contenthidelefthideright";
       mainContainer.className = "contenthidelefthideright";
       break;
     case 1:
@@ -429,7 +462,6 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "none";
         releasePanels(rightPanels);
       }
-//      mainContent.className = "contenthideright";
       mainContainer.className = "contenthideright";
       break;
     case 2:
@@ -444,7 +476,6 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-//      mainContent.className = "contenthideleft";
       mainContainer.className = "contenthideleft";
       break;
     case 3:
@@ -459,7 +490,6 @@ function changePreviewLayout(element, code){
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-//      mainContent.className = "content";
       mainContainer.className = "content";
       break;
     default:
@@ -494,9 +524,8 @@ function switchToWizardPage(el, toShowID){
 
 //----------------------------------------------------------------
 
-
 function panelEditorInit(){
-  tipobj=document.all? document.all["dhtmltooltip"] : document.getElementById? document.getElementById("dhtmltooltip") : ""
+  tipobj = document.all? document.all["dhtmltooltip"] : document.getElementById? document.getElementById("dhtmltooltip") : ""
 
   parentNode = null;
   realParent = null;
@@ -525,4 +554,9 @@ function panelEditorInit(){
   start1();
 }
 
-setTimeout("panelEditorInit()", 100);
+if (window.addEventListener) {
+  window.addEventListener("load",panelEditorInit,false);
+}
+else if (window.attachEvent) {
+  window.attachEvent("onload",panelEditorInit);
+}

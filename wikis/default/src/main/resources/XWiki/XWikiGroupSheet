@@ -33,6 +33,8 @@ $doc.display("member", $obj) | &lt;a class="deletelink" href="$doc.getURL("objec
 #else
 {table}
 &lt;span class="floatleft"&gt;Members&lt;/span&gt; #if($hasedit)&lt;a id="modifygroup" href="$doc.getURL("inline")"&gt;&lt;span class="hidden"&gt;($msg.get("edit"))&lt;/span&gt;&lt;/a&gt;
+#else
+
 #end
 #foreach($obj in $doc.getObjects("XWiki.XWikiGroups"))
 $xwiki.getUserName($obj.getProperty("member").value)

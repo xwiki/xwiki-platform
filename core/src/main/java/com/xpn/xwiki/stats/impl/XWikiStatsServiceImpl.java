@@ -143,7 +143,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                CollectionUtils.reverseArray(actionsarray);
                int nb = Math.min(actions.size(), size);
                for (int i=0;i<nb;i++)
-                    list.add((String) actionsarray[i]);
+                    list.add(actionsarray[i]);
                }
         }
         return list;
@@ -215,7 +215,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                     // Catch exception to not fail here
                     try {
                      store.deleteXWikiCollection(oldObject, context, true, true);
-                    } catch (Exception e) {};
+                    } catch (Exception e) {}
                 }
 
                 store.saveXWikiCollection(vobject, context, true);
@@ -312,8 +312,6 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
         if (vobject!=null) {
             // Let's verify if the session is valid
-            Date endDate = vobject.getEndDate();
-
             // If the cookie is not the same
             if (!vobject.getCookie().equals(cookie.getValue())) {
                 // Let's log a message here
@@ -324,14 +322,12 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                            + session.getId() + " for request with cookie " + cookie.getValue());
                 // And forget about this session
                 vobject = null;
-            }
-
-            // If session is longer than 30 minutes we should invalidate it
-            // and create a new one
-            if ((nowDate.getTime()-endDate.getTime()) > 30 * 60 * 1000)
+            } else if ((nowDate.getTime() - vobject.getEndDate().getTime()) > 30 * 60 * 1000) {
+                // If session is longer than 30 minutes we should invalidate it
+                // and create a new one
                 vobject = null;
+            }
         }
-
 
         if (vobject==null) {
            if (!newcookie) {
@@ -350,6 +346,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                }
 
            }
+        }
+        if(vobject != null && !context.getUser().equals(vobject.getName())) {
+            // If the user is not the same, we should invalidate the session
+            // and create a new one
+            vobject = null;
         }
 
         if (vobject==null) {

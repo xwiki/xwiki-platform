@@ -78,6 +78,9 @@ Space header, footer
 	color:  #fff;
 	text-decoration: none;
 }
+#breadcrumbs a:hover {
+  color: #D70;
+}
 /*
 ---------------------------------------
 Content

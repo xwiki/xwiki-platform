@@ -19,11 +19,10 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<content>
-1 $doc.name
+<content>1 $doc.name
 
 #if($context.action == "inline")
-#warningmessage($msg.get("userdeletioncannotbecanceled"))
+#warning($msg.get("userdeletioncannotbecanceled"))
 #set($redirect = $xwiki.getRequestURL())
 {table}
 &lt;span class="floatleft"&gt;Members&lt;/span&gt; &lt;a id="adduser" href="$doc.getURL("objectadd","classname=XWiki.XWikiGroups&amp;amp;xredirect=$redirect")" title="$msg.get("addusertogroup")"&gt;&lt;span class="hidden"&gt;($msg.get("add"))&lt;/span&gt;&lt;/a&gt; | 
@@ -39,5 +38,5 @@ $doc.display("member", $obj) | &lt;a class="deletelink" href="$doc.getURL("objec
 $xwiki.getUserName($obj.getProperty("member").value)
 #end
 {table}
-#end
-</content></xwikidoc>
+#end</content>
+</xwikidoc>

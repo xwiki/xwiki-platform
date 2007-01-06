@@ -53,7 +53,7 @@
 <content>#set($obj = "")
 #set($obj = $doc.getObject("XWiki.ArticleClass"))
 #if($obj == "")
-#warningmessage("This is not an article!")
+#warning("This is not an article!")
 #elseif($context.action!="inline")
 &lt;div class="hfeed"&gt;
 &lt;div class="hentry"&gt;

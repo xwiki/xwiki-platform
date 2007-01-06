@@ -57,14 +57,129 @@ $response.sendRedirect($doc.getURL("view", "forceLeftPanels=1&amp;forceRightPane
 #set($showEmptyPanels = 1)
 #if($xwiki.hasAdminRights())
 1 Panel Wizard
-
 &lt;div class="floatcontainer"&gt;&lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-&lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection" &gt;Page Layout&lt;/a&gt;&lt;/li&gt;
-&lt;li onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;Panel List&lt;/a&gt;&lt;/li&gt;
-##&lt;li onclick="switchToWizardPage(this, 'CreateSection'); return false;"&gt;&lt;a href="#CreateSection"&gt;Create&lt;/a&gt;&lt;/li&gt;
+&lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;Panel List&lt;/a&gt;&lt;/li&gt;
+&lt;li onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection" &gt;Page Layout&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-&lt;div id="xwikieditcontent"&gt;
+&lt;div id="xwikieditcontent" class="clear"&gt;
+##1.1 Panel List
+&lt;div id="PanelListSection"&gt;
+&lt;span class="hastooltip" onmouseover="if(window.isDraggingPanel) return; showtip(this, 'To drag a panel, use your mouse and click on the header of the panel. Keep your left mouse button down while you move your mouse and the panel at the same time. While you move the panel you will see in real-time where the panel will be dropped when you release your left mouse button.', 300)"&gt;Drag and drop&lt;/span&gt; panels to rearrange them inside a column or between columns. To add or remove panels, drag them from the list of available panels to one of the columns or from the column into the list, respectively.
+#set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
+#set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
+#set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
+#set($panelsList = $xwiki.searchDocuments($sql))
+#set($categoryMap = $xwiki.getHashMap())
+#foreach($category in $categoryList)
+  $!categoryMap.put($category, $xwiki.getArrayList())
+#end
+#foreach ($item in $panelsList)
+  #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+  #if($obj.type == 'view')
+    #set($arrayList = $categoryMap.get($obj.category))
+    #if($arrayList)
+      #set($discard = $categoryMap.get($obj.category).add($item))
+      ## TODO: uncategorized?
+    #end
+  #end
+#end
+##
+#set($panelsPerRow = 3)
+{pre}
+&lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
+#set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
+#if($request.place)
+#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain&amp;place=${request.place}"))
+#else
+#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain"))
+#end
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/Drag.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/ieemu.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/toolTip.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+window.ajaxurl = '$ajaxurl';
+window.allPanelsPlace = new Object();
+window.panelsavesuccess = "$msg.get("panelsavesuccess")";
+window.panelsaveerror = "$msg.get("panelsaveerror")";
+#set($counter = 0)
+#set($panelsStatus = $xwiki.hashMap)
+$xwiki.hashMap
+#foreach($category in $categoryList)
+  #set($categPanels = $categoryMap.get($category))
+  #foreach ($item in $categPanels)
+    #set($discard = $panelsStatus.put($item, "false"))
+    #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+    window.allPanelsPlace[$counter] = new Object();
+    window.allPanelsPlace[$counter]['fullname'] = '$item';
+    #set($issetleft = 0)
+    #set($counterleft = 0)
+    #set($issetright = 0)
+    #set($counterright = 0)
+    #foreach($element in $leftPanels)
+      #if($item == $element)
+        window.allPanelsPlace[$counter]['left'] = $counterleft;
+        #set($issetleft = 1)
+        #set($discard = $panelsStatus.put($item, "true"))
+      #end
+      #set($counterleft = $counterleft + 1)
+    #end
+    #if($issetleft == 0)
+      window.allPanelsPlace[$counter]['left'] = -1;
+    #end
+    #foreach($element in $rightPanels)
+      #if($item == $element)
+        window.allPanelsPlace[$counter]['right'] = $counterright;
+        #set($issetright = 1)
+        #set($discard = $panelsStatus.put($item, "true"))
+      #end
+      #set($counterright = $counterright + 1)
+    #end
+    #if($issetright == 0)
+      window.allPanelsPlace[$counter]['right'] = -1;
+    #end
+    #set($counter = $counter + 1)
+  #end
+#end
+window.showLeftColumn = $showLeftPanels;
+window.showRightColumn = $showRightPanels;
+&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/panelWizard.js")"&gt; &lt;/script&gt;
+{/pre}
+&lt;div id="allviewpanels"&gt;
+## start of accordion:
+  &lt;div id="panellistaccordion"&gt;
+  #foreach($category in $categoryList)
+    ## start of accordion tab:
+    &lt;div&gt;
+      &lt;div class="accordionTabTitleBar"&gt;&lt;h6&gt;$category&lt;/h6&gt;&lt;/div&gt;
+      ## start of accordion tab content:
+      &lt;div class="accordionTabContentBox"&gt;
+      #set($categPanels = $categoryMap.get($category))
+      #if($categPanels.size() == 0)
+        There are no panels from this category.
+      #else
+        #foreach ($item in $categPanels)
+          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+                &lt;div class="panelitemc"&gt;
+                  &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
+                  &lt;div class="panelcontainer" onmouseover="if(!window.isDraggingPanel){ showtip(this, unescape('$xwiki.getURLEncoded($doc.display("description", $obj)).replace("+", "%20")'), 300); }"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                  &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
+                &lt;/div&gt;
+        #end
+      #end
+      ## end of accordion tab content:
+      &lt;/div&gt;
+    ## end of accorion tab:
+    &lt;/div&gt;
+  ## end of foreach:
+  #end
+  ## end of accordion:
+  &lt;/div&gt;
+## end of allpanels div
+&lt;/div&gt;
+## end of PanelsListSection
+&lt;/div&gt;
 ##1.1 Page Layout
 &lt;div id="PageLayoutSection"&gt;
 Choose a page layout:
@@ -118,7 +233,6 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
 &lt;div 
 #if($crtlayout == 3)id="selectedoption"#end
 class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
-##&lt;input type="radio" name="pagelayout" value="leftrightcol" /&gt;
 &lt;label&gt;Both columns&lt;/label&gt;
 &lt;div  id="bothcolumns" class="layoutmaquette"&gt;
 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
@@ -131,163 +245,14 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
 &lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-##1.1 Panel List
-&lt;div id="PanelListSection"&gt;
-&lt;span class="hastooltip" onmouseover="showtip(this, 'To drag a panel, use your mouse and click on the header of the panel. Keep your left mouse button down while you move your mouse and the panel at the same time. While you move the panel you will see in real-time where the panel will be dropped when you release your left mouse button.', 300)"&gt;Drag and drop&lt;/span&gt; panels to rearrange them inside a column or between columns. To add or remove panels, drag them from the list of available panels to one of the columns or from the column into the list, respectively.
-#set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
-#set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
-#set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
-#set($panelsList = $xwiki.searchDocuments($sql))
-#set($categoryMap = $xwiki.getHashMap())
-#foreach($category in $categoryList)
-  $!categoryMap.put($category, $xwiki.getArrayList())
-#end
-#foreach ($item in $panelsList)
-  #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
-  #if($obj.type == 'view')
-    #set($arrayList = $categoryMap.get($obj.category))
-    #if($arrayList)
-      #set($discard = $categoryMap.get($obj.category).add($item))
-      ## TODO: uncategorized?
-    #end
-  #end
-#end
-##
-#set($panelsPerRow = 3)
-&lt;div id="allviewpanels"&gt;
-## start of accordion:
-  &lt;div id="panellistaccordion"&gt;
-  #foreach($category in $categoryList)
-    ## start of accordion tab:
-    &lt;div&gt;
-      &lt;div class="accordionTabTitleBar"&gt;&lt;h6&gt;$category&lt;/h6&gt;&lt;/div&gt;
-      ## start of accordion tab content:
-      &lt;div&gt;
-      #set($categPanels = $categoryMap.get($category))
-      #if($categPanels.size() == 0)
-        There are no panels from this category.
-      #else
-##        &lt;table&gt;
-##        #set($counter = 0)
-        #foreach ($item in $categPanels)
-          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
-##          #if ($counter == 0)
-##            &lt;tr&gt;
-##          #end
-##              &lt;td&gt;
-##                &lt;div class="verysmall"&gt;
-                &lt;div class="panelitemc"&gt;
-                  &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
-                  &lt;div class="panelcontainer" onmouseover="showtip(this, unescape('$xwiki.getURLEncoded($doc.display("description", $obj)).replace("+", "%20")'), 300)"&gt;#displaypanel("$item")&lt;/div&gt;
-                  &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
-                &lt;/div&gt;
-##              &lt;/td&gt;
-##          #set($counter = $counter + 1)
-##          #if ($counter == $panelsPerRow)
-##            #set($counter = 0)
-##            &lt;/tr&gt;
-##          #end
-        #end
-##        #if ($counter != 0)
-##            &lt;/tr&gt;
-##        #end
-##        &lt;/table&gt;
-      #end
-      ## end of accordion tab content:
-      &lt;/div&gt;
-    ## end of accorion tab:
-    &lt;/div&gt;
-  ## end of foreach:
-  #end
-  ## end of accordion:
-  &lt;/div&gt;
-## end of allpanels div
-&lt;/div&gt;
-## end of PanelsListSection
-&lt;/div&gt;
 &lt;/div&gt; ## xwikieditcontent
-##1.1 Create
-##&lt;div id="CreateSection"&gt;
-###includeTopic("Panels.CreatePanel")
-##&lt;/div&gt;
 &lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
 &lt;span class="xwikibuttonlink"&gt;
-&lt;span class="buttonwrapper"&gt;&lt;a href="javascript:void()" onclick="save(); return false;"&gt;Save the new layout&lt;/a&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;a href="#" onclick="save(); return false;"&gt;Save the new layout&lt;/a&gt;&lt;/span&gt;
 &lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL("view")" onclick="revert(); return false;"&gt;Revert&lt;/a&gt;&lt;/span&gt;
 &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;Go to Panels home page&lt;/a&gt;&lt;/span&gt;
 &lt;/span&gt;
 &lt;/div&gt;
-
-{pre}
-&lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
-#set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
-#if($request.place)
-#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain&amp;place=${request.place}"))
-#else
-#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain"))
-#end
-&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/Drag.js")"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/ieemu.js")"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/toolTip.js")"&gt;&lt;/script&gt;
-&lt;script type="text/javascript"&gt;
-window.ajaxurl = '$ajaxurl';
-#*
-window.panelsOnLeft = new array();
-#set($counter = 0)
-#foreach($item in $leftPanels)
-window.panelsOnLeft[$counter] = '$item';
-#set($counter = $counter + 1)
-#end
-
-window.panelsOnRight = new array();
-#set($counter = 0)
-#foreach($item in $rightPanels)
-window.panelsOnRight[$counter] = '$item';
-#set($counter = $counter + 1)
-#end
-*#
-
-window.allPanelsPlace = new Object();
-#set($counter = 0)
-#foreach($category in $categoryList)
-  #set($categPanels = $categoryMap.get($category))
-  #foreach ($item in $categPanels)
-    #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
-    window.allPanelsPlace[$counter] = new Object();
-    window.allPanelsPlace[$counter]['fullname'] = '$item';
-    #set($issetleft = 0)
-    #set($counterleft = 0)
-    #set($issetright = 0)
-    #set($counterright = 0)
-    #foreach($element in $leftPanels)
-      #if($item == $element)
-        window.allPanelsPlace[$counter]['left'] = $counterleft;
-        #set($issetleft = 1)
-      #end
-      #set($counterleft = $counterleft + 1)
-    #end
-    #if($issetleft == 0)
-      window.allPanelsPlace[$counter]['left'] = -1;
-    #end
-    #foreach($element in $rightPanels)
-      #if($item == $element)
-        window.allPanelsPlace[$counter]['right'] = $counterright;
-        #set($issetright = 1)
-      #end
-      #set($counterright = $counterright + 1)
-    #end
-    #if($issetright == 0)
-      window.allPanelsPlace[$counter]['right'] = -1;
-    #end
-    #set($counter = $counter + 1)
-  #end
-#end
-
-window.showLeftColumn = $showLeftPanels;
-window.showRightColumn = $showRightPanels;
-&lt;/script&gt;
-&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/panelEditor.js")"&gt; &lt;/script&gt;
-{/pre}
 #else
 #xwikimessageboxstart("Panel Editor" "")
 You need to be administrator of the Place to use the Home Page Editor

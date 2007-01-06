@@ -201,6 +201,19 @@
 <number>18</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </skin>
+<usertype>
+<prettyName>User type</prettyName>
+<multiSelect>0</multiSelect>
+<values>Basic|Advanced</values>
+<displayType>select</displayType>
+<unmodifiable>0</unmodifiable>
+<size>1</size>
+<separators> ,|</separators>
+<relationalStorage>0</relationalStorage>
+<name>usertype</name>
+<number>21</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</usertype>
 <imtype>
 <name>imtype</name>
 <prettyName>IM Type</prettyName>
@@ -365,6 +378,9 @@
 </property>
 <property>
 <skin></skin>
+</property>
+<property>
+<usertype>Advanced</usertype>
 </property>
 <property>
 <imtype>---</imtype>

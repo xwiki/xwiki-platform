@@ -4,17 +4,17 @@
 #end
 #if($reg<=0)
 #if($reg==-2)
-#errormessage("$msg.get('passwordmismatch').")
+#error("$msg.get('passwordmismatch').")
 #elseif($reg==-3)
-#errormessage("$msg.get('useralreadyexists').")
+#error("$msg.get('useralreadyexists').")
 #elseif($reg==-4)
-#errormessage("$msg.get('invalidusername').")
+#error("$msg.get('invalidusername').")
 #else
-#errormessage("$msg.get('registerfailed') ($msg.get('registerfailedcode') $reg).")
+#error("$msg.get('registerfailed') ($msg.get('registerfailedcode') $reg).")
 #end
 #elseif($reg)
 #set($xwname = "XWiki.${request.xwikiname}")
-#infomessage("$xwiki.getUserName($xwname) ($request.xwikiname): $msg.get('registersuccessful').")
+#info("$xwiki.getUserName($xwname) ($request.xwikiname): $msg.get('registersuccessful').")
 #end
 #if(!$reg||$reg<0 )
 <form id="register" name="register" action="" action="" method="post">

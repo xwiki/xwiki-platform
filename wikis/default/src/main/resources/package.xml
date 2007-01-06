@@ -51,6 +51,7 @@
 <file defaultAction="0" language="">XWiki.ClassItemSheet</file>
 <file defaultAction="0" language="">XWiki.BlogRssCode</file>
 <file defaultAction="0" language="">XWiki.DefaultSkin</file>
+<file defaultAction="0" language="">XWiki.CreatePage</file>
 <file defaultAction="0" language="">Main.WebRss</file>
 <file defaultAction="0" language="">Main.WhatsNew</file>
 <file defaultAction="0" language="">Main.SpaceIndex</file>
@@ -73,6 +74,7 @@
 <file defaultAction="0" language="">Blog.WebHome</file>
 <file defaultAction="0" language="">Blog.Categories</file>
 <file defaultAction="0" language="">Blog.Category</file>
+<file defaultAction="0" language="">Blog.CreateBlogPost</file>
 <file defaultAction="0" language="">Admin.WebHome</file>
 <file defaultAction="0" language="">Admin.WebPreferences</file>
 <file defaultAction="0" language="">Admin.CopyDocument</file>
@@ -84,7 +86,6 @@
 <file defaultAction="0" language="">Panels.GlobalRightsEditorWelcome</file>
 <file defaultAction="0" language="">Panels.XWikiSyntax</file>
 <file defaultAction="0" language="">Panels.IncludedDocuments</file>
-<file defaultAction="0" language="">Panels.PanelEditor</file>
 <file defaultAction="0" language="">Panels.AddClassProperty</file>
 <file defaultAction="0" language="">Panels.ClassSwitcher</file>
 <file defaultAction="0" language="">Panels.ClassEditorWelcome</file>

@@ -24,7 +24,7 @@
 #xwikimessageboxstart("Place Manager" "")
 You are not admin on this place ($place).
 #xwikimessageboxend()
-#else
+#elseif($request.xpage == "plain")
 #if((!$place)||($place==""))
 #set($prefsdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
 #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))
@@ -44,7 +44,7 @@ You are not admin on this place ($place).
 #if($showRightPanels)
 #set($ok = $prefsdoc.set("showRightPanels",$showRightPanels))
 #end
-#set($ok = $prefsdoc.saveWithProgrammingRights())
+#set($ok = $prefsdoc.save())
 SUCCESS
 #else
 #set($prefsdoc = $xwiki.getDocument("${place}:XWiki.XWikiPreferences"))
@@ -57,8 +57,11 @@ SUCCESS
 #if($rightPanels&amp;&amp;$rightPanels!="")
 #set($ok = $prefsdoc.set("rightPanels",$rightPanels))
 #end
-#set($ok = $prefsdoc.saveWithProgrammingRights())
+#set($ok = $prefsdoc.save())
 SUCCESS
 #end
+#else
+1 Panel layout update
+#warning("This page is not supposed to be accessed directly. Please use the [Panel wizard&gt;PanelWizard]")
 #end</content>
 </xwikidoc>

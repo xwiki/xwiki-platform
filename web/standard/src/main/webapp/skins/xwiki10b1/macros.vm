@@ -279,16 +279,32 @@ $html
 ###    message
 ###
 
-#macro(warningmessage $text)
-<div class="warningmessage"><span class="hidden">$msg.get("warning"): </span>$text</div>
+#macro(warning $text)
+<div class="warningmessage"><span class="messagetype">$msg.get("warning"): </span>$text</div>
 #end
 
-#macro(errormessage $text)
-<div class="errormessage"><span class="hidden">$msg.get("error"): </span>$text</div>
+#macro(error $text)
+<div class="errormessage"><span class="messagetype">$msg.get("error"): </span>$text</div>
 #end
 
-#macro(infomessage $text)
+#macro(info $text)
 <div class="infomessage">$text</div>
+#end
+
+#macro(message $text)
+<div class="plainmessage">$text</div>
+#end
+
+#macro (floatingbox $text)
+<fieldset class="floatinginfobox">$text</fieldset>
+#end
+
+#macro (startfloatingbox)
+<fieldset class="floatinginfobox">
+#end
+
+#macro (endfloatingbox)
+</fieldset>
 #end
 
 ###

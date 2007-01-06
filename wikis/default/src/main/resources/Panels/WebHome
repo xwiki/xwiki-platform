@@ -21,17 +21,23 @@
 <validationScript></validationScript>
 <content>1 Panels
 
+#if($hasadmin)
+1.1 Create new panels
+#includeTopic("Panels.CreatePanel")
+#end
+
 1.1 Viewer panels
 
 #set ($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
 #foreach ($item in $xwiki.searchDocuments($sql))
 #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
 #if($obj.type == 'view')
-   * [$item]#if($hasadmin){pre} [{/pre}&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;{pre}]{/pre}#end: $obj.description 
+* [$item]#if($hasadmin){pre} [{/pre}&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;{pre}]{/pre}#end: $obj.description
 #end
 #end
 
-You can customize the side column(s) of the document view using the ["what you see is what you get" panel editor&gt;Panels.PanelWizard].
+#if($hasadmin) &lt;div class="plainmessage"&gt;&lt;img src="$xwiki.getSkinFile("icons/wiz.png")" alt=""/&gt; You can customize the side column(s)  using the [Panel Wizard&gt;Panels.PanelWizard].&lt;/div&gt; #end
+
 
 1.1 Editor panels
 #foreach ($item in $xwiki.searchDocuments($sql))
@@ -40,13 +46,4 @@ You can customize the side column(s) of the document view using the ["what you s
    * [$item]#if($hasadmin){pre} [{/pre}&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;{pre}]{/pre}#end: $obj.description
 #end
 #end
-
-1.1 Create new panels
-
-#includeTopic("Panels.CreatePanel")
-
-
-
-
-
 </content></xwikidoc>

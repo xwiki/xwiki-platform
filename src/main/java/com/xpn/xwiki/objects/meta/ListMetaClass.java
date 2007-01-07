@@ -25,6 +25,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
 public class ListMetaClass extends PropertyMetaClass {
 
@@ -66,6 +67,12 @@ public class ListMetaClass extends PropertyMetaClass {
         size_class.setSize(5);
         size_class.setNumberType("integer");
         safeput("size", size_class);
+
+        StringClass separator_class = new StringClass(this);
+        separator_class.setName("separator");
+        separator_class.setPrettyName("Join separator");
+        separator_class.setSize(20);
+        safeput("separator", separator_class);
 
         StaticListClass sort_class = new StaticListClass(this);
         sort_class.setName("sort");

@@ -28,14 +28,14 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 
 public class PasswordMetaClass extends StringMetaClass {
 
-public PasswordMetaClass() {
-    super();
-    // setType("passwordmetaclass");
-    setPrettyName("Password Class");
-    setName(PasswordClass.class.getName());
+    public PasswordMetaClass() {
+        super();
+        // setType("passwordmetaclass");
+        setPrettyName("Password Class");
+        setName(PasswordClass.class.getName());
     }
 
     public BaseCollection newObject(XWikiContext context) {
-          return new PasswordClass();
+        return new PasswordClass();
     }
 }

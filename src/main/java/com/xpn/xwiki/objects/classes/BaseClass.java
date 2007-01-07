@@ -23,33 +23,37 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.validation.XWikiValidationInterface;
-import com.xpn.xwiki.validation.XWikiValidationStatus;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.ecs.xhtml.select;
 import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
 
-import java.io.StringReader;
-import java.util.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 
 
 public class BaseClass extends BaseCollection implements ClassInterface {
-    private static final Log log = LogFactory.getLog(BaseClass.class);
     private String customMapping;
     private String customClass;
     private String defaultWeb;
@@ -432,8 +436,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             list_class.setSize(size);
             list_class.setMultiSelect(multiSelect);
             list_class.setValues(values);
-            if (displayType!=null)
-             list_class.setDisplayType(displayType);
+            if (displayType!=null) {
+                list_class.setDisplayType(displayType);
+            }
             list_class.setObject(this);
             put(fieldName, list_class);
             return true;
@@ -468,8 +473,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             DateClass date_class = new DateClass();
             date_class.setName(fieldName);
             date_class.setPrettyName(fieldPrettyName);
-            if (dformat!=null)
+            if (dformat!=null) {
                 date_class.setDateFormat(dformat);
+            }
             date_class.setObject(this);
             date_class.setEmptyIsToday(emptyIsToday);
             put(fieldName, date_class);
@@ -524,9 +530,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public String getCustomMapping() {
         if ("XWiki.XWikiPreferences".equals(getName()))
-          return "internal";
-        if (customMapping==null)
-          return "";
+            return "internal";
+        if (customMapping == null)
+            return "";
         return customMapping;
     }
 
@@ -589,11 +595,10 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         }
     }
 
-    public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException { {
+    public static BaseObject newCustomClassInstance(String className, XWikiContext context) throws XWikiException {
         BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject object = (bclass==null) ? new BaseObject() : bclass.newCustomClassInstance(context);
         return object;
-    }
     }
 
     public String getDefaultWeb() {
@@ -694,7 +699,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     public boolean validateObject(BaseObject obj, XWikiContext context) throws XWikiException {
         boolean isValid = true;
-        Object[] props = (Object[]) getPropertyNames();
+        Object[] props = getPropertyNames();
         for (int i=0;i<props.length;i++) {
             String propname = (String) props[i];
             BaseProperty property = (BaseProperty) obj.get(propname);
@@ -711,12 +716,11 @@ public class BaseClass extends BaseCollection implements ClassInterface {
 
     private boolean executeValidationScript(BaseObject obj, String validationScript, XWikiContext context) throws XWikiException {
         try {
-        XWikiValidationInterface validObject = (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
-        return validObject.validateObject(obj, context);
+            XWikiValidationInterface validObject = (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
+            return validObject.validateObject(obj, context);
         } catch (Throwable e) {
              XWikiValidationStatus.addExceptionToContext(getName(), "", e, context);
              return false;
         }
     }
-
 }

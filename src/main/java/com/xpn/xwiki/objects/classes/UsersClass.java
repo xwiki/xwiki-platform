@@ -1,11 +1,11 @@
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.StringProperty;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.button;
 import org.apache.ecs.xhtml.input;
@@ -13,10 +13,14 @@ import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
 
-import java.util.*;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class UsersClass extends ListClass {
-
     public UsersClass(PropertyMetaClass wclass) {
         super("userslist", "Users List", wclass);
         setSize(6);
@@ -80,7 +84,7 @@ public class UsersClass extends ListClass {
             return list;
 
         String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(value, ", ");
+        String[] result = StringUtils.split(val, ", ");
         for (int i = 0; i < result.length; i++)
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
         return list;
@@ -98,7 +102,7 @@ public class UsersClass extends ListClass {
             list = new ArrayList();
 
         List selectlist;
-        BaseProperty prop =  (BaseProperty)object.safeget(name);
+        BaseProperty prop = (BaseProperty)object.safeget(name);
         if (prop==null) {
             selectlist = new ArrayList();
         } else {

@@ -81,10 +81,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public String getFieldFullName() {
-        if (getObject()==null)
-         return getName();
+        if (getObject() == null)
+            return getName();
         else
-         return getObject().getName() + "_" + getName();
+            return getObject().getName() + "_" + getName();
     }
     
     public int getId() {
@@ -124,7 +124,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
        input input = new input();
-       PropertyInterface prop = (PropertyInterface) object.safeget(name);
+       PropertyInterface prop = object.safeget(name);
        if (prop!=null) input.setValue(prop.toFormString());
 
        input.setType("hidden");
@@ -402,24 +402,22 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     }
 
     public boolean validateProperty(BaseProperty property, XWikiContext context) {
-        boolean isValid = false;
         String regexp = getValidationRegExp();
-        if ((regexp==null)||(regexp.trim().equals("")))
-         return true;
+        if ((regexp == null) || (regexp.trim().equals("")))
+            return true;
 
-        String value = ((property==null)||(property.getValue()==null)) ? "" : property.getValue().toString();
+        String value = ((property == null) || (property.getValue() == null)) ? "" : property.getValue().toString();
         try {
             if (context.getUtil().match(regexp, value))
-             return true;
+                return true;
             else {
-                XWikiValidationStatus.addErrorToContext((getObject()==null) ? "" : getObject().getClassName(), getName(), getTranslatedPrettyName(context), getValidationMessage(), context);
+                XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject().getClassName(), getName(), getTranslatedPrettyName(context),
+                        getValidationMessage(), context);
                 return false;
             }
         } catch (Exception e) {
             XWikiValidationStatus.addExceptionToContext(getObject().getClassName(), getName(), e, context);
             return false;
         }
-
     }
-
 }

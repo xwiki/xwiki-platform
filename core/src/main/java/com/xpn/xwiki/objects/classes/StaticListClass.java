@@ -56,12 +56,12 @@ public class StaticListClass extends ListClass {
     }
 
     public List getList(XWikiContext context) {
-        String values = (String) getValues();
+        String values = getValues();
         return getListFromString(values);
     }
 
     public Map getMap(XWikiContext context) {
-        String values = (String) getValues();
+        String values = getValues();
         return getMapFromString(values);
     }
 }

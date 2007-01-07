@@ -21,19 +21,21 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
+import org.apache.velocity.VelocityContext;
+
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
-import com.xpn.xwiki.XWikiContext;
-
-import java.util.*;
-
-import org.apache.velocity.VelocityContext;
-import org.apache.ecs.xhtml.select;
-import org.apache.ecs.xhtml.option;
-import org.apache.commons.lang.StringUtils;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class DBTreeListClass extends DBListClass {
 
@@ -163,7 +165,7 @@ public class DBTreeListClass extends DBListClass {
         if (list!=null) {
             for (int i=0;i<list.size();i++) {
                 ListItem item = (ListItem) list.get(i);
-                String display = level + getDisplayValue(item.getId(), map, context);
+                String display = level + getDisplayValue(item.getId(), "", map, context);
                 option option = new option(display, item.getId());
                 option.addElement(display);
                 if (selectlist.contains(item.getId()))

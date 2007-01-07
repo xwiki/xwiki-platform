@@ -75,12 +75,13 @@ public abstract class BaseElement implements ElementInterface, Serializable {
         BaseElement element = null;
         try {
             element = (BaseElement) getClass().newInstance();
+            element.setName(getName());
+            element.setPrettyName(getPrettyName());
+            return element;
         } catch (Exception e) {
             // This should not happen
         }
-        element.setName(getName());
-        element.setPrettyName(getPrettyName());
-        return element;
+        return null;
     }
 
 }

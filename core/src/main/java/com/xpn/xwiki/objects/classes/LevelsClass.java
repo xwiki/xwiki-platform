@@ -16,7 +16,6 @@ import org.dom4j.Element;
 import java.util.*;
 
 public class LevelsClass extends ListClass {
-
     public LevelsClass(PropertyMetaClass wclass) {
         super("levelslist", "Levels List", wclass);
         setSize(6);
@@ -33,7 +32,6 @@ public class LevelsClass extends ListClass {
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList();
-
         }
 
         XWikiRequest req = context.getRequest();
@@ -81,7 +79,7 @@ public class LevelsClass extends ListClass {
             return list;
 
         String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(value, ", ");
+        String[] result = StringUtils.split(val, ", ");
         for (int i = 0; i < result.length; i++)
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
         return list;

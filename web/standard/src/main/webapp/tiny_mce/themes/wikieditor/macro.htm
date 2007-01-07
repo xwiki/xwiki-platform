@@ -127,7 +127,10 @@
 </head>
 <body onload="init();">
 <div id="macros"></div>
-<div id="loading"><span class="loadingAjax">{$lang_loading_macros}</span></div>
+<div id="loading" align="center">
+    <div class="loadingAjax"></div>
+    {$lang_loading_macros}    
+</div>
 <script type="text/javascript">
     loadMacroList(baseurl);
 </script>

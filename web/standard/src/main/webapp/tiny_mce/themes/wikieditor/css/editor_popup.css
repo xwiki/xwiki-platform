@@ -274,7 +274,10 @@ legend {
 
 .loadingAjax {
     font-weight: bold;
-    background-color: #00ccff;
+    background-image: url(../images/ajax_loading.gif);
+    background-repeat: "none";
+    width: 50px;
+    height: 50px;
 }
 
 

@@ -24,6 +24,21 @@
 
 package com.xpn.xwiki.objects.classes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
+import org.dom4j.Element;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -34,14 +49,6 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.collections.ListUtils;
-import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
-import org.dom4j.Element;
-
-import java.util.*;
 
 public abstract class ListClass extends PropertyClass {
 
@@ -51,6 +58,7 @@ public abstract class ListClass extends PropertyClass {
 		setDisplayType("select");
 		setMultiSelect(false);
 		setSize(1);
+		setSeparator(" ");
     }
 
 	public ListClass(PropertyMetaClass wclass) {
@@ -112,6 +120,14 @@ public abstract class ListClass extends PropertyClass {
     public void setPicker(boolean picker) {
         setIntValue("picker", picker ? 1 : 0);
     }
+    
+    public String getSeparator() {
+        return getStringValue("separator");
+    }
+    
+    public void setSeparator(String separator) {
+        setStringValue("separator", separator);
+    }
 
     public static List getListFromString(String value) {
         return getListFromString(value, "|", true);
@@ -150,12 +166,11 @@ public abstract class ListClass extends PropertyClass {
         String[] result = StringUtils.split(val, "|");
         for (int i = 0; i < result.length; i++) {
             String element = StringUtils.replace(result[i], "%PIPE%", "|");
-            if (element.indexOf('=')!=-1) {
-                String[] data = StringUtils.split(element,"=");
+            if (element.indexOf('=') != -1) {
+                String[] data = StringUtils.split(element, "=");
                 map.put(data[0], new ListItem(data[0], data[1]));
-            }
-            else
-              map.put(element, new ListItem(element, element));
+            } else
+                map.put(element, new ListItem(element, element));
         }
         return map;
     }
@@ -233,23 +248,81 @@ public abstract class ListClass extends PropertyClass {
 		return lprop;
 	}
 
-    protected String getDisplayValue(String value, Map map, XWikiContext context) {
+    /** 
+     * Search for an internationalizable display text for the current value.
+     * The search process is:
+     * <ol>
+     *   <li>let V = the internal value of the option, used as the "value" attribute of the <option> element, and D = the displayed value</li>
+     *   <li>if a message with the key <fieldFullName>_<V> exists, return it as D</li>
+     *   <li>else, if a message with the key <fieldName>_<V> exists, return it as D</li>
+     *   <li>else, if a message with the key option_<V> exists, return it as D</li>
+     *   <li>else, D can be specified in the values parameter of the property by using V=D</li>
+     *   <li>else return V</li>
+     * </ol>
+     * @param value The internal value.
+     * @param name The name of the ListProperty.
+     * @param map The value=name mapping specified in the "values" parameter of the property.
+     * @param context The request context.
+     * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     */
+    protected String getDisplayValue(String value, String name, Map map, XWikiContext context) {
         ListItem item = (ListItem) map.get(value);
         String displayValue;
-        if (item==null)
-         displayValue = value;
-        else
-         displayValue = item.getValue();
-        if ((context==null)||(context.getWiki()==null))
-         return displayValue;
-        else {
-            String msgname = getFieldFullName() + "_" + displayValue;
-            String newresult = context.getWiki().getMessage(msgname, context);
-            if (msgname.equals(newresult))
-             return displayValue;
-            else
-             return newresult;
+        if (item == null) {
+            displayValue = value;
         }
+        else {
+            displayValue = item.getValue();
+        }
+        if ((context == null) || (context.getWiki() == null)) {
+            return displayValue;
+        }
+        else {
+            String msgname = getFieldFullName() + "_" + value;
+            String newresult = context.getWiki().getMessage(msgname, context);
+            if (msgname.equals(newresult)) {
+                msgname = "option_" + name + "_" + value;
+                newresult = context.getWiki().getMessage(msgname, context);
+                if (msgname.equals(newresult)) {
+                    msgname = "option_" + value;
+                    newresult = context.getWiki().getMessage(msgname, context);
+                    if (msgname.equals(newresult)) {
+                        return displayValue;
+                    }
+                }
+            }
+            return newresult;
+        }
+    }
+
+    /**
+     * Search for an internationalizable display text for the current value.
+     * The value can be either a simple string, or a value=name pair selected from the database.
+     * @see #getDisplayValue(String, String, Map, XWikiContext)
+     * @param rawvalue The internal value, or a value=name  pair.
+     * @param name The name of the ListProperty.
+     * @param map The value=name mapping specified in the "values" parameter of the property.
+     * @param context The request context.
+     * @return The text that should be displayed, representing a human-understandable name for the internal value.
+     */
+    protected String getDisplayValue(Object rawvalue, String name, Map map, XWikiContext context) {
+        if (rawvalue instanceof Object[]) {
+            return ((Object[]) rawvalue)[1].toString();
+        }
+        return getDisplayValue(rawvalue.toString(), name, map, context);
+    }
+
+    /**
+     * If the list is populated with value=name pairs selected from the database,
+     *  then return only the value. Otherwise, it is a simple value. 
+     * @param rawvalue
+     * @return The list value
+     */
+    protected String getElementValue(Object rawvalue) {
+        if (rawvalue instanceof Object[]) {
+            return ((Object[]) rawvalue)[0].toString();
+        }
+        return rawvalue.toString();
     }
 
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
@@ -265,20 +338,21 @@ public abstract class ListClass extends PropertyClass {
 	}
 
 	public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-		List selectlist;
-		BaseProperty prop = (BaseProperty) object.safeget(name);
+        List selectlist;
+        String separator = getSeparator();
+        BaseProperty prop = (BaseProperty) object.safeget(name);
         Map map = getMap(context);
-		if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-			selectlist = (List) prop.getValue();
+        if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
             List newlist = new ArrayList();
-            for (int i=0; i<selectlist.size();i++) {
-                newlist.add(getDisplayValue((String)selectlist.get(i), map, context));
+            for (Iterator it = selectlist.iterator(); it.hasNext(); ) {
+                newlist.add(getDisplayValue(it.next(), name, map, context));
             }
-            buffer.append(StringUtils.join(newlist.toArray(), " "));
+            buffer.append(StringUtils.join(newlist.toArray(), separator));
         } else {
-			buffer.append(getDisplayValue((String)prop.getValue(), map, context));
-		}
-	}
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+        }
+    }
 
 	public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
 		if (getDisplayType().equals("input")) {
@@ -318,12 +392,13 @@ public abstract class ListClass extends PropertyClass {
 
 		// Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
-			String value = it.next().toString();
+			Object rawvalue = it.next();
+            String value = getElementValue(rawvalue);
 			input radio = new input((getDisplayType().equals("radio")&&isMultiSelect()) ? input.radio : input.checkbox, prefix + name, value);
 
 			if (selectlist.contains(value))
 				radio.setChecked(true);
-			radio.addElement(getDisplayValue(value, map, context));
+			radio.addElement(getDisplayValue(rawvalue, name, map, context));
 
             buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "\">");
             buffer.append(radio.toString());
@@ -389,8 +464,9 @@ public abstract class ListClass extends PropertyClass {
 
 		// Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
-			String value = it.next().toString();
-			String display = getDisplayValue(value, map, context);
+            Object rawvalue = it.next();
+            String value = getElementValue(rawvalue);
+			String display = getDisplayValue(rawvalue, name, map, context);
 			option option = new option(display, value);
 			option.addElement(display);
 			if (selectlist.contains(value))
@@ -433,12 +509,14 @@ public abstract class ListClass extends PropertyClass {
 
         // Add options from Set
         for (Iterator it=list.iterator();it.hasNext();) {
-            String value = it.next().toString();
+            Object rawvalue = it.next();
+            String value = getElementValue(rawvalue);
+            String display = getDisplayValue(rawvalue, name, getMap(context), context);
             input radio = new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix + name, value);
 
             if (selectlist.contains(value))
                 radio.setChecked(true);
-            radio.addElement(getDisplayValue(value, getMap(context), context));
+            radio.addElement(display);
             buffer.append(radio.toString());
             if(it.hasNext()){
             	buffer.append("<br/>");
@@ -473,8 +551,9 @@ public abstract class ListClass extends PropertyClass {
 
         // Add options from Set
         for (Iterator it=list.iterator();it.hasNext();) {
-            String value = it.next().toString();
-            String display = getDisplayValue(value, getMap(context), context);
+            Object rawvalue = it.next();
+            String value = getElementValue(rawvalue);
+            String display = getDisplayValue(rawvalue, name, getMap(context), context);
             option option = new option(display, value);
             option.addElement(display);
             if (selectlist.contains(value))

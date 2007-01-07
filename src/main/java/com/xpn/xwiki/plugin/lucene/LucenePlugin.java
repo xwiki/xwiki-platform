@@ -159,7 +159,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         Query parsedQuery = null;
 
         // for object search
-        if (query.contains(":")) {
+        if (query.indexOf(":") >= 0) {
             String property = query.substring(0, query.indexOf(":"));
             query = query.substring(query.indexOf(":") + 1, query.length());
             QueryParser qp = new QueryParser(property, analyzer);

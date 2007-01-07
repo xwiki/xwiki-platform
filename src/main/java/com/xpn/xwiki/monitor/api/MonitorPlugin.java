@@ -110,7 +110,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
             if (mdata==null) {
                 if (log.isInfoEnabled()) {
-                    log.info("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call startRequest");
+                    log.info("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
                 }
                 return;
             }

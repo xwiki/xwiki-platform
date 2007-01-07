@@ -23,6 +23,7 @@ package com.xpn.xwiki.store;
 
 import java.sql.*;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.

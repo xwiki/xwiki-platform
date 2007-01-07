@@ -322,7 +322,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
               doc.setContent("#includeForm(\"XWiki.FeedEntryClassSheet\"");
         }
 
-
         Iterator it = feed.getEntries().iterator();
         while (it.hasNext())
         {

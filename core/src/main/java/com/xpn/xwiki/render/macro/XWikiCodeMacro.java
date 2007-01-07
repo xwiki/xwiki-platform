@@ -46,14 +46,12 @@
 
 package com.xpn.xwiki.render.macro;
 
-import org.apache.commons.lang.StringUtils;
-import org.radeox.macro.CodeMacro;
-import org.radeox.macro.parameter.MacroParameter;
-
 import java.io.IOException;
 import java.io.Writer;
 
-
+import org.apache.commons.lang.StringUtils;
+import org.radeox.macro.CodeMacro;
+import org.radeox.macro.parameter.MacroParameter;
 
 public class XWikiCodeMacro extends CodeMacro {
 
@@ -74,5 +72,4 @@ public class XWikiCodeMacro extends CodeMacro {
       super.execute(writer, params);
       return;
     }
-
 }

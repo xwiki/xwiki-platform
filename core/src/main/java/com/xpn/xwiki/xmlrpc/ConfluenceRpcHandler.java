@@ -90,6 +90,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         }
 
         try {
+            md5 = MessageDigest.getInstance("MD5");
             sbValueBeforeMD5.append(username.toString());
             sbValueBeforeMD5.append(":");
             sbValueBeforeMD5.append(password.toString());
@@ -110,8 +111,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             }
             String valueAfterMD5 = sb.toString();
             return valueAfterMD5;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error: " + e);
+        }
+        catch (Exception ex) {
+            log.error("Unhandled exception:", ex);
         }
         return null;
     }
@@ -131,7 +135,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     public boolean logout(String token) throws XWikiException {
         XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
@@ -142,7 +145,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     Map getServerInfo(String token) throws XWikiException {
         XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
@@ -169,7 +171,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     public Map getSpace(String token, String spaceKey) throws XWikiException {
         XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
@@ -306,14 +307,15 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
 
         List commentlist = document.getObjects("XWiki.XWikiComments");
-        ArrayList result = new ArrayList(commentlist.size());
         if (commentlist!=null) {
+            ArrayList result = new ArrayList(commentlist.size());
             for (int i=0;i<commentlist.size();i++) {
                 Comment comment = new Comment(document, (BaseObject)commentlist.get(i), context);
                 result.add(comment);
             }
+            return result.toArray();
         }
-        return result.toArray();
+        return new Object[0];
     }
 
     public Map storePage(String token, Map pageht) throws XWikiException {

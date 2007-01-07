@@ -258,7 +258,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 name = name.substring(0, qsIndex);
             }
 
-            // + is use for spaces
+            // + is used for spaces
             name = name.replace('+',' ');
 
             String newname = name;

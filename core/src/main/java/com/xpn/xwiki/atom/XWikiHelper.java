@@ -101,7 +101,6 @@ public class XWikiHelper {
   public List listUserBlogs(String userName) throws XWikiException, MalformedURLException {
     List userBlogs = new ArrayList();
     XWiki xwiki = xwikiContext.getWiki();
-    XWikiRequest request = xwikiContext.getRequest();
     List searchResults = xwiki.search("select doc from XWikiDocument as doc, BaseObject as obj where obj.className='XWiki.BlogPreferences' and obj.name <> 'XWiki.BlogPreferences' and obj.name = doc.fullName order by obj.name", MAX_BLOGS, 0, xwikiContext);
     Iterator it = searchResults.iterator();
     while (it.hasNext()) {

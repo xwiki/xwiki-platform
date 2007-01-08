@@ -16,16 +16,16 @@
 ##
 ## Create menu
 ##
-#if($hasedit)
-## #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("create") "tmCreate")
-#xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("create") "tmCreate")
-#submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("createpage"))
-#submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("createspace"))
-#submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("createblogpost"))
-#if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("createevent"))#end
-#if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("createpanel"))#end
-#xwikitopmenuentryend()
-#end
+##if($hasedit)
+### #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("create") "tmCreate")
+##xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("create") "tmCreate")
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("createpage"))
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("createspace"))
+##submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("createblogpost"))
+##if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("createevent"))#end
+##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("createpanel"))#end
+##xwikitopmenuentryend()
+##end
 
 ##
 ## Edit menu

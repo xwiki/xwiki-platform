@@ -563,7 +563,7 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
 }
 
 WikiEditor.prototype.getStyleToolbar = function() {
-    return this.getStyleControl("fontselect") + this.getStyleControl("fontSizeSelect") + this.getStyleControl("mceForeColor") + this.getStyleControl("mceBackColor");
+    return this.getStyleControl("fontselect") + " " + this.getStyleControl("fontSizeSelect") + this.getStyleControl("mceForeColor") + this.getStyleControl("mceBackColor");
 }
 
 WikiEditor.prototype.getStyleControl = function(button_name) {

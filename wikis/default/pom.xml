@@ -45,5 +45,38 @@
       </extension>
     </extensions>
   </build>
+  <profiles>
+    <profile>
+      <!-- Running with this profile will create a Jetty database loaded with the content of the XAR file -->
+      <id>hsqldb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.xpn.xwiki</groupId>
+            <artifactId>xwiki-packager</artifactId>
+            <configuration>
+              <sourceDirectory>${basedir}/src/main/resources</sourceDirectory>
+              <hibernateConfig>${basedir}/src/main/packager/hibernate.cfg.hsqldb.xml</hibernateConfig>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>1.8.0.1</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>import</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
         

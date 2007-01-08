@@ -81,6 +81,13 @@ Il n'y a pas de photo.
 &lt;/td&gt;&lt;td&gt;
 &lt;a href="$doc.getURL("inline")"&gt;Modify your profile&lt;/a&gt;
 &lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2"&gt;
+#if($isAdvancedUser)
+&lt;a href="$doc.getURL("save", "XWiki.XWikiUsers_${obj.number}_usertype=Simple")"&gt;Switch to Simple edit mode&lt;/a&gt;
+#else
+&lt;a href="$doc.getURL("save", "XWiki.XWikiUsers_${obj.number}_usertype=Advanced")"&gt;Switch to Advanced edit mode&lt;/a&gt;
+#end
+&lt;/td&gt;&lt;/tr&gt;
 #end
 #end
 &lt;tr&gt;&lt;td colspan="2"&gt;

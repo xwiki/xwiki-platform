@@ -366,16 +366,18 @@ Function CreateStartFile
     FileWrite $4 "echo off$\r$\n"
     FileWrite $4 "set LANG=fr_FR.ISO8859-1$\r$\n"
     FileWrite $4 "set JETTY_PORT=$ServerPort$\r$\n"
-    FileWrite $4 'set JETTY_HOME=.$\r$\n'
-    FileWrite $4 "java -Djetty.port=%JETTY_PORT% -Djetty.home=%JETTY_HOME% -Dfile.encoding=iso-8859-1 -jar %JETTY_HOME%/start.jar"
+    FileWrite $4 "set JETTY_HOME=.$\r$\n"
+    FileWrite $4 "set JAVA_OPTS=-Xmx300m$\r$\n"
+    FileWrite $4 "java %JAVA_OPTS% -Djetty.port=%JETTY_PORT% -Djetty.home=%JETTY_HOME% -Dfile.encoding=iso-8859-1 -jar %JETTY_HOME%/start.jar"
     FileClose $4
     
     FileOpen $4 "$INSTDIR\xwikionjetty\start_xwiki.sh" w
     FileWrite $4 "#!/bin/sh$\r$\n"
     FileWrite $4 "export LANG=fr_FR.ISO8859-1$\r$\n"
     FileWrite $4 "JETTY_PORT=$ServerPort$\r$\n"
-    FileWrite $4 'JETTY_HOME=.$\r$\n'
-    FileWrite $4 "java -Djetty.port=$$JETTY_PORT -Djetty.home=$$JETTY_HOME -Dfile.encoding=iso-8859-1 -jar $$JETTY_HOME/start.jar"
+    FileWrite $4 "JETTY_HOME=.$\r$\n"
+    FileWrite $4 "JAVA_OPTS=-Xmx300m$\r$\n"
+    FileWrite $4 "java $$JAVA_OPTS -Djetty.port=$$JETTY_PORT -Djetty.home=$$JETTY_HOME -Dfile.encoding=iso-8859-1 -jar $$JETTY_HOME/start.jar"
     FileClose $4
     
     Pop $4
@@ -388,13 +390,13 @@ Function CreateStopFile
     
     FileOpen $4 "$INSTDIR\xwikionjetty\stop_xwiki.bat" w
     FileWrite $4 "echo off$\r$\n"
-    FileWrite $4 'set JETTY_HOME=.$\r$\n'
+    FileWrite $4 "set JETTY_HOME=.$\r$\n"
     FileWrite $4 "java -Djetty.home=%JETTY_HOME% -jar %JETTY_HOME%/stop.jar$\r$\n"
     FileClose $4
     
     FileOpen $4 "$INSTDIR\xwikionjetty\stop_xwiki.sh" w
     FileWrite $4 "#!/bin/sh$\r$\n"
-    FileWrite $4 'JETTY_HOME=.$\r$\n'
+    FileWrite $4 "JETTY_HOME=.$\r$\n"
     FileWrite $4 "java -Djetty.home=$$JETTY_HOME -jar $$JETTY_HOME/stop.jar$\r$\n"
     FileClose $4
     
@@ -480,6 +482,7 @@ LangString ^FinishTitle ${LANG_ENGLISH} "$(^Name) has been installed"
 LangString ^FinishTitle ${LANG_FRENCH} "$(^Name) est installé"
 LangString ^SelectComponent ${LANG_ENGLISH} "Select the type of install :"
 LangString ^SelectComponent ${LANG_FRENCH} "Choisissez une installation :"
+
 
 
 

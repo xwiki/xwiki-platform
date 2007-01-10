@@ -10,29 +10,14 @@ WikiEditor.prototype.initMacrosPlugin = function() {
 		alert("Macros Plugin: You must load the core syntax plugin before!");
 		return;
 	}
-
+    
     this.addToolbarHandler('handleMacrosButtons');
-
-	this.addCommand('wikiMacro', 'macroCommand');
 }
 
 wikiEditor.initMacrosPlugin();
 
 WikiEditor.prototype.insertMacro = function(editor_id, name) {
 	this.core.execInstanceCommand(editor_id, "mceInsertRawHTML", false, name);
-}
-
-
-WikiEditor.prototype.macroCommand = function(editor_id, element, command, user_interface, value) {
-	var template = new Array();
-
-    template['file'] = 'macro.htm';
-	template['width'] = 520;
-	template['height'] = 300;
-
-    tinyMCE.openWindow(template, {editor_id : editor_id, scrollbars : 'yes',  resizable : 'no', mce_windowresize: false});
-
-    return this.dummyCommand();
 }
 
 WikiEditor.prototype.handleMacrosButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {

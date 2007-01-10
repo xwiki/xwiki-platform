@@ -33,19 +33,19 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
     this.addExternalProcessor((/\*(\s*)(.+?)(\s*)\*/gi), '$1<b class="bold">$2<\/b>$3');
-    this.addInternalProcessor((/<strong[^>]*>(\s*)(.*?)(\s*)<\/strong>/gi), '$1*$2*$3');
+    this.addInternalProcessor((/<strong[^>]*>(\s*)(.*?)(\s*)<\/strong>/i), 'convertBoldTextInternal');
 
 	this.addExternalProcessor((/~~(\s*)(.+?)(\s*)~~/gi), '$1<i class="italic">$2<\/i>$3');
-	this.addInternalProcessor((/<em[^>]*>(\s*)(.*?)(\s*)<\/em>/gi), '$1~~$2~~$3');
+	this.addInternalProcessor((/<em[^>]*>(\s*)(.*?)(\s*)<\/em>/i), 'convertItalicTextInternal');
 
     this.addExternalProcessor((/__(\s*)(.+?)(\s*)__/gi), '$1<u>$2<\/u>$3');
-    this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/gi), '$1__$2__$3');
+    this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/i), 'convertUnderLineTextInternal');
 
     this.addExternalProcessor((/\\\\/gi), '<br />');
     this.addInternalProcessor((/<br\s*\/>|<br\s*>/gi), '\\\\');
 
     this.addExternalProcessor((/--(\s*)(.+?(\s*))--/gi),  '$1<strike class="strike">$2<\/strike>$3');
-	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/gi), '$1--$2--$3');
+	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/i), 'convertStrikeTextInternal');
 
 	this.addInternalProcessor((/[#$][a-zA-Z0-9-_.]+\(([^&)]*&quot;[^)]*)+?\)/i), 'convertVelocityScriptsInternal');
 
@@ -109,6 +109,42 @@ WikiEditor.prototype.convertGroovyScriptsInternal = function(regexp, result, con
 	return content.replace(regexp, str);
 }
 
+WikiEditor.prototype.convertBoldTextInternal = function(regexp, result, content) {
+    var str = result[1];
+    if  (result[2] != "") {
+        str += "*" + result[2] + "*";
+    }
+    str += result[3];
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertItalicTextInternal = function(regexp, result, content) {
+    var str = result[1];
+    if  (result[2] != "") {
+        str += "~~" + result[2] + "~~";
+    }
+    str += result[3];
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertUnderLineTextInternal = function(regexp, result, content) {
+    var str = result[1];
+    if  (result[2] != "") {
+        str += "__" + result[2] + "__";
+    }
+    str += result[3];
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertStrikeTextInternal = function(regexp, result, content) {
+    var str = result[1];
+    if  (result[2] != "") {
+        str += "--" + result[2] + "--";
+    }
+    str += result[3];
+    return content.replace(regexp, str);
+}
+
 WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
     var txt;
     var str="";
@@ -128,6 +164,8 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
                 str = "[" + txt + ">" + href + "]";
         }
 
+    } else {
+        str = result[4];
     }
     return content.replace(regexp, str);
 }

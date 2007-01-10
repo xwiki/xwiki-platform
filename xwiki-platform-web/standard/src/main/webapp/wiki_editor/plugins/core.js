@@ -41,6 +41,9 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/__(\s*)(.+?)(\s*)__/gi), '$1<u>$2<\/u>$3');
     this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/gi), '$1__$2__$3');
 
+    this.addExternalProcessor((/\\\\/gi), '<br />');
+    this.addInternalProcessor((/<br\s*\/>|<br\s*>/gi), '\\\\');
+
     this.addExternalProcessor((/--(\s*)(.+?(\s*))--/gi),  '$1<strike class="strike">$2<\/strike>$3');
 	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/gi), '$1--$2--$3');
 
@@ -91,7 +94,7 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<\/?p[^>]*>/gi, "");
-    str = str.replace(/<br \/>/g, '\r\n');
+    str = str.replace(/<br\s*\/>/g, '\\');
     return str;
 }
 
@@ -295,7 +298,8 @@ WikiEditor.prototype._fixParagraph = function(node) {
 
 WikiEditor.prototype._cleanBR = function(node) {
 	if(node.nodeName.toLowerCase() == "br") {
-		node.parentNode.removeChild(node);
+		node.parentNode.replaceChild(document.createTextNode("\\\\"), node);
+		//node.parentNode.removeChild(node);
 		return;
 	}
 

@@ -193,6 +193,14 @@
       <version>1.0.5</version>
     </dependency>
 
+    <!-- See http://jira.codehaus.org/browse/MEV-488 -->
+    <dependency>
+      <groupId>javax.jcr</groupId>
+      <artifactId>jcr</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+
     <!-- Standard dependencies found in the central repository -->
 
     <dependency>
@@ -276,11 +284,6 @@
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
       <version>1.2.9</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.jcr</groupId>
-      <artifactId>jcr</artifactId>
-      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>ant</groupId>

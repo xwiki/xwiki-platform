@@ -37,8 +37,12 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
 
-
-
+/**
+ * A proxy store implementation that caches Documents when they are first fetched and subsequently return them from
+ * a cache. It delegates all write and search operations to an underlying store without doing any caching on them.
+ *
+ * @version: $Id: $
+ */
 public class XWikiCacheStore implements XWikiCacheStoreInterface {
 
     private static final Log log = LogFactory.getLog(XWikiCacheStore.class);

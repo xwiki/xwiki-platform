@@ -187,9 +187,6 @@ public class XWikiRenderingEngine {
                 if (monitor!=null)
                     monitor.startTimer("rendering");
 
-                XWikiDocument doc = context.getDoc();
-                XWikiDocument cdoc = context.getDoc();
-
                 String content = text;
 
                 // Which is the current idoc and sdoc
@@ -207,8 +204,9 @@ public class XWikiRenderingEngine {
                     for (int i=0;i<renderers.size();i++){
                         XWikiRenderer renderer = ((XWikiRenderer)renderers.get(i));
                         String rendererName = renderer.getClass().getName();
-                        if (isRendered(contentdoc, rendererName, context))
+                        if (isRendered(contentdoc, rendererName, context)) {
                             content = ((XWikiRenderer)renderers.get(i)).render(content, contentdoc, includingdoc, context);
+                        }
                         else
                             if (log.isDebugEnabled()) log.debug("skip renderer: " + rendererName + " for the document " + contentdoc.getFullName());
                     }

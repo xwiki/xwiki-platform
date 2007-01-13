@@ -52,8 +52,8 @@ import java.util.Map;
 
 public class XWikiVelocityRenderer implements XWikiRenderer {
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.XWikiVelocityRenderer.class);
-    public XWikiVelocityRenderer() {
 
+    public XWikiVelocityRenderer() {
         try {
             Velocity.init();
         } catch (Exception e) {
@@ -79,7 +79,6 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
 
             try {
                 vcontext.put("doc", doc.newDocument(context));
-
                 try {
                     // We need to do this in case there are any macros in the content
                     List macrolist = context.getWiki().getIncludedMacros(contentdoc.getSpace(), content, context);

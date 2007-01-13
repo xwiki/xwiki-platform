@@ -67,7 +67,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Map validTypesMap = new HashMap();
 
     /**
-     * THis allows to initialize our storage engine.
+     * This allows to initialize our storage engine.
      * The hibernate config file path is taken from xwiki.cfg
      * or directly in the WEB-INF directory.
      * @param xwiki

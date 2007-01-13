@@ -29,52 +29,54 @@ import com.xpn.xwiki.XWikiException;
 import java.io.IOException;
 
 public class SaveAndContinueAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
-		XWikiRequest request = context.getRequest();
-		XWikiResponse response = context.getResponse();
+    public boolean action(XWikiContext context) throws XWikiException {
+        XWikiRequest request = context.getRequest();
+        XWikiResponse response = context.getResponse();
 
-		String back = request.getParameter("xredirect");
-		if (back == null || back.equals("")) {
-			back = request.getHeader("Referer");
-			if (back == null || back.equals("")) {
-				back = context.getDoc().getURL("edit", context);
-			}
-            else{
-                int qm = back.indexOf('?');
-                String base = back.substring(0, qm != -1 ? qm : back.length());
-                String query = "";
-                int start = back.indexOf("editor=");
-                if(start != -1){
-                    int end = back.indexOf('&', start);
-                    if(end == -1){
-                        end = back.length();
+        String back = request.getParameter("xcontinue");
+        if (back == null || back.equals("")) {
+            back = request.getParameter("xredirect");
+            if (back == null || back.equals("")) {
+                back = request.getHeader("Referer");
+                if (back == null || back.equals("")) {
+                    back = context.getDoc().getURL("edit", context);
+                } else {
+                    int qm = back.indexOf('?');
+                    String base = back.substring(0, qm != -1 ? qm : back.length());
+                    String query = "";
+                    int start = back.indexOf("editor=");
+                    if (start != -1) {
+                        int end = back.indexOf('&', start);
+                        if (end == -1) {
+                            end = back.length();
+                        }
+                        query = query + back.substring(start, end);
                     }
-                    query = query + back.substring(start, end);
+                    back = base + "?" + query;
                 }
-                back = base + "?" + query;
             }
-		}
+        }
 
-		if (back != null && back.indexOf("editor=class") >= 0) {
-			PropUpdateAction pua = new PropUpdateAction();
-			if (pua.propUpdate(context)) {
-				pua.render(context);
-			}
-		} else {
-			SaveAction sa = new SaveAction();
-			if (sa.save(context)) {
-				sa.render(context);
-			}
-		}
-		// Forward back to the originating page
-		try {
-			response.sendRedirect(back);
-		} catch (IOException ignored) {
-		}
-		return false;
-	}
+        if (back != null && back.indexOf("editor=class") >= 0) {
+            PropUpdateAction pua = new PropUpdateAction();
+            if (pua.propUpdate(context)) {
+                pua.render(context);
+            }
+        } else {
+            SaveAction sa = new SaveAction();
+            if (sa.save(context)) {
+                sa.render(context);
+            }
+        }
+        // Forward back to the originating page
+        try {
+            response.sendRedirect(back);
+        } catch (IOException ignored) {
+        }
+        return false;
+    }
 
-	public String render(XWikiContext context) throws XWikiException {
-		return "exception";
-	}
+    public String render(XWikiContext context) throws XWikiException {
+        return "exception";
+    }
 }

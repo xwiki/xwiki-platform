@@ -166,11 +166,13 @@ Space header, footer
   clear: right;
   margin-right: 5px;
 }
-
 #xwikidocinfo {
   width: 100%;
 }
-
+#xwikiplatformversion {
+  float: left;
+  margin-left: 5px;
+}
 /*
 ---------------------------------------
 Content
@@ -1005,4 +1007,46 @@ html>body #xwikieditcontent{
 }
 .xwiki-form-listclass {
   margin-right: 10px;
+}
+
+
+/**
+Attachments
+*/
+div.attachment {
+  overflow: hidden;
+  clear: both;
+  margin: 8px 0px;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ccc;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  font-size: 85%;
+}
+.attachment .mime {
+  display: block;
+  float: left;
+  padding-right: 8px;
+  padding-bottom: 4px;
+}
+.attachment .information {
+  position: relative;
+  overflow: hidden;
+}
+.attachment .name {
+  display: block;
+  float: left;
+  font-size: 170%;
+  padding: 0px 6px 4px 0px;
+}
+.attachment .version {
+  display: block;
+}
+.attachment .meta {
+  clear: left;
+}
+.attachment .xwikibuttonlinks {
+  float: right;
+  font-size: 130%;
+  padding: 4px 10px;
 }

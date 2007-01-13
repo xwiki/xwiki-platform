@@ -1,3 +1,16 @@
+#macro(dynamicsize $sz)
+#if($sz < 1024)
+$sz bytes
+#else
+#set($ksz = $sz / 1024)
+#if($ksz < 1024)
+${ksz}kb
+#else
+#set($Msz = $sz / 1048576)
+${Msz}Mb
+#end
+#end
+#end
 ###
 ### List document attachments
 ###
@@ -10,51 +23,34 @@
 #if($request.xredirect)
 #set( $redirect = $request.xredirect)
 #else
-#set( $redirect = $xwiki.getRequestURL())
+#set( $redirect = $xwiki.getRequestURL().replaceAll("&", "&amp;"))
 #end
 #set($showactions = 0)
 #set($attachments = $doc.attachmentList)
     <div id="attachmentscontent" class="xwikiintracontent">
     <div id="attw">
-#if($inline == true)    <div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>#end
+#if($inline == true)
+    <div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
+#end
       <div id="attachments">
 #if($attachments.size()>0)
-      <table class="xwikidatatable" summary="$msg.get("document") ${doc.displayTitle} &mdash; $msg.get("attachments")">
-        <col class="attachmenttype"/>
-        <col class="attachmentname"/>
-        <col class="attachmentauthor"/>
-        <col class="attachmentversion"/>
-        <col class="attachmentdate"/>
-        <col class="attachmentsize"/>
-#if($hasedit || $hasadmin)
-        <col class="attachmentdelete"/>
-#end
-        <tr>
-          <th></th>
-          <th>$msg.get("filename")</th>
-          <th>$msg.get("author")</th>
-          <th>$msg.get("version")</th>
-          <th>$msg.get("date")</th>
-          <th>$msg.get("size")</th>
-#if($hasedit || $hasadmin)
-          <th></th>
-#end
-        </tr>
-
 #foreach ($attach in $attachments)
-        <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
-          <td class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</td>
-          <td><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></td>
-          <td>$xwiki.getLocalUserName($attach.author)</td>
-          <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
-          <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
-          <td>$attach.filesize</td>
+        <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
+          <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
+          <div class="information">
+          <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>
 #if($hasedit || $hasadmin)
-          <td class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+          <span class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></span>
 #end
-        </tr>
+          <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
+          <div class="meta">
+          <span class="publisher">$msg.get("PostedBy"): <span>$xwiki.getLocalUserName($attach.author)</span></span>
+          <span class="date">$msg.get("on") $!xwiki.formatDate($attach.date, "dd/MM/yyyy")</span>
+          <span class="size">(#dynamicsize($attach.filesize))</span>
+          </div>
+        </div>
+  </div> ## row
 #end
-      </table>
 #else
 <div>$msg.get("noattachments")</div>
 #end

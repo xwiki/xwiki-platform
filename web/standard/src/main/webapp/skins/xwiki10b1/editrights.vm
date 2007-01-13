@@ -2,7 +2,7 @@
 #if($request.global=="1")
 $response.sendRedirect($doc.getURL("admin", "editor=rights&global=1"))
 #else
-$response.sendRedirect($doc.getURL("edit", "editor=rights"))
+$response.sendRedirect($doc.getURL($context.action, "editor=rights"))
 #end
 #else
 #set($formname = "update")
@@ -16,6 +16,7 @@ $response.sendRedirect($doc.getURL("edit", "editor=rights"))
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent" class="clear">
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=rights")"/></div>
 <div>
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))

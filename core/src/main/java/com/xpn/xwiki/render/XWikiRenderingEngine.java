@@ -267,10 +267,10 @@ public class XWikiRenderingEngine {
     }
 
     private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context) {
-        return ((context==null) ? "xwiki" : context.getDatabase()) + "-"
+        return ((context == null) ? "xwiki" : context.getDatabase()) + "-"
                 + ((contentdoc==null) ? "" : contentdoc.getDatabase() + ":" + contentdoc.getFullName()) + "-"
                 + ((includingdoc==null) ? "" : includingdoc.getDatabase() + ":" + includingdoc.getFullName()) + "-"
-                + ((context.getRequest()==null) ? "" : context.getRequest().getQueryString())
+                + ((context == null || context.getRequest()==null) ? "" : context.getRequest().getQueryString())
                 + "-" + text.hashCode();
     }
 

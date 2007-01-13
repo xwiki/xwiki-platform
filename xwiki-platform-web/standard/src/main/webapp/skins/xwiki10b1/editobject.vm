@@ -1,5 +1,5 @@
 #if($request.xpage=="editobject")
-$response.sendRedirect($doc.getURL("edit", "editor=object"))
+$response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #else
 #set($formname = "update")
 #set($saveaction = "save")
@@ -7,8 +7,8 @@ $response.sendRedirect($doc.getURL("edit", "editor=object"))
 #set($redirect = $xwiki.getRequestURL())
 <div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-## <div class="topbuttons">#template("editactions.vm")</div>
 <div id="xwikieditcontent">
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=object")"/></div>
 <div id="xwikiobjects" class="accordion">
 #foreach($class in $classes)
 #set($props = $class.getProperties())

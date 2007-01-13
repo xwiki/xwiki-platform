@@ -413,10 +413,10 @@ fieldset.xwikimessage legend{
 
 
 
-tr.row.odd{
+tr.row.odd, .odd{
   background-color: #EEE;
 }
-tr.row.even{
+tr.row.even, .even{
   background-color: #FFF;
 }
 tr th{
@@ -432,10 +432,10 @@ a:visited{
   color: #777;
 }
 
-tr.row.odd{
+tr.row.odd, .odd{
   background-color: #FFF;
 }
-tr.row.even{
+tr.row.even, .even{
   background-color: #E4F6FF;
 }
 th{
@@ -667,7 +667,7 @@ input[type=checkbox], input[type=radio]{
 }
 */
 
-#xwikidata #attachmentscontent{
+#body #attachmentscontent{
   background-color: #E4F6FF;
 }
 #xwikidata form{
@@ -676,6 +676,7 @@ input[type=checkbox], input[type=radio]{
 }
 #comments, #attachments{
   padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 #xwikidata form{

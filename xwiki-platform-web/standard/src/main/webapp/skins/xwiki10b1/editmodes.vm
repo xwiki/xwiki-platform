@@ -19,7 +19,6 @@
 #if($isAdvancedUser)<li id="xwikieditclass"#if($editor == "class") class="active"#end><a href="$doc.getURL("edit", "editor=class&amp;$param")">$msg.get("editClass")</a></li> #end
 <li id="xwikieditrights"#if($editor == "rights") class="active"#end><a href="$doc.getURL("edit", "editor=rights&amp;$param")">$msg.get("editRights")</a></li>
 #if($isAdvancedUser)<li id="xwikiedithistory"#if($editor == "history") class="active"#end><a href="$doc.getURL("edit", "editor=history&amp;$docvariant&amp;$param")">$msg.get("editHistory")</a></li>#end
-#if($isAdvancedUser)<li id="xwikieditcode"#if($editor == "code") class="active"#end><a href="$doc.getURL("edit", "editor=code&amp;$docvariant&amp;$param")">$msg.get("viewcode")</a></li> #end
 </ul>
 </div>
 ## Full Screen editor not yet ready

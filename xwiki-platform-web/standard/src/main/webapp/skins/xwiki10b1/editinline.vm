@@ -6,6 +6,7 @@
 #set($xnotification=$!request.getParameter("xnotification"))
 <form id="inline" method="post" action="$doc.getURL("preview")">
 <div>
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("inline")"/></div>
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="xnotification" value="$!xnotification" />
 <input type="hidden" name="template" value="$!request.template" />

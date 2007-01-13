@@ -1,4 +1,8 @@
+#if((!$request.editor) || ($request.editor.trim() == ""))
 #set($editor = "inline")
+#else
+#set($editor = $request.editor)
+#end
 ##
 ## Header
 ##

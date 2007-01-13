@@ -1,1 +1,1 @@
-$response.sendRedirect($doc.getURL("edit", $request.queryString.replace("xpage=wysiwyg&", "")))
+$response.sendRedirect($doc.getURL("edit", $request.queryString.replace("xpage=wysiwyg", "editor=wysiwyg")))

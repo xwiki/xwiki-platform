@@ -5,7 +5,9 @@
 <div class="overflowcontainer">
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<div class="hidden">
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spacerights")"/>
+</div>
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />
 #set($obj = $doc.getObject(${class.name}, 0))

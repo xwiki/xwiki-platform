@@ -44,7 +44,7 @@
         </tr>
 #end
 </table>
-      <div class="buttons"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
+      <div class="buttons"><div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div></div>
       </div>
     </div>
   </form>

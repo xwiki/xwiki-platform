@@ -5,6 +5,10 @@
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
+<div class="hidden">
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spacerights")"/>
+<input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
+</div>
 <div id="xwikichangespace">
 <p>$msg.get("editrightsforspace"): $space</p>
 <p>$msg.get("changespace"): <select name="space" onchange="location='?editor=spacerights&amp;global=1&amp;space=' + this.value;">
@@ -15,7 +19,6 @@
 </select></p>
 </div> ## xwikichangespace
 <div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />

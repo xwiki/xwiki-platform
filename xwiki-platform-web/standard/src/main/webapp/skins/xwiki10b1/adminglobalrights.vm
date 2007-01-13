@@ -7,7 +7,9 @@
 <div id="xwikieditcontent">
 <div style="overflow:auto">
 <div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=")"/>
+<input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
+</div>
 #set ($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 <input type="hidden" name="${class.name}_nb" value="$nb" />

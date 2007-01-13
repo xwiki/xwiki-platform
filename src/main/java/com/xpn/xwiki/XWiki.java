@@ -30,49 +30,42 @@
  */
 package com.xpn.xwiki;
 
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.User;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.impl.OSCacheService;
-import com.xpn.xwiki.cache.impl.XWikiCacheListener;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.notify.*;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
-import com.xpn.xwiki.stats.api.XWikiStatsService;
-import com.xpn.xwiki.stats.impl.SearchEngineRule;
-import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
-import com.xpn.xwiki.store.*;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
-import com.xpn.xwiki.util.MenuSubstitution;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.*;
-import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
+import java.util.zip.ZipOutputStream;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -91,24 +84,74 @@ import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipOutputStream;
-
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.User;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.impl.OSCacheService;
+import com.xpn.xwiki.cache.impl.XWikiCacheListener;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.notify.DocObjectChangedRule;
+import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.notify.XWikiActionRule;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.notify.XWikiPageNotification;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.GroupsClass;
+import com.xpn.xwiki.objects.classes.LevelsClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
+import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.SearchEngineRule;
+import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheStore;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
+import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
+import com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+import com.xpn.xwiki.util.MenuSubstitution;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactoryService;
+import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface {
     private static final Log log = LogFactory.getLog(XWiki.class);
@@ -1406,17 +1449,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public String getLanguagePreference(XWikiContext context) {
     	return getDocLanguagePreference(context);
     }
-    
+
     public String getDocLanguagePreference(XWikiContext context) {
         // First we get the language from the request
         String language;
+        String defaultLanguage = context.getWiki().getXWikiPreference("language", "", context);
+        if (defaultLanguage == null || defaultLanguage.equals("")) {
+            defaultLanguage = "en";
+        }
 
         language = context.getLanguage();
         if (language != null)
             return language;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = context.getWiki().getXWikiPreference("language", "", context);
+            language = defaultLanguage;
             context.setLanguage(language);
             return language;
         }
@@ -1430,7 +1477,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     cookie.setMaxAge(0);
                     cookie.setPath("/");
                     context.getResponse().addCookie(cookie);
-                    language = "";
+                    language = defaultLanguage;
                 } else {
                     // setting language cookie
                     Cookie cookie = new Cookie("language", language);
@@ -1472,23 +1519,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Then from the navigator language setting
         if (context.getRequest() != null) {
             String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept == null) || (accept.equals(""))) {
-                context.setLanguage("");
-                return "";
-            }
-
-            String[] alist = StringUtils.split(accept, ",;-");
-            if ((alist == null) || (alist.length == 0)) {
-                context.setLanguage("");
-                return "";
-            } else {
-                context.setLanguage(alist[0]);
-                return alist[0];
+            if ((accept != null) && (!accept.equals(""))) {
+                String[] alist = StringUtils.split(accept, ",;-_");
+                if ((alist != null) && !(alist.length == 0)) {
+                    context.setLanguage(alist[0]);
+                    return alist[0];
+                }
             }
         }
 
-        context.setLanguage("");
-        return "";
+        // Then from the global preference
+        context.setLanguage(defaultLanguage);
+        return defaultLanguage;
     }
 
     public String getDocLanguagePreferenceNew(XWikiContext context) {

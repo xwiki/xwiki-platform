@@ -376,34 +376,35 @@ public abstract class ListClass extends PropertyClass {
     }
 
 	protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-		List list = getList(context);
+        List list = getList(context);
         Map map = getMap(context);
-		List selectlist;
+        List selectlist;
 
-		BaseProperty prop = (BaseProperty) object.safeget(name);
-		if (prop == null) {
-			selectlist = new ArrayList();
-		} else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-			selectlist = (List) prop.getValue();
-		} else {
-			selectlist = new ArrayList();
-			selectlist.add(prop.getValue());
-		}
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop == null) {
+            selectlist = new ArrayList();
+        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
+            selectlist = (List) prop.getValue();
+        } else {
+            selectlist = new ArrayList();
+            selectlist.add(prop.getValue());
+        }
 
-		// Add options from Set
-		for (Iterator it = list.iterator(); it.hasNext();) {
-			Object rawvalue = it.next();
+        // Add options from Set
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            Object rawvalue = it.next();
             String value = getElementValue(rawvalue);
-			input radio = new input((getDisplayType().equals("radio")&&isMultiSelect()) ? input.radio : input.checkbox, prefix + name, value);
+            input radio = new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix + name, value);
 
-			if (selectlist.contains(value))
-				radio.setChecked(true);
-			radio.addElement(getDisplayValue(rawvalue, name, map, context));
+            if (selectlist.contains(value)) {
+                radio.setChecked(true);
+            }
+            radio.addElement(getDisplayValue(rawvalue, name, map, context));
 
             buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "\">");
             buffer.append(radio.toString());
             buffer.append("</span>");
-		}
+        }
 
         org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
         buffer.append(hidden);

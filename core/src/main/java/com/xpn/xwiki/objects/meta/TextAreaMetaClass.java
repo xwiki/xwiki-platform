@@ -52,6 +52,16 @@ public TextAreaMetaClass() {
     editor_class.setMultiSelect(false);
     editor_class.setSize(1);
     safeput("editor", editor_class);
+
+     StaticListClass contenttype_class = new StaticListClass(this);
+     contenttype_class.setName("contenttype");
+     contenttype_class.setPrettyName("Content");
+     contenttype_class.setValues("FullyRenderedText|VelocityCode|PureText");
+     contenttype_class.setRelationalStorage(false);
+     contenttype_class.setDisplayType("select");
+     contenttype_class.setMultiSelect(false);
+     contenttype_class.setSize(1);
+     safeput("contenttype", contenttype_class);
   }
 
 

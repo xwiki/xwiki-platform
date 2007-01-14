@@ -2560,26 +2560,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return user;
     }
 
+    /**
+     * Prepares the localized resources, according to the selected language.
+     * 
+     * From any point in the code (java, velocity or groovy) the "msg" parameter holds
+     * an instance of the localized resource bundle, and the "locale" parameter holds
+     * the current locale settings.
+     * @param context The request context.
+     */
     public void prepareResources(XWikiContext context) {
         if (context.get("msg") == null) {
-            //String ilanguage = getInterfaceLanguagePreference(context);
+            // String ilanguage = getInterfaceLanguagePreference(context);
             String dlanguage = getDocLanguagePreference(context);
-            if (context.getResponse() != null)
-                context.getResponse().setLocale(new Locale(dlanguage));
-            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", new Locale(dlanguage));
-            if (bundle == null)
+            Locale locale = new Locale(dlanguage);
+            context.put("locale", locale);
+            if (context.getResponse() != null) {
+                context.getResponse().setLocale(locale);
+            }
+            ResourceBundle bundle = ResourceBundle.getBundle("ApplicationResources", locale);
+            if (bundle == null) {
                 bundle = ResourceBundle.getBundle("ApplicationResources");
+            }
             XWikiMessageTool msg = new XWikiMessageTool(bundle);
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
-            if (vcontext != null)
+            if (vcontext != null) {
                 vcontext.put("msg", msg);
+                vcontext.put("locale", locale);
+            }
             Map gcontext = (Map) context.get("gcontext");
-            if (gcontext != null)
+            if (gcontext != null) {
                 gcontext.put("msg", msg);
+                gcontext.put("locale", locale);
+            }
         }
     }
-
 
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException {
         return getAuthService().checkAuth(context);

@@ -83,7 +83,6 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -300,7 +299,15 @@ public class XWikiDocument {
     }
 
     public String getRenderedContent(String text, XWikiContext context) {
-        return context.getWiki().getRenderingEngine().renderText(text, this, context);
+        String result;
+        HashMap backup = new HashMap();
+
+        backupContext(backup, context);
+        setAsContextDoc(context);
+        result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+        restoreContext(backup, context);
+
+        return result;
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException {
@@ -612,24 +619,23 @@ public class XWikiDocument {
      * @return
      */
     public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context) {
-            if (!((customClassName==null)||(customClassName.equals(""))))
-                try {
-                    Class[] classes = new Class[]{XWikiDocument.class, XWikiContext.class};
-                    Object[] args = new Object[]{this, context};
-                    return (com.xpn.xwiki.api.Document) Class.forName(customClassName).getConstructor(classes).newInstance(args);
-                } catch (InstantiationException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+        if (!((customClassName == null) || (customClassName.equals(""))))
+            try {
+                Class[] classes = new Class[] { XWikiDocument.class, XWikiContext.class };
+                Object[] args = new Object[] { this, context };
+                return (com.xpn.xwiki.api.Document) Class.forName(customClassName).getConstructor(classes).newInstance(args);
+            } catch (InstantiationException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            } catch (IllegalAccessException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            } catch (InvocationTargetException e) {
+                e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+            }
         return new com.xpn.xwiki.api.Document(this, context);
-
     }
 
     public com.xpn.xwiki.api.Document newDocument(XWikiContext context) {
@@ -1024,6 +1030,10 @@ public class XWikiDocument {
 
     public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context) {
         try {
+            HashMap backup = new HashMap();
+            backupContext(backup, context);
+            setAsContextDoc(context);
+
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
@@ -1054,11 +1064,12 @@ public class XWikiDocument {
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
+            restoreContext(backup, context);
             return result.toString();
         }
-        catch (Exception e) {
+        catch (Exception ex) {
+            log.warn("Exception showing field " + fieldname, ex);
             return "";
-            // return "||Exception showing field " + fieldname + ": " + e.getMessage() + "||";
         }
     }
 
@@ -3252,6 +3263,69 @@ public class XWikiDocument {
         } catch (Throwable e) {
              XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
              return false;
+        }
+    }
+    public static void backupContext(HashMap backup, XWikiContext context) {
+        backup.put("doc", context.getDoc());
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        if (vcontext != null) {
+            backup.put("vdoc", vcontext.get("doc"));
+            backup.put("vcdoc", vcontext.get("cdoc"));
+            backup.put("vtdoc", vcontext.get("tdoc"));
+        }
+        Map gcontext = (Map) context.get("gcontext");
+        if (gcontext != null) {
+            backup.put("gdoc", gcontext.get("doc"));
+            backup.put("gcdoc", gcontext.get("cdoc"));
+            backup.put("gtdoc", gcontext.get("tdoc"));
+        }
+    }
+
+    public static void restoreContext(HashMap backup, XWikiContext context) {
+        context.setDoc((XWikiDocument)backup.get("doc"));
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        Map gcontext = (Map) context.get("gcontext");
+        if (vcontext != null) {
+            if (backup.get("vdoc") != null) {
+                vcontext.put("doc", backup.get("vdoc"));
+            }
+            if (backup.get("vcdoc") != null) {
+                vcontext.put("cdoc", backup.get("vcdoc"));
+            }
+            if (backup.get("vtdoc") != null) {
+                vcontext.put("tdoc", backup.get("vtdoc"));
+            }
+        }
+        if (gcontext != null) {
+            if (backup.get("gdoc") != null) {
+                gcontext.put("doc", backup.get("gdoc"));
+            }
+            if (backup.get("gcdoc") != null) {
+                gcontext.put("cdoc", backup.get("gcdoc"));
+            }
+            if (backup.get("gtdoc") != null) {
+                gcontext.put("tdoc", backup.get("gtdoc"));
+            }
+        }
+    }
+
+    public void setAsContextDoc(XWikiContext context) {
+        try {
+            context.setDoc(this);
+            com.xpn.xwiki.api.Document apidoc = this.newDocument(context);
+            com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+            VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+            Map gcontext = (Map) context.get("gcontext");
+            if (vcontext != null) {
+                vcontext.put("doc", apidoc);
+                vcontext.put("tdoc", tdoc);
+            }
+            if (gcontext != null) {
+                gcontext.put("doc", apidoc);
+                gcontext.put("tdoc", tdoc);
+            }
+        } catch (XWikiException ex) {
+            log.warn("Unhandled exception setting context", ex);
         }
     }
 }

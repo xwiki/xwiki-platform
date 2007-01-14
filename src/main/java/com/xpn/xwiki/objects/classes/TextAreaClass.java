@@ -23,16 +23,17 @@
 
 package com.xpn.xwiki.objects.classes;
 
+import org.apache.ecs.xhtml.textarea;
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import org.apache.ecs.xhtml.textarea;
-import org.apache.velocity.VelocityContext;
 
 public class TextAreaClass extends StringClass {
-
     public TextAreaClass(PropertyMetaClass wclass) {
         super("textarea", "Text Area", wclass);
         setSize(40);
@@ -61,23 +62,21 @@ public class TextAreaClass extends StringClass {
         return getStringValue("editor").toLowerCase();
     }
 
+    public String getContentType() {
+        String result = getStringValue("contenttype").toLowerCase();
+        if (result.equals("")) {
+            result = "fullyrenderedtext";
+        }
+        return result;
+    }
+
     public boolean isWysiwyg(XWikiContext context) {
         String editor = null;
-        if ((context!=null)&&(context.getRequest()!=null))
+        if ((context != null) && (context.getRequest() != null)) {
             editor = context.getRequest().get("xeditmode");
+        }
 
-        if (editor!=null) {
-                if (editor.equals("text"))
-                    return false;
-                if (editor.equals("puretext"))
-                    return false;
-                if (editor.equals("wysiwyg"))
-                    return true;
-            }
-
-        editor = getEditor();
-
-        if (editor!=null) {
+        if (editor != null) {
             if (editor.equals("text"))
                 return false;
             if (editor.equals("puretext"))
@@ -86,10 +85,22 @@ public class TextAreaClass extends StringClass {
                 return true;
         }
 
-        if ((context!=null)&&(context.getWiki()!=null))
-         editor = context.getWiki().getEditorPreference(context);
+        editor = getEditor();
 
-        if (editor!=null) {
+        if (editor != null) {
+            if (editor.equals("text"))
+                return false;
+            if (editor.equals("puretext"))
+                return false;
+            if (editor.equals("wysiwyg"))
+                return true;
+        }
+
+        if ((context != null) && (context.getWiki() != null)) {
+            editor = context.getWiki().getEditorPreference(context);
+        }
+
+        if (editor != null) {
             if (editor.equals("text"))
                 return false;
             if (editor.equals("puretext"))
@@ -106,18 +117,19 @@ public class TextAreaClass extends StringClass {
         textarea textarea = new textarea();
         String tname = prefix + name;
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop!=null) textarea.addElement(prop.toFormString());
+        if (prop != null) {
+            textarea.addElement(prop.toFormString());
+        }
 
         textarea.setName(tname);
         textarea.setID(tname);
         textarea.setCols(getSize());
         textarea.setRows(getRows() + (isWysiwyg ? 2 : 0));
 
-
         // Let's add the Wysiwyg JS
         if (isWysiwyg) {
             String wysiwyg = (String) context.get("editor_wysiwyg");
-            if (wysiwyg==null) {
+            if (wysiwyg == null) {
                 wysiwyg = tname;
             } else {
                 wysiwyg += "," + tname;
@@ -125,26 +137,35 @@ public class TextAreaClass extends StringClass {
             context.put("editor_wysiwyg", wysiwyg);
         } else {
             VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-            if (vcontext!=null) {
-             vcontext.put("textareaName", tname);
-             vcontext.put("textarea", textarea);
-             String addscript = context.getWiki().parseTemplate("textarea_text.vm", context);
-             buffer.append(addscript);
+            if (vcontext != null) {
+                vcontext.put("textareaName", tname);
+                vcontext.put("textarea", textarea);
+                String addscript = context.getWiki().parseTemplate("textarea_text.vm", context);
+                buffer.append(addscript);
             }
         }
         buffer.append(textarea.toString());
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        String editor = getEditor();
+        // String editor = getEditor();
+        String contentType = getContentType();
+        XWikiDocument doc = context.getDoc();
 
-        if ((editor!=null)&&(context.getDoc()!=null)&&((editor.equals("text"))||isWysiwyg(context))) {
+        if ((contentType != null) && (doc != null) && (contentType.equals("puretext"))) {
+            super.displayView(buffer, name, prefix, object, context);
+        } else if ((contentType != null) && (context.getWiki() != null) && (contentType.equals("velocitycode"))) {
             StringBuffer sbuf = new StringBuffer();
             super.displayView(sbuf, name, prefix, object, context);
-            buffer.append(context.getDoc().getRenderedContent(sbuf.toString(), context));
+            buffer.append(context.getWiki().parseContent(sbuf.toString(), context));
+        } else {
+            StringBuffer sbuf = new StringBuffer();
+            super.displayView(sbuf, name, prefix, object, context);
+            if (doc != null) {
+                buffer.append(doc.getRenderedContent(sbuf.toString(), context));
+            } else {
+                buffer.append(sbuf.toString());
+            }
         }
-        else
-            super.displayView(buffer, name, prefix, object, context);
     }
-
 }

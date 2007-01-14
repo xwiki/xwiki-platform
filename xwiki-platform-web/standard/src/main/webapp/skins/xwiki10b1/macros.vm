@@ -172,7 +172,7 @@
 #if(!$pobj)
 ## discarded
 #else
-$!paneldoc.display("content", "view")
+$!doc.display("content", "view", $pobj)
 #end
 #end
 #end

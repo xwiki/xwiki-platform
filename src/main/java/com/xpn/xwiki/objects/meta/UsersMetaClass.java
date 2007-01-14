@@ -18,9 +18,7 @@ public class UsersMetaClass extends ListMetaClass {
         safeput("usesList", uselist_class);
     }
 
-
-
     public BaseCollection newObject(XWikiContext context) {
-        return new UsersMetaClass();
+        return new UsersClass();
     }
 }

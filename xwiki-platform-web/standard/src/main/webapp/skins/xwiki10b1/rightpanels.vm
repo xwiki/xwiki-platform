@@ -2,7 +2,7 @@
 <div id="rightPanels" class="panels right"#if($showRightPanels != "1" && $request.getParameter("forceRightPanels")) style="display: none;"#end>
 #foreach($panel in $rightPanels)
 ##$xwiki.includeForm("$panel",false)
-#displaypanel($panel)
+#displaypanel($panel.trim())
 #end
 </div>
 #end

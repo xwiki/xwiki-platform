@@ -4,6 +4,6 @@
 #set($adminPanels = $adminPanels.split(","))
 <div id="editPanels" class="panels editor">
 #foreach($panel in $adminPanels)
-#displaypanel($panel)
+#displaypanel($panel.trim())
 #end
 </div>

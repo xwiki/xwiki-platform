@@ -896,6 +896,7 @@ WikiEditor.prototype.convertHeadingExternal = function(regexp, result, content) 
 WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
     var bounds = this.replaceMatchingTag(content, result[1], null);
     var lclass = "";
+    var newContent = "";
     var attributes = this.readAttributes(result[2]);
     if (attributes && attributes["class"]) {
         lclass = attributes["class"];
@@ -903,7 +904,12 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
     var str = "";
 	if(bounds && bounds["start"] > -1) {
         str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]), lclass);
-        return content.substring(0, bounds["start"]) + "\r\n" + str + content.substring(bounds["end"], content.length);
+        newContent = content.substring(0, bounds["start"]);
+        if (this.core.isMSIE) {
+            newContent += "\r\n"
+        }
+        newContent += str + content.substring(bounds["end"], content.length);
+        return newContent;
 	}
     return content;
 }

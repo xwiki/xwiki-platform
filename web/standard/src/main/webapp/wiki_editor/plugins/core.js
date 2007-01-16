@@ -42,7 +42,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/i), 'convertUnderLineTextInternal');
 
     this.addExternalProcessor((/\\\\/gi), '<br />');
-    this.addInternalProcessor((/<br\s*\/>|<br\s*>/gi), '\\\\');
+    this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\\r\n');
 
     this.addExternalProcessor((/--(\s*)(.+?(\s*))--/gi),  '$1<strike class="strike">$2<\/strike>$3');
 	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/i), 'convertStrikeTextInternal');

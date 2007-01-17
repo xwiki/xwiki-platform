@@ -3,12 +3,25 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #else
 #set($formname = "update")
 #set($saveaction = "save")
+#set($hasCustomClass = ($request.classname && (!$request.classname.trim().equals(""))))
+#set($hasCustomObject = ($hasCustomClass && $request.nb && (!$request.nb.trim().equals(""))))
+#if($hasCustomClass)
+#set($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
+#else
 #set($classes = $doc.getxWikiClasses())
+#end
 #set($redirect = $xwiki.getRequestURL())
 <div class="clear"></div>
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
-<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=object")"/></div>
+#set($q = "editor=object")
+#if($hasCustomClass)
+#set($q = "${q}&amp;classname=${request.classname}")
+#if($hasCustomObject)
+#set($q = "${q}&amp;nb=${request.nb}")
+#end
+#end
+<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/></div>
 <div id="xwikiobjects" class="accordion">
 #foreach($class in $classes)
 #set($props = $class.getProperties())
@@ -19,10 +32,23 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #end
 #set($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
-#foreach($obj in $doc.getObjects($class.name))
+#if($hasCustomObject)
+#set($object = $doc.getObject($class.name, $xwiki.parseInt($request.nb)))
+#if($object)
+#set($objects = [$object])
+#else
+#set($objects = [])
+#warning($msg.get("nosuchobject"))
+#end
+#else
+#set($objects = $doc.getObjects($class.name))
+#end
+#foreach($obj in $objects)
+#if(!$hasCustomObject)
 <div id="field_${class.name}_${obj.number}">
 <div id="field_${class.name}_${obj.number}_title" class="accordionTabTitleBar"><h6><tt><strong>${class.name}[${obj.number}]: </strong>$doc.display($firstfield, $obj)</tt></h6></div>
 <div id="field_${class.name}_${obj.number}_content" class="accordionTabContentBox"><div>
+#end
 #if($first == 1)
 <input type="hidden" name="${class.name}_nb" value="$nb" />
 #set($first = 0)
@@ -34,8 +60,10 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #end
 </dl>
 <div class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${doc.getURL('edit', 'editor=object')}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("removethisobject")</a></div>
+#if(!$hasCustomObject)
 </div></div>
 </div>
+#end
 #end
 #end
 </div>

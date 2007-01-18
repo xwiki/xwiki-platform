@@ -39,6 +39,8 @@
 
     <!-- Mapping files -->
     <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+
 
   </session-factory>
 </hibernate-configuration>

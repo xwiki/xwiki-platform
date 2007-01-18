@@ -28,6 +28,8 @@ package com.xpn.xwiki.store;
  * Time: 12:02:10
  * To change this template use File | Settings | File Templates.
  */
+public class XWikiBatcherFactory {
+}
 /*
 public class XWikiBatcherFactory extends BatchingBatcherFactory {
 

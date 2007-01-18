@@ -762,7 +762,7 @@ public class XWikiDocument {
             setObjects(classname, objects);
         }
         objects.add(object);
-        int nb = objects.size() - 1;
+        int nb  = objects.size() - 1;
         object.setNumber(nb);
         return nb;
     }

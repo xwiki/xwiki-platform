@@ -49,6 +49,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
         register(xwiki, XWikiContext.MODE_PORTLET, XWikiPortletURLFactory.class, "xwiki.urlfactory.portletclass");
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");
+        register(xwiki, XWikiContext.MODE_GWT, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
     }
 
     protected void register(XWiki xwiki, int mode, Class defaultImpl, String propertyName)

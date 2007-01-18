@@ -4200,29 +4200,33 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public String clearName(String name, XWikiContext context) {
-        return clearName(name, true, context);
+        return clearName(name, true, false, context);
     }
 
-    public String clearName(String name, boolean stripDots, XWikiContext context) {
-        name = name.replaceAll("[àâä]","a");
-        name = name.replaceAll("[éèêë]","e");
-        name = name.replaceAll("[îï]","i");
-        name = name.replaceAll("[ôö]","o");
-        name = name.replaceAll("[ùûü]","u");
+    public String clearName(String name, boolean stripDots, boolean ascii, XWikiContext context) {
+        name = name.replaceAll("[àâä��]","a");
+        name = name.replaceAll("[éèêë���]","e");
+        name = name.replaceAll("[îïi]","i");
+        name = name.replaceAll("[ôö�]","o");
+        name = name.replaceAll("[ùûü��]","u");
         name = name.replaceAll("[\"!?]","");
         name = name.replaceAll("[_':,;\\\\/]"," ");
         name = name.replaceAll("\\s+","");
         name = name.replaceAll("[\\(\\)]"," ");
 
-        if (stripDots)
-            name = name.replaceAll("[\\.]","");
+        if (stripDots) {
+  	       name = name.replaceAll("[\\.]","");
+        }
+
+        if (ascii) {
+           name = name.replaceAll("[^a-zA-Z0-9\\-_]", "");
+        }
 
         if (name.length() > 250)
             name = name.substring(0, 250);
         return name;
 
     }
-
 
     public String getUniquePageName(String space, XWikiContext context) {
   	         String pageName = generateRandomString(16);

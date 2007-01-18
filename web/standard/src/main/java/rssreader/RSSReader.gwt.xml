@@ -1,0 +1,9 @@
+<module>
+
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name='api.Api'/>
+    <inherits name="com.google.gwt.i18n.I18N"/>
+    <inherits name="org.gwtwidgets.WidgetLibrary"/>
+
+    <entry-point class='rssreader.client.RSSReader'/>
+</module>

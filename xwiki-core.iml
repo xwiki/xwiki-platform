@@ -42,6 +42,7 @@
     <orderEntry type="library" name="Captcha" level="project" />
     <orderEntry type="library" name="Servlet API" level="project" />
     <orderEntry type="library" name="Lucene" level="project" />
+    <orderEntry type="library" name="GWT" level="project" />
     <orderEntryProperties />
   </component>
 </module>

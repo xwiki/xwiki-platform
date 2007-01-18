@@ -1,0 +1,5 @@
+<module>
+    <inherits name='com.google.gwt.user.User'/>
+    <servlet path="/XWikiService" class="api.server.XWikiServiceImpl"/>
+    <entry-point class='api.client.Api'/>
+</module>

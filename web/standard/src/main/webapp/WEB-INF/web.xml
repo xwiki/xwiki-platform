@@ -74,7 +74,7 @@
 
         <load-on-startup>10</load-on-startup>
     </servlet>
-    
+
      <servlet>
         <servlet-name>xmlrpc</servlet-name>
         <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
@@ -84,6 +84,11 @@
           <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
         </init-param>
      </servlet>
+
+    <servlet>
+        <servlet-name>XWikiService</servlet-name>
+        <servlet-class>api.server.XWikiServiceImpl</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>action</servlet-name>
@@ -99,7 +104,7 @@
         <servlet-name>action</servlet-name>
         <url-pattern>/xwiki/*</url-pattern>
     </servlet-mapping>
-    
+
     <servlet-mapping>
         <servlet-name>xmlrpc</servlet-name>
         <url-pattern>/xmlrpc/*</url-pattern>
@@ -108,6 +113,11 @@
     <servlet-mapping>
         <servlet-name>redirectHome</servlet-name>
         <url-pattern>/index.redirect</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>XWikiService</servlet-name>
+        <url-pattern>/XWikiService</url-pattern>
     </servlet-mapping>
 
     <!-- The Usual Welcome File List -->
@@ -156,7 +166,7 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    
+
     <env-entry>
         <env-entry-name>XWikiConfig</env-entry-name>
         <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>

@@ -43,8 +43,10 @@ import java.sql.CallableStatement;
  * Time: 10:56:45
  * To change this template use File | Settings | File Templates.
  */
+public class XWikiBatcher {
+}
+
 /*
-public class XWikiBatcher extends BatchingBatcher {
 
     private static ThreadLocal sqlStats = new ThreadLocal() {
          protected synchronized Object initialValue() {

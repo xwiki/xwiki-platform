@@ -378,9 +378,6 @@ lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpa
                     <!-- Excluded because it throws OutOfMemoryException-->
                     <exclude name="**/StoreObjectHibernateTest.java"/>
                     <exclude name="**/StoreTest.java"/>
-                    <!-- Excluded because hibernate store is the one used -->
-                    <exclude name="**/StoreRCSFileTest.java"/>
-                    <exclude name="**/StoreObjectRCSFileTest.java"/>
                     <!-- Excluded because Rename is not yet ready -->
                     <exclude name="**/RenamePageTest.java"/>
                     <!-- Excluded because LDAP setup is needed -->

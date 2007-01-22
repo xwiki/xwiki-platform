@@ -32,17 +32,18 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
  */
 public class DocumentData extends IndexData {
-    public DocumentData (final XWikiDocument doc, final XWikiContext context)
+
+    public DocumentData(final XWikiDocument doc, final XWikiContext context)
     {
-        super (doc, context);
-        setAuthor (doc.getAuthor ());
-        setCreator (doc.getCreator ());
-        setModificationDate (doc.getDate ());
-        setCreationDate (doc.getCreationDate ());
+        super(doc, context);
+        setAuthor(doc.getAuthor());
+        setCreator(doc.getCreator());
+        setModificationDate(doc.getDate());
+        setCreationDate(doc.getCreationDate());
     }
 
     /**
-     * @see net.jkraemer.xwiki.plugins.lucene.IndexData#getType()
+     * @see IndexData#getType()
      */
     public String getType ()
     {
@@ -51,14 +52,16 @@ public class DocumentData extends IndexData {
 
     /**
      * @return a string containing the result of
-     *         {@link IndexData#getFullText(XWikiDocument, XWikiContext, String)}
+     *         {@link IndexData#getFullText(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)}
      *         plus the full text content of this document (in the given
      *         language)
      */
-    public String getFullText (XWikiDocument doc, XWikiContext context)
+    public String getFullText(XWikiDocument doc, XWikiContext context)
     {
-        return new StringBuffer (super.getFullText (doc, context)).append (" ").append (doc.getContent ())
-                .toString ();
-    }
+        StringBuffer text = new StringBuffer(super.getFullText(doc, context));
+        text.append(" ");
+        text.append(doc.getContent());
 
+        return text.toString();
+    }
 }

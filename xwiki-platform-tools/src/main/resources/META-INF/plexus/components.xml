@@ -26,13 +26,6 @@
       </configuration>
     </component>
 
-    <component>
-      <role>org.codehaus.plexus.archiver.Archiver</role>
-      <role-hint>xar</role-hint>
-      <implementation>org.codehaus.plexus.archiver.zip.ZipArchiver</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-    </component>
-
   </components>
 </component-set>
 

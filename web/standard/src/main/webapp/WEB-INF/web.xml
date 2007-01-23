@@ -85,10 +85,14 @@
         </init-param>
      </servlet>
 
+    <!-- This is for the GWT support. Currently the GWT Java files are not being built so we need
+         to disable this. In the future, once we have GWT integrated in the build we'll need to
+         re-enable this.
     <servlet>
         <servlet-name>XWikiService</servlet-name>
         <servlet-class>api.server.XWikiServiceImpl</servlet-class>
     </servlet>
+    -->
 
     <servlet-mapping>
         <servlet-name>action</servlet-name>
@@ -115,11 +119,15 @@
         <url-pattern>/index.redirect</url-pattern>
     </servlet-mapping>
 
+    <!-- This is for the GWT support. Currently the GWT Java files are not being built so we need
+         to disable this. In the future, once we have GWT integrated in the build we'll need to
+         re-enable this.
     <servlet-mapping>
         <servlet-name>XWikiService</servlet-name>
         <url-pattern>/XWikiService</url-pattern>
     </servlet-mapping>
-
+    -->
+    
     <!-- The Usual Welcome File List -->
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

@@ -9,11 +9,33 @@
   </parent>
   <artifactId>xwiki-build-xar-handlers</artifactId>
   <name>XWiki Tools - Build - XAR Handlers</name>
-  <packaging>jar</packaging>
+  <packaging>maven-plugin</packaging>
   <description>XWiki Build Tools - XAR Handlers (Lifecycle and ArtifactHandler)</description>
   <scm>
     <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/build-tools/build-xar-handlers</connection>
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/build-tools/build-xar-handlers</developerConnection>
     <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-tools/build-tools/build-xar-handlers</url>
   </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>2.0</version>
+      </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-archiver</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -21,7 +21,9 @@
     <class entity-name="XWiki.KeywordClass" table="feeds_keyword">
         <id name="id" type="integer" unsaved-value="any"><column name="key_id" not-null="true" /><generator class="assigned" /></id>
         <property name="name" type="text">
-            <column name="key_name" /></property> </class>
+            <column name="key_name" /></property>
+        <property name="group" type="text">
+        <column name="key_group" /></property> </class>
     <class entity-name="XWiki.FeedEntryClass" table="feeds_feedentry">
         <id name="id" type="integer" unsaved-value="any"><column name="fee_id" not-null="true" /><generator class="assigned" /></id>
         <property name="title" type="text"><column name="fee_title" /></property>

@@ -764,6 +764,7 @@ public class XWikiDocument {
         objects.add(object);
         int nb  = objects.size() - 1;
         object.setNumber(nb);
+        setContentDirty(true);
         return nb;
     }
 
@@ -857,6 +858,7 @@ public class XWikiDocument {
             setObject(classname, 0, object);
         else
             setObject(classname, vobj.size(), object);
+        setContentDirty(true);
     }
 
     public void setObject(String classname, int nb, BaseObject object) {
@@ -871,6 +873,7 @@ public class XWikiDocument {
         }
         objects.set(nb, object);
         object.setNumber(nb);
+        setContentDirty(true);
     }
 
     public boolean isNew() {
@@ -891,6 +894,7 @@ public class XWikiDocument {
                 getxWikiClass().merge((BaseClass) tbclass.clone());
             }
         }
+        setContentDirty(true);
     }
 
     public void mergexWikiObjects(XWikiDocument templatedoc) {
@@ -921,6 +925,7 @@ public class XWikiDocument {
                 getxWikiObjects().put(name, objects);
             }
         }
+        setContentDirty(true);
     }
 
     public void clonexWikiObjects(XWikiDocument templatedoc) {
@@ -952,6 +957,7 @@ public class XWikiDocument {
 
     public void setTemplate(String template) {
         this.template = template;
+        setMetaDataDirty(true);
     }
 
     public String displayPrettyName(String fieldname, XWikiContext context) {
@@ -1262,6 +1268,7 @@ public class XWikiDocument {
         StaticListClass tagProp = (StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
         tagProp.fromString(tags);
         this.tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tags));
+        setMetaDataDirty(true);
     }
 
     public String getTags(XWikiContext context){
@@ -1331,6 +1338,7 @@ public class XWikiDocument {
             }
             getxWikiObjects().put(name, newobjects);
         }
+        setContentDirty(true);
     }
     
     public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException {
@@ -1405,6 +1413,7 @@ public class XWikiDocument {
                 }
             }
         }
+        setContentDirty(true);
     }
 
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
@@ -1473,6 +1482,7 @@ public class XWikiDocument {
              newattachment.getAttachment_content().setContentDirty(true);
             getAttachmentList().add(newattachment);
         }
+        setContentDirty(true);
     }
 
     public void loadAttachments(XWikiContext context) throws XWikiException {
@@ -2043,10 +2053,12 @@ public class XWikiDocument {
                 }
             }
         }
+        setContentDirty(true);
     }
 
     public void addObjectsToRemove(BaseObject object) {
         getObjectsToRemove().add(object);
+        setContentDirty(true);
     }
 
     public ArrayList getObjectsToRemove() {
@@ -2055,6 +2067,7 @@ public class XWikiDocument {
 
     public void setObjectsToRemove(ArrayList objectsToRemove) {
         this.objectsToRemove = objectsToRemove;
+        setContentDirty(true);
     }
 
     public List getIncludedPages(XWikiContext context) {
@@ -2285,6 +2298,7 @@ public class XWikiDocument {
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setStringValue(fieldName, value);
+        setContentDirty(true);
     }
 
     public List getListValue(String className, String fieldName) {
@@ -2311,6 +2325,7 @@ public class XWikiDocument {
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setListValue(fieldName, value);
+        setContentDirty(true);
     }
 
     public void setLargeStringValue(String className, String fieldName, String value) {
@@ -2322,6 +2337,7 @@ public class XWikiDocument {
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setLargeStringValue(fieldName, value);
+        setContentDirty(true);
     }
 
     public void setIntValue(String className, String fieldName, int value) {
@@ -2333,6 +2349,7 @@ public class XWikiDocument {
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setIntValue(fieldName, value);
+        setContentDirty(true);
     }
 
 
@@ -2372,6 +2389,8 @@ public class XWikiDocument {
 
         if (name.equals(""))
             name = "WebHome";
+
+        setContentDirty(true);
     }
 
     public String getLanguage() {
@@ -2394,6 +2413,7 @@ public class XWikiDocument {
 
     public void setDefaultLanguage(String defaultLanguage) {
         this.defaultLanguage = defaultLanguage;
+        setMetaDataDirty(true);
     }
 
     public int getTranslation() {
@@ -2402,6 +2422,7 @@ public class XWikiDocument {
 
     public void setTranslation(int translation) {
         this.translation = translation;
+        setMetaDataDirty(true);
     }
 
     public String getTranslatedContent(XWikiContext context) throws XWikiException {
@@ -2767,6 +2788,7 @@ public class XWikiDocument {
 
     public void setDefaultTemplate(String defaultTemplate) {
         this.defaultTemplate = defaultTemplate;
+        setMetaDataDirty(true);
     }
 
     public Vector getComments() {
@@ -3171,10 +3193,12 @@ public class XWikiDocument {
 
     public void setCustomClass(String customClass) {
         this.customClass = customClass;
+        setMetaDataDirty(true);
     }
 
     public void setValidationScript(String validationScript) {
         this.validationScript = validationScript;
+        setMetaDataDirty(true);
     }
 
     public String getValidationScript() {

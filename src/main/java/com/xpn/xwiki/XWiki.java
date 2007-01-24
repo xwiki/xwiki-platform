@@ -2684,7 +2684,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // We do everything in the context of the including document
                 if (database != null)
                     context.setDatabase(database);
-                return getRenderingEngine().renderText(contentdoc.getContent(), (XWikiDocument) context.get("doc"), (XWikiDocument) context.get("doc"), context);
+                return getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, (XWikiDocument) context.get("doc"), context);
             } else {
                 // We stay in the context included document
                 return getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc, context);

@@ -81,6 +81,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * Initialize the storage engine with a specific path
      * This is used for tests.
+     * This is used for tests.
      * @param hibpath
      */
     public XWikiHibernateStore(String hibpath) {
@@ -236,6 +237,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.incrementVersion();
                 if (context.getWiki().hasVersioning(doc.getFullName(), context))
                  context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
+
+                doc.setContentDirty(false);
+                doc.setMetaDataDirty(false);
             } else {
                 if (doc.getDocumentArchive()!=null) {
                     // Let's make sure we save the archive if we have one

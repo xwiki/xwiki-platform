@@ -105,6 +105,11 @@ body {
 
 }
 
+.filtersep {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
 .articles {
     width: 100%;
     overflow: scroll;
@@ -174,18 +179,52 @@ body {
     float: left;
     clear: left;
     padding: 5px;
+    overflow: scroll;
 }
 
 .articlecontent {
 
 }
-
-.articlecomments {
-  margin: 10px;
-  padding: 5px;
-  border: 1px solid #cccccc;
-}
-
 .dateform,.formfield {
   float: left;
+}
+
+.articleextlink2 {
+
+}
+
+.commentsbox, .tagsbox {
+    width: 300px;
+    margin: 10px;
+    padding: 5px;
+    border: 1px solid #cccccc;
+}
+
+.commentsboxtitle,.commentslink,.commentsboxcontent {
+}
+.tagsbox,.tagsboxtitle,.tagslink {
+}
+
+.tagslink, .commentslink {
+    margin-left:  10px;
+}
+
+.tagscloudlink {
+    float: left;
+    margin-right: 5px;
+}
+.tagscloud10 { font-size: 10px; }
+.tagscloud11 { font-size: 12px; }
+.tagscloud12 { font-size: 14px; }
+.tagscloud13 { font-size: 16px; }
+.tagscloud14 { font-size: 18px; }
+.tagscloud15 { font-size: 20px; }
+.tagscloud16 { font-size: 22px; }
+.tagscloud17 { font-size: 24px; }
+.tagscloud18 { font-size: 26px; }
+
+.articlesnext {
+  float: right;
+  margin-top: 5px;
+  margin-right: 50px;
 }

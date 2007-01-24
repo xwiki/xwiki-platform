@@ -2,6 +2,7 @@ package rssreader.client;
 
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Widget;
+import api.client.XObject;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,15 +12,15 @@ import com.google.gwt.user.client.ui.Widget;
  * To change this template use File | Settings | File Templates.
  */
 public class ActivateKeywordClickListener implements ClickListener {
-    private String keyword;
+    private XObject keywordobj;
     private RSSReader reader;
 
-    public ActivateKeywordClickListener(RSSReader reader, String keyword) {
-        this.keyword = keyword;
+    public ActivateKeywordClickListener(RSSReader reader, XObject keywordobj) {
+        this.keywordobj = keywordobj;
         this.reader = reader;
     }
 
     public void onClick(Widget sender) {
-        reader.onActivateKeyword(keyword);
+        reader.onActivateKeyword((String) keywordobj.get("name"), (String) keywordobj.get("group"));
     }
 }

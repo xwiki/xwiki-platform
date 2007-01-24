@@ -2,6 +2,8 @@ package api.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: ldubost
@@ -32,4 +34,14 @@ public interface XWikiServiceAsync {
     void updateProperty(String doc, String className, String propertyname, String value, AsyncCallback async);
 
     void updateProperty(String doc, String className, String propertyname, int value, AsyncCallback async);
+
+    void updateProperty(String docname, String className, String propertyname, List value, AsyncCallback async);
+
+    void addComment(String docname, String message, AsyncCallback async);
+
+    void addObject(String docname, XObject xobject, AsyncCallback async);
+
+    void customQuery(String queryPage, AsyncCallback async);
+
+    void customQuery(String queryPage, int nb, int start, AsyncCallback async);
 }

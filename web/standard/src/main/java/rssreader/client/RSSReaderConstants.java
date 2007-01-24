@@ -80,4 +80,24 @@ public interface RSSReaderConstants extends Messages {
     String TrashedOn();
 
     String TrashedOff();
+
+    String PostComment();
+
+    String Cancel();
+
+    String CommentPosted();
+
+    String Limitformat();
+
+    String Feeds();
+
+    String Modify();
+
+    String Reload();
+
+    String Status();
+
+    String PostTags();
+
+    String Next();
 }

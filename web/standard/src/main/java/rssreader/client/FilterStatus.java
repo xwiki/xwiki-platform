@@ -20,6 +20,7 @@ public class FilterStatus {
     public String date;
     public String feed;
     public String group;
+    public int start;
 
     public void reset() {
         flagged = 0;
@@ -30,6 +31,7 @@ public class FilterStatus {
         date = null;
         feed = null;
         group = null;
+        start = 0;
     }
 
     public String toString() {

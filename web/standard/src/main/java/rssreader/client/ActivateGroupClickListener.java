@@ -11,15 +11,15 @@ import com.google.gwt.user.client.ui.Widget;
  * To change this template use File | Settings | File Templates.
  */
 public class ActivateGroupClickListener implements ClickListener {
-    private String name;
+    private String groupname;
     private RSSReader reader;
 
-    public ActivateGroupClickListener(RSSReader reader, String url) {
-        this.name = name;
+    public ActivateGroupClickListener(RSSReader reader, String groupname) {
+        this.groupname = groupname;
         this.reader = reader;
     }
 
     public void onClick(Widget sender) {
-        reader.onActivateGroup(name);
+        reader.onActivateGroup(groupname);
     }
 }

@@ -108,7 +108,10 @@ public class SaveAction extends PreviewAction {
 			if (tdoc.isNew())
 				tdoc.setCreator(username);
 
-			xwiki.saveDocument(tdoc, olddoc, context);
+            // Make sure we have at least the meta data dirty status
+            tdoc.setMetaDataDirty(true);
+
+            xwiki.saveDocument(tdoc, olddoc, context);
 			XWikiLock lock = tdoc.getLock(context);
 			if (lock != null)
 				tdoc.removeLock(context);

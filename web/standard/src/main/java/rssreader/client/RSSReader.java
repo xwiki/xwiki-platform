@@ -5,13 +5,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import api.client.XWikiService;
 import api.client.Document;
 import api.client.XObject;
 
 import java.util.*;
 
-import org.gwtwidgets.client.ui.LightBox;
+import org.gwtwidgets.client.util.SimpleDateFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,27 +24,31 @@ import org.gwtwidgets.client.ui.LightBox;
 public class RSSReader implements EntryPoint, FormHandler {
     private RootPanel rpanel;
     private HorizontalPanel hpanel = new HorizontalPanel();
-    private VerticalPanel viewpanel = new VerticalPanel();
+    private DockPanel viewpanel = new DockPanel();
     private VerticalPanel filterpanel = new VerticalPanel();
     private FormPanel searchform = new FormPanel();
+    private FlowPanel tagspanel = new FlowPanel();
     private Panel menupanel = new VerticalPanel();
     private TextBox keywordTextBox = new TextBox();
     private TextBox dateTextBox = new TextBox();
     private DialogBox dialog = new DialogBox();
-    //private LightBox dialog2 = new LightBox(dialog);
     private PopupPanel popupMessage = new PopupPanel();
+    private PopupPanel commentPopup = new PopupPanel(false);
+    private PopupPanel tagsPopup = new PopupPanel(false);
     private Tree feedTree = new Tree();
     private Map feeds;
     private Map groups;
-    private List keywords;
+    private Map keywords;
     private static RSSReaderConstants constants = (RSSReaderConstants) GWT.create(RSSReaderConstants.class);
     private int clickCounter = 0;
-    private static final int NB_ARTICLES = 50;
+    private static final int NB_ARTICLES = 10;
 
     // Filters
     private FilterStatus filterStatus = new FilterStatus();
     private Hyperlink flagFilterLink;
     private Hyperlink trashFilterLink;
+    private String webappName = "xwiki";
+    private String page = "Feeds.WebHome";
 
     public static RSSReaderConstants getConstants() {
         return constants;
@@ -54,7 +59,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         rpanel.add(hpanel);
         hpanel.add(menupanel);
         hpanel.add(viewpanel);
-        viewpanel.add(filterpanel);
+        viewpanel.add(filterpanel, DockPanel.NORTH);
         int width = rpanel.getOffsetWidth() - menupanel.getOffsetWidth();
         viewpanel.setWidth(width + "px");
         // Root Panel
@@ -67,9 +72,14 @@ public class RSSReader implements EntryPoint, FormHandler {
         // Filter Panel
         prepareFilterPanel();
 
+
         // Menu Panel
-        HTML title = new HTML();
-        title.setHTML(constants.RSSReader());
+        String titlehtml = constants.Feeds() + " | ";
+        titlehtml += "<a href=\"" + getURL(page, "inline")  + "\" target=\"_blank\">" + constants.Modify() + "</a>";
+        titlehtml += " | " + "<a href=\"" + getURL(page, "view", "confirm=1")  + "\" target=\"_blank\">" + constants.Reload() + "</a>";
+        titlehtml += " | " + "<a href=\"" + getURL(page, "view", "status=1")  + "\" target=\"_blank\">" + constants.Status() + "</a>";
+        HTML title = new HTML(titlehtml);
+
         menupanel.setStyleName("rssmenu");
         menupanel.add(title);
         menupanel.add(feedTree);
@@ -92,11 +102,29 @@ public class RSSReader implements EntryPoint, FormHandler {
         formpanel.add(button);
         menupanel.add(searchform);
 
+        tagspanel = new FlowPanel();
+        menupanel.add(tagspanel);
+
         // Load the feed list
         XWikiService.App.getInstance().getDocument(constants.feedPage(), true, true, false, new AsyncLoadFeedCallback(this));
+
+        // Load the tags list
+        XWikiService.App.getInstance().customQuery("Feeds.TagsList", 0, 0, new AsyncLoadTagsListCallback(this));        
+
         // Load the latest article list
         filterStatus.trashed = -1;
         onActivateAllFilter();
+    }
+
+    private String getURL(String page, String action) {
+        return getURL(page, action, null);
+    }
+
+    private String getURL(String page, String action, String qs) {
+        String url = "/" + webappName  + "/bin/" + action + "/" + page.replace('.','/');
+        if (qs!=null)
+         url += "?" + qs;
+        return url;
     }
 
     private void prepareFilterPanel() {
@@ -107,7 +135,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         HTML filtertitle = new HTML(constants.Filters());
         filtertitle.setStyleName("filtertitle");
         filterline.add(filtertitle, DockPanel.WEST);
-        HTML filterstatus = new HTML(getFilterStatus());
+        Panel filterstatus = getFilterStatus();
         filterstatus.setStyleName("filterstatus");
         filterline.add(filterstatus, DockPanel.WEST);
 
@@ -148,7 +176,17 @@ public class RSSReader implements EntryPoint, FormHandler {
         HTML filtertext = new HTML(constants.Limitfrom());
         formpanel.add(filtertext);
         dateTextBox.setName("date");
-        dateTextBox.setText(filterStatus.date);
+        if (filterStatus.date==null) {
+            Date date = new Date();
+            date = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+            date.setHours(12);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            String sdate = format.format(date);
+            dateTextBox.setText(sdate);
+        } else
+         dateTextBox.setText(filterStatus.date);
         dateTextBox.setStyleName("formfield");
         formpanel.add(dateTextBox);
         Button button = new Button();
@@ -160,13 +198,9 @@ public class RSSReader implements EntryPoint, FormHandler {
             }
         });
         formpanel.add(button);
+        HTML filterformattext = new HTML(constants.Limitformat());
+        formpanel.add(filterformattext);
         filterline2.add(dateform, DockPanel.WEST);
-
-
-        if (filterStatus.date!=null) {
-           HTML filterdate = new HTML(filterStatus.date.toString());
-           filterline2.add(filterdate, DockPanel.WEST);
-        }
 
         Hyperlink filterclear = new Hyperlink(constants.ClearFilter(), "");
         filterclear.setStyleName("filterclear");
@@ -282,6 +316,16 @@ public class RSSReader implements EntryPoint, FormHandler {
         });
         hpanel.add(untrashed);
 
+        Hyperlink nextlink = new Hyperlink(constants.Next(), "");
+        nextlink.addStyleName("articlesnext");
+        nextlink.addClickListener(new ClickListener() {
+            public void onClick(Widget widget) {
+                filterStatus.start  += NB_ARTICLES;
+                onRefresh();
+            }
+        });
+        hpanel.add(nextlink);
+
         filterpanel.add(hpanel);
     }
 
@@ -311,8 +355,118 @@ public class RSSReader implements EntryPoint, FormHandler {
         onActivateAllFilter();
     }
 
-    private String getFilterStatus() {
-        return filterStatus.toString();
+    private Panel getFilterStatus() {
+        Panel status = new HorizontalPanel();
+        if (filterStatus.feed!=null) {
+            String html = RSSReader.getConstants().Feed();
+            html += " " + filterStatus.feed;
+            status.add(new HTML(html));
+            Hyperlink datelink = new Hyperlink("(x)", "");
+            datelink.addClickListener(new ClickListener() {
+                public void onClick(Widget widget) {
+                    filterStatus.feed = null;
+                    onRefresh();
+                }
+            });
+            status.add(datelink);
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.group!=null) {
+            String html = RSSReader.getConstants().Group();
+            html += " " + filterStatus.group;
+            status.add(new HTML(html));
+            Hyperlink datelink = new Hyperlink("(x)", "");
+            datelink.addClickListener(new ClickListener() {
+                public void onClick(Widget widget) {
+                    filterStatus.group = null;
+                    onRefresh();
+                }
+            });
+            status.add(datelink);
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.keyword!=null) {
+            String html = RSSReader.getConstants().Keyword();
+            html += " " + filterStatus.keyword;
+            status.add(new HTML(html));
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.tags.size()>0) {
+            String html = RSSReader.getConstants().Tags();
+            status.add(new HTML(html));
+            Hyperlink tagslink = new Hyperlink("(x)", "");
+            tagslink.addClickListener(new ClickListener() {
+                public void onClick(Widget widget) {
+                    filterStatus.tags.clear();
+                    onRefresh();
+                }
+            });
+            status.add(tagslink);
+            status.add(new HTML(": "));
+            for (int i=0;i<filterStatus.tags.size();i++) {
+                html = " " + filterStatus.tags.get(i);
+                status.add(new HTML(html));
+            }
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.flagged ==1) {
+            String html = RSSReader.getConstants().FlagOn();
+            status.add(new HTML(html));
+        }
+        if (filterStatus.flagged ==-1) {
+            String html = RSSReader.getConstants().FlagOff();
+            status.add(new HTML(html));
+        }
+        if (filterStatus.trashed == 1) {
+            String html = RSSReader.getConstants().TrashedOn();
+            status.add(new HTML(html));
+        }
+        if (filterStatus.trashed ==-1) {
+            String html = RSSReader.getConstants().TrashedOff();
+            status.add(new HTML(html));
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.read==1) {
+            String html = RSSReader.getConstants().ReadOn();
+            status.add(new HTML(html));
+        }
+        if (filterStatus.read==-11) {
+            String html = RSSReader.getConstants().ReadOff();
+            status.add(new HTML(html));
+        }
+
+        addSeparator(status);
+
+        if (filterStatus.date!=null) {
+            String html = RSSReader.getConstants().Limitfrom();
+            html += filterStatus.date;
+            status.add(new HTML(html));
+            Hyperlink datelink = new Hyperlink("(x)", "");
+            datelink.addClickListener(new ClickListener() {
+                public void onClick(Widget widget) {
+                    filterStatus.date = null;
+                    onRefresh();
+                }
+            });
+            status.add(datelink);
+        }
+        return status;
+    }
+
+    private void addSeparator(Panel status) {
+        HTML html = new HTML(" - ");
+        html.setStyleName("filtersep");
+        status.add(html);
     }
 
     private void onPressReview() {
@@ -375,7 +529,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         if (feedpage!=null) {
             feeds = new HashMap();
             groups = new HashMap();
-            keywords = new ArrayList();
+            keywords = new HashMap();
 
 
             List fobjects = feedpage.getObjects("XWiki.AggregatorURLClass");
@@ -396,10 +550,14 @@ public class RSSReader implements EntryPoint, FormHandler {
             if (objects!=null) {
                 for (int j=0;j<objects.size();j++) {
                     XObject xobj = (XObject) objects.get(j);
-                    keywords.add(xobj.getProperty("name"));
+                    String name = (String) xobj.getProperty("name");
+                    String group = (String) xobj.getProperty("group");
+                    String fullname = name;
+                    if ((group!=null)&&(!group.equals("")))
+                     fullname += " - " + group;
+                    keywords.put(fullname, xobj);
                 }
-                Collections.sort(keywords);
-            }
+             }
 
             refreshFeedTree();
         }
@@ -451,7 +609,9 @@ public class RSSReader implements EntryPoint, FormHandler {
         }
         feedTree.addItem(groupsTree);
 
-        Iterator keywordit = keywords.iterator();
+        List kkeys = new ArrayList(keywords.keySet());
+        Collections.sort(kkeys);
+        Iterator keywordit = kkeys.iterator();
         while (keywordit.hasNext()) {
             String keywordname = (String) keywordit.next();
             addKeywordToTree(keywordsTree, keywordname);
@@ -470,7 +630,8 @@ public class RSSReader implements EntryPoint, FormHandler {
     private void addKeywordToTree(TreeItem treeItem, String keyword) {
         Hyperlink link = new Hyperlink(keyword, "");
         link.setStyleName("treeelementtext");
-        link.addClickListener(new ActivateKeywordClickListener(this, keyword));
+        XObject xobj = (XObject) keywords.get(keyword);
+        link.addClickListener(new ActivateKeywordClickListener(this, xobj));
         treeItem.addItem(link);
     }
 
@@ -497,9 +658,14 @@ public class RSSReader implements EntryPoint, FormHandler {
         dialog.show();
     }
 
+    public void onRefresh() {
+        onActivateAllFilter(filterStatus.start);
+    }
+
     public void onActivateAll() {
         onActivateAll(0);
     }
+
     public void onActivateAll(int start) {
         String message = constants.LoadingAll();
         filterStatus.reset();
@@ -553,14 +719,17 @@ public class RSSReader implements EntryPoint, FormHandler {
         showArticles(message, start);
     }
 
-    public void onActivateKeyword(String keyword) {
-        onActivateKeyword(keyword, 0);
+    public void onActivateKeyword(String keyword, String group) {
+        onActivateKeyword(keyword, group, 0);
     }
 
-    public void onActivateKeyword(String keyword, int start) {
+    public void onActivateKeyword(String keyword, String group, int start) {
         String message = constants.LoadingMatching() + " " + keyword;
+        if (group!=null)
+             message += " - " + group;
         filterStatus.feed = null;
         filterStatus.keyword = keyword;
+        filterStatus.group = group;
         showArticles(message, start);
     }
 
@@ -570,7 +739,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         html.setText(message);
         viewpanel.clear();
         prepareFilterPanel();
-        viewpanel.add(filterpanel);
+        viewpanel.add(filterpanel, DockPanel.NORTH);
         String skeyword = (filterStatus.keyword==null) ? null : filterStatus.keyword.replaceAll("'", "''");
         String sql = ", BaseObject as obj, XWiki.FeedEntryClass as feedentry ";
         String wheresql = "where doc.fullName=obj.name and obj.className='XWiki.FeedEntryClass' and obj.id=feedentry.id ";
@@ -578,7 +747,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         if ((filterStatus.tags!=null)&&(filterStatus.tags.size()>0)) {
             for(int i=0;i<filterStatus.tags.size();i++) {
                 String tag = (String) filterStatus.tags.get(i);
-                wheresql += " and elements(feedentry.tags) contains '" + tag.replaceAll("'","''") + "'";
+                wheresql += " and '" + tag.replaceAll("'","''") + "' in elements(feedentry.tags) ";
             }
         }
 
@@ -603,7 +772,12 @@ public class RSSReader implements EntryPoint, FormHandler {
         if ((filterStatus.feed!=null)&&(!filterStatus.feed.trim().equals(""))) {
             wheresql += " and feedentry.feedurl='" + filterStatus.feed.replaceAll("'","''") + "'";
         } else if ((filterStatus.group!=null)&&(!filterStatus.group.trim().equals(""))) {
-            wheresql += " and elements(feedentry.group) contains '" + filterStatus.group.replaceAll("'","''") + "'";
+            wheresql += " and feedentry.feedurl in ("
+                     + "select feed.url from XWiki.AggregatorURLClass as feed where '" + filterStatus.group.replaceAll("'","''") + "' in elements(feed.group))"; 
+        }
+
+        if (filterStatus.date!=null) {
+            wheresql += " and feedentry.date >= '" + filterStatus.date + "' ";
         }
 
         if (filterStatus.read!=0) {
@@ -619,7 +793,7 @@ public class RSSReader implements EntryPoint, FormHandler {
 
     private void setViewPanelWidth() {
         viewpanel.setWidth((rpanel.getOffsetWidth() - menupanel.getOffsetWidth()) + "px");
-        viewpanel.setHeight((Window.getClientHeight() - (rpanel.getAbsoluteTop() + filterpanel.getOffsetHeight())) + "px");
+        // viewpanel.setHeight((Window.getClientHeight() - (rpanel.getAbsoluteTop() + filterpanel.getOffsetHeight())) + "px");
     }
 
     public void showArticle(List feedentries, String keyword) {
@@ -630,7 +804,6 @@ public class RSSReader implements EntryPoint, FormHandler {
                 Document feedpage = (Document) feedentries.get(i);
                 if (feedpage!=null) {
                     XObject feedentry = feedpage.getObject("XWiki.FeedEntryClass", 0);
-                    FlexTable table = new FlexTable();
                     String title = feedentry.getViewProperty("title");
                     String feedname = feedentry.getViewProperty("feedname");
                     String feedurl = feedentry.getViewProperty("feedurl");
@@ -638,6 +811,7 @@ public class RSSReader implements EntryPoint, FormHandler {
                     String author = feedentry.getViewProperty("author");
                     String date = feedentry.getViewProperty("date");
                     String content = feedentry.getViewProperty("content");
+                    String tags = feedentry.getViewProperty("tags");
                     Integer iFlag = (Integer) feedentry.getProperty("flag");
                     int flagstatus = (iFlag==null) ? 0 : iFlag.intValue();
                     List comments = feedpage.getObjects("XWiki.XWikiComments");
@@ -669,6 +843,12 @@ public class RSSReader implements EntryPoint, FormHandler {
                     HTML outsidelink = new HTML(outsidelinkhtml);
                     outsidelink.setStyleName("articleextlink");
                     articletitlepanel.add(outsidelink);
+
+                    // Outside link
+                    outsidelinkhtml = "<a href=\"" + url + "\" target=\"_blank\">" + url + "</a>";
+                    outsidelink = new HTML(outsidelinkhtml);
+                    outsidelink.setStyleName("articleextlink2");
+                    articlepanel.add(outsidelink);
 
                     // Blog source
                     HTML authorhtml = new HTML();
@@ -710,22 +890,69 @@ public class RSSReader implements EntryPoint, FormHandler {
                         content = cleanHTML(content);
                     }
 
+
                     HorizontalPanel contentzonepanel = new HorizontalPanel();
                     contentzonepanel.setStyleName("articlecontentzone");
+
+
                     HTMLPanel contentpanel = new HTMLPanel(content);
                     contentpanel.setStyleName("articlecontent");
                     contentzonepanel.add(contentpanel);
 
-                    VerticalPanel commentspanel = new VerticalPanel();
-                    commentspanel.setStyleName("articlecomments");
-                    contentzonepanel.add(commentspanel);
-                    commentspanel.add(new HTMLPanel(constants.Comments()));
+                    VerticalPanel datapanel = new VerticalPanel();
+                    contentzonepanel.add(datapanel);
+
+
+                    FlexTable tagspanel = new FlexTable();
+                    tagspanel.setStyleName("tagsbox");
+                    datapanel.add(tagspanel);
+                    HorizontalPanel tagstitle = new HorizontalPanel();
+                    tagstitle.add(new HTML(constants.Tags()));
+                    tagspanel.setWidget(0, 0, tagstitle);
+                    tagspanel.getCellFormatter().setStyleName(0, 0, "tagsboxtitle");
+
+                    HTML tagshtml = new HTML(tags);
+                    Image tagslink = new Image(getImagePath("agrss_comment.png"));
+                    tagslink.addClickListener(new TagsClickListener(this, feedpage.getSpace() + "." + feedpage.getName(), tags, tagshtml));
+                    tagslink.setStyleName("tagslink");
+                    tagstitle.add(tagslink);
+                    tagspanel.setWidget(0, 1, tagshtml);
+                    tagspanel.getCellFormatter().setStyleName(0, 1, "tagsboxitems");
+                    
+                    FlexTable commentspanel = new FlexTable();
+                    commentspanel.setStyleName("commentsbox");
+                    datapanel.add(commentspanel);
+                    HorizontalPanel commenttitle = new HorizontalPanel();
+                    commenttitle.add(new HTML(constants.Comments()));
+                    commentspanel.setWidget(0, 0, commenttitle);
+                    commentspanel.getFlexCellFormatter().setColSpan(0, 0, 3);
+                    commentspanel.getCellFormatter().setStyleName(0, 0, "commentsboxtitle");
+
+                    Image commentlink = new Image(getImagePath("agrss_comment.png"));
+                    commentlink.addClickListener(new CommentClickListener(this, feedpage.getSpace() + "." + feedpage.getName()));
+                    commentlink.setStyleName("commentslink");
+                    commenttitle.add(commentlink);
+
                     // Need to add comments here..
+                    int line = 1;
+                    if (comments!=null) {
+                        for (int cnb=comments.size()-1;cnb>=0;cnb--) {
+                            XObject comment = (XObject) comments.get(cnb);
+                            commentspanel.setHTML(line, 0, comment.getViewProperty("date"));
+                            commentspanel.setHTML(line, 1, comment.getViewProperty("author").replaceAll("XWiki.", ""));
+                            commentspanel.getCellFormatter().setStyleName(line, 0, "commentsboxheader");
+                            line++;
+                            commentspanel.getFlexCellFormatter().setColSpan(line, 0, 3);
+                            commentspanel.getCellFormatter().setStyleName(line, 0, "commentsboxcontent");
+                            commentspanel.setHTML(line, 0, comment.getViewProperty("comment"));
+                            line++;
+                        }
+                    }
 
                     contentzonepanel.setVisible(false);
                     titlelink.addClickListener(new TitleClickListener(contentzonepanel));
                     articlepanel.add(contentzonepanel);
-                    viewpanel.add(articlepanel);
+                    viewpanel.add(articlepanel, DockPanel.NORTH);
                 }
             }
             History.newItem("feedview");
@@ -746,7 +973,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         if (keywordTextBox.getText().length() == 0) {
             Window.alert(constants.NoSearchTerm());
         } else {
-            onActivateKeyword(keywordTextBox.getText());
+            onActivateKeyword(keywordTextBox.getText(), null);
         }
     }
 
@@ -770,8 +997,96 @@ public class RSSReader implements EntryPoint, FormHandler {
         if (success==false)
          showError(constants.FlagFeedFailed());
         else {
-            feedentry.setProperty("flagged", new Integer(newflagstatus));
+            feedentry.setProperty("flag", new Integer(newflagstatus));
             link.setUrl(getImagePath((newflagstatus==1) ? "agrss_star_on.png" : "agrss_star_off.png"));
+        }
+    }
+
+    public void showCommentForm(String page, int x, int y) {
+        VerticalPanel vpanel = new VerticalPanel();
+        commentPopup.clear();
+        commentPopup.add(vpanel);
+        TextArea tarea = new TextArea();
+        tarea.setPixelSize(400, 200);
+        vpanel.add(tarea);
+        FlowPanel fpanel = new FlowPanel();
+        vpanel.add(fpanel);
+        Button cancel = new Button(constants.Cancel(), new ClickListener() {
+            public void onClick(Widget widget) {
+                commentPopup.hide();
+            }
+        });
+        Button submit = new Button(constants.PostComment(), new PostCommentClickListener(this, page, tarea));
+        fpanel.add(cancel);
+        fpanel.add(submit);
+        commentPopup.setPopupPosition(x - 400, y - 100);
+        commentPopup.show();
+    }
+
+    public void postComment(String page, String text) {
+        commentPopup.hide();
+        XWikiService.App.getInstance().addComment(page, text, new AsyncCallback() {
+            public void onFailure(Throwable throwable) {
+                showError((Throwable) throwable);
+            }
+            public void onSuccess(Object object) {
+                onRefresh();
+            }
+        });
+    }
+
+    public void showTagsForm(String page, String tags, HTML tagshtml, int x, int y) {
+        VerticalPanel vpanel = new VerticalPanel();
+        tagsPopup.clear();
+        tagsPopup.add(vpanel);
+        TextBox tarea = new TextBox();
+        tarea.setText(tags);
+        tarea.setSize("50", "200");
+        vpanel.add(tarea);
+        FlowPanel fpanel = new FlowPanel();
+        vpanel.add(fpanel);
+        Button cancel = new Button(constants.Cancel(), new ClickListener() {
+            public void onClick(Widget widget) {
+                tagsPopup.hide();
+            }
+        });
+        Button submit = new Button(constants.PostTags(), new PostTagsClickListener(this, page, tarea, tagshtml));
+        fpanel.add(cancel);
+        fpanel.add(submit);
+        tagsPopup.setPopupPosition(x - 200, y - 40);
+        tagsPopup.show();
+    }
+
+    public void postTags(String page, final String tags, HTML tagshtml) {
+        tagsPopup.hide();
+        List taglist = new ArrayList();
+        String[] tagarray = tags.split(" ");
+        for (int i=0;i<tagarray.length;i++)
+         taglist.add(tagarray[i]);
+        XWikiService.App.getInstance().updateProperty(page, "XWiki.FeedEntryClass", "tags", taglist, new PostTagsAsyncCallback(this, tagshtml, tags));
+    }
+
+    public void showTagsList(List list) {
+        if (list!=null) {
+            for (int i=0;i<list.size();i++) {
+                List result = (List) list.get(i);
+                String name = (String) result.get(0);
+                int count = ((Integer)result.get(1)).intValue();
+                Hyperlink link = new Hyperlink(name, "");
+                int pixels = 9 + count;
+                if (pixels>15)
+                 pixels = 15;
+                link.setStyleName("tagscloudlink tagscloud" + pixels);
+                link.addClickListener(new TagsItemClickListener(this, name));
+                tagspanel.add(link);
+            }
+        }
+    }
+
+    public void onActivateTag(String tag) {
+        if (!filterStatus.tags.contains(tag)) {
+            filterStatus.tags.add(tag);
+            onActivateAllFilter();
         }
     }
 

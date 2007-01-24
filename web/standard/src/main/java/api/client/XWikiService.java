@@ -3,7 +3,6 @@ package api.client;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.core.client.GWT;
-
 import java.util.List;
 
 /**
@@ -26,6 +25,11 @@ public interface XWikiService extends RemoteService {
     public List getDocuments(String sql, int nb, int start, boolean fullName, boolean viewDisplayers, boolean editDisplayers);
     public boolean updateProperty(String doc, String className, String propertyname, String value);
     public boolean updateProperty(String doc, String className, String propertyname, int value);
+    public boolean updateProperty(String docname, String className, String propertyname, List value);
+    public boolean addComment(String docname, String message);
+    public boolean addObject(String docname, XObject xobject);
+    public List customQuery(String queryPage);
+    public List customQuery(String queryPage, int nb, int start);
 
     /**
      * Utility/Convinience class.

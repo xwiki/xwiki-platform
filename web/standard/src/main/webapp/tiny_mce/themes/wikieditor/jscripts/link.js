@@ -7,6 +7,7 @@ function init() {
     document.forms[0].file_text.value = text;
     document.forms[0].attach_text.value = text;
     document.forms[0].email_text.value = text;
+    document.forms[0].wiki_page.value = text;
 
     if ((href != null) && (href != "")) {
 	    if (href.search(/(https?|ftp):\/\/[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]/gi)>-1) {

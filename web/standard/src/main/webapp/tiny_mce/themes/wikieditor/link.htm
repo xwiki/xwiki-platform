@@ -367,26 +367,32 @@ if (url != null) {
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
                         <td align="left" valign="middle">
-                            <table border="0" cellpadding="4" cellspacing="0" width="200">
+                            <table border="0" cellpadding="4" cellspacing="0">
                                 <tr>
-                                    <td nowrap="nowrap">{$lang_link_attach_title} :</td>
                                     <td>
-                                        <input type="text" id="attach_text" name="attach_text" value="" style="width: 200px" />
+                                        <table border="0" cellpadding="4" cellspacing="0" width="200">
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_attach_title} :</td>
+                                                <td>
+                                                    <input type="text" id="attach_text" name="attach_text" value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td nowrap="nowrap">{$lang_link_attachment_title} :</td>
+                                                <td>
+                                                    <input type="text" id="attach_file" name="attach_file"  value="" style="width: 200px" />
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td nowrap="nowrap">{$lang_link_attachment_title} :</td>
-                                    <td>
-                                        <input type="text" id="attach_file" name="attach_file"  value="" style="width: 200px" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap="nowrap" colspan="2"><a href="#" onclick="loadUploadAttachs(baseurl);">{$lang_link_upload_attachment_title}</a>
+                                    <td nowrap="nowrap"><a href="#" onclick="if (document.getElementById('uploadattach').innerHTML == '') loadUploadAttachs(baseurl); else document.getElementById('uploadattach').innerHTML = ''">{$lang_link_upload_attachment_title}</a>
                                         <div style="margin: 3px" id="uploadattach"></div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td nowrap="nowrap" colspan="2"></td>
+                                    <td nowrap="nowrap"></td>
                                 </tr>
                             </table>
                         </td>

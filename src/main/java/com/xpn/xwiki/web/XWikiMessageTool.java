@@ -38,6 +38,7 @@ import java.util.Set;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.log4j.Logger;
 
 /**
  * Internationalization service based on key/property values. The key is the id of the message
@@ -61,6 +62,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XWikiMessageTool
 {
+    private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
+
     private static final String KEY = "bundledocs";
 
     private ResourceBundle bundle;
@@ -142,8 +145,20 @@ public class XWikiMessageTool
                             }
                             result.add(docBundle);
                         }
+                        else
+                        {
+                            // The document listed as a document bundle doesn't exist. Do nothing
+                            // and log.
+                            LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
+                                + "as an internationalization document bundle but it does not "
+                                + "exist.");
+                        }
                     } catch (XWikiException e) {
-                        // Doc not found, discard
+                        // Error while loading the document.
+                        // TODO: A runtime exception should be thrown that will bubble up till the
+                        // topmost level. For now simply log the error
+                        LOG.error("Failed to load internationalization document bundle ["
+                            + docBundle + "].", e);
                     }
                 }
             }

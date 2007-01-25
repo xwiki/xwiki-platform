@@ -31,6 +31,11 @@ import junit.framework.TestCase;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
+/**
+ * Unit tests for the {@link com.xpn.xwiki.atom.WSSEHttpHeader} class.
+ *
+ * @version $Id: $
+ */
 public class WSSEHeaderTest extends TestCase {
 
   public void testParseUserName() {

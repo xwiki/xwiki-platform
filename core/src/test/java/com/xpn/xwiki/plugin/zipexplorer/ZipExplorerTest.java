@@ -35,6 +35,11 @@ import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Unit tests for the {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin} class.
+ *
+ * @version $Id: $
+ */
 public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase
 {
     private ZipExplorerPlugin plugin;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -2581,7 +2581,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             if (bundle == null) {
                 bundle = ResourceBundle.getBundle("ApplicationResources");
             }
-            XWikiMessageTool msg = new XWikiMessageTool(bundle);
+            XWikiMessageTool msg = new XWikiMessageTool(bundle, context);
             context.put("msg", msg);
             VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
             if (vcontext != null) {

@@ -159,25 +159,28 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         Query parsedQuery = null;
 
         // for object search
-        if (query.indexOf(":") >= 0) {
+        if (query.startsWith("PROP ")) {
             String property = query.substring(0, query.indexOf(":"));
             query = query.substring(query.indexOf(":") + 1, query.length());
             QueryParser qp = new QueryParser(property, analyzer);
             parsedQuery = qp.parse(query);
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
-            return bQuery;
+        } else if(query.startsWith("MULTI ")) {
+            //for fulltext search
+            List fieldList = IndexUpdater.fields;
+            String[] fields = (String[]) fieldList.toArray(new String[fieldList.size()]);
+            BooleanClause.Occur[] flags = new BooleanClause.Occur[fields.length];
+            for (int i = 0; i < flags.length; i++) {
+                flags[i] = BooleanClause.Occur.SHOULD;
+            }
+            parsedQuery = MultiFieldQueryParser.parse(query, fields, flags, analyzer);
+            bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
+        } else {
+            QueryParser qp = new QueryParser("ft", analyzer);
+            parsedQuery = qp.parse(query);
+            bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         }
 
-        //for fulltext search
-        List fieldList = IndexUpdater.fields;
-        String[] fields = (String[]) fieldList.toArray(new String[fieldList.size()]);
-        BooleanClause.Occur[] flags = new BooleanClause.Occur[fields.length];
-        for (int i = 0; i < flags.length; i++) {
-            flags[i] = BooleanClause.Occur.SHOULD;
-        }
-        parsedQuery = MultiFieldQueryParser.parse(query, fields, flags, analyzer);
-        bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
-        
         if (virtualWikiNames != null && virtualWikiNames.length() > 0) {
             bQuery.add(buildOredTermQuery(virtualWikiNames, IndexFields.DOCUMENT_WIKI), BooleanClause.Occur.SHOULD);
         }

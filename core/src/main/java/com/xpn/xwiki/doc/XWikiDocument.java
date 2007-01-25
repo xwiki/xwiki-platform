@@ -299,6 +299,8 @@ public class XWikiDocument {
     }
 
     public String getRenderedContent(String text, XWikiContext context) {
+        /*
+         // TODO: verify the impact of this code
         String result;
         HashMap backup = new HashMap();
 
@@ -306,7 +308,8 @@ public class XWikiDocument {
         setAsContextDoc(context);
         result = context.getWiki().getRenderingEngine().renderText(text, this, context);
         restoreContext(backup, context);
-
+        */
+        String result = context.getWiki().getRenderingEngine().renderText(text, this, context);
         return result;
     }
 

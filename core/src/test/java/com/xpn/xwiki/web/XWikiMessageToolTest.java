@@ -91,9 +91,9 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getXWikiPreference").will(
             returnValue("Space1.Doc1, Space2.Doc2"));
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "somekey=somevalue", false)));
+            .will(returnValue(createDocument(111111L, "Space1.Doc1", "somekey=somevalue", false)));
         this.mockXWiki.stubs().method("getDocument").with(eq("Space2.Doc2"), ANYTHING)
-            .will(returnValue(createDocument(222222L, "someKey=someValue\n"
+            .will(returnValue(createDocument(222222L, "Space2.Doc2", "someKey=someValue\n"
                 + "keyInXWikiPreferences=eureka", false)));
 
         assertEquals("eureka", this.tool.get("keyInXWikiPreferences"));
@@ -104,7 +104,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue(null));
         this.mockXWiki.stubs().method("Param").will(returnValue("Space1.Doc1"));
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "keyInXWikiCfg=gotcha", false)));
+            .will(returnValue(createDocument(111111L, "Space1.Doc1", "keyInXWikiCfg=gotcha",
+                false)));
 
         assertEquals("gotcha", this.tool.get("keyInXWikiCfg"));
     }
@@ -117,7 +118,7 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     {
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "", true)));
+            .will(returnValue(createDocument(111111L, "Space1.Doc1", "", true)));
         List docs = this.tool.getDocumentBundles();
         assertEquals(0, docs.size());
     }
@@ -126,7 +127,7 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     {
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
 
-        Mock document = createMockDocument(11111L, "key=value", false);
+        Mock document = createMockDocument(11111L, "Space1.Doc1", "key=value", false);
 
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
             .will(returnValue(document.proxy()));
@@ -144,7 +145,7 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     {
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
 
-        Mock document = createMockDocument(11111L, "key=value", false);
+        Mock document = createMockDocument(11111L, "Space1.Doc1", "key=value", false);
 
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
             .will(returnValue(document.proxy()));
@@ -160,12 +161,12 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         assertEquals("found", this.tool.get("modifiedKey"));
     }
 
-    private XWikiDocument createDocument(long id, String content, boolean isNew)
+    private XWikiDocument createDocument(long id, String name, String content, boolean isNew)
     {
-        return (XWikiDocument) createMockDocument(id, content, isNew).proxy();
+        return (XWikiDocument) createMockDocument(id, name, content, isNew).proxy();
     }
 
-    private Mock createMockDocument(long id, String content, boolean isNew)
+    private Mock createMockDocument(long id, String name, String content, boolean isNew)
     {
         Mock mockDocument = mock(XWikiDocument.class);
         XWikiDocument document = (XWikiDocument) mockDocument.proxy();
@@ -174,6 +175,7 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         mockDocument.stubs().method("getId").will(returnValue(new Long(id)));
         mockDocument.stubs().method("getDate").will(returnValue(new Date()));
         mockDocument.stubs().method("getContent").will(returnValue(content));
+        mockDocument.stubs().method("getFullName").will(returnValue(name));
         return mockDocument;
     }
 

@@ -40,7 +40,7 @@ $response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiPreference
 #set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets", "leftPanels", "rightPanels", "showLeftPanels", "showRightPanels", "pageWidth"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])
-#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages", "documentBundles" ])
+#set($sectionitemsmap.advanced = ["macros_languages", "macros_velocity","macros_groovy", "macros_mapping", "notification_pages" ])
 #####
 ##
 ## Define the macro that displays the options in a category

@@ -381,8 +381,7 @@ public class Document extends Api {
     }
 
     /**
-     * return true if the document is a new one (Has never been saved)
-     * @return
+     * @return true if the document is a new one (ie it has never been saved) or false otherwise
      */
     public boolean isNew() {
         return doc.isNew();

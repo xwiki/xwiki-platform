@@ -735,6 +735,10 @@
         <property name="comment_registered" type="string">
             <column name="XWP_COMMENT_REGISTERED" length="255" />
         </property>
+        <property name="documentBundles" type="string">
+            <column name="XWP_DOCUMENT_BUNDLES" length="255" />
+        </property>
+
     </class>
 
     <!-- XWikiComments custom mapping -->

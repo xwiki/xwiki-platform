@@ -2026,6 +2026,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
+        needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 30);
 
         if (((BooleanClass)bclass.get("showLeftPanels")).getDisplayType().equals("checkbox"))
         {

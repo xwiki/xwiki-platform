@@ -556,7 +556,7 @@
 <validationRegExp></validationRegExp>
 <tooltip></tooltip>
 <unmodifiable>0</unmodifiable>
-<size>30</size>
+<size>60</size>
 <name>documentBundles</name>
 <validationMessage></validationMessage>
 <number>52</number>

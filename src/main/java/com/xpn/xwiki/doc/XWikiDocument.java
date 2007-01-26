@@ -879,6 +879,9 @@ public class XWikiDocument {
         setContentDirty(true);
     }
 
+    /**
+     * @return true if the document is a new one (ie it has never been saved) or false otherwise
+     */
     public boolean isNew() {
         return isNew;
     }

@@ -13,7 +13,7 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1164620481000</creationDate>
 <date>1166177444000</date>
-<contentUpdateDate>1166177444000</contentUpdateDate>
+<contentUpdateDate>1169801142000</contentUpdateDate>
 <version>1.8</version>
 <title></title>
 <template></template>
@@ -32,6 +32,7 @@
 <prettyName>Tags</prettyName>
 <multiSelect>1</multiSelect>
 <values></values>
+<separator> </separator>
 <displayType>input</displayType>
 <unmodifiable>0</unmodifiable>
 <size>30</size>

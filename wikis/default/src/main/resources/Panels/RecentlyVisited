@@ -13,7 +13,7 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1153566866000</creationDate>
 <date>1166177446000</date>
-<contentUpdateDate>1166177446000</contentUpdateDate>
+<contentUpdateDate>1169801141000</contentUpdateDate>
 <version>1.46</version>
 <title>Recently visited documents</title>
 <template></template>
@@ -37,6 +37,7 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
 <values>view|edit</values>
 <number>2</number>
@@ -50,6 +51,7 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
 <values>Information|Navigation|Tools|Administration|Other</values>
 <number>5</number>

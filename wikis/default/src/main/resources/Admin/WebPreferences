@@ -13,7 +13,7 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1159568426000</creationDate>
 <date>1166177443000</date>
-<contentUpdateDate>1166177443000</contentUpdateDate>
+<contentUpdateDate>1169801141000</contentUpdateDate>
 <version>1.44</version>
 <title></title>
 <template></template>
@@ -34,6 +34,10 @@
 <prettyName>Admin eMail</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>14</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </admin_email>
@@ -42,6 +46,10 @@
 <prettyName>Macros for the Wiki Parser</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>32</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_wiki>
@@ -50,7 +58,12 @@
 <prettyName>Authenticated View</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>5</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </authenticate_view>
@@ -59,7 +72,12 @@
 <prettyName>Authentication Active Check</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>31</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </auth_active_check>
@@ -69,6 +87,12 @@
 <unmodifiable>0</unmodifiable>
 <size>40</size>
 <rows>5</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>9</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </meta>
@@ -77,6 +101,10 @@
 <prettyName>Macros for Velocity</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>27</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_velocity>
@@ -85,6 +113,10 @@
 <prettyName>Web Copyright</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>5</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </webcopyright>
@@ -93,6 +125,10 @@
 <prettyName>Web Background Color</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>10</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>2</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </webbgcolor>
@@ -101,7 +137,12 @@
 <prettyName>Display the left panel column</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>46</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </showLeftPanels>
@@ -110,7 +151,12 @@
 <prettyName>Activate the tagging</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>51</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </tags>
@@ -119,6 +165,10 @@
 <prettyName>Plugins</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>40</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>6</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </plugins>
@@ -128,6 +178,12 @@
 <unmodifiable>0</unmodifiable>
 <size>60</size>
 <rows>8</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>8</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </menu>
@@ -139,11 +195,30 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>35</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_anonymous>
+<skin>
+<name>skin</name>
+<prettyName>Skin</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>20</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</skin>
 <registration_registered>
 <name>registration_registered</name>
 <prettyName>Registered</prettyName>
@@ -152,42 +227,55 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>36</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </registration_registered>
-<skin>
-<name>skin</name>
-<prettyName>Skin</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>20</size>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</skin>
-<renderXWikiGroovyRenderer>
-<name>renderXWikiGroovyRenderer</name>
-<prettyName>Render Groovy code</prettyName>
-<unmodifiable>0</unmodifiable>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<number>42</number>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</renderXWikiGroovyRenderer>
 <renderXWikiVelocityRenderer>
 <name>renderXWikiVelocityRenderer</name>
 <prettyName>Render velocity code</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>41</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </renderXWikiVelocityRenderer>
+<renderXWikiGroovyRenderer>
+<name>renderXWikiGroovyRenderer</name>
+<prettyName>Render Groovy code</prettyName>
+<unmodifiable>0</unmodifiable>
+<displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
+<displayType>yesno</displayType>
+<validationMessage></validationMessage>
+<number>42</number>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</renderXWikiGroovyRenderer>
 <rightPanels>
 <name>rightPanels</name>
 <prettyName>Panels displayed on the right</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>45</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </rightPanels>
@@ -196,7 +284,12 @@
 <prettyName>Display the right panel column</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>47</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </showRightPanels>
@@ -205,6 +298,10 @@
 <prettyName>Language</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>1</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </language>
@@ -213,6 +310,10 @@
 <prettyName>Version</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>12</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </version>
@@ -221,6 +322,10 @@
 <prettyName>SMTP Server</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>13</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </smtp_server>
@@ -229,6 +334,10 @@
 <prettyName>Editbox Height</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>5</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>24</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </editbox_height>
@@ -237,6 +346,10 @@
 <prettyName>Default Language</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>5</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>20</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </default_language>
@@ -245,7 +358,12 @@
 <prettyName>Multi-Lingual</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>19</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </multilingual>
@@ -254,6 +372,10 @@
 <prettyName>Macros for Groovy</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>28</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_groovy>
@@ -262,6 +384,10 @@
 <prettyName>Title</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>10</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
@@ -271,6 +397,12 @@
 <unmodifiable>0</unmodifiable>
 <size>60</size>
 <rows>15</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>30</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </macros_mapping>
@@ -282,8 +414,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>39</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </comment_anonymous>
@@ -295,8 +434,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>40</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </comment_registered>
@@ -308,8 +454,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>default|640|800|1024|1280|1600</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>48</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </pageWidth>
@@ -318,6 +471,10 @@
 <prettyName>Supported languages</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>49</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </languages>
@@ -326,6 +483,10 @@
 <prettyName>Stylesheet</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>17</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </stylesheet>
@@ -334,7 +495,12 @@
 <prettyName>Use eMail Verification</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>24</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </use_email_verification>
@@ -346,8 +512,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>38</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </edit_registered>
@@ -357,6 +530,12 @@
 <unmodifiable>0</unmodifiable>
 <size>72</size>
 <rows>10</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>34</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </invitation_email_content>
@@ -365,15 +544,36 @@
 <prettyName>Notification Pages</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>33</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </notification_pages>
+<documentBundles>
+<name>documentBundles</name>
+<prettyName>Internationalization Document Bundles</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>30</size>
+<number>52</number>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<validationMessage></validationMessage>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</documentBundles>
 <renderXWikiRadeoxRenderer>
 <name>renderXWikiRadeoxRenderer</name>
 <prettyName>Render Wiki syntax</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>43</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </renderXWikiRadeoxRenderer>
@@ -383,6 +583,12 @@
 <unmodifiable>0</unmodifiable>
 <size>72</size>
 <rows>10</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>16</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </confirmation_email_content>
@@ -391,6 +597,10 @@
 <prettyName>Stylesheets</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>30</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>18</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </stylesheets>
@@ -402,8 +612,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>---|Image|Text</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>37</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </edit_anonymous>
@@ -412,6 +629,10 @@
 <prettyName>Advertisement Client ID</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>25</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </ad_clientid>
@@ -423,8 +644,15 @@
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
 <size>1</size>
+<separator> </separator>
 <separators> ,|</separators>
+<sort>none</sort>
 <values>Text|Wysiwyg</values>
+<tooltip></tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<picker></picker>
+<validationMessage></validationMessage>
 <number>23</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </editor>
@@ -433,6 +661,10 @@
 <prettyName>Editbox Width</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>5</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>23</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </editbox_width>
@@ -441,6 +673,10 @@
 <prettyName>convert email type</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>1</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>50</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </convertmail>
@@ -449,7 +685,12 @@
 <prettyName>Backlinks</prettyName>
 <unmodifiable>0</unmodifiable>
 <displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
 <displayType>yesno</displayType>
+<validationMessage></validationMessage>
 <number>25</number>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </backlinks>
@@ -458,6 +699,10 @@
 <prettyName>Panels displayed on the left</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>44</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </leftPanels>
@@ -467,34 +712,53 @@
 <unmodifiable>0</unmodifiable>
 <size>72</size>
 <rows>10</rows>
+<customDisplay></customDisplay>
+<contenttype>FullyRenderedText</contenttype>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<editor>---</editor>
+<validationMessage></validationMessage>
 <number>15</number>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </validation_email_content>
-<authenticate_edit>
-<name>authenticate_edit</name>
-<prettyName>Authenticate On Edit</prettyName>
-<unmodifiable>0</unmodifiable>
-<displayFormType>select</displayFormType>
-<displayType>yesno</displayType>
-<number>7</number>
-<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-</authenticate_edit>
-<macros_languages>
-<name>macros_languages</name>
-<prettyName>Macros Languages</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<number>26</number>
-<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-</macros_languages>
 <macros_wiki2>
 <name>macros_wiki2</name>
 <prettyName>Macros for new Wiki Parser</prettyName>
 <unmodifiable>0</unmodifiable>
 <size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
 <number>29</number>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </macros_wiki2>
+<macros_languages>
+<name>macros_languages</name>
+<prettyName>Macros Languages</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<tooltip></tooltip>
+<validationMessage></validationMessage>
+<number>26</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</macros_languages>
+<authenticate_edit>
+<name>authenticate_edit</name>
+<prettyName>Authenticate On Edit</prettyName>
+<unmodifiable>0</unmodifiable>
+<displayFormType>select</displayFormType>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<defaultValue></defaultValue>
+<tooltip></tooltip>
+<displayType>yesno</displayType>
+<validationMessage></validationMessage>
+<number>7</number>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</authenticate_edit>
 </class>
 <name>Admin.WebPreferences</name>
 <number>0</number>
@@ -563,10 +827,10 @@
 <confirmation_email_content></confirmation_email_content>
 </property>
 <property>
-<skin></skin>
+<registration_registered></registration_registered>
 </property>
 <property>
-<registration_registered></registration_registered>
+<skin></skin>
 </property>
 <property>
 <renderXWikiVelocityRenderer></renderXWikiVelocityRenderer>
@@ -617,10 +881,10 @@
 <validation_email_content></validation_email_content>
 </property>
 <property>
-<macros_wiki2></macros_wiki2>
+<macros_languages></macros_languages>
 </property>
 <property>
-<macros_languages></macros_languages>
+<macros_wiki2></macros_wiki2>
 </property>
 <property>
 <macros_groovy></macros_groovy>
@@ -644,6 +908,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <size>5</size>
+<separator> </separator>
 <usesList>1</usesList>
 <number>4</number>
 <classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
@@ -656,6 +921,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <size>5</size>
+<separator> </separator>
 <usesList>1</usesList>
 <number>4</number>
 <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
@@ -668,6 +934,7 @@
 <displayType>select</displayType>
 <multiSelect>1</multiSelect>
 <size>3</size>
+<separator> </separator>
 <number>4</number>
 <classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
 </levels>

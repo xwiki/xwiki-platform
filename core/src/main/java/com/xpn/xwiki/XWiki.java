@@ -1941,7 +1941,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return bclass;
     }
 
-
+    /**
+     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all
+     * the required configuration properties to make XWiki work properly. If some properties are
+     * missing they are created and saved in the database.
+     *
+     * @param context the XWiki Context
+     * @return the XWiki Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the datavase
+     */
     public BaseClass getPrefsClass(XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;

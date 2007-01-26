@@ -45,10 +45,10 @@ import org.apache.log4j.Logger;
  * being looked for and the returned value is the message in the language requested. There are
  * 3 sources where properties are looked for (in the specified order):
  * <ol>
- *   <li>If there's a "bundledocs" property in the XWiki Preferences page then the XWiki documents
- *       listed there (separated by commas) are considered the source for properties</li>
- *   <li>If there's a "xwiki.bundledodcs" property in the XWiki configuration file (xwiki.cfg) then
- *       the XWiki documents listed there (separated by commas) are considered for source for
+ *   <li>If there's a "documentBundles" property in the XWiki Preferences page then the XWiki
+ *       documents listed there (separated by commas) are considered the source for properties</li>
+ *   <li>If there's a "xwiki.documentBundles" property in the XWiki configuration file (xwiki.cfg)
+ *       then the XWiki documents listed there (separated by commas) are considered for source for
  *       properties</li>
  *   <li>The Resource Bundle passed in the constructor</li>
  * </ol>
@@ -64,7 +64,7 @@ public class XWikiMessageTool
 {
     private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
 
-    private static final String KEY = "bundledocs";
+    private static final String KEY = "documentBundles";
 
     private ResourceBundle bundle;
 
@@ -96,9 +96,9 @@ public class XWikiMessageTool
     }
     
     /**
-     * Tries first to get the preference "bundledocs" in the wiki preferences.
+     * Tries first to get the preference "documentBundles" in the wiki preferences.
      * If not found, this method tries to find the the entry in the config file
-     * under the key "xwiki.bundledocs".
+     * under the key "xwiki.documentBundles".
      *
      * @return the list of translation documents as XWiki page names separated by commas
      *         (eg XWiki.trans1,XWiki.trans2, etc) or null if no translation have been found
@@ -170,8 +170,7 @@ public class XWikiMessageTool
      * Looks for a translation in the list of documents. It first checks if the
      * translation can be found in the cache.
      *
-     * @param key
-     *            the key identifying the translation
+     * @param key the key identifying the translation
      * @return the translation or null if not found or if the passed key is null
      */
     protected String getTranslation(String key)

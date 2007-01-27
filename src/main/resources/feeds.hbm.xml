@@ -36,7 +36,8 @@
         <property name="fullContent" type="text"><column name="fee_fullcontent" /></property>
         <property name="xml" type="text"><column name="fee_xml" /></property>
         <property name="date" type="timestamp"><column name="fee_date" /></property>
-        <property name="flag" type="integer"><column name="fee_flag" default="0" not-null="true" /></property>
+        <property name="flag" type="integer"><column name="fee_flag" default="0" /></property>
+        <property name="read" type="integer"><column name="fee_read" default="0" /></property>
         <list name="tags" table="feeds_feedentrytags" lazy="false">
             <key><column name="fet_id" /></key>
             <index column="fet_number"/>

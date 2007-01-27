@@ -267,14 +267,16 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
              int nb = updateFeed(feedname, feedurl, oneDocPerEntry, context);
              if (nb!=-1)
               total += nb;
+             if (context.get("feedimgurl")!=null) {
+                 obj.set("imgurl", context.get("feedimgurl"),context);
+                 context.remove("feedimgurl");
+             }
              obj.set("nb", new Integer(nb), context);
              obj.set("date", new Date(), context);
             }
             // Update original document
             context.getWiki().saveDocument(doc, context);
         }
-        // Update original document
-        context.getWiki().saveDocument(doc, context);
         return total;
     }
 
@@ -289,6 +291,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
             SyndFeed feed = getFeedForce(feedurl, true, context);
             if (feed != null) {
+                if (feed.getImage()!=null)
+                 context.put("feedimgurl", feed.getImage().getUrl());
                 saveFeed(feedname, feedurl, feed, fullContent, oneDocPerEntry, context);
                 return feed.getEntries().size();
             } else
@@ -365,6 +369,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         needsUpdate |= bclass.addTextField("name", "Name", 80);
         needsUpdate |= bclass.addTextField("url", "url", 80);
+        needsUpdate |= bclass.addTextField("imgurl", "Image url", 80);
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("nb","nb",5,"integer");
 
@@ -402,6 +407,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addTextAreaField("xml", "XML", 80, 10);
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("flag", "Flag", 5, "integer");
+        needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
         needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, "");
 
         String content = doc.getContent();

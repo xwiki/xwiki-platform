@@ -15,6 +15,7 @@ import java.util.List;
 public class Feed {
     private String name;
     private String url;
+    private String imgurl;
     private List groups;
     private String date;
     private Integer nb;
@@ -29,6 +30,7 @@ public class Feed {
         setGroups((List) xobj.getProperty("group"));
         setDate((String) xobj.getProperty("date"));
         setNb((Integer) xobj.getProperty("nb"));
+        setImgurl((String)xobj.getProperty("imgurl"));
     }
 
     public String getName() {
@@ -69,5 +71,13 @@ public class Feed {
 
     public void setNb(Integer nb) {
         this.nb = nb;
+    }
+
+    public String getImgurl() {
+        return imgurl;
+    }
+
+    public void setImgurl(String imgurl) {
+        this.imgurl = imgurl;
     }
 }

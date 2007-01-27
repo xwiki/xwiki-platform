@@ -100,4 +100,6 @@ public interface RSSReaderConstants extends Messages {
     String PostTags();
 
     String Next();
+
+    String Other();
 }

@@ -166,7 +166,7 @@
 #if($obj == "")
 ## discarded
 #else
-$paneldoc.display("content", "view", $obj)
+$doc.display("content", "view", $obj)
 #end
 #end
 #macro(displayPropName $prop)

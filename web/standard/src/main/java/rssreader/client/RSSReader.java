@@ -36,6 +36,8 @@ public class RSSReader implements EntryPoint, FormHandler {
     private PopupPanel commentPopup = new PopupPanel(false);
     private PopupPanel tagsPopup = new PopupPanel(false);
     private Tree feedTree = new Tree();
+    private Tree groupTree = new Tree();
+    private Tree keywordTree = new Tree();
     private Map feeds;
     private Map groups;
     private Map keywords;
@@ -67,6 +69,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         hpanel.setStyleName("rssaggr");
 
         // View Panel
+        // View Panel
         viewpanel.setStyleName("articles");
 
         // Filter Panel
@@ -82,9 +85,20 @@ public class RSSReader implements EntryPoint, FormHandler {
 
         menupanel.setStyleName("rssmenu");
         menupanel.add(title);
-        menupanel.add(feedTree);
+        TabPanel tabpanel = new TabPanel();
+        menupanel.add(tabpanel);
 
+        tabpanel.add(feedTree, constants.AllFeeds());
+        tabpanel.getTabBar().selectTab(0);
+        feedTree.setStyleName("feedtree");
+        tabpanel.add(groupTree, constants.Groups());
+        groupTree.setStyleName("grouptree");
+        tabpanel.add(keywordTree, constants.Keywords());
+        keywordTree.setStyleName("keywordtree");
+
+        VerticalPanel searchpanel = new VerticalPanel();
         searchform.addFormHandler(this);
+        searchform.setStyleName("menutab");
         HorizontalPanel formpanel = new HorizontalPanel();
         searchform.add(formpanel);
         formpanel.add(new HTML(constants.Search()));
@@ -100,10 +114,10 @@ public class RSSReader implements EntryPoint, FormHandler {
             }
         });
         formpanel.add(button);
-        menupanel.add(searchform);
-
+        searchpanel.add(searchform);
         tagspanel = new FlowPanel();
-        menupanel.add(tagspanel);
+        searchpanel.add(tagspanel);
+        tabpanel.add(searchpanel, constants.Search());
 
         // Load the feed list
         XWikiService.App.getInstance().getDocument(constants.feedPage(), true, true, false, new AsyncLoadFeedCallback(this));
@@ -139,31 +153,35 @@ public class RSSReader implements EntryPoint, FormHandler {
         filterstatus.setStyleName("filterstatus");
         filterline.add(filterstatus, DockPanel.WEST);
 
-        String pressreviewurl = "/xwiki/bin/view/Feeds/PressReview?xpage=plain";
-        pressreviewurl += "&flagged=" + filterStatus.flagged;
-        pressreviewurl += "&trashed=" + filterStatus.trashed;
-        pressreviewurl += "&read=" + filterStatus.read;
+        String params = "";
+        params += "&flagged=" + filterStatus.flagged;
+        params += "&trashed=" + filterStatus.trashed;
+        params += "&read=" + filterStatus.read;
         if (filterStatus.feed!=null)
-         pressreviewurl += "&feed=" + filterStatus.feed;
+         params += "&feed=" + filterStatus.feed;
         if (filterStatus.group!=null)
-         pressreviewurl += "&group=" + filterStatus.group;
+         params += "&group=" + filterStatus.group;
         if (filterStatus.tags.size()>0)
-         pressreviewurl += "&tags=" + filterStatus.tags.toString();
+         params += "&tags=" + filterStatus.tags.toString();
         if (filterStatus.keyword!=null)
-         pressreviewurl += "&keyword=" + filterStatus.keyword;
+         params += "&keyword=" + filterStatus.keyword;
         if (filterStatus.date!=null)
-         pressreviewurl += "&date=" + filterStatus.date;
+         params += "&date=" + filterStatus.date;
+
+        String pressreviewurl = "/xwiki/bin/view/Feeds/PressReview?" + params;
+        String tagcloudurl = "/xwiki/bin/view/Feeds/TagCloud?" + params;
 
         // Outside link
-        String outsidelinkhtml = "<a href=\"" + pressreviewurl + "\" target=\"_blank\"><img src=\""
+        String outsidelinkhtml = "<a href=\"" + tagcloudurl + "\" target=\"_blank\"><img src=\""
+                                + getImagePath("agrss_comment.png") + "\" /></a>";
+        HTML tagcloud = new HTML(outsidelinkhtml);
+        tagcloud.setStyleName("tabcloudlink");
+        filterline.add(tagcloud, DockPanel.EAST);
+
+        outsidelinkhtml = "<a href=\"" + pressreviewurl + "\" target=\"_blank\"><img src=\""
                                 + getImagePath("agrss_mail.png") + "\" /></a>";
         HTML pressreview = new HTML(outsidelinkhtml);
         pressreview.setStyleName("pressreviewlink");
-        pressreview.addClickListener(new ClickListener() {
-            public void onClick(Widget sender) {
-                   onPressReview();
-            }
-        });
         filterline.add(pressreview, DockPanel.EAST);
         filterpanel.add(filterline);
         DockPanel filterline2 = new DockPanel();
@@ -286,7 +304,36 @@ public class RSSReader implements EntryPoint, FormHandler {
         });
         hpanel.add(unflagged);
 
-        // Filtre suivi/non suivi
+        // Filtre lu/non lu
+        Image read, unread;
+        if (filterStatus.read==1) {
+            read = new Image(getImagePath("agrss_lu_on.png"));
+            read.setStyleName("readfilteractive filterimage");
+        } else {
+            read = new Image(getImagePath("agrss_lu_off.png"));
+            read.setStyleName("readfilterinactive filterimage");
+        }
+        read.addClickListener(new ClickListener() {
+            public void onClick(Widget sender) {
+                switchReadFilter();
+            }
+        });
+        hpanel.add(read);
+        if (filterStatus.read==-1) {
+            unread = new Image(getImagePath("agrss_nonlu_on.png"));
+            unread.setStyleName("unreadfilteractive nfilterimage");
+        } else {
+            unread = new Image(getImagePath("agrss_nonlu_off.png"));
+            unread.setStyleName("unreadfilterinactive nfilterimage");
+        }
+        unread.addClickListener(new ClickListener() {
+            public void onClick(Widget sender) {
+                switchUnReadFilter();
+            }
+        });
+        hpanel.add(unread);
+
+        // Filtre poubelle
         Image trashed, untrashed;
         if ((filterStatus.trashed==1)&&(filterStatus.flagged!=1)) {
             trashed = new Image(getImagePath("agrss_poub_on.png"));
@@ -328,6 +375,7 @@ public class RSSReader implements EntryPoint, FormHandler {
 
         filterpanel.add(hpanel);
     }
+
 
     private void onUpdateDate() {
         if (dateTextBox.getText().length() == 0) {
@@ -464,9 +512,11 @@ public class RSSReader implements EntryPoint, FormHandler {
     }
 
     private void addSeparator(Panel status) {
+        /*
         HTML html = new HTML(" - ");
         html.setStyleName("filtersep");
         status.add(html);
+        */
     }
 
     private void onPressReview() {
@@ -492,6 +542,24 @@ public class RSSReader implements EntryPoint, FormHandler {
         } else {
             filterStatus.flagged = 0;
             filterStatus.trashed = 0;
+        }
+        onActivateAllFilter();
+    }
+
+    private void switchReadFilter() {
+        if (filterStatus.read!=1) {
+           filterStatus.read = 1;
+        } else {
+            filterStatus.read = 0;
+        }
+        onActivateAllFilter();
+    }
+
+    private void switchUnReadFilter() {
+        if (filterStatus.read!=-1) {
+           filterStatus.read = -1;
+        } else {
+            filterStatus.read = 0;
         }
         onActivateAllFilter();
     }
@@ -564,25 +632,11 @@ public class RSSReader implements EntryPoint, FormHandler {
     }
 
     private void refreshFeedTree() {
-        feedTree.setWidth("250px");
-        feedTree.setHeight("380px");
-        feedTree.setStyleName("menutree");
-        TreeItem allTree = new TreeItem();
-        TreeItem groupsTree = new TreeItem(constants.Groups());
-        TreeItem keywordsTree = new TreeItem(constants.Keywords());
-
-        Hyperlink link = new Hyperlink(constants.AllFeeds(), "");
-        link.setStyleName("treeelementtext");
-        link.addClickListener(new ActivateAllClickListener(this));
-        allTree.setWidget(link);
-
         Iterator feedit = feeds.values().iterator();
         while (feedit.hasNext()) {
             Feed feed = (Feed) feedit.next();
-            addFeedToTree(allTree, feed);
+            addFeedToTree(feedTree, feed);
         }
-        feedTree.addItem(allTree);
-
         List keys = new ArrayList(groups.keySet());
         Collections.sort(keys);
         Iterator groupit = keys.iterator();
@@ -591,11 +645,11 @@ public class RSSReader implements EntryPoint, FormHandler {
             if ((groupname!=null)&&(!groupname.trim().equals(""))) {
                 Map group = (Map) groups.get(groupname);
                 TreeItem groupItemTree = new TreeItem();
-                link = new Hyperlink(groupname, "");
+                Hyperlink link = new Hyperlink(groupname, "");
                 link.setStyleName("treeelementtext");
-                link.addClickListener(new ActivateGroupClickListener(this, groupname));
+                link.addClickListener(new ActivateGroupClickListener(this, link, groupname));
                 groupItemTree.setWidget(link);
-                groupsTree.addItem(groupItemTree);
+                groupTree.addItem(groupItemTree);
                 List feeds = new ArrayList(group.keySet());
                 Collections.sort(feeds);
                 Iterator feedgroupit = feeds.iterator();
@@ -604,34 +658,50 @@ public class RSSReader implements EntryPoint, FormHandler {
                     Feed feed = (Feed) group.get(feedname);
                     addFeedToTree(groupItemTree, feed);
                 }
-                groupsTree.addItem(groupItemTree);
+                groupTree.addItem(groupItemTree);
             }
         }
-        feedTree.addItem(groupsTree);
 
         List kkeys = new ArrayList(keywords.keySet());
         Collections.sort(kkeys);
         Iterator keywordit = kkeys.iterator();
         while (keywordit.hasNext()) {
             String keywordname = (String) keywordit.next();
-            addKeywordToTree(keywordsTree, keywordname);
+            addKeywordToTree(keywordTree, keywordname);
         }
-        feedTree.addItem(keywordsTree);
         setViewPanelWidth();
     }
 
-    private void addFeedToTree(TreeItem treeItem, Feed feed) {
-        Hyperlink link = new Hyperlink(feed.getName() + "(" + feed.getNb() + ")", "");
+    private void addFeedToTree(Tree treeItem, Feed feed) {
+        String feedtitle =  feed.getName() + "(" + feed.getNb() + ")";
+        String imgurl = feed.getImgurl();
+        if ((imgurl!=null)&&(!imgurl.trim().equals(""))) {
+            feedtitle = "<img src=\"" + imgurl + "\" class=\"rssthumbnail\" />" + feedtitle;
+            String url = feed.getUrl();
+        }
+        Hyperlink link = new Hyperlink(feedtitle, true, "");
         link.setStyleName("treeelementtext");
-        link.addClickListener(new ActivateFeedClickListener(this, feed.getName(), feed.getUrl()));
+        link.addClickListener(new ActivateFeedClickListener(this, feed.getName(), feed.getUrl(), link));
+        treeItem.add(link);
+    }
+
+    private void addFeedToTree(TreeItem treeItem, Feed feed) {
+        String feedtitle =  feed.getName() + "(" + feed.getNb() + ")";
+        String imgurl = feed.getImgurl();
+        if ((imgurl!=null)&&(!imgurl.trim().equals(""))) {
+            feedtitle = "<img src=\"" + imgurl + "\" class=\"rssthumbnail\" />" + feedtitle;
+        }
+        Hyperlink link = new Hyperlink(feedtitle, true, "");
+        link.setStyleName("treeelementtext");
+        link.addClickListener(new ActivateFeedClickListener(this, feed.getName(), feed.getUrl(), link));
         treeItem.addItem(link);
     }
 
-    private void addKeywordToTree(TreeItem treeItem, String keyword) {
+    private void addKeywordToTree(Tree treeItem, String keyword) {
         Hyperlink link = new Hyperlink(keyword, "");
         link.setStyleName("treeelementtext");
         XObject xobj = (XObject) keywords.get(keyword);
-        link.addClickListener(new ActivateKeywordClickListener(this, xobj));
+        link.addClickListener(new ActivateKeywordClickListener(this, xobj, link));
         treeItem.addItem(link);
     }
 
@@ -780,8 +850,10 @@ public class RSSReader implements EntryPoint, FormHandler {
             wheresql += " and feedentry.date >= '" + filterStatus.date + "' ";
         }
 
-        if (filterStatus.read!=0) {
-            // not implemented
+        if (filterStatus.read==1) {
+            wheresql += " and feedentry.read=1";
+        } else if (filterStatus.read==-1) {
+            wheresql += " and (feedentry.read is null or feedentry.read=0)";
         }
 
         sql += wheresql + " order by feedentry.date desc";
@@ -814,6 +886,8 @@ public class RSSReader implements EntryPoint, FormHandler {
                     String tags = feedentry.getViewProperty("tags");
                     Integer iFlag = (Integer) feedentry.getProperty("flag");
                     int flagstatus = (iFlag==null) ? 0 : iFlag.intValue();
+                    Integer iRead = (Integer) feedentry.getProperty("read");
+                    int readstatus = (iRead==null) ? 0 : iRead.intValue();
                     List comments = feedpage.getObjects("XWiki.XWikiComments");
 
                     VerticalPanel articlepanel = new VerticalPanel();
@@ -822,8 +896,24 @@ public class RSSReader implements EntryPoint, FormHandler {
                     // Article Title box
                     HorizontalPanel articletoppanel = new HorizontalPanel();
                     articlepanel.add(articletoppanel);
+                    HorizontalPanel articletitlepanel2 = new HorizontalPanel();
+                    articletoppanel.add(articletitlepanel2);
+
+                    // Image
+                    if (feedname!=null) {
+                        Feed feed = (Feed) feeds.get(feedname);
+                        if (feed!=null) {
+                            String imgurl = feed.getImgurl();
+                            if ((imgurl!=null)&&(!imgurl.trim().equals(""))) {
+                                Image image = new Image(imgurl);
+                                image.setStyleName("rssthumbnail2");
+                                articletitlepanel2.add(image);
+                            }
+                        }
+                    }
+
                     FlowPanel articletitlepanel = new FlowPanel();
-                    articletoppanel.add(articletitlepanel);
+                    articletitlepanel2.add(articletitlepanel);
                     articletitlepanel.setStyleName("articletitle");
 
                     // Flag
@@ -834,7 +924,11 @@ public class RSSReader implements EntryPoint, FormHandler {
 
                     // Title text
                     Hyperlink titlelink = new Hyperlink(title, "feedcontentview "+ clickCounter);
-                    titlelink.setStyleName("articletitletext");
+                    if (readstatus==1)
+                     titlelink.setStyleName("articletitletext");
+                    else
+                     titlelink.setStyleName("articletitletextunread");
+
                     articletitlepanel.add(titlelink);
 
                     // Outside link
@@ -843,6 +937,11 @@ public class RSSReader implements EntryPoint, FormHandler {
                     HTML outsidelink = new HTML(outsidelinkhtml);
                     outsidelink.setStyleName("articleextlink");
                     articletitlepanel.add(outsidelink);
+
+                    Image trashlink = new Image(getImagePath("agrss_trash.png"));
+                    trashlink.addClickListener(new TrashClickListener(this, feedentry, feedpage.getSpace() + "." + feedpage.getName(), trashlink));
+                    trashlink.setStyleName("articletrash");
+                    articletitlepanel.add(trashlink);
 
                     // Outside link
                     outsidelinkhtml = "<a href=\"" + url + "\" target=\"_blank\">" + url + "</a>";
@@ -856,7 +955,7 @@ public class RSSReader implements EntryPoint, FormHandler {
                     articletitlepanel.add(authorhtml);
 
                     Hyperlink feedlink = new Hyperlink(feedname, "feedview");
-                    feedlink.addClickListener(new ActivateFeedClickListener(this, feedname, feedurl));
+                    feedlink.addClickListener(new ActivateFeedClickListener(this, feedname, feedurl, feedlink));
                     feedlink.setStyleName("articlesource");
                     articletitlepanel.add(feedlink);
 
@@ -950,7 +1049,7 @@ public class RSSReader implements EntryPoint, FormHandler {
                     }
 
                     contentzonepanel.setVisible(false);
-                    titlelink.addClickListener(new TitleClickListener(contentzonepanel));
+                    titlelink.addClickListener(new TitleClickListener(contentzonepanel, feedpage.getSpace() + "." + feedpage.getName(), feedentry, titlelink));
                     articlepanel.add(contentzonepanel);
                     viewpanel.add(articlepanel, DockPanel.NORTH);
                 }
@@ -992,6 +1091,16 @@ public class RSSReader implements EntryPoint, FormHandler {
         int newflagstatus = (flagstatus==1) ? 0 : 1;
         XWikiService.App.getInstance().updateProperty(feedname, "XWiki.FeedEntryClass", "flag", newflagstatus, new AsyncFlagFeedCallback(this, feedentry, newflagstatus, link));
     }
+
+    public void trashFeed(String feedname, XObject feedentry, Image link) {
+        Integer iFlag = (Integer) feedentry.getProperty("flag");
+        int flagstatus = (iFlag==null) ? 0 : iFlag.intValue();
+        if (flagstatus!=-1) {
+         int newflagstatus = -1;
+         XWikiService.App.getInstance().updateProperty(feedname, "XWiki.FeedEntryClass", "flag", newflagstatus, new AsyncFlagFeedCallback(this, feedentry, newflagstatus, link));
+        }
+    }
+
 
     public void flagFeedCallback(XObject feedentry, int newflagstatus, Image link, boolean success) {
         if (success==false)
@@ -1041,7 +1150,7 @@ public class RSSReader implements EntryPoint, FormHandler {
         tagsPopup.add(vpanel);
         TextBox tarea = new TextBox();
         tarea.setText(tags);
-        tarea.setSize("50", "200");
+        tarea.setSize("200px", "50px");
         vpanel.add(tarea);
         FlowPanel fpanel = new FlowPanel();
         vpanel.add(fpanel);
@@ -1090,16 +1199,52 @@ public class RSSReader implements EntryPoint, FormHandler {
         }
     }
 
+    public void clearTreeStyles() {
+        Iterator it = feedTree.treeItemIterator();
+        while(it.hasNext()) {
+            TreeItem item = (TreeItem) it.next();
+            item.getWidget().setStyleName("treeelementtext");
+        }
+        it = groupTree.treeItemIterator();
+        while(it.hasNext()) {
+            TreeItem item = (TreeItem) it.next();
+            item.getWidget().setStyleName("treeelementtext");
+        }
+        it = keywordTree.treeItemIterator();
+        while(it.hasNext()) {
+            TreeItem item = (TreeItem) it.next();
+            item.getWidget().setStyleName("treeelementtext");
+        }
+    }
+
 
     public  class TitleClickListener implements ClickListener {
         private Panel panel;
+        private XObject feedentry;
+        private String feedpage;
+        private Hyperlink link;
 
-        public TitleClickListener(Panel panel) {
+        public TitleClickListener(Panel panel, String feedpage, XObject feedentry,  Hyperlink link) {
             this.panel = panel;
+            this.feedentry = feedentry;
+            this.feedpage = feedpage;
+            this.link = link;
         }
         public void onClick(Widget sender) {
             clickCounter++;
             panel.setVisible(!panel.isVisible());
+            Integer iRead = (Integer) feedentry.getProperty("read");
+            int readstatus = (iRead==null) ? 0 : iRead.intValue();
+            if (readstatus!=1) {
+             XWikiService.App.getInstance().updateProperty(feedpage, "XWiki.FeedEntryClass", "read", 1, new AsyncCallback() {
+                 public void onFailure(Throwable throwable) {
+                    showError(throwable);
+                 }
+                 public void onSuccess(Object object) {
+                     link.setStyleName("articletitletext");
+                 }
+             });
+            }
             History.newItem("feedcontentview" + clickCounter);
         }
     }

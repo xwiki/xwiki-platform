@@ -299,17 +299,15 @@ public class XWikiDocument {
     }
 
     public String getRenderedContent(String text, XWikiContext context) {
-        /*
-         // TODO: verify the impact of this code
         String result;
         HashMap backup = new HashMap();
-
-        backupContext(backup, context);
-        setAsContextDoc(context);
-        result = context.getWiki().getRenderingEngine().renderText(text, this, context);
-        restoreContext(backup, context);
-        */
-        String result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+        try {
+            backupContext(backup, context);
+            setAsContextDoc(context);
+            result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+        } finally {
+            restoreContext(backup, context);
+        }
         return result;
     }
 
@@ -1041,8 +1039,8 @@ public class XWikiDocument {
     }
 
     public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context) {
+        HashMap backup = new HashMap();
         try {
-            HashMap backup = new HashMap();
             backupContext(backup, context);
             setAsContextDoc(context);
 
@@ -1076,12 +1074,14 @@ public class XWikiDocument {
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
-            restoreContext(backup, context);
             return result.toString();
         }
         catch (Exception ex) {
             log.warn("Exception showing field " + fieldname, ex);
             return "";
+        }
+        finally {
+            restoreContext(backup, context);            
         }
     }
 

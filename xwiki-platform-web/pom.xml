@@ -39,6 +39,7 @@
   <modules>
     <module>standard</module>
     <module>exo</module>
+    <module>gwt</module>
   </modules>
 </project>
         

@@ -58,6 +58,11 @@
     <property name="web.exo.main.src.dir" value="${web.exo.src.dir}/main" />
     <property name="web.exo.webapp.main.src.dir" value="${web.exo.main.src.dir}/webapp" />
 
+    <property name="gwt.dir" value="${web.dir}/gwt/" />
+    <property name="gwt.src.dir" value="${gwt.dir}/src" />
+    <property name="gwt.main.src.dir" value="${gwt.src.dir}/main" />
+    <property name="gwt.java.main.src.dir" value="${gwt.main.src.dir}/java" />
+
     <!-- The following line is used to read the version -->
     <property file="${web.standard.webapp.main.src.dir}/WEB-INF/xwiki.cfg" />
     
@@ -165,8 +170,18 @@
     	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar,
-	jcaptcha-all-1.0-RC3.jar,
-lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpad-3.0-alpha1-20050704.jar,xpp3-1.1.3.4-RC8_min.jar"/>
+	jcaptcha-all-1.0-RC3.jar" />
+
+
+    <fileset id="libs.lucene.fileset" dir="${lib.dir}"
+	includes="lucene-core-2.0.0.jar,
+		PDFBox-0.7.2.jar,
+		poi-3.0-alpha1-20050704.jar,
+		poi-scratchpad-3.0-alpha1-20050704.jar,
+		xpp3-1.1.3.4-RC8_min.jar" />
+
+    <fileset id="libs.gwt.fileset" dir="${lib.dir}"
+        includes="gwt-servlet-1.3.3.jar" />
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />
@@ -174,17 +189,18 @@ lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpa
      <fileset id="libs.exo.fileset" dir="${lib.dir}"
 	includes="picocontainer-1.1.jar,exo-platform.commons-2.0.jar,exo-platform.container-2.0.jar,exo-platform.service.chart.api-2.0.jar,exo-platform.service.chart.impl-2.0.jar,exo-platform.service.common.api-2.0.jar,exo-platform.service.database.api-2.0.jar,exo-platform.service.database.impl-2.0.jar,exo-platform.service.organization.api-2.0.jar,exo-platform.service.organization.impl-2.0.jar,exo-platform.service.security.api-2.0.jar,exo-platform.service.security.impl-2.0.jar" />
 
-
     <fileset id="libs.tests.fileset" dir="${lib.dir}"
         includes="cactus-1.7.2.jar,cactus-ant-1.7.2.jar,aspectjrt-1.2.1.jar,httpunit-1.6.jar,junit-4.1.jar,nekohtml-0.9.5.jar,clover-1.3.9.jar,jmock-1.1.0RC1.jar,jmock-cglib-1.1.0RC1.jar,org.mortbay.jetty-5.1.3.jar" />
 
     <pathconvert pathsep=";" property="libs.main" refid="libs.main.fileset" />
     <pathconvert pathsep=";" property="libs.hib" refid="libs.hib.fileset" />
     <pathconvert pathsep=";" property="libs.exo" refid="libs.exo.fileset" />
+    <pathconvert pathsep=";" property="libs.lucene" refid="libs.lucene.fileset" />
+    <pathconvert pathsep=";" property="libs.gwt" refid="libs.gwt.fileset" />
     <pathconvert pathsep=";" property="libs.servlet" refid="libs.servlet.fileset" />
     <pathconvert pathsep=";" property="libs.tests" refid="libs.tests.fileset"/>
 
-    <property name="libs" value="${libs.main};${libs.hib};${libs.exo};${libs.servlet}" />
+    <property name="libs" value="${libs.main};${libs.hib};${libs.exo};${libs.servlet};${libs.lucene};${libs.gwt}" />
 
     <property name="clover.initstring" location="${test.clover.dir}/clover"/>
     <available property="junit.available" classname="junit.framework.TestCase"/>
@@ -283,6 +299,13 @@ lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpa
 	
     <target name="xwiki" depends="clover-yes, clover-no, xwiki.nonjava">
         <javac srcdir="${core.java.main.src.dir}"
+            destdir="${classes.dir}"
+            classpath="${libs}"
+            debug="on" optimize="on" deprecation="on"
+            compiler="${compiler}" source="1.4"
+            sourcepath=""
+            encoding="ISO-8859-1"/>
+        <javac srcdir="${gwt.java.main.src.dir}"
             destdir="${classes.dir}"
             classpath="${libs}"
             debug="on" optimize="on" deprecation="on"

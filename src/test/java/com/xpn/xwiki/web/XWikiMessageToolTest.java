@@ -153,11 +153,13 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         // First time get any key just to put the doc properties in cache
         assertEquals("modifiedKey", this.tool.get("modifiedKey"));
 
-        // Now modify the document content to add a new key and change the document's date
+        // Now modify the document content to add a new key and change the document's date. We add
+        // one second to ensure the new date is definitely newer than the old one.
         document.stubs().method("getContent").will(returnValue("modifiedKey=found"));
-        document.stubs().method("getDate").will(returnValue(new Date()));
+        document.stubs().method("getDate").will(returnValue(
+            new Date(System.currentTimeMillis() + 1000L)));
 
-        // Even though the document has been cached it's reloaded because it's date has changed
+        // Even though the document has been cached it's reloaded because its date has changed
         assertEquals("found", this.tool.get("modifiedKey"));
     }
 

@@ -29,7 +29,7 @@
   </parent>
   <artifactId>xwiki-gwt</artifactId>
   <name>XWiki GWT API</name>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <description>The GWT API XWiki JAR</description>
   <scm>
     <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/gwt</connection>

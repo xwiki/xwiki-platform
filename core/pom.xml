@@ -404,6 +404,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <includes>**/ZipExplorer*.java</includes>
+          <includes>**/XWikiMessageTool.java</includes>
         </configuration>
       </plugin>
     </plugins>

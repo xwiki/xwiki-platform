@@ -62,26 +62,69 @@ import org.apache.log4j.Logger;
  */
 public class XWikiMessageTool
 {
+    /**
+     * Log4J logger object to log messages in this class.
+     */
     private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
 
+    /**
+     * Property name used to defined internationalization document bundles in either XWikiProperties
+     * ("documentBundles") or in the xwiki.cfg configuration file ("xwiki.documentBundles").
+     */
     private static final String KEY = "documentBundles";
 
+    /**
+     * The default Resource Bundle to fall back to if no document bundle is found when trying to
+     * get a key.
+     */
     private ResourceBundle bundle;
 
+    /**
+     * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for
+     * loading documents.
+     */
     private XWikiContext context;
 
-    private Map previousDates = new HashMap(); // <Long, Date>
+    /**
+     * Cache properties loaded from the document bundles for maximum efficiency. The map is of
+     * type (Long, Properties) where Long is the XWiki document ids.
+     */
+    private Map propsCache = new HashMap();
 
-    private Map propsCache = new HashMap(); // <Long, Properties>
+    /**
+     * Cache for saving the last modified dates of document bundles that have been loaded. This
+     * is used so that we can reload them if they've been modified since last time they were
+     * cached. The map is of type (Long, Date) where Long is the XWiki document ids. 
+     */
+    private Map previousDates = new HashMap();
 
-    private Set docsToRefresh = new HashSet(); // <Long>
+    /**
+     * List of document bundles that have been modified since the last time they were cached. The
+     * Set containers Long objects which are the XWiki document ids.
+     * 
+     * TODO: This instance variable should be removed as it's used internally and its state
+     * shouldn't encompass several calls to get().
+     */
+    private Set docsToRefresh = new HashSet();
 
+    /**
+     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
+     *        trying to get a key
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
+     *        primitives for loading documents
+     */
     public XWikiMessageTool(ResourceBundle bundle, XWikiContext context)
     {
         this.bundle = bundle;
         this.context = context;
     }
 
+    /**
+     * @param key the key identifying the message to look for
+     * @return the message in the defined language
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
+     *      message
+     */
     public String get(String key)
     {
         String translation = getTranslation(key);
@@ -96,70 +139,58 @@ public class XWikiMessageTool
     }
     
     /**
-     * Tries first to get the preference "documentBundles" in the wiki preferences.
-     * If not found, this method tries to find the the entry in the config file
-     * under the key "xwiki.documentBundles".
-     *
-     * @return the list of translation documents as XWiki page names separated by commas
-     *         (eg XWiki.trans1,XWiki.trans2, etc) or null if no translation have been found
+     * @return the list of internationalisation document bundle names as a list of XWiki page names
+     *         ("Space.Document") or an empty list if no such documents have been found
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
+     *      document bundles
      */
-    protected String getDocumentBundleNames()
+    protected List getDocumentBundleNames()
     {
+        List docNamesList;
+
         String docNames = this.context.getWiki().getXWikiPreference(KEY, this.context);
         if (docNames == null || "".equals(docNames)) {
             docNames = this.context.getWiki().Param("xwiki." + KEY);
         }
-        return docNames;
+
+        if (docNames == null) {
+            docNamesList = new ArrayList();
+        } else {
+            docNamesList = Arrays.asList(docNames.split(","));
+        }
+
+        return docNamesList;
     }
 
     /**
-     * Retrieve a list of bundle documents. This is done by looking for the
-     * document names in the preferences, then looking for the translated
-     * versions of these documents.
-     *
-     * @return the bundle documents if at least one can be found, else an empty list
+     * @return the internationalization document bundles (a list of {@XWikiDocument})
+     * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
+     *      document bundles
      */
     protected List getDocumentBundles()
     {
-        XWikiDocument docBundle = null;
         List result = new ArrayList();
-        String docNames = getDocumentBundleNames();
-        if (docNames != null) {
-            List docNamesList = Arrays.asList(docNames.split(","));
-            Iterator it = docNamesList.iterator();
-            while (it.hasNext()) {
-                String docName = ((String) it.next()).trim();
-                if (!docName.equals("")) {
-                    try {
-                        // First, looks for a document suffixed by the language
-                        docBundle = this.context.getWiki().getDocument(docName, this.context);
-                        docBundle = docBundle.getTranslatedDocument(this.context);
-                        if (!docBundle.isNew()) {
-                            // Checks for a name update
-                            Long docId = new Long(docBundle.getId());
-                            Date docDate = docBundle.getDate();
-                            // Check for a doc modification
-                            if (!docDate.equals(this.previousDates.get(docId))) {
-                                this.docsToRefresh.add(docId);
-                                this.previousDates.put(docId, docDate);
-                            }
-                            result.add(docBundle);
-                        }
-                        else
-                        {
-                            // The document listed as a document bundle doesn't exist. Do nothing
-                            // and log.
-                            LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
-                                + "as an internationalization document bundle but it does not "
-                                + "exist.");
-                        }
-                    } catch (XWikiException e) {
-                        // Error while loading the document.
-                        // TODO: A runtime exception should be thrown that will bubble up till the
-                        // topmost level. For now simply log the error
-                        LOG.error("Failed to load internationalization document bundle ["
-                            + docBundle + "].", e);
+        Iterator docNames = getDocumentBundleNames().iterator();
+        while (docNames.hasNext()) {
+            String docName = ((String) docNames.next()).trim();
+            XWikiDocument docBundle = getDocumentBundle(docName);
+            if (docBundle != null) {
+                if (!docBundle.isNew()) {
+                    // Checks for a name update
+                    Long docId = new Long(docBundle.getId());
+                    Date docDate = docBundle.getDate();
+                    // Check for a doc modification
+                    if (!docDate.equals(this.previousDates.get(docId))) {
+                        this.docsToRefresh.add(docId);
+                        this.previousDates.put(docId, docDate);
                     }
+                    result.add(docBundle);
+                } else {
+                    // The document listed as a document bundle doesn't exist. Do nothing
+                    // and log.
+                    LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
+                        + "as an internationalization document bundle but it does not "
+                        + "exist.");
                 }
             }
         }
@@ -167,46 +198,77 @@ public class XWikiMessageTool
     }
 
     /**
-     * Looks for a translation in the list of documents. It first checks if the
-     * translation can be found in the cache.
+     * @param documentName the document's name (eg Space.Document)
+     * @return the document object corresponding to the passed document's name. A translated
+     *         version of the document for the current Locale is looked for.
+     */
+    private XWikiDocument getDocumentBundle(String documentName)
+    {
+        XWikiDocument docBundle;
+
+        if (documentName.length() == 0) {
+            docBundle = null;
+        } else {
+            try {
+                // First, looks for a document suffixed by the language
+                docBundle = this.context.getWiki().getDocument(documentName, this.context);
+                docBundle = docBundle.getTranslatedDocument(this.context);
+            } catch (XWikiException e) {
+                // Error while loading the document.
+                // TODO: A runtime exception should be thrown that will bubble up till the
+                // topmost level. For now simply log the error
+                LOG.error("Failed to load internationalization document bundle ["
+                    + documentName + "].", e);
+                docBundle = null;
+            }
+        }
+        
+        return docBundle;
+    }
+
+    /**
+     * Looks for a translation in the list of internationalization document bundles. It first
+     * checks if the translation can be found in the cache.
      *
      * @param key the key identifying the translation
      * @return the translation or null if not found or if the passed key is null
      */
     protected String getTranslation(String key)
     {
-        if (key == null) {
-            return null;
-        }
-        Iterator it = getDocumentBundles().iterator();
-        while(it.hasNext()) {
-            XWikiDocument docBundle = (XWikiDocument) it.next();
-            Long docId = new Long(docBundle.getId());
-            Properties props = null;
-            if (this.docsToRefresh.contains(docId) || !this.propsCache.containsKey(docId)) {
-                // Cache needs to be updated
-                props = new Properties();
-                if (docBundle != null) {
-                    String content = docBundle.getContent();
-                    InputStream is = new ByteArrayInputStream(content.getBytes());
-                    try {
-                        props.load(is);
-                    } catch (IOException e) {
-                        // Cannot do anything
+        String returnValue = null;
+
+        if (key != null) {
+            Iterator it = getDocumentBundles().iterator();
+            while (it.hasNext()) {
+                XWikiDocument docBundle = (XWikiDocument) it.next();
+                Long docId = new Long(docBundle.getId());
+                Properties props = null;
+                if (this.docsToRefresh.contains(docId) || !this.propsCache.containsKey(docId)) {
+                    // Cache needs to be updated
+                    props = new Properties();
+                    if (docBundle != null) {
+                        String content = docBundle.getContent();
+                        InputStream is = new ByteArrayInputStream(content.getBytes());
+                        try {
+                            props.load(is);
+                        } catch (IOException e) {
+                            // Cannot do anything
+                        }
                     }
+                    // updates cache
+                    this.propsCache.put(docId, props);
+                    this.docsToRefresh.remove(docId);
+                } else {
+                    // gets from cache
+                    props = (Properties) this.propsCache.get(docId);
                 }
-                // updates cache
-                this.propsCache.put(docId, props);
-                this.docsToRefresh.remove(docId);
-            } else {
-                // gets from cache
-                props = (Properties) this.propsCache.get(docId);
-            }
-            String trad = props.getProperty(key);
-            if (trad != null) {
-                return trad;
+                String translation = props.getProperty(key);
+                if (translation != null) {
+                    returnValue = translation;
+                    break;
+                }
             }
         }
-        return null;
+        return returnValue;
     }
 }

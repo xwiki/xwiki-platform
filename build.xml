@@ -221,11 +221,7 @@ lucene-core-2.0.0.jar,PDFBox-0.7.2.jar,poi-3.0-alpha1-20050704.jar,poi-scratchpa
     </taskdef>
 
     <target name="prepare">
-        <propertyfile file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" >
-            <entry key="build.number" type="int" value="1" operation="+" pattern="0000" />
-        </propertyfile>
-        <property file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" />
-        <property name="version" value="${xwiki.version}.${build.number}" />
+        <property name="version" value="${xwiki.version}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />
         <property name="test.warfile" value="${release.dir}/xwiki.war" />
         <property name="exo.warfile" value="${release.dir}/xwiki-exo-${version}.war" />

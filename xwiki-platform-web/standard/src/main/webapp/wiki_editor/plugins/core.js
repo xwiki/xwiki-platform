@@ -26,8 +26,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
 
-    this.addExternalProcessor((/\[(.*?)(>(.*?))?(>(.*?))?\]/i), 'convertLinkExternal');
-	this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
+    this.addExternalProcessor((/\[(.*?)((>|\|)(.*?))?((>|\|)(.*?))?\]/i), 'convertLinkExternal');
+    this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
     this.addExternalProcessor((/\{table\}([\s\S]+?)\{table\}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
@@ -150,8 +150,12 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
     var str="";
     var href;
     var target;
+    var separator = ">";
     if( (txt = this.trimString(result[4])) != "") {
         var att = this.readAttributes(result[1] + " " + result[3]);
+        if(att && att["id"]) {
+            separator = "|";
+        }
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
             href = href.replace(/%20/g," ");
@@ -159,12 +163,12 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
                 str = "[" + txt + "]";
             } else if(att["target"] && att["target"] != "_self") {
                 target = this.trimString(att["target"]);
-                str = "[" + txt + ">" + href + ">" + target + "]";
+                str = "[" + txt + separator + href + separator + target + "]";
             } else
-                str = "[" + txt + ">" + href + "]";
+                str = "[" + txt + separator + href + "]";
         }
 
-    } else {
+        } else {
         str = result[4];
     }
     return content.replace(regexp, str);
@@ -816,8 +820,9 @@ WikiEditor.prototype.LINK_INTERNAL_CLASS_NAME = "wikilink";
 
 WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 	var text = result[1];
-	var url = (result[3])?(result[3]):(text);
-    var target = this.trimString(result[5]);
+    var separator = this.trimString(result[3]);
+    var url = (result[4])?(result[4]):(text);
+    var target = this.trimString(result[7]);
     var classname;
 	var str;
     if(this.isExternalLink(url)) {
@@ -826,8 +831,11 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 		classname = this.LINK_INTERNAL_CLASS_NAME;
 	}
 	str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
+    if (separator == "|") {
+        str += " id=\"" +  url + "\"";
+    }
     if ((target != "undefined") && (target != "") && (target != "_self")) {
-        str += " target=\"" + result[5] + "\"";
+        str += " target=\"" + result[7] + "\"";
     }
     str += ">" + text + "<\/a>";
 	return content.replace(regexp, str);

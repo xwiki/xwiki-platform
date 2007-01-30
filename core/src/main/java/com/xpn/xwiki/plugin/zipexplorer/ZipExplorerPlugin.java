@@ -104,7 +104,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     {
         String url = context.getRequest().getRequestURI();
 
-        // Verify if we should return the original attachment. This will happend if the requested
+        // Verify if we should return the original attachment. This will happen if the requested
         // download URL doesn't point to a zip or if the URL doesn't point to a file inside the ZIP.
         if (!isZipFile(attachment.getFilename())
             || !isValidZipURL(url, context.getAction().trim()))

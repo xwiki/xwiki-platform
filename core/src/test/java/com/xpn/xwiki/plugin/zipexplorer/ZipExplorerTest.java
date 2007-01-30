@@ -105,6 +105,30 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }
 
+    public void testDownloadAttachmentWhenURLIsNotZipFile() throws Exception {
+        XWikiAttachment originalAttachment = createAttachment("somefile.whatever", null,
+            (XWikiDocument) mock(XWikiDocument.class).proxy());
+
+        XWikiContext context = createXWikiContext(
+            "http://server/xwiki/bin/download/Main/Document/somefile.whatever");
+
+        XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
+
+        assertSame(originalAttachment, newAttachment);
+    }
+
+    public void testDownloadAttachmentWhenURLIsZipButNotPointingInsideZip() throws Exception {
+        XWikiAttachment originalAttachment = createAttachment("zipfile.zip", null,
+            (XWikiDocument) mock(XWikiDocument.class).proxy());
+
+        XWikiContext context = createXWikiContext(
+            "http://server/xwiki/bin/download/Main/Document/zipfile.zip");
+
+        XWikiAttachment newAttachment = this.plugin.downloadAttachment(originalAttachment, context);
+
+        assertSame(originalAttachment, newAttachment);
+    }
+
     public void testGetFileList() throws Exception {
         XWikiDocument document = createXWikiDocumentWithZipFileAttachment();
 

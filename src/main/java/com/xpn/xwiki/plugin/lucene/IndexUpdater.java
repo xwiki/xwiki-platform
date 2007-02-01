@@ -1,36 +1,31 @@
 /*
- * 
- * ===================================================================
+ * Copyright 2005-2007, XpertNet SARL, and individual contributors as
+ * indicated by the contributors.txt.
  *
- * Copyright (c) 2005 Jens Krämer, All rights reserved.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Created on 21.01.2005
- *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.lucene;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -43,42 +38,52 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
 
 /**
- * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
+ * @version $Id: $
  */
 public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterface,
-        XWikiActionNotificationInterface {
-
+    XWikiActionNotificationInterface
+{
     private static final Logger LOG = Logger.getLogger(IndexUpdater.class);
 
     /**
      * Milliseconds of sleep between checks for changed documents
      */
     private int indexingInterval = 300000;
+
     private boolean exit = false;
+
     private IndexWriter writer;
+
     private String indexDir;
+
     private XWikiDocumentQueue queue = new XWikiDocumentQueue();
+
     private Analyzer analyzer;
+
     private LucenePlugin plugin;
+
     private IndexSearcher searcher;
+
     private IndexReader reader;
 
     private XWikiContext context;
+
     private XWiki xwiki;
 
     static List fields = new ArrayList();
-    
 
-    public void doExit() {
+    public void doExit()
+    {
         exit = true;
     }
 
@@ -87,7 +92,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      *
      * @see java.lang.Runnable#run()
      */
-    public void run() {
+    public void run()
+    {
         MDC.put("url", "index updating thread");
 
         while (!exit) {
@@ -142,10 +148,15 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         MDC.remove("url");
     }
 
-    private synchronized void closeSearcher() {
+    private synchronized void closeSearcher()
+    {
         try {
-            if (searcher != null) searcher.close();
-            if (reader != null) reader.close();
+            if (searcher != null) {
+                searcher.close();
+            }
+            if (reader != null) {
+                reader.close();
+            }
         } catch (IOException e) {
             LOG.error("error closing index searcher", e);
             e.printStackTrace();
@@ -156,10 +167,11 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     }
 
     /**
-     * Opens the index reader and searcher used for finding and deleting old
-     * versions of indexed documents.
+     * Opens the index reader and searcher used for finding and deleting old versions of indexed
+     * documents.
      */
-    private synchronized void openSearcher() {
+    private synchronized void openSearcher()
+    {
         try {
             reader = IndexReader.open(indexDir);
             searcher = new IndexSearcher(reader);
@@ -171,10 +183,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
     /**
      * Deletes the documents with the given ids from the index.
-     *
-     * @param oldDocs
      */
-    private void deleteOldDocs(List oldDocs) {
+    private void deleteOldDocs(List oldDocs)
+    {
         for (Iterator iter = oldDocs.iterator(); iter.hasNext();) {
             Integer id = (Integer) iter.next();
             if (LOG.isDebugEnabled()) {
@@ -193,7 +204,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      * @param data
      * @return
      */
-    private Collection getOldIndexDocIds(IndexData data) {
+    private Collection getOldIndexDocIds(IndexData data)
+    {
         List retval = new ArrayList(3);
         Query query = data.buildQuery();
         try {
@@ -202,7 +214,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 retval.add(new Integer(hits.id(i)));
             }
         } catch (IOException e) {
-            LOG.error("error looking for old versions of document " + data + " with query " + query, e);
+            LOG.error("error looking for old versions of document " + data + " with query " + query,
+                e);
             e.printStackTrace();
         }
         return retval;
@@ -211,7 +224,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      *
      */
-    private void openWriter(boolean create) {
+    private void openWriter(boolean create)
+    {
         if (writer != null) {
             LOG.error("Writer already open and createWriter called");
             return;
@@ -233,7 +247,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      *
      */
-    private void closeWriter() {
+    private void closeWriter()
+    {
         if (writer == null) {
             LOG.error("Writer not open and closeWriter called");
             return;
@@ -252,14 +267,15 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         if (LOG.isDebugEnabled()) {
             LOG.debug("closed writer.");
         }
-
     }
 
     /**
      * @param doc
      * @throws IOException
      */
-    private void addToIndex(IndexData data, XWikiDocument doc, XWikiContext context) throws IOException {
+    private void addToIndex(IndexData data, XWikiDocument doc, XWikiContext context)
+        throws IOException
+    {
         if (LOG.isDebugEnabled()) {
             LOG.debug("addToIndex: " + data);
         }
@@ -279,28 +295,32 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * @param indexDir The indexDir to set.
      */
-    public void setIndexDir(String indexDir) {
+    public void setIndexDir(String indexDir)
+    {
         this.indexDir = indexDir;
     }
 
     /**
      * @param analyzer The analyzer to set.
      */
-    public void setAnalyzer(Analyzer analyzer) {
+    public void setAnalyzer(Analyzer analyzer)
+    {
         this.analyzer = analyzer;
     }
 
     /**
      * @param config
      */
-    public synchronized void init(Properties config, LucenePlugin plugin, XWiki wiki) {
+    public synchronized void init(Properties config, LucenePlugin plugin, XWiki wiki)
+    {
         this.xwiki = wiki;
         this.context = new XWikiContext();
         this.context.setWiki(xwiki);
         this.context.setDatabase(xwiki.getDatabase());
         this.plugin = plugin;
         // take the first configured index dir as the one for writing
-        String[] indexDirs = StringUtils.split(config.getProperty(LucenePlugin.PROP_INDEX_DIR), " ,");
+        String[] indexDirs =
+            StringUtils.split(config.getProperty(LucenePlugin.PROP_INDEX_DIR), " ,");
         if (indexDirs != null && indexDirs.length > 0) {
             this.indexDir = indexDirs[0];
             File f = new File(indexDir);
@@ -309,7 +329,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 cleanIndex();
             }
         }
-        indexingInterval = 1000 * Integer.parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL,
+        indexingInterval =
+            1000 * Integer.parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL,
                 "300"));
         openSearcher();
     }
@@ -317,7 +338,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      *
      */
-    public void cleanIndex() {
+    public void cleanIndex()
+    {
         LOG.info("trying to clear index for rebuilding");
         while (writer != null) {
             if (LOG.isDebugEnabled()) {
@@ -339,7 +361,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * @param document
      */
-    public void add(XWikiDocument document, XWikiContext context) {
+    public void add(XWikiDocument document, XWikiContext context)
+    {
         queue.add(new DocumentData(document, context));
         if (document.hasElement(XWikiDocument.HAS_OBJECTS)) {
             addObject(document, context);
@@ -350,22 +373,26 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      * @param document
      * @param context
      */
-    public void addObject(XWikiDocument document, XWikiContext context) {
+    public void addObject(XWikiDocument document, XWikiContext context)
+    {
         queue.add(new ObjectData(document, context));
     }
 
     /**
      * @param attachment
      */
-    public void add(XWikiDocument document, XWikiAttachment attachment, XWikiContext context) {
-        if (document != null && attachment != null && context != null)
+    public void add(XWikiDocument document, XWikiAttachment attachment, XWikiContext context)
+    {
+        if (document != null && attachment != null && context != null) {
             queue.add(new AttachmentData(document, attachment, context));
-        else
-            LOG.error("invalid parameters given to add: " + document + ", " + attachment + ", " + context);
+        } else {
+            LOG.error("invalid parameters given to add: " + document + ", " + attachment + ", " +
+                context);
+        }
     }
 
-
-    public int addAttachmentsOfDocument(XWikiDocument document, XWikiContext context) {
+    public int addAttachmentsOfDocument(XWikiDocument document, XWikiContext context)
+    {
         int retval = 0;
         final List attachmentList = document.getAttachmentList();
         retval += attachmentList.size();
@@ -380,7 +407,6 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         return retval;
     }
 
-
     /**
      * Notification of changes in document content
      *
@@ -388,10 +414,13 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      *com.xpn.xwiki.doc.XWikiDocument,com.xpn.xwiki.doc.XWikiDocument,
      *int,com.xpn.xwiki.XWikiContext)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newDoc, XWikiDocument oldDoc, int event,
-                       XWikiContext context) {
+    public void notify(XWikiNotificationRule rule, XWikiDocument newDoc, XWikiDocument oldDoc,
+        int event,
+        XWikiContext context)
+    {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event + ", newDoc="
+            LOG.debug(
+                "notify from XWikiDocChangeNotificationInterface, event=" + event + ", newDoc="
                     + newDoc + " oldDoc=" + oldDoc);
         }
         try {
@@ -405,10 +434,11 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      * Notification of attachment uploads.
      *
      * @see com.xpn.xwiki.notify.XWikiActionNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *com.xpn.xwiki.doc.XWikiDocument,java.lang.String,
-     *com.xpn.xwiki.XWikiContext)
+     *com.xpn.xwiki.doc.XWikiDocument,java.lang.String,com.xpn.xwiki.XWikiContext)
      */
-    public void notify(XWikiNotificationRule arg0, XWikiDocument doc, String action, XWikiContext context) {
+    public void notify(XWikiNotificationRule arg0, XWikiDocument doc, String action,
+        XWikiContext context)
+    {
         if ("upload".equals(action)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("upload action notification for doc " + doc.getName());
@@ -420,10 +450,12 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 for (Iterator iter = attachments.iterator(); iter.hasNext();) {
                     XWikiAttachment attachment = (XWikiAttachment) iter.next();
                     if (newestAttachment != null
-                            && attachment.getDate().before(newestAttachment.getDate()))
+                        && attachment.getDate().before(newestAttachment.getDate()))
+                    {
                         newestAttachment = attachment;
-                    else
+                    } else {
                         newestAttachment = attachment;
+                    }
                 }
                 add(doc, newestAttachment, context);
             } catch (Exception e) {
@@ -432,7 +464,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         }
     }
 
-    public long getQueueSize() {
+    public long getQueueSize()
+    {
         return queue.getSize();
     }
 }

@@ -1,244 +1,256 @@
 /*
- * 
- * ===================================================================
+ * Copyright 2005-2007, XpertNet SARL, and individual contributors as
+ * indicated by the contributors.txt.
  *
- * Copyright (c) 2005 Jens Krämer, All rights reserved.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Created on 25.01.2005
- *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.lucene;
 
-import java.util.Date;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.Date;
 
 /**
- * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
+ * @version $Id: $
  */
 public abstract class IndexData
 {
-    private static final Logger LOG = Logger.getLogger (IndexData.class);
+    private static final Logger LOG = Logger.getLogger(IndexData.class);
 
-    private String              documentName;
-    private String              documentWeb;
-    private String              fullName;
-    private String              author;
-    private Date                creationDate;
-    private String              creator;
-    private String              language;
-    private Date                modificationDate;
-    /** name of the virtual wiki this doc belongs to */
-    private String              wiki;
+    private String documentName;
 
-    public IndexData (final XWikiDocument doc, final XWikiContext context)
+    private String documentWeb;
+
+    private String fullName;
+
+    private String author;
+
+    private Date creationDate;
+
+    private String creator;
+
+    private String language;
+
+    private Date modificationDate;
+
+    /**
+     * name of the virtual wiki this doc belongs to
+     */
+    private String wiki;
+
+    public IndexData(final XWikiDocument doc, final XWikiContext context)
     {
-        setDocumentName (doc.getName ());
-        setDocumentWeb (doc.getSpace());
-        setWiki (context.getDatabase ());
-        setFullName (new StringBuffer (wiki).append (":").append (documentWeb).append (".")
-                .append (documentName).toString ());
-        setLanguage (doc.getLanguage ());
+        setDocumentName(doc.getName());
+        setDocumentWeb(doc.getSpace());
+        setWiki(context.getDatabase());
+        setFullName(new StringBuffer(wiki).append(":").append(documentWeb).append(".")
+            .append(documentName).toString());
+        setLanguage(doc.getLanguage());
     }
 
     /**
-     * Adds this documents data to a lucene Document instance for indexing.
-     * <p>
-     * <strong>Short introduction to Lucene field types </strong>
-     * </p>
-     * <p>
-     * Which type of Lucene field is used determines what Lucene does with data
-     * and how we can use it for searching and showing search results:
-     * </p>
-     * <ul>
-     * <li>Keyword fields don't get tokenized, but are searchable and stored in
-     * the index. This is perfect for fields you want to search in
-     * programmatically (like ids and such), and date fields. Since all
-     * user-entered queries are tokenized, letting the user search these fields
-     * makes almost no sense, except of queries for date fields, where
-     * tokenization is useless.</li>
-     * <li>the stored text fields are used for short texts which should be
-     * searchable by the user, and stored in the index for reconstruction.
-     * Perfect for document names, titles, abstracts.</li>
-     * <li>the unstored field takes the biggest part of the content - the full
-     * text. It is tokenized and indexed, but not stored in the index. This
-     * makes sense, since when the user wants to see the full content, he clicks
-     * the link to vie the full version of a document, which is then delivered
-     * by xwiki.</li>
-     * </ul>
-     * @param luceneDoc
-     *            if not null, this controls which translated version of the
-     *            content will be indexed. If null, the content in the default
-     *            language will be used.
+     * Adds this documents data to a lucene Document instance for indexing. <p> <strong>Short
+     * introduction to Lucene field types </strong> </p> <p> Which type of Lucene field is used
+     * determines what Lucene does with data and how we can use it for searching and showing search
+     * results: </p> <ul> <li>Keyword fields don't get tokenized, but are searchable and stored in
+     * the index. This is perfect for fields you want to search in programmatically (like ids and
+     * such), and date fields. Since all user-entered queries are tokenized, letting the user search
+     * these fields makes almost no sense, except of queries for date fields, where tokenization is
+     * useless.</li> <li>the stored text fields are used for short texts which should be searchable
+     * by the user, and stored in the index for reconstruction. Perfect for document names, titles,
+     * abstracts.</li> <li>the unstored field takes the biggest part of the content - the full text.
+     * It is tokenized and indexed, but not stored in the index. This makes sense, since when the
+     * user wants to see the full content, he clicks the link to vie the full version of a document,
+     * which is then delivered by xwiki.</li> </ul>
+     *
+     * @param luceneDoc if not null, this controls which translated version of the content will be
+     * indexed. If null, the content in the default language will be used.
      */
-    public void addDataToLuceneDocument (org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
-                                         XWikiContext context)
+    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc,
+        XWikiDocument doc,
+        XWikiContext context)
     {
         // Keyword fields: stored and indexed, but not tokenized
-        luceneDoc.add (new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.TOKENIZED));
-        luceneDoc.add (new Field(IndexFields.DOCUMENT_LANGUAGE, this.language, Field.Store.YES, Field.Index.TOKENIZED));
-        if (wiki != null && wiki.length () > 0)
-            luceneDoc.add (new Field (IndexFields.DOCUMENT_WIKI, wiki, Field.Store.YES, Field.Index.TOKENIZED));
-        if (getType () != null) luceneDoc.add (new Field (IndexFields.DOCUMENT_TYPE, getType (), Field.Store.YES, Field.Index.TOKENIZED));
-        if (modificationDate != null)
-            luceneDoc.add (new Field(IndexFields.DOCUMENT_DATE, IndexFields
-                    .dateToString (modificationDate), Field.Store.YES, Field.Index.NO));
-        if (creationDate != null)
-            luceneDoc.add (new Field(IndexFields.DOCUMENT_CREATIONDATE, IndexFields
-                    .dateToString (creationDate), Field.Store.YES, Field.Index.NO));
+        luceneDoc.add(
+            new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE, this.language, Field.Store.YES,
+            Field.Index.TOKENIZED));
+        if (wiki != null && wiki.length() > 0) {
+            luceneDoc.add(
+                new Field(IndexFields.DOCUMENT_WIKI, wiki, Field.Store.YES, Field.Index.TOKENIZED));
+        }
+        if (getType() != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_TYPE, getType(),
+                Field.Store.YES, Field.Index.TOKENIZED));
+        }
+        if (modificationDate != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_DATE, IndexFields
+                .dateToString(modificationDate), Field.Store.YES, Field.Index.NO));
+        }
+        if (creationDate != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATIONDATE, IndexFields
+                .dateToString(creationDate), Field.Store.YES, Field.Index.NO));
+        }
 
         // stored Text fields: tokenized and indexed
-        luceneDoc.add (new Field(IndexFields.DOCUMENT_NAME, documentName, Field.Store.YES, Field.Index.TOKENIZED));
-        luceneDoc.add (new Field(IndexFields.DOCUMENT_WEB, documentWeb, Field.Store.YES, Field.Index.TOKENIZED));
-        if (author != null) luceneDoc.add (new Field(IndexFields.DOCUMENT_AUTHOR, author, Field.Store.YES, Field.Index.TOKENIZED));
-        if (creator != null) luceneDoc.add (new Field(IndexFields.DOCUMENT_CREATOR, creator, Field.Store.YES, Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, documentName, Field.Store.YES,
+            Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, documentWeb, Field.Store.YES,
+            Field.Index.TOKENIZED));
+        if (author != null) {
+            luceneDoc.add(
+                new Field(IndexFields.DOCUMENT_AUTHOR, author, Field.Store.YES,
+                    Field.Index.TOKENIZED));
+        }
+        if (creator != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATOR, creator,
+                Field.Store.YES, Field.Index.TOKENIZED));
+        }
 
         // UnStored fields: tokenized and indexed, but no reconstruction of
         // original content will be possible from the search result
-        try
-        {
-            final String ft = getFullText (doc, context);
-            if (ft != null) luceneDoc.add (new Field(IndexFields.FULLTEXT, ft, Field.Store.NO, Field.Index.TOKENIZED));
-        } catch (Exception e)
-        {
-            LOG.error ("error extracting fulltext for document " + this, e);
+        try {
+            final String ft = getFullText(doc, context);
+            if (ft != null) {
+                luceneDoc
+                    .add(
+                        new Field(IndexFields.FULLTEXT, ft, Field.Store.NO, Field.Index.TOKENIZED));
+            }
+        } catch (Exception e) {
+            LOG.error("error extracting fulltext for document " + this, e);
         }
     }
 
     /**
-     * Builds a Lucene query matching only the document this instance
-     * represents. This is used for removing old versions of a document from the
-     * index before adding a new one.
+     * Builds a Lucene query matching only the document this instance represents. This is used for
+     * removing old versions of a document from the index before adding a new one.
+     *
      * @return a query matching the field DOCUMENT_ID to the value of #getId()
      */
-    public Query buildQuery ()
+    public Query buildQuery()
     {
-        return new TermQuery (new Term (IndexFields.DOCUMENT_ID, getId ()));
+        return new TermQuery(new Term(IndexFields.DOCUMENT_ID, getId()));
     }
 
     /**
-     * @return string unique to this document across all languages and virtual
-     *         wikis
+     * @return string unique to this document across all languages and virtual wikis
      */
-    public String getId ()
+    public String getId()
     {
-        StringBuffer retval = new StringBuffer ();
-        if (wiki != null && wiki.length () > 0) retval.append (wiki).append (":");
-        retval.append (documentWeb).append (".");
-        retval.append (documentName).append (".");
-        retval.append (language);
-        return retval.toString ();
+        StringBuffer retval = new StringBuffer();
+        if (wiki != null && wiki.length() > 0) {
+            retval.append(wiki).append(":");
+        }
+        retval.append(documentWeb).append(".");
+        retval.append(documentName).append(".");
+        retval.append(language);
+        return retval.toString();
     }
 
     /**
      * @return String of documentName, documentWeb, author and creator
      */
-    public String getFullText (XWikiDocument doc, XWikiContext context)
+    public String getFullText(XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer sb = new StringBuffer (documentName).append (" ").append (documentWeb).append (" ")
-                .append (author).append (creator);
-        return sb.toString ();
+        StringBuffer sb = new StringBuffer(documentName).append(" ").append(documentWeb).append(" ")
+            .append(author).append(creator);
+        return sb.toString();
     }
 
-    public abstract String getType ();
+    public abstract String getType();
 
-    public String toString ()
+    public String toString()
     {
-        return getId ();
+        return getId();
     }
 
     /**
-     * @param author
-     *            The author to set.
+     * @param author The author to set.
      */
-    public void setAuthor (String author)
+    public void setAuthor(String author)
     {
         this.author = author;
     }
 
     /**
-     * @param documentName
-     *            The documentName to set.
+     * @param documentName The documentName to set.
      */
-    public void setDocumentName (String documentName)
+    public void setDocumentName(String documentName)
     {
         this.documentName = documentName;
     }
 
     /**
-     * @param documentWeb
-     *            The documentWeb to set.
+     * @param documentWeb The documentWeb to set.
      */
-    public void setDocumentWeb (String documentWeb)
+    public void setDocumentWeb(String documentWeb)
     {
         this.documentWeb = documentWeb;
     }
 
     /**
-     * @param modificationDate
-     *            The modificationDate to set.
+     * @param modificationDate The modificationDate to set.
      */
-    public void setModificationDate (Date modificationDate)
+    public void setModificationDate(Date modificationDate)
     {
         this.modificationDate = modificationDate;
     }
 
-    public String getDocumentName ()
+    public String getDocumentName()
     {
         return documentName;
     }
 
-    public String getDocumentWeb ()
+    public String getDocumentWeb()
     {
         return documentWeb;
     }
 
-    public String getWiki ()
+    public String getWiki()
     {
         return wiki;
     }
 
-    public void setWiki (String wiki)
+    public void setWiki(String wiki)
     {
         this.wiki = wiki;
     }
 
-    public Date getCreationDate ()
+    public Date getCreationDate()
     {
         return creationDate;
     }
 
-    public void setCreationDate (Date creationDate)
+    public void setCreationDate(Date creationDate)
     {
         this.creationDate = creationDate;
     }
 
-    public String getCreator ()
+    public String getCreator()
     {
         return creator;
     }
 
-    public void setCreator (String creator)
+    public void setCreator(String creator)
     {
         this.creator = creator;
     }
@@ -246,26 +258,27 @@ public abstract class IndexData
     /**
      * @return
      */
-    public String getFullName ()
+    public String getFullName()
     {
         return fullName;
     }
 
-    public void setFullName (String fullName)
+    public void setFullName(String fullName)
     {
         this.fullName = fullName;
     }
 
-    public String getLanguage ()
+    public String getLanguage()
     {
         return language;
     }
 
-    public void setLanguage (String lang)
+    public void setLanguage(String lang)
     {
-        if (lang != null && lang.length () > 0)
+        if (lang != null && lang.length() > 0) {
             this.language = lang;
-        else
+        } else {
             this.language = "default";
+        }
     }
 }

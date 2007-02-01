@@ -1,33 +1,23 @@
 /*
+ * Copyright 2005-2007, XpertNet SARL, and individual contributors as
+ * indicated by the contributors.txt.
  *
- * ===================================================================
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * Copyright (c) 2005 Jens Kramer, All rights reserved.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Created on 25.01.2005
- *
- * @author Lokesh (N.Lokeswara Reddy) Congruent Solutions.Pvt.Ltd.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package com.xpn.xwiki.plugin.lucene;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.apache.lucene.document.Field;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -37,15 +27,22 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import org.apache.log4j.Logger;
+import org.apache.lucene.document.Field;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hold the property values of the XWiki.ArticleClass Objects.
  */
-public class ObjectData extends IndexData {
-
+public class ObjectData extends IndexData
+{
     private static final Logger LOG = Logger.getLogger(ObjectData.class);
 
-    public ObjectData(final XWikiDocument doc, final XWikiContext context) {
+    public ObjectData(final XWikiDocument doc, final XWikiContext context)
+    {
         super(doc, context);
         setAuthor(doc.getAuthor());
         setCreator(doc.getCreator());
@@ -53,21 +50,21 @@ public class ObjectData extends IndexData {
         setCreationDate(doc.getCreationDate());
     }
 
-
     /**
-     * @see net.jkraemer.xwiki.plugins.lucene.IndexData#getType()
+     * @see com.xpn.xwiki.plugin.lucene.IndexData#getType()
      */
-    public String getType() {
+    public String getType()
+    {
         return LucenePlugin.DOCTYPE_WIKIPAGE;
     }
 
     /**
-     * @return a string containing the result of
-     *         {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus
-     *         the full text content (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as it could be
-     *         extracted.
+     * @return a string containing the result of {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus
+     *         the full text content (values of title,category,content and extract )
+     *         XWiki.ArticleClass Object, as far as it could be extracted.
      */
-    public String getFullText(XWikiDocument doc, XWikiContext context) {
+    public String getFullText(XWikiDocument doc, XWikiContext context)
+    {
         StringBuffer retval = new StringBuffer(super.getFullText(doc, context));
         String contentText = getContentAsText(doc, context);
         if (contentText != null) {
@@ -77,11 +74,10 @@ public class ObjectData extends IndexData {
     }
 
     /**
-     * @param doc
-     * @param context
      * @return string containing value of title,category,content and extract of XWiki.ArticleClass
      */
-    private String getContentAsText(XWikiDocument doc, XWikiContext context) {
+    private String getContentAsText(XWikiDocument doc, XWikiContext context)
+    {
         StringBuffer contentText = new StringBuffer();
         try {
             LOG.info(doc.getFullName());
@@ -90,10 +86,10 @@ public class ObjectData extends IndexData {
             while (itKey.hasNext()) {
                 String className = (String) itKey.next();
                 Iterator itObj = doc.getObjects(className).iterator();
-                while (itObj.hasNext())
+                while (itObj.hasNext()) {
                     extractContent(contentText, (BaseObject) itObj.next(), context);
+                }
             }
-
         } catch (Exception e) {
             LOG.error("error getting content from  XWiki Objects ", e);
             e.printStackTrace();
@@ -101,12 +97,15 @@ public class ObjectData extends IndexData {
         return contentText.toString();
     }
 
-    private void extractContent(StringBuffer contentText, BaseObject baseObject, XWikiContext context) {
+    private void extractContent(StringBuffer contentText, BaseObject baseObject,
+        XWikiContext context)
+    {
         try {
             if (baseObject != null) {
                 Object[] propertyNames = baseObject.getPropertyNames();
                 for (int i = 0; i < propertyNames.length; i++) {
-                    BaseProperty baseProperty = (BaseProperty) baseObject.getField((String) propertyNames[i]);
+                    BaseProperty baseProperty =
+                        (BaseProperty) baseObject.getField((String) propertyNames[i]);
                     if ((baseProperty != null) && (baseProperty.getValue() != null)) {
                         contentText.append(baseProperty.getValue().toString());
                     }
@@ -119,8 +118,10 @@ public class ObjectData extends IndexData {
         }
     }
 
-    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
-                                        XWikiContext context) {
+    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc,
+        XWikiDocument doc,
+        XWikiContext context)
+    {
 
         super.addDataToLuceneDocument(luceneDoc, doc, context);
         Map objects = doc.getxWikiObjects();
@@ -133,11 +134,12 @@ public class ObjectData extends IndexData {
 
             while (itObj.hasNext()) {
                 baseObject = (BaseObject) itObj.next();
-                if (baseObject!=null) {
+                if (baseObject != null) {
                     Object[] propertyNames = baseObject.getPropertyNames();
                     for (int i = 0; i < propertyNames.length; i++) {
                         try {
-                            indexProperty(luceneDoc, baseObject, (String) propertyNames[i], context);
+                            indexProperty(luceneDoc, baseObject, (String) propertyNames[i],
+                                context);
                         } catch (Exception e) {
                             LOG.error("error extracting fulltext for document " + this, e);
                         }
@@ -147,23 +149,26 @@ public class ObjectData extends IndexData {
         }
     }
 
-    private void indexProperty(org.apache.lucene.document.Document luceneDoc, BaseObject baseObject, String propertyName, XWikiContext context) {
+    private void indexProperty(org.apache.lucene.document.Document luceneDoc, BaseObject baseObject,
+        String propertyName, XWikiContext context)
+    {
         String fieldFullName = baseObject.getClassName() + "." + propertyName;
         BaseClass bClass = baseObject.getxWikiClass(context);
         PropertyInterface prop = bClass.getField(propertyName);
 
-        if (prop instanceof StaticListClass && ((StaticListClass)prop).isMultiSelect()) {
+        if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
             indexStaticList(luceneDoc, baseObject, (StaticListClass) prop, propertyName, context);
         } else {
             final String ft = getContentAsText(baseObject, propertyName);
             if (ft != null) {
                 luceneDoc.add(new Field(fieldFullName, ft, Field.Store.YES, Field.Index.TOKENIZED));
-
             }
         }
     }
 
-    private void indexStaticList(org.apache.lucene.document.Document luceneDoc, BaseObject baseObject, StaticListClass prop, String propertyName, XWikiContext context) {
+    private void indexStaticList(org.apache.lucene.document.Document luceneDoc,
+        BaseObject baseObject, StaticListClass prop, String propertyName, XWikiContext context)
+    {
         Map possibleValues = prop.getMap(context);
         List keys = baseObject.getListValue(propertyName);
         String fieldFullName = baseObject.getClassName() + "." + propertyName;
@@ -174,12 +179,15 @@ public class ObjectData extends IndexData {
             if (item != null) {
                 // we index the key of the list
                 String fieldName = fieldFullName + ".key";
-                luceneDoc.add(new Field(fieldName, item.getId(), Field.Store.YES, Field.Index.TOKENIZED));
+                luceneDoc.add(
+                    new Field(fieldName, item.getId(), Field.Store.YES, Field.Index.TOKENIZED));
                 //we index the value
                 fieldName = fieldFullName + ".value";
-                luceneDoc.add(new Field(fieldName, item.getValue(), Field.Store.YES, Field.Index.TOKENIZED));
+                luceneDoc.add(
+                    new Field(fieldName, item.getValue(), Field.Store.YES, Field.Index.TOKENIZED));
                 if (!item.getId().equals(item.getValue())) {
-                    luceneDoc.add(new Field(fieldFullName, item.getValue(), Field.Store.YES, Field.Index.TOKENIZED));
+                    luceneDoc.add(new Field(fieldFullName, item.getValue(), Field.Store.YES,
+                        Field.Index.TOKENIZED));
                 }
             }
             //we index both if value is not equal to the id(key)
@@ -187,11 +195,14 @@ public class ObjectData extends IndexData {
         }
     }
 
-    public String getFullText(XWikiDocument doc, BaseObject baseObject, String property, XWikiContext context) {
+    public String getFullText(XWikiDocument doc, BaseObject baseObject, String property,
+        XWikiContext context)
+    {
         return getContentAsText(baseObject, property);
     }
 
-    private String getContentAsText(BaseObject baseObject, String property) {
+    private String getContentAsText(BaseObject baseObject, String property)
+    {
 
         StringBuffer contentText = new StringBuffer();
         try {
@@ -206,6 +217,4 @@ public class ObjectData extends IndexData {
         }
         return contentText.toString();
     }
-
-
 }

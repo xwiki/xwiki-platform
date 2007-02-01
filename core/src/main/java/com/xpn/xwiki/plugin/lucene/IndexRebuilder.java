@@ -1,25 +1,30 @@
 /*
- * 
- * ===================================================================
+ * Copyright 2005-2007, XpertNet SARL, and individual contributors as
+ * indicated by the contributors.txt.
  *
- * Copyright (c) 2005 Jens Krämer, All rights reserved.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Created on 01.02.2005
- *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package com.xpn.xwiki.plugin.lucene;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,44 +32,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 /**
- * Handles rebuilding of the whole Index. This involves the following steps:
- * <ul>
- * <li>empty the existing index</li>
- * <li>retrieve the names of all virtual wikis</li>
- * <li>get and index all documents for each virtual wiki</li>
- * <li>get and index all translations of each document</li>
- * <li>get and index all attachments of each document</li>
- * </ul>
- * The indexing of all content fetched from the wiki is triggered by handing the
- * data to the indexUpdater thread.
+ * Handles rebuilding of the whole Index. This involves the following steps: <ul> <li>empty the
+ * existing index</li> <li>retrieve the names of all virtual wikis</li> <li>get and index all
+ * documents for each virtual wiki</li> <li>get and index all translations of each document</li>
+ * <li>get and index all attachments of each document</li> </ul> The indexing of all content fetched
+ * from the wiki is triggered by handing the data to the indexUpdater thread.
  *
- * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
+ * @version $Id: $
  */
-public class IndexRebuilder {
+public class IndexRebuilder
+{
     private IndexUpdater indexUpdater;
+
     private static final Logger LOG = Logger.getLogger(IndexRebuilder.class);
 
     /**
-     * First empties the index, then fetches all Documents, their translations
-     * and their attachments for re-addition to the index.
+     * First empties the index, then fetches all Documents, their translations and their attachments
+     * for re-addition to the index.
      *
-     * @param wiki
-     * @param context
-     * @return total number of documentes and attachments successfully added to
-     *         the indexer queue, -1 when errors occured.
-     * @throws XWikiException
+     * @return total number of documentes and attachments successfully added to the indexer queue,
+     *         -1 when errors occured.
      * @todo TODO: give more detailed results
      */
-    public int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, XWikiContext context) {
+    public int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, XWikiContext context)
+    {
         indexUpdater.cleanIndex();
         int retval = 0;
         Collection wikiServers;
@@ -86,20 +78,18 @@ public class IndexRebuilder {
         // Iterate all found virtual wikis
         for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
             int wikiResult = indexWiki(xwiki, (String) iter.next());
-            if (retval != -1) retval += wikiResult;
+            if (retval != -1) {
+                retval += wikiResult;
+            }
         }
         return retval;
     }
 
     /**
      * Adds the content of a given wiki to the indexUpdater's queue.
-     *
-     * @param xwiki
-     * @param context
-     * @param wikiName
-     * @return
      */
-    protected int indexWiki(com.xpn.xwiki.XWiki xwiki, String wikiName) {
+    protected int indexWiki(com.xpn.xwiki.XWiki xwiki, String wikiName)
+    {
         LOG.info("reading content of wiki " + wikiName);
         int retval = 0;
         XWikiContext wikiContext = new XWikiContext();
@@ -137,11 +127,11 @@ public class IndexRebuilder {
     }
 
     /**
-     * Getting the content(values of title/category/content/extract properties ) from the XWiki.ArticleClass objects
-     * @param document
-     * @param wikiContext
+     * Getting the content(values of title/category/content/extract properties ) from the
+     * XWiki.ArticleClass objects
      */
-    private int addObjectsOfDocument(XWikiDocument document, XWikiContext wikiContext) {
+    private int addObjectsOfDocument(XWikiDocument document, XWikiContext wikiContext)
+    {
         int retval = 0;
         Map xwikiObjects = document.getxWikiObjects();
         if (document.hasElement(XWikiDocument.HAS_OBJECTS)) {
@@ -155,7 +145,8 @@ public class IndexRebuilder {
      * @param document
      * @param wikiContext
      */
-    private int addAttachmentsOfDocument(XWikiDocument document, XWikiContext wikiContext) {
+    private int addAttachmentsOfDocument(XWikiDocument document, XWikiContext wikiContext)
+    {
         int retval = 0;
         final List attachmentList = document.getAttachmentList();
         retval += attachmentList.size();
@@ -175,13 +166,15 @@ public class IndexRebuilder {
      * @param wikiContext
      * @throws XWikiException
      */
-    protected int addTranslationsOfDocument(XWikiDocument document, XWikiContext wikiContext) {
+    protected int addTranslationsOfDocument(XWikiDocument document, XWikiContext wikiContext)
+    {
         int retval = 0;
         List translations;
         try {
             translations = document.getTranslationList(wikiContext);
         } catch (XWikiException e) {
-            LOG.error("error getting list of translations from document " + document.getFullName(), e);
+            LOG.error("error getting list of translations from document " + document.getFullName(),
+                e);
             e.printStackTrace();
             return 0;
         }
@@ -192,7 +185,7 @@ public class IndexRebuilder {
                 retval++;
             } catch (XWikiException e1) {
                 LOG.error("error getting translated document for document " + document.getFullName()
-                        + " and language " + lang);
+                    + " and language " + lang);
                 e1.printStackTrace();
             }
         }
@@ -203,11 +196,12 @@ public class IndexRebuilder {
      * @param wiki
      * @return
      */
-    private Collection findWikiServers(XWiki wiki, XWikiContext context) {
+    private Collection findWikiServers(XWiki wiki, XWikiContext context)
+    {
         List retval = new ArrayList();
         final String hql = ", BaseObject as obj, StringProperty as prop "
-                + "where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass'"
-                + " and prop.id.id = obj.id " + "and prop.id.name = 'server'";
+            + "where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass'"
+            + " and prop.id.id = obj.id " + "and prop.id.name = 'server'";
         List result = null;
         try {
             result = wiki.getXWiki().getStore().searchDocumentsNames(hql, context);
@@ -228,7 +222,8 @@ public class IndexRebuilder {
         return retval;
     }
 
-    public void setIndexUpdater(IndexUpdater indexUpdater) {
+    public void setIndexUpdater(IndexUpdater indexUpdater)
+    {
         this.indexUpdater = indexUpdater;
     }
 }

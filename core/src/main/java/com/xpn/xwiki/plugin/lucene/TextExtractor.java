@@ -1,61 +1,65 @@
 /*
- * 
- * ===================================================================
+ * Copyright 2005-2007, XpertNet SARL, and individual contributors as
+ * indicated by the contributors.txt.
  *
- * Copyright (c) 2005 Jens Krämer, All rights reserved.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details, published at
- * http://www.gnu.org/copyleft/gpl.html or in gpl.txt in the
- * root folder of this distribution.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * Created on 25.01.2005
- *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.lucene;
+
+import com.xpn.xwiki.plugin.lucene.textextraction.MSExcelTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.MSPowerPointTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.MSWordTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.MimetypeTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.PDFTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.PlainTextExtractor;
+import com.xpn.xwiki.plugin.lucene.textextraction.XmlTextExtractor;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import com.xpn.xwiki.plugin.lucene.textextraction.*;
-
 /**
- * Extraction of text from various binary formats. Extraction itself is done by
- * the textExtractor classes in Packages below <code>org.outerj.daisy</code>
- * taken from the <a href="http://new.cocoondev.org/daisy">Daisy project </a>.
- * @author <a href="mailto:jk@jkraemer.net">Jens Krämer </a>
+ * Extraction of text from various binary formats. Extraction itself is done by the textExtractor
+ * classes in Packages below <code>org.outerj.daisy</code> taken from the <a
+ * href="http://new.cocoondev.org/daisy">Daisy project </a>.
+ *
+ * @version $Id: $
  */
 public class TextExtractor
 {
-    private static final Logger LOG            = Logger.getLogger (TextExtractor.class);
+    private static final Logger LOG = Logger.getLogger(TextExtractor.class);
 
-    static final Map            textExtractors = new HashMap ();
-    static
-    {
+    static final Map textExtractors = new HashMap();
+
+    static {
         // TODO: make text extractors more pluggable by moving this into a config file.
-        final XmlTextExtractor xmlTextExtractor = new XmlTextExtractor ();
-        textExtractors.put ("application/xhtml+xml", xmlTextExtractor);
-        textExtractors.put ("text/xml", xmlTextExtractor);
-        textExtractors.put ("text/plain", new PlainTextExtractor());
-        textExtractors.put ("application/pdf", new PDFTextExtractor());
+        final XmlTextExtractor xmlTextExtractor = new XmlTextExtractor();
+        textExtractors.put("application/xhtml+xml", xmlTextExtractor);
+        textExtractors.put("text/xml", xmlTextExtractor);
+        textExtractors.put("text/plain", new PlainTextExtractor());
+        textExtractors.put("application/pdf", new PDFTextExtractor());
 //        textExtractors.put ("application/vnd.sun.xml.writer", new OpenOfficeTextExtractor ());
-        textExtractors.put ("application/msword", new MSWordTextExtractor ());
-        textExtractors.put ("application/ms-word", new MSWordTextExtractor ());
-        textExtractors.put ("application/vnd.msword", new MSWordTextExtractor ());
-        textExtractors.put ("application/vnd.ms-word", new MSWordTextExtractor ());
-        textExtractors.put ("application/vnd.ms-powerpoint", new MSPowerPointTextExtractor());
-        textExtractors.put ("application/ms-powerpoint", new MSPowerPointTextExtractor());
-        textExtractors.put ("application/ms-excel", new MSExcelTextExtractor());
-        textExtractors.put ("application/vnd.ms-excel", new MSExcelTextExtractor());
+        textExtractors.put("application/msword", new MSWordTextExtractor());
+        textExtractors.put("application/ms-word", new MSWordTextExtractor());
+        textExtractors.put("application/vnd.msword", new MSWordTextExtractor());
+        textExtractors.put("application/vnd.ms-word", new MSWordTextExtractor());
+        textExtractors.put("application/vnd.ms-powerpoint", new MSPowerPointTextExtractor());
+        textExtractors.put("application/ms-powerpoint", new MSPowerPointTextExtractor());
+        textExtractors.put("application/ms-excel", new MSExcelTextExtractor());
+        textExtractors.put("application/vnd.ms-excel", new MSExcelTextExtractor());
     }
 
     /**
@@ -63,24 +67,20 @@ public class TextExtractor
      * @param mimetype
      * @return
      */
-    public static String getText (byte[] content, String mimetype)
+    public static String getText(byte[] content, String mimetype)
     {
-        final MimetypeTextExtractor extractor = (MimetypeTextExtractor) textExtractors.get (mimetype);
-        if (extractor != null)
-        {
-            try
-            {
-                return extractor.getText (content);
-            } catch (Exception e)
-            {
-                LOG.error ("error getting text for mimetype " + mimetype, e);
-                e.printStackTrace ();
+        final MimetypeTextExtractor extractor =
+            (MimetypeTextExtractor) textExtractors.get(mimetype);
+        if (extractor != null) {
+            try {
+                return extractor.getText(content);
+            } catch (Exception e) {
+                LOG.error("error getting text for mimetype " + mimetype, e);
+                e.printStackTrace();
             }
-        } else
-        {
-            LOG.info ("no text extractor for mimetype " + mimetype);
+        } else {
+            LOG.info("no text extractor for mimetype " + mimetype);
         }
         return null;
     }
-
 }

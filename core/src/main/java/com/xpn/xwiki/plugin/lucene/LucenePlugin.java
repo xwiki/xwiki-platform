@@ -101,9 +101,14 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         super.finalize();
     }
 
-    public synchronized int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, XWikiContext context)
+    /**
+     * Trigger a rebuild of the whole Lucene index.
+     *
+     * @return Number of documents scheduled for indexing. -1 in case of errors
+     */
+    public synchronized int rebuildIndex(XWiki wiki, XWikiContext context)
     {
-        return indexRebuilder.rebuildIndex(wiki, context);
+        return this.indexRebuilder.rebuildIndex(wiki, context);
     }
 
     /**
@@ -260,8 +265,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         indexUpdater.init(config, this, context.getWiki());
         indexUpdaterThread = new Thread(indexUpdater);
         indexUpdaterThread.start();
-        indexRebuilder = new IndexRebuilder();
-        indexRebuilder.setIndexUpdater(indexUpdater);
+        indexRebuilder = new IndexRebuilder(indexUpdater);
 
         docChangeRule = new DocChangeRule(indexUpdater);
         xwikiActionRule = new XWikiActionRule(indexUpdater);

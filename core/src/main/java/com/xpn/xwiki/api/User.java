@@ -39,7 +39,7 @@ public class User extends Api {
     }
 
     public XWikiUser getUser() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return user;
 		return null;
     }

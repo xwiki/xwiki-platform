@@ -83,7 +83,7 @@ public class FeedPluginApi extends Api {
     }
 
     public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, context);
         else
          return -1;
@@ -94,7 +94,7 @@ public class FeedPluginApi extends Api {
     }
 
     public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry) {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, context);
         else
          return -1;

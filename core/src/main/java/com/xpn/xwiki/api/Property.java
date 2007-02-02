@@ -40,7 +40,7 @@ public class Property extends Element {
     }
 
     public BaseProperty getProperty() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return (BaseProperty) element;
         else
             return null;

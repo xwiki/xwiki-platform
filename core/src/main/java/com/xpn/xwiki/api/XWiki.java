@@ -65,7 +65,7 @@ public class XWiki extends Api {
      * @return  Priviledged Main XWiki Object
      */
     public com.xpn.xwiki.XWiki getXWiki() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki;
         return null;
     }
@@ -257,7 +257,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List search(String wheresql) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.search(wheresql, context);
 		return null;
     }
@@ -272,7 +272,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List search(String wheresql, int nb, int start) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.search(wheresql, nb, start, context);
 		return null;
     }
@@ -337,7 +337,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, context);
         return null;
     }
@@ -862,7 +862,7 @@ public class XWiki extends Api {
         try {
 	    // So, what's the register right for? This says that if the creator of the page
 	    // (Admin) has programming rights, anybody can register. Is this OK?
-            if (checkProgrammingRights()) {
+            if (hasProgrammingRights()) {
                 registerRight = true;
             } else
             {
@@ -934,7 +934,7 @@ public class XWiki extends Api {
      */
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin,
                              String baseWikiName, String description, String language, boolean failOnExist) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language, failOnExist, context);
         return -1;
     }
@@ -956,7 +956,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public void addToAllGroup(String fullwikiname) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             xwiki.setUserDefaultGroup(fullwikiname, context);
     }
 
@@ -970,7 +970,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the mail was not send successfully
      */
     public void sendConfirmationMail(String xwikiname, String password, String email, String add_message, String contentfield) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, context);
     }
 
@@ -983,7 +983,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the mail was not send successfully
      */
     public void sendConfirmationMail(String xwikiname, String password, String email, String contentfield) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, context);
     }
 
@@ -995,7 +995,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the mail was not send successfully
      */
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
     }
 
@@ -1007,7 +1007,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the mail was not send successfully
      */
     public void sendMessage(String sender, String[] recipient, String message) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             xwiki.sendMessage(sender, recipient, message, context);
     }
 
@@ -1019,7 +1019,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, null, null, null, false, context);
 		return false;
     }
@@ -1033,7 +1033,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, null, null, wikilanguage, false, context);
 		return false;
     }
@@ -1048,7 +1048,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, context);
 		return false;
     }
@@ -1064,7 +1064,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, context);
 		return false;
     }
@@ -1081,7 +1081,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the document was not copied properly
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, context);
 		return false;
     }
@@ -1097,7 +1097,7 @@ public class XWiki extends Api {
      * @throws XWikiException if the space was not copied properly
      */
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, context);
 		return -1;
     }
@@ -1966,7 +1966,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException
      */
     public Object parseGroovyFromString(String script) throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return xwiki.parseGroovyFromString(script, context);
 		return "groovy_missingrights";
     }

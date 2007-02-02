@@ -80,7 +80,7 @@ public class Context extends Api {
      * @param database the data name
      */
     public void setDatabase(String database) {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
           context.setDatabase(database);
     }
 
@@ -129,7 +129,7 @@ public class Context extends Api {
      * @return the XWiki object if you have the programming right
      */
     public com.xpn.xwiki.XWiki getXWiki() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return context.getWiki();
         else
          return null;
@@ -140,7 +140,7 @@ public class Context extends Api {
      * @return the current requested document
      */
     public XWikiDocument getDoc() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return context.getDoc();
         else
          return null;
@@ -167,7 +167,7 @@ public class Context extends Api {
      * @param doc
      */
     public void setDoc(XWikiDocument doc) {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
           context.setDoc(doc);
     }
 
@@ -176,7 +176,7 @@ public class Context extends Api {
      * @return the unwrapped version of the context if you have the programming right
      */
     public XWikiContext getContext() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return context;
         else
          return null;
@@ -187,7 +187,7 @@ public class Context extends Api {
     }
 
     public java.lang.Object get(String key) {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return context.get(key);
         else
             return null;
@@ -198,7 +198,7 @@ public class Context extends Api {
     }
 
     public void put(String key, java.lang.Object value) {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             context.put(key, value);
     }
 

@@ -39,7 +39,7 @@ public class Object extends Collection {
     }
 
     public BaseObject getXWikiObject() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return (BaseObject) getCollection();
         else
          return null;

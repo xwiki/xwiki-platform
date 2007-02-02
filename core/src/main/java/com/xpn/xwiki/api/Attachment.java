@@ -162,7 +162,7 @@ public class Attachment extends Api {
      * @see XWikiAttachment
      */
     public XWikiAttachment getAttachment() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return attachment;
         else
             return null;

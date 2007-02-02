@@ -20,27 +20,27 @@
 package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Context;
 import org.apache.log4j.Logger;
 
 /**
- * This is the main interface for using the Plugin. It basically acts as a facade to the {@link
- * LucenePlugin}class. <p> The methods intended for use in wiki pages are </p> <ul> <li>{@link
- * #rebuildIndex(com.xpn.xwiki.api.XWiki,Context)}for rebuilding the whole index</li> <li>{@link
- * #getSearchResults(String,String,com.xpn.xwiki.api.XWiki)}for searching the index</li> <li> {@link
- * #getSearchResults(String,String,String,com.xpn.xwiki.api.XWiki)} for searching specific virtual
- * wikis</li> <li>and {@link #getSearchResultsFromIndexes(String,String,String,
- *com.xpn.xwiki.api.XWiki)} for searching other lucene indexes than thos configured in
- * <code>xwiki.cfg</code></li> </ul>
+ * This plugin allows index based search in the contents of Wiki Pages and their attachments, as
+ * far as any text can be extracted from them. Text can be extracted from OpenOffice Writer,
+ * MSWord, PDF, XML/XHTML, plain text, etc. Text extraction is done with the help of various
+ * third party libs such as Apache POI and PDFBox and some classes from the Daisy project.
+ *
+ * <p>This is the main interface for using the Lucene Plugin. It acts as a facade to the
+ * {@link LucenePlugin} class.</p>
  *
  * @version $Id: $
  */
 public class LucenePluginApi extends Api
 {
-    private LucenePlugin plugin;
-
     private static final Logger LOG = Logger.getLogger(LucenePluginApi.class);
+
+    private LucenePlugin plugin;
 
     public LucenePluginApi(LucenePlugin plugin, XWikiContext context)
     {
@@ -49,17 +49,21 @@ public class LucenePluginApi extends Api
     }
 
     /**
-     * Starts a rebuild of the whole index.
+     * Trigger a rebuild of the whole Lucene index.
      *
      * @return Number of documents scheduled for indexing. -1 in case of errors
      */
-    public int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, Context context)
+    public int rebuildIndex(XWiki wiki, Context context)
     {
+        int nbDocuments = -1;
+
         if (wiki.hasAdminRights()) {
-            return getPlugin().rebuildIndex(wiki, context.getContext());
+            nbDocuments = getPlugin().rebuildIndex(wiki, context.getContext());
+        } else {
+            LOG.error("Access denied for rebuilding the Lucene index. Admin rights are required.");
         }
-        LOG.info("access denied to rebuildIndex: insufficient rights");
-        return -1;
+
+        return nbDocuments;
     }
 
     /**

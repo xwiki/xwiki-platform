@@ -33,25 +33,35 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handles rebuilding of the whole Index. This involves the following steps: <ul> <li>empty the
- * existing index</li> <li>retrieve the names of all virtual wikis</li> <li>get and index all
- * documents for each virtual wiki</li> <li>get and index all translations of each document</li>
- * <li>get and index all attachments of each document</li> </ul> The indexing of all content fetched
- * from the wiki is triggered by handing the data to the indexUpdater thread.
+ * Handles rebuilding of the whole Index. This involves the following steps:
+ * <ul>
+ *   <li>empty the existing index</li>
+ *   <li>retrieve the names of all virtual wikis</li>
+ *   <li>get and index all documents for each virtual wiki</li>
+ *   <li>get and index all translations of each document</li>
+ *   <li>get and index all attachments of each document</li>
+ * </ul>
+ * The indexing of all contents fetched from the wiki is triggered by handing the data to the
+ * indexUpdater thread.
  *
  * @version $Id: $
  */
 public class IndexRebuilder
 {
+    private static final Logger LOG = Logger.getLogger(IndexRebuilder.class);
+
     private IndexUpdater indexUpdater;
 
-    private static final Logger LOG = Logger.getLogger(IndexRebuilder.class);
+    public IndexRebuilder(IndexUpdater indexUpdater)
+    {
+        this.indexUpdater = indexUpdater;
+    }
 
     /**
      * First empties the index, then fetches all Documents, their translations and their attachments
      * for re-addition to the index.
      *
-     * @return total number of documentes and attachments successfully added to the indexer queue,
+     * @return total number of documents and attachments successfully added to the indexer queue,
      *         -1 when errors occured.
      * @todo TODO: give more detailed results
      */
@@ -220,10 +230,5 @@ public class IndexRebuilder
             }
         }
         return retval;
-    }
-
-    public void setIndexUpdater(IndexUpdater indexUpdater)
-    {
-        this.indexUpdater = indexUpdater;
     }
 }

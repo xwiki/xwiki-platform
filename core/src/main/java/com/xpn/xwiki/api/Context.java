@@ -182,7 +182,7 @@ public class Context extends Api
     public XWikiContext getContext()
     {
         if (hasProgrammingRights()) {
-            return getContext();
+            return super.getContext();
         } else {
             return null;
         }

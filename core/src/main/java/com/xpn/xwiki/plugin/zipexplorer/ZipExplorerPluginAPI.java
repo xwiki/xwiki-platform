@@ -73,7 +73,7 @@ public class ZipExplorerPluginAPI extends Api
      */
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment)
     {
-        return this.plugin.downloadAttachment(attachment, context);
+        return this.plugin.downloadAttachment(attachment, getContext());
     }
 
     /**
@@ -84,7 +84,7 @@ public class ZipExplorerPluginAPI extends Api
      */
     public List getFileList(Document document, String attachmentName)
     {
-        return this.plugin.getFileList(document, attachmentName, context);
+        return this.plugin.getFileList(document, attachmentName, getContext());
     }
 
     /**
@@ -111,7 +111,7 @@ public class ZipExplorerPluginAPI extends Api
      */
     public List getFileTreeList(Document document, String attachmentName)
     {
-        return this.plugin.getFileTreeList(document, attachmentName, context);
+        return this.plugin.getFileTreeList(document, attachmentName, getContext());
     }
 
     /**
@@ -123,6 +123,6 @@ public class ZipExplorerPluginAPI extends Api
      */
     public String getFileLink(Document document, String attachmentName, String fileName)
     {
-        return this.plugin.getFileLink(document, attachmentName, fileName, context);
+        return this.plugin.getFileLink(document, attachmentName, fileName, getContext());
     }
 }

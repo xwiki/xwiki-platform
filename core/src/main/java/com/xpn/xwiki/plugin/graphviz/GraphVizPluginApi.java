@@ -53,7 +53,7 @@ public class GraphVizPluginApi extends Api {
     }
 
     public String getDotImageURL(String content, boolean dot) throws IOException {
-        return plugin.getDotImageURL(content, dot, context);
+        return plugin.getDotImageURL(content, dot, getContext());
     }
 
     public String writeDotImage(String content, boolean dot) throws IOException {
@@ -65,11 +65,11 @@ public class GraphVizPluginApi extends Api {
     }
 
     public void outputDotImage(String content, boolean dot) throws IOException {
-        plugin.outputDotImage(content, "gif", dot, context);
+        plugin.outputDotImage(content, "gif", dot, getContext());
     }
 
     public void outputDotImage(String content, String extension, boolean dot) throws IOException {
-        plugin.outputDotImage(content, extension, dot, context);
+        plugin.outputDotImage(content, extension, dot, getContext());
     }
 
     public void flushCache() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,8 +19,6 @@
  *
  * @author sdumitriu
  */
-
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,57 +28,68 @@ import com.xpn.xwiki.objects.PropertyInterface;
 
 import java.util.Iterator;
 
-public abstract class Collection extends Element {
-
-    public Collection(BaseCollection collection, XWikiContext context) {
+public abstract class Collection extends Element
+{
+    public Collection(BaseCollection collection, XWikiContext context)
+    {
         super(collection, context);
     }
 
-    protected BaseCollection getCollection() {
+    protected BaseCollection getCollection()
+    {
         return (BaseCollection) this.element;
     }
 
-    public Class getxWikiClass() {
-        return new Class(getCollection().getxWikiClass(context), context);
+    public Class getxWikiClass()
+    {
+        return new Class(getCollection().getxWikiClass(getContext()), getContext());
     }
 
-    public String getName() {
+    public String getName()
+    {
         return getCollection().getName();
     }
 
-    public String getPrettyName() {
+    public String getPrettyName()
+    {
         return getCollection().getPrettyName();
     }
-    public int getNumber() {
+
+    public int getNumber()
+    {
         return getCollection().getNumber();
     }
 
-    public java.lang.Object[] getPropertyNames() {
+    public java.lang.Object[] getPropertyNames()
+    {
         return getCollection().getPropertyNames();
     }
 
-    public Element[] getProperties() {
+    public Element[] getProperties()
+    {
         java.util.Collection coll = getCollection().getFieldList();
-        if (coll==null)
+        if (coll == null) {
             return null;
+        }
         Property[] properties = new Property[coll.size()];
-        int i=0;
-        for (Iterator it = coll.iterator(); it.hasNext();i++) {
-            properties[i] = new Property((BaseProperty) it.next(), context);
+        int i = 0;
+        for (Iterator it = coll.iterator(); it.hasNext(); i++) {
+            properties[i] = new Property((BaseProperty) it.next(), getContext());
         }
         return properties;
     }
 
-    public Property getProperty(String name) {
+    public Property getProperty(String name)
+    {
         try {
-          PropertyInterface prop = getCollection().get(name);
-        if (prop==null)
-         return null;
+            PropertyInterface prop = getCollection().get(name);
+            if (prop == null) {
+                return null;
+            }
 
-        return new Property((BaseProperty) prop, context);
+            return new Property((BaseProperty) prop, getContext());
         } catch (Exception e) {
             return null;
         }
     }
-
 }

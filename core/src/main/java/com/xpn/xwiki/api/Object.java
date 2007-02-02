@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,8 +19,6 @@
  *
  * @author amelentev
  */
-
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
@@ -28,50 +26,60 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-public class Object extends Collection {
-
-    public Object(BaseObject obj, XWikiContext context) {
+public class Object extends Collection
+{
+    public Object(BaseObject obj, XWikiContext context)
+    {
         super(obj, context);
     }
 
-    protected BaseObject getBaseObject() {
+    protected BaseObject getBaseObject()
+    {
         return (BaseObject) getCollection();
     }
 
-    public BaseObject getXWikiObject() {
-        if (hasProgrammingRights())
-         return (BaseObject) getCollection();
-        else
-         return null;
+    public BaseObject getXWikiObject()
+    {
+        if (hasProgrammingRights()) {
+            return (BaseObject) getCollection();
+        } else {
+            return null;
+        }
     }
 
-    public java.lang.Object get(String name) {
+    public java.lang.Object get(String name)
+    {
         String docname = getCollection().getName();
         try {
-            XWikiDocument doc = context.getWiki().getDocument(docname, context);
-            return doc.display(name, this.getBaseObject(), context);
+            XWikiDocument doc = getContext().getWiki().getDocument(docname, getContext());
+            return doc.display(name, this.getBaseObject(), getContext());
         } catch (XWikiException e) {
             return null;
         }
     }
 
-    public java.lang.Object display(String name, String mode) {
+    public java.lang.Object display(String name, String mode)
+    {
         String docname = getCollection().getName();
         try {
-            XWikiDocument doc = context.getWiki().getDocument(docname, context);
-            return doc.display(name, mode, this.getBaseObject(), context);
+            XWikiDocument doc = getContext().getWiki().getDocument(docname, getContext());
+            return doc.display(name, mode, this.getBaseObject(), getContext());
         } catch (XWikiException e) {
             return null;
         }
     }
 
-    public boolean equals(java.lang.Object arg0) {
-        if (!(arg0 instanceof Object)) return false;
+    public boolean equals(java.lang.Object arg0)
+    {
+        if (!(arg0 instanceof Object)) {
+            return false;
+        }
         Object o = (Object) arg0;
-        return o.context.equals(context) && element.equals(o.element);
+        return o.getContext().equals(getContext()) && element.equals(o.element);
     }
 
-    public void set(String fieldname, java.lang.Object value) {
-        getBaseObject().set(fieldname, value, context);
+    public void set(String fieldname, java.lang.Object value)
+    {
+        getBaseObject().set(fieldname, value, getContext());
     }
 }

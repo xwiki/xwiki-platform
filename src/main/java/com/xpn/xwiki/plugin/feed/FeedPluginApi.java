@@ -47,27 +47,27 @@ public class FeedPluginApi extends Api {
     }
 
     public SyndFeed getFeeds(String sfeeds) throws IOException {
-        return plugin.getFeeds(sfeeds, context);
+        return plugin.getFeeds(sfeeds, getContext());
     }
 
     public SyndFeed getFeeds(String sfeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, force, context);
+        return plugin.getFeeds(sfeeds, force, getContext());
     }
 
     public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, context);
+        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, getContext());
     }
 
     public SyndFeed getFeed(String sfeed) throws IOException {
-        return plugin.getFeed(sfeed, false, context);
+        return plugin.getFeed(sfeed, false, getContext());
     }
 
     public SyndFeed getFeed(String sfeed, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, force, context);
+        return plugin.getFeed(sfeed, force, getContext());
     }
 
     public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, context);
+        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, getContext());
     }
 
     public int updateFeeds() throws XWikiException {
@@ -84,18 +84,18 @@ public class FeedPluginApi extends Api {
 
     public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException {
         if (hasProgrammingRights())
-         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, context);
+         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, getContext());
         else
          return -1;
     }
 
     public int updateFeed(String feedname, String feedurl) {
-        return plugin.updateFeed(feedname, feedurl, true, context);
+        return plugin.updateFeed(feedname, feedurl, true, getContext());
     }
 
     public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry) {
         if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, context);
+         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, getContext());
         else
          return -1;
     }

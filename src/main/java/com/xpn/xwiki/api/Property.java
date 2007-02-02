@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -18,37 +18,44 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
 
-public class Property extends Element {
-
-    public Property(BaseProperty property, XWikiContext context) {
-       super(property, context);
+public class Property extends Element
+{
+    public Property(BaseProperty property, XWikiContext context)
+    {
+        super(property, context);
     }
 
-    protected BaseProperty getBaseProperty() {
-        return (BaseProperty)element;
+    protected BaseProperty getBaseProperty()
+    {
+        return (BaseProperty) element;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return element.getName();
     }
 
-    public BaseProperty getProperty() {
-        if (hasProgrammingRights())
+    public BaseProperty getProperty()
+    {
+        if (hasProgrammingRights()) {
             return (BaseProperty) element;
-        else
+        } else {
             return null;
+        }
     }
 
-    public java.lang.Object getValue() {
-        if (element.getName().equals("password") && !context.getWiki().getRightService().hasProgrammingRights(context))
+    public java.lang.Object getValue()
+    {
+        if (element.getName().equals("password") &&
+            !getContext().getWiki().getRightService().hasProgrammingRights(getContext()))
+        {
             return null;
-        return ((BaseProperty)element).getValue();
+        }
+        return ((BaseProperty) element).getValue();
     }
 }

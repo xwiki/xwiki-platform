@@ -45,10 +45,10 @@ public class CaptchaPluginApi extends Api {
     }
 
     public String displayCaptcha(String action, String classname) throws XWikiException {
-        return getPlugin().displayCaptcha(action, classname, context);
+        return getPlugin().displayCaptcha(action, classname, getContext());
     }
 
     public Boolean verifyCaptcha(String action) throws XWikiException {
-        return getPlugin().verifyCaptcha(action, context);
+        return getPlugin().verifyCaptcha(action, getContext());
     }
 }

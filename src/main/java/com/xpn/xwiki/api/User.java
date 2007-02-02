@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,8 +19,6 @@
  *
  * @author kaaloo
  */
-
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,24 +28,28 @@ import com.xpn.xwiki.user.api.XWikiUser;
 
 import java.util.Collection;
 
-public class User extends Api {
+public class User extends Api
+{
     private XWikiUser user;
 
-    public User(XWikiUser user, XWikiContext context) {
-       super(context);
-       this.user = user;
+    public User(XWikiUser user, XWikiContext context)
+    {
+        super(context);
+        this.user = user;
     }
 
-    public XWikiUser getUser() {
-        if (hasProgrammingRights())
+    public XWikiUser getUser()
+    {
+        if (hasProgrammingRights()) {
             return user;
-		return null;
-    }
-    
-    public boolean isUserInGroup(String groupName) throws XWikiException {
-    	XWikiGroupService groupService = context.getWiki().getGroupService(context);
-    	Collection groups = groupService.listGroupsForUser(user.getUser(), context);
-    	return groups.contains(groupName);
+        }
+        return null;
     }
 
+    public boolean isUserInGroup(String groupName) throws XWikiException
+    {
+        XWikiGroupService groupService = getContext().getWiki().getGroupService(getContext());
+        Collection groups = groupService.listGroupsForUser(user.getUser(), getContext());
+        return groups.contains(groupName);
+    }
 }

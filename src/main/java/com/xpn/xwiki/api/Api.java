@@ -22,13 +22,37 @@ package com.xpn.xwiki.api;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from
+ * Velocity or Groovy in XWiki documents.
+ *
+ * @version $Id: $
+ */
 public class Api
 {
+    /**
+     * @see #getContext()
+     * @todo make this variable private after we agree on it on the mailing list. It'll break
+     *       non-core plugins but better do it now rather than after the 1.0 release...
+     */
     protected XWikiContext context;
 
+    /**
+     * @param context the XWiki Context object
+     * @see #getContext()
+     */
     public Api(XWikiContext context)
     {
         this.context = context;
+    }
+
+    /**
+     * @return The XWiki Context object containing all information about the current XWiki instance,
+     *         including information on the current request and response.
+     */
+    public XWikiContext getContext()
+    {
+        return this.context;
     }
 
     /**

@@ -46,34 +46,34 @@ public class LDAPPluginApi extends Api {
     }
 
     public HashMap search(String searchstr, String[] params) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, null, context);
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, null, getContext());
     }
 
     public HashMap search(String searchstr, int scope, String[] params) throws LDAPException {
-        return plugin.search(searchstr, scope, params, null, context);
+        return plugin.search(searchstr, scope, params, null, getContext());
     }
 
     public HashMap search(String searchstr, String[] params, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, connection, context);
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, connection, getContext());
     }
 
     public HashMap search(String searchstr) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, null, context);
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, null, getContext());
     }
 
     public HashMap search(String searchstr, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, connection, context);
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, connection, getContext());
     }
 
     public HashMap search(String searchstr, int scope, String[] params, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, scope, params, connection, context);
+        return plugin.search(searchstr, scope, params, connection, getContext());
     }
 
     public HashMap getEntry(String dn) throws LDAPException {
-        return plugin.getEntry(dn, context);
+        return plugin.getEntry(dn, getContext());
     }
 
     public HashMap getEntry(String dn, HashMap connection) throws LDAPException {
-        return plugin.getEntry(dn, connection, context);
+        return plugin.getEntry(dn, connection, getContext());
     }    
 }

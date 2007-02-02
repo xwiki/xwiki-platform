@@ -77,7 +77,7 @@ public class Document extends Api {
      * @return
      */
     public XWikiDocument getDocument() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return doc;
         else
             return null;
@@ -375,7 +375,7 @@ public class Document extends Api {
      * @throws XWikiException
      */
     public XWikiDocumentArchive getDocumentArchive() throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return doc.getDocumentArchive(context);
         return null;
     }
@@ -642,14 +642,14 @@ public class Document extends Api {
     }
 
     public String toXML() throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return doc.toXML(context);
         else
             return "";
     }
 
     public org.dom4j.Document toXMLDocument() throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             return doc.toXMLDocument(context);
         else return null;
     }
@@ -1218,7 +1218,7 @@ public class Document extends Api {
     }
 
     public void saveWithProgrammingRights() throws XWikiException {
-        if (checkProgrammingRights()){
+        if (hasProgrammingRights()){
             saveDocument();
         }
         else {
@@ -1309,7 +1309,7 @@ public class Document extends Api {
     }
 
     public void deleteWithProgrammingRights() throws XWikiException {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
             context.getWiki().deleteDocument(getDocument(), context);
         else {
             java.lang.Object[] args = {doc.getFullName()};

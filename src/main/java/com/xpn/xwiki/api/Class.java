@@ -89,7 +89,7 @@ public class Class extends Collection {
      * @return the BaseClass (without the wrapping) if you have the programming right.
      */
     public BaseClass getXWikiClass() {
-        if (checkProgrammingRights())
+        if (hasProgrammingRights())
          return (BaseClass) getCollection();
         else
          return null;

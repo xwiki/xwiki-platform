@@ -50,7 +50,7 @@ public class Api
      * @return The XWiki Context object containing all information about the current XWiki instance,
      *         including information on the current request and response.
      */
-    public XWikiContext getContext()
+    protected XWikiContext getContext()
     {
         return this.context;
     }

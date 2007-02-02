@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,239 +19,259 @@
  *
  * @author ludovic
  */
-
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import java.util.List;
 
-
-public class Context extends Api {
-
-    public Context(XWikiContext context) {
+public class Context extends Api
+{
+    public Context(XWikiContext context)
+    {
         super(context);
     }
 
     /**
-     *
      * @return an object which contains the Request context
      */
-    public XWikiRequest getRequest() {
-       return context.getRequest();
+    public XWikiRequest getRequest()
+    {
+        return getContext().getRequest();
     }
 
     /**
-     *
      * @return an object which contains the response object
      */
-    public XWikiResponse getResponse() {
-       return context.getResponse();
+    public XWikiResponse getResponse()
+    {
+        return getContext().getResponse();
     }
 
-    public int getMode() {
-        return context.getMode();
+    public int getMode()
+    {
+        return getContext().getMode();
     }
 
     /**
-     *
      * @return the current database name
      */
-    public String getDatabase() {
-        return context.getDatabase();
+    public String getDatabase()
+    {
+        return getContext().getDatabase();
     }
 
     /**
-     *
      * @return the original database
      */
-    public String getOriginalDatabase() {
-        return context.getOriginalDatabase();
+    public String getOriginalDatabase()
+    {
+        return getContext().getOriginalDatabase();
     }
 
     /**
      * set the database if you have the programming right
+     *
      * @param database the data name
      */
-    public void setDatabase(String database) {
-        if (hasProgrammingRights())
-          context.setDatabase(database);
+    public void setDatabase(String database)
+    {
+        if (hasProgrammingRights()) {
+            getContext().setDatabase(database);
+        }
     }
 
     /**
-     *
      * @return the url Factory
      */
-    public XWikiURLFactory getURLFactory() {
-        return context.getURLFactory();
+    public XWikiURLFactory getURLFactory()
+    {
+        return getContext().getURLFactory();
     }
 
     /**
-     *
      * @return true if the server is in virtual mode (ie host more than one wiki)
      */
-    public boolean isVirtual() {
-        return context.isVirtual();
+    public boolean isVirtual()
+    {
+        return getContext().isVirtual();
     }
 
     /**
-     *
      * @return the requested action
      */
-    public String getAction() {
-         return context.getAction();
+    public String getAction()
+    {
+        return getContext().getAction();
     }
 
     /**
-     *
      * @return the language of the current user
      */
-    public String getLanguage() {
-         return context.getLanguage();
+    public String getLanguage()
+    {
+        return getContext().getLanguage();
     }
 
     /**
-     *
      * @return the interface language preference of the current user
      */
-    public String getInterfaceLanguage() {
-         return context.getInterfaceLanguage();
+    public String getInterfaceLanguage()
+    {
+        return getContext().getInterfaceLanguage();
     }
 
     /**
-     *
      * @return the XWiki object if you have the programming right
      */
-    public com.xpn.xwiki.XWiki getXWiki() {
-        if (hasProgrammingRights())
-         return context.getWiki();
-        else
-         return null;
+    public com.xpn.xwiki.XWiki getXWiki()
+    {
+        if (hasProgrammingRights()) {
+            return getContext().getWiki();
+        } else {
+            return null;
+        }
     }
 
     /**
-     *
      * @return the current requested document
      */
-    public XWikiDocument getDoc() {
-        if (hasProgrammingRights())
-         return context.getDoc();
-        else
-         return null;
+    public XWikiDocument getDoc()
+    {
+        if (hasProgrammingRights()) {
+            return getContext().getDoc();
+        } else {
+            return null;
+        }
     }
 
     /**
-     *
      * @return the current user which made the request
      */
-    public String getUser() {
-         return context.getUser();
+    public String getUser()
+    {
+        return getContext().getUser();
     }
 
     /**
-     *
      * @return the local username of the current user which made the request
      */
-    public String getLocalUser() {
-        return context.getLocalUser();
+    public String getLocalUser()
+    {
+        return getContext().getLocalUser();
     }
 
     /**
      * set the document if you have the programming right
-     * @param doc
      */
-    public void setDoc(XWikiDocument doc) {
-        if (hasProgrammingRights())
-          context.setDoc(doc);
+    public void setDoc(XWikiDocument doc)
+    {
+        if (hasProgrammingRights()) {
+            getContext().setDoc(doc);
+        }
     }
 
     /**
-     *
      * @return the unwrapped version of the context if you have the programming right
      */
-    public XWikiContext getContext() {
-        if (hasProgrammingRights())
-         return context;
-        else
-         return null;
-    }
-
-    protected XWikiContext getProtectedContext() {
-         return context;
-    }
-
-    public java.lang.Object get(String key) {
-        if (hasProgrammingRights())
-            return context.get(key);
-        else
+    public XWikiContext getContext()
+    {
+        if (hasProgrammingRights()) {
+            return getContext();
+        } else {
             return null;
+        }
     }
 
-    public java.lang.Object getEditorWysiwyg() {
-            return context.getEditorWysiwyg();
+    protected XWikiContext getProtectedContext()
+    {
+        return getContext();
     }
 
-    public void put(String key, java.lang.Object value) {
-        if (hasProgrammingRights())
-            context.put(key, value);
+    public java.lang.Object get(String key)
+    {
+        if (hasProgrammingRights()) {
+            return getContext().get(key);
+        } else {
+            return null;
+        }
     }
 
-    public void setFinished(boolean finished) {
-        context.setFinished(finished);
+    public java.lang.Object getEditorWysiwyg()
+    {
+        return getContext().getEditorWysiwyg();
+    }
+
+    public void put(String key, java.lang.Object value)
+    {
+        if (hasProgrammingRights()) {
+            getContext().put(key, value);
+        }
+    }
+
+    public void setFinished(boolean finished)
+    {
+        getContext().setFinished(finished);
     }
 
     /**
-     *
      * @return the cache duration
      */
-    public int getCacheDuration() {
-        return context.getCacheDuration();
+    public int getCacheDuration()
+    {
+        return getContext().getCacheDuration();
     }
 
     /**
-     *
      * @param duration in second
      */
-    public void setCacheDuration(int duration) {
-        context.setCacheDuration(duration);
+    public void setCacheDuration(int duration)
+    {
+        getContext().setCacheDuration(duration);
     }
 
-    public void setLinksAction(String action) {
-        context.setLinksAction(action);
+    public void setLinksAction(String action)
+    {
+        getContext().setLinksAction(action);
     }
 
-    public void unsetLinksAction() {
-        context.unsetLinksAction();
+    public void unsetLinksAction()
+    {
+        getContext().unsetLinksAction();
     }
 
-    public String getLinksAction() {
-        return context.getLinksAction();
+    public String getLinksAction()
+    {
+        return getContext().getLinksAction();
     }
 
-    public void setLinksQueryString(String value) {
-        context.setLinksQueryString(value);
+    public void setLinksQueryString(String value)
+    {
+        getContext().setLinksQueryString(value);
     }
 
-    public void unsetLinksQueryString() {
-        context.unsetLinksQueryString();
+    public void unsetLinksQueryString()
+    {
+        getContext().unsetLinksQueryString();
     }
 
-    public String getLinksQueryString() {
-        return context.getLinksQueryString();
+    public String getLinksQueryString()
+    {
+        return getContext().getLinksQueryString();
     }
 
-    public XWikiValidationStatus getValidationStatus() {
-        return context.getValidationStatus();
+    public XWikiValidationStatus getValidationStatus()
+    {
+        return getContext().getValidationStatus();
     }
 
-    public List getDisplayedFields() {
-        return context.getDisplayedFields();
+    public List getDisplayedFields()
+    {
+        return getContext().getDisplayedFields();
     }
-
 }

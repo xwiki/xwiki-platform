@@ -40,8 +40,8 @@ public class ImagePluginAPI  extends Api {
 
     public int getHeight(String pageName, String attachmentName){
         try {
-            XWikiAttachment attachment = context.getWiki().getDocument(pageName, context).getAttachment(attachmentName);
-            return plugin.getHeight(attachment, context);
+            XWikiAttachment attachment = getContext().getWiki().getDocument(pageName, getContext()).getAttachment(attachmentName);
+            return plugin.getHeight(attachment, getContext());
         } catch (Exception e) {
             return -1;
         }
@@ -49,8 +49,8 @@ public class ImagePluginAPI  extends Api {
 
     public int getWidth(String pageName, String attachmentName){
         try {
-            XWikiAttachment attachment = context.getWiki().getDocument(pageName, context).getAttachment(attachmentName);
-            return plugin.getWidth(attachment, context);
+            XWikiAttachment attachment = getContext().getWiki().getDocument(pageName, getContext()).getAttachment(attachmentName);
+            return plugin.getWidth(attachment, getContext());
         } catch (Exception e) {
             return -1;
         }

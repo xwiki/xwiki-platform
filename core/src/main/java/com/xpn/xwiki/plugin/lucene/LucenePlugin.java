@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.DocChangeRule;
@@ -36,14 +35,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searcher;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,14 +93,8 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         super.finalize();
     }
 
-    /**
-     * Trigger a rebuild of the whole Lucene index.
-     *
-     * @return Number of documents scheduled for indexing. -1 in case of errors
-     */
-    public synchronized int rebuildIndex(XWiki wiki, XWikiContext context)
-    {
-        return this.indexRebuilder.rebuildIndex(wiki, context);
+    public synchronized int rebuildIndex(XWikiContext context) {
+        return indexRebuilder.rebuildIndex(context);
     }
 
     /**
@@ -116,66 +102,160 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
      * Slower than {@link #getSearchResults}since new index searcher instances are created for every
      * query.
      *
-     * @param query query string
-     * @param myIndexDirs comma separated list of directories containing the lucene indexes to
-     * search.
-     * @param languages comma separated list of language codes to search in, may be null to search
-     * all languages
+     * @param query       query string
+     * @param myIndexDirs comma separated list of directories containing the lucene
+     *                    indexes to search.
+     * @param languages   comma separated list of language codes to search in, may be
+     *                    null to search all languages
+     * @context context of the request
+     * @return
+     * @throws Exception
      */
-    public SearchResults getSearchResultsFromIndexes(String query, String myIndexDirs,
-        String languages,
-        XWiki wiki) throws Exception
-    {
+    public SearchResults getSearchResultsFromIndexes(String query, String myIndexDirs, String languages,
+                                                     XWikiContext context) throws Exception {
         Searcher[] mySearchers = createSearchers(myIndexDirs);
-        SearchResults retval = search(query, null, languages, mySearchers, wiki);
+        SearchResults retval = search(query, (String) null, null, languages, mySearchers, context);
         closeSearchers(mySearchers);
         return retval;
     }
 
     /**
-     * Searches all Indexes configured in xwiki.cfg (property <code>xwiki.plugins.lucene.indexdir</code>)
+     * Allows to search special named lucene indexes without having to configure
+     * them in xwiki.cfg. Slower than {@link #getSearchResults}since
+     * new index searcher instances are created for every query.
      *
-     * @param query query String entered into a search form
-     * @param wiki XWiki
+     * @param query       query string
+     * @param sortField   sort field(s)
+     * @param myIndexDirs comma separated list of directories containing the lucene
+     *                    indexes to search.
+     * @param languages   comma separated list of language codes to search in, may be
+     *                    null to search all languages
+     * @context context of the request
+     * @return
+     * @throws Exception
+     */
+    public SearchResults getSearchResultsFromIndexes(String query, String[] sortField, String myIndexDirs, String languages,
+                                                     XWikiContext context) throws Exception {
+        Searcher[] mySearchers = createSearchers(myIndexDirs);
+        SearchResults retval = search(query, sortField, null, languages, mySearchers, context);
+        closeSearchers(mySearchers);
+        return retval;
+    }
+
+    /**
+     * Allows to search special named lucene indexes without having to configure
+     * them in xwiki.cfg. Slower than {@link #getSearchResults}since
+     * new index searcher instances are created for every query.
+     *
+     * @param query       query string
+     * @param sortField   sort field(s)
+     * @param myIndexDirs comma separated list of directories containing the lucene
+     *                    indexes to search.
+     * @param languages   comma separated list of language codes to search in, may be
+     *                    null to search all languages
+     * @context context of the request
+     * @return
+     * @throws Exception
+     */
+    public SearchResults getSearchResultsFromIndexes(String query, String sortField, String myIndexDirs, String languages,
+                                                     XWikiContext context) throws Exception {
+        Searcher[] mySearchers = createSearchers(myIndexDirs);
+        SearchResults retval = search(query, sortField, null, languages, mySearchers, context);
+        closeSearchers(mySearchers);
+        return retval;
+    }
+
+    /**
+     * Searches all Indexes configured in xwiki.cfg (property
+     * <code>xwiki.plugins.lucene.indexdir</code>)
+     *
+     * @param query            query String entered into a search form
+     * @param sortField   sort field(s)
      * @param virtualWikiNames Name of the virtual Wiki to search, global search when null
      * @param languages comma separated list of language codes to search in, may be null to search
      * all languages
      * @return Searchresults as a collection of Maps
+     * @context context of the request
      * @throws Exception in case of error(s)
      */
-    public SearchResults getSearchResults(String query, String virtualWikiNames, String languages,
-        XWiki wiki)
-        throws Exception
-    {
-        return search(query, virtualWikiNames, languages, this.searchers, wiki);
+    public SearchResults getSearchResults(String query, String sortField, String virtualWikiNames, String languages, XWikiContext context)
+            throws Exception {
+        return search(query, sortField, virtualWikiNames, languages, this.searchers, context);
     }
 
     /**
-     * @param virtualWikiNames comma separated list of virtual wiki names to search in, may be null
-     * to search all virtual wikis
+     * Searches all Indexes configured in xwiki.cfg (property
+     * <code>xwiki.plugins.lucene.indexdir</code>)
+     *
+     * @param query            query String entered into a search form
+     * @param sortField   sort field(s)
+     * @param virtualWikiNames Name of the virtual Wiki to search, global search when null
      * @param languages comma separated list of language codes to search in, may be null to search
      * all languages
+     * @return Searchresults as a collection of Maps
+     * @context context of the request
+     * @throws Exception in case of error(s)
      */
-    private SearchResults search(String query, String virtualWikiNames, String languages,
-        Searcher[] indexes, XWiki wiki) throws IOException, ParseException
-    {
+    public SearchResults getSearchResults(String query, String[] sortField, String virtualWikiNames, String languages, XWikiContext context)
+            throws Exception {
+        return search(query, sortField, virtualWikiNames, languages, this.searchers, context);
+    }
+
+    /**
+     * @param query
+     * @param sortField   sort field(s)
+     * @param indexes
+     * @param virtualWikiNames comma separated list of virtual wiki names to search in, may
+     *                         be null to search all virtual wikis
+     * @param languages        comma separated list of language codes to search in, may be
+     *                         null to search all languages
+     * @context context of the request
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    private SearchResults search(String query, String sortField, String virtualWikiNames, String languages,
+                                 Searcher[] indexes, XWikiContext context) throws IOException, ParseException {
         MultiSearcher searcher = new MultiSearcher(indexes);
         Query q = buildQuery(query, virtualWikiNames, languages);
-        Hits hits = searcher.search(q);
+        Hits hits = (sortField==null) ? searcher.search(q) : searcher.search(q, new Sort(sortField));
         final int hitcount = hits.length();
         if (LOG.isDebugEnabled()) {
             LOG.debug("query " + q + " returned " + hitcount + " hits");
         }
-        return new SearchResults(hits, wiki);
+        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
     }
 
     /**
+     * @param sortField   sort field(s)
+     * @param indexes
+     * @param virtualWikiNames comma separated list of virtual wiki names to search in, may
+     *                         be null to search all virtual wikis
+     * @param languages        comma separated list of language codes to search in, may be
+     *                         null to search all languages
+     * @context context of the request
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    private SearchResults search(String query, String[] sortField, String virtualWikiNames, String languages,
+                                 Searcher[] indexes, XWikiContext context) throws IOException, ParseException {
+        MultiSearcher searcher = new MultiSearcher(indexes);
+        Query q = buildQuery(query, virtualWikiNames, languages);
+        Hits hits = (sortField==null) ? searcher.search(q) : searcher.search(q, new Sort(sortField));
+        final int hitcount = hits.length();
+        if (LOG.isDebugEnabled()) LOG.debug("query " + q + " returned " + hitcount + " hits");
+        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
+    }
+
+    /**
+     * @param query
      * @param virtualWikiNames comma separated list of virtual wiki names
      * @param languages comma separated list of language codes to search in, may be null to search
      * all languages
      */
     private Query buildQuery(String query, String virtualWikiNames, String languages)
-        throws ParseException
+            throws ParseException
     {
         // build a query like this: <user query string> AND <wikiNamesQuery> AND
         // <languageQuery>
@@ -207,11 +287,11 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
         if (virtualWikiNames != null && virtualWikiNames.length() > 0) {
             bQuery.add(buildOredTermQuery(virtualWikiNames, IndexFields.DOCUMENT_WIKI),
-                BooleanClause.Occur.SHOULD);
+                    BooleanClause.Occur.SHOULD);
         }
         if (languages != null && languages.length() > 0) {
             bQuery.add(buildOredTermQuery(languages, IndexFields.DOCUMENT_LANGUAGE),
-                BooleanClause.Occur.SHOULD);
+                    BooleanClause.Occur.SHOULD);
         }
         return bQuery;
     }
@@ -228,7 +308,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             BooleanQuery orQuery = new BooleanQuery();
             for (int i = 0; i < valueArray.length; i++) {
                 orQuery.add(new TermQuery(new Term(fieldname, valueArray[i].trim())),
-                    BooleanClause.Occur.SHOULD);
+                        BooleanClause.Occur.SHOULD);
             }
             return orQuery;
         }
@@ -245,7 +325,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         config = context.getWiki().getConfig();
         try {
             analyzer = (Analyzer) Class.forName(config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER))
-                .newInstance();
+                    .newInstance();
         } catch (Exception e) {
             e.printStackTrace();
             LOG.error("error instantiating analyzer : ", e);
@@ -255,7 +335,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             } catch (Exception e1) {
                 e1.printStackTrace();
                 throw new RuntimeException("instantiation of default analyzer " + DEFAULT_ANALYZER
-                    + " failed", e1);
+                        + " failed", e1);
             }
         }
         this.indexDirs = config.getProperty(PROP_INDEX_DIR);
@@ -337,9 +417,9 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             this.searchers = createSearchers(indexDirs);
         } catch (Exception e1) {
             LOG.error(
-                "error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e1);
+                    "error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e1);
             throw new RuntimeException("error opening searchers for index dirs "
-                + config.getProperty(PROP_INDEX_DIR), e1);
+                    + config.getProperty(PROP_INDEX_DIR), e1);
         }
     }
 

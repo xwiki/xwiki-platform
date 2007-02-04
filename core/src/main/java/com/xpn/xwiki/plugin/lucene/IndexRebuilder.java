@@ -21,16 +21,12 @@ package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Handles rebuilding of the whole Index. This involves the following steps:
@@ -61,18 +57,19 @@ public class IndexRebuilder
      * First empties the index, then fetches all Documents, their translations and their attachments
      * for re-addition to the index.
      *
-     * @return total number of documents and attachments successfully added to the indexer queue,
-     *         -1 when errors occured.
+     * @param context
+     * @return total number of documentes and attachments successfully added to
+     *         the indexer queue, -1 when errors occured.
+     * @throws XWikiException
      * @todo TODO: give more detailed results
      */
-    public int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, XWikiContext context)
-    {
+    public int rebuildIndex(XWikiContext context) {
         indexUpdater.cleanIndex();
         int retval = 0;
         Collection wikiServers;
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
-        if (wiki.isVirtual()) {
-            wikiServers = findWikiServers(wiki, context);
+        if (xwiki.isVirtual()) {
+            wikiServers = findWikiServers(context);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("found " + wikiServers.size() + " virtual wikis:");
                 for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
@@ -87,7 +84,7 @@ public class IndexRebuilder
         }
         // Iterate all found virtual wikis
         for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
-            int wikiResult = indexWiki(xwiki, (String) iter.next());
+            int wikiResult = indexWiki((String) iter.next(), context);
             if (retval != -1) {
                 retval += wikiResult;
             }
@@ -97,12 +94,16 @@ public class IndexRebuilder
 
     /**
      * Adds the content of a given wiki to the indexUpdater's queue.
+     *
+     * @param wikiName
+     * @param context
+     * @return
      */
-    protected int indexWiki(com.xpn.xwiki.XWiki xwiki, String wikiName)
-    {
+    protected int indexWiki(String wikiName, XWikiContext context) {
         LOG.info("reading content of wiki " + wikiName);
         int retval = 0;
         XWikiContext wikiContext = new XWikiContext();
+        XWiki xwiki = context.getWiki();
         wikiContext.setWiki(xwiki);
         wikiContext.setDatabase(wikiName);
         Collection docNames = null;
@@ -184,7 +185,7 @@ public class IndexRebuilder
             translations = document.getTranslationList(wikiContext);
         } catch (XWikiException e) {
             LOG.error("error getting list of translations from document " + document.getFullName(),
-                e);
+                    e);
             e.printStackTrace();
             return 0;
         }
@@ -195,7 +196,7 @@ public class IndexRebuilder
                 retval++;
             } catch (XWikiException e1) {
                 LOG.error("error getting translated document for document " + document.getFullName()
-                    + " and language " + lang);
+                        + " and language " + lang);
                 e1.printStackTrace();
             }
         }
@@ -203,18 +204,17 @@ public class IndexRebuilder
     }
 
     /**
-     * @param wiki
+     * @param context
      * @return
      */
-    private Collection findWikiServers(XWiki wiki, XWikiContext context)
-    {
+    private Collection findWikiServers(XWikiContext context) {
         List retval = new ArrayList();
         final String hql = ", BaseObject as obj, StringProperty as prop "
-            + "where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass'"
-            + " and prop.id.id = obj.id " + "and prop.id.name = 'server'";
+                + "where doc.fullName=obj.name and obj.className='XWiki.XWikiServerClass'"
+                + " and prop.id.id = obj.id " + "and prop.id.name = 'server'";
         List result = null;
         try {
-            result = wiki.getXWiki().getStore().searchDocumentsNames(hql, context);
+            result = context.getWiki().getStore().searchDocumentsNames(hql, context);
         } catch (Exception e) {
             LOG.error("error getting list of wiki servers!");
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,10 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author namphunghai
- * @author torcq
- * @author sdumitriu
  */
 package com.xpn.xwiki.web;
 
@@ -32,44 +28,71 @@ import org.apache.velocity.VelocityContext;
 
 import java.io.IOException;
 
-public class ViewAction extends XWikiAction {
-    public boolean action(XWikiContext context) throws XWikiException {
+/**
+ * Action called when the request URL has the "/view/" string in its path (this is configured
+ * in <code>struts-config.xml</code>. It means the request is to display a page in view mode.
+ *
+ * @version $Id: $ 
+ */
+public class ViewAction extends XWikiAction
+{
+    /**
+     * {@inheritDoc}
+     * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
+     */
+    public boolean action(XWikiContext context) throws XWikiException
+    {
+        boolean shouldRender = true;
+
         XWikiRequest request = context.getRequest();
-        context.put("action","view");
+        context.put("action", "view");
+
+        // Redirect to the ViewrevAction is the URL has a rev parameter (when the user asks to
+        // view a specific revision of a document).
         String rev = request.getParameter("rev");
-        if (rev!=null) {
+        if (rev != null) {
             String url = context.getDoc().getURL("viewrev", request.getQueryString(), context);
             try {
                 context.getResponse().sendRedirect(url);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            shouldRender = false;
             return false;
         }
-        return true;
+
+        return shouldRender;
     }
 
-    public String render(XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext) 
+     */
+    public String render(XWikiContext context) throws XWikiException
+    {
         handleRevision(context);
         XWikiDocument doc = (XWikiDocument) context.get("doc");
         XWiki xwiki = context.getWiki();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
-        // Add captcha plugin for comment to avoid spam robots
+        // Register the captcha plugin in the Velocity context so that it can be used later on
+        // to avoid spam robots.
         if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null)
+            CaptchaPluginApi captchaPluginApi =
+                (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+            if (captchaPluginApi != null) {
                 vcontext.put("captchaPlugin", captchaPluginApi);
-            else
+            } else {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                        XWikiException.ERROR_XWIKI_UNKNOWN, "CaptchaPlugin not loaded");
+                    XWikiException.ERROR_XWIKI_UNKNOWN, "CaptchaPlugin not loaded");
+            }
         }
 
         String defaultTemplate = doc.getDefaultTemplate();
-        if ((defaultTemplate !=null) && (!defaultTemplate.equals(""))) {
-        	return defaultTemplate;
+        if ((defaultTemplate != null) && (!defaultTemplate.equals(""))) {
+            return defaultTemplate;
+        } else {
+            return "view";
         }
-        else
-        	return "view";
     }
 }

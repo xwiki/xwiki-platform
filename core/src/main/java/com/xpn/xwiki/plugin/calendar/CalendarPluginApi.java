@@ -53,28 +53,28 @@ public class CalendarPluginApi extends Api {
     }
 
     public CalendarParams getCalendarParams(String month, String year) {
-        return getPlugin().getCalendarParams(month, year, getContext());
+        return getPlugin().getCalendarParams(month, year, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, user, getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, Document doc, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, doc.getDocument(), user, getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, doc.getDocument(), user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, hql, user, getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, hql, user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, hql, nb, getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, hql, nb, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData) throws XWikiException
     {
-        return getPlugin().getHTMLCalendar(calendarParams, calendarData, getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, calendarData, getXWikiContext());
     }
 
     public CalendarParams getCalendarParams() {
@@ -107,35 +107,35 @@ public class CalendarPluginApi extends Api {
     }
 
     public Calendar getCalendar(long time) {
-        Calendar cal = Calendar.getInstance(getContext().getResponse().getLocale());
+        Calendar cal = Calendar.getInstance(getXWikiContext().getResponse().getLocale());
         cal.setTime(new Date(time));
         return cal;
     }
 
     public Calendar getCalendar() {
-        Calendar cal = Calendar.getInstance(getContext().getResponse().getLocale());
+        Calendar cal = Calendar.getInstance(getXWikiContext().getResponse().getLocale());
         cal.setTime(new Date());
         return cal;
     }
 
     public net.fortuna.ical4j.model.Calendar getCalendar(String surl) throws ParserException, IOException {
-        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, getContext());
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, getXWikiContext());
         return calendar;
     }
 
 
     public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password) throws ParserException, IOException {
-        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, getContext());
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, getXWikiContext());
         return calendar;
     }
 
     public CalendarData getCalendarEvents(String surl, String user) throws ParserException, IOException {
-        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, getContext());
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, getXWikiContext());
         return fromCalendar(calendar, user);
     }
 
     public CalendarData getCalendarEvents(String surl, String user, String username, String password) throws ParserException, IOException {
-        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, getContext());
+        net.fortuna.ical4j.model.Calendar calendar = plugin.getCalendar(surl, username, password, getXWikiContext());
         return fromCalendar(calendar, user);
     }
 
@@ -204,21 +204,21 @@ public class CalendarPluginApi extends Api {
     }
 
     public String toICal(Document doc, String user) throws XWikiException {
-      CalendarData cData = new CalendarData(doc.getDocument(), user, getContext());
+      CalendarData cData = new CalendarData(doc.getDocument(), user, getXWikiContext());
       return toICal(cData);
     }
 
     public String toICal(String user) throws XWikiException {
-      CalendarData cData = new CalendarData(getContext().getDoc(), user, getContext());
+      CalendarData cData = new CalendarData(getXWikiContext().getDoc(), user, getXWikiContext());
       return toICal(cData);
     }
 
     public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user) throws XWikiException, ParserException, IOException {
-        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user), getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user), getXWikiContext());
     }
 
     public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user, String username, String password) throws XWikiException, ParserException, IOException {
-        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user, username, password), getContext());
+        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user, username, password), getXWikiContext());
     }
 
 }

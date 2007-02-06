@@ -46,34 +46,34 @@ public class LDAPPluginApi extends Api {
     }
 
     public HashMap search(String searchstr, String[] params) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, null, getContext());
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, null, getXWikiContext());
     }
 
     public HashMap search(String searchstr, int scope, String[] params) throws LDAPException {
-        return plugin.search(searchstr, scope, params, null, getContext());
+        return plugin.search(searchstr, scope, params, null, getXWikiContext());
     }
 
     public HashMap search(String searchstr, String[] params, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, connection, getContext());
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, params, connection, getXWikiContext());
     }
 
     public HashMap search(String searchstr) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, null, getContext());
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, null, getXWikiContext());
     }
 
     public HashMap search(String searchstr, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, connection, getContext());
+        return plugin.search(searchstr, LDAPConnection.SCOPE_SUB, null, connection, getXWikiContext());
     }
 
     public HashMap search(String searchstr, int scope, String[] params, HashMap connection) throws LDAPException {
-        return plugin.search(searchstr, scope, params, connection, getContext());
+        return plugin.search(searchstr, scope, params, connection, getXWikiContext());
     }
 
     public HashMap getEntry(String dn) throws LDAPException {
-        return plugin.getEntry(dn, getContext());
+        return plugin.getEntry(dn, getXWikiContext());
     }
 
     public HashMap getEntry(String dn, HashMap connection) throws LDAPException {
-        return plugin.getEntry(dn, connection, getContext());
+        return plugin.getEntry(dn, connection, getXWikiContext());
     }    
 }

@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiException;
 public class Api
 {
     /**
-     * @see #getContext()
+     * @see #getXWikiContext()
      * @todo make this variable private after we agree on it on the mailing list. It'll break
      *       non-core plugins but better do it now rather than after the 1.0 release...
      */
@@ -39,7 +39,7 @@ public class Api
 
     /**
      * @param context the XWiki Context object
-     * @see #getContext()
+     * @see #getXWikiContext()
      */
     public Api(XWikiContext context)
     {
@@ -53,7 +53,7 @@ public class Api
      * @return The XWiki Context object containing all information about the current XWiki instance,
      *         including information on the current request and response.
      */
-    protected XWikiContext getContext()
+    protected XWikiContext getXWikiContext()
     {
         return this.context;
     }

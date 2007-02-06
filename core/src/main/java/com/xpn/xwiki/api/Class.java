@@ -71,7 +71,7 @@ public class Class extends Collection
         int i = 0;
         for (Iterator it = coll.iterator(); it.hasNext(); i++) {
             properties[i] = new PropertyClass(
-                (com.xpn.xwiki.objects.classes.PropertyClass) it.next(), getContext());
+                (com.xpn.xwiki.objects.classes.PropertyClass) it.next(), getXWikiContext());
         }
         Arrays.sort(properties, new PropertyComparator());
         return properties;
@@ -87,7 +87,7 @@ public class Class extends Collection
     {
         return new PropertyClass(
             (com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name),
-            getContext());
+            getXWikiContext());
     }
 
     /**
@@ -107,8 +107,8 @@ public class Class extends Collection
      */
     public Object newObject() throws XWikiException
     {
-        BaseObject obj = (BaseObject) getBaseClass().newObject(getContext());
-        return obj.newObjectApi(obj, getContext());
+        BaseObject obj = (BaseObject) getBaseClass().newObject(getXWikiContext());
+        return obj.newObjectApi(obj, getXWikiContext());
     }
 }
 

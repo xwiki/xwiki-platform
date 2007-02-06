@@ -51,8 +51,8 @@ public class Object extends Collection
     {
         String docname = getCollection().getName();
         try {
-            XWikiDocument doc = getContext().getWiki().getDocument(docname, getContext());
-            return doc.display(name, this.getBaseObject(), getContext());
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
         }
@@ -62,8 +62,8 @@ public class Object extends Collection
     {
         String docname = getCollection().getName();
         try {
-            XWikiDocument doc = getContext().getWiki().getDocument(docname, getContext());
-            return doc.display(name, mode, this.getBaseObject(), getContext());
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
         }
@@ -75,11 +75,11 @@ public class Object extends Collection
             return false;
         }
         Object o = (Object) arg0;
-        return o.getContext().equals(getContext()) && element.equals(o.element);
+        return o.getXWikiContext().equals(getXWikiContext()) && element.equals(o.element);
     }
 
     public void set(String fieldname, java.lang.Object value)
     {
-        getBaseObject().set(fieldname, value, getContext());
+        getBaseObject().set(fieldname, value, getXWikiContext());
     }
 }

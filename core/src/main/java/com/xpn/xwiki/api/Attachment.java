@@ -130,7 +130,7 @@ public class Attachment extends Api {
      * @throws XWikiException
      */
     public byte[] getContent() throws XWikiException {
-        return attachment.getContent(getContext());
+        return attachment.getContent(getXWikiContext());
     }
 
     /**
@@ -142,7 +142,7 @@ public class Attachment extends Api {
     }
 
     public Version[] getVersions() throws XWikiException {
-        attachment.loadArchive(getContext());
+        attachment.loadArchive(getXWikiContext());
         return attachment.getVersions();
     }
 
@@ -152,7 +152,7 @@ public class Attachment extends Api {
      * @throws XWikiException
      */
     public List getVersionList() throws XWikiException {
-        attachment.loadArchive(getContext());
+        attachment.loadArchive(getXWikiContext());
         return attachment.getVersionList();
     }
 
@@ -173,7 +173,7 @@ public class Attachment extends Api {
      * @return the mimetype of the attachment
      */
     public String getMimeType() {
-        return attachment.getMimeType(getContext());
+        return attachment.getMimeType(getXWikiContext());
     }
 
     /**
@@ -181,10 +181,10 @@ public class Attachment extends Api {
      * @return true if it's an image
      */
     public boolean isImage() {
-        return attachment.isImage(getContext());
+        return attachment.isImage(getXWikiContext());
     }
 
      public XWikiAttachment getAttachmentRevision(String rev) throws XWikiException{
-        return attachment.getAttachmentRevision(rev, getContext());
+        return attachment.getAttachmentRevision(rev, getXWikiContext());
     }
 }

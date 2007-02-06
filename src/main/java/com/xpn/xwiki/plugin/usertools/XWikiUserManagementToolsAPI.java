@@ -39,19 +39,19 @@ public class XWikiUserManagementToolsAPI extends Api{
     }
 
     public String inviteUser(String name, String email) throws XWikiException {
-        return userMngtTools.inviteUser(name, email, getContext());
+        return userMngtTools.inviteUser(name, email, getXWikiContext());
     }
 
     public boolean resendInvitation(String email) throws XWikiException {
-        return userMngtTools.resendInvitation(email, getContext());
+        return userMngtTools.resendInvitation(email, getXWikiContext());
     }
 
     public String getUserSpace() {
-        return userMngtTools.getUserSpace(getContext());
+        return userMngtTools.getUserSpace(getXWikiContext());
     }
 
     public String getUserPage(String email) {
-        return userMngtTools.getUserPage(email, getContext());
+        return userMngtTools.getUserPage(email, getXWikiContext());
     }
 
     public boolean isValidEmail(String email) {
@@ -59,10 +59,10 @@ public class XWikiUserManagementToolsAPI extends Api{
     }
 
     public String getUserName(String userPage) throws XWikiException {
-        return userMngtTools.getUserName(userPage, getContext());
+        return userMngtTools.getUserName(userPage, getXWikiContext());
     }
 
     public String getEmail(String userPage) throws XWikiException {
-        return userMngtTools.getEmail(userPage, getContext());
+        return userMngtTools.getEmail(userPage, getXWikiContext());
     }
 }

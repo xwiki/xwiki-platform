@@ -120,17 +120,17 @@ public class PackageAPI   extends Api {
         ArrayList APIfiles = new ArrayList(files.size());
 
         for (int i = 0; i < files.size(); i++)
-            APIfiles.add(new DocumentInfoAPI((DocumentInfo) files.get(i), getContext()));
+            APIfiles.add(new DocumentInfoAPI((DocumentInfo) files.get(i), getXWikiContext()));
         return APIfiles;
     }
 
 
     public boolean add(String docFullName, int DefaultAction) throws XWikiException {
-        return plugin.add(docFullName, DefaultAction, getContext());
+        return plugin.add(docFullName, DefaultAction, getXWikiContext());
     }
 
     public boolean add(String docFullName) throws XWikiException {
-        return plugin.add(docFullName, getContext());
+        return plugin.add(docFullName, getXWikiContext());
     }
 
     public void setDocumentAction(String docFullName, int action)
@@ -157,53 +157,53 @@ public class PackageAPI   extends Api {
 
 
     public String export() throws IOException, XWikiException {
-        getContext().getResponse().setContentType("application/zip");
-        getContext().getResponse().addHeader("Content-disposition", "attachment; filename=" + XWiki.getURLEncoded(plugin.getName()) + ".xar");
-        getContext().setFinished(true);
-        return  plugin.export(getContext().getResponse().getOutputStream(), getContext());
+        getXWikiContext().getResponse().setContentType("application/zip");
+        getXWikiContext().getResponse().addHeader("Content-disposition", "attachment; filename=" + XWiki.getURLEncoded(plugin.getName()) + ".xar");
+        getXWikiContext().setFinished(true);
+        return  plugin.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
     }
 
     public String Import(byte file[]) throws IOException, XWikiException {
-        return plugin.Import(file, getContext());
+        return plugin.Import(file, getXWikiContext());
     }
 
     public int testInstall()
     {
-        return plugin.testInstall(false, getContext());
+        return plugin.testInstall(false, getXWikiContext());
     }
 
     public int testInstall(boolean isAdmin)
     {
-        return plugin.testInstall(isAdmin, getContext());
+        return plugin.testInstall(isAdmin, getXWikiContext());
     }
 
     public void backupWiki() throws XWikiException, IOException {
-        plugin.addAllWikiDocuments(getContext());
+        plugin.addAllWikiDocuments(getXWikiContext());
         this.export();
     }
 
     public String toXml()
     {
-        return plugin.toXml(getContext());
+        return plugin.toXml(getXWikiContext());
     }
 
     public int install() throws XWikiException {
-        return plugin.install(getContext());
+        return plugin.install(getXWikiContext());
     }
 
     public List getErrors() {
-        return plugin.getErrors(getContext());
+        return plugin.getErrors(getXWikiContext());
     }
 
     public List getSkipped() {
-        return plugin.getSkipped(getContext());
+        return plugin.getSkipped(getXWikiContext());
     }
 
     public List getInstalled() {
-        return plugin.getInstalled(getContext());
+        return plugin.getInstalled(getXWikiContext());
     }
 
     public int getStatus() {
-        return plugin.getStatus(getContext());
+        return plugin.getStatus(getXWikiContext());
     }
 }

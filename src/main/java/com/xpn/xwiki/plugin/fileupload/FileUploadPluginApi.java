@@ -43,7 +43,7 @@ public class FileUploadPluginApi extends PluginApi {
      *  Deletes all temporary files of the upload
      */
     public void cleanFileList() {
-        getFileUploadPlugin().cleanFileList(getContext());
+        getFileUploadPlugin().cleanFileList(getXWikiContext());
     }
 
     /**
@@ -52,7 +52,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @throws XWikiException An XWikiException is thrown if the request could not be parser
      */
     public void loadFileList() throws XWikiException {
-        getFileUploadPlugin().loadFileList(getContext());
+        getFileUploadPlugin().loadFileList(getXWikiContext());
     }
 
     /**
@@ -64,7 +64,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @throws XWikiException An XWikiException is thrown if the request could not be parser
      */
     public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir) throws XWikiException {
-        getFileUploadPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir, getContext());
+        getFileUploadPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir, getXWikiContext());
     }
 
     /**
@@ -73,7 +73,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @return a list of FileItem elements
      */
     public List getFileItems() {
-        return getFileUploadPlugin().getFileItems(getContext());
+        return getFileUploadPlugin().getFileItems(getXWikiContext());
     }
 
     /**
@@ -85,7 +85,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @throws XWikiException Exception is thrown if the data could not be read
      */
     public byte[] getFileItemData(String name) throws XWikiException {
-        return getFileUploadPlugin().getFileItemData(name, getContext());
+        return getFileUploadPlugin().getFileItemData(name, getXWikiContext());
     }
 
     /**
@@ -97,7 +97,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @throws XWikiException Exception is thrown if the data could not be read
      */
     public String getFileItem(String name) throws XWikiException {
-        return getFileUploadPlugin().getFileItem(name, getContext());
+        return getFileUploadPlugin().getFileItem(name, getXWikiContext());
     }
 
     /**
@@ -107,7 +107,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @return List of strings of the item names
      */
     public List getFileItemNames() {
-        return getFileUploadPlugin().getFileItemNames(getContext());
+        return getFileUploadPlugin().getFileItemNames(getXWikiContext());
     }
 
     /**
@@ -116,6 +116,6 @@ public class FileUploadPluginApi extends PluginApi {
      * @return  The file name
      */
     public String getFileName(String name) {
-        return getFileUploadPlugin().getFileName(name, getContext());
+        return getFileUploadPlugin().getFileName(name, getXWikiContext());
     }
 }

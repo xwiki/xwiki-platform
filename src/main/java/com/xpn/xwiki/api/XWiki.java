@@ -84,7 +84,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public String getRequestURL() throws XWikiException {
-        return getContext().getURLFactory().getRequestURL(getContext()).toString();
+        return getXWikiContext().getURLFactory().getRequestURL(getXWikiContext()).toString();
     }
 
     /**
@@ -95,12 +95,12 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public Document getDocument(String fullname) throws XWikiException {
-        XWikiDocument doc = xwiki.getDocument(fullname, getContext());
-        if (xwiki.getRightService().hasAccessLevel("view", getContext().getUser(), doc.getFullName(), getContext()) == false) {
+        XWikiDocument doc = xwiki.getDocument(fullname, getXWikiContext());
+        if (xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(), getXWikiContext()) == false) {
             return null;
         }
 
-        Document newdoc = doc.newDocument(getContext());
+        Document newdoc = doc.newDocument(getXWikiContext());
         return newdoc;
     }
 
@@ -112,7 +112,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public boolean exists(String fullname) throws XWikiException {
-        return xwiki.exists(fullname, getContext());
+        return xwiki.exists(fullname, getXWikiContext());
     }
 
     /**
@@ -125,8 +125,8 @@ public class XWiki extends Api {
     public boolean checkAccess(String docname, String right) {
         try {
             XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(docname, getContext());
-            return getContext().getWiki().checkAccess(right, doc, getContext());
+            doc.setFullName(docname, getXWikiContext());
+            return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
             return false;
         }
@@ -142,12 +142,12 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public Document getDocument(String web, String fullname) throws XWikiException {
-        XWikiDocument doc = xwiki.getDocument(web, fullname, getContext());
-        if (xwiki.getRightService().hasAccessLevel("view", getContext().getUser(), doc.getFullName(), getContext()) == false) {
+        XWikiDocument doc = xwiki.getDocument(web, fullname, getXWikiContext());
+        if (xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(), getXWikiContext()) == false) {
             return null;
         }
 
-        Document newdoc = doc.newDocument(getContext());
+        Document newdoc = doc.newDocument(getXWikiContext());
         return newdoc;
     }
 
@@ -163,14 +163,14 @@ public class XWiki extends Api {
         if ((doc == null) || (doc.getDoc() == null))
             return null;
 
-        if (xwiki.getRightService().hasAccessLevel("view", getContext().getUser(), doc.getFullName(), getContext()) == false) {
+        if (xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getFullName(), getXWikiContext()) == false) {
             // Finally we return null, otherwise showing search result is a real pain
             return null;
         }
 
         try {
-            XWikiDocument revdoc = xwiki.getDocument(doc.getDoc(), rev, getContext());
-            Document newdoc = revdoc.newDocument(getContext());
+            XWikiDocument revdoc = xwiki.getDocument(doc.getDoc(), rev, getXWikiContext());
+            Document newdoc = revdoc.newDocument(getXWikiContext());
             return newdoc;
         } catch (Exception e) {
             // Can't read versioned document
@@ -217,7 +217,7 @@ public class XWiki extends Api {
      * @return the textarea text content
      */
     public String getTextArea(String content) {
-        return com.xpn.xwiki.XWiki.getTextArea(content, getContext());
+        return com.xpn.xwiki.XWiki.getTextArea(content, getXWikiContext());
     }
 
     /**
@@ -227,7 +227,7 @@ public class XWiki extends Api {
      * @return the htmlarea text content
      */
     public String getHTMLArea(String content) {
-        return xwiki.getHTMLArea(content, getContext());
+        return xwiki.getHTMLArea(content, getXWikiContext());
     }
 
     /**
@@ -237,7 +237,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List getClassList() throws XWikiException {
-        return xwiki.getClassList(getContext());
+        return xwiki.getClassList(getXWikiContext());
     }
 
     /**
@@ -258,7 +258,7 @@ public class XWiki extends Api {
      */
     public List search(String wheresql) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.search(wheresql, getContext());
+            return xwiki.search(wheresql, getXWikiContext());
 		return null;
     }
 
@@ -273,7 +273,7 @@ public class XWiki extends Api {
      */
     public List search(String wheresql, int nb, int start) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.search(wheresql, nb, start, getContext());
+            return xwiki.search(wheresql, nb, start, getXWikiContext());
 		return null;
     }
 
@@ -308,7 +308,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List searchDocuments(String wheresql) throws XWikiException {
-        return xwiki.getStore().searchDocumentsNames(wheresql, getContext());
+        return xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
     }
 
     /**
@@ -322,7 +322,7 @@ public class XWiki extends Api {
      * @see List searchDocuments(String where sql)
      */
     public List searchDocuments(String wheresql, int nb, int start) throws XWikiException {
-        return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getContext());
+        return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, getXWikiContext());
     }
 
     /**
@@ -338,7 +338,7 @@ public class XWiki extends Api {
      */
     public List searchDocuments(String wheresql, int nb, int start, String selectColumns) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, getContext());
+            return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns, getXWikiContext());
         return null;
     }
 
@@ -350,7 +350,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List searchDocuments(String wheresql, boolean distinctbylanguage) throws XWikiException {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, getContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, getXWikiContext()));
     }
 
     /**
@@ -363,7 +363,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start) throws XWikiException {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, getContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, getXWikiContext()));
     }
 
     /**
@@ -380,7 +380,7 @@ public class XWiki extends Api {
                 try {
                     if (obj instanceof XWikiDocument) {
                         XWikiDocument doc = (XWikiDocument) obj;
-                        Document wrappedDoc = doc.newDocument(getContext());
+                        Document wrappedDoc = doc.newDocument(getXWikiContext());
                         result.add(wrappedDoc);
                     } else if (obj instanceof Document) {
                         result.add(obj);
@@ -402,7 +402,7 @@ public class XWiki extends Api {
      * @return evaluated content if the content contains velocity scripts
      */
     public String parseContent(String content) {
-        return xwiki.parseContent(content, getContext());
+        return xwiki.parseContent(content, getXWikiContext());
     }
 
     /**
@@ -413,7 +413,7 @@ public class XWiki extends Api {
      * @return Final message
      */
     public String parseMessage() {
-        return xwiki.parseMessage(getContext());
+        return xwiki.parseMessage(getXWikiContext());
     }
 
     /**
@@ -426,7 +426,7 @@ public class XWiki extends Api {
      * @return the result of the parsed message
      */
     public String parseMessage(String id) {
-        return xwiki.parseMessage(id, getContext());
+        return xwiki.parseMessage(id, getXWikiContext());
     }
 
     /**
@@ -439,7 +439,7 @@ public class XWiki extends Api {
      * @return the result of the parsed message
      */
     public String getMessage(String id) {
-        return xwiki.getMessage(id, getContext());
+        return xwiki.getMessage(id, getXWikiContext());
     }
 
     /**
@@ -450,7 +450,7 @@ public class XWiki extends Api {
      * @return Evaluated content from the template
      */
     public String parseTemplate(String template) {
-        return xwiki.parseTemplate(template, getContext());
+        return xwiki.parseTemplate(template, getXWikiContext());
     }
 
     /**
@@ -461,7 +461,7 @@ public class XWiki extends Api {
      * @return Evaluated content from the template
      */
     public String renderTemplate(String template) {
-        return xwiki.renderTemplate(template, getContext());
+        return xwiki.renderTemplate(template, getXWikiContext());
     }
 
     /**
@@ -472,7 +472,7 @@ public class XWiki extends Api {
      * @return text result of the servlet
      */
     public String invokeServletAndReturnAsString(String url) {
-        return xwiki.invokeServletAndReturnAsString(url, getContext());
+        return xwiki.invokeServletAndReturnAsString(url, getXWikiContext());
     }
 
     /**
@@ -484,7 +484,7 @@ public class XWiki extends Api {
      * @return URL to access this file
      */
     public String getSkinFile(String filename) {
-        return xwiki.getSkinFile(filename, getContext());
+        return xwiki.getSkinFile(filename, getXWikiContext());
     }
 
     /**
@@ -497,7 +497,7 @@ public class XWiki extends Api {
      * @return URL to access this file
      */
     public String getSkinFile(String filename, boolean forceSkinAction) {
-        return xwiki.getSkinFile(filename, forceSkinAction, getContext());
+        return xwiki.getSkinFile(filename, forceSkinAction, getXWikiContext());
     }
 
     /**
@@ -512,7 +512,7 @@ public class XWiki extends Api {
      * @return The current skin for this request and user
      */
     public String getSkin() {
-        return xwiki.getSkin(getContext());
+        return xwiki.getSkin(getXWikiContext());
     }
 
     /**
@@ -522,7 +522,7 @@ public class XWiki extends Api {
      * @return The current baseskin for this request and user
      */
     public String getBaseSkin() {
-        return xwiki.getBaseSkin(getContext());
+        return xwiki.getBaseSkin(getXWikiContext());
     }
 
     /**
@@ -532,7 +532,7 @@ public class XWiki extends Api {
      * @return the text for the copyright
      */
     public String getWebCopyright() {
-        return xwiki.getWebCopyright(getContext());
+        return xwiki.getWebCopyright(getXWikiContext());
     }
 
     /**
@@ -543,7 +543,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getXWikiPreference(String prefname) {
-        return xwiki.getXWikiPreference(prefname, getContext());
+        return xwiki.getXWikiPreference(prefname, getXWikiContext());
     }
 
     /**
@@ -555,7 +555,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getXWikiPreference(String prefname, String default_value) {
-        return xwiki.getXWikiPreference(prefname, default_value, getContext());
+        return xwiki.getXWikiPreference(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -567,7 +567,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getWebPreference(String prefname) {
-        return xwiki.getWebPreference(prefname, getContext());
+        return xwiki.getWebPreference(prefname, getXWikiContext());
     }
 
     /**
@@ -580,7 +580,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getWebPreferenceFor(String prefname, String space) {
-        return xwiki.getWebPreference(prefname, space, "", getContext());
+        return xwiki.getWebPreference(prefname, space, "", getXWikiContext());
     }
 
     /**
@@ -593,7 +593,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getWebPreference(String prefname, String default_value) {
-        return xwiki.getWebPreference(prefname, default_value, getContext());
+        return xwiki.getWebPreference(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -603,7 +603,7 @@ public class XWiki extends Api {
      * @return The preference for the current skin
      */
     public String getSkinPreference(String prefname) {
-        return xwiki.getSkinPreference(prefname, getContext());
+        return xwiki.getSkinPreference(prefname, getXWikiContext());
     }
 
     /**
@@ -614,7 +614,7 @@ public class XWiki extends Api {
      * @return The preference for the current skin
      */
     public String getSkinPreference(String prefname, String default_value) {
-        return xwiki.getSkinPreference(prefname, default_value, getContext());
+        return xwiki.getSkinPreference(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -627,7 +627,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in long format
      */
     public String getWebPreferenceFor(String prefname, String space, String default_value) {
-        return xwiki.getWebPreference(prefname, space, default_value, getContext());
+        return xwiki.getWebPreference(prefname, space, default_value, getXWikiContext());
     }
 
     /**
@@ -639,7 +639,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in long format
      */
     public long getXWikiPreferenceAsLong(String prefname, long default_value) {
-        return xwiki.getXWikiPreferenceAsLong(prefname, default_value, getContext());
+        return xwiki.getXWikiPreferenceAsLong(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -650,7 +650,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in long format
      */
     public long getXWikiPreferenceAsLong(String prefname) {
-        return xwiki.getXWikiPreferenceAsLong(prefname, getContext());
+        return xwiki.getXWikiPreferenceAsLong(prefname, getXWikiContext());
     }
 
     /**
@@ -663,7 +663,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in long format
      */
     public long getWebPreferenceAsLong(String prefname, long default_value) {
-        return xwiki.getWebPreferenceAsLong(prefname, default_value, getContext());
+        return xwiki.getWebPreferenceAsLong(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -675,7 +675,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in long format
      */
     public long getWebPreferenceAsLong(String prefname) {
-        return xwiki.getWebPreferenceAsLong(prefname, getContext());
+        return xwiki.getWebPreferenceAsLong(prefname, getXWikiContext());
     }
 
     /**
@@ -687,7 +687,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in int format
      */
     public int getXWikiPreferenceAsInt(String prefname, int default_value) {
-        return xwiki.getXWikiPreferenceAsInt(prefname, default_value, getContext());
+        return xwiki.getXWikiPreferenceAsInt(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -698,7 +698,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in int format
      */
     public int getXWikiPreferenceAsInt(String prefname) {
-        return xwiki.getXWikiPreferenceAsInt(prefname, getContext());
+        return xwiki.getXWikiPreferenceAsInt(prefname, getXWikiContext());
     }
 
     /**
@@ -711,7 +711,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in int format
      */
     public int getWebPreferenceAsInt(String prefname, int default_value) {
-        return xwiki.getWebPreferenceAsInt(prefname, default_value, getContext());
+        return xwiki.getWebPreferenceAsInt(prefname, default_value, getXWikiContext());
     }
 
     /**
@@ -723,7 +723,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language in int format
      */
     public int getWebPreferenceAsInt(String prefname) {
-        return xwiki.getWebPreferenceAsInt(prefname, getContext());
+        return xwiki.getWebPreferenceAsInt(prefname, getXWikiContext());
     }
 
     /**
@@ -735,7 +735,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getUserPreference(String prefname) {
-        return xwiki.getUserPreference(prefname, getContext());
+        return xwiki.getUserPreference(prefname, getXWikiContext());
     }
 
     /**
@@ -745,7 +745,7 @@ public class XWiki extends Api {
      * @return The preference for this wiki and the current language
      */
     public String getUserPreferenceFromCookie(String prefname) {
-        return xwiki.getUserPreferenceFromCookie(prefname, getContext());
+        return xwiki.getUserPreferenceFromCookie(prefname, getXWikiContext());
     }
 
     /**
@@ -760,7 +760,7 @@ public class XWiki extends Api {
      * @return the document language preference for the request
      */
     public String getLanguagePreference() {
-        return xwiki.getLanguagePreference(getContext());
+        return xwiki.getLanguagePreference(getXWikiContext());
     }
 
     /**
@@ -768,7 +768,7 @@ public class XWiki extends Api {
      * @return current language for the request
      */
     public String getDocLanguagePreference() {
-        return xwiki.getDocLanguagePreference(getContext());
+        return xwiki.getDocLanguagePreference(getXWikiContext());
     }
 
     /**
@@ -783,7 +783,7 @@ public class XWiki extends Api {
      * @return the document language preference for the request
      */
     public String getInterfaceLanguagePreference() {
-        return xwiki.getInterfaceLanguagePreference(getContext());
+        return xwiki.getInterfaceLanguagePreference(getXWikiContext());
     }
 
     /**
@@ -799,7 +799,7 @@ public class XWiki extends Api {
      * @return true for multi-lingual/false for mono-lingual
      */
     public boolean isMultiLingual() {
-        return xwiki.isMultiLingual(getContext());
+        return xwiki.isMultiLingual(getXWikiContext());
     }
 
     /**
@@ -808,7 +808,7 @@ public class XWiki extends Api {
      */
     public void flushCache() {
         if (hasProgrammingRights())
-            xwiki.flushCache(getContext());
+            xwiki.flushCache(getXWikiContext());
     }
 
     /**
@@ -819,7 +819,7 @@ public class XWiki extends Api {
     public void resetRenderingEngine() {
         if (hasProgrammingRights())
             try {
-                xwiki.resetRenderingEngine(getContext());
+                xwiki.resetRenderingEngine(getXWikiContext());
             } catch (XWikiException e) {
             }
     }
@@ -866,12 +866,12 @@ public class XWiki extends Api {
                 registerRight = true;
             } else
             {
-                registerRight = xwiki.getRightService().hasAccessLevel("register", getContext().getUser(),
-                        "XWiki.XWikiPreferences", getContext());
+                registerRight = xwiki.getRightService().hasAccessLevel("register", getXWikiContext().getUser(),
+                        "XWiki.XWikiPreferences", getXWikiContext());
             }
 
             if (registerRight)
-                return xwiki.createUser(withValidation, userRights, getContext());
+                return xwiki.createUser(withValidation, userRights, getXWikiContext());
             return -1;
 
         } catch (Exception e) {
@@ -935,7 +935,7 @@ public class XWiki extends Api {
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin,
                              String baseWikiName, String description, String language, boolean failOnExist) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language, failOnExist, getContext());
+            return xwiki.createNewWiki(wikiName, wikiUrl, wikiAdmin, baseWikiName, description, language, failOnExist, getXWikiContext());
         return -1;
     }
 
@@ -947,7 +947,7 @@ public class XWiki extends Api {
      * @throws XWikiException
      */
     public int validateUser(boolean withConfirmEmail) throws XWikiException {
-        return xwiki.validateUser(withConfirmEmail, getContext());
+        return xwiki.validateUser(withConfirmEmail, getXWikiContext());
     }
 
     /**
@@ -957,7 +957,7 @@ public class XWiki extends Api {
      */
     public void addToAllGroup(String fullwikiname) throws XWikiException {
         if (hasProgrammingRights())
-            xwiki.setUserDefaultGroup(fullwikiname, getContext());
+            xwiki.setUserDefaultGroup(fullwikiname, getXWikiContext());
     }
 
     /**
@@ -971,7 +971,7 @@ public class XWiki extends Api {
      */
     public void sendConfirmationMail(String xwikiname, String password, String email, String add_message, String contentfield) throws XWikiException {
         if (hasProgrammingRights())
-            xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getContext());
+            xwiki.sendConfirmationEmail(xwikiname, password, email, add_message, contentfield, getXWikiContext());
     }
 
     /**
@@ -984,7 +984,7 @@ public class XWiki extends Api {
      */
     public void sendConfirmationMail(String xwikiname, String password, String email, String contentfield) throws XWikiException {
         if (hasProgrammingRights())
-            xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, getContext());
+            xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield, getXWikiContext());
     }
 
     /**
@@ -996,7 +996,7 @@ public class XWiki extends Api {
      */
     public void sendMessage(String sender, String recipient, String message) throws XWikiException {
         if (hasProgrammingRights())
-            xwiki.sendMessage(sender, recipient, message, getContext());
+            xwiki.sendMessage(sender, recipient, message, getXWikiContext());
     }
 
     /**
@@ -1008,7 +1008,7 @@ public class XWiki extends Api {
      */
     public void sendMessage(String sender, String[] recipient, String message) throws XWikiException {
         if (hasProgrammingRights())
-            xwiki.sendMessage(sender, recipient, message, getContext());
+            xwiki.sendMessage(sender, recipient, message, getXWikiContext());
     }
 
     /**
@@ -1020,7 +1020,7 @@ public class XWiki extends Api {
      */
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, null, null, null, false, getContext());
+            return xwiki.copyDocument(docname, targetdocname, null, null, null, false, getXWikiContext());
 		return false;
     }
 
@@ -1034,7 +1034,7 @@ public class XWiki extends Api {
      */
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, null, null, wikilanguage, false, getContext());
+            return xwiki.copyDocument(docname, targetdocname, null, null, wikilanguage, false, getXWikiContext());
 		return false;
     }
 
@@ -1049,7 +1049,7 @@ public class XWiki extends Api {
      */
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, getContext());
+            return xwiki.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, getXWikiContext());
 		return false;
     }
 
@@ -1065,7 +1065,7 @@ public class XWiki extends Api {
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, getContext());
+            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, getXWikiContext());
 		return false;
     }
 
@@ -1082,7 +1082,7 @@ public class XWiki extends Api {
      */
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki, String wikilanguage, boolean reset, boolean force) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, getContext());
+            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, getXWikiContext());
 		return false;
     }
 
@@ -1098,7 +1098,7 @@ public class XWiki extends Api {
      */
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikiLanguage, boolean clean) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, getContext());
+            return xwiki.copyWikiWeb(web, sourceWiki, targetWiki, wikiLanguage, clean, getXWikiContext());
 		return -1;
     }
 
@@ -1136,8 +1136,8 @@ public class XWiki extends Api {
      */
     public String includeTopic(String topic, boolean pre) throws XWikiException {
         if (pre)
-            return "{pre}" + xwiki.include(topic, false, getContext()) + "{/pre}";
-		return xwiki.include(topic, false, getContext());
+            return "{pre}" + xwiki.include(topic, false, getXWikiContext()) + "{/pre}";
+		return xwiki.include(topic, false, getXWikiContext());
     }
 
     /**
@@ -1152,8 +1152,8 @@ public class XWiki extends Api {
      */
     public String includeForm(String topic, boolean pre) throws XWikiException {
         if (pre)
-            return "{pre}" + xwiki.include(topic, true, getContext()) + "{/pre}";
-		return xwiki.include(topic, true, getContext());
+            return "{pre}" + xwiki.include(topic, true, getXWikiContext()) + "{/pre}";
+		return xwiki.include(topic, true, getXWikiContext());
     }
 
     /**
@@ -1163,7 +1163,7 @@ public class XWiki extends Api {
      */
     public boolean hasAccessLevel(String level) {
         try {
-            return xwiki.getRightService().hasAccessLevel(level, getContext().getUser(), getContext().getDoc().getFullName(), getContext());
+            return xwiki.getRightService().hasAccessLevel(level, getXWikiContext().getUser(), getXWikiContext().getDoc().getFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1178,7 +1178,7 @@ v     * API to check rights on a document for a given user
      */
     public boolean hasAccessLevel(String level, String user, String docname) {
         try {
-            return xwiki.getRightService().hasAccessLevel(level, user, docname, getContext());
+            return xwiki.getRightService().hasAccessLevel(level, user, docname, getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1192,7 +1192,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the evaluation went wrong
      */
     public String renderText(String text, Document doc) throws XWikiException {
-        return xwiki.getRenderingEngine().renderText(text, doc.getDoc(), getContext());
+        return xwiki.getRenderingEngine().renderText(text, doc.getDoc(), getXWikiContext());
     }
 
     /**
@@ -1219,7 +1219,7 @@ v     * API to check rights on a document for a given user
             return buf.toString();
 
         try {
-            return xwiki.getRenderingEngine().renderText(buf.toString(), doc.getDoc(), getContext());
+            return xwiki.getRenderingEngine().renderText(buf.toString(), doc.getDoc(), getXWikiContext());
         } catch (Exception e) {
             return buf.toString();
         }
@@ -1231,7 +1231,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if something went wrong
      */
     public List getSpaces() throws XWikiException {
-        return xwiki.getSpaces(getContext());
+        return xwiki.getSpaces(getXWikiContext());
     }
 
     /**
@@ -1241,7 +1241,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the loading went wrong
      */
     public List getSpaceDocsName(String SpaceName) throws XWikiException {
-        return xwiki.getSpaceDocsName(SpaceName, getContext());
+        return xwiki.getSpaceDocsName(SpaceName, getXWikiContext());
     }
 
     /**
@@ -1337,7 +1337,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the URL could not be generated properly
      */
     public String getAttachmentURL(String fullname, String filename) throws XWikiException {
-        return xwiki.getAttachmentURL(fullname, filename, getContext());
+        return xwiki.getAttachmentURL(fullname, filename, getXWikiContext());
     }
 
     /**
@@ -1351,7 +1351,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the URL could not be generated properly
      */
     public String getURL(String fullname) throws XWikiException {
-        return xwiki.getURL(fullname, "view", getContext());
+        return xwiki.getURL(fullname, "view", getXWikiContext());
     }
 
     /**
@@ -1366,7 +1366,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the URL could not be generated properly
      */
     public String getURL(String fullname, String action) throws XWikiException {
-        return xwiki.getURL(fullname, action, getContext());
+        return xwiki.getURL(fullname, action, getXWikiContext());
     }
 
     /**
@@ -1383,7 +1383,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException if the URL could not be generated properly
      */
     public String getURL(String fullname, String action, String querystring) throws XWikiException {
-        return xwiki.getURL(fullname, action, querystring, getContext());
+        return xwiki.getURL(fullname, action, querystring, getXWikiContext());
     }
 
     /**
@@ -1460,7 +1460,7 @@ v     * API to check rights on a document for a given user
      */
     public void outputImage(BufferedImage image) throws IOException {
         JPEGImageEncoder encoder;
-        OutputStream ostream = getContext().getResponse().getOutputStream();
+        OutputStream ostream = getXWikiContext().getResponse().getOutputStream();
         encoder = JPEGCodec.createJPEGEncoder(ostream);
         encoder.encode(image);
         ostream.flush();
@@ -1474,7 +1474,7 @@ v     * API to check rights on a document for a given user
      * @return A DocumentStats object with number of actions performed, unique visitors, number of visits
      */
     public DocumentStats getCurrentMonthXWikiStats(String action) {
-        return getContext().getWiki().getStatsService(getContext()).getDocMonthStats("", action, new Date(), getContext());
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext()).getDocMonthStats("", action, new Date(), getXWikiContext());
     }
 
     /**
@@ -1487,7 +1487,7 @@ v     * API to check rights on a document for a given user
      */
     public String getRefererText(String referer) {
         try {
-            return xwiki.getRefererText(referer, getContext());
+            return xwiki.getRefererText(referer, getXWikiContext());
         } catch (Exception e) {
             return "";
         }
@@ -1504,9 +1504,9 @@ v     * API to check rights on a document for a given user
      **/
     public String getShortRefererText(String referer, int length) {
         try {
-            return xwiki.getRefererText(referer, getContext()).substring(0, length);
+            return xwiki.getRefererText(referer, getXWikiContext()).substring(0, length);
         } catch (Exception e) {
-            return xwiki.getRefererText(referer, getContext());
+            return xwiki.getRefererText(referer, getXWikiContext());
         }
     }
 
@@ -1528,7 +1528,7 @@ v     * API to check rights on a document for a given user
      * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getUserName(String user) {
-        return xwiki.getUserName(user, null, getContext());
+        return xwiki.getUserName(user, null, getXWikiContext());
     }
 
     /**
@@ -1541,7 +1541,7 @@ v     * API to check rights on a document for a given user
      * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getUserName(String user, String format) {
-        return xwiki.getUserName(user, format, getContext());
+        return xwiki.getUserName(user, format, getXWikiContext());
     }
 
     /**
@@ -1552,9 +1552,9 @@ v     * API to check rights on a document for a given user
      */
     public String getLocalUserName(String user) {
         try {
-            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), null, getContext());
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), null, getXWikiContext());
         } catch (Exception e) {
-            return xwiki.getUserName(user, null, getContext());
+            return xwiki.getUserName(user, null, getXWikiContext());
         }
     }
 
@@ -1569,9 +1569,9 @@ v     * API to check rights on a document for a given user
      */
     public String getLocalUserName(String user, String format) {
         try {
-            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, getContext());
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, getXWikiContext());
         } catch (Exception e) {
-            return xwiki.getUserName(user, format, getContext());
+            return xwiki.getUserName(user, format, getXWikiContext());
         }
     }
 
@@ -1584,7 +1584,7 @@ v     * API to check rights on a document for a given user
      * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getUserName(String user, boolean link) {
-        return xwiki.getUserName(user, null, link, getContext());
+        return xwiki.getUserName(user, null, link, getXWikiContext());
     }
 
     /**
@@ -1599,7 +1599,7 @@ v     * API to check rights on a document for a given user
      * @return The first name and last name fields surrounded with a link to the user page
      */
     public String getUserName(String user, String format, boolean link) {
-        return xwiki.getUserName(user, format, link, getContext());
+        return xwiki.getUserName(user, format, link, getXWikiContext());
     }
 
     /**
@@ -1612,9 +1612,9 @@ v     * API to check rights on a document for a given user
      */
     public String getLocalUserName(String user, boolean link) {
         try {
-            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), null, link, getContext());
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), null, link, getXWikiContext());
         } catch (Exception e) {
-            return xwiki.getUserName(user, null, link, getContext());
+            return xwiki.getUserName(user, null, link, getXWikiContext());
         }
     }
 
@@ -1631,18 +1631,18 @@ v     * API to check rights on a document for a given user
      */
     public String getLocalUserName(String user, String format, boolean link) {
         try {
-            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, link, getContext());
+            return xwiki.getUserName(user.substring(user.indexOf(":") + 1), format, link, getXWikiContext());
         } catch (Exception e) {
-            return xwiki.getUserName(user, format, link, getContext());
+            return xwiki.getUserName(user, format, link, getXWikiContext());
         }
     }
     
     public User getUser(){
-    	return xwiki.getUser(getContext());
+    	return xwiki.getUser(getXWikiContext());
     }
     
     public User getUser(String username){
-    	return xwiki.getUser(username, getContext());
+    	return xwiki.getUser(username, getXWikiContext());
     }
 
     /**
@@ -1652,7 +1652,7 @@ v     * API to check rights on a document for a given user
      * @return A string with the date formating from the default Wiki setting
      */
     public String formatDate(Date date) {
-        return xwiki.formatDate(date, null, getContext());
+        return xwiki.formatDate(date, null, getXWikiContext());
     }
 
     /**
@@ -1666,7 +1666,7 @@ v     * API to check rights on a document for a given user
      * @see java.text.SimpleDateFormat
      */
     public String formatDate(Date date, String format) {
-        return xwiki.formatDate(date, format, getContext());
+        return xwiki.formatDate(date, format, getXWikiContext());
     }
 
     /**
@@ -1676,7 +1676,7 @@ v     * API to check rights on a document for a given user
      * @return a plugin object
      */
     public Api get(String name) {
-        return xwiki.getPluginApi(name, getContext());
+        return xwiki.getPluginApi(name, getXWikiContext());
     }
 
     /**
@@ -1686,7 +1686,7 @@ v     * API to check rights on a document for a given user
      * @return a plugin object
      */
     public Api getPlugin(String name) {
-        return xwiki.getPluginApi(name, getContext());
+        return xwiki.getPluginApi(name, getXWikiContext());
     }
 
     /**
@@ -1697,10 +1697,10 @@ v     * API to check rights on a document for a given user
      * @return a ArrayList of document names
      */
     public java.util.Collection getRecentActions(String action, int size) {
-        XWikiStatsService stats = getContext().getWiki().getStatsService(getContext());
+        XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
             return new ArrayList();
-        return stats.getRecentActions(action, size, getContext());
+        return stats.getRecentActions(action, size, getXWikiContext());
     }
 
     /**
@@ -1708,7 +1708,7 @@ v     * API to check rights on a document for a given user
      * @return "google" or "none"
      */
     public String getAdType() {
-        return xwiki.getAdType(getContext());
+        return xwiki.getAdType(getXWikiContext());
     }
 
     /**
@@ -1716,7 +1716,7 @@ v     * API to check rights on a document for a given user
      * @return an Ad affiliate ID
      */
     public String getAdClientId() {
-        return xwiki.getAdClientId(getContext());
+        return xwiki.getAdClientId(getXWikiContext());
     }
 
     /**
@@ -1867,7 +1867,7 @@ v     * API to check rights on a document for a given user
      * @return ArrayList of document names
      */
     public List getIncludedMacros(String defaultweb, String content) {
-        return xwiki.getIncludedMacros(defaultweb, content, getContext());
+        return xwiki.getIncludedMacros(defaultweb, content, getXWikiContext());
     }
 
 
@@ -1903,7 +1903,7 @@ v     * API to check rights on a document for a given user
      */
     public void refreshLinks() throws XWikiException {
         if (hasAdminRights()) {
-            xwiki.refreshLinks(getContext());
+            xwiki.refreshLinks(getXWikiContext());
         }
     }
 
@@ -1914,7 +1914,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is the preference could not be retrieved
      */
     public boolean hasBacklinks() throws XWikiException {
-        return xwiki.hasBacklinks(getContext());
+        return xwiki.hasBacklinks(getXWikiContext());
     }
 
     /**
@@ -1924,7 +1924,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is the preference could not be retrieved
      */
     public boolean hasTags() throws XWikiException {
-        return xwiki.hasTags(getContext());
+        return xwiki.hasTags(getXWikiContext());
     }
 
     /**
@@ -1937,10 +1937,10 @@ v     * API to check rights on a document for a given user
      */
     public boolean renamePage(Document doc, String newFullName){
         try {
-            if (xwiki.exists(newFullName, getContext()) && !xwiki.getRightService().hasAccessLevel("delete", getContext().getUser(), newFullName, getContext()))
+            if (xwiki.exists(newFullName, getXWikiContext()) && !xwiki.getRightService().hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext()))
                 return false;       
-            if (xwiki.getRightService().hasAccessLevel("edit", getContext().getUser(), doc.getFullName(), getContext())) {
-                xwiki.renamePage(doc.getFullName(), newFullName, getContext());
+            if (xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(), getXWikiContext())) {
+                xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
             }
         } catch (XWikiException e) {
             return false;
@@ -1955,7 +1955,7 @@ v     * API to check rights on a document for a given user
      * @return "wysiwyg" or "text"
      */
     public String getEditorPreference() {
-        return xwiki.getEditorPreference(getContext());
+        return xwiki.getEditorPreference(getXWikiContext());
     }
 
     /**
@@ -1967,7 +1967,7 @@ v     * API to check rights on a document for a given user
      */
     public Object parseGroovyFromString(String script) throws XWikiException {
         if (hasProgrammingRights())
-            return xwiki.parseGroovyFromString(script, getContext());
+            return xwiki.parseGroovyFromString(script, getXWikiContext());
 		return "groovy_missingrights";
     }
 
@@ -1979,9 +1979,9 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException
      */
     public Object parseGroovyFromPage(String fullname) throws XWikiException {
-        XWikiDocument doc = xwiki.getDocument(fullname, getContext());
-        if (xwiki.getRightService().hasProgrammingRights(doc, getContext()))
-            return xwiki.parseGroovyFromString(doc.getContent(),getContext());
+        XWikiDocument doc = xwiki.getDocument(fullname, getXWikiContext());
+        if (xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext()))
+            return xwiki.parseGroovyFromString(doc.getContent(), getXWikiContext());
 		return "groovy_missingrights";
     }
 
@@ -1991,7 +1991,7 @@ v     * API to check rights on a document for a given user
      * @return String with each macro on each line
      */
     public String getMacroList() {
-        return xwiki.getMacroList(getContext());
+        return xwiki.getMacroList(getXWikiContext());
     }
 
     /**
@@ -1999,7 +1999,7 @@ v     * API to check rights on a document for a given user
      * @return a boolean value
      */
     public boolean useWysiwygStyleToolbar() {
-        return xwiki.useWysiwygStyleToolbar(getContext());
+        return xwiki.useWysiwygStyleToolbar(getXWikiContext());
     }
 
     /**
@@ -2010,7 +2010,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception if the object could not be read
      */
     public com.xpn.xwiki.api.Object getObjectFromRequest(String className) throws XWikiException {
-        return new com.xpn.xwiki.api.Object(xwiki.getObjectFromRequest(className, getContext()), getContext());
+        return new com.xpn.xwiki.api.Object(xwiki.getObjectFromRequest(className, getXWikiContext()), getXWikiContext());
     }
 
     /**
@@ -2018,7 +2018,7 @@ v     * API to check rights on a document for a given user
      * @return an XWikiDocument wrapped in a Document
      */
     public Document createDocument() {
-        return new XWikiDocument().newDocument(getContext());
+        return new XWikiDocument().newDocument(getXWikiContext());
     }
 
     /**
@@ -2029,7 +2029,7 @@ v     * API to check rights on a document for a given user
      * @return converted wiki page name for this username
      */
     public String convertUsername(String username) {
-        return xwiki.convertUsername(username, getContext());
+        return xwiki.convertUsername(username, getXWikiContext());
     }
 
     /**
@@ -2041,7 +2041,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String displaySearchColumns(String className, XWikiQuery query) throws XWikiException {
-        return xwiki.displaySearchColumns(className,"",query, getContext());
+        return xwiki.displaySearchColumns(className,"",query, getXWikiContext());
     }
 
     /**
@@ -2054,7 +2054,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String displaySearchColumns(String className, String prefix, XWikiQuery query) throws XWikiException {
-        return xwiki.displaySearchColumns(className,prefix,query, getContext());
+        return xwiki.displaySearchColumns(className,prefix,query, getXWikiContext());
     }
 
     /**
@@ -2066,7 +2066,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String displaySearch(String fieldname, String className) throws XWikiException {
-        return xwiki.displaySearch(fieldname,className, getContext());
+        return xwiki.displaySearch(fieldname,className, getXWikiContext());
     }
 
     /**
@@ -2079,7 +2079,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String displaySearch(String fieldname, String className, XWikiCriteria criteria) throws XWikiException {
-       return xwiki.displaySearch(fieldname,className,criteria, getContext());
+       return xwiki.displaySearch(fieldname,className,criteria, getXWikiContext());
     }
     /**
      * API to display a field in search mode for a specific class with preselected values, optionally adding a prefix to the field name
@@ -2092,7 +2092,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria) throws XWikiException {
-       return xwiki.displaySearch(fieldname, className, prefix, criteria, getContext());
+       return xwiki.displaySearch(fieldname, className, prefix, criteria, getXWikiContext());
     }
 
     /**
@@ -2103,7 +2103,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public List search(XWikiQuery query) throws XWikiException {
-        return xwiki.search(query, getContext());
+        return xwiki.search(query, getXWikiContext());
     }
 
     /**
@@ -2114,7 +2114,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public XWikiQuery createQueryFromRequest(String className) throws XWikiException {
-        return xwiki.createQueryFromRequest(className, getContext());
+        return xwiki.createQueryFromRequest(className, getXWikiContext());
     }
 
     /**
@@ -2125,7 +2125,7 @@ v     * API to check rights on a document for a given user
      * @throws XWikiException exception is a failure occured
      */
     public String searchAsTable(XWikiQuery query) throws XWikiException {
-        return xwiki.searchAsTable(query, getContext());
+        return xwiki.searchAsTable(query, getXWikiContext());
     }
 
     /**
@@ -2135,7 +2135,7 @@ v     * API to check rights on a document for a given user
      * @return a PropertyClass object from a BaseClass object
      */
     public com.xpn.xwiki.api.PropertyClass getPropertyClassFromName(String propPath) {
-        return new PropertyClass(xwiki.getPropertyClassFromName(propPath, getContext()), getContext());
+        return new PropertyClass(xwiki.getPropertyClassFromName(propPath, getXWikiContext()), getXWikiContext());
     }
 
     /**
@@ -2144,7 +2144,7 @@ v     * API to check rights on a document for a given user
      * @return a unique page name
      */
     public String getUniquePageName(String name){
-        return xwiki.getUniquePageName(name, getContext());
+        return xwiki.getUniquePageName(name, getXWikiContext());
     }
 
     /**
@@ -2154,7 +2154,7 @@ v     * API to check rights on a document for a given user
      * @return a unique page name
      */
     public String getUniquePageName(String space, String name){
-        return xwiki.getUniquePageName(space, name, getContext());
+        return xwiki.getUniquePageName(space, name, getXWikiContext());
     }
 
     /**
@@ -2163,7 +2163,7 @@ v     * API to check rights on a document for a given user
      * @return A valid page name
      */
     public String clearName(String name){
-        return xwiki.clearName(name, getContext());
+        return xwiki.clearName(name, getXWikiContext());
     }
 
     /**
@@ -2174,7 +2174,7 @@ v     * API to check rights on a document for a given user
      * @return HTML with working tooltip
      */
     public String addTooltip(String html, String message, String params) {
-        return xwiki.addTooltip(html, message, params, getContext());
+        return xwiki.addTooltip(html, message, params, getXWikiContext());
     }
 
     /**
@@ -2184,7 +2184,7 @@ v     * API to check rights on a document for a given user
      * @return HTML with working tooltip
      */
     public String addTooltip(String html, String message) {
-        return xwiki.addTooltip(html, message, getContext());
+        return xwiki.addTooltip(html, message, getXWikiContext());
     }
 
     /**
@@ -2192,13 +2192,13 @@ v     * API to check rights on a document for a given user
      * @return
      */
     public String addTooltipJS() {
-        return xwiki.addTooltipJS(getContext());
+        return xwiki.addTooltipJS(getXWikiContext());
     }
 
     /*
      * Inserts a Mandatory asterix
      */
     public String addMandatory() {
-        return xwiki.addMandatory(getContext());
+        return xwiki.addMandatory(getXWikiContext());
     }
 }

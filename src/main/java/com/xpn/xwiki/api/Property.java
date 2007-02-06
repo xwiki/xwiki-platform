@@ -52,7 +52,7 @@ public class Property extends Element
     public java.lang.Object getValue()
     {
         if (element.getName().equals("password") &&
-            !getContext().getWiki().getRightService().hasProgrammingRights(getContext()))
+            !getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext()))
         {
             return null;
         }

@@ -41,4 +41,6 @@ public interface ConfluenceRpcInterface {
 	public Object[] getUserGroups(String token, String username);
 
 	public void addUserToGroup(String token, String username, String groupname);
+	
+	public Map addSpace(String token, Map spaceProperties) throws XWikiException;
 }

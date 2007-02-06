@@ -33,6 +33,12 @@ public class Space extends SpaceSummary {
         this.setHomepage(homepage);
     }
 
+    public Space(Hashtable spaceProperties) {
+        super(spaceProperties);
+        this.setDescription(((String) spaceProperties.get("description")));
+        this.setHomepage(((String) spaceProperties.get("homepage")));
+    }    
+    
     public Hashtable getHashtable() {
         Hashtable ht = super.getHashtable();
         ht.put("description", getDescription());

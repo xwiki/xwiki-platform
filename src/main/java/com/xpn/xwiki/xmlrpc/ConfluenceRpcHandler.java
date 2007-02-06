@@ -410,4 +410,26 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         return content;
     }
 
+    public Map addSpace(String token, Map spaceProperties) throws XWikiException {
+        Space space = new Space(new Hashtable(spaceProperties));
+
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        context.setAction("save");
+
+        // Verify authentication token
+        checkToken(token, context);
+
+        // Create a new document and store it
+        XWikiDocument document = new XWikiDocument(space.getKey(), "WebHome");
+        document.setAuthor(context.getUser());
+
+        context.getWiki().saveDocument(document, context);
+
+        // Set space settings
+        space.setUrl(document.getURL("view", context));
+        space.setHomepage( new Long(document.getId()).toString());
+
+        return space.getHashtable();
+   }
 }

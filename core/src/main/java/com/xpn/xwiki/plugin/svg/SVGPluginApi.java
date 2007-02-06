@@ -53,7 +53,7 @@ public class SVGPluginApi extends Api {
     }
 
     public String getSVGImageURL(String content, int height, int width) throws IOException, SVGConverterException {
-        return plugin.getSVGImageURL(content, height, width, getContext());
+        return plugin.getSVGImageURL(content, height, width, getXWikiContext());
     }
 
     public String writeSVGImage(String content, int height, int width) throws IOException, SVGConverterException {
@@ -65,11 +65,11 @@ public class SVGPluginApi extends Api {
     }
 
     public void outputSVGImage(String content, int height, int width) throws IOException, SVGConverterException {
-        plugin.outputSVGImage(content, "gif", height, width, getContext());
+        plugin.outputSVGImage(content, "gif", height, width, getXWikiContext());
     }
 
     public void outputSVGImage(String content, String extension, int height, int width) throws IOException, SVGConverterException {
-        plugin.outputSVGImage(content, extension, height, width, getContext());
+        plugin.outputSVGImage(content, extension, height, width, getXWikiContext());
     }
 
     public void flushCache() {

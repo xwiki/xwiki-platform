@@ -42,7 +42,7 @@ public abstract class Collection extends Element
 
     public Class getxWikiClass()
     {
-        return new Class(getCollection().getxWikiClass(getContext()), getContext());
+        return new Class(getCollection().getxWikiClass(getXWikiContext()), getXWikiContext());
     }
 
     public String getName()
@@ -74,7 +74,7 @@ public abstract class Collection extends Element
         Property[] properties = new Property[coll.size()];
         int i = 0;
         for (Iterator it = coll.iterator(); it.hasNext(); i++) {
-            properties[i] = new Property((BaseProperty) it.next(), getContext());
+            properties[i] = new Property((BaseProperty) it.next(), getXWikiContext());
         }
         return properties;
     }
@@ -87,7 +87,7 @@ public abstract class Collection extends Element
                 return null;
             }
 
-            return new Property((BaseProperty) prop, getContext());
+            return new Property((BaseProperty) prop, getXWikiContext());
         } catch (Exception e) {
             return null;
         }

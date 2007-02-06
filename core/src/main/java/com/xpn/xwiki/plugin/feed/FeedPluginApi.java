@@ -47,27 +47,27 @@ public class FeedPluginApi extends Api {
     }
 
     public SyndFeed getFeeds(String sfeeds) throws IOException {
-        return plugin.getFeeds(sfeeds, getContext());
+        return plugin.getFeeds(sfeeds, getXWikiContext());
     }
 
     public SyndFeed getFeeds(String sfeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, force, getContext());
+        return plugin.getFeeds(sfeeds, force, getXWikiContext());
     }
 
     public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, getContext());
+        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, getXWikiContext());
     }
 
     public SyndFeed getFeed(String sfeed) throws IOException {
-        return plugin.getFeed(sfeed, false, getContext());
+        return plugin.getFeed(sfeed, false, getXWikiContext());
     }
 
     public SyndFeed getFeed(String sfeed, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, force, getContext());
+        return plugin.getFeed(sfeed, force, getXWikiContext());
     }
 
     public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, getContext());
+        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, getXWikiContext());
     }
 
     public int updateFeeds() throws XWikiException {
@@ -84,18 +84,18 @@ public class FeedPluginApi extends Api {
 
     public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException {
         if (hasProgrammingRights())
-         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, getContext());
+         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, getXWikiContext());
         else
          return -1;
     }
 
     public int updateFeed(String feedname, String feedurl) {
-        return plugin.updateFeed(feedname, feedurl, true, getContext());
+        return plugin.updateFeed(feedname, feedurl, true, getXWikiContext());
     }
 
     public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry) {
         if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, getContext());
+         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, getXWikiContext());
         else
          return -1;
     }

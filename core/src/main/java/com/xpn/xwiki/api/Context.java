@@ -42,7 +42,7 @@ public class Context extends Api
      */
     public XWikiRequest getRequest()
     {
-        return getContext().getRequest();
+        return getXWikiContext().getRequest();
     }
 
     /**
@@ -50,12 +50,12 @@ public class Context extends Api
      */
     public XWikiResponse getResponse()
     {
-        return getContext().getResponse();
+        return getXWikiContext().getResponse();
     }
 
     public int getMode()
     {
-        return getContext().getMode();
+        return getXWikiContext().getMode();
     }
 
     /**
@@ -63,7 +63,7 @@ public class Context extends Api
      */
     public String getDatabase()
     {
-        return getContext().getDatabase();
+        return getXWikiContext().getDatabase();
     }
 
     /**
@@ -71,7 +71,7 @@ public class Context extends Api
      */
     public String getOriginalDatabase()
     {
-        return getContext().getOriginalDatabase();
+        return getXWikiContext().getOriginalDatabase();
     }
 
     /**
@@ -82,7 +82,7 @@ public class Context extends Api
     public void setDatabase(String database)
     {
         if (hasProgrammingRights()) {
-            getContext().setDatabase(database);
+            getXWikiContext().setDatabase(database);
         }
     }
 
@@ -91,7 +91,7 @@ public class Context extends Api
      */
     public XWikiURLFactory getURLFactory()
     {
-        return getContext().getURLFactory();
+        return getXWikiContext().getURLFactory();
     }
 
     /**
@@ -99,7 +99,7 @@ public class Context extends Api
      */
     public boolean isVirtual()
     {
-        return getContext().isVirtual();
+        return getXWikiContext().isVirtual();
     }
 
     /**
@@ -107,7 +107,7 @@ public class Context extends Api
      */
     public String getAction()
     {
-        return getContext().getAction();
+        return getXWikiContext().getAction();
     }
 
     /**
@@ -115,7 +115,7 @@ public class Context extends Api
      */
     public String getLanguage()
     {
-        return getContext().getLanguage();
+        return getXWikiContext().getLanguage();
     }
 
     /**
@@ -123,7 +123,7 @@ public class Context extends Api
      */
     public String getInterfaceLanguage()
     {
-        return getContext().getInterfaceLanguage();
+        return getXWikiContext().getInterfaceLanguage();
     }
 
     /**
@@ -132,7 +132,7 @@ public class Context extends Api
     public com.xpn.xwiki.XWiki getXWiki()
     {
         if (hasProgrammingRights()) {
-            return getContext().getWiki();
+            return getXWikiContext().getWiki();
         } else {
             return null;
         }
@@ -144,7 +144,7 @@ public class Context extends Api
     public XWikiDocument getDoc()
     {
         if (hasProgrammingRights()) {
-            return getContext().getDoc();
+            return getXWikiContext().getDoc();
         } else {
             return null;
         }
@@ -155,7 +155,7 @@ public class Context extends Api
      */
     public String getUser()
     {
-        return getContext().getUser();
+        return getXWikiContext().getUser();
     }
 
     /**
@@ -163,7 +163,7 @@ public class Context extends Api
      */
     public String getLocalUser()
     {
-        return getContext().getLocalUser();
+        return getXWikiContext().getLocalUser();
     }
 
     /**
@@ -172,7 +172,7 @@ public class Context extends Api
     public void setDoc(XWikiDocument doc)
     {
         if (hasProgrammingRights()) {
-            getContext().setDoc(doc);
+            getXWikiContext().setDoc(doc);
         }
     }
 
@@ -182,7 +182,7 @@ public class Context extends Api
     public XWikiContext getContext()
     {
         if (hasProgrammingRights()) {
-            return super.getContext();
+            return super.getXWikiContext();
         } else {
             return null;
         }
@@ -190,13 +190,13 @@ public class Context extends Api
 
     protected XWikiContext getProtectedContext()
     {
-        return getContext();
+        return getXWikiContext();
     }
 
     public java.lang.Object get(String key)
     {
         if (hasProgrammingRights()) {
-            return getContext().get(key);
+            return getXWikiContext().get(key);
         } else {
             return null;
         }
@@ -204,19 +204,19 @@ public class Context extends Api
 
     public java.lang.Object getEditorWysiwyg()
     {
-        return getContext().getEditorWysiwyg();
+        return getXWikiContext().getEditorWysiwyg();
     }
 
     public void put(String key, java.lang.Object value)
     {
         if (hasProgrammingRights()) {
-            getContext().put(key, value);
+            getXWikiContext().put(key, value);
         }
     }
 
     public void setFinished(boolean finished)
     {
-        getContext().setFinished(finished);
+        getXWikiContext().setFinished(finished);
     }
 
     /**
@@ -224,7 +224,7 @@ public class Context extends Api
      */
     public int getCacheDuration()
     {
-        return getContext().getCacheDuration();
+        return getXWikiContext().getCacheDuration();
     }
 
     /**
@@ -232,46 +232,46 @@ public class Context extends Api
      */
     public void setCacheDuration(int duration)
     {
-        getContext().setCacheDuration(duration);
+        getXWikiContext().setCacheDuration(duration);
     }
 
     public void setLinksAction(String action)
     {
-        getContext().setLinksAction(action);
+        getXWikiContext().setLinksAction(action);
     }
 
     public void unsetLinksAction()
     {
-        getContext().unsetLinksAction();
+        getXWikiContext().unsetLinksAction();
     }
 
     public String getLinksAction()
     {
-        return getContext().getLinksAction();
+        return getXWikiContext().getLinksAction();
     }
 
     public void setLinksQueryString(String value)
     {
-        getContext().setLinksQueryString(value);
+        getXWikiContext().setLinksQueryString(value);
     }
 
     public void unsetLinksQueryString()
     {
-        getContext().unsetLinksQueryString();
+        getXWikiContext().unsetLinksQueryString();
     }
 
     public String getLinksQueryString()
     {
-        return getContext().getLinksQueryString();
+        return getXWikiContext().getLinksQueryString();
     }
 
     public XWikiValidationStatus getValidationStatus()
     {
-        return getContext().getValidationStatus();
+        return getXWikiContext().getValidationStatus();
     }
 
     public List getDisplayedFields()
     {
-        return getContext().getDisplayedFields();
+        return getXWikiContext().getDisplayedFields();
     }
 }

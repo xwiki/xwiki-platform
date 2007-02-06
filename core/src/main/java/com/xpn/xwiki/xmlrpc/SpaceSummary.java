@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,9 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.xmlrpc;
 
 import java.util.Hashtable;
@@ -34,6 +32,12 @@ public class SpaceSummary {
         this.setUrl(url);
     }
 
+    public SpaceSummary(Hashtable spaceSummaryProperties) {
+        this((String) spaceSummaryProperties.get("key"),
+            (String) spaceSummaryProperties.get("name"),
+            (String) spaceSummaryProperties.get("url"));
+    }
+    
     public Hashtable getHashtable() {
         Hashtable ht = new Hashtable();
         ht.put("key", getKey());

@@ -1,5 +1,5 @@
 /**
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,10 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
-
 package com.xpn.xwiki.render.macro;
 
 import java.io.IOException;
@@ -57,7 +54,8 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  *   #include*, use the top level document instead of the included one.
  *   This is useful for templates, for example.</li>
  * </ul>
- * @author sdumitriu
+ *
+ * @version $Id: $
  */
 public class ImageMacro extends BaseLocaleMacro {
     public String getLocaleKey() {
@@ -87,8 +85,8 @@ public class ImageMacro extends BaseLocaleMacro {
             align = null;
         }
         String halign = params.get("halign", 4);
-        if (null == align || align.indexOf("=") != -1) {
-            align = null;
+        if (null == halign || halign.indexOf("=") != -1) {
+            halign = null;
         }
         String document = params.get("document", 5);
         if (null == document || document.indexOf("=") != -1) {

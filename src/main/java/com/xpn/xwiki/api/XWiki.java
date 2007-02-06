@@ -1908,20 +1908,20 @@ v     * API to check rights on a document for a given user
     }
 
     /**
-     * API to check if the backlinks functionality is active
+     * API to check if the backlinks feature is active
      * Backlinks are activated in xwiki.cfg or in the XWiki Preferences
-     * @return true is the backlinks are active
-     * @throws XWikiException exception is the preference could not be retrieved
+     * @return true if the backlinks feature is active
+     * @throws XWikiException exception if the preference could not be retrieved
      */
     public boolean hasBacklinks() throws XWikiException {
         return xwiki.hasBacklinks(getXWikiContext());
     }
 
     /**
-     * API to check if the tags  functionality is active
-     * Backlinks are activated in xwiki.cfg or in the XWiki Preferences
-     * @return true is the tags are active
-     * @throws XWikiException exception is the preference could not be retrieved
+     * API to check if the tags feature is active.
+     * Tags are activated in xwiki.cfg or in the XWiki Preferences
+     * @return true if the tags feature is active, false otherwise
+     * @throws XWikiException exception if the preference could not be retrieved
      */
     public boolean hasTags() throws XWikiException {
         return xwiki.hasTags(getXWikiContext());

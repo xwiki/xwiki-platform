@@ -10,6 +10,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
+import org.hibernate.jdbc.ConnectionManager;
+import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
@@ -24,6 +26,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.InvocationHandler;
 
 
 /**
@@ -188,7 +192,9 @@ public class XWikiHibernateBaseStore {
      * @throws HibernateException
      */
     public void shutdownHibernate(XWikiContext context) throws HibernateException {
-        closeSession(getSession(context));
+        Session session = getSession(context);
+        preCloseSession(session);
+        closeSession(session);
         if (getSessionFactory()!=null) {
             ((SessionFactoryImpl)getSessionFactory()).getConnectionProvider().close();
         }
@@ -493,7 +499,7 @@ public class XWikiHibernateBaseStore {
 
             // Keep some statistics about session and connections
             nbConnections++;
-            addConnection(session.connection(), context);
+            addConnection(getRealConnection(session), context);
 
             setSession(session, context);
             setDatabase(session, context);
@@ -556,6 +562,10 @@ public class XWikiHibernateBaseStore {
             setTransaction(null, context);
 
             if (transaction!=null) {
+                // We need to clean up our connection map first because the connection will
+                // be aggressively closed by hibernate 3.1 and more
+                preCloseSession(session);
+
                 if ( log.isDebugEnabled() ) log.debug("Releasing hibernate transaction " + transaction);
                 if (commit) {
                     transaction.commit();
@@ -564,9 +574,7 @@ public class XWikiHibernateBaseStore {
                 }
             }
         } finally {
-            if (session!=null) {
                 closeSession(session);
-            }
         }
     }
 
@@ -577,22 +585,44 @@ public class XWikiHibernateBaseStore {
      */
     private void closeSession(Session session) throws HibernateException {
         if (session!=null) {
-            try {
-                if ( log.isDebugEnabled() ) log.debug("Releasing hibernate session " + session);
-                Connection connection = session.connection();
-                if ((connection!=null)) {
-                    nbConnections--;
-                    try {
-                        removeConnection(connection);
-                    } catch (Throwable e) {
-                        // This should not happen
-                        e.printStackTrace();
-                    }
-                }
-            } finally {
                 session.close();
+        }
+    }
+
+
+    /**
+     * Closes the hibernate session
+     * @param session
+     * @throws HibernateException
+     */
+    private void preCloseSession(Session session) throws HibernateException {
+        if (session!=null) {
+            if ( log.isDebugEnabled() ) log.debug("Releasing hibernate session " + session);
+            Connection connection = getRealConnection(session);
+            if ((connection!=null)) {
+                nbConnections--;
+                try {
+                    removeConnection(connection);
+                } catch (Throwable e) {
+                    // This should not happen
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    /* Hack to get the real JDBC connection because hibernate 3.1 wraps the connection in a proxy and this creates a memory leak */
+    private Connection getRealConnection(Session session) {
+        Connection conn = session.connection();
+         if (conn instanceof Proxy) {
+            Object bcp = Proxy.getInvocationHandler(conn);
+            if (bcp instanceof BorrowedConnectionProxy) {
+                ConnectionManager cm = (ConnectionManager) XWiki.getPrivateField(bcp, "connectionManager");
+                if (cm!=null)
+                 return cm.getConnection();
+            }
+        }
+        return conn;
     }
 
     /**

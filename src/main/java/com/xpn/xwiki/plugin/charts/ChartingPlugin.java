@@ -36,6 +36,8 @@ import com.xpn.xwiki.web.XWikiResponse;
 import org.apache.batik.apps.rasterizer.SVGConverterException;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.Plot;
@@ -56,16 +58,25 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 	
     public void init(XWikiContext context) {
         super.init(context);
+    	log.info("Charting Plugin - init");
         
         File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         tempDir = new File(dir, "charts");
         try {
             tempDir.mkdirs();
-        } catch (Exception e) {};
+        } catch (Exception e1) {
+        	log.warn("Could not create charts temporary directory: "+tempDir, e1);
+            dir = (File) new File(context.getWiki().Param("xwiki.upload.tempdir"));
+            try {
+            	tempDir = new File(dir, "charts");
+            } catch (Exception e2) {
+            	log.error("Could not create charts temporary directory: "+tempDir, e2);
+            }
+        };
     }
 
     public String getName() {
-        return super.getName();
+        return "charting";
     }
     
     public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {
@@ -190,5 +201,6 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
         return new File(tempDir, filename);
     }
     
+    private static Log log = LogFactory.getFactory().getInstance(ChartingPlugin.class);
     private File tempDir;
 }

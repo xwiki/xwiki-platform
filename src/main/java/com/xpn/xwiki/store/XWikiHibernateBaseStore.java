@@ -7,6 +7,9 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
+
+import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
@@ -25,7 +28,6 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationHandler;
 

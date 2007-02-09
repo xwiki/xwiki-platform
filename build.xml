@@ -109,7 +109,6 @@
     	hsqldb-1.8.0.jar,
     	odmg-3.0.jar,
     	oscache-2.3.2-xwiki.jar,
-    	concurrent.jar,
     	jgroups-2.4CR1.jar,
     	swarmcache.jar,
     	xalan-2.7.0.jar,xerces-2.7.1.jar,xsltc-2.7.0.jar,serializer-2.7.0.jar,xml-apis-2.0.2.jar,
@@ -170,6 +169,7 @@
     	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar,
+    	backport-util-concurrent-3.0.jar,
 	jcaptcha-all-1.0-RC3.jar" />
 
 

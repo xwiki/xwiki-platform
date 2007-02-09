@@ -395,6 +395,11 @@
       <artifactId>radeox</artifactId>
       <version>1.0-b2</version>
     </dependency>
+    <dependency>
+      <groupId>backport-util-concurrent</groupId>
+      <artifactId>backport-util-concurrent</artifactId>
+      <version>3.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

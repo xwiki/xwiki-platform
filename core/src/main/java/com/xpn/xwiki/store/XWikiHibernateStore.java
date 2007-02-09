@@ -1704,41 +1704,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean bTransaction = false;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
-            StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
-
-            if (wheresql==null)
-                wheresql = "";
-
-            int orderPos = wheresql.toLowerCase().indexOf("order by");
-            if (orderPos >= 0)
-            {
-                orderPos += "order by".length();
-                String orderStatement = wheresql.substring(orderPos + 1);
-                orderStatement = orderStatement.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
-                sql.append(", ").append(orderStatement);
-            }
-
-            sql.append(" from XWikiDocument as doc");
-
-            wheresql = wheresql.trim();
-            if (!wheresql.equals("")) {
-                if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
-                    sql.append(" where ");
-                else
-                    sql.append(" ");
-
-                sql.append(wheresql);
-            }
-            String ssql = sql.toString();
+            String sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
 
             // Start monitoring timer
             if (monitor!=null)
-                monitor.startTimer("hibernate", ssql);
+                monitor.startTimer("hibernate", sql);
 
             checkHibernate(context);
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
-            Query query = session.createQuery(ssql);
+            Query query = session.createQuery(sql);
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -1753,10 +1728,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return list;
         }
         catch (Exception e) {
-            Object[] args = { wheresql  };
-            // Object[] args = { ((wheresql==null) ? "" : wheresql)  };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                    "Exception while searching documents with sql {0}", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                "Exception while searching documents with sql [{0}]", e, new Object[]{ wheresql });
         } finally {
             try {
                 if (bTransaction)
@@ -1769,133 +1743,23 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    protected List searchDocumentsNamesAdvanced(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException {
-        boolean bTransaction = false;
-        MonitorPlugin monitor  = Util.getMonitorPlugin(context);
-        try {
-            if(selectColumns == null) {
-                selectColumns = "";
-            }
-            else {
-                selectColumns = selectColumns.trim();
-            }
-            StringBuffer sql = new StringBuffer("select distinct doc.web, doc.name");
-            if (!selectColumns.equals("")) {
-                sql.append(",");
-                sql.append(selectColumns);
-            }
-
-            if (wheresql==null)
-                wheresql = "";
-
-            int orderPos = wheresql.toLowerCase().indexOf("order by");
-            if (orderPos >= 0)
-            {
-                orderPos += "order by".length();
-                String orderStatement = wheresql.substring(orderPos + 1);
-                orderStatement = orderStatement.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
-                sql.append(", ").append(orderStatement);
-            }
-
-            sql.append(" from XWikiDocument as doc");
-
-            wheresql = wheresql.trim();
-            if (!wheresql.equals("")) {
-                if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
-                    sql.append(" where ");
-                else
-                    sql.append(" ");
-
-                sql.append(wheresql);
-            }
-            String ssql = sql.toString();
-
-            // Start monitoring timer
-            if (monitor!=null)
-                monitor.startTimer("hibernate", ssql);
-
-            checkHibernate(context);
-            bTransaction = beginTransaction(false, context);
-            Session session = getSession(context);
-            Query query = session.createQuery(ssql);
-            if (start!=0)
-                query.setFirstResult(start);
-            if (nb!=0)
-                query.setMaxResults(nb);
-            Iterator it = query.list().iterator();
-            List list = new ArrayList();
-            if(selectColumns.equals("")) {
-                while (it.hasNext()) {
-                    Object[] result = (Object[]) it.next();
-                    String name = (String) result[0] + "." + (String)result[1];
-                    list.add(name);
-                }
-            }
-            else {
-                HashMap map;
-                StringTokenizer tok = new StringTokenizer(selectColumns, ", ");
-                String[] columns = new String[tok.countTokens()];
-                int i = 0;
-                while(tok.hasMoreTokens()) {
-                    columns[i++] = tok.nextToken();
-                }
-                while (it.hasNext()) {
-                    Object[] result = (Object[]) it.next();
-                    map = new HashMap();
-                    String name = (String) result[0] + "." + (String)result[1];
-                    map.put("docname", name);
-                    for(int k = 0; k < i; ++k) {
-                        map.put(columns[k], result[k+2]);
-                    }
-                    list.add(map);
-                }
-            }
-            return list;
-        }
-        catch (Exception e) {
-            Object[] args = { wheresql  };
-            // Object[] args = { ((wheresql==null) ? "" : wheresql)  };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                    "Exception while searching documents with sql {0}", e, args);
-        } finally {
-            try {
-                if (bTransaction)
-                    endTransaction(context, false, false);
-            } catch (Exception e) {}
-
-            // End monitoring timer
-            if (monitor!=null)
-                monitor.endTimer("hibernate");
-        }
-    }
-
-    
+    /**
+     * @todo refactor it to remove duplications with the searchDocument API without the distrinctbylanguage parameter
+     */
     public List searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
-            StringBuffer sql;
-            if (distinctbylanguage)
-                sql = new StringBuffer("select distinct doc.web, doc.name, doc.language from XWikiDocument as doc");
-            else
-                sql = new StringBuffer("select distinct doc.web, doc.name from XWikiDocument as doc");
-
-            if (wheresql==null)
-                wheresql = "";
-            wheresql.trim();
-            if (!wheresql.equals("")) {
-                if ((!wheresql.startsWith("where"))&&(!wheresql.startsWith(",")))
-                    sql.append(" where ");
-                else
-                    sql.append(" ");
-
-                sql.append(wheresql);
+            String sql;
+            if (distinctbylanguage) {
+                sql = createSQLQuery("select distinct doc.web, doc.name, doc.language", wheresql);
+            } else {
+                sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
             }
-            String ssql = sql.toString();
 
             // Start monitoring timer
             if (monitor!=null)
-                monitor.startTimer("hibernate", ssql);
+                monitor.startTimer("hibernate", sql);
 
             checkHibernate(context);
             if (bTransaction) {
@@ -1905,7 +1769,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            Query query = session.createQuery(ssql);
+            Query query = session.createQuery(sql);
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -1939,10 +1803,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return list;
         }
         catch (Exception e) {
-            Object[] args = { wheresql  };
-            // Object[] args = { ((wheresql==null) ? "" : wheresql)  };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                    "Exception while searching documents with sql {0}", e, args);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
+                "Exception while searching documents with SQL [{0}]", e, new Object[]{ wheresql });
         } finally {
             try {
                 if (bTransaction)
@@ -1953,6 +1816,66 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (monitor!=null)
                 monitor.endTimer("hibernate");
         }
+    }
+
+    /**
+     * @param queryPrefix the start of the SQL query
+     *        (for example "select distinct doc.web, doc.name")
+     * @param whereSQL the where clause to append
+     * @return the full formed SQL query, to which the order by columns have been added as returned
+     *         columns (this is required for example for HSQLDB).
+     */
+    protected String createSQLQuery(String queryPrefix, String whereSQL)
+    {
+        StringBuffer sql = new StringBuffer(queryPrefix);
+
+        String normalizedWhereSQL;
+        if (whereSQL == null) {
+            normalizedWhereSQL = "";
+        } else {
+            normalizedWhereSQL = whereSQL.trim();
+        }
+
+        sql.append(getColumnsForSelectStatement(normalizedWhereSQL));
+        sql.append(" from XWikiDocument as doc");
+
+        if (!normalizedWhereSQL.equals("")) {
+            if ((!normalizedWhereSQL.startsWith("where")) && (!normalizedWhereSQL.startsWith(","))) {
+                sql.append(" where ");
+            } else {
+                sql.append(" ");
+            }
+            sql.append(normalizedWhereSQL);
+        }
+
+        return sql.toString();
+    }
+
+    /**
+     * @param whereSQL the SQL where clause
+     * @return the list of columns to return in the select clause as a string starting with ", " if
+     *         there are columns or an empty string otherwise. The returned columns are
+     *         extracted from the where clause. One reason for doing so is because HSQLDB only
+     *         support SELECT DISTINCT SQL statements where the columns operated on are returned
+     *         from the query.
+     */
+    protected String getColumnsForSelectStatement(String whereSQL)
+    {
+        StringBuffer columns = new StringBuffer();
+
+        int orderByPos = whereSQL.toLowerCase().indexOf("order by");
+        if (orderByPos >= 0) {
+            String orderByStatement = whereSQL.substring(orderByPos + "order by".length() + 1);
+            StringTokenizer tokenizer = new StringTokenizer(orderByStatement, ",");
+            while (tokenizer.hasMoreTokens()) {
+                String column = tokenizer.nextToken();
+                // Remove "desc" or "asc" from the column found
+                column = column.replaceAll("([d|D][e|E][s|S][c|C])|([a|A][s|S][c|C])", "");
+                columns.append(", ").append(column.trim());
+            }
+        }
+
+        return columns.toString();
     }
 
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) {

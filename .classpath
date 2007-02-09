@@ -126,6 +126,6 @@
 	<classpathentry kind="lib" path="lib/poi-3.0-alpha1-20050704.jar"/>
 	<classpathentry kind="lib" path="lib/poi-scratchpad-3.0-alpha1-20050704.jar"/>
 	<classpathentry kind="lib" path="lib/radeox-1.0-b2.jar"/>
-	<classpathentry kind="lib" path="lib/backport-util-concurrent.jar"/>
+	<classpathentry kind="lib" path="lib/backport-util-concurrent-3.0.jar"/>
 	<classpathentry kind="output" path="build/eclipse/web/WEB-INF/classes"/>
 </classpath>

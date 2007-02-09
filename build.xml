@@ -169,7 +169,7 @@
     	jgroups-2.2.9.3.jar,
         jfreechart-1.0.0-rc1.jar,
         jcommon-1.0.5.jar,
-    	backport-util-concurrent.jar,
+    	backport-util-concurrent-3.0.jar,
 	jcaptcha-all-1.0-RC3.jar" />
 
 

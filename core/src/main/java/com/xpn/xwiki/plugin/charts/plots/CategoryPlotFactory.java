@@ -37,6 +37,11 @@ import org.jfree.data.category.DefaultCategoryDataset;
 public class CategoryPlotFactory {
 	private static CategoryPlotFactory uniqueInstance = new CategoryPlotFactory();
 	
+	/**
+	 * This class is not used directly
+	 * but through area, bar and line
+	 * (there is a sort of dynamic inheritance here)
+	 */
 	private CategoryPlotFactory() {
 		// empty
 	}

@@ -32,6 +32,11 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYDataset;
 
+/**
+ * This class is not used directly
+ * but through area, bar and line
+ * (there is a sort of dynamic inheritance here)
+ */
 public class XYPlotFactory {
 	private static XYPlotFactory uniqueInstance = new XYPlotFactory();
 	

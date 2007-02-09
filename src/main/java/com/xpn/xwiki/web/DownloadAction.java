@@ -73,8 +73,16 @@ public class DownloadAction extends XWikiAction
         response.setContentType(mimetype);
 
         String ofilename = XWiki.getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
+
+        // The inline attribute of Content-Disposition tells the browser that they should display
+        // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
+        // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
+        // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
+        // Save dialog box (exe, zip, xar, etc).
         response.addHeader("Content-disposition", "inline; filename=\"" + ofilename + "\"");
+
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
+
         // Sending the content of the attachment
         byte[] data;
         try {

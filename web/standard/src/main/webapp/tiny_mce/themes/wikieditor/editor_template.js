@@ -83,9 +83,9 @@ var TinyMCE_WikieditorTheme = {
 				template['file'] = 'link.htm';
 				template['width'] = 600;
 				if (tinyMCE.isMSIE) {
-                    template['height'] = 550;
+                    template['height'] = 570;
                 } else {
-                    template['height'] = 530;
+                    template['height'] = 550;
                 }
 
                 // Language specific width and height addons

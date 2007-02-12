@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,9 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author ravenees
- * @author jeremi
  */
 package com.xpn.xwiki.plugin.zipexplorer;
 
@@ -32,9 +29,11 @@ import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.net.URLDecoder;
 
 /**
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
@@ -51,8 +51,13 @@ import java.util.zip.ZipInputStream;
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {
     /**
+     * Log4J logger object to log messages in this class.
+     */
+    private static final Logger LOG = Logger.getLogger(ZipExplorerPlugin.class);
+
+    /**
      * Path separators for URL.
-     * @todo Define this somewhere else as this is not specific to this plugin 
+     * @todo Define this somewhere else as this is not specific to this plugin
      */
     private static final String URL_SEPARATOR = "/";
 
@@ -255,7 +260,8 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      *         The ZIP URL must be of the format
      *         <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>.
      *         With the example above this method would return
-     *         <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL passed
+     *         <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL
+     *         passed.
      * @todo There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL
      *       manipulation. Once this exists remove this code.
      *       See http://jira.xwiki.org/jira/browse/XWIKI-437
@@ -270,7 +276,20 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         if (pos == -1) {
             return "";
         }
-        return path.substring(pos + 1);
+        path = path.substring(pos + 1);
+
+        // Unencode any encoding done by the browser on the URL. For example the browser will
+        // encode spaces and other special characters.
+        try {
+            path = URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // In case of error we log the error and continue with the undecoded URL.
+            // TODO: Ideally this should rather fail fast but we have no exception handling
+            // framework for scripting code. Change this when we have one. 
+            LOG.error("Failed to decode URL path [" + path + "]", e);
+        }
+
+        return path;
     }
 
     /**

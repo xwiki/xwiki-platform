@@ -173,11 +173,13 @@ public class ZipExplorerTest extends org.jmock.cglib.MockObjectTestCase
 
     public void testGetFileLocationFromZipURL()
     {
+        String urlPrefix = "server/xwiki/bin/download/Main/Document/zipfile.zip";
+
         assertEquals("Directory/File.txt", this.plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip/Directory/File.txt",
-            "download"));
-        assertEquals("", this.plugin.getFileLocationFromZipURL(
-            "http://server/xwiki/bin/download/Main/Document/zipfile.zip", "download"));
+            urlPrefix + "/Directory/File.txt", "download"));
+        assertEquals("", this.plugin.getFileLocationFromZipURL(urlPrefix, "download"));
+        assertEquals("Some Directory/File WithSpace.txt",  this.plugin.getFileLocationFromZipURL(
+            urlPrefix + "/Some%20Directory/File%20WithSpace.txt", "download"));
     }
 
     private XWikiDocument createXWikiDocumentWithZipFileAttachment() throws Exception {

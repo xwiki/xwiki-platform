@@ -2,23 +2,29 @@
 
 <toolbox>
   <tool>
-     <key>toolLoader</key>
-     <class>org.apache.velocity.tools.generic.ToolLoader</class>
+    <key>toolLoader</key>
+    <scope>request</scope>
+    <class>org.apache.velocity.tools.generic.ToolLoader</class>
   </tool>
   <tool>
-     <key>link</key>
-     <class>org.apache.velocity.tools.struts.StrutsLinkTool</class>
+    <key>link</key>
+    <scope>request</scope>
+    <class>org.apache.velocity.tools.struts.StrutsLinkTool</class>
   </tool>
   <tool>
-     <key>msg</key>
-     <class>org.apache.velocity.tools.struts.MessageTool</class>
+    <key>msg</key>
+    <scope>request</scope>
+    <class>org.apache.velocity.tools.struts.MessageTool</class>
   </tool>
   <tool>
-     <key>errors</key>
-     <class>org.apache.velocity.tools.struts.ErrorsTool</class>
+    <key>errors</key>
+    <scope>request</scope>
+    <class>org.apache.velocity.tools.struts.ErrorsTool</class>
   </tool>
   <tool>
-     <key>form</key>
-     <class>org.apache.velocity.tools.struts.FormTool</class>
+    <key>form</key>
+    <scope>request</scope>
+    <class>org.apache.velocity.tools.struts.FormTool</class>
   </tool>
 </toolbox>
+    

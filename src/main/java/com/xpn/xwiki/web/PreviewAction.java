@@ -31,24 +31,33 @@ import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 import org.apache.velocity.VelocityContext;
 
 public class PreviewAction extends XWikiAction {
+    private boolean isActionSelected(String action) {
+        if (action == null || action.equals("")) {
+            return false;
+        }
+        return true;
+    }
 	public boolean action(XWikiContext context) throws XWikiException {
 		XWikiRequest request = context.getRequest();
-		String formaction = request.getParameter("formaction");
-		if (formaction == null || formaction.equals("") || formaction.equals("_preview_")) {
-			return true;
-		} else if (formaction.equals("_save_")) {
+		// String formaction = request.getParameter("formaction");
+		String formactionsave = request.getParameter("formactionsave");
+		String formactioncancel = request.getParameter("formactioncancel");
+		String formactionsac = request.getParameter("formactionsac");
+        if (isActionSelected(formactionsave)) {
 			SaveAction sa = new SaveAction();
 			if (sa.action(context)) {
 				sa.render(context);
 			}
 			return false;
-		} else if (formaction.equals("_cancel_")) {
+        }
+        if (isActionSelected(formactioncancel)) {
 			CancelAction ca = new CancelAction();
 			if (ca.action(context)) {
 				ca.render(context);
 			}
 			return false;
-		} else if (formaction.equals("_saveandcontinue_")) {
+        }
+        if (isActionSelected(formactionsac)) {
 			SaveAndContinueAction saca = new SaveAndContinueAction();
 			if (saca.action(context)) {
 				saca.render(context);
@@ -61,8 +70,6 @@ public class PreviewAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {
 		XWikiRequest request = context.getRequest();
         XWiki xwiki = context.getWiki();
-		String formaction = request.getParameter("formaction");
-		if (formaction == null || formaction.equals("") || formaction.equals("_preview_")) {
 			XWikiDocument doc = context.getDoc();
 			XWikiForm form = context.getForm();
 			VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -119,7 +126,5 @@ public class PreviewAction extends XWikiAction {
             if ((context.get("recheckcaptcha") != null) && ((Boolean)context.get("recheckcaptcha")).booleanValue())
                 return "captcha";
             else return "preview";
-		}
-		return "disambiguation";
 	}
 }

@@ -183,8 +183,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
 
             if (user == null)
                 return null;
-            else
-                return new XWikiUser(user.getName());
+            return new XWikiUser(user.getName());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -210,7 +209,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
          * context given as argument. However, the right way to do this
          * would probably be to throw XWikiException-s.
          */
-        
+
         if ((username == null) || (username.trim().equals(""))) {
             context.put("message", "nousername");
             return null;

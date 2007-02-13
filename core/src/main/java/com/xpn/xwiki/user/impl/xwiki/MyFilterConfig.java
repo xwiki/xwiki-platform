@@ -50,5 +50,4 @@ public class MyFilterConfig implements FilterConfig {
     public void setInitParameter(String key, String s) {
         params.put(key, s);
     }
-
 }

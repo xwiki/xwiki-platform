@@ -68,7 +68,7 @@ public class SkinAction extends XWikiAction
                     return null;
             } catch (XWikiException ex) {
                 // TODO: ignored for the moment, this must be rethinked
-                log.error(new Integer(idx), ex);
+                log.debug(new Integer(idx), ex);
             }
             idx = path.lastIndexOf("/", idx - 1);
         }

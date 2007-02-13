@@ -172,28 +172,28 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 buffer.append("<span class=\"wikilink\"><a href=\"");
 
                 // + is use for spaces
+                // TODO: This causes problems with [C++ Examples]
                 name = name.replace('+',' ');
                 // If the document exists with the conversion of spaces and accents
                 // then we use this one
-                String newname = noaccents(name);
                 XWikiDocument newdoc = new XWikiDocument();
-                if (newname.indexOf(".")!=-1) {
-                        newdoc.setFullName(newname, context);
+                String newname = noaccents(name);
+                if (name.indexOf(".")!=-1) {
+                        newdoc.setFullName(name, context);
                 } else {
                     newdoc.setSpace(context.getDoc().getSpace());
-                    newdoc.setName(newname);
+                    newdoc.setName(name);
                 }
 
                 // If the document does not exist, then we use the normal name as is
                 if (!context.getWiki().exists(newdoc.getFullName(), context)) {
-                    if (name.indexOf(".")!=-1) {
-                            newdoc.setFullName(name, context);
+                    if (newname.indexOf(".")!=-1) {
+                            newdoc.setFullName(newname, context);
                     } else {
                         newdoc.setSpace(context.getDoc().getSpace());
-                        newdoc.setName(name);
+                        newdoc.setName(newname);
                     }
                 }
-
 
                 if ((db==null)||(database.equals(db)))
                  addLinkToContext(newdoc.getFullName(), context);

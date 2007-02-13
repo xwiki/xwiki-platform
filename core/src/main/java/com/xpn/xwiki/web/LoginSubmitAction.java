@@ -21,11 +21,17 @@
  */
 package com.xpn.xwiki.web;
 
+import javax.servlet.http.HttpServletResponse;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 public class LoginSubmitAction extends XWikiAction {
     public String render(XWikiContext context) throws XWikiException {
+        String msg = (String)context.get("message");
+        if(msg != null && !msg.trim().equals("")) {
+            context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
         return "login";
     }
 }

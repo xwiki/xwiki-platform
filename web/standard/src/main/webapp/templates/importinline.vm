@@ -1,3 +1,11 @@
+#if($request.xredirect)
+#set($redirect = $request.xredirect)
+#else
+#set($redirect = $xwiki.getRequestURL())
+#end
+#if(!$redirect)
+#set($redirect = $doc.getURL("import", "editor=import"))
+#end
 #if($request.action=="import")
 ##
 ## Importing files
@@ -50,7 +58,7 @@ $msg.get("selectfiletoimport"):
           <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>
           <td>$attach.filesize</td>
 #if($hasedit || $hasadmin)
-          <td class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+          <td class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
 #end
         </tr>
 #end
@@ -75,11 +83,6 @@ $msg.get("noattachments")
   <div id="noSelectedDocs"><h4 class="heading-1-1-1" id="noSelectedDocsTxt">$msg.get("nodocuments")</h4></div>
 
 <h4 class="heading-1-1-1">$msg.get("uploadnewarchivetoimport")</h4>
-#if($request.xredirect)
-#set( $redirect = $request.xredirect)
-#else
-#set( $redirect = $xwiki.getRequestURL())
-#end
 <script type="text/javascript" src="$xwiki.getSkinFile("import.js")"></script>
 <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
 <fieldset class="expanded" id="attachform">

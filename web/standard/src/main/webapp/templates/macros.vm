@@ -192,7 +192,7 @@ $xwiki.getUserName("xwiki:${username}")
   #set ($max = $int.valueOf($max))
  #end
  #if ($numbered == "")
-  #set ($numbered = false) 
+  #set ($numbered = false)
  #else
   #set ($numbered = $boolean.valueOf($numbered))
   #set ($context.context.tocNumbered = $numbered)
@@ -201,29 +201,41 @@ $xwiki.getUserName("xwiki:${username}")
  #set ($context.context.tocData = $tocData)
  #set ($lastLevel = $init - 1)
  #set ($depth = 0)
+ #set ($openeditem = true)
  #foreach ($tocEntry in $tocData.entrySet())
   #set ($level = $tocEntry.value.level)
   #if ($level > $lastLevel)
    #set ($to = $lastLevel + 1)
    #set ($iter = [$level .. $to])
    #foreach ($n in $iter)
+    #if($openeditem)
+      #set($openeditem = false)
+    #else
+<li>
+    #end
 <ul>
     #set ($depth = $depth + 1)
    #end
   #elseif ($level < $lastLevel)
    #set ($to = $level + 1)
    #set ($iter = [$lastLevel .. $to])
+</li>
    #foreach ($n in $iter)
 </ul>
+</li>
     #set ($depth = $depth - 1)
    #end
+  #else
+</li>
   #end
- <li><a href="#$tocEntry.key">$!tocEntry.value.numbering $tocEntry.value.text</a> 
+ <li class="tocEntry"><a href="#$tocEntry.key">$!tocEntry.value.numbering $xwiki.parseContent($tocEntry.value.text)</a>
   #set ($lastLevel = $level)
+  #set($openeditem = true)
  #end
  #if ($depth > 0)
   #set ($levels = [1 .. $depth])
   #foreach($level in $levels)
+ </li>
 </ul>#end
  #end
 #end
@@ -441,7 +453,7 @@ $html
 #macro(formatdateISO $date)
 #set($tz = $xwiki.formatDate($date, "Z"))
 #set($tz = "${tz.substring(0, 3)}:${tz.substring(3)}")
-$xwiki.formatDate($date, "yyyy-MM-dd")T$xwiki.formatDate($date, "hh:mm:ss")$tz#end
+$xwiki.formatDate($date, "yyyy-MM-dd")T$xwiki.formatDate($date, "HH:mm:ss")$tz#end
 
 ##
 ## Formats a username like a fn (hCard microformat)

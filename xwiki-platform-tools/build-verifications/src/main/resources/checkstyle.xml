@@ -11,11 +11,6 @@
 <!-- Checkstyle properties for XWiki projects -->
 <module name="Checker">
 
-  <!-- Other modules -->
-  <module name="SuppressionFilter">
-    <property name="file" value="${checkstyle.suppressions.file}"/>
-  </module>
-
   <!--
      ======================================================================================
        Checks that do not require a TreeWalker (sorted alphabetically)

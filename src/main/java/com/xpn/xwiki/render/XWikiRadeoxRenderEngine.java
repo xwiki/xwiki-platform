@@ -113,7 +113,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             }
 
             // + is use for spaces
-            name = name.replace('+',' ');
+            name = name.replaceAll("\\+", " ");
             String newname = noaccents(name);
             XWikiDocument doc = new XWikiDocument(
                     (currentdoc!=null) ? currentdoc.getSpace() : "Main",
@@ -145,7 +145,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         // allow using spaces in links to anchors
-        if (anchor != null) anchor = anchor.replace(' ','+');
+        if (anchor != null) anchor = anchor.replaceAll(" ", "+");
         
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor); 
@@ -173,7 +173,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
                 // + is use for spaces
                 // TODO: This causes problems with [C++ Examples]
-                name = name.replace('+',' ');
+                name = name.replaceAll("\\+", " ");
+
                 // If the document exists with the conversion of spaces and accents
                 // then we use this one
                 XWikiDocument newdoc = new XWikiDocument();
@@ -259,7 +260,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             }
 
             // + is used for spaces
-            name = name.replace('+',' ');
+            name = name.replaceAll("\\+", " ");
 
             String newname = name;
             XWikiDocument newdoc = new XWikiDocument();

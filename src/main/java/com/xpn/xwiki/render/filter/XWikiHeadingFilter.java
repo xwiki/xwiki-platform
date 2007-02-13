@@ -16,9 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
- * @author tepich
  */
 package com.xpn.xwiki.render.filter;
 
@@ -107,7 +104,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 			}
 		}
 
-        String heading = formatter.format(new Object[]{id, level.replace('.', '-'), numbering, text, hlevel});
+        String heading = formatter.format(new Object[]{id, level.replaceAll("\\.", "-"), numbering, text, hlevel});
 
 
         Object beforeAction = xcontext.get("action");
@@ -142,7 +139,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                     } catch (XWikiException e) { }
 
                     String url = doc.getURL("edit", editparams.toString(), xcontext);
-                    return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text.replace("'", "&#39;")+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
+                    return heading + "<span class='edit_section'>&#91;<a style='text-decoration: none;' title='Edit section: "+text.replaceAll("'", "&#39;")+"' href='"+ url+"'>"+"edit"+"</a>&#93;</span>";
                 }
             }
         }

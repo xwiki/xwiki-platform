@@ -729,7 +729,7 @@ public class XWikiHibernateBaseStore {
     protected Configuration makeMapping(String className, String custommapping1) {
         Configuration hibconfig = new Configuration();
         {
-            hibconfig.addXML(makeMapping(className , "xwikicustom_" + className.replace('.','_'), custommapping1));
+            hibconfig.addXML(makeMapping(className , "xwikicustom_" + className.replaceAll("\\.", "_"), custommapping1));
         }
         hibconfig.buildMappings();
         return hibconfig;

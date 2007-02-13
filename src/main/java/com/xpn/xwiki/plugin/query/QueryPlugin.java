@@ -161,7 +161,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         int is = name.indexOf('['),
         ip = name.indexOf('/');
         if (is<0 || ip < is)
-            return name.replace('/', '.');
+            return name.replaceAll("/", ".");
         return name;
     }
     protected String getXPathName(String name) {
@@ -236,7 +236,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         String className = (String) classes.toArray()[0];
         BaseClass bclass = context.getWiki().getClass(className, context);
         xpath.append("/*/*/obj/");
-        xpath.append(className.replace('.','/'));
+        xpath.append(className.replaceAll("\\.", "/"));
         String where= bclass.makeQuery(query);
         if (where.equals(""))
             xpath.append("/*");

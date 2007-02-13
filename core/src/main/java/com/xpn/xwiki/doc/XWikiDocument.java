@@ -1434,7 +1434,9 @@ public class XWikiDocument
                         result.append("|");
                     }
                     String data = display((String) it.next(), object, context);
-                    if (data.trim().equals("")) {
+                    data = data.trim();
+                    data = data.replace( '\n', ' ' );
+                    if (data.length() == 0) {
                         result.append("&nbsp;");
                     } else {
                         result.append(data);

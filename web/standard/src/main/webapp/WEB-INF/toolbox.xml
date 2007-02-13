@@ -2,11 +2,6 @@
 
 <toolbox>
   <tool>
-    <key>toolLoader</key>
-    <scope>request</scope>
-    <class>org.apache.velocity.tools.generic.ToolLoader</class>
-  </tool>
-  <tool>
     <key>link</key>
     <scope>request</scope>
     <class>org.apache.velocity.tools.struts.StrutsLinkTool</class>
@@ -27,4 +22,3 @@
     <class>org.apache.velocity.tools.struts.FormTool</class>
   </tool>
 </toolbox>
-    

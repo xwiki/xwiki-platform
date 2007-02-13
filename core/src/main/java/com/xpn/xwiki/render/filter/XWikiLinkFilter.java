@@ -52,7 +52,6 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
 
     private static Log log = LogFactory.getLog(XWikiLinkFilter.class);
 
-
     /**
      * The regular expression for detecting WikiLinks.
      * Overwrite in subclass to support other link styles like
@@ -80,8 +79,13 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
             String str = result.group(1);
             if (str != null) {
             	// TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
+                // The only unescaping done should be %xx => char,
+                // since &#nnn; must be preserved (the active encoding cannot handle the character)
+                // and + should be preserved (for "Doc.C++ examples").
+                // Anyway, this unescaper only treats &#nnn;
                 // trim the name and unescape it
-                str = Encoder.unescape(str.trim());
+                // str = Encoder.unescape(str.trim());
+                str = str.trim();
                 String text = null, href = null, target = null;
                 boolean specificText = false;
 

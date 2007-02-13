@@ -10,7 +10,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
 	// External/Internal conversion setup
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
-	this.addInternalProcessor((/\s*<h3\s*([^>]*)>([\s\S]+?)<\/h3>/i), 'convertHeadingInternal');
+	this.addInternalProcessor((/\s*<h3\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h3>/i), 'convertHeadingInternal');
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
 
@@ -212,7 +212,7 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 	var str = "";
 	var txt;
 	var headr = /heading((-1)+)/i;
-	if( (txt = this.trimString(result[2])) != "") {
+	if( (txt = this.trimString(result[4])) != "") {
 		var att = this.readAttributes(result[1]);
 		if(att && att["class"]) {
 			var r = headr.exec(att["class"]);
@@ -664,7 +664,7 @@ WikiEditor.prototype.getListControls = function(button_name) {
 			break;
 	}
 
-	return str;                      
+	return str;
 }
 
 WikiEditor.prototype.getTextToolbar = function() {

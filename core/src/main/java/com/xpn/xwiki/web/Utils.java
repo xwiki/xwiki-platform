@@ -396,7 +396,7 @@ public class Utils {
     public static String decode(String name, XWikiContext context) {
         try {
             // Make sure + is considered as a space
-            String result = name.replace('+', ' ');
+            String result = name.replaceAll("\\+", " ");
 
             // It seems Internet Explorer can send us back UTF-8
             // instead of ISO-8859-1 for URLs

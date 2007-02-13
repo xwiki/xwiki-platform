@@ -1435,7 +1435,7 @@ public class XWikiDocument
                     }
                     String data = display((String) it.next(), object, context);
                     data = data.trim();
-                    data = data.replace( '\n', ' ' );
+                    data = data.replaceAll("\n", " ");
                     if (data.length() == 0) {
                         result.append("&nbsp;");
                     } else {

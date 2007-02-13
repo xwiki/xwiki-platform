@@ -2009,7 +2009,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (!isValidCustomMapping(doc1class.getName(), mapconfig, doc1class))
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Custom Mapping");
 
-        config.addXML(makeMapping(doc1class.getName() , "xwikicustom_" + doc1class.getName().replace('.','_'), custommapping));
+        config.addXML(makeMapping(doc1class.getName() , "xwikicustom_" + doc1class.getName().replaceAll("\\.", "_"), custommapping));
         config.buildMappings();
         return true;
     }

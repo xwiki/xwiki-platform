@@ -78,10 +78,9 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             Principal principal = MyBasicAuthenticator.checkLogin(request, response, context);
             if (principal!=null) {
                 return false;
-            } else {
-                if ("1".equals(request.getParameter("basicauth")))
-                 return true;
             }
+            if ("1".equals(request.getParameter("basicauth")))
+                return true;
         } catch (Exception e) {
             // in case of exception we continue on Form Auth.
             // we don't want this to interfere with the most common behavior
@@ -89,10 +88,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
         // process any persistent login information, if user is not already logged in,
         // persistent logins are enabled, and the persistent login info is present in this request
-        if (
-                persistentLoginManager != null
-                && persistentLoginManager.rememberingLogin(request)
-        ) {
+        if (persistentLoginManager != null && persistentLoginManager.rememberingLogin(request)) {
             String username = convertUsername(persistentLoginManager.getRememberedUsername(request, response), context);
             String password = persistentLoginManager.getRememberedPassword(request, response);
 
@@ -136,9 +132,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 }
 
                 request.setUserPrincipal(principal);
-                String continueToURL = getContinueToURL(request);
-                // This is the url that the user was initially accessing before being prompted for login.
-                response.sendRedirect(response.encodeRedirectURL(continueToURL));
+                if (!((Boolean)context.get("ajax")).booleanValue()) {
+                    String continueToURL = getContinueToURL(request);
+                    // This is the url that the user was initially accessing before being prompted for login.
+                    response.sendRedirect(response.encodeRedirectURL(continueToURL));
+                }
             } else {
                 // login failed
                 // set response status and forward to error page
@@ -174,9 +172,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
       if (savedURL != null) {
          return savedURL;
-      } else {
-         return request.getContextPath() + defaultPage;
       }
+      return request.getContextPath() + defaultPage;
    }
 
     public static Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {

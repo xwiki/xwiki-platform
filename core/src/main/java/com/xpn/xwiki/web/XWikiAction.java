@@ -109,6 +109,12 @@ public abstract class XWikiAction extends Action {
 
             XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
+            String sajax = request.get("ajax");
+            boolean ajax = false;
+            if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
+                ajax = true;
+            }
+            context.put("ajax", new Boolean(ajax));
 
             // Any error before this will be treated using a redirection to an error page
 

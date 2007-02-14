@@ -80,7 +80,7 @@ $request.serverName
 #set($logourl = "${request.scheme}://${request.serverName}${port}$logourl")
 &lt;image rdf:resource="$logourl"/&gt;
 &lt;dc:language&gt;$doc.defaultLanguage&lt;/dc:language&gt;
-&lt;dc:rights&gt;$xwiki.getXMLEncoded($xwiki.webCopyright.replace('&lt;', '&lt;html:').replace('&lt;html:/', '&lt;/html:'))&lt;/dc:rights&gt;
+&lt;dc:rights&gt;$xwiki.getXMLEncoded($xwiki.webCopyright.replaceAll('&lt;', '&lt;html:').replaceAll('&lt;html:/', '&lt;/html:'))&lt;/dc:rights&gt;
 &lt;dc:publisher&gt;$xwiki.getUserName($doc.author, false)&lt;/dc:publisher&gt;
 &lt;dc:creator&gt;$xwiki.getUserName($doc.author, false)&lt;/dc:creator&gt;
 &lt;items&gt;

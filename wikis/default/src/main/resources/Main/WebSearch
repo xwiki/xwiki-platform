@@ -63,10 +63,10 @@
 #end
 &lt;div class="centered"&gt;
 &lt;form action="WebSearch"&gt;
-{pre}&lt;input type="text" name="text" value="$!text.replace('"', '&amp;quot;')" size="20"&gt;&amp;nbsp;&lt;input type="submit" name="search" value="Search"&gt;{/pre}
+{pre}&lt;input type="text" name="text" value="$!text.replaceAll('"', '&amp;quot;')" size="20"&gt;&amp;nbsp;&lt;input type="submit" name="search" value="Search"&gt;{/pre}
 &lt;/form&gt;
 &lt;/div&gt;
-#set ($text = $text.replace("'", "''"))
+#set ($text = $text.replaceAll("'", "''"))
 #set($allresults = $xwiki.hashMap)
 
 ## -----------------------------------------------------------

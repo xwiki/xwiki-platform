@@ -461,7 +461,7 @@ $xwiki.formatDate($date, "yyyy-MM-dd")T$xwiki.formatDate($date, "HH:mm:ss")$tz#e
 #macro(userfn $username)
 #set($fn = $xwiki.getLocalUserName($username))
 #if($fn.indexOf("<a") >= 0)
-#set($fn = $fn.replace("<a", '<a class="url fn"'))
+#set($fn = $fn.replaceAll("<a", '<a class="url fn"'))
 #else
 #set($fn = "<span class='fn'>$fn</span>")
 #end

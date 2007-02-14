@@ -52,21 +52,21 @@
 </property>
 </object>
 <content>1 Search
-
-
-
-#set($formatDate = "MMMM dd, yyyy HH:mm")
 #if ($request.getParameter("text"))
-{pre}#set ($text = $request.getParameter("text")){/pre}
+#set ($text = $request.getParameter("text"))
 #else
 #set($text = "")
 #end
+&lt;form action=""&gt;
 &lt;div class="centered"&gt;
-&lt;form action="WebSearch"&gt;
-{pre}&lt;input type="text" name="text" value="$!text.replaceAll('"', '&amp;quot;')" size="20"&gt;&amp;nbsp;&lt;input type="submit" name="search" value="Search"&gt;{/pre}
-&lt;/form&gt;
+{pre}&lt;input type="text" name="text" value="$!text.replace("&gt;", "&amp;gt;").replace("&lt;", "&amp;lt;").replace('"', "&amp;quot;")" size="20"/&gt;{/pre}
+      &lt;input type="submit" value="Search"/&gt;
 &lt;/div&gt;
-#set ($text = $text.replaceAll("'", "''"))
+&lt;/form&gt;
+#if($text == "")
+## No search
+#else
+#set($text = $text.replaceAll("'", "''").replaceAll("%", "\\%"))
 #set($allresults = $xwiki.hashMap)
 
 ## -----------------------------------------------------------
@@ -88,27 +88,30 @@
 #set ($webClause = "$excludedWebs")
 #end
 
-1.1 Search in page content
-
 ## -----------------------------------------------------------
 ## Search in page content
 ## -----------------------------------------------------------
-#set ($sql = "where $webClause doc.content like '%$text%' order by doc.date desc")
-#includeInContext("XWiki.Results")
-
-1.1 Search in properties
+#set ($sql = "where $webClause doc.content like '%$!text%' order by doc.date desc")
+#foreach ($item in $xwiki.searchDocuments($sql , 0, 0))
+#set($discard = $allresults.put($item, '1'))
+#end
 
 ## -----------------------------------------------------------
 ## Search in text fields (simple String properties)
 ## -----------------------------------------------------------
 #set($sql= ", BaseObject as obj, StringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!text%'")
-#includeInContext("XWiki.Results")
-
-1.1 Search in text fields
+#foreach ($item in $xwiki.searchDocuments($sql , 0, 0))
+#set($discard = $allresults.put($item, '1'))
+#end
 
 ## -----------------------------------------------------------
 ## Search in big text fields (textarea properties)
 ## -----------------------------------------------------------
 #set($sql= ", BaseObject as obj, LargeStringProperty as prop where $webClause obj.name=doc.fullName and prop.id.id = obj.id and prop.value like '%$!text%'")
-#includeInContext("XWiki.Results")</content>
+#foreach ( $item in $xwiki.searchDocuments($sql , 0, 0))
+#set($discard = $allresults.put($item, '1'))
+#end
+
+#includeInContext("XWiki.Results")
+#end</content>
 </xwikidoc>

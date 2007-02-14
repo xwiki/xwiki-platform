@@ -43,6 +43,7 @@ public class XWikiContext extends Hashtable {
    public static final int MODE_ATOM = 3;
    public static final int MODE_PDF = 4;
    public static final int MODE_GWT = 5;
+   public static final int MODE_GWT_DEBUG = 6;
 
    private boolean finished = false;
    private XWiki wiki;

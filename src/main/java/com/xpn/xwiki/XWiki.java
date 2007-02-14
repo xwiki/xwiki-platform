@@ -268,7 +268,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     } else {
                         xwikicfgis = econtext.getResourceAsStream(xwikicfg);
                         if (xwikicfgis == null) {
-                            if (context.getMode() == XWikiContext.MODE_GWT)
+                            if (context.getMode() == XWikiContext.MODE_GWT || context.getMode()==XWikiContext.MODE_GWT_DEBUG)
                                 xwikicfgis =
                                     XWiki.class.getClassLoader().getResourceAsStream(
                                         "xwiki-gwt.cfg");
@@ -5016,5 +5016,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public boolean hasVersioning(String fullName, XWikiContext context)
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
+    }
+
+    public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context) {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullName, context);
+        return doc.getExternalAttachmentURL(filename, "download", context);
     }
 }

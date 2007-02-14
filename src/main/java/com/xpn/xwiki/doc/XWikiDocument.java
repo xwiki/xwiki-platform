@@ -651,6 +651,10 @@ public class XWikiDocument
         return context.getURLFactory().getURL(url, context);
     }
 
+    public String getExternalAttachmentURL(String filename, String action, XWikiContext context) {
+        URL url = context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(), context);
+        return url.toString();
+    }
     public String getAttachmentURL(String filename, String action, String querystring,
         XWikiContext context)
     {
@@ -1026,8 +1030,7 @@ public class XWikiDocument
 
     public void setObject(String classname, int nb, BaseObject object)
     {
-        Vector objects = null;
-        objects = getObjects(classname);
+        Vector objects = getObjects(classname);
         if (objects == null) {
             objects = new Vector();
             setObjects(classname, objects);

@@ -34,7 +34,7 @@
 #set($force = $!request.get("force"))
 #if (($tdoc.getLocked()==true)&&(!$force))
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
-<a href="$doc.getURL("edit", "$!{request.getQueryString().replace('&', '&amp;').replace('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
+<a href="$doc.getURL("edit", "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()
 #else
 <h4 id="xwikieditorstitles">$msg.get("chooseeditor")</h4>

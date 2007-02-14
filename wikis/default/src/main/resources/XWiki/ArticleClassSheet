@@ -81,7 +81,7 @@ Posted by &lt;address class="author vcard"&gt;#userfn($doc.creator)&lt;/address&
 &lt;/dl&gt;
 #set($newtitle = $request.title)
 #if($newtitle)
-#set($newtitle = $newtitle.replace('"',"'"))
+#set($newtitle = $newtitle.replaceAll('"',"'"))
 &lt;script type="text/javascript"&gt;
 var title = "${newtitle}";
 {pre}

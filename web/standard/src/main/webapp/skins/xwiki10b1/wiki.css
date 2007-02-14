@@ -211,7 +211,14 @@ ol.HEBREW { list-style-type: hebrew; }
  background-color: #DDDDDD;
 }
 .wiki-calendar-today{
- background-color: #C0D4E7;
+  background-color: #C0D4E7;
+}
+.wiki-calendar-today-notinmonth{
+ background-color: #D9E0E7;
+ color: #BBBBBB;
+}
+.wiki-calendar-today-notinmonth a, .wiki-calendar-daynotinmonth a{
+  color: #BBB !important;
 }
 
 .article_title {
@@ -237,4 +244,11 @@ ol.HEBREW { list-style-type: hebrew; }
 
 .underline{
   text-decoration: underline;
+}
+
+.workshop {
+  background-color: #FED;
+}
+.event .username {
+  font-size: 80%;
 }

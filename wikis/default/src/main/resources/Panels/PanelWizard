@@ -164,7 +164,7 @@ window.showRightColumn = $showRightPanels;
           #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
                 &lt;div class="panelitemc"&gt;
                   &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
-                  &lt;div class="panelcontainer" onmouseover="if(!window.isDraggingPanel){ showtip(this, unescape('$xwiki.getURLEncoded($doc.display("description", $obj)).replace("+", "%20")'), 300); }"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                  &lt;div class="panelcontainer" onmouseover="if(!window.isDraggingPanel){ showtip(this, unescape('$xwiki.getURLEncoded($doc.display("description", $obj)).replaceAll("[+]", "%20")'), 300); }"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
                   &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
                 &lt;/div&gt;
         #end

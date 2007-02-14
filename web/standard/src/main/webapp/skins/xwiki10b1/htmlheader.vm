@@ -57,9 +57,9 @@ $xwiki.parseContent($!xwiki.getWebPreference("meta"))
  function lockEdit(){
     if (lockEditFlag==false) {
 #if($context.action=="inline")
-      var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replace("&amp;", "&")}";
+      var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replaceAll("&amp;", "&")}";
 #else
-      var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replace("&amp;", "&")}";
+      var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replaceAll("&amp;", "&")}";
 #end
       var myAjax = new Ajax.Request(
                 surl,

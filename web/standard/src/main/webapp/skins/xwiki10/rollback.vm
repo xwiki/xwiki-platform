@@ -7,7 +7,7 @@
 #template("header.vm")
 <div class="layoutsection">
   <div id="contentcolumn" class="content hideleft hideright">
-#xwikimessagebox($msg.get("rollback") $msg.get('readytorollback').concat(" ").concat($request.get("rev")).concat("?") "${request.requestURL}?confirm=1&amp;${request.queryString.replace('&', '&amp;').replace('&amp;amp;', '&amp;')}" $doc.getURL('view') $msg.get("yes") $msg.get("no"))
+#xwikimessagebox($msg.get("rollback") $msg.get('readytorollback').concat(" ").concat($request.get("rev")).concat("?") "${request.requestURL}?confirm=1&amp;${request.queryString.replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}" $doc.getURL('view') $msg.get("yes") $msg.get("no"))
   </div>
 </div>
 ##

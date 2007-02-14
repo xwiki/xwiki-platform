@@ -2,7 +2,7 @@
 #set($title = $request.getParameter("title"))
 #set($template = $request.getParameter("template"))
 #if($tocreate=="panel")
-#set($docname=$title.replace("/", "%2F"))
+#set($docname=$title.replaceAll("/", "%2F"))
 #if(!$template)
 #set($template="Panels.PanelTemplate")
 #end
@@ -18,12 +18,12 @@ $response.sendRedirect($newdoc.getURL("inline", "template=${template}&Panels.Pan
 $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 #end
 #elseif($tocreate=="page")
-#set($docname=$title.replace("/", "."))
+#set($docname=$title.replaceAll("/", "."))
 #elseif($tocreate=="space")
-#set($title=$title.replace(" \\.\\/", ""))
+#set($title=$title.replaceAll("[ ./]", ""))
 #set($docname="${title}.WebHome")
 #elseif($tocreate=="post")
-#set($docname="Blog.${title.replace(' ', '')}")
+#set($docname="Blog.${title.replaceAll(" ", "")}")
 #end
 #*
 #set($newdoc=$xwiki.getDocument($docname))

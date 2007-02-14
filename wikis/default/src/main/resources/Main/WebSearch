@@ -112,6 +112,6 @@
 #set($discard = $allresults.put($item, '1'))
 #end
 
-#includeInContext("XWiki.Results")
+#includeInContext("XWiki.SearchResults")
 #end</content>
 </xwikidoc>

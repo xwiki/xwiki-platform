@@ -210,17 +210,19 @@ function chwWizard(){
     Insert : false
   }
   var activatedElements = {
+    Bar    : {
+             Data   : [],
+             Type   : ["ChartType"],
+             Titles : ["ChartTitle", "ChartSubtitle"],
+/* not yet
+             Axes   : ["XAxis", "YAxis"] */
+             },
     Pie    : {
              Data   : [],
              Type   : ["ChartType"],
              Titles : ["ChartTitle", "ChartSubtitle"]
              },
-    Bar    : {
-             Data   : [],
-             Type   : ["ChartType"],
-             Titles : ["ChartTitle", "ChartSubtitle"],
-             Axes   : ["XAxis", "YAxis"]
-             },
+/* these don't work yet
     Line    : {
              Data   : [],
              Type   : ["ChartType"],
@@ -238,7 +240,7 @@ function chwWizard(){
              Type   : ["ChartType"],
              Titles : ["ChartTitle", "ChartSubtitle"],
              Axes   : ["XAxis", "YAxis"]
-             }
+             }*/
   }
   var selectorObjects = new Object();
   var colorObjects = new Object();

@@ -213,17 +213,17 @@ function chwWizard(){
     Bar    : {
              Data   : [],
              Type   : ["ChartType"],
-             Titles : ["ChartTitle", "ChartSubtitle"],
+             Titles : ["ChartTitle", "ChartSubtitle"]
 /* not yet
-             Axes   : ["XAxis", "YAxis"] */
+,             Axes   : ["XAxis", "YAxis"] */
              },
     Pie    : {
              Data   : [],
              Type   : ["ChartType"],
              Titles : ["ChartTitle", "ChartSubtitle"]
-             },
+             }
 /* these don't work yet
-    Line    : {
+,    Line    : {
              Data   : [],
              Type   : ["ChartType"],
              Titles : ["ChartTitle", "ChartSubtitle"],

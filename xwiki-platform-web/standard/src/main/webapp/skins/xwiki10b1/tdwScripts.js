@@ -295,6 +295,11 @@ function tdwWizard(){
       }
     }
     else{
+      //alert("window.opener.wizard");
+      //for (var p in window.opener)
+      //   alert(p);
+      //alert(window.opener.wizard);
+      // this fails in IE
       window.opener.wizard.setValidDatasource('type:table;doc:' + doc + ';table_number:' + table + ';range:' + getRange() + ';has_header_row:' + document.getElementById('tdwRowHeaderInput').checked + ';has_header_column:' + document.getElementById('tdwColumnHeaderInput').checked + ';ignore_alpha:' + document.getElementById('tdwIgnoreAlphaInput').checked + ';decimal_symbol:' + (document.getElementById('tdwDecimalSymbolInput').checked ? 'comma' : 'period'));
     }
     window.close();

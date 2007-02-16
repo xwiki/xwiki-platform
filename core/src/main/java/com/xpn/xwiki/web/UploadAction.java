@@ -104,6 +104,11 @@ public class UploadAction extends XWikiAction
         // Add the attachment to the document
         attachment.setDoc(olddoc);
 
+        olddoc.setAuthor(username);
+        if (olddoc.isNew()) {
+            olddoc.setCreator(username);
+        }
+
         // Save the content and the archive
         try {
             olddoc.saveAttachmentContent(attachment, context);

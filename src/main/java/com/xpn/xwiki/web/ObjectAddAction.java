@@ -38,6 +38,7 @@ public class ObjectAddAction extends XWikiAction {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+        String username = context.getUser();
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
@@ -61,6 +62,11 @@ public class ObjectAddAction extends XWikiAction {
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(doc.getFullName());
         doc.setObject(className, nb, newobject);
+
+        doc.setAuthor(username);
+        if (doc.isNew()) {
+            doc.setCreator(username);
+        }
         xwiki.saveDocument(doc, olddoc, context);
 
         // forward to edit

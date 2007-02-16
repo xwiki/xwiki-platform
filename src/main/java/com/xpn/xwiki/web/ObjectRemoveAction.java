@@ -45,6 +45,7 @@ public class ObjectRemoveAction extends XWikiAction {
         // Remove it from the object list
         objects.set(classId, null);
         doc.addObjectsToRemove(object);
+        doc.setAuthor(context.getUser());
         xwiki.saveDocument(doc, olddoc, context);
 
         // forward to edit

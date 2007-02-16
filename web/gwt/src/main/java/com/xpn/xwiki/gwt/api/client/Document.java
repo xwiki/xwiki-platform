@@ -1,3 +1,26 @@
+/*
+ * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ * @author jeremi
+ * @author ldubost
+ *
+ */
 package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -6,20 +29,20 @@ import java.util.*;
 import java.util.Collection;
 import java.lang.Object;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 19 nov. 2006
- * Time: 19:42:43
- * To change this template use File | Settings | File Templates.
- */
 public class Document implements IsSerializable {
+
+    public static final int HAS_ATTACHMENTS = 1;
+    public static final int HAS_OBJECTS = 2;
+    public static final int HAS_CLASS = 4;
+
+
     private long id;
     private String title;
     private String parent;
     private String space;
     private String name;
     private String content;
+    private String renderedContent;
     private String meta;
     private String format;
     private String creator;
@@ -38,6 +61,14 @@ public class Document implements IsSerializable {
     private int translation;
     private Map objects = new HashMap();
     private XObject currentObj;
+    private String fullName;
+    private boolean editRight;
+    private List attachments = new ArrayList();
+    private String uploadURL;
+    private int hasElement;
+
+    public Document() {
+    }
 
     public long getId() {
         return id;
@@ -237,7 +268,7 @@ public class Document implements IsSerializable {
             list = new ArrayList();
             objects.put(className, list);
         }
-        obj.setNumber(list.size()+1);
+//        obj.setNumber(list.size()+1);
         list.add(obj);
         return obj.getNumber();
     }
@@ -323,4 +354,58 @@ public class Document implements IsSerializable {
     }
 
 
+    public String getRenderedContent() {
+        return renderedContent;
+    }
+
+    public void setRenderedContent(String renderedContent) {
+        this.renderedContent = renderedContent;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public boolean isEditRight() {
+        return editRight;
+    }
+
+    public void setEditRight(boolean editRight) {
+        this.editRight = editRight;
+    }
+
+    public List getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List attachments) {
+        this.attachments = attachments;
+    }
+
+    public void addAttachments(Attachment att) {
+        if (attachments==null) {
+            attachments = new ArrayList();
+        }
+        attachments.add(att);
+    }
+
+    public String getUploadURL() {
+        return uploadURL;
+    }
+
+    public void setUploadURL(String uploadURL) {
+        this.uploadURL = uploadURL;
+    }
+
+    public boolean hasElement(int element) {
+        return ((hasElement & element) == element);
+    }
+
+    public void setHasElement(int hasElement) {
+        this.hasElement = hasElement;
+    }
 }

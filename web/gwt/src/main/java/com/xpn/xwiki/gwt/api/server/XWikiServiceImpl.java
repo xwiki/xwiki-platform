@@ -1,3 +1,26 @@
+/*
+ * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ * @author jeremi
+ * @author ldubost
+ *
+ */
 package com.xpn.xwiki.gwt.api.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -5,20 +28,18 @@ import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.gwt.api.client.*;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCContext;
 import com.xpn.xwiki.xmlrpc.MockXWikiServletContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.gwt.api.client.XWikiService;
-import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.gwt.api.client.User;
-import com.xpn.xwiki.gwt.api.client.XObject;
 
 import javax.servlet.ServletContext;
 import java.util.List;
@@ -26,13 +47,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Date;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 19 nov. 2006
- * Time: 19:40:30
- * To change this template use File | Settings | File Templates.
- */
+
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
 
     protected XWikiContext getXWikiContext() throws XWikiException {
@@ -53,6 +68,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         XWikiContext context = Utils.prepareContext("", request, response, engine);
         context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
+
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
@@ -63,25 +79,72 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         if (user != null)
             username = user.getUser();
         context.setUser(username);        
+
+        if (context.getDoc() == null)
+            context.setDoc(new XWikiDocument("Fake", "Document"));
         return context;
     }
 
 
     public Document getDocument(String fullName) {
-        return getDocument(fullName, false, false, false);
+        return getDocument(fullName, false, false, false, false);
     }
 
-    public Document getDocument(String fullName, boolean full) {
-        return getDocument(fullName, full, false, false);
+
+// TODO check conflicts problems
+    public Document getDocument(String fullName, boolean full, boolean withRenderedContent) {
+        return getDocument(fullName, full, false, false, withRenderedContent);
+    }
+
+    public String getUniquePageName(String space){
+        try {
+            XWikiContext context = getXWikiContext();
+            return context.getWiki().getUniquePageName(space, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+    }
+
+    public String getUniquePageName(String space, String pageName){
+        try {
+            XWikiContext context = getXWikiContext();
+            return context.getWiki().getUniquePageName(space, pageName, context);
+        } catch (XWikiException e) {
+            return null;
+        }
+    }
+
+    public Document getUniqueDocument(String space, String pageName) {
+        try {
+            XWikiContext context = getXWikiContext();
+            String fullName = context.getWiki().getUniquePageName(space, pageName, context);
+            return getDocument(fullName);
+        } catch (XWikiException e) {
+            return null;
+        }
+    }
+
+    public Document getUniqueDocument(String space) {
+        try {
+            XWikiContext context = getXWikiContext();
+            String fullName = context.getWiki().getUniquePageName(space, context);
+            return getDocument(space + "." + fullName);
+        } catch (XWikiException e) {
+            return null;
+        }
     }
 
     public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers) {
+		return getDocument(fullName, full, viewDisplayers, editDisplayers, false);
+	}
+
+    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent) {
         try {
             XWikiContext context = getXWikiContext();
-            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
+            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context) == true) {
                 XWikiDocument doc = context.getWiki().getDocument(fullName, context);
 
-                return newDocument(new Document(), doc, full, viewDisplayers, editDisplayers, context);
+                return newDocument(new Document(), doc, full, viewDisplayers, editDisplayers, withRenderedContent, context);
             } else {
                 return null;
             }
@@ -138,7 +201,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     public List getDocuments(String sql, int nb, int start) {
-        return getDocuments(sql, nb, start, false, false, false);
+        return getDocuments(sql, nb, start, false);
     }
 
     public List getDocuments(String sql, int nb, int start, boolean full) {
@@ -148,7 +211,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     public List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers) {
         try {
             XWikiContext context = getXWikiContext();
-            return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, context);
+            return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, false, context);
         } catch (Exception e) {
            e.printStackTrace();
             return null;
@@ -206,7 +269,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
-    public List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, XWikiContext context) {
+    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, XWikiContext context) {
+		return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, false, context);	
+	}
+
+    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent, XWikiContext context) {
           List newlist = new ArrayList();
         try {
             List list = context.getWiki().getStore().searchDocumentsNames(sql, nb, start, context);
@@ -215,7 +282,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             for (int i=0;i<list.size();i++) {
                 if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), (String) list.get(i), context)==true) {
                     XWikiDocument doc = context.getWiki().getDocument((String) list.get(i), context);
-                    Document apidoc = newDocument(new Document(), doc, full, viewDisplayers, editDisplayers, context);
+                    Document apidoc = newDocument(new Document(), doc, full, viewDisplayers, editDisplayers, withRenderedContent, context);
                     newlist.add(apidoc);
                 }
             }
@@ -246,6 +313,77 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    public List getObjects(String sql, String className, int nb, int start){
+        List docs = getDocuments(sql, nb, start, true);
+        List objects = new ArrayList();
+        Iterator it = docs.iterator();
+        while(it.hasNext()){
+            Document doc = (Document) it.next();
+            List docObjs = doc.getObjects(className);
+            if (docObjs != null)
+                objects.addAll(docObjs);
+        }
+        return objects;
+    }
+
+    public XObject getFirstObject(String sql, String className){
+        List objs = getObjects(sql, className, 1, 0);
+        if (objs != null && objs.size() > 0)
+            return (XObject) objs.get(0);
+        return null;
+    }
+
+    public XObject addObject(XWikiDocument doc, String className){
+        try {
+            XWikiContext context = getXWikiContext();
+            int index = doc.createNewObject(className, context);
+            return newObject(new XObject(), doc.getObject(className, index), false, false, context);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    public XObject addObject(String fullName, String className) {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
+                XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
+
+                XObject obj = addObject(doc, className);
+
+                context.getWiki().saveDocument(doc, oldDoc, context);
+
+                return obj;
+            }
+            return null;
+        } catch (XWikiException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
+    }
+
+    public List addObject(String fullName, List classesName){
+        try{
+            XWikiContext context = getXWikiContext();
+            XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+            XWikiDocument oldDoc = (XWikiDocument) doc.clone();
+            Iterator it = classesName.iterator();
+            List objs = new ArrayList();
+            while(it.hasNext()){
+                objs.add(addObject(doc, (String) it.next()));
+            }
+            context.getWiki().saveDocument(doc, oldDoc, context);
+            return objs;
+        } catch (XWikiException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
+    }
+
+
     public boolean addObject(String docname, XObject xobject) {
         XWikiContext context = null;
         try {
@@ -262,6 +400,132 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         } catch (XWikiException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+
+    /**
+     * save only the content of a document
+     * TODO manage translations
+     * @param fullName
+     * @param content
+     * @return
+     */
+    public Boolean saveDocumentContent(String fullName, String content) {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
+                XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
+                doc.setContent(content);
+                doc.setAuthor(context.getUser());
+                if (doc.isNew())
+				    doc.setCreator(context.getUser());
+                context.getWiki().saveDocument(doc, oldDoc, context);
+                return Boolean.valueOf(true);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Boolean.valueOf(false);
+    }
+
+
+    public Boolean saveObject(XObject object) {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), object.getName(), context)) {
+                XWikiDocument doc = context.getWiki().getDocument(object.getName(), context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
+                BaseObject bObject = newBaseObject(doc.getObject(object.getClassName(), object.getNumber()),object, context);
+                doc.setObject(object.getClassName(), object.getNumber(), bObject);
+                doc.setAuthor(context.getUser());
+                if (doc.isNew())
+				    doc.setCreator(context.getUser());
+                context.getWiki().saveDocument(doc, oldDoc, context);
+                return Boolean.valueOf(true);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Boolean.valueOf(false);
+    }
+
+
+    public Boolean saveObjects(List objects) {
+        Iterator it = objects.iterator();
+        boolean error = false;
+        while(it.hasNext()){
+            error |= !saveObject((XObject) it.next()).booleanValue();
+        }
+        return Boolean.valueOf(!error);
+    }
+
+    /**
+     * return true if can be locked
+     * return null in case of an error
+     * return false in all the other cases
+
+     * @param fullName
+     * @param force
+     * @return
+     */
+    public Boolean lockDocument(String fullName, boolean force) {
+        try {
+            XWikiContext context = getXWikiContext();
+            XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+            if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
+
+                /* Setup a lock */
+                XWikiLock lock = doc.getLock(context);
+                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || force) {
+                    if (lock != null)
+                        doc.removeLock(context);
+                    doc.setLock(context.getUser(), context);
+                    return Boolean.valueOf(true);
+                } else
+                    return Boolean.valueOf(false);
+            }
+            else
+                return Boolean.valueOf(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
+    public void unlockDocument(String fullName) {
+        try {
+            XWikiContext context = getXWikiContext();
+
+            XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+            XWikiLock lock = doc.getLock(context);
+            if (lock != null)
+                doc.removeLock(context);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Boolean isLastDocumentVersion(String fullName, String version) {
+        try {
+            XWikiContext context = getXWikiContext();
+            return Boolean.valueOf(context.getWiki().getDocument(fullName, context).getVersion().equals(version));
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getLoginURL() {
+        try {
+            XWikiContext context = getXWikiContext();
+            return context.getWiki().getDocument("XWiki.XWikiLogin", context).getExternalURL("login", context);
+        } catch (XWikiException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -326,13 +590,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     private Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, XWikiContext context) {
-        return newDocument(doc, xdoc, withObjects, false, false, context);
+        return newDocument(doc, xdoc, withObjects, false, false, false, context);
     }
 
     private Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, boolean withViewDisplayers,
-                                 boolean withEditDisplayers, XWikiContext context) {
+                                 boolean withEditDisplayers, boolean withRenderedContent, XWikiContext context) {
         doc.setId(xdoc.getId());
         doc.setTitle(xdoc.getTitle());
+        doc.setFullName(xdoc.getFullName());
         doc.setParent(xdoc.getParent());
         doc.setSpace(xdoc.getSpace());
         doc.setName(xdoc.getName());
@@ -353,6 +618,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setLanguage(xdoc.getLanguage());
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
+        doc.setUploadURL(xdoc.getExternalURL("upload", context));
+        doc.setHasElement(xdoc.getElements());
+        try {
+            doc.setEditRight(context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), xdoc.getFullName(), context));
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
         if (withObjects) {
             Iterator it = xdoc.getxWikiObjects().values().iterator();
             while (it.hasNext()) {
@@ -367,7 +639,35 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 }
             }
         }
+        if(xdoc.getAttachmentList() != null && xdoc.getAttachmentList().size() > 0){
+            Iterator it = xdoc.getAttachmentList().iterator();
+            while (it.hasNext()) {
+                XWikiAttachment xAtt = (XWikiAttachment) it.next();
+                Attachment att = newAttachment(new Attachment(), xAtt, context);
+                doc.addAttachments(att);
+            }
+        }
+        if (withRenderedContent){
+            try {
+                doc.setRenderedContent(xdoc.getRenderedContent(context));
+            } catch (XWikiException e) {
+                e.printStackTrace();
+            }
+        }
         return doc;
+    }
+
+    private Attachment newAttachment(Attachment att, XWikiAttachment xAtt, XWikiContext context){
+        att.setAttDate(xAtt.getDate().getTime());
+        att.setAuthor(xAtt.getAuthor());
+        att.setFilename(xAtt.getFilename());
+        att.setId(xAtt.getId());
+        att.setImage(xAtt.isImage(context));
+        att.setMimeType(xAtt.getMimeType(context));
+        att.setFilesize(xAtt.getFilesize());
+        att.setDownloadUrl(context.getWiki().getExternalAttachmentURL(xAtt.getDoc().getFullName(), xAtt.getFilename(), context));
+
+        return att;
     }
 
     private XObject newObject(XObject xObject, BaseObject baseObject, boolean withViewDisplayers,
@@ -384,6 +684,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 BaseProperty prop = (BaseProperty) baseObject.get(propname);
                 if (prop!=null) {
                     Object value = prop.getValue();
+                    //TODO We should better put it in a standart form to be sure to be able to modify it
                     if (value instanceof Date)
                      xObject.set(propname, baseObject.displayView(propname, "", context));                    
                     else if (value instanceof List) {
@@ -420,5 +721,17 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    private BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) {
+        Object[] propnames = xObject.getPropertyNames().toArray();
+        for (int i = 0; i < propnames.length; i++) {
+            String propname = (String) propnames[i];
+            try {
+                //TODO will not work for a date
+                baseObject.set(propname, xObject.get(propname), context);
+            } catch (Exception e) {
+            }
+        }
+        return baseObject;
+    }
 
 }

@@ -408,10 +408,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
-          <includes>**/Api.java</includes>
-          <includes>**/ViewAction.java</includes>
-          <includes>**/XWikiMessageTool.java</includes>
-          <includes>**/ZipExplorer*.java</includes>
+          <includes>**/Api.java,**/ViewAction.java,**/XWikiMessageTool.java,**/ZipExplorer*.java</includes>
         </configuration>
       </plugin>
     </plugins>

@@ -63,16 +63,12 @@ img.chwNavigationImageHidden{
 
 .chwButton, .chwButtonDisabled{
   text-decoration: none;
-  color: #FFF;
+  color: #FFF !important;
   padding: 2px 15px 2px 15px;
   margin: 5px 5px 5px 5px;
 }
 .chwButton{
   background-color: #5368A6;
-}
-a.chwButton{
-  background-color: #369;
-  color: #FFF;
 }
 .chwButtonDisabled{
   background-color: #888;
@@ -137,7 +133,8 @@ input{
 }
 
 label{
-  /*margin-left: 8px;*/
+  /*margin-left: 8px;
+*/
 }
 
 #chwButtons{
@@ -298,6 +295,7 @@ td.chwDisabledCell{
 }
 
 .chwCustomColor{
+  color: black !important;
 }
 
 .chwCustomColorGroup input{

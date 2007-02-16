@@ -21,16 +21,15 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.ListResourceBundle;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
+import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.jmock.cglib.MockObjectTestCase;
-import org.jmock.Mock;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.XWikiMessageTool} class.
@@ -108,6 +107,24 @@ public class XWikiMessageToolTest extends MockObjectTestCase
                 false)));
 
         assertEquals("gotcha", this.tool.get("keyInXWikiCfg"));
+    }
+
+    /**
+     * Validate usage of parameters in bundles
+     */
+    public void testGetWithParameters()
+    {
+        this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue(null));
+        this.mockXWiki.stubs().method("Param").will(returnValue("Space1.Doc1"));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
+            .will(returnValue(createDocument(111111L, "Space1.Doc1",
+                "key=We have {0} new documents with {1} objects. {2}", false)));
+
+        List params = new ArrayList();
+        params.add("12");
+        params.add("3");
+
+        assertEquals("We have 12 new documents with 3 objects. {2}", this.tool.get("key", params));
     }
 
     /**

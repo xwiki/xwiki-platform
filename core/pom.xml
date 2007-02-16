@@ -410,6 +410,7 @@
         <configuration>
           <includes>
               **/Api.java,
+              **/xmlrpc/Attachment.java,
               **/ViewAction.java,
               **/XWikiMessageTool.java,
               **/ZipExplorer*.java

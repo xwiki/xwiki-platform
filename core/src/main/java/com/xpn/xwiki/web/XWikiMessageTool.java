@@ -23,6 +23,7 @@ package com.xpn.xwiki.web;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -121,7 +122,9 @@ public class XWikiMessageTool
 
     /**
      * @param key the key identifying the message to look for
-     * @return the message in the defined language
+     * @return the message in the defined language. The message should be a simple string without
+     *         any parameters. If you need to pass parameters see
+     *         {@link #get(String, java.util.List)}
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
      *      message
      */
@@ -134,6 +137,29 @@ public class XWikiMessageTool
             } catch (Exception e) {
                 translation = key;
             }
+        }
+        return translation;
+    }
+
+    /**
+     * Find a translation and then replace any parameters found in the translation by the passed
+     * params parameters. The format is the one used by {@link java.text.MessageFormat}.
+     * <p>
+     * Note: The reason we're using a List instead of an Object array is because we haven't found
+     * how to easily create an Array in Velocity whereas an Array is easily created. For example:
+     * <code>$msg.get("key", ["1", "2", "3"])</code>.
+     * </p>
+     *
+     * @param key the key of the string to find
+     * @param params the list of parameters to use for replacing "{N}" elements in the string. See
+     *        {@link java.text.MessageFormat} for the full syntax
+     * @return the translated string with parameters resolved
+     */
+    public String get(String key, List params)
+    {
+        String translation = get(key);
+        if (params != null) {
+            translation = MessageFormat.format(translation, params.toArray());
         }
         return translation;
     }

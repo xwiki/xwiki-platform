@@ -37,6 +37,11 @@ import java.io.IOException;
 public class ViewAction extends XWikiAction
 {
     /**
+     * @todo need an enumerated class for actions.
+     */
+    private static final String VIEW_ACTION = "view";
+
+    /**
      * {@inheritDoc}
      * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
      */
@@ -45,7 +50,7 @@ public class ViewAction extends XWikiAction
         boolean shouldRender = true;
 
         XWikiRequest request = context.getRequest();
-        context.put("action", "view");
+        context.put("action", VIEW_ACTION);
 
         // Redirect to the ViewrevAction is the URL has a rev parameter (when the user asks to
         // view a specific revision of a document).
@@ -92,7 +97,7 @@ public class ViewAction extends XWikiAction
         if ((defaultTemplate != null) && (!defaultTemplate.equals(""))) {
             return defaultTemplate;
         } else {
-            return "view";
+            return VIEW_ACTION;
         }
     }
 }

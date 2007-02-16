@@ -77,7 +77,7 @@ img.tdwNavigationImage{
 
 .tdwButton, .tdwButtonDisabled{
 	text-decoration: none;
-	color: #FFF;
+	color: #FFF !important;
 	padding: 2px 15px 2px 15px;
 	margin: 5px 5px 5px 5px;
 }

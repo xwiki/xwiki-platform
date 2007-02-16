@@ -4,7 +4,7 @@
               <legend id="chwChartsTypeLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('ChartsType');" title="$msg.get("chwdcharttypetitle")">$msg.get("chwcharttypelegend") &lt;&lt;</legend>
               <div id="chwChartsTypeDiv" class="chwVisible">
                 <label for="chwChartTypeInput" accesskey="t">$msg.get("chwcharttypelabel")</label>
-                <select id="chwChartTypeInput" size="2" name="type" onchange="window.wizard.changeChartType(this.value);">
+                <select id="chwChartTypeInput" name="type" onchange="window.wizard.changeChartType(this.value);">
                   <option selected="selected" value="Bar">Bar</option>
                   <option value="Pie">Pie</option>
 <!--                  <option value="Line">Line</option>

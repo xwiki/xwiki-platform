@@ -1,5 +1,6 @@
 <component-set>
   <components>
+
     <component>
       <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
       <role-hint>xar</role-hint>
@@ -7,12 +8,13 @@
       <configuration>
         <phases>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <package>org.apache.maven.its.it0115:test-extension:xar</package>
+          <package>com.xpn.xwiki:xwiki-build-xar-handlers:xar</package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </phases>
       </configuration>
     </component>
+
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>xar</role-hint>
@@ -23,5 +25,7 @@
         <packaging>xar</packaging>
       </configuration>
     </component>
+
   </components>
 </component-set>
+

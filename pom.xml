@@ -206,7 +206,7 @@
     <dependency>
       <groupId>velocity</groupId>
       <artifactId>velocity</artifactId>
-      <version>1.4</version>
+      <version>1.5-beta2</version>
       <exclusions>
         <!-- We're excluding velocity-dep as it includes a version of ORO that is masking our
              dependency of ORO that we're using transitively through another dependency. This

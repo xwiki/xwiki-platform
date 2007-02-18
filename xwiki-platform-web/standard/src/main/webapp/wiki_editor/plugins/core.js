@@ -228,45 +228,24 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 	return content.replace(regexp, str);
 }
 
-
-WikiEditor.prototype.fixHeadingStyle = function(child) {
-    if (child) {
-        if (child instanceof HTMLHeadingElement) {
-            var level = parseInt(child.nodeName[1]);
-            var cn = "heading" + this.buildString("-1", level);
-            child.className = cn;
-        } else {
-            var parent = child.parentNode;
-            if (parent instanceof HTMLHeadingElement) {
-                var level = parseInt(parent.nodeName[1]);
-                var cn = "heading" + this.buildString("-1", level);
-                parent.className = cn;
-            }
-        }
-    }
-}
-
 WikiEditor.prototype.fixTitle = function(editor_id, node) {
     var value = "";
     if (this._titleChangeValue==0) {
         this.core.execInstanceCommand(editor_id, "mceRemoveNode", false, node);
     } else {
-        value = "h" + this._titleChangeValue;
-        var childs = node.childNodes;
-        var parentNode = node.parentNode;
+        value = "<h" + this._titleChangeValue + ">";
         this.core.execInstanceCommand(editor_id, "FormatBlock", false, value);
-        if (parentNode) {
-            var pchilds = parentNode.childNodes;
-            for(childid in pchilds) {
-                var child = pchilds[childid];
-                this.fixHeadingStyle(child);
-            }
-        }
+        var childs = tinyMCE.selectedInstance.contentDocument.body.childNodes;
         if (childs) {
-            for(childid in childs) {
-                var child = childs[childid];
-                this.fixHeadingStyle(child);
+         for( var x = 0; childs[x]; x++ ) {
+            var child = childs[x];
+            var nn = child.nodeName;
+            if ((nn.length == 2) && (nn.charAt(0) == "H")) {
+                 var level = parseInt(nn.charAt(1));
+                 var cn = "heading" + this.buildString("-1", level);
+                 child.className = cn;
             }
+         }
         }
     }
     tinyMCE.triggerNodeChange();

@@ -10,7 +10,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
 	// External/Internal conversion setup
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
-	this.addInternalProcessor((/\s*<h3\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h3>/i), 'convertHeadingInternal');
+	this.addInternalProcessor((/\s*<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
 
@@ -228,35 +228,48 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 	return content.replace(regexp, str);
 }
 
-WikiEditor.prototype.fixTitle = function(editor_id, node) {
-    var newNode;
-    if(this._titleChangeValue == 0) { // erase the title
-        if(this.core.isMSIE) {
-			newNode = node.ownerDocument.createElement("p");
-			this._substituteNode(node, newNode);
-		}else {
-			this.core.execInstanceCommand(editor_id, "FormatBlock", false, "p");
-			newNode = this.core.getParentElement(node, "p");
-		}
-		newNode.className = this.PARAGRAPH_CLASS_NAME;
-	} else {
-		var cn = "heading" + this.buildString("-1", this._titleChangeValue);
-		if(this.core.isMSIE) {
-            newNode = node.ownerDocument.createElement("h3");
-            this._substituteNode(node, newNode);
-		}else {
-            if (this.core.getParentElement(node, "h3")) {
-                this.core.execInstanceCommand(editor_id, "FormatBlock", false, "h3");
-                newNode = this.core.getParentElement(node, "h3");
-            } else {
-                // This condition to fix bug in when mirgrate to tiny_mce 2
-				newNode = node.ownerDocument.createElement("h3");
-                this._substituteNode(node, newNode);
+
+WikiEditor.prototype.fixHeadingStyle = function(child) {
+    if (child) {
+        if (child instanceof HTMLHeadingElement) {
+            var level = parseInt(child.nodeName[1]);
+            var cn = "heading" + this.buildString("-1", level);
+            child.className = cn;
+        } else {
+            var parent = child.parentNode;
+            if (parent instanceof HTMLHeadingElement) {
+                var level = parseInt(parent.nodeName[1]);
+                var cn = "heading" + this.buildString("-1", level);
+                parent.className = cn;
             }
         }
-        newNode.className = cn;
-	}
-	this.core.triggerNodeChange();
+    }
+}
+
+WikiEditor.prototype.fixTitle = function(editor_id, node) {
+    var value = "";
+    if (this._titleChangeValue==0) {
+        this.core.execInstanceCommand(editor_id, "mceRemoveNode", false, node);
+    } else {
+        value = "h" + this._titleChangeValue;
+        var childs = node.childNodes;
+        var parentNode = node.parentNode;
+        this.core.execInstanceCommand(editor_id, "FormatBlock", false, value);
+        if (parentNode) {
+            var pchilds = parentNode.childNodes;
+            for(childid in pchilds) {
+                var child = pchilds[childid];
+                this.fixHeadingStyle(child);
+            }
+        }
+        if (childs) {
+            for(childid in childs) {
+                var child = childs[childid];
+                this.fixHeadingStyle(child);
+            }
+        }
+    }
+    tinyMCE.triggerNodeChange();
 }
 
 WikiEditor.prototype._substituteNode = function(oldNode, newNode) {
@@ -374,7 +387,7 @@ WikiEditor.prototype.handleTableButtons = function(editor_id, node, undo_index, 
 WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	var list = document.getElementById(editor_id + "_titleSelect");
 	if(list) {
-		var h3 = this.core.getParentElement(node, "h3");
+		var h3 = this.core.getParentElement(node, "h1,h2,h3,h4,h5,h6");
 		if(h3) {
 			var classname = h3.className;
 			var n = (classname.split("-").length)-1;
@@ -897,7 +910,7 @@ WikiEditor.prototype.isExternalLink = function(url) {
 
 WikiEditor.prototype.convertHeadingExternal = function(regexp, result, content) {
 	var n = result[1].split(".").length;
-	var str = '\r\n<h3 class="heading' + this.buildString("-1", n) + '">' + this.trimString(result[3]) + '<\/h3>';
+	var str = '\r\n<h' + n + ' class="heading' + this.buildString("-1", n) + '">' + this.trimString(result[3]) + '<\/h' + n + '>';
 	return content.substring(0, result["index"]) + str + content.substring(result["index"] + result[0].length, content.length);
 }
 

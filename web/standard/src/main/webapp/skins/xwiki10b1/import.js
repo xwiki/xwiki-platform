@@ -9,7 +9,7 @@ Object.extend(Object.extend(Ajax.XWikiRequest.prototype, Ajax.Request.prototype)
             this.action = action;
         else
             this.action = "view";
-        this.baseUrl = "/xwiki/bin/" + action;
+        this.baseUrl = "${request.contextPath}/bin/" + action;
 
         var onComplete = this.options.onComplete || Prototype.emptyFunction;
         this.options.onComplete = (function() {

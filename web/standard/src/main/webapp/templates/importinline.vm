@@ -83,7 +83,7 @@ $msg.get("noattachments")
   <div id="noSelectedDocs"><h4 class="heading-1-1-1" id="noSelectedDocsTxt">$msg.get("nodocuments")</h4></div>
 
 <h4 class="heading-1-1-1">$msg.get("uploadnewarchivetoimport")</h4>
-<script type="text/javascript" src="$xwiki.getSkinFile("import.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("import.js", true)"></script>
 <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
 <fieldset class="expanded" id="attachform">
 <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>

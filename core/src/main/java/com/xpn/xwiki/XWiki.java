@@ -1303,7 +1303,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (result != null)
                     return result;
             }
-            URL url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
+            URL url;
+            if (forceSkinAction) {
+                url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
+            } else {
+                url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
+            }
             return urlf.getURL(url, context);
         } catch (Exception e) {
         }
@@ -1465,10 +1470,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             // Try to get it from context
             baseskin = (String) context.get("baseskin");
-            if (baseskin != null)
+            if (baseskin != null) {
                 return baseskin;
-            else
+            } else {
                 baseskin = "";
+            }
 
             // Let's get the base skin doc itself
             if (fromRenderSkin) {
@@ -1478,7 +1484,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             if (baseskin.equals("")) {
                 // Let's get the base skin from the skin itself
                 String skin = getSkin(context);
-                skin = getSkin(context);
                 XWikiDocument doc = getDocument(skin, context);
                 baseskin = doc.getStringValue("XWiki.XWikiSkins", "baseskin");
             }
@@ -1500,7 +1505,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 return result;
         } catch (Exception e) {
         }
-        return "Copyright 2004 (c) Contributing Authors";
+        return "Copyright 2004-2007 (c) XPertNet and Contributing Authors";
     }
 
     public String getXWikiPreference(String prefname, XWikiContext context)

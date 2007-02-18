@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class SkinAction extends XWikiAction
 {
-    private static final Log log = LogFactory.getLog(XWiki.class);
+    private static final Log log = LogFactory.getLog(SkinAction.class);
 
     public String render(XWikiContext context) throws XWikiException
     {
@@ -46,24 +46,26 @@ public class SkinAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
+        String baseskin = xwiki.getBaseSkin(context, true);
+        XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
+        String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
         String path = request.getPathInfo();
+        log.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: " + defaultbaseskin);
         int idx = path.lastIndexOf("/");
         while (idx > 0) {
             try {
                 String filename = Utils.decode(path.substring(idx + 1), context);
+                log.debug("Trying '" + filename + "'");
 
                 if (renderSkin(filename, doc, context))
                     return null;
 
-                String baseskin = xwiki.getBaseSkin(context, true);
                 if (renderSkin(filename, baseskin, context))
                     return null;
 
-                XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
                 if (renderSkin(filename, baseskindoc, context))
                     return null;
 
-                String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
                 if (renderSkin(filename, defaultbaseskin, context))
                     return null;
             } catch (XWikiException ex) {
@@ -78,56 +80,73 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
+        log.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
 
         try {
-            BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
-            String content = null;
-            if (object != null) {
-                content = object.getStringValue(filename);
-            }
-
-            if ((content != null) && (!content.equals(""))) {
-                // Choose the right content type
-                String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                if (mimetype.equals("text/css")) {
-                    content = context.getWiki().parseContent(content, context);
+            if (doc.isNew()) {
+                log.debug("The skin document does not exist; trying on the filesystem");
+            } else {
+                log.debug("... as object property");
+                BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
+                String content = null;
+                if (object != null) {
+                    content = object.getStringValue(filename);
                 }
-                response.setContentType(mimetype);
-                response.setDateHeader("Last-Modified", doc.getDate().getTime());
-                // Sending the content of the attachment
-                response.setContentLength(content.length());
-                response.getWriter().write(content);
-                return true;
-            }
 
-            XWikiAttachment attachment = doc.getAttachment(filename);
-            if (attachment != null) {
-                // Sending the content of the attachment
-                byte[] data = attachment.getContent(context);
-                String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                if (mimetype.equals("text/css")) {
-                    data = context.getWiki().parseContent(new String(data), context).getBytes();
+                if ((content != null) && (!content.equals(""))) {
+                    // Choose the right content type
+                    String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                    if (mimetype.equals("text/css") || mimetype.equals("text/javascript")) {
+                        content = context.getWiki().parseContent(content, context);
+                    }
+                    response.setContentType(mimetype);
+                    response.setDateHeader("Last-Modified", doc.getDate().getTime());
+                    // Sending the content of the attachment
+                    response.setContentLength(content.length());
+                    response.getWriter().write(content);
+                    return true;
                 }
-                response.setContentType(mimetype);
-                response.setDateHeader("Last-Modified", attachment.getDate().getTime());
-                response.setContentLength(data.length);
-                response.getOutputStream().write(data);
-                return true;
+
+                log.debug("... as attachment");
+                XWikiAttachment attachment = doc.getAttachment(filename);
+                if (attachment != null) {
+                    // Sending the content of the attachment
+                    byte[] data = attachment.getContent(context);
+                    String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                    if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
+                        data = context.getWiki().parseContent(new String(data), context).getBytes();
+                    }
+                    response.setContentType(mimetype);
+                    response.setDateHeader("Last-Modified", attachment.getDate().getTime());
+                    response.setContentLength(data.length);
+                    response.getOutputStream().write(data);
+                    return true;
+                }
+                log.debug("... as fs document");
             }
 
-            if (doc.getWeb().equals("skins")) {
+            if (doc.getSpace().equals("skins")) {
                 String path = "skins/" + doc.getName() + "/" + filename;
-                if (!context.getWiki().resourceExists(path))
+                if (!context.getWiki().resourceExists(path)) {
                     path = "skins/" + context.getWiki().getBaseSkin(context) + "/" + filename;
+                }
+                if (!context.getWiki().resourceExists(path)) {
+                    path = "skins/" + context.getWiki().getDefaultBaseSkin(context) + "/" + filename;
+                }
+                if (!context.getWiki().resourceExists(path)) {
+                    log.info("Skin file '" + path + "' does not exist");
+                    return false;
+                }
+                log.debug("Rendering file '" + path + "'");
 
                 byte[] data = context.getWiki().getResourceContentAsBytes(path);
                 if ((data != null) && (data.length != 0)) {
                     // Choose the right content type
                     String mimetype =
                         xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                    if (mimetype.equals("text/css")) {
+                    if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
                         data =
                             context.getWiki().parseContent(new String(data), context).getBytes();
                     }
@@ -137,8 +156,6 @@ public class SkinAction extends XWikiAction
                     response.setContentLength(data.length);
                     response.getOutputStream().write(data);
                     return true;
-                } else {
-
                 }
             }
         } catch (IOException e) {
@@ -154,6 +171,7 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, String skin, XWikiContext context)
         throws XWikiException
     {
+        log.debug("Rendering file '" + filename + "' from the '" + skin + "' skin directory");
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         try {
@@ -171,7 +189,7 @@ public class SkinAction extends XWikiAction
             if (data == null || data.length == 0)
                 return false;
 
-            if (mimetype.equals("text/css")) {
+            if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
                 data = context.getWiki().parseContent(new String(data), context).getBytes();
             }
             response.getOutputStream().write(data);

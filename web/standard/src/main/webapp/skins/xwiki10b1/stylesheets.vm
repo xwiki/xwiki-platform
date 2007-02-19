@@ -1,11 +1,11 @@
 #set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
 #set( $stylesheets = $xwiki.getWebPreference("stylesheets"))
 #if ($defaultstyle!="")
-<link href="$xwiki.getSkinFile($defaultstyle)" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile($defaultstyle)" rel="stylesheet" type="text/css" title="default" />
+<link href="$xwiki.getSkinFile($defaultstyle, true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile($defaultstyle, true)" rel="stylesheet" type="text/css" title="default" />
 #else
-<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" />
-<link href="$xwiki.getSkinFile("style.css")" rel="stylesheet" type="text/css" title="default" />
+<link href="$xwiki.getSkinFile("style.css", true)" rel="stylesheet" type="text/css" />
+<link href="$xwiki.getSkinFile("style.css", true)" rel="stylesheet" type="text/css" title="default" />
 #end
 #if($printss)
 <link href="$xwiki.getSkinFile("print.css")" rel="stylesheet" type="text/css"/>

@@ -2,18 +2,6 @@
 ###
 ###
 #if((!$showactions)||($showactions==1))
-<script type="text/javascript">
-function checkDocumentContent() {
-  if (this.form.content) {
-    var content = this.form.content.value;
-    if (content == null || content == "") {
-      alert("$msg.get('wikicontentcannotbeempty')");
-      return false ;
-    }
-  }
-  return true;
-}
-</script>
 #set($editor = $request.getHeader('Referer'))
 #if((!$editor) || ($editor == ""))
 #if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&(!$doc.isAdvancedContent()))

@@ -289,7 +289,10 @@ WikiEditor.prototype._cleanNode = function(editor_id, node) {
 				//this.__removeBlankParagraphs(node);
 				return;
 			case "p":
-				//this._fixParagraph(node);
+                // alert(node.className);
+                node.className = "";
+                //this._fixParagraph(node);
+                break;
 			case "h3":
 			//case "ul":
 			//case "ol":

@@ -1,132 +1,4 @@
 ###
-###    Separator
-###
-### Insert a span containing a |
-###
-#macro (sep)
-<span class="separator"> | </span>
-#end
-
-###
-###    useravatar
-###
-### Display the avatar of a user, or a standard image if the user has no avatar
-###
-### @param username The name of the user whose avatar will be displayed
-###
-#macro(useravatar $username)
-  #if(!$picturelist)
-    #set($picturelist = $xwiki.hashMap)
-  #end
-  #if(!$picturelist.containsKey($username))
-    #set($picture = "<img src='")
-    #set($picture = $picture.concat($xwiki.getSkinFile("noavatar.png")))
-    #set($picture = $picture.concat("' alt='$username' title='$username'/>"))
-    #set($profiledoc = $xwiki.getDocument($username))
-    #if(!$profiledoc.isNew())
-      #set($profileobj = $profiledoc.getObject("XWikiUsers", 0))
-      #if($profiledoc.attachmentList.size() != 0)
-        #set($hasavatar = 0)
-        #if($profileobj.avatar && $profileobj.avatar != "")
-          #foreach ($attach in $profiledoc.attachmentList)
-            #if($attach.filename == $profileobj.avatar)
-              #set($hasavatar = 1)
-            #end
-          #end
-        #end
-        #if($hasavatar == 1)
-          #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
-          #set($picture = "<img src='")
-          #set($picture = $picture.concat($pictureurl))
-          #set($picture = $picture.concat("' alt='"))
-          #set($picture = $picture.concat($username))
-          #set($picture = $picture.concat("' title='"))
-          #set($picture = $picture.concat($username))
-          #set($picture = $picture.concat("'/>"))
-        #end
-      #end
-    #end
-    $!picturelist.put($username, $picture)
-  #end
-  $picturelist.get($username)
-#end
-
-###
-###    mimetypeimg
-###
-### Display an icon according to the mimetype
-###
-### @param mime The reported mimetype of the file
-### @param fname The name of the file
-###
-#macro(mimetypeimg $mime $fname)
-#set($idx = $fname.lastIndexOf("."))
-#set($idx = $idx + 1)
-#if(($idx != 0) && ($idx != -1))
-#set($ext = $fname.substring($idx))
-#else
-#set($ext = "")
-#end
-#####    images
-#if($mime.equals("image/svg"))
-<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.equals("application/svg+xml"))
-<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.startsWith("image/"))
-<img src="$xwiki.getSkinFile("mimetypes/jpg.png")" alt="[img]" title="[img]"/>#####    text based
-#elseif($mime.equals("text/plain"))
-<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#elseif($mime.equals("text/html"))
-<img src="$xwiki.getSkinFile("mimetypes/html.png")" alt="[html]" title="[html]"/>#elseif($mime.equals("text/css"))
-<img src="$xwiki.getSkinFile("mimetypes/url.png")" alt="[css]" title="[css]"/>#elseif($mime.startsWith("text/"))
-<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#####    documents
-#elseif($mime.equals("application/xml"))
-<img src="$xwiki.getSkinFile("mimetypes/xml.png")" alt="[xml]" title="[xml]"/>#elseif($mime.equals("application/pdf"))
-<img src="$xwiki.getSkinFile("mimetypes/pdf.png")" alt="[pdf]" title="[pdf]"/>#elseif($mime.equals("application/postscript"))
-<img src="$xwiki.getSkinFile("mimetypes/ps.png")" alt="[ps]" title="[ps]"/>#elseif($mime.equals("application/msword"))
-<img src="$xwiki.getSkinFile("mimetypes/word.png")" alt="[doc]" title="[doc]"/>#elseif($mime.equals("application/powerpoint"))
-<img src="$xwiki.getSkinFile("mimetypes/ppt.png")" alt="[ppt]" title="[ppt]"/>#elseif($mime.equals("application/x-shockwave-flash"))
-<img src="$xwiki.getSkinFile("mimetypes/swf.png")" alt="[swf]" title="[swf]"/>#####    archives
-#elseif($mime.equals("application/x-tar"))
-<img src="$xwiki.getSkinFile("mimetypes/tar.png")" alt="[tar]" title="[tar]"/>#elseif($mime.equals("application/zip"))
-<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[zip]" title="[zip]"/>#elseif($mime.equals("application/x-gzip"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($mime.equals("application/java-archive"))
-<img src="$xwiki.getSkinFile("mimetypes/jar.png")" alt="[jar]" title="[jar]"/>#####    media
-#elseif($mime.startsWith("audio/"))
-<img src="$xwiki.getSkinFile("mimetypes/wav.png")" alt="[audio]" title="[audio]"/>#elseif($mime.startsWith("video/"))
-<img src="$xwiki.getSkinFile("mimetypes/video.png")" alt="[video]" title="[video]"/>#####    octet-streams extensions
-#elseif($mime.equals("application/octet-stream"))
-#if($ext.equals("xls"))
-<img src="$xwiki.getSkinFile("mimetypes/excel.png")" alt="[xls]" title="[xls]"/>#elseif($ext.equals("bz") || $ext.equals("bz2") || $ext.equals("tbz"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_bz.png")" alt="[bz]" title="[bz]"/>#elseif($ext.equals("tgz"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($ext.equals("rar"))
-<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[rar]" title="[rar]"/>#elseif($ext.equals("odp") || $ext.equals("odt") || $ext.equals("odf") || $ext.equals("sxw") || $ext.equals("stw"))
-<img src="$xwiki.getSkinFile("mimetypes/openoffice.png")" alt="[odf]" title="[odf]"/>#else
-<img src="$xwiki.getSkinFile("mimetypes/bin.png")" alt="[bin]" title="[bin]"/>#end
-#elseif($mime.startsWith("application/"))
-<img src="$xwiki.getSkinFile("mimetypes/exec.png")" alt="[app]" title="[app]"/>#end
-#end
-
-###
-###    packName
-###
-### Display a shorter version of a string
-###
-### @param name The processed string
-###
-#macro(packName $name)
-#if(!$maxnamelength)
-#set($maxnamelength = 25)
-#end
-#set($idx = $name.lastIndexOf("."))
-#if(($idx != 0) && ($idx != -1))
-#set($ext = $name.substring($idx))
-#else
-#set($ext = "")
-#set($idx = $name.length())
-#end
-#set($fname = $name.substring(0, $idx))
-#if($fname.length() > $maxnamelength)$fname.substring(0, $maxnamelength)~$ext#else$name#end
-#end
-
-###
 ###    Panel header
 ###
 ### Generate the starting html code for a panel
@@ -310,14 +182,15 @@ $html
 ###
 ###    CSS properties
 ###
-
 #macro(csscolorproperty $csspropname $fieldname)
 #set($objcolor = $colors.get($fieldname))
 #if($objcolor && $objcolor != "")
   $csspropname: $objcolor;
 #end
 #end
-
+##
+##
+##
 #macro(csscolorpropertyimportant $csspropname $fieldname)
 #set($objcolor = $colors.get($fieldname))
 #if($objcolor && $objcolor != "")
@@ -325,13 +198,11 @@ $html
 #end
 #end
 
-
 #macro(displayPropName $prop)
 #if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
 $prop.prettyName#else
 $msg.get($prop.name)#end
 #end
-
 
 ###
 ###    Display Panel content

@@ -23,6 +23,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -273,5 +274,9 @@ public class Context extends Api
     public List getDisplayedFields()
     {
         return getXWikiContext().getDisplayedFields();
+    }
+    public Util getUtil()
+    {
+        return context.getUtil();
     }
 }

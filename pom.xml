@@ -39,7 +39,6 @@
   <modules>
     <module>core</module>
     <module>web</module>
-    <module>wikis</module>
   </modules>
   <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need to define it
        here because if com.xpn.xwiki:xwiki is not in the local repository we want to fetch it from the remote

@@ -64,7 +64,7 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 
         Boolean isValid = plugin.verifyCaptcha("register", this.context);
 
-        assertTrue(isValid);
+        assertTrue(isValid.booleanValue());
     }
 
     public void testVerifyCaptchaUsingTextWhenInvalidAnswerAndAnonymousUser() throws Exception
@@ -78,6 +78,6 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 
         Boolean isValid = plugin.verifyCaptcha("register", this.context);
 
-        assertFalse(isValid);
+        assertFalse(isValid.booleanValue());
     }
 }

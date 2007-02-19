@@ -13,15 +13,15 @@
 #end
   <div id="company">
   <div id="companylogo">
-    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home" rel="home">
+    <a href="$!xwiki.getURL("Main.WebHome", "view")" title="Home" rel="home">
 #set($logoname = $xwiki.getSkinPreference("logo", "logo.png"))
 #set($logo = $!prefdoc.getAttachment($logoname))
 #if(!$logo)
 #set($logourl = $xwiki.getSkinFile($logoname))
-      <img src="$logourl" alt="XWiki" width="200" height="70"/>
+      <img src="$!logourl" alt="XWiki" width="200" height="70"/>
 #else
 #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
-      <img src="$logourl" alt="XWiki"/>
+      <img src="$!logourl" alt="XWiki"/>
 #end
     </a>
   </div>
@@ -32,37 +32,37 @@
   <div id="globallinks">
     <div id="globalmenu">
 #if (!$isguest)
-      <a class="glink" href="$xwiki.getURL($context.user, "view")" id="headeruser">$xwiki.getUserName($context.user, false)</a> #sep()
+      <a class="glink" href="$!xwiki.getURL($context.user, "view")" id="headeruser">$!xwiki.getUserName($context.user, false)</a> #sep()
 #end
 #if ($context.action != "loginerror")
 #if ($isguest)
 #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$logredir"))
-      <a class="glink" href="$loginurl" id="headerlogin">$msg.get("login")</a>#sep()
+      <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get("login")</a>#sep()
 #else
 #set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
-      <a class="glink" href="$logouturl" id="headerlogout">$msg.get("logout")</a>#sep()
+      <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get("logout")</a>#sep()
 #end
 #end
 #if($isguest)
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
-      <a class="glink" href="$regurl" id="headerregister">$msg.get("register")</a>#sep()
+      <a class="glink" href="$!regurl" id="headerregister">$!msg.get("register")</a>#sep()
 #end
 #if($hasadmin)
-      <a class="glink" href="$xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$msg.get("admin")</a> #sep()
+      <a class="glink" href="$!xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$!msg.get("admin")</a> #sep()
 #end
 #if($xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">
-  <a href="$doc.getURL("view", "language=$doc.getDefaultLanguage()")">$doc.getDefaultLanguage()</a>
+  <a href="$!doc.getURL("view", "language=$doc.getDefaultLanguage()")">$!doc.getDefaultLanguage()</a>
   #foreach($lang in $doc.translationList)
-    / <a href="$doc.getURL("view", "language=$lang")">$lang</a>
+    / <a href="$!doc.getURL("view", "language=$lang")">$!lang</a>
   #end
   </span>
 #end
-##      <a href="$xwiki.getURL("Doc.WebHome","view")">$msg.get("doc")</a>
+##      <a href="$!xwiki.getURL("Doc.WebHome","view")">$!msg.get("doc")</a>
     </div> #*
 #if($searchdoc.isNew()==false)
     <div id="globalsearch">
-      <form action="$searchdoc.getURL("view")">
+      <form action="$!searchdoc.getURL("view")">
         <p><input type="text" name="text" value="" size="15"/>&nbsp;<input type="submit" class="button" value="Search"/></p>
       </form>
     </div>

@@ -1,3 +1,4 @@
+#if($xwiki.getDocument("XWiki.Registration").isNew())
 <h1>$msg.get("Registration")</h1>
 #if(!$reg||$reg<0 )
 <p>$msg.get("registerwelcome")</p>
@@ -53,4 +54,7 @@ $doc.set("last_name", $request.register_last_name)
 <span class="buttonwrapper"><input type="submit" value="$msg.get("iregister")"></span>
 </div>
 </form>
+#end
+#else
+$xwiki.getDocument("XWiki.Registration").getTranslatedDocument().getRenderedContent()
 #end

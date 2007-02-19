@@ -23,30 +23,59 @@
 
 package com.xpn.xwiki.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.servlet.http.Cookie;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.oro.text.PatternCache;
+import org.apache.oro.text.PatternCacheLRU;
+import org.apache.oro.text.perl.Perl5Util;
+import org.apache.oro.text.regex.MalformedPatternException;
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Perl5Matcher;
+import org.apache.tools.ant.filters.StringInputStream;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.oro.text.PatternCache;
-import org.apache.oro.text.PatternCacheLRU;
-import org.apache.oro.text.perl.Perl5Util;
-import org.apache.oro.text.regex.*;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.io.SAXReader;
-
-import javax.servlet.http.Cookie;
-import java.io.*;
-import java.util.*;
 
 public class Util {
 
     private static PatternCache patterns = new PatternCacheLRU(200);
     private Perl5Matcher matcher = new Perl5Matcher();
     private Perl5Util p5util = new Perl5Util(getPatterns());
+    private static final Log log = LogFactory.getLog(Util.class);
 
     public String substitute(String pattern, String text) {
         return getP5util().substitute(pattern, text);
@@ -577,5 +606,36 @@ public class Util {
             return null;
         }
     }
-
+    
+    /**
+     * API to obtain a DOM document for the specified string
+     * @param str The parsed text
+     * @return A DOM document element corresponding to the string, or null on error
+     */
+    public org.w3c.dom.Document getDOMForString(String str)
+    {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new StringInputStream(str));
+        } catch (SAXException ex) {
+            log.warn("Cannot parse string:" + str, ex);
+        } catch (IOException ex) {
+            log.warn("Cannot parse string:" + str, ex);
+        } catch (ParserConfigurationException ex) {
+            log.warn("Cannot parse string:" + str, ex);
+        }
+        return null;
+    }
+    /**
+     * API to get a new DOM document
+     * @return a new DOM document element, or null on error
+     */
+    public org.w3c.dom.Document getDOMDocument()
+    {
+        try {
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            log.warn("Cannot create DOM tree", ex);
+        }
+        return null;
+    }
 }

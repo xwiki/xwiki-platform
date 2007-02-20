@@ -426,5 +426,36 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
+           debugging XWiki, especially in the case when you cannot debug the application (for
+           example when you cannot reproduce the problem on your machine you can send an
+           aspectified XWiki JAR and ask the user to run it and send you the logs). -->
+      <id>debug</id>
+      <dependencies>
+        <dependency>
+          <groupId>aspectj</groupId>
+          <artifactId>aspectjrt</artifactId>
+          <version>1.5.2a</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>aspectj-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
         

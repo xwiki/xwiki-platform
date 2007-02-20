@@ -31,6 +31,7 @@ public class XObject implements IsSerializable {
     private Map properties = new HashMap();
     private Map viewProperties = new HashMap();
     private Map editProperties = new HashMap();
+    private Map editPropertiesFieldName = new HashMap();
     private String name;
     private String className;
     private int nb;
@@ -64,6 +65,11 @@ public class XObject implements IsSerializable {
         setProperty(name, prop);
     }
 
+    /**
+     * 
+     * @param name the name of the field
+     * @return html code to view the given field
+     */
     public String getViewProperty(String name) {
         return (String) viewProperties.get(name);
     }
@@ -72,12 +78,25 @@ public class XObject implements IsSerializable {
         viewProperties.put(name, prop);
     }
 
+    /**
+     *
+     * @param name the name of the field
+     * @return html code to edit the given field
+     */
     public String getEditProperty(String name) {
         return (String) editProperties.get(name);
     }
 
     public void setEditProperty(String name, String prop) {
         editProperties.put(name, prop);
+    }
+
+    public String getEditPropertyFieldName(String name) {
+        return (String) editPropertiesFieldName.get(name);
+    }
+
+    public void setEditPropertyFieldName(String name, String fieldName) {
+        editPropertiesFieldName.put(name, fieldName);
     }
 
     public String getName() {

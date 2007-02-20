@@ -32,6 +32,7 @@ import com.xpn.xwiki.gwt.api.client.*;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCContext;
@@ -57,12 +58,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
         ServletContext sContext = null;
         try {
-            sContext = getServletConfig().getServletContext();
+            sContext = getServletContext();
         } catch (Exception ignore) { }
         if (sContext != null) {
-            engine = new XWikiXMLRPCContext(sContext);
+            engine = new XWikiServletContext(sContext);
         } else {
-            engine = new XWikiXMLRPCContext(new MockXWikiServletContext());
+            engine = new XWikiServletContext(new MockXWikiServletContext());
         }
 
         XWikiContext context = Utils.prepareContext("", request, response, engine);
@@ -618,7 +619,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setLanguage(xdoc.getLanguage());
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
-        doc.setUploadURL(xdoc.getExternalURL("upload", context));
+        doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));
+        try {
+            doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", "ajax=1", context));
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
         doc.setHasElement(xdoc.getElements());
         try {
             doc.setEditRight(context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), xdoc.getFullName(), context));
@@ -675,16 +681,18 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         xObject.setName(baseObject.getName());
         xObject.setNumber(baseObject.getNumber());
         xObject.setClassName(baseObject.getClassName());
-        Object[] propnames = baseObject.getPropertyNames();
+        String prefix = baseObject.getxWikiClass(context).getName() + "_" + baseObject.getNumber() + "_";
+
+        Object[] propnames = baseObject.getxWikiClass(context).getFieldList().toArray();
         for (int i=0;i<propnames.length;i++) {
-            String propname = (String) propnames[i];
+            String propname = ((PropertyInterface)propnames[i]).getName();
             // TODO: this needs to be a param
             if (!propname.equals("fullcontent")) {
             try {
                 BaseProperty prop = (BaseProperty) baseObject.get(propname);
                 if (prop!=null) {
                     Object value = prop.getValue();
-                    //TODO We should better put it in a standart form to be sure to be able to modify it
+                    //TODO We should better put it in a standart format to be sure to be able to modify it
                     if (value instanceof Date)
                      xObject.set(propname, baseObject.displayView(propname, "", context));                    
                     else if (value instanceof List) {
@@ -700,11 +708,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             } catch (Exception e) {}
             try {
                 if (withViewDisplayers)
-                    xObject.setViewProperty(propname, baseObject.displayView(propname, "", context));
+                    xObject.setViewProperty(propname, baseObject.displayView(propname, prefix, context));
             } catch (Exception e) {}
             try {
-                if (withEditDisplayers)
-                    xObject.setEditProperty(propname, baseObject.displayEdit(propname, "", context));
+                if (withEditDisplayers) {
+                    xObject.setEditProperty(propname, baseObject.displayEdit(propname, prefix, context));
+                    xObject.setEditPropertyFieldName(propname, prefix + propname);
+                }
             } catch (Exception e) {}
             }
         }

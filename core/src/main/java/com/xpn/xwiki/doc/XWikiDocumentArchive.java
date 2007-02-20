@@ -118,4 +118,14 @@ public class XWikiDocumentArchive {
         Object[] lines = ToString.stringToArray(text);
         archive = new Archive(lines, docname, version);
     }
+
+    /**
+     * {@inheritDoc}
+     * @see Object#toString() 
+     */
+    public String toString()
+    {
+        return "id = [" + getId() + "], archive = ["
+            + (getRCSArchive() == null ? "null" : getRCSArchive().toString()) + "]"; 
+    }
 }

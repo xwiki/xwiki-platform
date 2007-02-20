@@ -71,6 +71,19 @@ public class XWikiDocumentArchive {
     }
 
     public void updateArchive(String docname, String text) throws XWikiException {
+
+        // JRCS used the user.name System property to set the author of a change. However JRCS
+        // has a bug when the user name has a space in the name
+        // (see http://jira.xwiki.org/jira/browse/XWIKI-896). The workaround is to set the
+        // user.name System property to some user without a space in its name. In addition
+        // we're not using that information anywhere so it won't matter.
+
+        // Saving the property in case some other part of the code or some dependent framework
+        // needs it.
+        String originalUsername = System.getProperty("user.name");
+
+        System.setProperty("user.name", "xwiki");
+
         try {
             Object[] lines = ToString.stringToArray(text);
             if (archive != null)
@@ -82,7 +95,11 @@ public class XWikiDocumentArchive {
             Object[] args = { docname };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
                     "Exception while manipulating the archive for doc {0}", e, args);
+        } finally {
+            // Restore the user name to its original value
+            System.setProperty("user.name", originalUsername);
         }
+
     }
 
     public Object clone() {

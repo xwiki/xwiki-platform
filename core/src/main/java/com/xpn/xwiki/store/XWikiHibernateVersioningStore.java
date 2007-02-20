@@ -143,7 +143,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         } catch (Exception e) {
             Object[] args = { new Long(archivedoc.getId()) };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while loading archive {0}", e, args);
+                    "Exception while saving archive {0}", e, args);
         } finally {
             try {
                 if (bTransaction)

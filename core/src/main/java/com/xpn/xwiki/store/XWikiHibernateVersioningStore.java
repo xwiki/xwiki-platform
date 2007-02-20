@@ -220,8 +220,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while loading archive {0}", e, args);
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
+                    "Exception while resetting archive {0}", e, args);
         } finally {
             try {
                 if (bTransaction)
@@ -246,8 +246,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             }
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while loading archive {0}", e, args);
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
+                    "Exception while updating archive {0}", e, args);
         } finally {
             try {
                 if (bTransaction)

@@ -3535,6 +3535,30 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return context.getURLFactory().getURL(url, context);
     }
 
+    public String getExternalURL(String fullname, String action, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullname, context);
+
+        URL url =
+            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, null, null,
+                doc.getDatabase(), context);
+        return url.toString();
+    }
+
+    public String getExternalURL(String fullname, String action, String querystring, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(fullname, context);
+
+        URL url =
+            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, querystring, null,
+                doc.getDatabase(), context);
+        return url.toString();
+    }
+
     public String getURL(String fullname, String action, String querystring, XWikiContext context)
         throws XWikiException
     {

@@ -81,6 +81,9 @@ public interface XWikiService extends RemoteService {
     public Boolean saveObject(XObject object);
     public Boolean saveObjects(List objects);
 
+    public Boolean deleteObject(XObject object);
+    public Boolean deleteObject(String docName, String className, int number);
+
     public boolean addComment(String docname, String message);
 
     public List customQuery(String queryPage);

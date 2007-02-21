@@ -166,7 +166,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
 		
         String imageURL = context.getDoc().getAttachmentURL(
         		file.getName(), "charting", context);
-		String pageURL = imageURL; // TODO: generate this
+		String pageURL = imageURL;
 		return new ChartImpl(params, imageURL, pageURL);
 	}
 	

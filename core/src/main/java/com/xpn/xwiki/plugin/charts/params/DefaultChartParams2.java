@@ -46,6 +46,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This is used by the charting wizard only
+ * Q: Why is this not used in the ChartingMacro ?
+ */
 public class DefaultChartParams2 extends ChartParams {
 	public static DefaultChartParams2 uniqueInstance;
 

@@ -31,8 +31,7 @@ public interface Chart {
 	public String getTitle();
 
 	/**
-	 * The location of the generated image.
-	 * @return
+	 * @return The location of the generated image
 	 */
 	public String getImageURL();
 

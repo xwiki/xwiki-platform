@@ -49,6 +49,11 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * TODO: Document this
+ * @author hritcu
+ *
+ */
 public class ChartingPlugin extends XWikiDefaultPlugin implements
 		XWikiPluginInterface {
 	public ChartingPlugin(String name, String className, XWikiContext context) {

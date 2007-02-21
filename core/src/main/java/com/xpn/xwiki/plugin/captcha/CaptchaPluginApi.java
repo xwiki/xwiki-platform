@@ -20,35 +20,39 @@
  * @author Phung Hai Nam (phunghainam@xwiki.com)
  * @version 5 Sep 2006
  */
-
 package com.xpn.xwiki.plugin.captcha;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 
-public class CaptchaPluginApi extends Api {
-
+public class CaptchaPluginApi extends Api
+{
     private CaptchaPlugin plugin;
 
-    public CaptchaPluginApi(CaptchaPlugin plugin, XWikiContext context) {
+    public CaptchaPluginApi(CaptchaPlugin plugin, XWikiContext context)
+    {
         super(context);
         setPlugin(plugin);
     }
 
-    public CaptchaPlugin getPlugin() {
+    public CaptchaPlugin getPlugin()
+    {
         return plugin;
     }
 
-    private void setPlugin(CaptchaPlugin plugin) {
+    private void setPlugin(CaptchaPlugin plugin)
+    {
         this.plugin = plugin;
     }
 
-    public String displayCaptcha(String action, String classname) throws XWikiException {
+    public String displayCaptcha(String action, String classname) throws XWikiException
+    {
         return getPlugin().displayCaptcha(action, classname, getXWikiContext());
     }
 
-    public Boolean verifyCaptcha(String action) throws XWikiException {
+    public Boolean verifyCaptcha(String action) throws XWikiException
+    {
         return getPlugin().verifyCaptcha(action, getXWikiContext());
     }
 }

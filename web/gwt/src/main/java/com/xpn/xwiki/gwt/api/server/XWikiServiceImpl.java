@@ -454,6 +454,34 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return Boolean.valueOf(false);
     }
 
+    public Boolean deleteObject(XObject object) {
+        return deleteObject(object.getName(), object.getClassName(), object.getNumber());   
+    }
+
+    public Boolean deleteObject(String docName, String className, int number) {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docName, context)) {
+                XWikiDocument doc = context.getWiki().getDocument(docName, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
+
+                BaseObject bObj = doc.getObject(className, number);
+
+                if (!doc.removeObject(bObj))
+                    return Boolean.valueOf(false);
+
+                doc.setAuthor(context.getUser());
+                if (doc.isNew())
+				    doc.setCreator(context.getUser());
+                context.getWiki().saveDocument(doc, oldDoc, context);
+                return Boolean.valueOf(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Boolean.valueOf(false);
+    }
+
 
     public Boolean saveObjects(List objects) {
         Iterator it = objects.iterator();

@@ -94,6 +94,10 @@ public interface XWikiServiceAsync {
 
     void saveObjects(List objects, AsyncCallback async);
 
+    void deleteObject(XObject object, AsyncCallback async);
+
+    void deleteObject(String docName, String className, int number, AsyncCallback async);
+
     void addComment(String docname, String message, AsyncCallback async);
 
     void customQuery(String queryPage, AsyncCallback async);

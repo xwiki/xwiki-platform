@@ -606,7 +606,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
-    private User newUser(User user, XWikiDocument xdoc, XWikiContext context) {
+    protected User newUser(User user, XWikiDocument xdoc, XWikiContext context) {
         newDocument(user, xdoc, context);
         user.setFirstName(xdoc.getStringValue("XWiki.XWikiUsers", "first_name"));
         user.setLastName(xdoc.getStringValue("XWiki.XWikiUsers", "last_name"));
@@ -614,15 +614,15 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return user;
     }
 
-    private Document newDocument(Document doc, XWikiDocument xdoc, XWikiContext context) {
+    protected Document newDocument(Document doc, XWikiDocument xdoc, XWikiContext context) {
         return newDocument(doc, xdoc, false, context);
     }
 
-    private Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, XWikiContext context) {
+    protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, XWikiContext context) {
         return newDocument(doc, xdoc, withObjects, false, false, false, context);
     }
 
-    private Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, boolean withViewDisplayers,
+    protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, boolean withViewDisplayers,
                                  boolean withEditDisplayers, boolean withRenderedContent, XWikiContext context) {
         doc.setId(xdoc.getId());
         doc.setTitle(xdoc.getTitle());
@@ -691,7 +691,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return doc;
     }
 
-    private Attachment newAttachment(Attachment att, XWikiAttachment xAtt, XWikiContext context){
+    protected Attachment newAttachment(Attachment att, XWikiAttachment xAtt, XWikiContext context){
         att.setAttDate(xAtt.getDate().getTime());
         att.setAuthor(xAtt.getAuthor());
         att.setFilename(xAtt.getFilename());
@@ -704,7 +704,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return att;
     }
 
-    private XObject newObject(XObject xObject, BaseObject baseObject, boolean withViewDisplayers,
+    protected XObject newObject(XObject xObject, BaseObject baseObject, boolean withViewDisplayers,
                               boolean withEditDisplayers,XWikiContext context) {
         xObject.setName(baseObject.getName());
         xObject.setNumber(baseObject.getNumber());
@@ -749,7 +749,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return xObject;
     }
 
-    private void mergeObject(XObject xobject, BaseObject baseObject, XWikiContext context) {
+    protected void mergeObject(XObject xobject, BaseObject baseObject, XWikiContext context) {
         BaseClass bclass = baseObject.getxWikiClass(context);
         Object[] propnames = bclass.getPropertyNames();
         for (int i=0;i<propnames.length;i++) {
@@ -759,7 +759,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
-    private BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) {
+    protected BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) {
         Object[] propnames = xObject.getPropertyNames().toArray();
         for (int i = 0; i < propnames.length; i++) {
             String propname = (String) propnames[i];

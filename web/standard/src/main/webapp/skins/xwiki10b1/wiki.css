@@ -194,21 +194,39 @@ ol.HEBREW { list-style-type: hebrew; }
   margin: 0px;
   margin-left: 3px;
 }
-
+.wiki-calendar-table *{
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+.wiki-calendar-table div{
+  font-size: 90%;
+  margin: 2px 0px;
+}
+* html .wiki-calendar-table div{
+  font-size: 80%;
+}
 .wiki-calendar-table {
- border-right: 1px gray solid;
- border-bottom: 1px gray solid;
+  border: 4px solid #C0D4E7;
+  font-size: 100%;
+  margin: auto;
+}
+.wiki-calendar-table td {
+  vertical-align: top;
+}
+.wiki-calendar-table th {
+  background-color: #FFF;
 }
 .wiki-calendar-table td, .wiki-calendar-table th {
- text-align: center;
- border-left: 1px gray solid;
- border-top: 1px gray solid;
- height: 60px;
- width: 120px;
+  text-align: center;
+  border: 1px #C0D4E7 solid;
+  height: 60px;
+  width: 90px;
+  padding-top: 0px !important;
 }
 .wiki-calendar-daynotinmonth{
  color: #BBBBBB;
- background-color: #DDDDDD;
+ background-color: #E5E5E5;
 }
 .wiki-calendar-today{
   background-color: #C0D4E7;
@@ -217,8 +235,73 @@ ol.HEBREW { list-style-type: hebrew; }
  background-color: #D9E0E7;
  color: #BBBBBB;
 }
+.wiki-calendar-daynamerow {
+  background-color: #C0D4E7 !important;
+}
+.wiki-calendar-daynamerow th{
+  background-color: #C0D4E7 !important;
+  color: #fff;
+  font-weight: 900;
+  height: 1.8em;
+}
+.wiki-calendar-daytitle {
+  background-color: #E8EEF7;
+  font-size: 75% !important;
+  padding: 0px 5px;
+  margin: 0px !important;
+}
+.wiki-calendar-daynotinmonth .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+.wiki-calendar-today-notinmonth .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+.wiki-calendar-today .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+
 .wiki-calendar-today-notinmonth a, .wiki-calendar-daynotinmonth a{
   color: #BBB !important;
+}
+.wiki-calendar-monthyearrow {
+  font-size: 140%;
+  font-weight: 100;
+  font-variant: small-caps;
+  color: #C0D4E7;
+  border: none !important;
+  width: auto !important;
+}
+.wiki-calendar-month-nav{
+  border: none !important;
+}
+.wiki-calendar-month-nav a{
+  font-size: 140%;
+  font-weight: bold;
+  color: #C0D4E7 !important;
+  text-decoration: none;
+}
+.wiki-calendar-month-nav a:hover{
+  text-decoration: none !important;
+  color: #38c !important;
+}
+#body .prev-month{
+  text-align: left;
+  padding-left: 8px;
+}
+#body .next-month{
+  text-align: right;
+  padding-right: 8px;
+}
+
+.underline{
+  text-decoration: underline;
+}
+
+.workshop {
+  background-color: #FED;
+}
+.event .username {
+  font-size: 80%;
 }
 
 .article_title {
@@ -240,15 +323,4 @@ ol.HEBREW { list-style-type: hebrew; }
  font-size: 75%;
  font-weight: bold;
  color: gray;
-}
-
-.underline{
-  text-decoration: underline;
-}
-
-.workshop {
-  background-color: #FED;
-}
-.event .username {
-  font-size: 80%;
 }

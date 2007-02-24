@@ -30,18 +30,38 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.DateProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.velocity.VelocityContext;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * CalendarData stores a list of events that can be displayed in an Event Calendar.
+ * The internal data is of type {@link com.xpn.xwiki.plugin.calendar.CalendarEvent}.
+ * The list can be populated with CalendarEvent XWiki objects from a document, with
+ * document names retrieved by a custom hibernate query, or  with recently changed document names.
+ * @author ludovic
+ * @author sdumitriu
+ */
 public class CalendarData {
-    private List cdata = new ArrayList();
+    private Map cdata = new HashMap();
 
+    /**
+     * Default constructor. Leaves the list of events empty.
+     */
     public CalendarData() {
     }
 
+    /**
+     * The most used constructor, which populates the list with CalendarEvent
+     * XWiki objects from the current document.
+     * @param user The default user to be used.
+     * @param context The request context
+     * @throws XWikiException
+     */
     public CalendarData(String user, XWikiContext context) throws XWikiException {
         addCalendarData(context.getDoc(), user);
     }
@@ -53,7 +73,7 @@ public class CalendarData {
     public CalendarData(String hql, String user, XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
         List list = xwiki.getStore().searchDocumentsNames(hql, context);
-        for (int i=0;i<list.size();i++) {
+        for (int i = 0; i < list.size(); i++) {
             String docname = (String) list.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
             addCalendarData(doc, user);
@@ -63,25 +83,54 @@ public class CalendarData {
     public CalendarData(String hql, int nb, XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
         List list = xwiki.getStore().searchDocumentsNames(hql, nb, 0, context);
-        for (int i=0;i<list.size();i++) {
+        SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
+        for (int i = 0; i < list.size(); i++) {
             String docname = (String) list.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
             Date date = doc.getDate();
             Calendar cdate = Calendar.getInstance();
             cdate.setTime(date);
-            cdata.add(new CalendarEvent(cdate, cdate, "",
-                    "[" + doc.getName() + ">" + doc.getFullName() + "] by " + context.getWiki().getLocalUserName(doc.getAuthor(), context) ));
+            cdata.put(df.format(date), new CalendarEvent(cdate, cdate, "", "[" + doc.getName() + ">" + doc.getFullName() + "] by "
+                    + context.getWiki().getLocalUserName(doc.getAuthor(), context)));
         }
     }
 
     public List getCalendarData() {
+        List ldata = new ArrayList();
+        List sortedKeys = new ArrayList(cdata.keySet());
+        java.util.Collections.sort(sortedKeys);
+        for(Iterator it = sortedKeys.iterator(); it.hasNext(); ) {
+            ldata.addAll((List)cdata.get(it.next()));
+        }
+        return ldata;
+    }
+
+    public Map getMappedCalendarData() {
         return cdata;
     }
 
+    public List getCalendarData(Calendar date) {
+        Object result = cdata.get(new SimpleDateFormat("yyMMdd").format(date.getTime()));
+        if(result == null) {
+            result = new ArrayList();
+        }
+        return (List)result;
+    }
+
+    /**
+     * List populating method. It iterates the CalendarEvent objects stored in the given document
+     * and creates Java wrappers that can be used by the Calendar plugin.
+     * @param doc The source document, populated with CalendarEvent objects.
+     * @param defaultUser The username to be used ig objects do not have a User field.
+     * @throws XWikiException
+     */
     public void addCalendarData(XWikiDocument doc, String defaultUser) throws XWikiException {
-        if (defaultUser==null) {
+        if(doc == null) {
+            return;
+        }
+        if (defaultUser == null) {
             BaseObject bobj = doc.getObject("XWiki.XWikiUsers");
-            if (bobj==null) {
+            if (bobj == null) {
                 defaultUser = doc.getCreator();
             } else {
                 defaultUser = doc.getFullName();
@@ -89,95 +138,147 @@ public class CalendarData {
         }
 
         String defaultDescription = "";
-        if (doc!=null)
-             defaultDescription = "[" + doc.getFullName() + "]";
+        defaultDescription = "[" + doc.getFullName() + "]";
 
         Vector bobjs = doc.getObjects("XWiki.CalendarEvent");
-        if (bobjs!=null) {
-        for (int i=0;i<bobjs.size();i++) {
-            try {
-            BaseObject bobj = (BaseObject) bobjs.get(i);
-            String user = "";
+        if (bobjs != null) {
+            for (int i = 0; i < bobjs.size(); ++i) {
+                try {
+                    BaseObject bobj = (BaseObject) bobjs.get(i);
+                    String user = "";
+                    try {
+                        user = (String) ((StringProperty) bobj.get("user")).getValue();
+                    } catch (Exception e) {
+                    }
 
-            try {
-                user = (String) ((StringProperty)bobj.get("user")).getValue();
-            } catch (Exception e) {}
-            String description = "";
+                    String description = "";
+                    try {
+                        description = (String) ((LargeStringProperty) bobj.get("description")).getValue();
+                    } catch (Exception e) {
+                    }
 
-            try {
-                description = (String) ((LargeStringProperty)bobj.get("description")).getValue();
-            } catch (Exception e) {}
+                    String title = "";
+                    try {
+                        title = (String) ((StringProperty) bobj.get("title")).getValue();
+                    } catch (Exception e) {
+                    }
 
-            Date dateStart = null;
-            try {
-                dateStart = (Date) ((DateProperty) bobj.get("startDate")).getValue();
-            } catch (Exception e) {}
+                    String url = "";
+                    try {
+                        url = (String) ((StringProperty) bobj.get("url")).getValue();
+                    } catch (Exception e) {
+                    }
 
+                    String location = "";
+                    try {
+                        location = (String) ((StringProperty) bobj.get("location")).getValue();
+                    } catch (Exception e) {
+                    }
 
-            Date dateEnd = null;
-            try {
-                dateEnd = (Date) ((DateProperty) bobj.get("endDate")).getValue();
-            } catch (Exception e) {}
+                    List category = null;
+                    try {
+                        category = (List) ((StringListProperty) bobj.get("category")).getValue();
+                    } catch (Exception e) {
+                    }
 
-            if ((user==null)||user.equals("")) {
-                user = defaultUser;
+                    Date dateStart = null;
+                    try {
+                        dateStart = (Date) ((DateProperty) bobj.get("startDate")).getValue();
+                    } catch (Exception e) {
+                    }
+
+                    Date dateEnd = null;
+                    try {
+                        dateEnd = (Date) ((DateProperty) bobj.get("endDate")).getValue();
+                    } catch (Exception e) {
+                    }
+
+                    if ((user == null) || user.equals("")) {
+                        user = defaultUser;
+                    }
+
+                    if (dateStart == null) {
+                        dateStart = dateEnd;
+                    }
+                    if (dateEnd == null) {
+                        dateEnd = dateStart;
+                    }
+
+                    if ((dateStart == null) || (dateEnd == null)) {
+                        continue;
+                    }
+
+                    if (dateStart.getTime() > dateEnd.getTime()) {
+                        Date dateTemp = dateStart;
+                        dateStart = dateEnd;
+                        dateEnd = dateTemp;
+                    }
+
+                    if ((description == null) || description.equals("")) {
+                        description = defaultDescription;
+                    }
+
+                    Calendar cdateStart = Calendar.getInstance();
+                    cdateStart.setTime(dateStart);
+                    Calendar cdateEnd = Calendar.getInstance();
+                    cdateEnd.setTime(dateEnd);
+                    addCalendarData(new CalendarEvent(cdateStart, cdateEnd, user, description, title, category, url, location));
+                } catch (Exception e) {
+                    // Let's continue in case of failure
+                    e.printStackTrace();
+                }
             }
-
-            if ((dateStart==null)&&(dateEnd==null))
-                continue;
-
-            if (dateStart==null)
-             dateStart = dateEnd;
-            if (dateEnd==null)
-             dateEnd = dateStart;
-
-            if (dateStart.getTime()>dateEnd.getTime()) {
-                Date dateTemp = dateStart;
-                dateStart = dateEnd;
-                dateEnd = dateTemp;
-            }
-
-            if ((description==null)||description.equals("")) {
-                description = defaultDescription;
-            }
-
-            Calendar cdateStart = Calendar.getInstance();
-            cdateStart.setTime(dateStart);
-            Calendar cdateEnd = Calendar.getInstance();
-            cdateEnd.setTime(dateEnd);
-            cdata.add(new CalendarEvent(cdateStart, cdateEnd, user, description));
-            } catch (Exception e) {
-                // Let's continue in case of failure
-                e.printStackTrace();
-            }
-
-        }
         }
     }
 
     public String getContent(Calendar tddate, XWikiContext context) {
+        return getContent(tddate, null, null, null, context);
+    }
+
+    public String getContent(Calendar tddate, String filteredUser, String filteredLocation, List filteredCategories, XWikiContext context) {
         StringBuffer result = new StringBuffer();
-        for (int i=0;i<cdata.size();i++) {
-            CalendarEvent event = (CalendarEvent) cdata.get(i);
-            int idate = tddate.get(Calendar.YEAR) * 1000 + tddate.get(Calendar.DAY_OF_YEAR);
-            int isdate = event.getDateStart().get(Calendar.YEAR) * 1000 + event.getDateStart().get(Calendar.DAY_OF_YEAR);
-            Calendar dtend = (Calendar) event.getDateEnd().clone();
-            // dtend.add(Calendar.SECOND, -1);
-            int iedate = dtend.get(Calendar.YEAR) * 1000 + dtend.get(Calendar.DAY_OF_YEAR);
-            if ((idate>= isdate)&&(idate<=iedate)) {
-                    StringBuffer message = new StringBuffer();
-                    String user = event.getUser();
-                    message.append("<div class=\"event\">");
-                    if ((user!=null)&&(!user.equals("")))
-                     message.append(context.getWiki().getLocalUserName(event.getUser(), context));
-                    String desc = event.getDescription();
-                    if ((desc!=null)&&(!desc.trim().equals(""))&&(!message.toString().trim().equals("")))
-                      message.append(": ");
-                    message.append(desc);
-                    message.append("<br />");
-                    message.append("</div>");
-                    result.append(message);
+        for (Iterator it = getCalendarData(tddate).iterator(); it.hasNext(); ) {
+            CalendarEvent event = (CalendarEvent) it.next();
+            String user = event.getUser().trim();
+            if ((filteredUser != null) && (!filteredUser.trim().equals("")) && (!filteredUser.trim().equals(user))) {
+                continue;
+            }
+            String location = event.getLocation().trim();
+            if ((filteredLocation != null) && (!filteredLocation.trim().equals("")) && (!filteredLocation.trim().equals(location))) {
+                continue;
+            }
+            List categories;
+            if (filteredCategories != null && filteredCategories.size() > 0) {
+                categories = new ArrayList(event.getCategory());
+                categories.retainAll(filteredCategories);
+                if (categories.size() <= 0) {
+                    continue;
                 }
+            }
+            categories = event.getCategory();
+            String title = event.getTitle().trim();
+            String url = event.getUrl();
+            result.append("<div class=\"event");
+            if (categories != null && categories.size() > 0) {
+                for (Iterator cit = categories.iterator(); cit.hasNext(); ) {
+                    result.append(" " + cit.next());
+                }
+            }
+            result.append("\">");
+            if ((user != null) && (!user.equals(""))) {
+                result.append("<span class=\"username\">" + context.getWiki().getLocalUserName(event.getUser(), context) + "</span>");
+            }
+            if ((user != null) && (!user.equals("")) && (title != null) && (!title.trim().equals(""))) {
+                result.append(": ");
+            }
+            if(url != null && !url.equals("")) {
+                result.append("<a href=\"" + url + "\">");
+            }
+            result.append(title);
+            if(title != null && !title.equals("")) {
+                result.append("</a>");
+            }
+            result.append("</div>");
         }
         return result.toString();
     }
@@ -185,25 +286,27 @@ public class CalendarData {
     public String getContent(Calendar tddate, String velocityScript, XWikiContext context) {
         VelocityContext vcontext = new VelocityContext();
         vcontext.put("date", tddate);
-        ArrayList events = new ArrayList();
-        for (int i=0;i<cdata.size();i++) {
-            CalendarEvent event = (CalendarEvent) cdata.get(i);
-            int idate = tddate.get(Calendar.YEAR) * 1000 + tddate.get(Calendar.DAY_OF_YEAR);
-            int isdate = event.getDateStart().get(Calendar.YEAR) * 1000 + event.getDateStart().get(Calendar.DAY_OF_YEAR);
-            Calendar dtend = (Calendar) event.getDateEnd().clone();
-            // dtend.add(Calendar.SECOND, -1);
-            int iedate = dtend.get(Calendar.YEAR) * 1000 + dtend.get(Calendar.DAY_OF_YEAR);
-            if ((idate>= isdate)&&(idate<=iedate)) {
-                   events.add(event);
-                }
-        }
+        List events = getCalendarData(tddate);
         vcontext.put("events", events);
         return XWikiVelocityRenderer.evaluate(velocityScript, "", vcontext, context);
     }
 
-
     public void addCalendarData(CalendarEvent event) {
-        cdata.add(event);
+        SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
+        Calendar cdateStart = event.getDateStart();
+        String dateEnd = df.format(event.getDateEnd().getTime());
+        Calendar crtDate = (Calendar)cdateStart.clone();
+        List evtList;
+        do {
+            evtList = (List) cdata.get(df.format(crtDate.getTime()));
+            if (evtList == null) {
+                evtList = new ArrayList();
+            }
+            evtList.add(event);
+            cdata.put(df.format(crtDate.getTime()), evtList);
+            crtDate.add(Calendar.DATE, 1);
+        }
+        while (df.format(crtDate.getTime()).compareTo(dateEnd) <= 0);
     }
 
     public void addCalendarData(Calendar dateStart, Calendar dateEnd, String user, String description) {
@@ -211,10 +314,10 @@ public class CalendarData {
     }
 
     public void addCalendarData(Date dateStart, Date dateEnd, String user, String description) {
-     Calendar cdateStart = Calendar.getInstance();
-     cdateStart.setTime(dateStart);
-     Calendar cdateEnd = Calendar.getInstance();
-     cdateEnd.setTime(dateEnd);
-     addCalendarData(cdateStart, cdateEnd, user, description);
+        Calendar cdateStart = Calendar.getInstance();
+        cdateStart.setTime(dateStart);
+        Calendar cdateEnd = Calendar.getInstance();
+        cdateEnd.setTime(dateEnd);
+        addCalendarData(cdateStart, cdateEnd, user, description);
     }
- }
+}

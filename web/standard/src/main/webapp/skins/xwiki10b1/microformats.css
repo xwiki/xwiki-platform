@@ -18,10 +18,6 @@ address.vcard{
   margin-top: 6px;
   margin-right: 8px;
 }
-.vcard .photo{
-  float: right;
-  margin-bottom: 40px;
-}
 
 dt.label label{
   color: #999;

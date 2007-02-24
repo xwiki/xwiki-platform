@@ -1,0 +1,35 @@
+###
+### Change a user's password
+###
+###
+#template("startpage.vm")
+<div class="minwidthb"></div>
+<div class="main layoutsubsection">
+#if($doc.getObject("XWikiUsers", 0))
+#set($i = $context.user.indexOf(":")+1)
+#if($context.user.substring($i) == $doc.fullName || $hasadmin)
+  <form action="$doc.getURL("save")" method="post" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("passwordmissmatch")'); return false; }">
+<h2 class="heading-1">$msg.get("changepassword", [$xwiki.getUserName($doc.fullName, false)])</h2>
+<dl>
+    <dt><label id="xwikipasswordlabel" for="xwikipassword">$msg.get("newpassword"):</label></dt>
+    <dd><input id="xwikipassword" type="password" name="XWiki.XWikiUsers_0_password" value="" size="20"/></dd>
+    <dt><label id="xwikipassword2label" for="xwikipassword2">$msg.get("reenterpassword"):</label></dt>
+    <dd><input id="xwikipassword2" type="password" name="password2" value="" size="20"/></dd>
+</dl>
+    <div class="padded">
+    <input type="submit" value="$msg.get("setthispassword")" class="button"/>
+    </div>
+    <div class="padded">
+    <a href="$doc.getURL("view")">$msg.get("cancelpwd")</a>
+    </div>
+  </form>
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#xwikimessageboxend()
+#end
+#else
+#xwikimessageboxstart($msg.get("password") $msg.get("notauser"))
+#xwikimessageboxend()
+#end
+</div></div>
+#template("endpage.vm")

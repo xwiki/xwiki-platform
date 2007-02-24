@@ -5,18 +5,22 @@
 ### TODO: Check extension
 ###
 #template("startpage.vm")
+<div class="minwidthb"></div>
+<div class="main layoutsubsection">
 #if($doc.getObject("XWikiUsers", 0))
 #if($context.user == $doc.fullName || $hasadmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }">
-#xwikimessageboxstart("Avatar" $msg.get("changephoto"))
+<div>
+<h2 class="heading-1">$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h2>
     <input type="hidden" name="xredirect" value="$doc.getURL("view", "xpage=changeavatar")"/>
     <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("uploadavatarfile"):</label></div>
     <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
     <div class="padded">
     <input type="submit" value="$msg.get("setthisavatar")" class="button"/>
-    <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
+    ##<input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
     </div>
-#xwikimessageboxend()
+    <a href="$doc.getURL("view")">$msg.get("cancelpwd")</a>
+  </div>
   </form>
 #else
 #xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
@@ -26,4 +30,5 @@
 #xwikimessageboxstart($msg.get("avatar") $msg.get("notauser"))
 #xwikimessageboxend()
 #end
+</div></div>
 #template("endpage.vm")

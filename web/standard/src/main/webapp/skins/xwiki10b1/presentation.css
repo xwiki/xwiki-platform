@@ -295,6 +295,34 @@ Images
 Misc
 ---------------------------------------
 */
+.specialmenu{
+  float: right;
+  border: 1px solid #CCC;
+  background-color: #E5E5E5;
+  padding: 8px;
+}
+
+.specialmenu ul{
+  padding: 0px;
+  margin: 0px;
+}
+.specialmenu li{
+  list-style-type: none;
+  padding: 4px 0px;
+  margin: 0px;
+  text-indent: 0px;
+}
+.specialmenu img{
+  vertical-align: middle;
+  width: 32px;
+}
+
+#body .specialmenu a{
+  color: #000;
+}
+#body .specialmenu a:hover{
+  color: #C82;
+}
 
 .currentspace a{
   text-decoration: none !important;

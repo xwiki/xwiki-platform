@@ -158,7 +158,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
         }
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
-            href = href.replace(/%20/g," ");
+            href = unescape(href);
             if ((href.toLowerCase() == txt.toLowerCase()) && (!att["target"] || (att["target"] == "_self"))) {
                 str = "[" + txt + "]";
             } else if(att["target"] && att["target"] != "_self") {
@@ -825,7 +825,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 	} else {
 		classname = this.LINK_INTERNAL_CLASS_NAME;
 	}
-	str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
+    str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
     if (separator == "|") {
         str += " id=\"" +  url + "\"";
     }

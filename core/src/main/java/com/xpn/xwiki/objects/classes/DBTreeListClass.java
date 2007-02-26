@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
@@ -117,7 +118,7 @@ public class DBTreeListClass extends DBListClass {
             selectlist = new ArrayList();
             selectlist.add(prop.getValue());
         }
-        String result = displayTree(name, prefix, selectlist, "view", context);
+        String result = displayFlatView(selectlist, context);
         if (result.equals(""))
             super.displayView(buffer, name, prefix, object, context);
         else
@@ -147,6 +148,78 @@ public class DBTreeListClass extends DBListClass {
         } else {
             displayTreeSelectEdit(buffer, name, prefix, object, context);
         }
+    }
+
+    private String displayFlatView(List selectlist, XWikiContext context){
+        Map map = getTreeMap(context);
+        List fullTreeList = getTreeList(map);
+        List resList = new ArrayList(selectlist.size());
+
+
+        Iterator it = selectlist.iterator();
+        while(it.hasNext()){
+            String item = (String) it.next();
+            List itemPath = getItemPath(item, fullTreeList, new ArrayList());
+            mergeItems(itemPath, resList);
+        }
+
+        return renderItemsList(resList);
+    }
+
+    protected String renderItemsList(List resList){
+        StringBuffer buff = new StringBuffer();
+
+
+        for (int i = 0; i < resList.size(); i++){
+            List items = (List) resList.get(i);
+            for (int j = 0; j < items.size(); j++){
+                ListItem item = (ListItem) items.get(j);
+                buff.append(item.getValue());
+                if (j < items.size() - 1)
+                    buff.append(" &gt; ");
+            }
+            if (i < resList.size() - 1)
+                buff.append("<br />");
+        }
+        return buff.toString();
+    }
+
+    private void mergeItems(List itemPath, List resList){
+        if (itemPath.size() == 0)
+            return ;
+
+        for (int i = 0; i < resList.size(); i++){
+            List items = (List) resList.get(i);
+            if (items.size() < itemPath.size()){
+                ListItem item1 = (ListItem) items.get(items.size() - 1);
+                ListItem item2 = (ListItem) itemPath.get(items.size() - 1);
+                if(item1.equals(item2)){
+                    resList.set(i, itemPath);
+                    return;
+                }
+            }
+            else {
+                ListItem item1 = (ListItem) items.get(itemPath.size() - 1);
+                ListItem item2 = (ListItem) itemPath.get(itemPath.size() - 1);
+                if (item1.equals(item2))
+                    return;
+            }
+        }
+        resList.add(itemPath);
+    }
+
+    private List getItemPath(String item, List treeList, ArrayList resList){
+        Iterator it = treeList.iterator();
+        while(it.hasNext()){
+            ListItem tmpItem = (ListItem) it.next();
+            if (item.equals(tmpItem.getId())) {
+                if (tmpItem.getParent().length() > 0)
+                    getItemPath(tmpItem.getParent(), treeList, resList);
+                resList.add(tmpItem);
+                return resList;
+            }
+        }
+        return null;
     }
 
     private String displayTree(String name, String prefix, List selectlist, String mode, XWikiContext context){

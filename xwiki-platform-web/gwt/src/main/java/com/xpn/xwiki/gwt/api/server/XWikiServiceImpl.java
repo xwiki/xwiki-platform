@@ -92,7 +92,6 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
 
-// TODO check conflicts problems
     public Document getDocument(String fullName, boolean full, boolean withRenderedContent) {
         return getDocument(fullName, full, false, false, withRenderedContent);
     }
@@ -720,10 +719,9 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 BaseProperty prop = (BaseProperty) baseObject.get(propname);
                 if (prop!=null) {
                     Object value = prop.getValue();
-                    //TODO We should better put it in a standart format to be sure to be able to modify it
                     if (value instanceof Date)
-                     xObject.set(propname, baseObject.displayView(propname, "", context));                    
-                    else if (value instanceof List) {
+                     xObject.set(propname, new Date(((Date)prop.getValue()).getTime()));                  
+                   else if (value instanceof List) {
                         List newlist = new ArrayList();
                         for (int j=0;j<((List)value).size();j++) {
                             newlist.add(((List)value).get(j));                            

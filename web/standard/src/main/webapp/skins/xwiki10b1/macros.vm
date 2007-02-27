@@ -6,8 +6,11 @@
 ### @param title The panel caption title
 ###
 #macro(panelheader $title)
-<div class="panel expanded">
-<h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>
+#set($cookieName = "${context.user}_${panel}")
+#set($expanded = "expanded")
+#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
+<div class="panel $expanded">
+<h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
 <div class="xwikipanelcontents">
 #end
 #macro(panelhiddenheader $title)
@@ -16,8 +19,11 @@
 <div class="xwikipanelcontents">
 #end
 #macro(largepanelheader $title)
-<div class="large panel expanded">
-<h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>##<span class="xwikipanelarrow" onclick="alert(5);">&nbsp;</span>
+#set($cookieName = "${context.user}_${panel}")
+#set($expanded = "expanded")
+#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
+<div class="large panel $expanded">
+<h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
 <div class="xwikipanelcontents">
 #end
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,11 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author ludovic
- * @author sdumitriu
  */
-
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
@@ -50,58 +46,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XWikiVelocityRenderer implements XWikiRenderer {
-    private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.XWikiVelocityRenderer.class);
+public class XWikiVelocityRenderer implements XWikiRenderer
+{
+    private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
-    public XWikiVelocityRenderer() {
+    public XWikiVelocityRenderer()
+    {
         try {
             Velocity.init();
         } catch (Exception e) {
+            // @todo This is bad. Velocity should be initialized at application start and if it
+            //       doesn't initialize then the application should exit.
             e.printStackTrace();
         }
     }
 
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context) {
-        VelocityContext vcontext = null;
+    /**
+     * {@inheritDoc}
+     * @see XWikiRenderer#render(String, XWikiDocument, XWikiDocument, XWikiContext)
+     */
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
+    {
+        VelocityContext vcontext = prepareContext(context);
+        Document previousdoc = (Document) vcontext.get("doc");
+
+        content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
+
         try {
-            String name = doc.getFullName();
-
-            int index1 = content.lastIndexOf("\n");
-            int index2 = content.lastIndexOf("##");
-            if(index1<index2){
-                content = content + "\n";
-            }
-            
-            content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
-            vcontext = prepareContext(context);
-
-            Document previousdoc = (Document) vcontext.get("doc");
-
+            vcontext.put("doc", doc.newDocument(context));
             try {
-                vcontext.put("doc", doc.newDocument(context));
-                try {
-                    // We need to do this in case there are any macros in the content
-                    List macrolist = context.getWiki().getIncludedMacros(contentdoc.getSpace(), content, context);
-                    if (macrolist!=null) {
-                        com.xpn.xwiki.XWiki xwiki = context.getWiki();
-                        for (int i=0;i<macrolist.size();i++) {
-                            String docname = (String) macrolist.get(i);
-                            log.debug("Pre-including macro topic " + docname);
-                            xwiki.include(docname, true, context);
-                        }
+                // We need to do this in case there are any macros in the content
+                List macrolist = context.getWiki().getIncludedMacros(contentdoc.getSpace(), content, context);
+                if (macrolist!=null) {
+                    com.xpn.xwiki.XWiki xwiki = context.getWiki();
+                    for (int i=0;i<macrolist.size();i++) {
+                        String docname = (String) macrolist.get(i);
+                        LOG.debug("Pre-including macro topic " + docname);
+                        xwiki.include(docname, true, context);
                     }
-                } catch (Throwable e) {
-                    // Make sure we never fail
-                    log.warn("Exception while pre-including macro topics", e);
                 }
-
-                return evaluate(content, name, vcontext, context);
-            } finally {
-                if (previousdoc!=null)
-                    vcontext.put("doc", previousdoc);
+            } catch (Exception e) {
+                // Make sure we never fail
+                LOG.warn("Exception while pre-including macro topics", e);
             }
 
+            return evaluate(content, doc.getFullName(), vcontext, context);
         } finally {
+            if (previousdoc!=null)
+                vcontext.put("doc", previousdoc);
         }
     }
 
@@ -109,19 +101,37 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public static VelocityContext prepareContext(XWikiContext context) {
+    /**
+     * @todo this method is used in several places which is why it had to be made static. Instead
+     *       we need to move it in a VelocityServices class or something similar as it's not
+     *       related to rendering.
+     */
+    public static VelocityContext prepareContext(XWikiContext context)
+    {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        if (vcontext==null)
+        if (vcontext == null) {
             vcontext = new VelocityContext();
+        }
+
         vcontext.put("formatter", new VelocityFormatter(vcontext));
+
+        // We put the com.xpn.xwiki.api.XWiki object into the context and not the
+        // com.xpn.xwiki.XWiki one which is for internal use only. In this manner we control what
+        // the user can access.
         vcontext.put("xwiki", new XWiki(context.getWiki(), context));
+
         vcontext.put("request", context.getRequest());
         vcontext.put("response", context.getResponse());
+
+        // We put the com.xpn.xwiki.api.Context object into the context and not the
+        // com.xpn.xwiki.XWikiContext one which is for internal use only. In this manner we control
+        // what the user can access.
         vcontext.put("context", new Context(context));
 
-        // Put the Velocity Context in the context
-        // so that includes can use it..
+        // Save the Velocity Context in the XWiki context so that users can access the objects
+        // we've put in it (xwiki, request, response, etc).
         context.put("vcontext", vcontext);
+
         return vcontext;
     }
 
@@ -132,9 +142,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
     public static String evaluate(String content, String name, VelocityContext vcontext, XWikiContext context) {
         StringWriter writer = new StringWriter();
         try {
-            boolean result;
-            result = XWikiVelocityRenderer.evaluate(vcontext, writer, name,
-                                                    new StringReader(content));
+            XWikiVelocityRenderer.evaluate(vcontext, writer, name, new StringReader(content));
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -300,8 +308,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer {
                 XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
                 result.append(doc.getContent());
             } catch (XWikiException e) {
-                if (log.isErrorEnabled())
-                log.error("Impossible to load velocity macros doc " + inclDocName);
+                if (LOG.isErrorEnabled())
+                LOG.error("Impossible to load velocity macros doc " + inclDocName);
             }
         }
     }

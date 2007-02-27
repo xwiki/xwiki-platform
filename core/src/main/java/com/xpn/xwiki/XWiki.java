@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Collections;
 import java.util.zip.ZipOutputStream;
 
 import javax.naming.Context;
@@ -4436,16 +4437,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     }
                 } catch (Exception e) {
                     // This should never happen
+                    // TODO: log a nice error message instead
                     e.printStackTrace();
-                    return null;
+                    return Collections.EMPTY_LIST;
                 }
             }
 
             return list;
         } catch (Exception e) {
             // This should never happen
+            // TODO: log a nice error message instead
             e.printStackTrace();
-            return null;
+            // @todo Shouldn't we return an empty list instead!!!!
+            return Collections.EMPTY_LIST;
         }
     }
 

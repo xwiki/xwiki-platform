@@ -50,17 +50,6 @@ public class XWikiVelocityRenderer implements XWikiRenderer
 {
     private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
-    public XWikiVelocityRenderer()
-    {
-        try {
-            Velocity.init();
-        } catch (Exception e) {
-            // @todo This is bad. Velocity should be initialized at application start and if it
-            //       doesn't initialize then the application should exit.
-            e.printStackTrace();
-        }
-    }
-
     /**
      * {@inheritDoc}
      * @see XWikiRenderer#render(String, XWikiDocument, XWikiDocument, XWikiContext)

@@ -5,24 +5,38 @@
   "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-    <display-name>xwiki</display-name>
 
-    <description>This application is a servlet and a portlet</description>
+  <display-name>xwiki</display-name>
+  <description>XWiki Application</description>
 
-    <filter>
-            <filter-name>Set Character Encoding</filter-name>
-            <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
-            <init-param>
-                <param-name>encoding</param-name>
-                <param-value>ISO-8859-1</param-value>
-            </init-param>
-   </filter>
+  <!-- Define context level parameters for XWiki's initialization -->
+  <context-param>
+    <param-name>org.apache.velocity.properties</param-name>
+    <param-value>/WEB-INF/velocity.properties</param-value>
+    <description>Velocity's configuration</description>
+  </context-param>
 
-      <filter-mapping>
-            <filter-name>Set Character Encoding</filter-name>
-            <url-pattern>/*</url-pattern>
-      </filter-mapping>
+  <filter>
+    <filter-name>Set Character Encoding</filter-name>
+    <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>ISO-8859-1</param-value>
+    </init-param>
+  </filter>
 
+  <filter-mapping>
+    <filter-name>Set Character Encoding</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- XWiki's initialization is done in a Servlet Context Listener. This is where we set up
+       everything that should be initialized prior to XWiki servicing requests. For example this
+       is where we initialize Velocity. -->
+  <listener>
+    <listener-class>com.xpn.xwiki.web.InitializationServletContextListener</listener-class>
+  </listener>
+  
     <servlet>
         <servlet-name>action</servlet-name>
         <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
@@ -56,23 +70,6 @@
     <servlet>
         <servlet-name>redirectHome</servlet-name>
         <servlet-class>com.xpn.xwiki.web.HomePageRedirect</servlet-class>
-    </servlet>
-
-    <servlet>
-        <servlet-name>velocity</servlet-name>
-        <servlet-class>org.apache.velocity.tools.view.servlet.VelocityViewServlet</servlet-class>
-
-        <init-param>
-            <param-name>org.apache.velocity.toolbox</param-name>
-            <param-value>/WEB-INF/toolbox.xml</param-value>
-        </init-param>
-
-        <init-param>
-            <param-name>org.apache.velocity.properties</param-name>
-            <param-value>/WEB-INF/velocity.properties</param-value>
-        </init-param>
-
-        <load-on-startup>10</load-on-startup>
     </servlet>
 
      <servlet>

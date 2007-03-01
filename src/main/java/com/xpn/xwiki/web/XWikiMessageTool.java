@@ -276,10 +276,9 @@ public class XWikiMessageTool
                         String content = docBundle.getContent();
                         byte[] docContent = null;
                         try {
-                            docContent = content.getBytes(this.context.getWiki().getEncoding());
+                            docContent = content.getBytes("UTF-8");
                         } catch (UnsupportedEncodingException ex) {
-                            LOG.error(
-                                "Unknown encoding: " + this.context.getWiki().getEncoding(), ex);
+                            LOG.error("Unknown encoding: UTF-8", ex);
                             docContent = content.getBytes();
                         }
                         InputStream is = new ByteArrayInputStream(docContent);
@@ -300,11 +299,9 @@ public class XWikiMessageTool
                         returnValue = translation;
                         try {
                             returnValue =
-                                new String(returnValue.getBytes("ISO-8859-1"), this.context
-                                    .getWiki().getEncoding());
+                                new String(returnValue.getBytes("ISO-8859-1"), "UTF-8");
                         } catch (UnsupportedEncodingException ex) {
-                            LOG.error(
-                                "Unknown encoding: " + this.context.getWiki().getEncoding(), ex);
+                            LOG.error("Unknown encoding: UTF-8", ex);
                         }
                         break;
                     }

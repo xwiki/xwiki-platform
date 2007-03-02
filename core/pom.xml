@@ -425,8 +425,9 @@
               **/Api.java,
               **/xmlrpc/Attachment.java,
               **/ViewAction.java,
-              **/XWikiMessageTool.java,
-              **/ZipExplorer*.java
+              **/ZipExplorer*.java,
+              **/content/**/*.java,
+              **/XWikiMessageTool.java
           </includes>
         </configuration>
       </plugin>

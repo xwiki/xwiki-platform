@@ -76,6 +76,11 @@ public class XWikiMessageTool
     private static final String KEY = "documentBundles";
 
     /**
+     *The encoding used for storing unicode characters as bytes.
+     */
+    private static final String BYTE_ENCODING = "UTF-8";
+
+    /**
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get
      * a key.
      */
@@ -276,9 +281,9 @@ public class XWikiMessageTool
                         String content = docBundle.getContent();
                         byte[] docContent = null;
                         try {
-                            docContent = content.getBytes("UTF-8");
+                            docContent = content.getBytes(BYTE_ENCODING);
                         } catch (UnsupportedEncodingException ex) {
-                            LOG.error("Unknown encoding: UTF-8", ex);
+                            LOG.error("Error splitting the document into bytes", ex);
                             docContent = content.getBytes();
                         }
                         InputStream is = new ByteArrayInputStream(docContent);
@@ -299,9 +304,9 @@ public class XWikiMessageTool
                         returnValue = translation;
                         try {
                             returnValue =
-                                new String(returnValue.getBytes("ISO-8859-1"), "UTF-8");
+                                new String(returnValue.getBytes("ISO-8859-1"), BYTE_ENCODING);
                         } catch (UnsupportedEncodingException ex) {
-                            LOG.error("Unknown encoding: UTF-8", ex);
+                            LOG.error("Error recombining the value from bytes", ex);
                         }
                         break;
                     }

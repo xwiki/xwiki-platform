@@ -19,46 +19,48 @@
  */
 package com.xpn.xwiki.content.parsers;
 
+import com.xpn.xwiki.XWikiException;
+
 /**
  * Exception raised by Content parsers when they fail to parse some content.
  * 
  * @version $Id: $
  */
-public class ContentParserException extends Exception
+public class ContentParserException extends XWikiException
 {
     /**
      * {@inheritDoc}
-     * @see Exception#Exception()
+     * @see XWikiException#XWikiException(int, int, String, Throwable, Object[])
+     */
+    public ContentParserException(int code, String message, Throwable e, Object[] args)
+    {
+        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, e, args);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XWikiException#XWikiException(int, int, String, Throwable)
+     */
+    public ContentParserException(int code, String message, Throwable e)
+    {
+        super(XWikiException.MODULE_XWIKI_CONTENT, code, message, e);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XWikiException#XWikiException(int, int, String)
+     */
+    public ContentParserException(int code, String message)
+    {
+        super(XWikiException.MODULE_XWIKI_CONTENT, code, message);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XWikiException#XWikiException() 
      */
     public ContentParserException()
     {
         super();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see Exception#Exception(String)
-     */
-    public ContentParserException(String message)
-    {
-        super(message);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see Exception#Exception(String, Throwable)
-     */
-    public ContentParserException(String message, Throwable throwable)
-    {
-        super(message, throwable);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see Exception#Exception(Throwable)
-     */
-    public ContentParserException(Throwable throwable)
-    {
-        super(throwable);
     }
 }

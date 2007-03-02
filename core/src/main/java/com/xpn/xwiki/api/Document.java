@@ -1636,4 +1636,42 @@ public class Document extends Api
     {
         return doc.validate(classNames, getXWikiContext());
     }
+
+    /**
+     * Rename the current document and all the backlinks leading to it. See
+     * {@link #renameDocument(String, java.util.List)} for more details.
+     *
+     * @param newDocumentName the new document name. If the space is not specified then defaults
+     *        to the current space.
+     * @throws XWikiException in case of an error
+     */
+    public void renameDocument(String newDocumentName) throws XWikiException
+    {
+        doc.renameDocument(newDocumentName, getXWikiContext());
+    }
+
+    /**
+     * Rename the current document and all the links pointing to it in the list of passed backlink
+     * documents. The renaming algorithm takes into account the fact that there are several ways to
+     * write a link to a given page and all those forms need to be renamed. For example the
+     * following links all point to the same page:
+     * <ul>
+     *   <li>[Page]</li>
+     *   <li>[Page?param=1]</li>
+     *   <li>[currentwiki:Page]</li>
+     *   <li>[CurrentSpace.Page]</li>
+     * </ul>
+     * <p>Note: links without a space are renamed with the space added.</p>
+     *
+     * @param newDocumentName the new document name. If the space is not specified then defaults
+     *        to the current space.
+     * @param backlinkDocumentNames the list of documents to parse and for which links will be
+     *        modified to point to the new renamed document.
+     * @throws XWikiException in case of an error
+     */
+    public void renameDocument(String newDocumentName, List backlinkDocumentNames)
+        throws XWikiException
+    {
+        doc.renameDocument(newDocumentName, backlinkDocumentNames, getXWikiContext());
+    }
 }

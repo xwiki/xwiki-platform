@@ -66,6 +66,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_GROOVY = 14;
     public static final int MODULE_XWIKI_NOTIFICATION = 15;
     public static final int MODULE_XWIKI_CACHE = 16;
+    public static final int MODULE_XWIKI_CONTENT = 17;
 
     public static final int MODULE_PLUGIN_LASZLO = 21;
 
@@ -238,6 +239,10 @@ public class XWikiException extends Exception {
 
     public static final int ERROR_LASZLO_INVALID_XML = 21001;
     public static final int ERROR_LASZLO_INVALID_DOTDOT = 21002;
+
+    // Content errors
+    public static final int ERROR_XWIKI_CONTENT_LINK_INVALID_TARGET = 22000;
+    public static final int ERROR_XWIKI_CONTENT_LINK_INVALID_URI = 22001;
 
 
     public XWikiException(int module, int code, String message, Throwable e, Object[] args) {

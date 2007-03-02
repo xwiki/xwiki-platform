@@ -23,6 +23,10 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.content.parsers.LinkParser;
+import com.xpn.xwiki.content.parsers.DocumentParser;
+import com.xpn.xwiki.content.parsers.ParsingResultCollection;
+import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -3096,15 +3100,98 @@ public class XWikiDocument
     }
 
     /**
-     * @deprecated {@link #copyDocument(Stringdocname,XWikiContextcontext)} Only do a copy and
-     *             not a renaming
+     * Rename the current document and all the backlinks leading to it. See
+     * {@link #renameDocument(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
+     *
+     * @param newDocumentName the new document name. If the space is not specified then defaults
+     *        to the current space.
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
      */
-    public XWikiDocument renameDocument(String docname, XWikiContext context) throws XWikiException
+    public void renameDocument(String newDocumentName, XWikiContext context)
+        throws XWikiException
     {
-        return copyDocument(docname, context);
+        renameDocument(newDocumentName, getBacklinks(context), context);
     }
 
-    public XWikiDocument copyDocument(String docname, XWikiContext context) throws XWikiException
+    /**
+     * Rename the current document and all the links pointing to it in the list of passed backlink
+     * documents. The renaming algorithm takes into account the fact that there are several ways to
+     * write a link to a given page and all those forms need to be renamed. For example the
+     * following links all point to the same page:
+     * <ul>
+     *   <li>[Page]</li>
+     *   <li>[Page?param=1]</li>
+     *   <li>[currentwiki:Page]</li>
+     *   <li>[CurrentSpace.Page]</li>
+     * </ul> 
+     * <p>Note: links without a space are renamed with the space added.</p>
+     *
+     * @param newDocumentName the new document name. If the space is not specified then defaults
+     *        to the current space.
+     * @param backlinkDocumentNames the list of documents to parse and for which links will be
+     *        modified to point to the new renamed document.
+     * @param context the ubiquitous XWiki Context
+     * @throws XWikiException in case of an error
+     */
+    public void renameDocument(String newDocumentName, List backlinkDocumentNames,
+        XWikiContext context) throws XWikiException
+    {
+        // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
+        // something fails in the middle...
+
+        Link newLink = new LinkParser().parse(newDocumentName);
+
+        // If the new document name doesn't contain the space name, use the current space name.
+        if (newLink.getSpace() == null) {
+            newLink.setSpace(getSpace());
+        }
+
+        // Step 1: Copy the document under a new name
+        context.getWiki().copyDocument(getFullName(), newDocumentName, context);
+
+        // Step 2: For each backlink to rename, parse the backlink document and replace the links
+        //         with the new name.
+        //         Note: we ignore invalid links here. Invalid links should be shown to the user so
+        //         that they fix them but the rename feature ignores them.
+        DocumentParser documentParser = new DocumentParser();
+        for (Iterator it = backlinkDocumentNames.iterator(); it.hasNext();) {
+            String backlinkDocumentName = (String) it.next();
+            XWikiDocument backlinkDocument =
+                context.getWiki().getDocument(backlinkDocumentName, context);
+
+            // Note: Here we cannot do a simple search/replace as there are several ways to point
+            // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
+            // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
+            // to recognize them and only then do a replace.
+            
+            ParsingResultCollection result =
+                documentParser.parseLinks(backlinkDocument.getContent());
+
+            // For each link in a backlink document check if it corresponds to the current document
+            // name. If so, rename it with the new name.
+            for (Iterator links = result.getValidElements().iterator(); links.hasNext();) {
+                Link link = (Link) links.next();
+                String linkText = link.toString();
+                if (getFullName().equals(link.getNormalizedName(context))) {
+                    // We've found a link to rename! Rename it!
+                    // TODO: Also handle the case where we're renaming to an external link.
+                    link.setSpace(newLink.getSpace());
+                    link.setPage(newLink.getPage());
+
+                    String newContent = StringUtils.replaceOnce(backlinkDocument.getContent(),
+                        linkText, link.toString());
+                    backlinkDocument.setContent(newContent);
+                }
+            }
+
+        }
+
+        // Step 3: Delete the old document
+        context.getWiki().deleteDocument(this, context);
+    }
+
+    public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException
     {
         String oldname = getFullName();
 
@@ -3115,15 +3202,15 @@ public class XWikiDocument
             return this;    */
 
         XWikiDocument newdoc = (XWikiDocument) clone();
-        newdoc.setFullName(docname, context);
+        newdoc.setFullName(newDocumentName, context);
         newdoc.setContentDirty(true);
-        newdoc.getxWikiClass().setName(docname);
+        newdoc.getxWikiClass().setName(newDocumentName);
         Vector objects = newdoc.getObjects(oldname);
         if (objects != null) {
             Iterator it = objects.iterator();
             while (it.hasNext()) {
                 BaseObject object = (BaseObject) it.next();
-                object.setName(docname);
+                object.setName(newDocumentName);
             }
         }
         return newdoc;

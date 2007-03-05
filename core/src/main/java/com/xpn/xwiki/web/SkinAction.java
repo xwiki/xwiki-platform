@@ -189,7 +189,7 @@ public class SkinAction extends XWikiAction
             if (data == null || data.length == 0)
                 return false;
 
-            if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
+            if ("text/css".equals(mimetype) || isJavascriptMimeType(mimetype)) {
                 data = context.getWiki().parseContent(new String(data), context).getBytes();
             }
             response.getOutputStream().write(data);
@@ -203,5 +203,15 @@ public class SkinAction extends XWikiAction
             else
                 return false;
         }
+    }
+
+    /**
+     * @param mimetype the mime type to check
+     * @return true if the mime type represents a javascript file
+     */
+    private boolean isJavascriptMimeType(String mimetype)
+    {
+        return (mimetype.equals("text/javascript") || mimetype.equals("application/x-javascript")
+            || mimetype.equals("application/javascript"));
     }
 }

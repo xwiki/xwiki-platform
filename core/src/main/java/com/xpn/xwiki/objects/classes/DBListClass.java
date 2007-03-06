@@ -111,6 +111,11 @@ public class DBListClass extends ListClass {
 
     public String getQuery(XWikiContext context) {
         String sql = getSql();
+        try {
+          sql = context.getDoc().getRenderedContent(sql, context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if ((sql==null)||(sql.trim().equals(""))) {
             String classname = getClassname();
             String idField = getIdField();

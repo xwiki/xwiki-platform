@@ -89,13 +89,51 @@ public class FeedPluginApi extends Api {
          return -1;
     }
 
-    public int updateFeed(String feedname, String feedurl) {
-        return plugin.updateFeed(feedname, feedurl, true, getXWikiContext());
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force) throws XWikiException {
+        if (hasProgrammingRights())
+         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, getXWikiContext());
+        else
+         return -1;
     }
 
-    public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry) {
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force, String space) throws XWikiException {
         if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, oneDocPerEntry, getXWikiContext());
+         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, space, getXWikiContext());
+        else
+         return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl) {
+        if (hasProgrammingRights())
+            return plugin.updateFeed(feedname, feedurl, false, true, getXWikiContext());
+        else
+            return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl, boolean fullContent) {
+        if (hasProgrammingRights())
+         return plugin.updateFeed(feedname, feedurl, fullContent, true, getXWikiContext());
+        else
+         return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry) {
+        if (hasProgrammingRights())
+         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, getXWikiContext());
+        else
+         return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force) {
+        if (hasProgrammingRights())
+         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, getXWikiContext());
+        else
+         return -1;
+    }
+
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force, String space) {
+        if (hasProgrammingRights())
+         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, space, getXWikiContext());
         else
          return -1;
     }

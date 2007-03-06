@@ -403,19 +403,44 @@ public class XWikiDocument
         }
     }
 
-    public String getDisplayTitle()
+    /**
+     * @param context the XWiki context used to get acces to the XWikiRenderingEngine object
+     * @return the document title. If a title has not been provided, look for a section title in
+     *         the document's content and if not found return the page name. The returned title
+     *         is also interpreted which means it's allowed to use Velocity, Groovy, etc syntax
+     *         within a title.
+     */
+    public String getDisplayTitle(XWikiContext context)
     {
+        // 1) Check if the user has provided a title
         String title = getTitle();
-        if (title.equals("")) {
+
+        // 2) If not, then try to extract the title from the first document section title
+        if (title.length() == 0) {
             title = extractTitle();
         }
-        if (title.equals("")) {
-            return getName();
+
+        // 3) Last if a title has been found renders it as it can contain macros, velocity code,
+        //    groovy, etc.
+        if (title.length() > 0) {
+            // This will not completely work for scriting code in title referencing variables
+            // defined elsewhere. In that case it'll only work if those variables have been
+            // parsed and put in the corresponding scripting context. This will not work for
+            // breadcrumbs for example.
+            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
         } else {
-            return title;
+            // 4) No title has been found, return the page name as the title
+            title = getName();
         }
+
+        return title;
     }
 
+    /**
+     * @return the first level 1 or level 1.1 title text in the document's content or "" if none
+     *         are found
+     * @todo this method has nothing to do in this class and should be moved elsewhere
+     */
     public String extractTitle()
     {
         try {

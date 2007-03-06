@@ -26,12 +26,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-public class CustomXWikiRenderingEngine extends XWikiRenderingEngine {
+public class CustomXWikiRenderingEngine extends DefaultXWikiRenderingEngine
+{
 	public CustomXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
 		super(xwiki, context);
     	Iterator it = getRendererNames().iterator();

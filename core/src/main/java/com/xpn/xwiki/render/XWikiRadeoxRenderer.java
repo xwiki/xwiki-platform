@@ -45,7 +45,7 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         setRemovePre(removePre);
     }
 
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context) {
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context) {
         Util util = context.getUtil();
         // Remove the content that is inside "{pre}"
         PreTagSubstitution preTagSubst = new PreTagSubstitution(util, isRemovePre());

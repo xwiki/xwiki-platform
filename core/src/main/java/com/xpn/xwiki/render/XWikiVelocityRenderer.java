@@ -46,15 +46,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XWikiVelocityRenderer implements XWikiRenderer
+public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
     private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
     /**
      * {@inheritDoc}
+     * @see XWikiInterpreter#interpret(String, XWikiDocument, XWikiContext)
+     */
+    public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
+    {
+        return render(content, contextdoc, contextdoc, context);
+    }
+
+    /**
+     * {@inheritDoc}
      * @see XWikiRenderer#render(String, XWikiDocument, XWikiDocument, XWikiContext)
      */
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
         VelocityContext vcontext = prepareContext(context);
         Document previousdoc = (Document) vcontext.get("doc");
@@ -62,7 +71,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer
         content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
 
         try {
-            vcontext.put("doc", doc.newDocument(context));
+            vcontext.put("doc", contextdoc.newDocument(context));
             try {
                 // We need to do this in case there are any macros in the content
                 List macrolist = context.getWiki().getIncludedMacros(contentdoc.getSpace(), content, context);
@@ -79,7 +88,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer
                 LOG.warn("Exception while pre-including macro topics", e);
             }
 
-            return evaluate(content, doc.getFullName(), vcontext, context);
+            return evaluate(content, contextdoc.getFullName(), vcontext, context);
         } finally {
             if (previousdoc!=null)
                 vcontext.put("doc", previousdoc);

@@ -35,6 +35,7 @@ import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiVirtualMacro;
+import com.xpn.xwiki.render.XWikiInterpreter;
 import com.xpn.xwiki.web.XWikiRequest;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.Writable;
@@ -50,15 +51,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class XWikiGroovyRenderer implements XWikiRenderer {
+public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
+{
     private static final Log log = LogFactory.getLog(com.xpn.xwiki.render.groovy.XWikiGroovyRenderer.class);
     private XWikiCache cache;
     private XWikiCache classCache;
 
-
     public XWikiGroovyRenderer() {
     }
-
 
     public void flushCache() {
         if (cache!=null) {
@@ -127,6 +127,15 @@ public class XWikiGroovyRenderer implements XWikiRenderer {
                 initCache(context);
         } catch (Exception e) {
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see XWikiInterpreter#interpret(String, XWikiDocument, XWikiContext)
+     */
+    public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
+    {
+        return render(content, contextdoc, contextdoc, context);
     }
 
     public String evaluate(String content, String name, Map gcontext) {

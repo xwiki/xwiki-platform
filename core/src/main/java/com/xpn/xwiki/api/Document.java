@@ -171,12 +171,14 @@ public class Document extends Api
     }
 
     /**
-     * return the title of the document. If there is no title, return the first title in the
-     * document
+     * @return the document title. If a title has not been provided, look for a section title in
+     *         the document's content and if not found return the page name. The returned title
+     *         is also interpreted which means it's allowed to use Velocity, Groovy, etc syntax
+     *         within a title.
      */
     public String getDisplayTitle()
     {
-        return doc.getDisplayTitle();
+        return doc.getDisplayTitle(getXWikiContext());
     }
 
     public String getFormat()

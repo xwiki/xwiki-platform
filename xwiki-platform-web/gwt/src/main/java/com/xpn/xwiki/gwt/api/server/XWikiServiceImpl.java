@@ -43,10 +43,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 import javax.servlet.ServletContext;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Date;
+import java.util.*;
 
 
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
@@ -587,7 +584,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiContext context = getXWikiContext();
             XWikiDocument queryDoc = context.getWiki().getDocument(queryPage, context);
             if (context.getWiki().getRightService().hasProgrammingRights(queryDoc, context)) {
-                List list = context.getWiki().getStore().search(queryDoc.getContent(), nb, start, context);
+                List list = context.getWiki().getStore().search(queryDoc.getRenderedContent(context), nb, start, context);
                 for (int i=0;i<list.size();i++) {
                     Object[] item = (Object[]) list.get(i);
                     List itemlist = new ArrayList();
@@ -757,6 +754,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    public String getDocumentContent(String fullName) {
+        return getDocumentContent(fullName, false, null);
+    }
+
     protected BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) {
         Object[] propnames = xObject.getPropertyNames().toArray();
         for (int i = 0; i < propnames.length; i++) {
@@ -769,5 +770,33 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
         return baseObject;
     }
+
+    public String getDocumentContent(String fullName, boolean rendered) {
+        return getDocumentContent(fullName, rendered, null);
+    }
+
+    public String getDocumentContent(String fullName, boolean rendered, Map params) {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
+                XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+                context.setDoc(doc);
+                if (rendered==false)
+                 return doc.getContent();
+                else {
+                    XWikiRequestWrapper srw = new XWikiRequestWrapper(context.getRequest());
+                    srw.setParameterMap(params);
+                    context.setRequest(srw);
+                    return doc.getRenderedContent(context);
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  
+            return null;
+        }
+    }
+
 
 }

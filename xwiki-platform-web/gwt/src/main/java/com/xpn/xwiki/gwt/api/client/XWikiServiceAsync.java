@@ -26,6 +26,7 @@ package com.xpn.xwiki.gwt.api.client;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -103,4 +104,10 @@ public interface XWikiServiceAsync {
     void customQuery(String queryPage, AsyncCallback async);
 
     void customQuery(String queryPage, int nb, int start, AsyncCallback async);
+
+    void getDocumentContent(String fullName, AsyncCallback async);
+
+    void getDocumentContent(String fullName, boolean rendered, AsyncCallback async);
+
+    void getDocumentContent(String fullName, boolean rendered, Map params, AsyncCallback async);
 }

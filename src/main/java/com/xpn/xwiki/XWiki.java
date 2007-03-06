@@ -110,6 +110,7 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
@@ -698,7 +699,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void resetRenderingEngine(XWikiContext context) throws XWikiException
     {
         // Prepare the Rendering Engine
-        setRenderingEngine(new XWikiRenderingEngine(this, context));
+        setRenderingEngine(new DefaultXWikiRenderingEngine(this, context));
     }
 
     private void preparePlugins(XWikiContext context)
@@ -1164,12 +1165,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String parseContent(String content, XWikiContext context)
     {
-        if ((content != null) && (!content.equals("")))
-            // Let's use this template
-            return XWikiVelocityRenderer.evaluate(content, context.getDoc().getFullName(),
-                (VelocityContext) context.get("vcontext"), context);
-        else
-            return "";
+        String parsedContent;
+
+        if ((content != null) && (!content.equals(""))) {
+            parsedContent = context.getWiki().getRenderingEngine().interpretText(content,
+                context.getDoc(), context);
+        } else {
+            parsedContent = "";
+        }
+
+        return parsedContent;
     }
 
     public String parseTemplate(String template, XWikiContext context)

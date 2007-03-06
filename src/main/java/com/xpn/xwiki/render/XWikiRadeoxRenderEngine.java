@@ -95,6 +95,11 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         return StringUtils.replace( Util.noaccents(name), " ", "");
     }
 
+    /**
+     * @param name the name of a wiki page
+     * @return true if the page exists or false otherwise
+     * @see org.radeox.api.engine.WikiRenderEngine#exists(String)
+     */
     public boolean exists(String name) {
         String database = context.getDatabase();
         try {
@@ -105,7 +110,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 context.setDatabase(db);
             }
 
-            XWikiDocument currentdoc = ((XWikiDocument) context.get("doc"));
+            XWikiDocument currentdoc = context.getDoc();
 
             int qsIndex = name.indexOf("?");
             if (qsIndex!=-1) {
@@ -143,10 +148,20 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         return true;
     }
 
+    /**
+     * Appends for example the &lt;a href&gt; HTML code for linking to a wiki
+     * page with the given name to the passed buffer.
+     *
+     * @param buffer the string to append to
+     * @param name the name of the wiki page pointed to by the link
+     * @param view the text that will be shown to the user for the link
+     * @param anchor the anchor specified in the link if any (can be null)
+     * @see org.radeox.api.engine.WikiRenderEngine#appendLink(StringBuffer, String, String, String) 
+     */
     public void appendLink(StringBuffer buffer, String name, String view, String anchor) {
         // allow using spaces in links to anchors
         if (anchor != null) anchor = anchor.replaceAll(" ", "+");
-        
+
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor); 
         } else {

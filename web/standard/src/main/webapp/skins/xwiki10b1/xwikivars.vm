@@ -7,7 +7,7 @@
 #set($spaceviewurl = $spaceDoc.getURL("view"))
 #set($viewurl = $doc.getURL("view"))
 #set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
-#set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
+#set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"||$context.user.equals("XWiki.superadmin")))
 #set($parent ="<a href='$doc.getParentURL()'>${doc.parent.title}</a>")
 #if($tdoc)
 #set($headertitle = "<a href='$viewurl'>${tdoc.displayTitle}</a>")

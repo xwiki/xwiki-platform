@@ -177,7 +177,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
 WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
     var text = this.trimString(result[3]);
     var str = "";
-    if (browser.isIE) str += "\r\n";
+    if (tinyMCE.isMSIE) str += "\r\n";
     str += "{table}\r\n";
     var rows = text.split("<\/tr>");
     for(var i=0; i< (rows.length - 1); i++) {
@@ -204,7 +204,7 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         }
     }
     str += "{table}";
-    if (browser.isIE) str += "\r\n";
+    if (tinyMCE.isMSIE) str += "\r\n";
     return content.replace(regexp, str);
 }
 

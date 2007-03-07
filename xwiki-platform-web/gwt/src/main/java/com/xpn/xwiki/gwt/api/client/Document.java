@@ -66,6 +66,7 @@ public class Document implements IsSerializable {
     private List attachments = new ArrayList();
     private String uploadURL;
     private String saveURL;
+    private String viewURL;
     private int hasElement;
 
     public Document() {
@@ -416,5 +417,13 @@ public class Document implements IsSerializable {
 
     public void setSaveURL(String saveURL) {
         this.saveURL = saveURL;
+    }
+
+    public String getViewURL() {
+        return viewURL;
+    }
+
+    public void setViewURL(String viewURL) {
+        this.viewURL = viewURL;
     }
 }

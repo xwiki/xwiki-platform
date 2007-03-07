@@ -644,6 +644,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
         doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));
+        doc.setViewURL(xdoc.getExternalURL("view", context));
         try {
             doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", "ajax=1", context));
         } catch (XWikiException e) {

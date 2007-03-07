@@ -32,6 +32,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
@@ -52,7 +53,7 @@ public class VelocityRenderTest extends HibernateTestCase {
         }
 
         public void testRenderingEngine() throws XWikiException {
-            XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+            XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
             AbstractRenderTest.renderTest(wikiengine, "#set( $count = 0 )\n#if ( $count == 1)\n *Hello1* \n#else\n *Hello2* \n#end\n",
                     "Hello2", false, getXWikiContext());
         }
@@ -110,7 +111,7 @@ public class VelocityRenderTest extends HibernateTestCase {
         }
 
     public void testVelocityError() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
         AbstractRenderTest.renderTest(wikiengine, "#skype(\"hello\")",
                 "hello", false, getXWikiContext());
     }
@@ -133,7 +134,7 @@ public class VelocityRenderTest extends HibernateTestCase {
     }
 
     public void testCacheRenderer() throws XWikiException {
-        XWikiRenderingEngine wikirenderer = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        XWikiRenderingEngine wikirenderer = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
         String content = "$context.setCacheDuration(1) $xwiki.date.time";
         String result = AbstractRenderTest.renderTest(wikirenderer, content, "", false, getXWikiContext());
         AbstractRenderTest.renderTest(wikirenderer, content, result, false, getXWikiContext());

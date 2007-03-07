@@ -44,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.filter.XWikiLinkFilter;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -56,18 +57,18 @@ public class XWikiTest extends HibernateTestCase {
      }
 
     public void testDefaultSkin() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
         assertEquals("Skin should be default", "default", getXWiki().getSkin(getXWikiContext()));
     }
 
     public void testAlternSkin() throws XWikiException {
         Utils.setStringValue("XWiki.XWikiPreferences", "skin", "altern", getXWikiContext());
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
         assertEquals("Skin should be altern", "altern", getXWiki().getSkin(getXWikiContext()));
     }
 
     public void testDefaultSkinFile() throws XWikiException {
-        XWikiRenderingEngine wikiengine = new XWikiRenderingEngine(getXWiki(), getXWikiContext());
+        XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
         assertEquals("Skin File should be default",  "/xwiki/skins/default/style.css", getXWiki().getSkinFile("style.css", getXWikiContext()));
     }
 

@@ -120,12 +120,10 @@ public class XWikiPortlet extends GenericPortlet {
         try {
             XWikiException xex = (XWikiException) e;
             if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                String page = Utils.getPage(request, "accessdenied");
-                Utils.parseTemplate(page, context);
+                Utils.parseTemplate("accessdenied", context);
                 return;
             } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
-                String page = Utils.getPage(request, "userinactive");
-                Utils.parseTemplate(page, context);
+                Utils.parseTemplate("userinactive", context);
                 return;
             }
             Utils.parseTemplate(Utils.getPage(request, "exception"), context);

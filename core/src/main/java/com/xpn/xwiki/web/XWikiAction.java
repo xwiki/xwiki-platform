@@ -169,8 +169,7 @@ public abstract class XWikiAction extends Action {
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                        String page = Utils.getPage(request, "accessdenied");
-                        Utils.parseTemplate(page, context);
+                        Utils.parseTemplate("accessdenied", context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
                         String page = Utils.getPage(request, "userinactive");

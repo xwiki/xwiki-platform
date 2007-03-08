@@ -31,7 +31,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -115,7 +114,7 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
 
         // Voluntarily ignore the first line... as it's the xml declaration
         String line = bfr.readLine();
-        os.append(MessageFormat.format("<?xml version=\"1.0\" encoding=\"{0}\"?>\n", charset));
+        os.append("<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n");
 
         line = bfr.readLine();
         while (null != line) {

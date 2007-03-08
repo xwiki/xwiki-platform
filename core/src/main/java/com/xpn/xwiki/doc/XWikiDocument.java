@@ -72,6 +72,7 @@ import org.suigeneris.jrcs.util.ToString;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
@@ -2183,6 +2184,11 @@ public class XWikiDocument
         fromXML(xml, false);
     }
 
+    public void fromXML(InputStream is) throws XWikiException
+    {
+        fromXML(is, false);
+    }
+
     public void fromXML(String xml, boolean withArchive) throws XWikiException
     {
         SAXReader reader = new SAXReader();
@@ -2195,6 +2201,27 @@ public class XWikiDocument
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
                 XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
         }
+
+        fromXML(domdoc, withArchive);
+    }
+
+    public void fromXML(InputStream in, boolean withArchive) throws XWikiException
+    {
+        SAXReader reader = new SAXReader();
+        Document domdoc;
+
+        try {
+            domdoc = reader.read(in);
+        } catch (DocumentException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
+                XWikiException.ERROR_DOC_XML_PARSING, "Error parsing xml", e, null);
+        }
+
+        fromXML(domdoc, withArchive);
+    }
+
+    public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
+    {
 
         Element docel = domdoc.getRootElement();
         setName(getElement(docel, "name"));

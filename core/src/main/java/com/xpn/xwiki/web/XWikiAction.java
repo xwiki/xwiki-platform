@@ -169,17 +169,14 @@ public abstract class XWikiAction extends Action {
                 try {
                     XWikiException xex = (XWikiException) e;
                     if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                        String page = Utils.getPage(request, "accessdenied");
-                        Utils.parseTemplate(page, context);
+                        Utils.parseTemplate("accessdenied", context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
-                        String page = Utils.getPage(request, "userinactive");
-                        Utils.parseTemplate(page, context);
+                        Utils.parseTemplate("userinactive", context);
                         return null;
                     }else if(xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND){
-                        String page = Utils.getPage(request, "exception");
                         context.put("message","attachmentdoesnotexist");
-                        Utils.parseTemplate(page, context);
+                        Utils.parseTemplate("exception", context);
                         return null;
                     }
                     vcontext.put("exp", e);

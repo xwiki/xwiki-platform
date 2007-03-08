@@ -27,7 +27,7 @@
     <artifactId>xwiki-root</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-gwt</artifactId>
+  <artifactId>xwiki-web-gwt</artifactId>
   <name>XWiki GWT API</name>
   <packaging>war</packaging>
   <description>The GWT API XWiki JAR</description>

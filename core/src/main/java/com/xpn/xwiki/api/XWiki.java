@@ -24,6 +24,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -2526,5 +2527,12 @@ public class XWiki extends Api
     public String addMandatory()
     {
         return xwiki.addMandatory(getXWikiContext());
+    }
+
+    /*
+     * Clear accents
+     */
+    public String clearAccents(String text) {
+        return Util.noaccents(text);
     }
 }

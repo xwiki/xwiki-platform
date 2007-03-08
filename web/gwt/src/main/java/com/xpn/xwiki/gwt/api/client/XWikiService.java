@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.core.client.GWT;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,6 +31,10 @@ public interface XWikiService extends RemoteService {
     public boolean addObject(String docname, XObject xobject);
     public List customQuery(String queryPage);
     public List customQuery(String queryPage, int nb, int start);
+    public String getDocumentContent(String fullName);
+    public String getDocumentContent(String fullName, boolean rendered);
+    public String getDocumentContent(String fullName, boolean rendered, Map params);
+
 
     /**
      * Utility/Convinience class.

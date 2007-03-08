@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -344,7 +345,9 @@ public class Package
                 if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()) {
                     continue;
                 } else {
-                    XWikiDocument doc = readFromXML(readFromInputStream(zis));
+                    XWikiDocument doc =
+                        readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
+
                     try {
                         filter(doc, context);
                         if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(),
@@ -631,24 +634,25 @@ public class Package
         }
     }
 
-    private String readFromInputStream(InputStream is) throws IOException
+    private ByteArrayInputStream readByteArrayFromInputStream(ZipInputStream zin, long size)
+        throws IOException
     {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream((size > 0) ? (int) size : 4096);
         byte[] data = new byte[4096];
-        StringBuffer buffer = new StringBuffer();
         int Cnt;
-        while ((Cnt = is.read(data, 0, 4096)) != -1) {
-            buffer.append(new String(data, 0, Cnt));
+        while ((Cnt = zin.read(data, 0, 4096)) != -1) {
+            baos.write(data, 0, Cnt);
         }
-        return buffer.toString();
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 
-    private XWikiDocument readFromXML(String XmlFile) throws XWikiException
+    private XWikiDocument readFromXML(InputStream is) throws XWikiException
     {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
-        if (backupPack && withVersions) {
-            doc.fromXML(XmlFile, true);
-        } else {
-            doc.fromXML(XmlFile);
+        if (backupPack && withVersions)
+            doc.fromXML(is, true);
+        else {
+            doc.fromXML(is);
         }
         return doc;
     }
@@ -799,8 +803,7 @@ public class Package
             fos.close();
         } catch (ExcludeDocumentException e) {
             log.info("Skip the document " + doc.getFullName());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Object[] args = new Object[1];
             args[0] = doc.getFullName();
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
@@ -930,7 +933,7 @@ public class Package
                     filename += "." + doc.getLanguage();
                 }
                 File docfile = new File(space, filename);
-                doc = readFromXML(readFromInputStream(new FileInputStream(docfile)));
+                doc = readFromXML(new FileInputStream(docfile));
                 if (doc == null) {
                     if (log.isErrorEnabled()) {
                         log.info("Package readFrom XML read null doc for " + docName +

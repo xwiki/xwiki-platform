@@ -126,7 +126,7 @@ public class XWikiPortlet extends GenericPortlet {
                 Utils.parseTemplate("userinactive", context);
                 return;
             }
-            Utils.parseTemplate(Utils.getPage(request, "exception"), context);
+            Utils.parseTemplate("exception", context);
         } catch (Exception e2) {
             // I hope this never happens
             e.printStackTrace();

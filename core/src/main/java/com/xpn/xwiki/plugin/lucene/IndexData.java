@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-import java.util.Date;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id: $
@@ -90,8 +91,9 @@ public abstract class IndexData
         XWikiContext context)
     {
         // Keyword fields: stored and indexed, but not tokenized
+        // Note: ID field must be UN_TOKENIZED to enable case sensitive IDs
         luceneDoc.add(
-            new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.TOKENIZED));
+            new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.UN_TOKENIZED));
         luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE, this.language, Field.Store.YES,
             Field.Index.TOKENIZED));
         if (wiki != null && wiki.length() > 0) {

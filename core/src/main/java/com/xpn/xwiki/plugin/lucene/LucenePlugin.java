@@ -79,7 +79,10 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public LucenePlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
+
+        // Note: The init() method is invoked automatically by the plugin manager. Thus it shouldn't
+        // be invoked as otherwise it'll be called twice, thus indexing the same documents several
+        // times...
     }
 
     /**

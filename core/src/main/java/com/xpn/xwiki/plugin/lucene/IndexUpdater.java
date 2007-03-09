@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -38,14 +40,13 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 
 /**
  * @version $Id: $
@@ -114,7 +115,6 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     XWikiContext context = (XWikiContext) this.context.clone();
                     context.getWiki().getStore().cleanUp(context);
                     IndexData data = queue.remove();
-
                     try {
                         oldDocs.addAll(getOldIndexDocIds(data));
                         XWikiDocument doc = xwiki.getDocument(data.getFullName(), context);
@@ -330,9 +330,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
             }
         }
         indexingInterval =
-            1000 * Integer.parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL,
-                "300"));
-        openSearcher();
+            1000 * Integer.parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "300"));
+
+        // Note: There's no need to open the Searcher here (with a call to openSearcher()) as each
+        // task needing it will open it itself.
     }
 
     /**
@@ -444,20 +445,21 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 LOG.debug("upload action notification for doc " + doc.getName());
             }
             try {
-                List attachments = doc.getAttachmentList();
+                //Retrieve the latest version (with the file just attached)
+                XWikiDocument basedoc = context.getWiki()
+                        .getDocument(doc.getFullName(), context);
+                List attachments = basedoc.getAttachmentList();
                 // find out the most recently changed attachment
                 XWikiAttachment newestAttachment = null;
                 for (Iterator iter = attachments.iterator(); iter.hasNext();) {
                     XWikiAttachment attachment = (XWikiAttachment) iter.next();
-                    if (newestAttachment != null
-                        && attachment.getDate().before(newestAttachment.getDate()))
+                    if ((newestAttachment == null)
+                        || attachment.getDate().after(newestAttachment.getDate()))
                     {
-                        newestAttachment = attachment;
-                    } else {
                         newestAttachment = attachment;
                     }
                 }
-                add(doc, newestAttachment, context);
+                add(basedoc, newestAttachment, context);
             } catch (Exception e) {
                 LOG.error("error in notify", e);
             }

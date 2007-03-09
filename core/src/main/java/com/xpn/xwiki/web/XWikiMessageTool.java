@@ -76,8 +76,7 @@ public class XWikiMessageTool
     private static final String KEY = "documentBundles";
 
     /**
-     *
-The encoding used for storing unicode characters as bytes.
+     * The encoding used for storing unicode characters as bytes.
      */
     private static final String BYTE_ENCODING = "UTF-8";
 

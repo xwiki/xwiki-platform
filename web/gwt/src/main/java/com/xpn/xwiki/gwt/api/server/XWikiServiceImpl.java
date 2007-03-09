@@ -24,26 +24,44 @@
 package com.xpn.xwiki.gwt.api.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.xpn.xwiki.web.*;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.gwt.api.client.*;
-import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.gwt.api.client.Attachment;
+import com.xpn.xwiki.gwt.api.client.Document;
+import com.xpn.xwiki.gwt.api.client.User;
+import com.xpn.xwiki.gwt.api.client.XObject;
+import com.xpn.xwiki.gwt.api.client.XWikiService;
+import com.xpn.xwiki.gwt.api.client.Dictionary;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCContext;
-import com.xpn.xwiki.xmlrpc.MockXWikiServletContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.xmlrpc.MockXWikiServletContext;
+import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
 
 import javax.servlet.ServletContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
@@ -64,13 +82,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
 
         XWikiContext context = Utils.prepareContext("", request, response, engine);
-        context.setMode(XWikiContext.MODE_GWT);
+        context.setMode(XWikiContext.MODE_GWT_DEBUG);
         context.setDatabase("xwiki");
 
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
         XWikiVelocityRenderer.prepareContext(context);
+        xwiki.prepareResources(context);
 
         String username = "XWiki.XWikiGuest";
         XWikiUser user = context.getWiki().checkAuth(context);
@@ -782,8 +801,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(fullName, context);
                 context.setDoc(doc);
-                if (rendered==false)
-                 return doc.getContent();
+                if (!rendered)
+                    return doc.getContent();
                 else {
                     XWikiRequestWrapper srw = new XWikiRequestWrapper(context.getRequest());
                     srw.setParameterMap(params);
@@ -797,6 +816,18 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             e.printStackTrace();  
             return null;
         }
+    }
+
+    public Dictionary getTranslation(String translationPage, String local){
+        try {
+            XWikiContext context = getXWikiContext();
+            XWikiMessageTool msg = context.getMessageTool();
+            Properties properties = msg.getDocumentBundleProperties(translationPage, context);
+            return new Dictionary(properties);
+        } catch (XWikiException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
     }
 
 

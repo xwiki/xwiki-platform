@@ -76,7 +76,8 @@ public class XWikiMessageTool
     private static final String KEY = "documentBundles";
 
     /**
-     *The encoding used for storing unicode characters as bytes.
+     *
+The encoding used for storing unicode characters as bytes.
      */
     private static final String BYTE_ENCODING = "UTF-8";
 
@@ -258,6 +259,51 @@ public class XWikiMessageTool
     }
 
     /**
+     * @param documentName the document's name (eg Space.Document)
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
+     *            primitives for loading documents
+     * @return the properties object corresponding to the documentName. A translated version
+     *         of the document for the current Locale is looked for.
+     */
+    public Properties getDocumentBundleProperties(String documentName, XWikiContext context){
+        Properties props = null;
+        try {
+            XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
+            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), documentName, context)
+            && !docBundle.isNew()) {
+                props = getDocumentBundleProperties(docBundle);
+            }
+        } catch (XWikiException e) {
+            // Cannot do anything
+        }
+        return props;
+    }
+
+    /**
+     * @param docBundle the documentwho contains the bundle
+     * @return the properties object corresponding to the docBundle. A translated version
+     *         of the document for the current Locale is looked for.
+     */
+    private Properties getDocumentBundleProperties(XWikiDocument docBundle){
+        Properties props = new Properties();
+        String content = docBundle.getContent();
+        byte[] docContent;
+        try {
+            docContent = content.getBytes(BYTE_ENCODING);
+        } catch (UnsupportedEncodingException ex) {
+            LOG.error("Error splitting the document into bytes", ex);
+            docContent = content.getBytes();
+        }
+        InputStream is = new ByteArrayInputStream(docContent);
+        try {
+            props.load(is);
+        } catch (IOException e) {
+            // Cannot do anything
+        }
+        return props;
+    }
+
+    /**
      * Looks for a translation in the list of internationalization document bundles. It first checks
      * if the translation can be found in the cache.
      * 
@@ -277,21 +323,7 @@ public class XWikiMessageTool
                     Properties props = null;
                     if (this.docsToRefresh.contains(docId) || !this.propsCache.containsKey(docId)) {
                         // Cache needs to be updated
-                        props = new Properties();
-                        String content = docBundle.getContent();
-                        byte[] docContent = null;
-                        try {
-                            docContent = content.getBytes(BYTE_ENCODING);
-                        } catch (UnsupportedEncodingException ex) {
-                            LOG.error("Error splitting the document into bytes", ex);
-                            docContent = content.getBytes();
-                        }
-                        InputStream is = new ByteArrayInputStream(docContent);
-                        try {
-                            props.load(is);
-                        } catch (IOException e) {
-                            // Cannot do anything
-                        }
+                        props = getDocumentBundleProperties(docBundle);
                         // updates cache
                         this.propsCache.put(docId, props);
                         this.docsToRefresh.remove(docId);

@@ -12,47 +12,13 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1158309516000</creationDate>
-<date>1180533666000</date>
-<contentUpdateDate>1180533666000</contentUpdateDate>
-<version>1.15</version>
+<date>1166177446000</date>
+<contentUpdateDate>1169801141000</contentUpdateDate>
+<version>1.9</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<name>tags</name>
-<prettyName>Tags</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>1</relationalStorage>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<size>30</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values></values>
-<number>1</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Panels.Recently Created</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -72,7 +38,6 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
-<cache>0</cache>
 <separators> ,|</separators>
 <values>view|edit</values>
 <number>2</number>
@@ -87,7 +52,6 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
-<cache>0</cache>
 <separators> ,|</separators>
 <values>Information|Navigation|Tools|Administration|Other</values>
 <number>5</number>
@@ -129,13 +93,13 @@
 <type>view</type>
 </property>
 <property>
-<description>List the last 5 documents created.</description>
+<description>Panel Description</description>
 </property>
 <property>
 <category>Information</category>
 </property>
 <property>
-<content>#set($recentlyCreated = $xwiki.searchDocuments("where 1=1 order by doc.creationDate desc", 5, 0))
+<content>#set($recentlyCreated = $xwiki.searchDocuments("where 1=1 order by doc.creationDate"))
 #if($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
 #panelheader("Recently Created")
 #set($first = true)

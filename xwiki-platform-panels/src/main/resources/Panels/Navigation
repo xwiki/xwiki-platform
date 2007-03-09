@@ -12,14 +12,13 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165426047000</creationDate>
-<date>1180530049000</date>
-<contentUpdateDate>1180530049000</contentUpdateDate>
-<version>1.78</version>
+<date>1166314279000</date>
+<contentUpdateDate>1169801141000</contentUpdateDate>
+<version>1.43</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment></comment>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -39,7 +38,6 @@
 <multiSelect>1</multiSelect>
 <size>30</size>
 <separator> </separator>
-<cache>0</cache>
 <separators> ,|</separators>
 <values></values>
 <number>1</number>
@@ -72,7 +70,6 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
-<cache>0</cache>
 <separators> ,|</separators>
 <values>view|edit</values>
 <number>2</number>
@@ -87,7 +84,6 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
-<cache>0</cache>
 <separators> ,|</separators>
 <values>Information|Navigation|Tools|Administration|Other</values>
 <number>5</number>
@@ -129,7 +125,7 @@
 <type>view</type>
 </property>
 <property>
-<description>Lists all spaces and all documents in the spaces. Note that administration spaces and pages are only displayed for Administrators. This Panel provides a default automated navigation. However when your wiki grows you'll usually want to replace it with your own fixed navigation for which you'll create another Panel.</description>
+<description>Navigation</description>
 </property>
 <property>
 <category>Navigation</category>
@@ -137,7 +133,7 @@
 <property>
 <content>#panelhiddenheader("Navigation")
 #set ($hiddenSpaces = ["XWiki", "Admin", "Panels"])
-#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
+#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.BlogRss","Main.Test", "Blog.Macros", "Main.TagsRss", "Main.Ouverture", "Main.WikiLaunch", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
 #set ($blackListedPages = ["WebPreferences"])
 &lt;div id="xwikinavcontainer"&gt;
 #set($spaces = $xwiki.spaces)
@@ -145,7 +141,7 @@
 #set($spacecount = 0)
 &lt;div id="xwikinav"&gt;
 #foreach($space in $spaces)
-#if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
+#if (!$hiddenSpaces.contains($space))
 #if ($doc.web == $space)
 #set ($spacecount = $i)
 #end
@@ -155,10 +151,10 @@
 &lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
 #set($hql = $xwiki.searchDocuments("doc.web='$space' order by doc.name"))
 #foreach($page in $hql)
-#if (!$hiddenPages.contains($page) || ($hiddenPages.contains($page) &amp;&amp; $xwiki.hasAdminRights()))
+#if (!$hiddenPages.contains($page))
 #set($dotIndex = $page.indexOf(".")+1)
 #set($pageName = $page.substring($dotIndex, $page.length()))
-#if (!$blackListedPages.contains($pageName) || ($blackListedPages.contains($pageName) &amp;&amp; $xwiki.hasAdminRights()))
+#if (!$blackListedPages.contains($pageName))
 #if ($doc.fullName == $page)
 - *$xwiki.getDocument($page).name*
 #else

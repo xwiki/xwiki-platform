@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  *
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,8 +20,7 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
@@ -34,4 +31,9 @@
   <name>XWiki Applications - Xarlets - Panels</name>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-applications/trunk/xarlets/panels</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-applications/trunk/xarlets/panels</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-applications/trunk/xarlets/panels</url>
+  </scm>
 </project>

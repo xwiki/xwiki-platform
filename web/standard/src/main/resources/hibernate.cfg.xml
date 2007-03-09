@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!-- Template for hibernate configuration. processing by maven using profiles.
+     Replace original src/main/webapp/WEB-INF/hibernate.cfg.xml -->
+<hibernate-configuration>
+  <session-factory>
+
+    <property name="show_sql">false</property>
+    <property name="use_outer_join">true</property>
+
+    <property name="dbcp.defaultAutoCommit">false</property>
+    <property name="dbcp.maxActive">50</property>
+    <property name="dbcp.maxIdle">5</property>
+    <property name="dbcp.maxWait">30000</property>
+    <property name="dbcp.whenExhaustedAction">1</property>
+    <property name="dbcp.ps.whenExhaustedAction">1</property>
+    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.ps.maxWait">120000</property>
+    <property name="dbcp.ps.maxIdle">20</property>
+
+    <property name="connection.url">${xwiki.db.connection.url}</property>
+    <property name="connection.username">${xwiki.db.connection.username}</property>
+    <property name="connection.password">${xwiki.db.connection.password}</property>
+    <property name="connection.driver_class">${xwiki.db.connection.driver_class}</property>
+    <property name="dialect">${xwiki.db.dialect}</property>
+
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+
+    <!-- Mapping files -->
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+
+  </session-factory>
+</hibernate-configuration>

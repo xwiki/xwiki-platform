@@ -259,18 +259,20 @@ The encoding used for storing unicode characters as bytes.
     }
 
     /**
-     * @param documentName the document's name (eg Space.Document)
+     * @param documentName the Resource bundle's name (eg Space.Document)
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
-     * @return the properties object corresponding to the documentName. A translated version
-     *         of the document for the current Locale is looked for.
+     *        primitives for loading documents
+     * @return the properties object corresponding to the passed Resource Bundle. A translated
+     *         version of the document for the current Locale is looked for.
      */
-    public Properties getDocumentBundleProperties(String documentName, XWikiContext context){
+    public Properties getDocumentBundleProperties(String documentName, XWikiContext context)
+    {
         Properties props = null;
         try {
             XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
-            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), documentName, context)
-            && !docBundle.isNew()) {
+            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
+                documentName, context) && !docBundle.isNew())
+            {
                 props = getDocumentBundleProperties(docBundle);
             }
         } catch (XWikiException e) {
@@ -284,7 +286,8 @@ The encoding used for storing unicode characters as bytes.
      * @return the properties object corresponding to the docBundle. A translated version
      *         of the document for the current Locale is looked for.
      */
-    private Properties getDocumentBundleProperties(XWikiDocument docBundle){
+    private Properties getDocumentBundleProperties(XWikiDocument docBundle)
+    {
         Properties props = new Properties();
         String content = docBundle.getContent();
         byte[] docContent;

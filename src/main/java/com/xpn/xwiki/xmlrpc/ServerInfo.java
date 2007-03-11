@@ -21,7 +21,8 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ServerInfo {
    private int majorVersion;
@@ -31,15 +32,15 @@ public class ServerInfo {
    private boolean developmentBuild;
    private String baseUrl;
 
-    public Hashtable getHashtable() {
-        Hashtable ht = new Hashtable();
-        ht.put("majorVersion", new Integer(getMajorVersion()));
-        ht.put("minorVersion", new Integer(getMinorVersion()));
-        ht.put("patcheLevel", new Integer(getPatchLevel()));
-        ht.put("buildId", getBuildId());
-        ht.put("developmentBuild", new Boolean(isDevelopmentBuild()));
-        ht.put("baseUrl", getBaseUrl());
-        return ht;
+    Map getParameters() {
+        Map params = new HashMap();
+        params.put("majorVersion", new Integer(getMajorVersion()));
+        params.put("minorVersion", new Integer(getMinorVersion()));
+        params.put("patcheLevel", new Integer(getPatchLevel()));
+        params.put("buildId", getBuildId());
+        params.put("developmentBuild", new Boolean(isDevelopmentBuild()));
+        params.put("baseUrl", getBaseUrl());
+        return params;
     }
 
     public int getMajorVersion() {

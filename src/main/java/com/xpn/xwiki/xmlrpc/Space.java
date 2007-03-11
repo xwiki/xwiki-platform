@@ -21,7 +21,7 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 public class Space extends SpaceSummary {
     private String description;
@@ -33,17 +33,17 @@ public class Space extends SpaceSummary {
         this.setHomepage(homepage);
     }
 
-    public Space(Hashtable spaceProperties) {
-        super(spaceProperties);
-        this.setDescription(((String) spaceProperties.get("description")));
-        this.setHomepage(((String) spaceProperties.get("homepage")));
+    public Space(Map parameters) {
+        super(parameters);
+        this.setDescription(((String) parameters.get("description")));
+        this.setHomepage(((String) parameters.get("homepage")));
     }    
     
-    public Hashtable getHashtable() {
-        Hashtable ht = super.getHashtable();
-        ht.put("description", getDescription());
-        ht.put("homepage", getHomepage());
-        return ht;
+    Map getParameters() {
+        Map params = super.getParameters();
+        params.put("description", getDescription());
+        params.put("homepage", getHomepage());
+        return params;
     }
 
     public String getDescription() {

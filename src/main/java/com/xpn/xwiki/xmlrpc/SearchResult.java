@@ -24,7 +24,8 @@ package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 public class SearchResult {
    private String title;
@@ -54,14 +55,14 @@ public class SearchResult {
          setExcerpt(content.substring(0,256));
     }
 
-    public Hashtable getHashtable() {
-        Hashtable ht = new Hashtable();
-        ht.put("title", getTitle());
-        ht.put("url", getUrl());
-        ht.put("excerpt", getExcerpt());
-        ht.put("id", getId());
-        ht.put("type", getType());
-        return ht;
+    Map getParameters() {
+        Map params = new HashMap();
+        params.put("title", getTitle());
+        params.put("url", getUrl());
+        params.put("excerpt", getExcerpt());
+        params.put("id", getId());
+        params.put("type", getType());
+        return params;
     }
 
     public String getTitle() {

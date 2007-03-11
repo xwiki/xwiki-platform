@@ -147,6 +147,9 @@ iframe {}
 /* Section 17: Forms */
 form { margin: 0px; }
 input {}
+.button{
+  font-size: 1em;
+}
 input:focus {}
 button {}
 button:focus {}

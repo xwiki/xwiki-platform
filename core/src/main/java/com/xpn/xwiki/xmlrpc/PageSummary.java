@@ -25,7 +25,8 @@ package com.xpn.xwiki.xmlrpc;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 public class PageSummary  {
     private String id;
@@ -45,7 +46,7 @@ public class PageSummary  {
        this.setLocks(locks);
    }
 
-    public PageSummary(Hashtable pageht) {
+    public PageSummary(Map pageht) {
         this.setId((String)pageht.get("id"));
         this.setSpace((String)pageht.get("space"));
         this.setParentId((String)pageht.get("parentId"));
@@ -63,15 +64,15 @@ public class PageSummary  {
         this.setLocks(0);
     }
 
-    public Hashtable getHashtable() {
-        Hashtable ht = new Hashtable();
-        ht.put("id", getId());
-        ht.put("space", getSpace());
-        ht.put("parentId", getParentId());
-        ht.put("title", getTitle());
-        ht.put("url", getUrl());
-        ht.put("locks", new Integer(getLocks()));
-        return ht;
+    Map getParameters() {
+        Map params = new HashMap();
+        params.put("id", getId());
+        params.put("space", getSpace());
+        params.put("parentId", getParentId());
+        params.put("title", getTitle());
+        params.put("url", getUrl());
+        params.put("locks", new Integer(getLocks()));
+        return params;
     }
 
     public String getId() {

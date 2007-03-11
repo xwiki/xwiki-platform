@@ -19,54 +19,142 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
-public class SpaceSummary {
+/**
+ * Represents the details of a Space (SpaceSummary) as described in the
+ * <a href="Confluence specification">
+ * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
+ *
+ * @TODO We're missing the Space Type field as described in the Confluence specification.
+ * @version $Id: $
+ */
+public class SpaceSummary 
+{
+    /**
+     * @see #getKey()
+     */    
+    private static final String KEY = "key";
+    
+    /**
+     * @see #getName()
+     */
+    private static final String NAME = "name";
+    
+    /**
+     * @see #getUrl()
+     */
+    private static final String URL = "url";
+    
+    /**
+     * @see #getKey()
+     */
     private String key;
+    
+    /**
+     * @see #getName()
+     */
     private String name;
+    
+    /**
+     * @see #getUrl()
+     */
     private String url;
 
-    public SpaceSummary(String key, String name, String url) {
+    /**
+     * @param key of the space (usually the Space's name as it's unique)
+     * @param name of the space
+     * @param url to view the space online. Example: "http://server/xwiki/bin/view/Space/WebHome"
+     */
+    public SpaceSummary(String key, String name, String url) 
+    {
         this.setKey(key);
         this.setName(name);
         this.setUrl(url);
     }
 
-    public SpaceSummary(Hashtable spaceSummaryProperties) {
-        this((String) spaceSummaryProperties.get("key"),
-            (String) spaceSummaryProperties.get("name"),
-            (String) spaceSummaryProperties.get("url"));
-    }
-    
-    public Hashtable getHashtable() {
-        Hashtable ht = new Hashtable();
-        ht.put("key", getKey());
-        ht.put("name", getName());
-        ht.put("url", getUrl());
-        return ht;
+    /**
+     * @param spaceSummaryProperties te Map containing all informations to setup a
+     *        SpaceSummary object. More specifically in the map there <b>must</b> be the following
+     *        keys:
+     *        <ul>
+     *          <li>"key": key of the SpaceSummary</li>
+     *          <li>"name": name of the SpaceSummary</li>
+     *          <li>"url": url to view the space online</li>
+     *       </ul>
+     * @see #SpaceSummary(String, String, String)
+     */
+    public SpaceSummary(Map spaceSummaryProperties) 
+    {
+        this((String) spaceSummaryProperties.get(KEY),
+            (String) spaceSummaryProperties.get(NAME),
+            (String) spaceSummaryProperties.get(URL));
     }
 
-    public String getKey() {
+    /**
+     * @return the SpaceSummary object represented by a Map. The Map keys are the XML-RPC 
+     *         ids and the values are the property values. This map will be used to 
+     *         build a XML-RPC message.
+     */     
+    Map getParameters()
+    {
+        Map params = new HashMap();
+        params.put(KEY, getKey());
+        params.put(NAME, getName());
+        params.put(URL, getUrl());
+        return params;
+    }
+
+    /**
+     * @return the key of the space (usually the Space's name as it's unique)
+     */
+    public String getKey()
+    {
         return key;
     }
 
-    public void setKey(String key) {
+    /**
+     * @param key the key of the space
+     * @see #getKey()
+     */
+    public void setKey(String key)
+    {
         this.key = key;
     }
 
-    public String getName() {
+    /**
+     * @return the name of the space
+     */
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    /**
+     * @param name the name of the space
+     * @see #getName()
+     */
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getUrl() {
+    /**
+     * @return the url to view this space online.
+     *         Example: "http://server/xwiki/bin/view/Space/WebHome"
+     */
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    /**
+     * @param url the url url to view this space online
+     * @see #getUrl()
+     */
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 }

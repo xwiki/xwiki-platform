@@ -152,9 +152,8 @@ public class Attachment
     /**
      * @return the Attachment object represented by a Map. The Map keys are the XML-RPC ids and the
      *         values are the property values. This map will be used to build a XML-RPC message.
-     * @todo change the method name to something like getDetails() or getParameters()
-     */       
-    public Map getHashtable() 
+     */
+    Map getParameters() 
     {
         Map params = new HashMap();
         params.put(ID, getId());

@@ -25,7 +25,8 @@ package com.xpn.xwiki.xmlrpc;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 public class PageHistorySummary {
     private String id;
@@ -47,13 +48,13 @@ public class PageHistorySummary {
         this.modifier = document.getAuthor();
     }
 
-    public Hashtable getHashtable() {
-        Hashtable ht = new Hashtable();
-        ht.put("id", getId());
-        ht.put("version", new Integer(getVersion()));
-        ht.put("modified", getModified());
-        ht.put("modifier", getModifier());
-        return ht;
+    Map getParameters() {
+        Map params = new HashMap();
+        params.put("id", getId());
+        params.put("version", new Integer(getVersion()));
+        params.put("modified", getModified());
+        params.put("modifier", getModifier());
+        return params;
     }
 
     public String getId() {

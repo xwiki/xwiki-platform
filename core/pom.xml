@@ -424,6 +424,7 @@
           <includes>
               **/Api.java,
               **/xmlrpc/Attachment.java,
+              **/xmlrpc/SpaceSummary.java,
               **/ViewAction.java,
               **/ZipExplorer*.java,
               **/content/**/*.java,

@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.Date;
-import java.util.Hashtable;
+import java.util.Map;
 
 public class Page extends PageSummary {
     private int version;
@@ -61,27 +61,27 @@ public class Page extends PageSummary {
        this.setHomepage((doc.getName().equals("WebHome")));
    }
 
-    public Page(Hashtable pageht) {
-        super(pageht);
-        this.setVersion(((Integer)pageht.get("version")).intValue());
-        this.setContent((String)pageht.get("content"));
-        this.setCreated((Date)pageht.get("created"));
-        this.setCreator((String)pageht.get("creator"));
-        this.setModified((Date)pageht.get("modified"));
-        this.setModifier((String)pageht.get("modifier"));
-        this.setHomepage(((Boolean)pageht.get("homepage")).booleanValue());
+    public Page(Map parameters) {
+        super(parameters);
+        this.setVersion(((Integer)parameters.get("version")).intValue());
+        this.setContent((String)parameters.get("content"));
+        this.setCreated((Date)parameters.get("created"));
+        this.setCreator((String)parameters.get("creator"));
+        this.setModified((Date)parameters.get("modified"));
+        this.setModifier((String)parameters.get("modifier"));
+        this.setHomepage(((Boolean)parameters.get("homepage")).booleanValue());
     }
 
-    public Hashtable getHashtable() {
-        Hashtable ht = super.getHashtable();
-        ht.put("version", new Integer(getVersion()));
-        ht.put("content", getContent());
-        ht.put("created", getCreated());
-        ht.put("creator", getCreator());
-        ht.put("modified", getModified());
-        ht.put("modifier", getModifier());
-        ht.put("homepage", new Boolean(isHomepage()));
-        return ht;
+    Map getParameters() {
+        Map params = super.getParameters();
+        params.put("version", new Integer(getVersion()));
+        params.put("content", getContent());
+        params.put("created", getCreated());
+        params.put("creator", getCreator());
+        params.put("modified", getModified());
+        params.put("modifier", getModifier());
+        params.put("homepage", new Boolean(isHomepage()));
+        return params;
     }
 
     public int getVersion() {

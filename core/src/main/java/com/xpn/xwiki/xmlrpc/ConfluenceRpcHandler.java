@@ -36,7 +36,10 @@ import org.suigeneris.jrcs.rcs.Version;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface {
 	private static final Log log = LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
@@ -164,7 +167,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i=0; i<webs.size(); i++) {
             String web = (String)webs.get(i);
             SpaceSummary spacesum = new SpaceSummary(web, web, "http://127.0.0.1:9080/xwiki/bin/view/" + web + "/WebHome");
-            spaces.add(spacesum.getHashtable());
+            spaces.add(spacesum.getParameters());
         }
         return spaces.toArray();
     }
@@ -176,7 +179,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         XWikiDocument doc = new XWikiDocument(spaceKey, "WebHome");
-        return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome")).getHashtable();
+        return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome")).getParameters();
     }
 
     public Object[] getPages(String token, String spaceKey) throws XWikiException {
@@ -192,7 +195,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             String docname = (String)docs.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
             PageSummary pagesum = new PageSummary(doc, context);
-            pages.add(pagesum.getHashtable());
+            pages.add(pagesum.getParameters());
         }
         return pages.toArray();
     }
@@ -206,7 +209,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         XWikiDocument doc = xwiki.getDocument(pageId, context);
         Page page = new Page(doc, context);
-        return page.getHashtable();
+        return page.getParameters();
     }
 
     public Object[] getPageHistory(String token, String pageId) throws XWikiException {
@@ -222,7 +225,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i=0;i<versions.length;i++) {
             String version = versions[i].toString();
             XWikiDocument revdoc = xwiki.getDocument(doc, version, context);
-            result.add((new PageHistorySummary(revdoc)).getHashtable());
+            result.add((new PageHistorySummary(revdoc)).getParameters());
         }
         return result.toArray();
     }
@@ -244,7 +247,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             String docname = (String)doclist.get(i);
             XWikiDocument document = xwiki.getDocument(docname, context);
             SearchResult sresult = new SearchResult(document);
-            result.add(sresult.getHashtable());
+            result.add(sresult.getParameters());
         }
         return result.toArray();
     }
@@ -288,7 +291,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         ArrayList result = new ArrayList(attachlist.size());
         for (int i=0;i<attachlist.size();i++) {
             Attachment attach = new Attachment(document, (XWikiAttachment)attachlist.get(i), context);
-            result.add(attach.getHashtable());
+            result.add(attach.getParameters());
         }
         return result.toArray();
     }
@@ -320,7 +323,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     public Map storePage(String token, Map pageht) throws XWikiException {
         try {
-        Page page = new Page(new Hashtable(pageht));
+        Page page = new Page(new HashMap(pageht));
 
         XWikiContext context = null;
         context = getXWikiContext();
@@ -341,7 +344,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         newdoc.setAuthor(context.getUser());
         newdoc.setContent(page.getContent());
         context.getWiki().saveDocument(newdoc, document, context);
-        return (new Page(newdoc, context)).getHashtable();
+        return (new Page(newdoc, context)).getParameters();
         } catch (XWikiException e) {
             e.printStackTrace();
             throw e;
@@ -411,7 +414,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     public Map addSpace(String token, Map spaceProperties) throws XWikiException {
-        Space space = new Space(new Hashtable(spaceProperties));
+        Space space = new Space(new HashMap(spaceProperties));
 
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -430,6 +433,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         space.setUrl(document.getURL("view", context));
         space.setHomepage( new Long(document.getId()).toString());
 
-        return space.getHashtable();
+        return space.getParameters();
    }
 }

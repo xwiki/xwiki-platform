@@ -4,7 +4,7 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<title>New chart wizard</title>
+<title>Creating new chart</title>
 <meta http-equiv="Content-Type" content="text/xhtml+xml; charset=$xwiki.encoding" />
 <meta http-equiv="imagetoolbar" content="no"/>
 $!xwiki.getWebPreference("meta") 
@@ -31,7 +31,8 @@ $!xwiki.getWebPreference("meta")
 #template("chw/datapage.vm")
 #template("chw/typepage.vm")
 #template("chw/titlepage.vm")
-#template("chw/axispage.vm")
+<!-- Not ready for prime time
+#template("chw/axispage.vm")-->
       </td>
     </tr>
     <tr>

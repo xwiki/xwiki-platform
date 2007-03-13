@@ -297,6 +297,13 @@ ol.HEBREW { list-style-type: hebrew; }
   text-decoration: underline;
 }
 
+.workshop {
+  background-color: #FED;
+}
+.event .username {
+  font-size: 80%;
+}
+
 .article_title {
  font-size: 120%;
  border-bottom: 1px;

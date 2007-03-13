@@ -1,159 +1,155 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!DOCTYPE web-app
-  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-  "http://java.sun.com/dtd/web-app_2_3.dtd">
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-    <display-name>xwiki</display-name>
-    <description>This application is a servlet and a portlet</description>
+  <display-name>xwiki</display-name>
+  <description>This application is a Servlet and a Portlet</description>
 
-    <filter>
-        <filter-name>ExoFilter</filter-name>
-        <filter-class>com.xpn.xwiki.user.impl.exo.ExoFilter</filter-class>
-    </filter>
+  <!-- Define context level parameters for XWiki's initialization -->
+  <context-param>
+    <param-name>org.apache.velocity.properties</param-name>
+    <param-value>/WEB-INF/velocity.properties</param-value>
+    <description>Velocity's configuration</description>
+  </context-param>
 
-    <filter>
-            <filter-name>Set Character Encoding</filter-name>
-            <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
-            <init-param>
-                <param-name>encoding</param-name>
-                <param-value>ISO-8859-1</param-value>
-            </init-param>
-   </filter>
+  <filter>
+    <filter-name>ExoFilter</filter-name>
+    <filter-class>com.xpn.xwiki.user.impl.exo.ExoFilter</filter-class>
+  </filter>
 
-      <filter-mapping>
-            <filter-name>Set Character Encoding</filter-name>
-            <url-pattern>/*</url-pattern>
-      </filter-mapping>
+  <filter>
+    <filter-name>Set Character Encoding</filter-name>
+    <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>ISO-8859-1</param-value>
+    </init-param>
+  </filter>
 
+  <filter-mapping>
+    <filter-name>Set Character Encoding</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
-    <filter-mapping>
-        <filter-name>ExoFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+  <filter-mapping>
+    <filter-name>ExoFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
-    <listener>
-        <listener-class>org.exoplatform.services.portletcontainer.impl.servlet.PortletApplicationListener</listener-class>
-    </listener>
+  <!-- XWiki's initialization is done in a Servlet Context Listener. This is where we set up
+       everything that should be initialized prior to XWiki servicing requests. For example this
+       is where we initialize Velocity. -->
+  <listener>
+    <listener-class>com.xpn.xwiki.web.InitializationServletContextListener</listener-class>
+  </listener>
 
-    <servlet>
-        <servlet-name>PortletWrapper</servlet-name>
-        <servlet-class>org.exoplatform.services.portletcontainer.impl.servlet.ServletWrapper</servlet-class>
-    </servlet>
+  <listener>
+    <listener-class>
+      org.exoplatform.services.portletcontainer.impl.servlet.PortletApplicationListener
+    </listener-class>
+  </listener>
 
+  <servlet>
+    <servlet-name>PortletWrapper</servlet-name>
+    <servlet-class>org.exoplatform.services.portletcontainer.impl.servlet.ServletWrapper
+    </servlet-class>
+  </servlet>
 
-    <servlet>
-        <servlet-name>action</servlet-name>
-        <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-        <init-param>
-            <param-name>application</param-name>
-            <param-value>ApplicationResources</param-value>
-        </init-param>
-        <init-param>
-            <param-name>xwiki</param-name>
-            <param-value>com.xpn.xwiki.XWiki</param-value>
-        </init-param>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>/WEB-INF/struts-config.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>debug</param-name>
-            <param-value>2</param-value>
-        </init-param>
-        <init-param>
-            <param-name>detail</param-name>
-            <param-value>2</param-value>
-        </init-param>
-        <init-param>
-            <param-name>validate</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
+  <servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>application</param-name>
+      <param-value>ApplicationResources</param-value>
+    </init-param>
+    <init-param>
+      <param-name>xwiki</param-name>
+      <param-value>com.xpn.xwiki.XWiki</param-value>
+    </init-param>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>detail</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>validate</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
 
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/bin/*</url-pattern>
+  </servlet-mapping>
 
-    <servlet>
-        <servlet-name>velocity</servlet-name>
-        <servlet-class>org.apache.velocity.tools.view.servlet.VelocityViewServlet</servlet-class>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/testbin/*</url-pattern>
+  </servlet-mapping>
 
-        <init-param>
-            <param-name>org.apache.velocity.toolbox</param-name>
-            <param-value>/WEB-INF/toolbox.xml</param-value>
-        </init-param>
+  <servlet-mapping>
+    <servlet-name>PortletWrapper</servlet-name>
+    <url-pattern>/PortletWrapper</url-pattern>
+  </servlet-mapping>
 
-        <init-param>
-            <param-name>org.apache.velocity.properties</param-name>
-            <param-value>/WEB-INF/velocity.properties</param-value>
-        </init-param>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/xwiki/*</url-pattern>
+  </servlet-mapping>
 
-        <load-on-startup>10</load-on-startup>
-    </servlet>
+  <!--
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+  -->
 
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/bin/*</url-pattern>
-    </servlet-mapping>
+  <!-- The Usual Welcome File List -->
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
 
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/testbin/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>PortletWrapper</servlet-name>
-        <url-pattern>/PortletWrapper</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/xwiki/*</url-pattern>
-    </servlet-mapping>
-
-    <!--
-    <error-page>
-      <error-code>500</error-code>
-      <location>/error.jsp</location>
-    </error-page>
-    <error-page>
-      <error-code>404</error-code>
-      <location>/error.jsp</location>
-    </error-page>
-    -->
-
-    <!-- The Usual Welcome File List -->
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-
-    <!-- Example Application Tag Library Descriptor
+  <!-- Example Application Tag Library Descriptor
 <taglib>
 <taglib-uri>/WEB-INF/app.tld</taglib-uri>
 <taglib-location>/WEB-INF/app.tld</taglib-location>
 </taglib>
   -->
 
-    <!-- Struts Tag Library Descriptors -->
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
-    </taglib>
+  <!-- Struts Tag Library Descriptors -->
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
+  </taglib>
 
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
-    </taglib>
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
+  </taglib>
 
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
-    </taglib>
-    <env-entry>
-        <env-entry-name>XWikiConfig</env-entry-name>
-        <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
-        <env-entry-type>java.lang.String</env-entry-type>
-    </env-entry>
-
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
+  </taglib>
+  <env-entry>
+    <env-entry-name>XWikiConfig</env-entry-name>
+    <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
+    <env-entry-type>java.lang.String</env-entry-type>
+  </env-entry>
 
 </web-app>

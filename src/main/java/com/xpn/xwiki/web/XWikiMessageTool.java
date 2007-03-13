@@ -107,7 +107,7 @@ public class XWikiMessageTool
 
     /**
      * List of document bundles that have been modified since the last time they were cached. The
-     * Set containers Long objects which are the XWiki document ids. TODO: This instance variable
+     * Set contains Long objects which are the XWiki document ids. TODO: This instance variable
      * should be removed as it's used internally and its state shouldn't encompass several calls to
      * get().
      */

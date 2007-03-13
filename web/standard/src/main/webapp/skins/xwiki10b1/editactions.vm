@@ -3,16 +3,23 @@
 ###
 #if((!$showactions)||($showactions==1))
 <script type="text/javascript">
-function checkDocumentContent() {
 // <![CDATA[
-  if ((document.forms.${formname}.content)&&(wikiEditor!=null)&&(wikiEditor.getContent()=="")) {
+function checkDocumentContent() {
+  if (document.forms.${formname}.content) { // There is a content editor
+    if (window.wikiEditor!=null) {
+      if (wikiEditor.getContent()=="") { // There is a wysiwyg editor, and it's content is empty
+        alert("$msg.get('wikicontentcannotbeempty')");
+        return false ;
+      }
+      return true; // There is a wysiwyg editor, with some content
+    }
     var content = document.forms.${formname}.content.value;
-    if (content == null || content == "") {
+    if (content == null || content == "") { // There is only the wiki editor, and it's content is empty
       alert("$msg.get('wikicontentcannotbeempty')");
       return false ;
     }
   }
-  return true;
+  return true; // There is only the wiki editor, with some content
 }
 // ]]>
 </script>
@@ -20,7 +27,7 @@ function checkDocumentContent() {
 #if ($sectionNumber != 0)
    #set($param = "section=$sectionNumber")
 #end
-  <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms.${formname}.action='$doc.getURL("cancel")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>
+  <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms.${formname}.action='$doc.getURL("cancel")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();"/></span>
 #if($previewenabled)  <span class="buttonwrapper"><input class="button" type="submit" name="formactionpreview" value="$msg.get("preview")" onclick="document.forms.${formname}.action='$doc.getURL("preview", $param)'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>
 #end
   <span class="buttonwrapper"><input class="button" type="submit" name="formactionsac" value="$msg.get("saveandcontinue")" onclick="document.forms.${formname}.action='$doc.getURL("saveandcontinue", $param)'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>

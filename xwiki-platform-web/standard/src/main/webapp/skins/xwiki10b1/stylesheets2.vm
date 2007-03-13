@@ -1,8 +1,14 @@
+<!-- Includes CSS files inline for modes other than the Servlet mode. This is because for example
+     in Portlet mode the HTML we create cannot contain a <HEADER> or <BODY> element. We normally
+     include CSS using the <LINK> element but it needs to go in the <HEADER>. Thus instead we do
+     the CSS inclusion inline here -->
+
 <style type="text/css">
 <!--
   @import url($xwiki.getSkinFile("style.css",true));
 -->
 </style>
+
 #set( $defaultstyle = $xwiki.getWebPreference("stylesheet"))
 #if ($defaultstyle!="")
 <style type="text/css">
@@ -11,6 +17,7 @@
 -->
 </style>
 #end
+
 #if($request.getHeader("user-agent").indexOf("MSIE")!=-1)
 <style type="text/css">
 <!--
@@ -18,15 +25,18 @@
 -->
 </style>
 #end
+
 <style type="text/css">
 <!--
   @import url($xwiki.getSkinFile("customcolors.css", true));
   @import url($xwiki.getSkinFile("customlayout.css", true));
 -->
 </style>
+
 <style type="text/css">
 $!xwiki.getWebPreference("style")
 </style>
+
 <style type="text/css">
 $!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
 </style>

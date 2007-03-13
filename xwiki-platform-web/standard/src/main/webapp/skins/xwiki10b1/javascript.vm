@@ -1,0 +1,63 @@
+<script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/prototype.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/rico.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/xwrico.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
+
+#if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
+<script type="text/javascript">
+// <![CDATA[
+ var cancelEditNextOnunload;
+ var cancelCancelEditFlag = true;
+ var  lockEditFlag = false;
+
+ function cancelEditResponse(){
+ }
+
+ function cancelEdit(){
+     if (cancelCancelEditFlag) {
+       var surl = "$doc.getExternalURL("cancel", "ajax=1")";
+       var myAjax = new Ajax.Request(
+                 surl,
+                 {
+                     method: 'get',
+                     parameters: "",
+                     asynchronous: true
+                 });
+        cancelCancelEditFlag = false;
+     }
+     if (cancelEditNextOnunload!=null)
+           cancelEditNextOnunload();
+ }
+
+ function lockEdit(){
+    if (lockEditFlag==false) {
+#if($context.action=="inline")
+      var surl = "$doc.getExternalURL("lock")?action=inline&ajax=1&${docvariant.replaceAll("&amp;", "&")}";
+#else
+      var surl = "$doc.getExternalURL("lock")?ajax=1&${docvariant.replaceAll("&amp;", "&")}";
+#end
+      var myAjax = new Ajax.Request(
+                surl,
+                {
+                    method: 'get',
+                    parameters: "",
+                    asynchronous: true
+                });
+       lockEditFlag = false;
+    }
+ }
+
+ function prepareCancelEdit() {
+     cancelEditNextOnunload = document.onunload;
+     document.onunload = cancelEdit;
+     lockEdit();
+ }
+ function cancelCancelEdit() {
+     cancelCancelEditFlag = false;
+ }
+// ]]>
+</script>
+#end

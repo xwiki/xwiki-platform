@@ -212,17 +212,7 @@
     <dependency>
       <groupId>velocity</groupId>
       <artifactId>velocity</artifactId>
-      <version>1.5-beta2</version>
-      <exclusions>
-        <!-- We're excluding velocity-dep as it includes a version of ORO that is masking our
-             dependency of ORO that we're using transitively through another dependency. This
-             leads to compilation problems with some code we have. An issues has been raised
-             on http://issues.apache.org/jira/browse/VELOCITY-491 -->
-        <exclusion>
-          <groupId>velocity</groupId>
-          <artifactId>velocity-dep</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>

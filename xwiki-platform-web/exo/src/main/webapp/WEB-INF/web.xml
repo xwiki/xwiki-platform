@@ -18,6 +18,10 @@
   <filter>
     <filter-name>ExoFilter</filter-name>
     <filter-class>com.xpn.xwiki.user.impl.exo.ExoFilter</filter-class>
+    <init-param>
+      <param-name>portalName</param-name>
+      <param-value>portal</param-value>
+    </init-param>
   </filter>
 
   <filter>

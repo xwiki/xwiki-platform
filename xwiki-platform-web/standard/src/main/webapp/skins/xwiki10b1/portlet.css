@@ -1,0 +1,20 @@
+#actionmenu {
+ position: relative;
+  height: 2em;
+  top: auto;
+  left: auto;
+  right: auto;
+  width: auto;
+  border: none;
+  z-index: auto;
+  overflow: visible;
+}
+  
+html > body #actionmenu{
+  position: relative;
+  top: auto;
+  left: auto;
+  width: auto;
+} 
+}
+

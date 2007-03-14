@@ -32,20 +32,22 @@ import java.io.IOException;
 public class ExoFilter implements Filter {
 
     public static final String EXO_CONTAINER = "portal";
-    public static FilterConfig filterCongif_ = null;
+    public static String portalName_ = null;
 
     public void init(FilterConfig filterConfig) throws ServletException {
-        if (filterConfig != null) {
-            filterCongif_ = filterConfig;
-        } else {
-            PortalContainer manager = RootContainer.getInstance().getPortalContainer(EXO_CONTAINER);
-            filterCongif_ = (FilterConfig) manager.getComponentInstanceOfType(FilterConfig.class);
+        portalName_ = filterConfig.getInitParameter("portalName");
+        if (portalName_ == null){
+          portalName_ = EXO_CONTAINER;
         }
+        System.out.append("init done");
+        System.out.append("portal Name: " + portalName_);
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-        PortalContainer pcontainer = RootContainer.getInstance().getPortalContainer(EXO_CONTAINER);
+        PortalContainer pcontainer = RootContainer.getInstance().getPortalContainer(portalName_);
+        System.out.append("pcontainer: " + pcontainer);
+
         PortalContainer.setInstance(pcontainer);
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -54,3 +56,4 @@ public class ExoFilter implements Filter {
     }
 
 }
+

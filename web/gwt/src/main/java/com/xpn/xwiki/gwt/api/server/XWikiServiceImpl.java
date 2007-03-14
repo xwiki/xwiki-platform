@@ -63,8 +63,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
+    private static final Log log = LogFactory.getLog(XWiki.class);
 
     protected XWikiContext getXWikiContext() throws XWikiException {
         XWikiRequest  request = new XWikiServletRequest(getThreadLocalRequest()); // use fake request
@@ -816,6 +820,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             e.printStackTrace();  
             return null;
         }
+    }
+
+    public void logJSError(Map infos){
+        log.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n"
+                + "module:" + infos.get("module") + "\n");
+               // + "stacktrace" + infos.get("stacktrace"));
     }
 
     public Dictionary getTranslation(String translationPage, String local){

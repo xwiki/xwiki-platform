@@ -93,6 +93,8 @@ public interface XWikiService extends RemoteService {
     public String getDocumentContent(String fullName, boolean rendered);
     public String getDocumentContent(String fullName, boolean rendered, Map params);
 
+    public void logJSError(Map infos);
+
     public Dictionary getTranslation(String translationPage, String local);
 
 

@@ -111,5 +111,7 @@ public interface XWikiServiceAsync {
 
     void getDocumentContent(String fullName, boolean rendered, Map params, AsyncCallback async);
 
+    void logJSError(Map infos, AsyncCallback async);
+
     void getTranslation(String translationPage, String local, AsyncCallback async);
 }

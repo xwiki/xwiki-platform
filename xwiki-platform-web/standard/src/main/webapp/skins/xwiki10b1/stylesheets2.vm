@@ -39,4 +39,6 @@ $!xwiki.getWebPreference("style")
 
 <style type="text/css">
 $!doc.display("style", "view", $doc.getObject("XWiki.XWikiHTML",0))
+
+@import url($xwiki.getSkinFile("portlet.css", true));
 </style>

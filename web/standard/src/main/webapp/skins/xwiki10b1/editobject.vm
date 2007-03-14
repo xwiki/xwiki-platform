@@ -1,4 +1,4 @@
-#if($request.xpage=="editobject")
+#if($request.xpage && $request.xpage=="editobject")
 $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #else
 #set($formname = "update")

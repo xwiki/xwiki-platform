@@ -6,7 +6,7 @@
 <div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
 <div id="contentcontainerinner">
 <div class="leftsidecolumns">
-#if($!hidecolumns == 1)
+#if($hidecolumns && ($!hidecolumns == 1))
   <div id="contentcolumn" class="contenthidelefthideright">
 #else
   <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">

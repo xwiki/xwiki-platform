@@ -24,7 +24,7 @@ function checkDocumentContent() {
 // ]]>
 </script>
 #set($param = "")
-#if ($sectionNumber != 0)
+#if ($sectionNumber && ($sectionNumber != 0))
    #set($param = "section=$sectionNumber")
 #end
   <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms.${formname}.action='$doc.getURL("cancel")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();"/></span>

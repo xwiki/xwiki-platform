@@ -35,11 +35,11 @@
 #set($space = $doc.web)
 #end
 #set($redirecturl = "")
-#if($editor == "prefs" && ($doc.fullName != "XWiki.XWikiPreferences" || $global != 1))
+#if($editor == "prefs" && ($doc.fullName != "XWiki.XWikiPreferences" || ($global && $global != 1)))
 #set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=prefs&global=1&space=$space"))
 #elseif($editor == "spaceprefs" && (($doc.name != "WebPreferences")||($doc.web!=$space)))
 #set($redirecturl = $xwiki.getDocument("${space}.WebPreferences").getURL("admin", "editor=spaceprefs&global=1&space=$space"))
-#elseif($editor == "globalrights" && (($doc.fullName != "XWiki.XWikiPreferences") || $global != 1))
+#elseif($editor == "globalrights" && (($doc.fullName != "XWiki.XWikiPreferences") || ($global && $global != 1)))
 #set($redirecturl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=globalrights&global=1&space=$space"))
 #elseif($editor == "spacerights" && (($doc.name != "WebPreferences")||($doc.web!=$space)))
 #set($redirecturl = $xwiki.getDocument("${space}.WebPreferences").getURL("admin", "editor=spacerights&global=1&space=$space"))

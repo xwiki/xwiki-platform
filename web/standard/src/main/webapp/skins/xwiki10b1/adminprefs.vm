@@ -29,7 +29,7 @@
 #set($prop = $obj.xWikiClass.get($item))
 #set($title = $msg.get($item))
 #if($title == $item)
-#if($prop != $xwiki.null)
+#if($prop)
 #set($title = $!prop.prettyName)
 #end
 #end

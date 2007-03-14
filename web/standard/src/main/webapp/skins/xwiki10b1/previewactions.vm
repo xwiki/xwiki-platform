@@ -11,7 +11,7 @@
 #end
 #end
 #set($editparams = "")
-#if ($sectionNumber != 0)
+#if ($sectionNumber && ($sectionNumber != 0))
 #set($editparams = "section=$sectionNumber")
 #end
 <form style="display: inline;" action="$tdoc.getURL("cancel")" method="post"><div style="display: inline;">

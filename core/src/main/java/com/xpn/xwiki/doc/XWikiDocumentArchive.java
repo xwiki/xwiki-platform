@@ -74,9 +74,10 @@ public class XWikiDocumentArchive {
 
         // JRCS used the user.name System property to set the author of a change. However JRCS
         // has a bug when the user name has a space in the name
-        // (see http://jira.xwiki.org/jira/browse/XWIKI-896). The workaround is to set the
+        // (see http://www.suigeneris.org/issues/browse/JRCS-22). The workaround is to set the
         // user.name System property to some user without a space in its name. In addition
-        // we're not using that information anywhere so it won't matter.
+        // we're not using that information anywhere so it won't matter. When JRCS bug is fixed
+        // remove this hack.
 
         // Saving the property in case some other part of the code or some dependent framework
         // needs it.

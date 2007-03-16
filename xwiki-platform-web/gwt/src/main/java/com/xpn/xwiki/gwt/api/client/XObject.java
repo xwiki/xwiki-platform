@@ -25,7 +25,11 @@ package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class XObject implements IsSerializable {
     private Map properties = new HashMap();

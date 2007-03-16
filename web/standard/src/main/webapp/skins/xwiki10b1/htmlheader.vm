@@ -40,14 +40,23 @@
 #else
 
   #if($request.ajaxRequest == "true")
-  <div class="BlockToUpdate"><div class="META-DATA"><div class="blockId">XWiki</div></div><div class="BLOCK-DATA">   
+    <div class="PortletResponse">
+      <div class="PortletResponsePortletId"></div>
+      <div class="PortletResponsePortletTitle"></div>
+      <div class="PortletResponsePortletMode"></div>
+      <div class="PortletResponsePortletState"></div>
+      <div class="PortletResponseData">
+        <div class="BlockToUpdate">
+          <div class="BlockToUpdateId">XWiki</div>
+          <div class="BlockToUpdateData">
+
   #end
 
   <!-- This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window
        properly. In the future Exo should modifies its behavior so that this is not necessary and
        this will need to be removed -->
   <div id="XWiki" class="XWiki UIApplication" style="overflow: auto">
-
+  
   #template("stylesheets2.vm")
   #template("javascript.vm")
 

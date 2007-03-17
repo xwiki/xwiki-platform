@@ -169,7 +169,7 @@ $xwiki.getUserName("xwiki:${username}")
 #set($mmurl = $mindmap)
 #else
 #set($mmurl1 = $doc.getAttachmentURL($mindmap,"download"))
-#set($mmurl = "http://${request.serverName}${mmurl1}")
+#set($mmurl = "http://${request.serverName}:${request.serverPort}${mmurl1}")
 #end
 #end
 <applet code="freemind.main.FreeMindApplet.class" archive="/xwiki/freemind/freemind.jar" width="${width}" height="${height}">

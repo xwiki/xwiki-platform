@@ -26,7 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.ArchiveFileFilter;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -37,12 +37,11 @@ import org.codehaus.plexus.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -64,14 +63,6 @@ public class XarMojo extends AbstractMojo
      * @readonly
      */
     private MavenProject project;
-
-    /**
-     * Directory to unpack dependent XARs into if needed
-     *
-     * @parameter expression="${project.build.directory}/xar/work"
-     * @required
-     */
-    private File workDirectory;
 
     /**
      * To look up Archiver/UnArchiver implementations
@@ -108,13 +99,9 @@ public class XarMojo extends AbstractMojo
         archiver.setDestFile(xarFile);
         archiver.setIncludeEmptyDirs(false);
         archiver.setCompress(true);
-        archiver.addDirectory(sourceDir);
 
-        List dependentXars = unpackDependentXars();
-        for (Iterator iter = dependentXars.iterator(); iter.hasNext();) {
-            File xarDir = (File) iter.next();
-            archiver.addDirectory(xarDir, null, new String[] {"package.xml"});
-        }
+        unpackDependentXars();
+        archiver.addDirectory(sourceDir);
 
         // If no package.xml can be found at the top level of the current project, generate one
         if (archiver.getFiles().get("package.xml") == null) {
@@ -164,9 +151,8 @@ public class XarMojo extends AbstractMojo
         fw.close();
     }
 
-    private List unpackDependentXars() throws MojoExecutionException
+    private void unpackDependentXars() throws MojoExecutionException
     {
-        List dependentXars = new ArrayList(); 
         Set artifacts = this.project.getArtifacts();
         for (Iterator iter = artifacts.iterator(); iter.hasNext();) {
             Artifact artifact = (Artifact) iter.next();
@@ -174,50 +160,38 @@ public class XarMojo extends AbstractMojo
             if (!artifact.isOptional() && filter.include(artifact)) {
                 String type = artifact.getType();
                 if ("xar".equals(type)) {
-                    File xarDir = unpackXarToTempDirectory(artifact);
-                    dependentXars.add(xarDir);
+                    unpackXarToOutputDirectory(artifact);
                 }
             }
         }
-        return dependentXars;
     }
 
     /**
-     * Unpacks A XAR artifacts into a temporary directory inside <tt>workDirectory</tt> named with
-     * the name of the XAR.
+     * Unpacks A XAR artifacts into the build output directory, along with the project's
+     * XAR files.
      *
      * @param artifact the XAR artifact to unpack.
-     * @return the directory containing the unpacked XAR.
      * @throws MojoExecutionException in case of unpack error
      */
-    private File unpackXarToTempDirectory(Artifact artifact) throws MojoExecutionException
+    private void unpackXarToOutputDirectory(Artifact artifact) throws MojoExecutionException
     {
-        String name = artifact.getFile().getName();
-        File tempLocation = new File(this.workDirectory, name.substring(0, name.length() - 4));
+        File outputLocation = new File(this.project.getBuild().getOutputDirectory());
 
-        boolean process = false;
-        if (!tempLocation.exists()) {
-            tempLocation.mkdirs();
-            process = true;
-        } else if (artifact.getFile().lastModified() > tempLocation.lastModified()) {
-            process = true;
+        if (!outputLocation.exists()) {
+            outputLocation.mkdirs();
         }
 
-        if (process) {
-            File file = artifact.getFile();
-            try {
-                unpack(file, tempLocation);
-            } catch (NoSuchArchiverException e) {
-                this.getLog().info(
-                    "Skip unpacking dependency file with unknown extension: " + file.getPath());
-            }
+        File file = artifact.getFile();
+        try {
+            unpack(file, outputLocation);
+        } catch (NoSuchArchiverException e) {
+            this.getLog().info(
+                "Skip unpacking dependency file with unknown extension: " + file.getPath());
         }
-
-        return tempLocation;
     }
 
     /**
-     * Unpacks the archive file.
+     * Unpacks the archive file (exclude the package.xml file if it exists)
      *
      * @param file File to be unpacked.
      * @param location Location where to put the unpacked files.
@@ -231,6 +205,16 @@ public class XarMojo extends AbstractMojo
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);
             unArchiver.setOverwrite(true);
+
+            // Do not unpack any package.xml file in dependant XARs. We'll generate a complete one
+            // automatically.
+            List filters = new ArrayList();
+            filters.add(new ArchiveFileFilter() {
+                public boolean include(InputStream dataStream, String entryName ) {
+                    return (!entryName.equals("package.xml"));
+                }});
+
+            unArchiver.setArchiveFilters(filters);
             unArchiver.extract();
         } catch (Exception e) {
             throw new MojoExecutionException("Error unpacking file [" + file + "] to [" + location

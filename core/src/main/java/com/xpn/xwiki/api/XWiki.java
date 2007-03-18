@@ -552,7 +552,7 @@ public class XWiki extends Api
      * this parameter does not exist or is empty, the xwiki.cfg parameter xwiki.defaultskin is
      * looked up If this parameter does not exist or is empty, the xwiki.cfg parameter
      * xwiki.defaultbaseskin is looked up If this parameter does not exist or is empty, the skin is
-     * "default"
+     * "albatross"
      * 
      * @return The current skin for this request and user
      */
@@ -564,7 +564,7 @@ public class XWiki extends Api
     /**
      * API to retrieve the current skin for this request and user Each skin has a skin it is based
      * on. If not the base skin is the xwiki.cfg parameter "xwiki.defaultbaseskin) If this parameter
-     * does not exist or is empty, the base skin is "default"
+     * does not exist or is empty, the base skin is "albatross"
      * 
      * @return The current baseskin for this request and user
      */

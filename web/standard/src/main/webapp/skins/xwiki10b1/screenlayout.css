@@ -58,6 +58,7 @@ Global header
 #headerglobal{
   display: block;
   height: 8em;
+  min-height: 100px;
   border-right:200px solid ;
   z-index: 1;
 }
@@ -66,6 +67,7 @@ Global header
   float: left;
   width: 200px;
   height: 8em;
+  min-height: 100px;
   margin-right: -200px;
 }
 

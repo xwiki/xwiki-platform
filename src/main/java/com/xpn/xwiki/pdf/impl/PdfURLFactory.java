@@ -37,7 +37,7 @@ public class PdfURLFactory extends XWikiServletURLFactory {
     public PdfURLFactory() {
     }
 
-    public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context) {
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring, String xwikidb, XWikiContext context) {
         try {
             File tempdir = (File) context.get("pdfexportdir");
             File file = new File(tempdir, web + "." + name + "." + filename);

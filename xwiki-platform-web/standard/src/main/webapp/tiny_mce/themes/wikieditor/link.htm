@@ -160,11 +160,23 @@ if (url != null) {
         <br />
         <div class="tabs">
             <ul>
-                <li id="wiki_tab" class="current"><span><a href="javascript:mcTabs.displayTab('wiki_tab','wiki_panel');" onmousedown="return false;">{$lang_link_wiki_tab}</a></span></li>
-                <li id="attachments_tab"><span><a href="javascript:mcTabs.displayTab('attachments_tab','attachments_panel');" onmousedown="return false;">{$lang_link_attachments_tab}</a></span></li>
-                <li id="web_tab"><span><a href="javascript:mcTabs.displayTab('web_tab','web_panel');" onmousedown="return false;">{$lang_link_web_tab}</a></span></li>
-                <li id="file_tab"><span><a href="javascript:mcTabs.displayTab('file_tab','file_panel');" onmousedown="return false;">{$lang_link_file_tab}</a></span></li>
-                <li id="email_tab"><span><a href="javascript:mcTabs.displayTab('email_tab','email_panel');" onmousedown="return false;">{$lang_link_email_tab}</a></span></li>
+                <script type="text/javascript">
+                    if (linkPopupHasTab("wiki_tab")) {
+                        document.writeln("<li id=\"wiki_tab\" class=\"current\"><span><a href=\"javascript:mcTabs.displayTab('wiki_tab','wiki_panel');\" onmousedown=\"return false;\">{$lang_link_wiki_tab}</a></span></li>")
+                    }
+                    if (linkPopupHasTab("web_tab")) {
+                        document.writeln("<li id=\"web_tab\"><span><a href=\"javascript:mcTabs.displayTab('web_tab','web_panel');\" onmousedown=\"return false;\">{$lang_link_web_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("attachments_tab")) {
+                        document.writeln("<li id=\"attachments_tab\" ><span><a href=\"javascript:mcTabs.displayTab('attachments_tab','attachments_panel');\" onmousedown=\"return false;\">{$lang_link_attachments_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("file_tab")) {
+                        document.writeln("<li id=\"file_tab\"><span><a href=\"javascript:mcTabs.displayTab('file_tab','file_panel');\" onmousedown=\"return false;\">{$lang_link_file_tab}</a></span></li>");
+                    }
+                    if (linkPopupHasTab("email_tab")) {
+                        document.writeln("<li id=\"email_tab\"><span><a href=\"javascript:mcTabs.displayTab('email_tab','email_panel');\" onmousedown=\"return false;\">{$lang_link_email_tab}</a></span></li>");
+                    }
+                </script>
             </ul>
         </div>
         <div class="panel_wrapper" style="border: 1px solid #d3e3f5;" >

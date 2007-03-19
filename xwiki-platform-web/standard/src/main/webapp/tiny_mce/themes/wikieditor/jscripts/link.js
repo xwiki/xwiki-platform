@@ -11,19 +11,29 @@ function init() {
 
     if ((href != null) && (href != "")) {
 	    if (href.search(/(https?|ftp):\/\/[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]/gi)>-1) {
-           mcTabs.displayTab('web_tab','web_panel');
-           document.forms[0].web_page.value = href;
-           document.forms[0].web_target.value = target;
+            if (linkPopupHasTab("web_tab")) {
+                mcTabs.displayTab('web_tab','web_panel');
+                document.forms[0].web_page.value = href;
+                document.forms[0].web_target.value = target;
+            }
         } else if (href.search(/wikiattachment:-:(.*?)/gi) > -1) {
-            mcTabs.displayTab('attachments_tab','attachments_panel');
-            document.forms[0].attach_file.value = href.replace(/wikiattachment:-:/gi, "").replace(/%20/gi, " ");
+            if (linkPopupHasTab("attachments_tab")) {
+                mcTabs.displayTab('attachments_tab','attachments_panel');
+                document.forms[0].attach_file.value = href.replace(/wikiattachment:-:/gi, "").replace(/%20/gi, " ");
+            }
         } else if (href.search(/mailto:(.*?)/gi) > -1) {
-            mcTabs.displayTab('email_tab','email_panel')
-            document.forms[0].email.value = href.replace(/mailto:/gi, "");
+            if (linkPopupHasTab("email_tab")) {
+                mcTabs.displayTab('email_tab','email_panel')
+                document.forms[0].email.value = href.replace(/mailto:/gi, "");
+            }
         } else if (href.search(/file:(\/\/\/\/\/)(.*?)/gi) > -1) {
-            mcTabs.displayTab('file_tab','file_panel');
+            if (linkPopupHasTab("file_tab")) {
+                mcTabs.displayTab('file_tab','file_panel');
+            }
         } else if (href.search(/file:(\/\/)(.*?)/gi) > -1) {
-            mcTabs.displayTab('file_tab','file_panel');
+            if (linkPopupHasTab("file_tab")) {
+                mcTabs.displayTab('file_tab','file_panel');
+            }
         } else {
             mcTabs.displayTab('wiki_tab','wiki_panel');
             var space = "", whref = href;
@@ -117,5 +127,25 @@ function updateAttachName(form) {
         form.filename.value = fname;
 
     return true;
+}
+
+function linkPopupHasTab(str) {
+    var linktabparam = tinyMCE.getParam("use_linkeditor_tabs");
+    if (linktabparam == null || linktabparam == "") {
+        linktabparam = "wiki_tab";
+    }
+    var linktabs = linktabparam.split(",");
+
+    var hasTab = false;
+    for (var i=0; i < linktabs.length; i++) {
+        var re = /(\S+(\s+\S+)*)+/i;
+        var r = re.exec(linktabs[i]);
+        var tab = (r && r[1])?r[1]:"";
+        if (tab == str) {
+            hasTab = true;
+        }
+    }
+    if (str == "wiki_tab") return true;
+    return hasTab;
 }
 

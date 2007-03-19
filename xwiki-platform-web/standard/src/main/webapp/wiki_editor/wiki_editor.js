@@ -70,8 +70,11 @@ WikiEditor.prototype.init = function(params) {
 									+"|value|wikieditorlistdepth|wikieditorlisttype]";
 	params["relative_urls"] = true;
     params["remove_linebreaks"] = false;
-	
-	this.setImagePath((params["wiki_images_path"] == null) ? "" : params["wiki_images_path"]);
+
+    params["use_linkeditor_tabs"] = "wiki_tab, web_tab, attachments_tab, email_tab, file_tab";
+    // if don't have this param then it's always default by wiki_tab
+
+    this.setImagePath((params["wiki_images_path"] == null) ? "" : params["wiki_images_path"]);
 	
 	if(params["wiki_theme"] && params["wiki_theme"] != "") {
 		this._theme = params["wiki_theme"];
@@ -458,6 +461,5 @@ WikiEditor.prototype.__removeHtmlTags = function(str) {
 	var remove_html_tags_regexp = /<[^>]*>/g;
 	return str.replace(remove_html_tags_regexp, "");
 }
-
 <!-- Initilization global variable and include core editor -->
 wikiEditor = new WikiEditor();

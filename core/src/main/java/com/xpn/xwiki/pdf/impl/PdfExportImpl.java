@@ -24,26 +24,42 @@ package com.xpn.xwiki.pdf.impl;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.util.Util;
 import org.apache.avalon.framework.logger.ConsoleLogger;
 import org.apache.avalon.framework.logger.Logger;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.fop.apps.Driver;
-import org.w3c.dom.Document;
+import org.apache.fop.apps.*;
 import org.w3c.tidy.Configuration;
 import org.w3c.tidy.Tidy;
+import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.dom4j.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.Properties;
+
+import info.informatica.doc.dom4j.XHTMLDocumentFactory;
+import info.informatica.doc.dom4j.XHTMLDocument;
+import info.informatica.doc.dom4j.CSSStylableElement;
+import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
 
 public class PdfExportImpl implements PdfExport {
     private Tidy tidy;
@@ -69,13 +85,25 @@ public class PdfExportImpl implements PdfExport {
         return xhtmlxsl;
     }
 
+    public String getXhtmlxsl(XWikiContext context) throws XWikiException {
+        String xsl = getPDFTemplateField("xhtmlxsl", context);
+        if ((xsl==null)||("".equals(xsl.trim())))
+         return xhtmlxsl;
+        else
+         return xsl;
+    }
+
     public void setXhtmlxsl(String xhtmlxsl) {
         this.xhtmlxsl = xhtmlxsl;
     }
 
-    public void exportXHtml(byte[] xhtml, OutputStream out, int type) throws XWikiException {
+    public void exportXHtml(byte[] xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException {
         // XSL Transformation to XML-FO
-        byte[] xmlfo = convertXHtmlToXMLFO(xhtml);
+        byte[] xmlfo = convertXHtmlToXMLFO(xhtml, context);
+
+        // DEBUG OUTPUT
+        System.out.println(new String(xmlfo));
+
         exportXMLFO(xmlfo, out, type);
     }
 
@@ -85,16 +113,51 @@ public class PdfExportImpl implements PdfExport {
         try {
             Logger logger = new ConsoleLogger(ConsoleLogger.LEVEL_DEBUG);
 
-            // Reset the image cache otherwise it could be a security issue
-            org.apache.fop.image.FopImageFactory.resetCache();
+            FopFactory fopFactory = FopFactory.newInstance();
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+            // configure foUserAgent as desired
 
-            InputSource source = new InputSource(new ByteArrayInputStream(xmlfo));
+            // Construct fop with desired output format
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
+
+            // Setup JAXP using identity transformer
+            TransformerFactory factory = TransformerFactory.newInstance();
+            Transformer transformer = factory.newTransformer(); // identity transformer
+
+            // Setup input stream
+            Source source = new StreamSource(new ByteArrayInputStream(xmlfo));
+
+            // Resulting SAX events (the generated FO) must be piped through to FOP
+            Result res = new SAXResult(fop.getDefaultHandler());
+
+            // Start XSLT transformation and FOP processing
+            transformer.transform(source, res);
+
+            // Result processing
+            FormattingResults foResults = fop.getResults();
+            java.util.List pageSequences = foResults.getPageSequences();
+            for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
+                PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
+                System.out.println("PageSequence "
+                        + (String.valueOf(pageSequenceResults.getID()).length() > 0
+                                ? pageSequenceResults.getID() : "<no id>")
+                        + " generated " + pageSequenceResults.getPageCount() + " pages.");
+            }
+            System.out.println("Generated " + foResults.getPageCount() + " pages in total.");
+
+            /*
+            // Reset the image cache otherwise it could be a security issue
+            // This should not be necessary anymore in 0.93
+            // org.apache.fop.image.ImageFactory.clearCaches();
+
             Driver driver = new Driver(source, out);
 
             driver.setRenderer(Driver.RENDER_PDF);
             driver.setLogger(logger);
             driver.setErrorDump(true);
             driver.run();
+            */
+
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT,
                     XWikiException.ERROR_XWIKI_EXPORT_PDF_FOP_FAILED,
@@ -103,8 +166,8 @@ public class PdfExportImpl implements PdfExport {
 
     }
 
-    public void exportHtml(String html, OutputStream out, int type) throws XWikiException {
-        exportXHtml(convertToStrictXHtml(html.getBytes()), out, type);
+    public void exportHtml(String html, OutputStream out, int type, XWikiContext context) throws XWikiException {
+        exportXHtml(applyCSS(convertToStrictXHtml(html.getBytes(), context), context), out, type, context);
     }
 
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException {
@@ -118,7 +181,7 @@ public class PdfExportImpl implements PdfExport {
             tempdir.mkdirs();
             context.put("pdfexportdir", tempdir);
             String content = context.getWiki().parseTemplate("pdf.vm", context);
-            exportHtml(content, out, type);
+            exportHtml(content, out, type, context);
         } finally {
             File[] filelist = tempdir.listFiles();
             for (int i=0;i<filelist.length;i++)
@@ -127,9 +190,9 @@ public class PdfExportImpl implements PdfExport {
         }
     }
 
-    public byte[] convertToStrictXHtml(byte[] input) {
+    public byte[] convertToStrictXHtml(byte[] input, XWikiContext context) {
 
-        System.out.println(new String(input));
+        // System.out.println(new String(input));
 
         try {
             InputStream in = new ByteArrayInputStream(input);
@@ -142,9 +205,9 @@ public class PdfExportImpl implements PdfExport {
         }
     }
 
-    public byte[] convertXHtmlToXMLFO(byte[] xhtml) throws XWikiException {
-        byte[] xmlfo = applyXsl(xhtml, getXhtmlxsl());
-        return applyXsl(xmlfo, getFopxsl());
+    public byte[] convertXHtmlToXMLFO(byte[] xhtml, XWikiContext context) throws XWikiException {
+        byte[] xmlfo = applyXsl(xhtml, getXhtmlxsl(context));
+        return applyXsl(xmlfo, getFopxsl(context));
     }
 
     public byte[] applyXsl(byte[] xml, String xslfile) throws XWikiException {
@@ -173,8 +236,96 @@ public class PdfExportImpl implements PdfExport {
         return transout.toByteArray();
     }
 
+    public byte[] applyCSS(byte[] html, XWikiContext context) throws XWikiException {
+        String css = ((context==null)||(context.getWiki()==null)) ? "" : context.getWiki().parseTemplate("pdf.css", context);
+        String style = getPDFTemplateField("style", context);
+        if (style!=null)
+         css += style;
+        return applyCSS(html, css, context);
+    }
+
+    public String getPDFTemplateField(String fieldname, XWikiContext context) throws XWikiException {
+        String fieldcontent = null;
+        XWikiDocument doc = getPDFTemplateDocument(context);
+        if (doc!=null) {
+            BaseObject bobj = doc.getObject("XWiki.PDFClass");
+            if (bobj!=null) {
+                fieldcontent = doc.display(fieldname, "view", bobj, context);
+            }
+        }
+        return fieldcontent;
+    }
+
+    public XWikiDocument getPDFTemplateDocument(XWikiContext context) throws XWikiException {
+        XWikiDocument doc = null;
+        XWikiRequest request = context.getRequest();
+        if (request!=null) {
+            String pdftemplate = request.get("pdftemplate");
+            if (pdftemplate!=null) {
+                doc = context.getWiki().getDocument(pdftemplate, context);
+            }
+        }
+        if (doc==null)
+            doc = context.getDoc();
+        return doc;
+    }
+
+    public byte[] applyCSS(byte[] html, String css, XWikiContext context) {
+        try {
+            Reader re = new StringReader(new String(html));
+            InputSource source = new InputSource(re);
+            SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
+            reader.setEntityResolver(new DefaultEntityResolver());
+            XHTMLDocument document = (XHTMLDocument) reader.read(source);
+
+            // Apply the style sheet
+            document.setDefaultStyleSheet(new DOMCSSStyleSheet(null, null));
+            document.getStyleSheet();
+            document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
+            applyInlineStyle(document.getRootElement());
+            OutputFormat outputFormat = new OutputFormat("", true);
+            if ((context == null) || (context.getWiki() == null)) {
+                outputFormat.setEncoding("UTF-8");
+            } else {
+                outputFormat.setEncoding(context.getWiki().getEncoding());
+            }
+            StringWriter out = new StringWriter();
+            XMLWriter writer = new XMLWriter(out, outputFormat);
+            writer.write(document);
+            String result = out.toString();
+            // DEBUG OUTPUT
+            System.out.println(result);
+            return result.getBytes();
+        } catch (Exception e ) {
+            e.printStackTrace();
+            return html;
+        }
+    }
+
+    private void applyInlineStyle(Element element) {
+        for (int i=0;i<element.nodeCount();i++) {
+            org.dom4j.Node node = element.node(i);
+            if (node instanceof CSSStylableElement) {
+                CSSStylableElement styleElement = (CSSStylableElement) node;
+                if (styleElement.getComputedStyle()!=null)
+                 styleElement.setAttributeValue("style", styleElement.getComputedStyle().getCssText());
+            }
+            if (node instanceof Element) {
+                applyInlineStyle((Element) node);
+            }      
+        }
+    }
+
     public String getFopxsl() {
         return fopxsl;
+    }
+
+    public String getFopxsl(XWikiContext context) throws XWikiException {
+        String xsl = getPDFTemplateField("fopxsl", context);
+        if ((xsl==null)||("".equals(xsl.trim())))
+         return fopxsl;
+        else
+         return xsl;
     }
 
     public void setFopxsl(String fopxsl) {
@@ -187,20 +338,21 @@ public class PdfExportImpl implements PdfExport {
         String outputfile;
         String content;
         PdfExportImpl pdf = new PdfExportImpl();
+        XWikiContext context = new XWikiContext();
 
         if (param.equals("-html2xhtml")) {
             // HTML TO XHTML
             inputfile = argv[1];
             outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
-            byte[] xhtml = pdf.convertToStrictXHtml(content.getBytes());
+            byte[] xhtml = pdf.convertToStrictXHtml(content.getBytes(), context);
             saveFile(outputfile, xhtml);
         } else if (param.equals("-html2xmlfo")) {
             inputfile = argv[1];
             outputfile = argv[2];
             content = Util.getFileContent(new File(inputfile));
             // XHTML TO XMLFO
-            byte[] xhtml = pdf.convertXHtmlToXMLFO(pdf.convertToStrictXHtml(content.getBytes()));
+            byte[] xhtml = pdf.convertXHtmlToXMLFO(pdf.convertToStrictXHtml(content.getBytes(), context), context);
             saveFile(outputfile, xhtml);
         } else if (param.equals("-xmlfo2pdf")) {
             inputfile = argv[1];
@@ -216,7 +368,7 @@ public class PdfExportImpl implements PdfExport {
             content = Util.getFileContent(new File(inputfile));
             // PDF
             FileOutputStream fos = new FileOutputStream(new File(outputfile));
-            pdf.exportHtml(content, fos,PdfExportImpl.PDF);
+            pdf.exportHtml(content, fos,PdfExportImpl.PDF, context);
             fos.close();
         } else {
             inputfile = param;
@@ -224,7 +376,7 @@ public class PdfExportImpl implements PdfExport {
             content = Util.getFileContent(new File(inputfile));
             // PDF
                 FileOutputStream fos = new FileOutputStream(new File(outputfile));
-            pdf.exportHtml(content, fos,PdfExportImpl.PDF);
+            pdf.exportHtml(content, fos,PdfExportImpl.PDF, context);
             fos.close();
         }
     }

@@ -77,7 +77,13 @@ section rather than just the recursive call-template.
         </xsl:variable>
         <xsl:element name="{name(.)}">
             <xsl:attribute name="border">
-                <xsl:text>1px solid black</xsl:text>
+                <xsl:value-of select="@border"/>
+            </xsl:attribute>
+            <xsl:attribute name="border-style">
+                <xsl:value-of select="@border-style"/>
+            </xsl:attribute>
+            <xsl:attribute name="border-color">
+                <xsl:value-of select="@border-color"/>
             </xsl:attribute>
             <xsl:call-template name="recur">
             <xsl:with-param name="max" select="$maxcols"/>

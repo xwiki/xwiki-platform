@@ -29,10 +29,10 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import java.io.OutputStream;
 
 public interface PdfExport {
-    public void exportXHtml(byte[] xhtml, OutputStream out, int type) throws XWikiException;
-    public void exportHtml(String xhtml, OutputStream out, int type) throws XWikiException;
+    public void exportXHtml(byte[] xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
+    public void exportHtml(String xhtml, OutputStream out, int type, XWikiContext context) throws XWikiException;
     public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException;
     public void exportToPDF(XWikiDocument doc, OutputStream out, XWikiContext context) throws XWikiException;
-    public byte[] convertToStrictXHtml(byte[] input);
-    public byte[] convertXHtmlToXMLFO(byte[] input) throws XWikiException;
+    public byte[] convertToStrictXHtml(byte[] input, XWikiContext context);
+    public byte[] convertXHtmlToXMLFO(byte[] input, XWikiContext context) throws XWikiException;
 }

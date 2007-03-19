@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:fo="http://www.w3.org/1999/XSL/Format"
-    xmlns:html="http://www.w3.org/1999/xhtml">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:fo="http://www.w3.org/1999/XSL/Format"
+                xmlns:html="http://www.w3.org/1999/xhtml">
 
     <xsl:output method="xml"
-        version="1.0"
-        encoding="iso-8859-1"
-        indent="no"/>
+                version="1.0"
+                encoding="iso-8859-1"
+                indent="no"/>
 
     <!--======================================================================
     Parameters
@@ -294,7 +294,7 @@
     <xsl:attribute-set name="table">
         <xsl:attribute name="border-collapse">separate</xsl:attribute>
         <xsl:attribute name="border-spacing">2px</xsl:attribute>
-        <xsl:attribute name="border">1px</xsl:attribute>
+        <xsl:attribute name="border">0px</xsl:attribute>
         <!--
         <xsl:attribute name="border-style">outset</xsl:attribute>
     -->
@@ -323,7 +323,7 @@
         <xsl:attribute name="font-size">90%</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
         <xsl:attribute name="text-align">left</xsl:attribute>
-        <xsl:attribute name="border">1px solid black</xsl:attribute>
+        <xsl:attribute name="border">0px solid black</xsl:attribute>
         <xsl:attribute name="background-color">lightgrey</xsl:attribute>
         <!--
         <xsl:attribute name="border-style">inset</xsl:attribute>
@@ -333,7 +333,7 @@
 
     <xsl:attribute-set name="td">
         <xsl:attribute name="font-size">90%</xsl:attribute>
-        <xsl:attribute name="border">1px solid b</xsl:attribute>
+        <xsl:attribute name="border">0px solid b</xsl:attribute>
         <!--
         <xsl:attribute name="border-style">inset</xsl:attribute>
     -->
@@ -475,45 +475,45 @@
     <xsl:template name="make-layout-master-set">
         <fo:layout-master-set>
             <fo:simple-page-master master-name="all-pages"
-                xsl:use-attribute-sets="page">
+                                   xsl:use-attribute-sets="page">
                 <fo:region-body margin-top="{$page-margin-top}"
-                    margin-right="{$page-margin-right}"
-                    margin-bottom="{$page-margin-bottom}"
-                    margin-left="{$page-margin-left}"
-                    column-count="{$column-count}"
-                    column-gap="{$column-gap}"/>
+                                margin-right="{$page-margin-right}"
+                                margin-bottom="{$page-margin-bottom}"
+                                margin-left="{$page-margin-left}"
+                                column-count="{$column-count}"
+                                column-gap="{$column-gap}"/>
                 <xsl:choose>
                     <xsl:when test="$writing-mode = 'tb-rl'">
                         <fo:region-before extent="{$page-margin-right}"
-                            precedence="true"/>
+                                          precedence="true"/>
                         <fo:region-after  extent="{$page-margin-left}"
-                            precedence="true"/>
+                                          precedence="true"/>
                         <fo:region-start  region-name="page-header"
-                            extent="{$page-margin-top}"
-                            writing-mode="lr-tb"
-                            display-align="before"/>
+                                          extent="{$page-margin-top}"
+                                          writing-mode="lr-tb"
+                                          display-align="before"/>
                         <fo:region-end    region-name="page-footer"
-                            extent="{$page-margin-bottom}"
-                            writing-mode="lr-tb"
-                            display-align="after"/>
+                                          extent="{$page-margin-bottom}"
+                                          writing-mode="lr-tb"
+                                          display-align="after"/>
                     </xsl:when>
                     <xsl:when test="$writing-mode = 'rl-tb'">
                         <fo:region-before region-name="page-header"
-                            extent="{$page-margin-top}"
-                            display-align="before"/>
+                                          extent="{$page-margin-top}"
+                                          display-align="before"/>
                         <fo:region-after  region-name="page-footer"
-                            extent="{$page-margin-bottom}"
-                            display-align="after"/>
+                                          extent="{$page-margin-bottom}"
+                                          display-align="after"/>
                         <fo:region-start  extent="{$page-margin-right}"/>
                         <fo:region-end    extent="{$page-margin-left}"/>
                     </xsl:when>
                     <xsl:otherwise><!-- $writing-mode = 'lr-tb' -->
                         <fo:region-before region-name="page-header"
-                            extent="{$page-margin-top}"
-                            display-align="before"/>
+                                          extent="{$page-margin-top}"
+                                          display-align="before"/>
                         <fo:region-after  region-name="page-footer"
-                            extent="{$page-margin-bottom}"
-                            display-align="after"/>
+                                          extent="{$page-margin-bottom}"
+                                          display-align="after"/>
                         <fo:region-start  extent="{$page-margin-left}"/>
                         <fo:region-end    extent="{$page-margin-bottom}"/>
                     </xsl:otherwise>
@@ -531,8 +531,8 @@
             </fo:title>
             <fo:static-content flow-name="page-header">
                 <fo:block space-before.conditionality="retain"
-                    space-before="{$page-header-margin}"
-                    xsl:use-attribute-sets="page-header">
+                          space-before="{$page-header-margin}"
+                          xsl:use-attribute-sets="page-header">
                     <xsl:if test="$title-print-in-header = 'true'">
                         <xsl:value-of select="/html:html/html:head/html:title"/>
                     </xsl:if>
@@ -540,8 +540,8 @@
             </fo:static-content>
             <fo:static-content flow-name="page-footer">
                 <fo:block space-after.conditionality="retain"
-                    space-after="{$page-footer-margin}"
-                    xsl:use-attribute-sets="page-footer">
+                          space-after="{$page-footer-margin}"
+                          xsl:use-attribute-sets="page-footer">
                     <xsl:if test="$page-number-print-in-footer = 'true'">
                         <xsl:text>- </xsl:text>
                         <fo:page-number/>
@@ -635,10 +635,10 @@
         <!-- e.g., style="text-align: center; color: red"
         converted to text-align="center" color="red" -->
         <xsl:variable name="name"
-            select="normalize-space(substring-before($style, ':'))"/>
+                      select="normalize-space(substring-before($style, ':'))"/>
         <xsl:if test="$name">
             <xsl:variable name="value-and-rest"
-                select="normalize-space(substring-after($style, ':'))"/>
+                          select="normalize-space(substring-after($style, ':'))"/>
             <xsl:variable name="value">
                 <xsl:choose>
                     <xsl:when test="contains($value-and-rest, ';')">
@@ -678,6 +678,8 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:when>
+                <xsl:when test="$name = 'list-style'">
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="{$name}">
                         <xsl:value-of select="$value"/>
@@ -686,7 +688,7 @@
             </xsl:choose>
         </xsl:if>
         <xsl:variable name="rest"
-            select="normalize-space(substring-after($style, ';'))"/>
+                      select="normalize-space(substring-after($style, ';'))"/>
         <xsl:if test="$rest">
             <xsl:call-template name="process-style">
                 <xsl:with-param name="style" select="$rest"/>
@@ -699,7 +701,7 @@
     Block-level
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:h3[@class='heading-1']">
+    <xsl:template match="html:h2[@class='heading-1']">
         <fo:block xsl:use-attribute-sets="h1">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -711,25 +713,31 @@
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3[@class='heading-1-1-1']">
+    <xsl:template match="html:h4[@class='heading-1-1-1']">
         <fo:block xsl:use-attribute-sets="h3">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
-    
-    <xsl:template match="html:h3[@class='heading-1-1-1-1']">
+
+    <xsl:template match="html:h5[@class='heading-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h4">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3[@class='heading-1-1-1-1-1']">
+    <xsl:template match="html:h6[@class='heading-1-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h5">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3[@class='heading-1-1-1-1-1-1']">
+    <xsl:template match="html:h6[@class='heading-1-1-1-1-1-1']">
+        <fo:block xsl:use-attribute-sets="h6">
+            <xsl:call-template name="process-common-attributes-and-children"/>
+        </fo:block>
+    </xsl:template>
+
+    <xsl:template match="html:h6[@class='heading-1-1-1-1-1-1-1']">
         <fo:block xsl:use-attribute-sets="h6">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
@@ -852,7 +860,7 @@
             <xsl:when test="@dir">true</xsl:when>
             <xsl:when test="@style">
                 <xsl:variable name="s"
-                    select="concat(';', translate(normalize-space(@style),
+                              select="concat(';', translate(normalize-space(@style),
                     ' ', ''))"/>
                 <xsl:choose>
                     <xsl:when test="contains($s, ';width:') or
@@ -916,26 +924,28 @@
     <xsl:template name="process-ul-li">
         <xsl:call-template name="process-common-attributes"/>
         <fo:list-item-label end-indent="label-end()"
-            text-align="end" wrap-option="no-wrap">
+                            text-align="end" wrap-option="no-wrap">
             <fo:block>
-                <xsl:variable name="depth" select="count(ancestor::html:ul)" />
-                <xsl:choose>
-                    <xsl:when test="$depth = 1">
-                        <fo:inline xsl:use-attribute-sets="ul-label-1">
-                            <xsl:value-of select="$ul-label-1"/>
-                        </fo:inline>
-                    </xsl:when>
-                    <xsl:when test="$depth = 2">
-                        <fo:inline xsl:use-attribute-sets="ul-label-2">
-                            <xsl:value-of select="$ul-label-2"/>
-                        </fo:inline>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <fo:inline xsl:use-attribute-sets="ul-label-3">
-                            <xsl:value-of select="$ul-label-3"/>
-                        </fo:inline>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <xsl:if test="not(@style='list-style: none; ')">
+                    <xsl:variable name="depth" select="count(ancestor::html:ul)" />
+                    <xsl:choose>
+                        <xsl:when test="$depth = 1">
+                            <fo:inline xsl:use-attribute-sets="ul-label-1">
+                                <xsl:value-of select="$ul-label-1"/>
+                            </fo:inline>
+                        </xsl:when>
+                        <xsl:when test="$depth = 2">
+                            <fo:inline xsl:use-attribute-sets="ul-label-2">
+                                <xsl:value-of select="$ul-label-2"/>
+                            </fo:inline>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <fo:inline xsl:use-attribute-sets="ul-label-3">
+                                <xsl:value-of select="$ul-label-3"/>
+                            </fo:inline>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:if>
             </fo:block>
         </fo:list-item-label>
         <fo:list-item-body start-indent="body-start()">
@@ -954,26 +964,28 @@
     <xsl:template name="process-ol-li">
         <xsl:call-template name="process-common-attributes"/>
         <fo:list-item-label end-indent="label-end()"
-            text-align="end" wrap-option="no-wrap">
+                            text-align="end" wrap-option="no-wrap">
             <fo:block>
-                <xsl:variable name="depth" select="count(ancestor::html:ol)" />
-                <xsl:choose>
-                    <xsl:when test="$depth = 1">
-                        <fo:inline xsl:use-attribute-sets="ol-label-1">
-                            <xsl:number format="{$ol-label-1}"/>
-                        </fo:inline>
-                    </xsl:when>
-                    <xsl:when test="$depth = 2">
-                        <fo:inline xsl:use-attribute-sets="ol-label-2">
-                            <xsl:number format="{$ol-label-2}"/>
-                        </fo:inline>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <fo:inline xsl:use-attribute-sets="ol-label-3">
-                            <xsl:number format="{$ol-label-3}"/>
-                        </fo:inline>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <xsl:if test="not(@style='list-style: none; ')">
+                    <xsl:variable name="depth" select="count(ancestor::html:ol)" />
+                    <xsl:choose>
+                        <xsl:when test="$depth = 1">
+                            <fo:inline xsl:use-attribute-sets="ol-label-1">
+                                <xsl:number format="{$ol-label-1}"/>
+                            </fo:inline>
+                        </xsl:when>
+                        <xsl:when test="$depth = 2">
+                            <fo:inline xsl:use-attribute-sets="ol-label-2">
+                                <xsl:number format="{$ol-label-2}"/>
+                            </fo:inline>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <fo:inline xsl:use-attribute-sets="ol-label-3">
+                                <xsl:number format="{$ol-label-3}"/>
+                            </fo:inline>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:if>
             </fo:block>
         </fo:list-item-label>
         <fo:list-item-body start-indent="body-start()">
@@ -1024,6 +1036,11 @@
     </xsl:template>
 
     <xsl:template name="process-table">
+        <xsl:if test="@style">
+            <xsl:call-template name="process-table-style">
+                <xsl:with-param name="style" select="@style"/>
+            </xsl:call-template>
+        </xsl:if>
         <xsl:if test="@width">
             <xsl:attribute name="inline-progression-dimension">
                 <xsl:choose>
@@ -1101,6 +1118,55 @@
         </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="process-table-style">
+        <xsl:param name="style"/>
+        <!-- e.g., style="text-align: center; color: red"
+    converted to text-align="center" color="red" -->
+        <xsl:variable name="name"
+                      select="normalize-space(substring-before($style, ':'))"/>
+        <xsl:if test="$name">
+            <xsl:variable name="value-and-rest"
+                          select="normalize-space(substring-after($style, ':'))"/>
+            <xsl:variable name="value">
+                <xsl:choose>
+                    <xsl:when test="contains($value-and-rest, ';')">
+                        <xsl:value-of select="normalize-space(substring-before(
+                    $value-and-rest, ';'))"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$value-and-rest"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$name = 'border'">
+                    <xsl:attribute name="border">
+                        <xsl:value-of select="$value"/>
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$name = 'border-style'">
+                    <xsl:attribute name="border-style">
+                        <xsl:value-of select="$value"/>
+                    </xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$name = 'border-color'">
+                    <xsl:attribute name="border-color">
+                        <xsl:value-of select="$value"/>
+                    </xsl:attribute>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:if>
+        <xsl:variable name="rest"
+                      select="normalize-space(substring-after($style, ';'))"/>
+        <xsl:if test="$rest">
+            <xsl:call-template name="process-table-style">
+                <xsl:with-param name="style" select="$rest"/>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+
+
+
     <xsl:template match="html:caption">
         <fo:table-caption xsl:use-attribute-sets="table-caption">
             <xsl:call-template name="process-common-attributes"/>
@@ -1130,7 +1196,7 @@
 
     <xsl:template name="process-table-rowgroup">
         <xsl:if test="ancestor::html:table[1]/@rules = 'groups'">
-            <xsl:attribute name="border">1px solid</xsl:attribute>
+            <xsl:attribute name="border">0px solid</xsl:attribute>
         </xsl:if>
         <xsl:call-template name="process-common-attributes-and-children"/>
     </xsl:template>
@@ -1173,7 +1239,7 @@
             <!-- it may override parent colgroup's width -->
         </xsl:call-template>
         <xsl:if test="ancestor::html:table[1]/@rules = 'cols'">
-            <xsl:attribute name="border">1px solid</xsl:attribute>
+            <xsl:attribute name="border">0px solid</xsl:attribute>
         </xsl:if>
         <xsl:call-template name="process-common-attributes"/>
         <!-- this processes also align and valign -->
@@ -1193,7 +1259,7 @@
 
     <xsl:template name="process-table-row">
         <xsl:if test="ancestor::html:table[1]/@rules = 'rows'">
-            <xsl:attribute name="border">1px solid</xsl:attribute>
+            <xsl:attribute name="border">0px solid</xsl:attribute>
         </xsl:if>
         <xsl:call-template name="process-common-attributes-and-children"/>
     </xsl:template>
@@ -1476,12 +1542,12 @@
 
     <xsl:template match="html:span[@style and contains(@style, 'writing-mode')]">
         <fo:inline-container alignment-baseline="central"
-            text-indent="0pt"
-            last-line-end-indent="0pt"
-            start-indent="0pt"
-            end-indent="0pt"
-            text-align="center"
-            text-align-last="center">
+                             text-indent="0pt"
+                             last-line-end-indent="0pt"
+                             start-indent="0pt"
+                             end-indent="0pt"
+                             text-align="center"
+                             text-align-last="center">
             <xsl:call-template name="process-common-attributes"/>
             <fo:block wrap-option="no-wrap" line-height="1">
                 <xsl:apply-templates/>
@@ -1568,11 +1634,17 @@
             </xsl:attribute>
         </xsl:if>
         <xsl:if test="@width">
+            <xsl:variable name="width">
+              <xsl:value-of select="@width"/>
+            </xsl:variable>
             <xsl:choose>
                 <xsl:when test="contains(@width, '%')">
                     <xsl:attribute name="width">
                         <xsl:value-of select="@width"/>
                     </xsl:attribute>
+                    <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$width &gt; '450'">
                     <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
@@ -1582,11 +1654,17 @@
             </xsl:choose>
         </xsl:if>
         <xsl:if test="@height">
+            <xsl:variable name="width">
+              <xsl:value-of select="@width"/>
+            </xsl:variable>
             <xsl:choose>
                 <xsl:when test="contains(@height, '%')">
                     <xsl:attribute name="height">
                         <xsl:value-of select="@height"/>
                     </xsl:attribute>
+                    <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$width &gt; '450'">
                     <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
@@ -1664,21 +1742,21 @@
 
     <xsl:template match="html:ruby">
         <fo:inline-container alignment-baseline="central"
-            block-progression-dimension="1em"
-            text-indent="0pt"
-            last-line-end-indent="0pt"
-            start-indent="0pt"
-            end-indent="0pt"
-            text-align="center"
-            text-align-last="center">
+                             block-progression-dimension="1em"
+                             text-indent="0pt"
+                             last-line-end-indent="0pt"
+                             start-indent="0pt"
+                             end-indent="0pt"
+                             text-align="center"
+                             text-align-last="center">
             <xsl:call-template name="process-common-attributes"/>
             <fo:block font-size="50%"
-                wrap-option="no-wrap"
-                line-height="1"
-                space-before.conditionality="retain"
-                space-before="-1.1em"
-                space-after="0.1em"
-                role="html:rt">
+                      wrap-option="no-wrap"
+                      line-height="1"
+                      space-before.conditionality="retain"
+                      space-before="-1.1em"
+                      space-after="0.1em"
+                      role="html:rt">
                 <xsl:for-each select="html:rt | html:rtc[1]/html:rt">
                     <xsl:call-template name="process-common-attributes"/>
                     <xsl:apply-templates/>
@@ -1692,12 +1770,12 @@
             </fo:block>
             <xsl:if test="html:rtc[2]/html:rt">
                 <fo:block font-size="50%"
-                    wrap-option="no-wrap"
-                    line-height="1"
-                    space-before="0.1em"
-                    space-after.conditionality="retain"
-                    space-after="-1.1em"
-                    role="html:rt">
+                          wrap-option="no-wrap"
+                          line-height="1"
+                          space-before="0.1em"
+                          space-after.conditionality="retain"
+                          space-after="-1.1em"
+                          role="html:rt">
                     <xsl:for-each select="html:rt | html:rtc[2]/html:rt">
                         <xsl:call-template name="process-common-attributes"/>
                         <xsl:apply-templates/>

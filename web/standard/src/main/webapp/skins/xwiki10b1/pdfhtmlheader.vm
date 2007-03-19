@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>
+$pdfdoc.use("XWiki.PDFClass")
+#set($title = $pdfdoc.display("title", "rendered"))
+#if((!$title)||($title==""))
+#set( $title = $!xwiki.getWebPreference("title"))
+#if ( $title != "")
+$xwiki.parseContent($title)
+#else
+XWiki - $!doc.web - $!doc.displayTitle
+#end
+#else
+$title
+#end
+</title>
+<meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+</head>
+<body id="body" class="${context.action}body">
+<div id="xwikimaincontainer">
+<div id="xwikimaincontainerinner">

@@ -36,7 +36,7 @@ public class PDFExportTest extends HibernateTestCase {
        return "<?xml version=\"1.0\" encoding=\"iso-8859-1\" ?>\n" +
                 "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n" +
                 "    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" +
-                "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">" +
+                "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
                 "<body>\n";
     }
 
@@ -48,7 +48,7 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         pdfexport.setXhtmlxsl("xhtml2fo.xsl");
         String html = getHeader() + "<p>Hello" + getFooter();
-        String xhtml = new String(pdfexport.convertToStrictXHtml(html.getBytes()));
+        String xhtml = new String(pdfexport.convertToStrictXHtml(html.getBytes(), context));
         assertTrue("XHTML Conversion failed", (xhtml.indexOf("</p>")!=-1));
     }
 
@@ -56,7 +56,7 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String html = getHeader() + "<p>Hello</p>" + getFooter();
-        pdfexport.exportHtml(html, out, 0);
+        pdfexport.exportHtml(html, out, 0, context);
         String result = new String(out.toByteArray());
         // assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
     }
@@ -65,7 +65,16 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String html = getHeader() + "<table><tr><td>Hello</td><td>Ah</td></tr><tr><td>Hello</td><td>Ah</td><td>Hi</td></tr></table>" + getFooter();
-        pdfexport.exportHtml(html, out, 0);
+        pdfexport.exportHtml(html, out, 0, context);
+        String result = new String(out.toByteArray());
+        //assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
+    }
+
+    public void testPDFConversionWithList() throws XWikiException {
+        PdfExportImpl pdfexport = new PdfExportImpl();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String html = getHeader() + "<ul class=\"star\"><li>List 1</li><li style=\"list-style: none; \"><ul class=\"star\"><li>List 2</li><li>List 2</li></ul></li><li>List 1</li><li style=\"list-style: none; \"><ul class=\"star\"><li>List 2</li><li>List 2</li></ul></li><li>List 1</li><li style=\"list-style: none; \"><ul class=\"star\"><li>List 2</li><li>List 2</li></ul></li></ul>" + getFooter();                                                                        
+        pdfexport.exportHtml(html, out, 0, context);
         String result = new String(out.toByteArray());
         //assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
     }
@@ -74,7 +83,7 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String html = getHeader() + "<table></table>" + getFooter();
-        pdfexport.exportHtml(html, out, 0);
+        pdfexport.exportHtml(html, out, 0, context);
         String result = new String(out.toByteArray());
         //assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
     }
@@ -83,7 +92,7 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String html = getHeader() + "<table><tr></tr><tr></tr></table>" + getFooter();
-        pdfexport.exportHtml(html, out, 0);
+        pdfexport.exportHtml(html, out, 0, context);
         String result = new String(out.toByteArray());
         //assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
     }
@@ -92,9 +101,19 @@ public class PDFExportTest extends HibernateTestCase {
         PdfExportImpl pdfexport = new PdfExportImpl();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         String html = getHeader() + "<img src=\"toto.gif\" />" + getFooter();
-        pdfexport.exportHtml(html, out, 0);
+        pdfexport.exportHtml(html, out, 0, context);
         String result = new String(out.toByteArray());
         //assertTrue("PDF Conversion failed", (result.indexOf("Hello")!=-1));
+    }
+
+    public void testCSSApplication() throws XWikiException {
+        PdfExportImpl pdfexport = new PdfExportImpl();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String html = getHeader() + "<span class=\"test\">Hello</span>" + getFooter();
+        String css = "span.test { color: red; }";
+        byte[] chtml = pdfexport.applyCSS(html.getBytes(), css, context);
+        String result = new String(chtml);
+        assertTrue("CSS is not applied", result.indexOf("style=\"color: red; \"")!=-1);
     }
 
 }

@@ -182,7 +182,7 @@ public class OSCacheService implements XWikiCacheService, Runnable
         }
         catch (Exception e)
         {
-            log.error("Could not load cache properties " + propertiesFilename, e);
+            log.warn("Could not load cache properties " + propertiesFilename + ": " + e.getMessage());
         }
         finally
         {

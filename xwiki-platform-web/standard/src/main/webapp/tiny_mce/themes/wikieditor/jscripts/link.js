@@ -9,6 +9,23 @@ function init() {
     document.forms[0].email_text.value = text;
     document.forms[0].wiki_page.value = text;
 
+    if (linkPopupHasTab("wiki_tab")) {
+        document.getElementById("wiki_tab").className = "current";
+        document.getElementById("wiki_panel").className = "current";
+    } else if (linkPopupHasTab("web_tab")) {
+        document.getElementById("web_tab").className = "current";
+        document.getElementById("web_panel").className = "current";
+    } else if (linkPopupHasTab("attachments_tab")) {
+        document.getElementById("attachments_tab").className = "current";
+        document.getElementById("attachments_panel").className = "current";
+    } else if (linkPopupHasTab("file_tab")) {
+        document.getElementById("file_tab").className = "current";
+        document.getElementById("file_panel").className = "current";
+    } else if (linkPopupHasTab("email_tab")) {
+        document.getElementById("email_tab").className = "current";
+        document.getElementById("email_panel").className = "current";
+    }
+
     if ((href != null) && (href != "")) {
 	    if (href.search(/(https?|ftp):\/\/[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]/gi)>-1) {
             if (linkPopupHasTab("web_tab")) {
@@ -35,15 +52,17 @@ function init() {
                 mcTabs.displayTab('file_tab','file_panel');
             }
         } else {
-            mcTabs.displayTab('wiki_tab','wiki_panel');
-            var space = "", whref = href;
-            if (href.indexOf(".") > -1) {
-                space = href.substring(0, href.indexOf("."));
-                whref = href.substring(href.indexOf(".") + 1, href.length);
+            if (linkPopupHasTab("wiki_tab")) {
+                mcTabs.displayTab('wiki_tab','wiki_panel');
+                var space = "", whref = href;
+                if (href.indexOf(".") > -1) {
+                    space = href.substring(0, href.indexOf("."));
+                    whref = href.substring(href.indexOf(".") + 1, href.length);
+                }
+                document.forms[0].wiki_space.value = space;
+                document.forms[0].wiki_page.value = whref;
+                document.forms[0].wiki_target.value = target;
             }
-            document.forms[0].wiki_space.value = space;
-            document.forms[0].wiki_page.value = whref;
-            document.forms[0].wiki_target.value = target;
         }
     }
 
@@ -62,24 +81,24 @@ function insertLink() {
     var dummy;
     tinyMCEPopup.restoreSelection();
 
-    if (wikiTabElm.className == "current") {
+    if (wikiTabElm != null && wikiTabElm.className == "current") {
         var href = document.forms[0].wiki_page.value;
         var space = document.forms[0].wiki_space.value;
         var wikitext = document.forms[0].wiki_text.value;
         var target = document.forms[0].wiki_target.value;
         tinyMCE.themes['wikieditor'].insertLink(href, target, wikitext, space, "", dummy, "");
 
-    } else if (webTabElm.className == "current") {
+    } else if (webTabElm != null && webTabElm.className == "current") {
         var webtext = document.forms[0].web_text.value;
         var href = document.forms[0].web_page.value;
         var target = document.forms[0].web_target.value;
         tinyMCE.themes['wikieditor'].insertLink(href, target , webtext, "", "", dummy, "");
 
-    } else if (attachTabElm.className == "current") {
+    } else if (attachTabElm != null && attachTabElm.className == "current") {
         var href = document.forms[0].attach_file.value;
         var text = document.forms[0].attach_text.value;
         tinyMCE.themes['wikieditor'].insertLink("wikiattachment:-:" + href, "", text, "", "", dummy, "");
-    } else if (fileTabElm.className == "current") {
+    } else if (fileTabElm != null && fileTabElm.className == "current") {
         var text = document.forms[0].file_text.value;
         var href = document.forms[0].filepaths.value;
         var filepaths="";
@@ -88,7 +107,7 @@ function insertLink() {
         else if (href.substring(0, 2) == "\\\\")
             filepaths = "file:\/\/\/" + href.replace(/\\/gi, "\/");
         tinyMCE.themes['wikieditor'].insertLink(filepaths, "", text, "", "", dummy, "");
-    } else if (emailTabElm.className == "current") {
+    } else if (emailTabElm != null && emailTabElm.className == "current") {
         var text = document.forms[0].email_text.value;
         var email = document.forms[0].email.value;
         href = "mailto:" + email;
@@ -145,7 +164,6 @@ function linkPopupHasTab(str) {
             hasTab = true;
         }
     }
-    if (str == "wiki_tab") return true;
     return hasTab;
 }
 

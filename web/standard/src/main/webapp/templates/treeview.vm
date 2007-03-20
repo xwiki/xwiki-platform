@@ -50,7 +50,7 @@
                 }
             }
         }
-        document.forms.${formname}["${fieldname}"].value=out.join("|");
+        document.getElementById("${fieldname}").value=out.join("|");
     }
 
     function showTreeState() {

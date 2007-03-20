@@ -62,12 +62,29 @@ public class EditForm extends XWikiForm
         setTitle(request.getParameter("title"));
         setComment(request.getParameter("comment"));
         setDefaultLanguage(request.getParameter("default_language"));
-        setTags(request.getParameter("tags"));
+        setTags(request.getParameterValues("tags"));
         setLockForce("1".equals(request.getParameter("force")));
     }
 
-    public void setTags(String parameter) {
-        this.tags = parameter;
+    public void setTags(String[] parameter) {
+        if (parameter == null) {
+            this.tags = "";
+            return;
+        }
+        StringBuffer tags = new StringBuffer();
+        boolean first = true;
+        for (int i = 0; i < parameter.length; ++i) {
+            if (!parameter[i].equals("")) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    tags.append("|");
+                }
+                tags.append(parameter[i]);
+            }
+        }
+        this.tags = tags.toString();
     }
 
     public String getTags(){

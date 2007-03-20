@@ -594,3 +594,40 @@ $xwiki.formatDate($date, "yyyy-MM-dd")T$xwiki.formatDate($date, "HH:mm:ss")$tz#e
 #end
 $fn
 #end
+
+###
+###
+### Macros for "foot notes"
+###
+### TODO:
+###       Make Radeox macros 
+###       Support in wysiwyg
+###
+###
+#macro(footnote $text)
+#if(!$page_footnotes)
+#set($page_footnotes = $xwiki.arrayList)
+#set($footnote_group_id = 1)
+#end
+#set($discard = $page_footnotes.add($text))
+#set($footnote_id = $page_footnotes.size())
+<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}">
+ <a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get("core.footnotes.gotofootnote", [${footnote_id}]): $text">\[$footnote_id\]</a>
+</sup>
+#end
+
+#macro(putFootnotes)
+#if($page_footnotes && ($page_footnotes.size() > 0))
+<div class="footnotes">
+<ol>
+#foreach($footnote in $page_footnotes)
+<li id="footnote_${footnote_group_id}_${velocityCount}">
+ <a class="footnoteBackRef" title="$msg.get("core.footnotes.backtoref")" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
+  $footnote</li>
+#end
+</ol>
+</div>
+#set($discard = $page_footnotes.clear())
+#set($footnote_group_id = $footnote_group_id + 1)
+#end
+#end

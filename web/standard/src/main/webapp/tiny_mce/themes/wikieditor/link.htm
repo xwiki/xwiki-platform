@@ -162,7 +162,7 @@ if (url != null) {
             <ul>
                 <script type="text/javascript">
                     if (linkPopupHasTab("wiki_tab")) {
-                        document.writeln("<li id=\"wiki_tab\" class=\"current\"><span><a href=\"javascript:mcTabs.displayTab('wiki_tab','wiki_panel');\" onmousedown=\"return false;\">{$lang_link_wiki_tab}</a></span></li>")
+                        document.writeln("<li id=\"wiki_tab\"><span><a href=\"javascript:mcTabs.displayTab('wiki_tab','wiki_panel');\" onmousedown=\"return false;\">{$lang_link_wiki_tab}</a></span></li>")
                     }
                     if (linkPopupHasTab("web_tab")) {
                         document.writeln("<li id=\"web_tab\"><span><a href=\"javascript:mcTabs.displayTab('web_tab','web_panel');\" onmousedown=\"return false;\">{$lang_link_web_tab}</a></span></li>");
@@ -180,7 +180,7 @@ if (url != null) {
             </ul>
         </div>
         <div class="panel_wrapper" style="border: 1px solid #d3e3f5;" >
-            <div id="wiki_panel" class="panel current">
+            <div id="wiki_panel" class="panel">
                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
                         <td align="center" valign="middle">

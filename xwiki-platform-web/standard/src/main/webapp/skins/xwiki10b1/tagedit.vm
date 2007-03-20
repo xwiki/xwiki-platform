@@ -1,10 +1,12 @@
 #if(!$hideTags || $hideTags == 0)
+#set($displayType = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty('displayType').value)
+#set($possibleTags = $tdoc.tagsPossibleValues)
+#if($possibleTags && $possibleTags.size() > 0)
+#if($displayType == 'select')
   <dl id="selectedTagsForm">
    <dt><label for="tags">$msg.get("tags"): </label></dt>
    <dd><input type="text" id="tags" name="tags" value="$!tdoc.tags"/></dd>
   </dl>
-  #set($possibleTags = $tdoc.tagsPossibleValues)
-  #if($possibleTags && $possibleTags.size() > 0)
     <div id="tag_possibilities" style="display:none">
     Available tags for this document
     <ul>
@@ -25,7 +27,7 @@
       for(var i = 0; i < els.length; i++) {
         var node = els[i].getElementsByTagName("a");
 	    if (node[0].innerHTML.toLowerCase() == tagName){
-	      if (!isClassExist(els[i], 'selected'))
+	      if (!eltHasClass(els[i], 'selected'))
 	        addClass(els[i], 'selected');
 	      else
 	        rmClass(els[i], 'selected');
@@ -34,14 +36,20 @@
     }
     function getTags(){
       var els = $('tag_possibilities').getElementsByTagName('ul')[0].getElementsByTagName('li');
-      var tags =  new Array();
+      var tags = "";
+      var first = true;
       for(var i = 0; i < els.length; i++) {
-	      if (isClassExist(els[i], 'selected')) {
-	        var node = els[i].getElementsByTagName("a");
-            tags += node[0].innerHTML;
+        if (eltHasClass(els[i], 'selected')) {
+          if(first){
+            first = false;
+          }
+          else {
             tags += "|";
-           }
-	  }
+          }
+          var node = els[i].getElementsByTagName("a");
+          tags += node[0].innerHTML;
+        }
+      }
       return tags;
     }
     function setTagsToForm(){
@@ -64,8 +72,25 @@
       $('selectedTagsForm').style.display="none";
       readTags();
     }
-    initTagScript();{/pre}
+    initTagScript();
 // ]]>
-    </script>
-  #end
+    {/pre}</script>
+#elseif($displayType == 'input')
+  <dl>
+   <dt><label for="tags">$msg.get("tags"): </label></dt>
+   <dd><input type="text" id="tags" name="tags" value="$!tdoc.tags"/></dd>
+  </dl>
+#else
+#set($existingTags = $xwiki.arrayList)
+#foreach($tag in $!tdoc.tags.split("[|]"))
+#set($discard = $existingTags.add($tag))
+#end
+  <dl id="selectedTagsForm">
+   <dt><label for="tags">$msg.get("tags"): </label></dt>
+#foreach($tag in $possibleTags)
+   <dd><label><input type="checkbox"#if($existingTags.contains($tag)) checked="checked"#end name="tags" value="$!tag"/>$tag</label></dd>
+#end
+  </dl>
+#end
+#end
 #end

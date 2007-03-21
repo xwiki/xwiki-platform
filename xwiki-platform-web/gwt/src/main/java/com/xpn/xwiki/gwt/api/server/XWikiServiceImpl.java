@@ -86,7 +86,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
 
         XWikiContext context = Utils.prepareContext("", request, response, engine);
-        context.setMode(XWikiContext.MODE_GWT_DEBUG);
+        context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
 
         XWiki xwiki = XWiki.getXWiki(context);
@@ -172,6 +172,15 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             return null;
         }
+    }
+
+    public User getUser(){
+        try {
+            return getUser(getXWikiContext().getUser());
+        } catch (XWikiException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
     }
 
     public User getUser(String fullName) {
@@ -666,10 +675,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setLanguage(xdoc.getLanguage());
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
-        doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));
+        doc.setUploadURL(xdoc.getExternalURL("upload",  context));  // "ajax=1"
         doc.setViewURL(xdoc.getExternalURL("view", context));
         try {
-            doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", "ajax=1", context));
+            doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", context)); //, "ajax=1"
         } catch (XWikiException e) {
             e.printStackTrace();
         }

@@ -52,6 +52,8 @@ public interface XWikiService extends RemoteService {
     public Document getUniqueDocument(String space);
 
     public User getUser(String fullName);
+    public User getUser();
+
     public User[] getUserList(int nb, int start);
 
     public boolean updateProperty(String docname, String className, String propertyname, String value);

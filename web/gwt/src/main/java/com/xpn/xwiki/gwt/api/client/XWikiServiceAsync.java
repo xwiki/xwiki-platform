@@ -55,6 +55,8 @@ public interface XWikiServiceAsync {
 
     void getUser(String fullName, AsyncCallback async);
 
+    void getUser(AsyncCallback async);
+
     void getUserList(int nb, int start, AsyncCallback async);
 
     void updateProperty(String docname, String className, String propertyname, String value, AsyncCallback async);

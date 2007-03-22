@@ -138,6 +138,11 @@
 <h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>##<span class="xwikipanelarrow" onclick="alert(5);">&nbsp;</span>
 <div class="xwikipanelcontents">
 #end
+#macro(panelhiddenheader $title)
+<div class="panel expanded">
+<h5 class="xwikipaneltitle hidden" onclick="togglePanelVisibility(this.parentNode);">$title</h5>
+<div class="xwikipanelcontents">
+#end
 #macro(largepanelheader $title)
 <div class="large panel expanded">
 <h5 class="xwikipaneltitle" onclick="togglePanelVisibility(this.parentNode);">$title</h5>##<span class="xwikipanelarrow" onclick="alert(5);">&nbsp;</span>

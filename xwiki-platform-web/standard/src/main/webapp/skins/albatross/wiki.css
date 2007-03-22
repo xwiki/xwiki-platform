@@ -324,32 +324,3 @@ ol.HEBREW { list-style-type: hebrew; }
  font-weight: bold;
  color: gray;
 }
-
-## Footnotes
-sup.footnoteRef a{
-  font-weight: bold;
-  text-decoration: none;
-}
-sup.footnoteRef:target a{
-  background-color: #E5F0FE;
-  color: #C82;
-}
-div.footnotes{
-  font-size: 70%;
-  margin: 10px 0px;
-  border: 1px solid #ddd;
-}
-.footnotes ol{
-  padding-left: 1em;
-}
-.footnotes li{
-  padding: 0px 4px;
-  margin: 0px;
-}
-.footnotes li:target{
-  background-color: #E5F0FE;
-}
-a.footnoteBackRef{
-  text-decoration: none;
-  font-weight: bold;
-}

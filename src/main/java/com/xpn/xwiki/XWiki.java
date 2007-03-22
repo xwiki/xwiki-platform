@@ -1460,7 +1460,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         String defaultbaseskin = Param("xwiki.defaultbaseskin", "");
         if (defaultbaseskin.equals("")) {
-            defaultbaseskin = Param("xwiki.defaultskin", "default");
+            defaultbaseskin = Param("xwiki.defaultskin", "albatross");
         }
         return defaultbaseskin;
     }

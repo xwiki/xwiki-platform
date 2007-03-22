@@ -735,7 +735,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public InputStream getResourceAsStream(String s) throws MalformedURLException
     {
-        return getEngineContext().getResourceAsStream(s);
+        InputStream is = getEngineContext().getResourceAsStream(s);
+        if (is == null) {
+            is = getEngineContext().getResourceAsStream("/" + s);
+        }
+        return is;
     }
 
     public String getResourceContent(String name) throws IOException
@@ -777,8 +781,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         InputStream ris = null;
         if (getEngineContext() != null) {
             try {
-                ris = getResourceAsStream(name);
-                if (ris != null)
+                if (getResourceAsStream(name) != null)
                     return true;
             } catch (IOException e) {
             }
@@ -1301,8 +1304,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             String skin = getSkin(context);
             String result = getSkinFile(filename, skin, forceSkinAction, context);
-            if (result != null)
+            if (result != null) {
                 return result;
+            }
             String baseskin = getBaseSkin(context);
             if (!skin.equals(baseskin)) {
                 result = getSkinFile(filename, baseskin, forceSkinAction, context);

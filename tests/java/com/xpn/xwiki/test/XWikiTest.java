@@ -58,7 +58,7 @@ public class XWikiTest extends HibernateTestCase {
 
     public void testDefaultSkin() throws XWikiException {
         XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
-        assertEquals("Skin should be default", "default", getXWiki().getSkin(getXWikiContext()));
+        assertEquals("Skin should be default", "albatross", getXWiki().getSkin(getXWikiContext()));
     }
 
     public void testAlternSkin() throws XWikiException {

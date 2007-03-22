@@ -3,7 +3,7 @@
 ###
 ### TODO: Web service?
 ###
-<div id="xwikicontent">
+<div>
 $cdoc.getRenderedContent()
 </div>
 <div class="about">

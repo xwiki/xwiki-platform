@@ -8,30 +8,4 @@
 <hr/>
 </div>
 #end
-#if($context.mode==1)
-<script type="text/javascript">
-// <![CDATA[
-
-function bindURL(){
-var el = document.getElementById("xwikicontent");
-if(el == null)
-  return;
-
-var list = el.getElementsByTagName("a");
-
-for(elid in list) {
- var element = list[elid];
- element.onclick = function(){
-   eXo.core.Browser.addOnLoadCallback('XWiki', bindURL);
-   ajaxGet(this.href + '&ajaxRequest=true');
-   return false;
- }
-}
-}
-
-eXo.core.Browser.addOnLoadCallback('XWiki', bindURL);
-
-// ]]>
-</script>
-#end
 ### TODO: Format the footer for pdf output

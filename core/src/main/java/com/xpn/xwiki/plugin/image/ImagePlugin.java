@@ -47,7 +47,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
     private static final int TYPE_JPG = 1;
     private static final int TYPE_PNG = 2;
     private static final int TYPE_BMP = 3;
-    private static String name = "image";
+    public static String PLUGIN_NAME = "image";
     private XWikiCache imageCache;
     private int capacity = 50;
 
@@ -63,7 +63,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
      * @return plugin name
      */
     public String getName() {
-        return name;
+        return PLUGIN_NAME;
     }
 
     public void init(XWikiContext context) {
@@ -140,7 +140,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
                 } catch (XWikiCacheNeedsRefreshException e) {
                     try {
                         if (width==0)
-                         attachmentClone = this.getImageByHeight(attachmentClone, height, context);
+                            attachmentClone = this.getImageByHeight(attachmentClone, height, context);
                         else if (height==0)
                             attachmentClone = this.getImageByWidth(attachmentClone, width, context);
                         else
@@ -164,7 +164,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
     public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context) throws Exception {
 
         if (getType(attachment.getMimeType(context)) == 0)
-            throw new PluginException(name,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            throw new PluginException(PLUGIN_NAME,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                     "Only JPG, PNG or BMP images are supported.");
 
         Image imgOri = getImage(attachment, context);
@@ -173,7 +173,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
         int imgOriHeight = imgOri.getHeight(null);
 
         if (thumbnailHeight >= imgOriHeight)
-            throw new PluginException(name, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
                     "Thumbnail image not created: the height is higher than the original one.");
 
         double imageRatio = (double) imgOriWidth / (double) imgOriHeight;
@@ -185,7 +185,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
     public XWikiAttachment getImage(XWikiAttachment attachment, int thumbnailWidth, int thumbnailHeight, XWikiContext context) throws Exception {
 
         if (getType(attachment.getMimeType(context)) == 0)
-            throw new PluginException(name,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            throw new PluginException(PLUGIN_NAME,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                     "Only JPG, PNG or BMP images are supported.");
 
         Image imgOri = getImage(attachment, context);
@@ -194,11 +194,11 @@ public class ImagePlugin extends XWikiDefaultPlugin {
         int imgOriHeight = imgOri.getHeight(null);
 
         if (thumbnailHeight >= imgOriHeight)
-            throw new PluginException(name, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
                     "Thumbnail image not created: the height is higher than the original one.");
 
         if (thumbnailWidth >= imgOriWidth)
-            throw new PluginException(name, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
                     "Thumbnail image not created: the width is higher than the original one.");
 
         createThumbnail(thumbnailWidth, thumbnailHeight, imgOri, attachment);
@@ -218,7 +218,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
     public XWikiAttachment getImageByWidth(XWikiAttachment attachment, int thumbnailWidth, XWikiContext context) throws Exception {
 
         if (getType(attachment.getMimeType(context)) == 0)
-            throw new PluginException(name,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            throw new PluginException(PLUGIN_NAME,  XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                     "Only JPG, PNG or BMP images are supported.");
 
         Image imgOri = getImage(attachment, context);
@@ -226,7 +226,7 @@ public class ImagePlugin extends XWikiDefaultPlugin {
         int imgOriHeight = imgOri.getHeight(null);
 
         if (thumbnailWidth >= imgOriWidth)
-            throw new PluginException(name, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+            throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
                     "Thumbnail image not created: the width is higher than the original one.");
 
         double imageRatio = (double) imgOriWidth / (double) imgOriHeight;

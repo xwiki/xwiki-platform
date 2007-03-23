@@ -10,10 +10,15 @@
 </div>## xwikimaincontainer
 </div>##UIApplication
 
- #if($request.ajaxRequest == 'true')
-  </div> ## BLOCK DATA
+#if($request.ajaxRequest == 'true')
+
+  </div> ## BlockToUpdateData
   </div> ## BlockToUpdate
- #end
+  </div> ## PortletResponseData
+  <div class="PortletResponseScript"></div>
+  </div> ## PortletResponse
+
+#end
 
 #end
 

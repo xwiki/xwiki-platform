@@ -1,8 +1,6 @@
-#if($context.getMode()!=1)
-  <script type="text/javascript" src="$xwiki.getSkinFile("rico/prototype.js")"></script>
-  <script type="text/javascript" src="$xwiki.getSkinFile("rico/rico.js")"></script>
-  <script type="text/javascript" src="$xwiki.getSkinFile("rico/xwrico.js")"></script>
-#end
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/prototype.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/rico.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("rico/xwrico.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("skin.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>

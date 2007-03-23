@@ -1,4 +1,4 @@
-#if($context.getMode()==0)## Visible only in a page
+#if($context.mode == 0 || $context.mode == 1)
 <div id="actionmenu" class="layoutsubsection">
 <h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
 <div class="rightmenu"><a id="tmDoc" href='http://www.xwiki.org/xwiki/bin/view/Main/Documentation' onclick="openURL('http://www.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("documentation")</strong></a></div>

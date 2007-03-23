@@ -162,7 +162,7 @@ Menu
 }
 .topmenuentry{
    border-color: #333; 
-   background: transparent right top no-repeat;
+   background:transparent right center no-repeat;
 }
 .tme{
   background: transparent url("icons/black-arrow-ab.png") right center no-repeat;

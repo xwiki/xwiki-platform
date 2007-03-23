@@ -1,4 +1,4 @@
-## In non-Servlet mode (in Portlet mode for example) we don't display <HEADER> and <BODY>
+<!-- In non-Servlet mode (in Portlet mode for example) we don't display <HEADER> and <BODY> -->
 #if($context.getMode()==0)
 
 <?xml version="1.0" encoding="$xwiki.encoding" ?>
@@ -39,13 +39,17 @@
 
 #else
 
-  #template("stylesheets2.vm")
-  #template("javascript.vm")
+  #if($request.ajaxRequest == "true")
+  <div class="BlockToUpdate"><div class="META-DATA"><div class="blockId">XWiki</div></div><div class="BLOCK-DATA">
+  #end
 
   <!-- This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window
        properly. In the future Exo should modifies its behavior so that this is not necessary and
        this will need to be removed -->
-  <div class="UIApplication" style="overflow: auto">
+  <div id="XWiki" class="XWiki UIApplication" style="overflow: auto">
+
+  #template("stylesheets2.vm")
+  #template("javascript.vm")
 
 #end
 

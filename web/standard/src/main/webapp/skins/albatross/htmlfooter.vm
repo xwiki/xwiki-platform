@@ -4,3 +4,16 @@
 </body>
 </html>
 #end
+
+#if($context.mode == 1)
+</div>## xwikimaincontainerinner
+</div>## xwikimaincontainer
+</div>##UIApplication
+
+ #if($request.ajaxRequest == 'true')
+  </div> ## BLOCK DATA
+  </div> ## BlockToUpdate
+ #end
+
+#end
+

@@ -1,5 +1,5 @@
 <div id="historycontent" class="xwikiintracontent">
-#if($inline == true)    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
+#if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
     <form action="$doc.getURL("edit", "editor=changes&amp;$docvariant")" method="post">
       <div id="history">
       <div class="centered">

@@ -184,7 +184,7 @@ $xwiki.getUserName("xwiki:${username}")
 
 #macro (toc $pinit $pmax $pnumbered)
 #set($init = $pinit)
-#set($max = $max)
+#set($max = $pmax)
 #set($numbered = $pnumbered)
  #set ($int = 0)
  #set ($boolean = false)

@@ -182,7 +182,7 @@ $xwiki.getUserName("xwiki:${username}")
 </applet>
 #end
 
-#macro (toc $init $max $numbered)
+#macro (toc $pinit $pmax $pnumbered)
 #set($init = $pinit)
 #set($max = $max)
 #set($numbered = $pnumbered)
@@ -245,6 +245,7 @@ $xwiki.getUserName("xwiki:${username}")
  </li>
 </ul>#end
  #end
+
 #end
 
 #macro (exportPackage)

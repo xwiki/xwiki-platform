@@ -29,7 +29,7 @@ ${Msz}Mb
 #set($attachments = $doc.attachmentList)
     <div id="attachmentscontent" class="xwikiintracontent">
     <div id="attw">
-#if($inline == true)
+#if($inline && ($inline == true))
     <div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
 #end
       <div id="attachments">
@@ -75,7 +75,7 @@ ${Msz}Mb
       </div> ## attachments
       </div> ## attw
     </div> ## attachmentscontent
-#if($inline == true)
+#if($inline && ($inline == true))
 <script type="text/javascript">
 //<!--
 #if($hasedit || $hasadmin)

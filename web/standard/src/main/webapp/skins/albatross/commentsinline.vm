@@ -9,7 +9,7 @@
 #set($comments = $doc.getComments(false))
 #end
   <div id="commentscontent" class="xwikiintracontent">
-#if($inline == true)    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>#end
+#if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>#end
     <div id="comments">
 #if($comments.size()>0)
 #foreach($comment in $comments)
@@ -51,7 +51,7 @@ $msg.get("nocomments")
 #end
     </div> ## comments
   </div> ## commentscontent
-#if($inline == true)
+#if($inline && ($inline == true))
       <script type="text/javascript">
 //<!--
 if(document.getElementById("commentform")) {

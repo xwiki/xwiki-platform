@@ -5,6 +5,7 @@
 ###
 <div id="xwikicontent">
 $cdoc.getRenderedContent()
+#putFootnotes()
 </div>
 <div class="about">
 $msg.get("version") $tdoc.version $msg.get("lastmodifiedby") $xwiki.getLocalUserName($tdoc.author) $msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($tdoc.date, "HH:mm")

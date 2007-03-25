@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,8 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author sdumitriu
- * @author tepich
  */
 package com.xpn.xwiki.util;
 
@@ -48,6 +46,7 @@ public class TOCGenerator {
     while (matcher.find()) {
       int level = (matcher.group(1).lastIndexOf("1") + 2) / 2;
       String text = matcher.group(3);
+      text = context.getWiki().parseContent(text, context);
       
       int occurence = 0;
       for (Iterator iter = processedHeadings.iterator(); iter.hasNext();) if (iter.next().equals(text)) occurence++;

@@ -4599,6 +4599,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return dweb;
     }
 
+
+    /**
+     * @deprecated use {@link XWikiDocument#renameDocument(String, XWikiContext)} instead
+     */
     public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context)
         throws XWikiException
     {
@@ -4614,13 +4618,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @deprecated replaced by
-     *             {@link #renamePage(XWikiDocument doc, String newFullName, XWikiContext context)}
-     * @param doc
-     * @param context
-     * @param newFullName
-     * @return
-     * @throws XWikiException
+     * @deprecated use {@link XWikiDocument#renameDocument(String, XWikiContext)} instead
      */
     public XWikiDocument renamePage(XWikiDocument doc, XWikiContext context, String newFullName)
         throws XWikiException

@@ -1640,6 +1640,14 @@ public class Document extends Api
     }
 
     /**
+     * @deprecated use {@link #rename(String)} instead
+     */
+    public void renameDocument(String newDocumentName) throws XWikiException
+    {
+        rename(newDocumentName);
+    }
+
+    /**
      * Rename the current document and all the backlinks leading to it. See
      * {@link #renameDocument(String, java.util.List)} for more details.
      *
@@ -1647,9 +1655,18 @@ public class Document extends Api
      *        to the current space.
      * @throws XWikiException in case of an error
      */
-    public void renameDocument(String newDocumentName) throws XWikiException
+    public void rename(String newDocumentName) throws XWikiException
     {
-        doc.renameDocument(newDocumentName, getXWikiContext());
+        doc.rename(newDocumentName, getXWikiContext());
+    }
+
+    /**
+     * @deprecated use {@link #rename(String, java.util.List)} instead
+     */
+    public void renameDocument(String newDocumentName, List backlinkDocumentNames)
+        throws XWikiException
+    {
+        rename(newDocumentName, backlinkDocumentNames);
     }
 
     /**
@@ -1671,9 +1688,9 @@ public class Document extends Api
      *        modified to point to the new renamed document.
      * @throws XWikiException in case of an error
      */
-    public void renameDocument(String newDocumentName, List backlinkDocumentNames)
+    public void rename(String newDocumentName, List backlinkDocumentNames)
         throws XWikiException
     {
-        doc.renameDocument(newDocumentName, backlinkDocumentNames, getXWikiContext());
+        doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
     }
 }

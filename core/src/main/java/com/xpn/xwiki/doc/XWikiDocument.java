@@ -1713,6 +1713,53 @@ public class XWikiDocument
 
     }
 
+    /**
+     * Use the document passsed as parameter as the new identity for the current document.
+     *
+     * @param document the document containing the new identity
+     * @throws XWikiException in case of error
+     */
+    private void clone(XWikiDocument document) throws XWikiException
+    {
+        setDatabase(document.getDatabase());
+        setRCSVersion(document.getRCSVersion());
+        setDocumentArchive(document.getDocumentArchive());
+        setAuthor(document.getAuthor());
+        setContentAuthor(document.getContentAuthor());
+        setContent(document.getContent());
+        setContentDirty(document.isContentDirty());
+        setCreationDate(document.getCreationDate());
+        setDate(document.getDate());
+        setCustomClass(document.getCustomClass());
+        setContentUpdateDate(document.getContentUpdateDate());
+        setTitle(document.getTitle());
+        setFormat(document.getFormat());
+        setFromCache(document.isFromCache());
+        setElements(document.getElements());
+        setId(document.getId());
+        setMeta(document.getMeta());
+        setMetaDataDirty(document.isMetaDataDirty());
+        setMostRecent(document.isMostRecent());
+        setName(document.getName());
+        setNew(document.isNew());
+        setStore(document.getStore());
+        setTemplate(document.getTemplate());
+        setSpace(document.getSpace());
+        setParent(document.getParent());
+        setCreator(document.getCreator());
+        setDefaultLanguage(document.getDefaultLanguage());
+        setDefaultTemplate(document.getDefaultTemplate());
+        setValidationScript(document.getValidationScript());
+        setLanguage(document.getLanguage());
+        setTranslation(document.getTranslation());
+        setxWikiClass((BaseClass) document.getxWikiClass().clone());
+        setxWikiClassXML(document.getxWikiClassXML());
+
+        clonexWikiObjects(document);
+        copyAttachments(document);
+        elements = document.elements;
+    }
+
     public Object clone()
     {
         XWikiDocument doc = null;
@@ -3153,17 +3200,17 @@ public class XWikiDocument
 
     /**
      * Rename the current document and all the backlinks leading to it. See
-     * {@link #renameDocument(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
+     * {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
      *
      * @param newDocumentName the new document name. If the space is not specified then defaults
      *        to the current space.
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
-    public void renameDocument(String newDocumentName, XWikiContext context)
+    public void rename(String newDocumentName, XWikiContext context)
         throws XWikiException
     {
-        renameDocument(newDocumentName, getBacklinks(context), context);
+        rename(newDocumentName, getBacklinks(context), context);
     }
 
     /**
@@ -3186,7 +3233,7 @@ public class XWikiDocument
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
-    public void renameDocument(String newDocumentName, List backlinkDocumentNames,
+    public void rename(String newDocumentName, List backlinkDocumentNames,
         XWikiContext context) throws XWikiException
     {
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
@@ -3234,6 +3281,7 @@ public class XWikiDocument
                     String newContent = StringUtils.replaceOnce(backlinkDocument.getContent(),
                         linkText, link.toString());
                     backlinkDocument.setContent(newContent);
+                    context.getWiki().saveDocument(backlinkDocument, context);
                 }
             }
 
@@ -3241,6 +3289,11 @@ public class XWikiDocument
 
         // Step 3: Delete the old document
         context.getWiki().deleteDocument(this, context);
+
+        // Step 4: The current document needs to point to the renamed document as otherwise it's
+        //         pointing to an invalid XWikiDocument object as it's been deleted...
+        clone(context.getWiki().getDocument(newDocumentName, context));
+
     }
 
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException

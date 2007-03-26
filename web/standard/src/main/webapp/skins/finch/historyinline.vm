@@ -1,7 +1,7 @@
 #set($showactions = 0)
 <div id="historycontent" class="xwikiintracontent">
     <h4 class="xwikiintratitle">$msg.get("history")</h4>
-    <form action="$doc.getURL("edit", "editor=changes&amp;$docvariant")" method="post">
+    <form action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       <div>
       <div class="centered">
 ##      <h4>$msg.get("dochistory")</h4>

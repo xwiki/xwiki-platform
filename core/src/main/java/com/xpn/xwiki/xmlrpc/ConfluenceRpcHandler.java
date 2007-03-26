@@ -34,8 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.suigeneris.jrcs.rcs.Version;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -59,23 +57,29 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
      * {@inheritDoc}
      * @see ConfluenceRpcInterface#login(String, String) 
      */
-    public String login(String username, String password) throws XWikiException {
+    public String login(String username, String password) throws XWikiException
+    {
+        String token;
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
-        if (username.equals("guest")) {
-            String ip = context.getRequest().getRemoteAddr();
-            String token = getValidationHash("guest", "guest", ip);
-            getTokens(context).put(token, new RemoteUser("XWiki.XWikiGuest", ip));
-            return token;
-        }   else if (xwiki.getAuthService().authenticate(username, password, context)!=null) {
-            String ip = context.getRequest().getRemoteAddr();
-            String token = getValidationHash(username, password, ip);
-            getTokens(context).put(token, new RemoteUser("XWiki." + username, ip));
-            return token;
-        } else
-            return null;
-    }
 
+        // Guest users are always allowed, others need to be checked
+        if (username.equals("guest")
+            || xwiki.getAuthService().authenticate(username, password, context) != null)
+        {
+            // Token should be unique for each session. Use a random number that doesn't guarantee
+            // uniqueness but that should be unique enough to be good enough.
+            token = xwiki.generateValidationKey(128);
+            String ip = context.getRequest().getRemoteAddr();
+            getTokens(context).put(token, new RemoteUser("XWiki." + username, ip));
+        } else {
+            // TODO: Throw an exception instead of returning null
+            token = null;
+        }
+
+        return token;
+    }    
+    
     private Map getTokens(XWikiContext context) {
         Map tokens = (Map) context.getEngineContext().getAttribute("xmlrpc_tokens");
         if (tokens==null) {
@@ -83,48 +87,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             context.getEngineContext().setAttribute("xmlrpc_tokens", tokens);
         }
         return tokens;
-    }
-
-    private String getValidationHash(String username, String password, String clientIP) {
-        String validationKey = "xmlrpcapi";
-        MessageDigest md5 = null;
-        StringBuffer sbValueBeforeMD5 = new StringBuffer();
-
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: " + e);
-        }
-
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-            sbValueBeforeMD5.append(username.toString());
-            sbValueBeforeMD5.append(":");
-            sbValueBeforeMD5.append(password.toString());
-            sbValueBeforeMD5.append(":");
-            sbValueBeforeMD5.append(clientIP.toString());
-            sbValueBeforeMD5.append(":");
-            sbValueBeforeMD5.append(validationKey.toString());
-
-            String valueBeforeMD5 = sbValueBeforeMD5.toString();
-            md5.update(valueBeforeMD5.getBytes());
-
-            byte[] array = md5.digest();
-            StringBuffer sb = new StringBuffer();
-            for (int j = 0; j < array.length; ++j) {
-                int b = array[j] & 0xFF;
-                if (b < 0x10) sb.append('0');
-                sb.append(Integer.toHexString(b));
-            }
-            String valueAfterMD5 = sb.toString();
-            return valueAfterMD5;
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error: " + e);
-        }
-        catch (Exception ex) {
-            log.error("Unhandled exception:", ex);
-        }
-        return null;
     }
 
     private void checkToken(String token, XWikiContext context) throws XWikiException {

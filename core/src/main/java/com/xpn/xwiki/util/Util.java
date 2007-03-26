@@ -34,13 +34,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 import javax.servlet.http.Cookie;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -103,19 +97,41 @@ public class Util {
         return p5util;
     }
 
-    public List getMatches(String content, String spattern, int group) throws MalformedPatternException {
+    public List getAllMatches(String content, String spattern, int group)
+        throws MalformedPatternException
+    {
         List list = new ArrayList();
         PatternMatcherInput input = new PatternMatcherInput(content);
         Pattern pattern = patterns.addPattern(spattern);
         while (matcher.contains(input, pattern)) {
             MatchResult result = matcher.getMatch();
             String smatch = result.group(group);
-            if (!list.contains(smatch))
-                list.add(smatch);
+            list.add(smatch);
         }
         return list;
     }
 
+    public List getUniqueMatches(String content, String spattern, int group)
+        throws MalformedPatternException
+    {
+        // Remove duplicate entries
+        Set uniqueMatches = new HashSet();
+        uniqueMatches.addAll(getAllMatches(content, spattern, group));
+
+        List matches = new ArrayList();
+        matches.addAll(uniqueMatches);
+
+        return matches;
+    }
+
+    /**
+     * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
+     */
+    public List getMatches(String content, String spattern, int group)
+        throws MalformedPatternException
+    {
+        return getUniqueMatches(content, spattern, group);
+    }
 
     public static String cleanValue(String value) {
         value = StringUtils.replace(value,"\r\r\n", "%_N_%");

@@ -4437,7 +4437,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         try {
             String pattern = "#includeMacros\\(\"(.*?)\"\\)";
-            List list = context.getUtil().getMatches(content, pattern, 1);
+            List list = context.getUtil().getUniqueMatches(content, pattern, 1);
             for (int i = 0; i < list.size(); i++) {
                 try {
                     String name = (String) list.get(i);

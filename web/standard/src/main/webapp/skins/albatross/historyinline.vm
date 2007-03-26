@@ -1,6 +1,6 @@
 <div id="historycontent" class="xwikiintracontent">
 #if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
-    <form action="$doc.getURL("edit", "editor=changes&amp;$docvariant")" method="post">
+    <form action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       <div id="history">
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">

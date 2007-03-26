@@ -61,7 +61,7 @@ public class DocumentParser implements ContentParser
 
         Iterator linkContents;
         try {
-            linkContents = this.util.getMatches(contentToParse, pattern, 1).iterator();
+            linkContents = this.util.getAllMatches(contentToParse, pattern, 1).iterator();
         } catch (MalformedPatternException e) {
             // This should never happen as our pattern used is controlled and is well formed.
             throw new RuntimeException("Invalid pattern used [" + pattern + " for parsing links "

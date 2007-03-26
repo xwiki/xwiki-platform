@@ -2513,7 +2513,7 @@ public class XWikiDocument
         try {
             String pattern =
                 "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
-            List list = context.getUtil().getMatches(getContent(), pattern, 2);
+            List list = context.getUtil().getUniqueMatches(getContent(), pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 try {
                     String name = (String) list.get(i);
@@ -2545,7 +2545,7 @@ public class XWikiDocument
         try {
             String pattern = "\\[(.*?)\\]";
             List newlist = new ArrayList();
-            List list = context.getUtil().getMatches(getContent(), pattern, 1);
+            List list = context.getUtil().getUniqueMatches(getContent(), pattern, 1);
             for (int i = 0; i < list.size(); i++) {
                 try {
                     String name = (String) list.get(i);
@@ -3281,10 +3281,9 @@ public class XWikiDocument
                     String newContent = StringUtils.replaceOnce(backlinkDocument.getContent(),
                         linkText, link.toString());
                     backlinkDocument.setContent(newContent);
-                    context.getWiki().saveDocument(backlinkDocument, context);
                 }
             }
-
+            context.getWiki().saveDocument(backlinkDocument, context);
         }
 
         // Step 3: Delete the old document
@@ -3682,7 +3681,7 @@ public class XWikiDocument
             "</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>";
         try {
             Util util = new Util();
-            List list = util.getMatches(content2, htmlregexp, 1);
+            List list = util.getUniqueMatches(content2, htmlregexp, 1);
             if (list.size() > 0) {
                 return true;
             }

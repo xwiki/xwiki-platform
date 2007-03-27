@@ -70,49 +70,19 @@ public class CalendarParams {
         return cal;
     }
     public String computePrevMonthURL() {
-        String smonth = (String) get("month");
-        int cmonth, pmonth;
-        if (smonth == null || smonth.equals("")) {
-            return "?month=-1";
+        Calendar c = this.getCalendar(Locale.getDefault());
+        c.add(Calendar.MONTH, -1);
+        if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
+            return "?year=" + c.get(Calendar.YEAR) + "&amp;month=" + c.get(Calendar.MONTH);
         }
-        try{
-            if (smonth.startsWith("+")) {
-                cmonth = Integer.parseInt(smonth.substring(1));
-            } else {
-                cmonth = Integer.parseInt(smonth);
-            }
-        }
-        catch(Exception ex) {
-            cmonth = 0;
-        }
-        pmonth = -1 + cmonth;
-        if (pmonth >= 0) {
-            return "?month=%2b" + pmonth;
-        } else {
-            return "?month=" + pmonth;
-        }
+        return "?month=" + c.get(Calendar.MONTH);
     }
     public String computeNextMonthURL() {
-        String smonth = (String) get("month");
-        int cmonth, nmonth;
-        if (smonth == null || smonth.equals("")) {
-            return "?month=%2b1";
+        Calendar c = this.getCalendar(Locale.getDefault());
+        c.add(Calendar.MONTH, 1);
+        if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
+            return "?year=" + c.get(Calendar.YEAR) + "&amp;month=" + c.get(Calendar.MONTH);
         }
-        try{
-            if (smonth.startsWith("+")) {
-                cmonth = Integer.parseInt(smonth.substring(1));
-            } else {
-                cmonth = Integer.parseInt(smonth);
-            }
-        }
-        catch(Exception ex) {
-            cmonth = 0;
-        }
-        nmonth = 1 + cmonth;
-        if (nmonth >= 0) {
-            return "?month=%2b" + nmonth;
-        } else {
-            return "?month=" + nmonth;
-        }
+        return "?month=" + c.get(Calendar.MONTH);
     }
 }

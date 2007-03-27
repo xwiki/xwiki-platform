@@ -41,11 +41,13 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
     }
     if(att && (href = att["src"]) != null) {
         href = this.trimString(href);
-        href = "/xwiki/bin/" + href.substring(href.indexOf("/",3) + 1);
+        var contextPathImage = tinyMCE.getParam("wiki_images_path").toString();
+        href = contextPathImage.substring(0, contextPathImage.indexOf("/",2)) +
+               "/bin/" + href.substring(href.indexOf("/",3) + 1);
         var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
         var r = imgname_reg.exec(href);
         if(r) {
-            var imgname = r[1].replace(/%20/g," ");
+            var imgname = r[1].replace(/%20/g," ");                      
 			str = "{image:" + imgname;
             var width=att["width"] ? this.trimString(att["width"]) : "";
 			var height=att["height"] ? this.trimString(att["height"]) : "";

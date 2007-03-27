@@ -3289,8 +3289,10 @@ public class XWikiDocument
                     link.setSpace(newLink.getSpace());
                     link.setPage(newLink.getPage());
 
+                    // We need to add the link delimiters ("[" and "]") for doing the search and
+                    // replace as otherwise we might rename text with the same content as a link.
                     String newContent = StringUtils.replaceOnce(backlinkDocument.getContent(),
-                        linkText, link.toString());
+                        "[" + linkText + "]", "[" + link.toString() + "]");
                     backlinkDocument.setContent(newContent);
                 }
             }

@@ -3239,6 +3239,17 @@ public class XWikiDocument
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
 
+        // Set the context to point to the document being renamed. This is required so that
+        // the Link.getNormalizedName() method which uses context.getDoc().getSpace() gets the
+        // space from the document and not the space from the document where the renamed is called
+        // from. If we don't do this and if the rename is being done from a document in a different
+        // space the we won't be able to recognize links which have no space defined and which
+        // point to the document being renamed...
+        XWikiDocument originalCurrentDocument = context.getDoc();
+        context.setDoc(this);
+
+        // Parse the new document in order to get a Link object so that we can easily get the
+        // space and page name.
         Link newLink = new LinkParser().parse(newDocumentName);
 
         // If the new document name doesn't contain the space name, use the current space name.
@@ -3293,6 +3304,8 @@ public class XWikiDocument
         //         pointing to an invalid XWikiDocument object as it's been deleted...
         clone(context.getWiki().getDocument(newDocumentName, context));
 
+        // Restore the current document in the context
+        context.setDoc(originalCurrentDocument);
     }
 
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException

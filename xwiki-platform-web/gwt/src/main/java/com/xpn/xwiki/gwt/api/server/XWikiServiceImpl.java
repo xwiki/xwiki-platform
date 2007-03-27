@@ -650,6 +650,30 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return newDocument(doc, xdoc, withObjects, false, false, false, context);
     }
 
+    public boolean hasAccessLevel(String level, String fullName, XWikiContext context)
+    {
+        try {
+            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level,
+                context.getUser(), fullName, context);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected void assertEditRight(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        if (!hasAccessLevel("edit", doc.getFullName(), context))
+            throw new XWikiException(XWikiException.MODULE_XWIKI_GWT_API, XWikiException.ERROR_XWIKI_ACCESS_DENIED,"edit_denied", null);
+    }
+
+    protected void assertViewRight(String fullName, XWikiContext context) throws XWikiException {
+        if (!hasAccessLevel("view", fullName, context))
+            throw new XWikiException(XWikiException.MODULE_XWIKI_GWT_API, XWikiException.ERROR_XWIKI_ACCESS_DENIED,"view_denied", null);
+    }
+
+    protected void assertViewRight(XWikiDocument doc, XWikiContext context) throws XWikiException {
+        assertViewRight(doc.getFullName(), context);
+    }
+
     protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, boolean withViewDisplayers,
                                  boolean withEditDisplayers, boolean withRenderedContent, XWikiContext context) {
         doc.setId(xdoc.getId());

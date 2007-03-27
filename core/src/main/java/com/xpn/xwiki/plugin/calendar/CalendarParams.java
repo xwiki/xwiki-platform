@@ -46,7 +46,7 @@ public class CalendarParams {
         String smonth = (String) get("month");
         cal.set(Calendar.DAY_OF_MONTH, 1);
         try {
-            if (smonth != null) {
+            if (smonth != null && !smonth.trim().equals("")) {
                 if (smonth.indexOf("+") != -1) {
                     cal.add(Calendar.MONTH, Integer.parseInt(smonth.substring(1)));
                 } else if (smonth.indexOf("-") != -1) {
@@ -56,7 +56,7 @@ public class CalendarParams {
                 }
             }
             String syear = (String) get("year");
-            if (syear != null) {
+            if (syear != null && !syear.trim().equals("")) {
                 if (syear.indexOf("+") != -1) {
                     cal.add(Calendar.YEAR, Integer.parseInt(syear));
                 } else if (syear.indexOf("-") != -1) {

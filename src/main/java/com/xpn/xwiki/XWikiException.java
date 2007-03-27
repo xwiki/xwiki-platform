@@ -68,6 +68,7 @@ public class XWikiException extends Exception {
     public static final int MODULE_XWIKI_CACHE = 16;
     public static final int MODULE_XWIKI_CONTENT = 17;
     public static final int MODULE_XWIKI_XMLRPC = 18;
+    public static final int MODULE_XWIKI_GWT_API = 19;
 
     public static final int MODULE_PLUGIN_LASZLO = 21;
 

@@ -48,4 +48,34 @@ public class DocumentParserTest extends TestCase
         assertEquals("link1", ((Link) result.getValidElements().get(0)).getPage());
         assertEquals("link2", ((Link) result.getValidElements().get(1)).getPage());
     }
+
+    public void testParseLinksAndReplaceWhenNoSpaceInLink() throws Exception
+    {
+        DocumentParser parser = new DocumentParser();
+        Link linkToLookFor = new LinkParser().parse("XWiki.link1");
+        Link newLink = new LinkParser().parse("XWiki2.mylink");
+
+        ReplacementResultCollection result = parser.parseLinksAndReplace(
+            "This is [link1]. This is [link2].", linkToLookFor, newLink,
+            new RenamePageReplaceLinkHandler(), "XWiki");
+
+        assertEquals("This is [XWiki2.mylink]. This is [link2].", result.getModifiedContent());
+        assertEquals(1, result.getReplacedElements().size());
+    }
+
+    public void testParseLinksAndReplaceWhenPipeSeparatorInLink() throws Exception
+    {
+        DocumentParser parser = new DocumentParser();
+        LinkParser linkParser = new LinkParser();
+
+        Link linkToLookFor = linkParser.parse("Space.Page");
+        Link newLink = new LinkParser().parse("Space2.Page2");
+
+        ReplacementResultCollection result = parser.parseLinksAndReplace(
+            "This is [Hello|Space.Page?param=1].", linkToLookFor, newLink,
+            new RenamePageReplaceLinkHandler(), "Whatever");
+
+        assertEquals("This is [Hello|Space2.Page2?param=1].", result.getModifiedContent());
+    }
+
 }

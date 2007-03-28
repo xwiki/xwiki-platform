@@ -13,6 +13,7 @@
 </div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">
+<div>
 #template("simpleedittoolbar.vm")
 $xwiki.getTextArea($tdoc.content)
 #*
@@ -28,7 +29,7 @@ function endresize(){
 </script>
 <div id="resizeta" onstartdrag="startresize()" onenddrag="endresize()" ></div>
 *#
-</div> ## xwikieditcontent
+</div></div> ## xwikieditcontent
 </div> ## xwikitext
 ## #template("tagedit.vm")
 </div> ## noname

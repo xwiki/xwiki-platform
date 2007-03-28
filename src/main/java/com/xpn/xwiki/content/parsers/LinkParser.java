@@ -61,8 +61,8 @@ public class LinkParser implements ContentParser
 
         // Note: It's important to parse the alias and the target in that order. See
         // {@link #parseAlias} for more detailas as to why.
-        link.setAlias(parseAlias(content));
-        link.setTarget(parseTarget(content));        
+        parseAlias(content, link);
+        parseTarget(content, link);        
 
         // Parse the link reference itself. Note: the order here is also very important.
         // We parse the query string early as it can contain our special delimiter characters
@@ -98,9 +98,9 @@ public class LinkParser implements ContentParser
      *
      * @param content the string to parse. This parameter will be modified by the method to remove
      *                the parsed content.
-     * @return the alias or null if no alias was specified
+     * @param link the link on which to set the alias and the delimiter symbol used
      */
-    protected String parseAlias(StringBuffer content)
+    protected void parseAlias(StringBuffer content, Link link)
     {
         String alias = null;
 
@@ -108,6 +108,8 @@ public class LinkParser implements ContentParser
         int separatorIndex = content.indexOf(LINK_SEPARATOR_PIPE);
         if (separatorIndex == -1) {
             separatorIndex = content.indexOf(LINK_SEPARATOR_GREATERTHAN);
+        } else {
+            link.setUsePipeDelimiterSymbol(true);
         }
 
         if (separatorIndex != -1) {
@@ -120,27 +122,29 @@ public class LinkParser implements ContentParser
             }
         }
 
-        return alias;
+        link.setAlias(alias);
     }
 
     /**
      * Find out the target part of the full link.
      *
      * <p>Note: The target element must start with an underscore ("_"). See
-     * {@link #parseAlias(StringBuffer)} for more details as to why.</p>
+     * {@link #parseAlias(StringBuffer, Link)} for more details as to why.</p>
      *
      * @param content the string to parse. This parameter will be modified by the method to remove
      *                the parsed content.
-     * @return the target or null if no target was specified
+     * @param link the link on which to set the target and the delimiter symbol used
      * @throws ContentParserException if the target does not start with an underscore
      */
-    protected String parseTarget(StringBuffer content) throws ContentParserException
+    protected void parseTarget(StringBuffer content, Link link) throws ContentParserException
     {
         String target = null;
 
         int separatorIndex = content.lastIndexOf(LINK_SEPARATOR_PIPE);
         if (separatorIndex == -1) {
             separatorIndex = content.lastIndexOf(LINK_SEPARATOR_GREATERTHAN);
+        } else {
+            link.setUsePipeDelimiterSymbol(true);
         }
 
         if (separatorIndex != -1) {
@@ -154,7 +158,7 @@ public class LinkParser implements ContentParser
             content.delete(separatorIndex, content.length());
         }
 
-        return target;
+        link.setTarget(target);
     }
 
     /**

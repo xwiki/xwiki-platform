@@ -451,6 +451,9 @@
               **/content/**/*.java,
               **/XWikiMessageTool.java
           </includes>
+          <excludes>
+              **/RenamePageReplaceLinkHandler.java
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

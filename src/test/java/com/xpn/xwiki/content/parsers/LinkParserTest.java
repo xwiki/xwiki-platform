@@ -32,63 +32,86 @@ public class LinkParserTest extends TestCase
     public void testParseAliasWhenOnlyReferenceIsSpecified()
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("reference");
-        assertNull(parser.parseAlias(sb));
+        parser.parseAlias(sb, link);
+
+        assertNull(link.getAlias());
+        assertFalse(link.isUsingPipeDelimiter());
         assertEquals("reference", sb.toString());
     }
 
     public void testParseAliasWhenValidAliasSpecified()
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("alias|reference");
-        assertEquals("alias", parser.parseAlias(sb));
-        assertEquals("reference", sb.toString());
+        parser.parseAlias(sb, link);
 
-        sb = new StringBuffer("alias>reference");
-        assertEquals("alias", parser.parseAlias(sb));
+        assertEquals("alias", link.getAlias());
         assertEquals("reference", sb.toString());
+        assertTrue(link.isUsingPipeDelimiter());
+
+        link = new Link();
+        sb = new StringBuffer("alias>reference");
+        parser.parseAlias(sb, link);
+
+        assertEquals("alias", link.getAlias());
+        assertEquals("reference", sb.toString());
+        assertFalse(link.isUsingPipeDelimiter());
     }
 
     public void testParseAliasWhenTargetSpecified()
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("reference|_target");
-        assertNull(parser.parseAlias(sb));
+        parser.parseAlias(sb, link);
+
+        assertNull(link.getAlias());
         assertEquals("reference|_target", sb.toString());
+        assertTrue(link.isUsingPipeDelimiter());
     }
 
     public void testParseTargetWhenNoTargetSpecified() throws Exception
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("reference");
-        assertNull(parser.parseTarget(sb));
+        parser.parseTarget(sb, link);
+
+        assertNull(link.getTarget());
         assertEquals("reference", sb.toString());
+        assertFalse(link.isUsingPipeDelimiter());
     }
 
     public void testParseTargetWithValidTarget() throws Exception
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("reference|_target");
-        assertEquals("_target", parser.parseTarget(sb));
-        assertEquals("reference", sb.toString());
+        parser.parseTarget(sb, link);
 
-         sb = new StringBuffer("reference>_target");
-        assertEquals("_target", parser.parseTarget(sb));
+        assertEquals("_target", link.getTarget());
         assertEquals("reference", sb.toString());
+        assertTrue(link.isUsingPipeDelimiter());
+
+        link = new Link();
+        sb = new StringBuffer("reference>_target");
+        parser.parseTarget(sb, link);
+
+        assertEquals("_target", link.getTarget());
+        assertEquals("reference", sb.toString());
+        assertFalse(link.isUsingPipeDelimiter());
     }
 
     public void testParseTargetWithInvalidTarget()
     {
         LinkParser parser = new LinkParser();
-
+        Link link = new Link();
         StringBuffer sb = new StringBuffer("reference|target");
         try {
-            parser.parseTarget(sb);
+            parser.parseTarget(sb, link);
             fail("Should have thrown an exception here");
         } catch (ContentParserException expected) {
             assertEquals("Error number 22000 in 17: Invalid link format. The target element must "

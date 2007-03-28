@@ -19,12 +19,10 @@
  */
 package com.xpn.xwiki.content.parsers;
 
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.content.Link;
 
-import java.util.Iterator;
-
-import org.apache.oro.text.regex.MalformedPatternException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Parse document source content as typed by the user.
@@ -39,12 +37,13 @@ import org.apache.oro.text.regex.MalformedPatternException;
 public class DocumentParser implements ContentParser
 {
     /**
-     * Utility class used here to apply regex patterns and get matched strings.
+     * The regex pattern to recognize a wiki link.  
      */
-    private Util util = new Util();
+    private static final Pattern LINK_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
     /**
-     * Parse the links contained into a raw content representing a document (as typed by the user).
+     * Parse the links contained into the passed content represent the raw content from a document
+     * (as typed by the user).
      * 
      * @param contentToParse the raw document content to parse.
      * @return a list of {@link Link} objects containing the parsed links and a list of invalid
@@ -55,31 +54,89 @@ public class DocumentParser implements ContentParser
     public ParsingResultCollection parseLinks(String contentToParse)
     {
         ParsingResultCollection results = new ParsingResultCollection();
-
         LinkParser linkParser = new LinkParser();
-        String pattern = "\\[(.*?)\\]";
+        Matcher matcher = LINK_PATTERN.matcher(contentToParse);
 
-        Iterator linkContents;
-        try {
-            linkContents = this.util.getAllMatches(contentToParse, pattern, 1).iterator();
-        } catch (MalformedPatternException e) {
-            // This should never happen as our pattern used is controlled and is well formed.
-            throw new RuntimeException("Invalid pattern used [" + pattern + " for parsing links "
-                + "in [" + contentToParse + "]", e);
-        }
-
-        while (linkContents.hasNext()) {
-            String linkContent = (String) linkContents.next();
-            Link link;
-            try {
-                link = linkParser.parse(linkContent);
-                results.addValidElement(link);
-            } catch (ContentParserException e) {
-                // Failed to parse a link. Add it as an invalid element in the result
-                results.addInvalidElementId(contentToParse);
-            }
+        while (matcher.find()) {
+            parseLink(linkParser, matcher.group(1), results);
         }
 
         return results;
+    }
+
+    /**
+     * Parse the links contained into the passed content represent the raw content from a document
+     * (as typed by the user) and replace links that matches the passed linkToLookFor Link with the
+     * specified newLink link. The comparison between found links and the link to look for is done
+     * by the ReplaceLinkHandler passed as parameter.
+     *
+     * @param contentToParse the raw document content to parse.
+     * @param linkToLookFor the link to look for that will be replaced by the new link
+     * @param newLink the new link
+     * @param linkHandler the handler to use for comparing the links and for deciding what the
+     *        replaced link will look like. For example two links may be pointing to the same
+     *        document but one link may have a different alias or target. The handler decides
+     *        what to do in these cases.
+     * @param currentSpace the space to use for normalizing links. This is used for links that have
+     *        no space defined.
+     * @return a list of {@link Link} objects containing the parsed links, a list of invalid
+     *         link contents found and a list of replaced links, returned as a
+     *         {@link ReplacementResultCollection}. This allows users of this method to decide what
+     *         they want to do with invalid links (like report them to the user, fix them, generate
+     *         an error, etc).
+     */
+    public ReplacementResultCollection parseLinksAndReplace(String contentToParse,
+        Link linkToLookFor, Link newLink, ReplaceLinkHandler linkHandler, String currentSpace)
+    {
+        ReplacementResultCollection results = new ReplacementResultCollection();
+        LinkParser linkParser = new LinkParser();
+        Matcher matcher = LINK_PATTERN.matcher(contentToParse);
+        StringBuffer modifiedContent = new StringBuffer();
+        
+        Link normalizedLinkToLookFor = linkToLookFor.getNormalizedLink(currentSpace);
+        Link nomalizedNewLink = newLink.getNormalizedLink(currentSpace);
+
+        while (matcher.find()) {
+            Link foundLink = parseLink(linkParser, matcher.group(1), results);
+
+            // Verify if the link found matches the link to look for
+            if (foundLink != null) {
+                Link normalizedFoundLink = foundLink.getNormalizedLink(currentSpace);
+
+                if (linkHandler.compare(normalizedLinkToLookFor, normalizedFoundLink)) {
+                    matcher.appendReplacement(modifiedContent, "[" + linkHandler.getReplacementLink(
+                        nomalizedNewLink, normalizedFoundLink).toString() + "]");
+                    results.addReplacedElement(normalizedFoundLink);
+                }
+            }
+        }
+        matcher.appendTail(modifiedContent);
+        results.setModifiedContent(modifiedContent.toString());
+
+        return results;
+    }
+
+    /**
+     * Helper metohd to parse a link and add the result of the parsing to the resulting collections
+     * of objects to be returned to the user.
+     *
+     * @param parser the link parser to use for parsing the link
+     * @param linkContent the content to parse
+     * @param results the resulting collections of objects (valid elements, invalid elements) to
+     *        pass back to the user. See
+              {@link com.xpn.xwiki.content.parsers.ParsingResultCollection} for more details
+     * @return the parsed link or null if an error happened during the parsing (invalid link)
+     */
+    private Link parseLink(LinkParser parser, String linkContent, ParsingResultCollection results)
+    {
+        Link link = null;
+        try {
+            link = parser.parse(linkContent);
+            results.addValidElement(link);
+        } catch (ContentParserException e) {
+            // Failed to parse the found link. Add it as an invalid element in the result
+            results.addInvalidElementId(linkContent);
+        }
+        return link;
     }
 }

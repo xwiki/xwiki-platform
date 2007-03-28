@@ -19,14 +19,7 @@
  */
 package com.xpn.xwiki.content;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-
 import java.net.URI;
-
-import org.radeox.filter.interwiki.InterWiki;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents the parsed data of a wiki link. The XWiki link format is as follows:
@@ -72,7 +65,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @version $Id: $
  */
-public class Link
+public class Link implements Cloneable
 {
     /**
      * @see #getAlias()
@@ -120,21 +113,9 @@ public class Link
     private String target;
 
     /**
-     * Radeox InterWiki instance used to resolve
-     * <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> names.
+     * @see #isUsingPipeDelimiter()
      */
-    private InterWiki interWiki = InterWiki.getInstance();
-
-    /**
-     * @param interWiki the Radeox interWiki managerto use to resolve InterWiki names.
-     * @todo When we move to a component based architecture the InterWiki instance will be set by
-     *       the component manager. At that time we'll need to create a wrapper class around
-     *       Radeox's implementation and create an interface.
-     */
-    protected void setInterWikiManager(InterWiki interWiki)
-    {
-        this.interWiki = interWiki;
-    }
+    private boolean isUsingPipeDelimiter;
 
     /**
      * @param alias see {@link #getAlias()}
@@ -296,10 +277,27 @@ public class Link
     }
 
     /**
+     * @return true if the link is using the Pipe symbol ("|") as its separator between alias,
+     *         target and link name, or false if it's using the greater than symbol (">")
+     */
+    public boolean isUsingPipeDelimiter()
+    {
+        return this.isUsingPipeDelimiter;
+    }
+
+    /**
+     * @param isUsingPipeDelimiter see {@link #isUsingPipeDelimiter()} 
+     */
+    public void setUsePipeDelimiterSymbol(boolean isUsingPipeDelimiter)
+    {
+        this.isUsingPipeDelimiter = isUsingPipeDelimiter;
+    }
+
+    /**
      * @return a String representation of the link without alias nor target.
      *         Example: "Space.WebHome#anchor?param1=1"
      */
-    public String getLink()
+    private String getLinkName()
     {
         StringBuffer buffer = new StringBuffer();
 
@@ -338,6 +336,19 @@ public class Link
     }
 
     /**
+     * Append a delimiter symbol. See {@link #isUsingPipeDelimiter()}
+     * @param buffer the buffer to append to
+     */
+    private void appendDelimiterSymbol(StringBuffer buffer)
+    {
+        if (isUsingPipeDelimiter()) {
+            buffer.append('|');
+        } else {
+            buffer.append('>');
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * @see Object#toString()
      */
@@ -347,13 +358,13 @@ public class Link
 
         if (getAlias() != null) {
             buffer.append(getAlias());
-            buffer.append('>');
+            appendDelimiterSymbol(buffer);
         }
 
-        buffer.append(getLink());
+        buffer.append(getLinkName());
 
         if (getTarget() != null) {
-            buffer.append('>');
+            appendDelimiterSymbol(buffer);
             buffer.append(getTarget());
         }
 
@@ -370,76 +381,34 @@ public class Link
     }
 
     /**
-     * Perform a series of normalization steps on the link name. The steps are:
+     * Perform a series of normalization steps on the link. The steps are:
      * <ul>
      *   <li>if the link is not a URI and it doesn't have a page defined then make it point to
      *       WebHome</li>
-     *   <li>if the link is an interwiki link, then resolve it</li>
-     *   <li>if the link doesn't have a space defined, fill it in with the current document's
-     *       space name</li>
-     *   <li>replace '+' characters with spaces in the link name</li>
-     *   <li>if the link cannot be found on the current wiki, remove all accents and spaces from
-     *       the name</li>
+     *   <li>if the link is internal and doesn't have a space defined, fill it in with the current
+     *       document's space name</li>
      * </ul>
-     * 
-     * @param context the XWiki context (used to get the current space name)
-     * @return the normalized wiki link without any anchor or query string
-     * @exception XWikiException in case of a normalization error, for example if the InterWiki
-     *            manager cannot resolve the InterWiki alias
+     *
+     * @param currentSpace the space to use when no space has been defined in the link
+     * @return the normalized link
      */
-    public String getNormalizedName(XWikiContext context) throws XWikiException
+    public Link getNormalizedLink(String currentSpace)
     {
-        String normalizedLink;
-
-        // If no page was specified, use WebHome
-        String page = getPage();
-        if (page == null) {
-            page = "WebHome";
+        Link normalizedLink;
+        try {
+            normalizedLink = (Link) clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Failed to clone object [" + this.toString() + "]");
         }
 
-        if (isExternal()) {
-            if (getInterWikiAlias() != null) {
-                // Return a resolved InterWiki link if found, otherwise throw an exception
-                if (this.interWiki.contains(getInterWikiAlias())) {
-                    normalizedLink = this.interWiki.getWikiUrl(getInterWikiAlias(), page);
-                } else {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_CONTENT,
-                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "Failed to find URL for inter "
-                        + "wiki link [" + getInterWikiAlias() + "]. Make sure you have configured "
-                        + "InterWiki correctly in your wiki.");
-                }
-            } else {
-                normalizedLink = getURI().toString();
-            }
-        } else {
-            // If no space was specified, use the space from the current document defined in the
-            // context.
-            if (getSpace() == null) {
-                normalizedLink = context.getDoc().getSpace();
-            } else {
-                normalizedLink = getSpace();
-            }
-            normalizedLink = normalizedLink + "." + page;
+        // If no page was specified, use WebHome
+        if ((normalizedLink.getURI() == null) && (normalizedLink.getPage() == null)) {
+            normalizedLink.setPage("WebHome");
+        }
 
-            // Replace '+' with spaces
-            // TODO: This causes problems with [C++ Examples]
-            normalizedLink = normalizedLink.replaceAll("\\+", " ");
-
-            // Before we can check if the link exists we need to set the target database in case
-            // the user has defined a virtual wiki alias.
-            String originalDatabase = context.getDatabase();
-            if (getVirtualWikiAlias() != null) {
-                context.setDatabase(getVirtualWikiAlias());
-            }
-
-            try {
-                // If the link doesn't point to an existing document, remove accents and spaces.
-                if (!context.getWiki().exists(normalizedLink, context)) {
-                    normalizedLink = StringUtils.replace(Util.noaccents(normalizedLink), " ", "");
-                }
-            } finally {
-                context.setDatabase(originalDatabase);
-            }
+        // If no space was specified, use the current space
+        if (!normalizedLink.isExternal() && (normalizedLink.getSpace() == null)) {
+            normalizedLink.setSpace(currentSpace);
         }
 
         return normalizedLink;

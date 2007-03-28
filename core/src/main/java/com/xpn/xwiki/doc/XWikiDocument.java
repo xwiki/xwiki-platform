@@ -25,7 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.content.parsers.LinkParser;
 import com.xpn.xwiki.content.parsers.DocumentParser;
-import com.xpn.xwiki.content.parsers.ParsingResultCollection;
+import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
+import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
@@ -3239,22 +3240,19 @@ public class XWikiDocument
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
 
-        // Set the context to point to the document being renamed. This is required so that
-        // the Link.getNormalizedName() method which uses context.getDoc().getSpace() gets the
-        // space from the document and not the space from the document where the renamed is called
-        // from. If we don't do this and if the rename is being done from a document in a different
-        // space the we won't be able to recognize links which have no space defined and which
-        // point to the document being renamed...
-        XWikiDocument originalCurrentDocument = context.getDoc();
-        context.setDoc(this);
+        // This link handler recognizes that 2 links are the same when they point to the same
+        // document (regardless of query string, target or alias). It keeps the query string,
+        // target and alias from the link being replaced.
+        RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
 
-        // Parse the new document in order to get a Link object so that we can easily get the
-        // space and page name.
+        // Transform string representation of old and new links so that they can be manipulated.
+        Link oldLink = new LinkParser().parse(getFullName());
         Link newLink = new LinkParser().parse(newDocumentName);
 
-        // If the new document name doesn't contain the space name, use the current space name.
-        if (newLink.getSpace() == null) {
-            newLink.setSpace(getSpace());
+        // Verify if the user is trying to rename to the same name... In that case, simply exits
+        // for efficiency.
+        if (linkHandler.compare(newLink, oldLink)) {
+            return;
         }
 
         // Step 1: Copy the document under a new name
@@ -3265,6 +3263,7 @@ public class XWikiDocument
         //         Note: we ignore invalid links here. Invalid links should be shown to the user so
         //         that they fix them but the rename feature ignores them.
         DocumentParser documentParser = new DocumentParser();
+
         for (Iterator it = backlinkDocumentNames.iterator(); it.hasNext();) {
             String backlinkDocumentName = (String) it.next();
             XWikiDocument backlinkDocument =
@@ -3273,29 +3272,11 @@ public class XWikiDocument
             // Note: Here we cannot do a simple search/replace as there are several ways to point
             // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
             // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
-            // to recognize them and only then do a replace.
-            
-            ParsingResultCollection result =
-                documentParser.parseLinks(backlinkDocument.getContent());
+            // to recognize them and do the replace.
+            ReplacementResultCollection result = documentParser.parseLinksAndReplace(
+                backlinkDocument.getContent(), oldLink, newLink, linkHandler, getSpace());
 
-            // For each link in a backlink document check if it corresponds to the current document
-            // name. If so, rename it with the new name.
-            for (Iterator links = result.getValidElements().iterator(); links.hasNext();) {
-                Link link = (Link) links.next();
-                String linkText = link.toString();
-                if (getFullName().equals(link.getNormalizedName(context))) {
-                    // We've found a link to rename! Rename it!
-                    // TODO: Also handle the case where we're renaming to an external link.
-                    link.setSpace(newLink.getSpace());
-                    link.setPage(newLink.getPage());
-
-                    // We need to add the link delimiters ("[" and "]") for doing the search and
-                    // replace as otherwise we might rename text with the same content as a link.
-                    String newContent = StringUtils.replaceOnce(backlinkDocument.getContent(),
-                        "[" + linkText + "]", "[" + link.toString() + "]");
-                    backlinkDocument.setContent(newContent);
-                }
-            }
+            backlinkDocument.setContent((String) result.getModifiedContent());
             context.getWiki().saveDocument(backlinkDocument, context);
         }
 
@@ -3305,9 +3286,6 @@ public class XWikiDocument
         // Step 4: The current document needs to point to the renamed document as otherwise it's
         //         pointing to an invalid XWikiDocument object as it's been deleted...
         clone(context.getWiki().getDocument(newDocumentName, context));
-
-        // Restore the current document in the context
-        context.setDoc(originalCurrentDocument);
     }
 
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException

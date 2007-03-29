@@ -30,7 +30,7 @@
 #set($discard = $renamedBLs.add($param.substring(9)))
 #end
 #end
-##$doc.rename($request.newPageName, $renamedBLs)
+$doc.rename($request.newPageName, $renamedBLs)
 #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$doc.fullName, $request.newPageName, $xwiki.getURL($request.newPageName)])")
 #xwikimessageboxend()
 #end

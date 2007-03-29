@@ -117,8 +117,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer!=null) {
-          if (log.isInfoEnabled()) {
-              log.info("MONITOR: error recursive timers for " + timername);
+          if (log.isWarnEnabled()) {
+              log.warn("MONITOR: error recursive timers for " + timername);
           }
         } else {
           timer = new MonitorTimer(timername, details);
@@ -135,8 +135,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isInfoEnabled()) {
-              log.info("MONITOR: could not find timer for " + timername);
+          if (log.isWarnEnabled()) {
+              log.warn("MONITOR: could not find timer for " + timername);
           }
         } else {
             timer.setDetails(details);
@@ -150,8 +150,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isInfoEnabled()) {
-              log.info("MONITOR: could not find timer for " + timername);
+          if (log.isWarnEnabled()) {
+              log.warn("MONITOR: could not find timer for " + timername);
           }
         } else {
           timer.setEndDate();
@@ -179,14 +179,12 @@ public class MonitorData {
     }
 
     public void log() {
-        if (log.isWarnEnabled()) {
-            log.warn("MONITOR " + wikiPage + ": " + getDuration() + "ms");
-        }
-        if (log.isInfoEnabled()) {
+        if (log.isDebugEnabled()) {
+            log.debug("MONITOR " + wikiPage + ": " + getDuration() + "ms");
             Iterator it = timerSummaries.values().iterator();
             while (it.hasNext()) {
                 MonitorTimerSummary tsummary = (MonitorTimerSummary) it.next();
-               log.info("MONITOR " + wikiPage + " " + action + " " + tsummary.getName() + ": " + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
+                log.debug("MONITOR " + wikiPage + " " + action + " " + tsummary.getName() + ": " + tsummary.getDuration() + "ms " + tsummary.getNbCalls());
             }
         }
     }

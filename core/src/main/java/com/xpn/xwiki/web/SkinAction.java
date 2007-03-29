@@ -98,7 +98,7 @@ public class SkinAction extends XWikiAction
                 if ((content != null) && (!content.equals(""))) {
                     // Choose the right content type
                     String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                    if (mimetype.equals("text/css") || mimetype.equals("text/javascript")) {
+                    if (mimetype.equals("text/css") || isJavascriptMimeType(mimetype)) {
                         content = context.getWiki().parseContent(content, context);
                     }
                     response.setContentType(mimetype);
@@ -115,7 +115,7 @@ public class SkinAction extends XWikiAction
                     // Sending the content of the attachment
                     byte[] data = attachment.getContent(context);
                     String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                    if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
+                    if ("text/css".equals(mimetype) || isJavascriptMimeType(mimetype)) {
                         data = context.getWiki().parseContent(new String(data), context).getBytes();
                     }
                     response.setContentType(mimetype);
@@ -148,7 +148,7 @@ public class SkinAction extends XWikiAction
                     // Choose the right content type
                     String mimetype =
                         xwiki.getEngineContext().getMimeType(filename.toLowerCase());
-                    if ("text/css".equals(mimetype) || "text/javascript".equals(mimetype)) {
+                    if ("text/css".equals(mimetype) || isJavascriptMimeType(mimetype)) {
                         data =
                             context.getWiki().parseContent(new String(data), context).getBytes();
                     }

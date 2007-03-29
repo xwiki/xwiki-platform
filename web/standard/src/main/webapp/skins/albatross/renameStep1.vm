@@ -1,0 +1,30 @@
+###
+### Rename document template, step 1: choose new name + updated backlinks
+###
+## TODO: check if this information should be displayed?
+<h2 class="heading-1">Renaming $doc.fullName</h2>
+<form action="?xpage=rename&amp;step=2" method="post">
+<h3 class="heading-1-1">$msg.get("core.rename.title.newName")</h3>
+#set($pweb = $doc.space)
+#set($newname = $msg.get("core.rename.defaultTitle"))
+<div class="padded">
+<input type="text" name="newPageName" value="${pweb}.${newname}" class="panelinput"
+  onfocus="if(this.value=='${pweb}.${newname}') this.value='${pweb}.'" onblur="if(this.value=='${pweb}.') this.value='${pweb}.${newname}'"/>
+</div>
+#set($backlinks = $doc.getBacklinks())
+#if($backlinks.size() > 0)
+<h3 class="heading-1-1">$msg.get("core.rename.title.updateDocs")</h3>
+#foreach($backlink in $backlinks)
+#if(!$xwiki.hasAccessLevel("edit", $context.user, $backlink))
+<div><label style="color: #999;"><input type="checkbox" disabled="disabled"/> $backlink</label></div>
+#elseif($xwiki.getDocument($backlink).isProgrammaticContent())
+<div><label style="color: #900;"><input type="checkbox" name="backlink_$backlink"/> $backlink</label></div>
+#else
+<div><label><input type="checkbox" name="backlink_$backlink" checked="checked"/> $backlink</label></div>
+#end
+#end
+#end
+<div class="padded">
+<span class="buttonwrapper"><input type="submit" value="$msg.get("core.rename.submit")"/></span>
+</div>
+</form>

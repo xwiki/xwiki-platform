@@ -206,6 +206,9 @@ Menu
 #tmDelete a strong{
   background-image: url(icons/black-delete.png);
 }
+#tmRename a strong{
+  background-image: url(icons/black-rename-ab.png);
+}
 #tmCreate a:hover strong{
   background-image: url(icons/black-create-ab2.png);
 }
@@ -223,6 +226,9 @@ Menu
 }
 #tmDelete a:hover strong{
   background-image: url(icons/black-delete2.png);
+}
+#tmRename a:hover strong{
+  background-image: url(icons/black-rename-ab2.png);
 }
 
 .submenu{

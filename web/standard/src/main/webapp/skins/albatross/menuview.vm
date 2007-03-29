@@ -79,6 +79,12 @@
 #if($hasadmin)
 #xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("delete") "tmDelete")
 #end
+##
+## Rename menu
+##
+#if($hasedit)
+#xwikitopmenuentry($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("rename") "tmRename")
+#end
 </div>
 </div>
 #end

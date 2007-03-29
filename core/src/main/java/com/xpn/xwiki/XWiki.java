@@ -3677,22 +3677,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         VelocityContext vcontext) throws XWikiException
     {
         XWikiDocument doc;
+        String docName = getDocumentName(request, context);
         try {
-            doc = getDocument(getDocumentName(request, context), context);
-            context.put("doc", doc);
-            vcontext.put("doc", doc.newDocument(context));
-            vcontext.put("cdoc", vcontext.get("doc"));
+            doc = getDocument(docName, context);
         } catch (XWikiException e) {
             doc = context.getDoc();
             if (context.getAction().equals("delete")) {
                 if (doc == null) {
-                    doc = new XWikiDocument();
-                    doc.setFullName(getDocumentName(request, context));
-                    doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
-                    doc.setStore(getStore());
-                    context.put("doc", doc);
-                    vcontext.put("doc", doc.newDocument(context));
-                    vcontext.put("cdoc", vcontext.get("doc"));
+                    setPhonyDocument(docName, context, vcontext);
                 }
                 if (!checkAccess("admin", doc, context)) {
                     throw e;
@@ -3706,6 +3698,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Otherwise we don't have the user language
         if (checkAccess(context.getAction(), doc, context) == false) {
             Object[] args = {doc.getFullName(), context.getUser()};
+            setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}",
@@ -3713,17 +3706,31 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 args);
         } else if (checkActive(context) == 0) {
             Object[] args = {context.getUser()};
+            setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                 XWikiException.ERROR_XWIKI_USER_INACTIVE,
                 "User {0} account is inactive",
                 null,
                 args);
         }
-
+        context.put("doc", doc);
+        vcontext.put("doc", doc.newDocument(context));
+        vcontext.put("cdoc", vcontext.get("doc"));
         XWikiDocument tdoc = doc.getTranslatedDocument(context);
         context.put("tdoc", tdoc);
         vcontext.put("tdoc", tdoc.newDocument(context));
         return true;
+    }
+
+    public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext) {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(docName);
+        doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
+        doc.setStore(getStore());
+        context.put("doc", doc);
+        vcontext.put("doc", doc.newDocument(context));
+        vcontext.put("cdoc", vcontext.get("doc"));
+        vcontext.put("tdoc", vcontext.get("doc"));
     }
 
     public XWikiEngineContext getEngineContext()

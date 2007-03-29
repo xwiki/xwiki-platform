@@ -30,9 +30,16 @@
 #set($discard = $renamedBLs.add($param.substring(9)))
 #end
 #end
+
+## Save the old document name so that we can display it in the notice box. After the rename the
+## doc points to the new name!
+#set ($oldDocName = $doc.fullName)
+
 $doc.rename($request.newPageName, $renamedBLs)
-#xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$doc.fullName, $request.newPageName, $xwiki.getURL($request.newPageName)])")
+
+#xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$oldDocName, $doc.fullName, $xwiki.getURL($doc.fullName)])")
 #xwikimessageboxend()
+
 #end
 #end
 <div class="clearfloats"></div>

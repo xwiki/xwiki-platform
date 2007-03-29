@@ -72,10 +72,11 @@ public class DocumentParserTest extends TestCase
         Link newLink = new LinkParser().parse("Space2.Page2");
 
         ReplacementResultCollection result = parser.parseLinksAndReplace(
-            "This is [Hello|Space.Page?param=1].", linkToLookFor, newLink,
+            "This is [Hello|Space.Page?param=${doc\\.fullName}].", linkToLookFor, newLink,
             new RenamePageReplaceLinkHandler(), "Whatever");
 
-        assertEquals("This is [Hello|Space2.Page2?param=1].", result.getModifiedContent());
+        assertEquals("This is [Hello|Space2.Page2?param=${doc\\.fullName}].",
+            result.getModifiedContent());
     }
 
 }

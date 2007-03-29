@@ -24,6 +24,8 @@ import com.xpn.xwiki.content.Link;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Parse document source content as typed by the user.
  *
@@ -104,8 +106,18 @@ public class DocumentParser implements ContentParser
                 Link normalizedFoundLink = foundLink.getNormalizedLink(currentSpace);
 
                 if (linkHandler.compare(normalizedLinkToLookFor, normalizedFoundLink)) {
-                    matcher.appendReplacement(modifiedContent, "[" + linkHandler.getReplacementLink(
-                        nomalizedNewLink, normalizedFoundLink).toString() + "]");
+
+                    // Compute the replacement string to use. This string must have "$" and
+                    // "\" symbols escaped as otherwise "$" will be considered as a regex group
+                    // replacement and "\" as a regex escape.
+                    // Note: We need to replace the "\" before the "$" as the "$" replacement
+                    // introduces other backslashes which would themselves be espaced...
+                    String replacementText = "[" + linkHandler.getReplacementLink(
+                        nomalizedNewLink, normalizedFoundLink).toString() + "]";
+                    replacementText = StringUtils.replace(replacementText, "\\", "\\\\");
+                    replacementText = StringUtils.replace(replacementText, "$", "\\$");
+
+                    matcher.appendReplacement(modifiedContent, replacementText);
                     results.addReplacedElement(normalizedFoundLink);
                 }
             }
@@ -117,7 +129,7 @@ public class DocumentParser implements ContentParser
     }
 
     /**
-     * Helper metohd to parse a link and add the result of the parsing to the resulting collections
+     * Helper method to parse a link and add the result of the parsing to the resulting collections
      * of objects to be returned to the user.
      *
      * @param parser the link parser to use for parsing the link

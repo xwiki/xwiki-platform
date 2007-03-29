@@ -79,8 +79,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             if (mdata!=null) {
                 removeFromActiveTimerDataList(cthread);
                 addToLastUnfinishedTimerDataList(mdata);
-                if (log.isInfoEnabled()) {
-                    log.info("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call endRequest");
+                if (log.isWarnEnabled()) {
+                    log.warn("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call endRequest");
                 }
                 mdata.endRequest(false);
             }
@@ -109,8 +109,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             Thread cthread = Thread.currentThread();
             MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
             if (mdata==null) {
-                if (log.isInfoEnabled()) {
-                    log.info("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
+                if (log.isWarnEnabled()) {
+                    log.warn("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
                 }
                 return;
             }

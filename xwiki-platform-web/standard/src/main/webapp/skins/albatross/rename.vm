@@ -1,0 +1,41 @@
+###
+### Rename document template
+###
+#if(!$xwiki.hasAccessLevel("edit"))
+#template("accessdenied.vm")
+#else
+#template("startpage.vm")
+## TODO: Improve the interface, splitting the operation into more steps.
+#if((!$step) || ($step == ""))
+#set($step = $request.getParameter("step"))
+#end
+#if((!$step) || ($step == ""))
+#set($step = "1")
+#end
+#set($step = $xwiki.parseInt("$step"))
+<div class="main layoutsubsection">
+#if($step == 1)
+#template("renameStep1.vm")
+#else
+#if((!$request.newPageName) || ($request.newPageName.trim().equals("")) || ($request.newPageName.endsWith(".")))
+#error("$msg.get('core.rename.emptyName')")
+#template("renameStep1.vm")
+#elseif($xwiki.exists($request.newPageName))
+#error("$msg.get('core.rename.alreadyExists', [$request.newPageName, $xwiki.getURL($request.newPageName)])")
+#template("renameStep1.vm")
+#else
+#set($renamedBLs = $xwiki.arrayList)
+#foreach($param in $request.parameterNames)
+#if($param.startsWith("backlink_"))
+#set($discard = $renamedBLs.add($param.substring(9)))
+#end
+#end
+##$doc.rename($request.newPageName, $renamedBLs)
+#xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$doc.fullName, $request.newPageName, $xwiki.getURL($request.newPageName)])")
+#xwikimessageboxend()
+#end
+#end
+<div class="clearfloats"></div>
+</div>## main
+#template("endpage.vm")
+#end

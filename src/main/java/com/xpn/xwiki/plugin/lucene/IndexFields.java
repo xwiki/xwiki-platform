@@ -60,8 +60,9 @@ public abstract class IndexFields
     public static final String DOCUMENT_LANGUAGE = "lang";
 
     /**
-     * Type of a document, "attachment" or "wikipage", used to control presentation of
-     * searchresults. See {@link SearchResult}and xdocs/searchResult.vm.
+     * Type of a document, "attachment", "wikipage" or "objects", used to
+     * control presentation of searchresults.
+     * See {@link SearchResult}and xdocs/searchResult.vm.
      */
     public static final String DOCUMENT_TYPE = "type";
 

@@ -126,7 +126,7 @@ public class AttachmentData extends IndexData
      */
     public String getId()
     {
-        return new StringBuffer(super.getId()).append(".").append(filename).toString();
+        return new StringBuffer(super.getId()).append(".file.").append(filename).toString();
     }
 
     /**

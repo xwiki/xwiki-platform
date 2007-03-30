@@ -79,16 +79,16 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             if (mdata!=null) {
                 removeFromActiveTimerDataList(cthread);
                 addToLastUnfinishedTimerDataList(mdata);
-                if (log.isWarnEnabled()) {
-                    log.warn("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call endRequest");
+                if (log.isDebugEnabled()) {
+                    log.debug("MONITOR: Thread " + cthread.getName() + " for page " + mdata.getWikiPage() + " did not call endRequest");
                 }
                 mdata.endRequest(false);
             }
             mdata = new MonitorData(page, action, url, cthread.getName());
             activeTimerDataList.put(cthread, mdata);
         } catch (Throwable e) {
-            if (log.isWarnEnabled()) {
-                log.warn("MONITOR: endRequest failed with exception " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("MONITOR: endRequest failed with exception " + e);
                 e.printStackTrace();
             }
         }
@@ -109,8 +109,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             Thread cthread = Thread.currentThread();
             MonitorData mdata = (MonitorData) activeTimerDataList.get(cthread);
             if (mdata==null) {
-                if (log.isWarnEnabled()) {
-                    log.warn("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
+                if (log.isDebugEnabled()) {
+                    log.debug("MONITOR: Thread " + cthread.getName() + " did not call startRequest");
                 }
                 return;
             }
@@ -120,8 +120,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
             removeFromActiveTimerDataList(cthread);
             addToTimerDataList(mdata);
         } catch (Throwable e) {
-            if (log.isWarnEnabled()) {
-                log.warn("MONITOR: endRequest failed with exception " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("MONITOR: endRequest failed with exception " + e);
                 e.printStackTrace();
             }
         }
@@ -195,8 +195,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
                 mdata.startTimer(timername, desc);
             }
         } catch (Throwable e) {
-            if (log.isWarnEnabled()) {
-                log.warn("MONITOR: startRequest for timer " + timername + " failed with exception " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("MONITOR: startRequest for timer " + timername + " failed with exception " + e);
                 e.printStackTrace();
             }
         }
@@ -213,8 +213,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
                 mdata.setTimerDetails(timername, desc);
             }
         } catch (Throwable e) {
-            if (log.isWarnEnabled()) {
-                log.warn("MONITOR: setTimerDesc for timer " + timername + " failed with exception " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("MONITOR: setTimerDesc for timer " + timername + " failed with exception " + e);
                 e.printStackTrace();
             }
         }
@@ -231,8 +231,8 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
                 mdata.endTimer(timername);
             }
         } catch (Throwable e) {
-            if (log.isWarnEnabled()) {
-                log.warn("MONITOR: endRequest for timer " + timername + " failed with exception " + e);
+            if (log.isDebugEnabled()) {
+                log.debug("MONITOR: endRequest for timer " + timername + " failed with exception " + e);
                 e.printStackTrace();
             }
         }

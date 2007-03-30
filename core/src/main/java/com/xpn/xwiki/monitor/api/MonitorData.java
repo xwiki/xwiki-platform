@@ -117,8 +117,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer!=null) {
-          if (log.isWarnEnabled()) {
-              log.warn("MONITOR: error recursive timers for " + timername);
+          if (log.isDebugEnabled()) {
+              log.debug("MONITOR: error recursive timers for " + timername);
           }
         } else {
           timer = new MonitorTimer(timername, details);
@@ -135,8 +135,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isWarnEnabled()) {
-              log.warn("MONITOR: could not find timer for " + timername);
+          if (log.isDebugEnabled()) {
+              log.debug("MONITOR: could not find timer for " + timername);
           }
         } else {
             timer.setDetails(details);
@@ -150,8 +150,8 @@ public class MonitorData {
         MonitorTimer timer;
         timer = (MonitorTimer)timers.get(timername);
         if (timer==null) {
-          if (log.isWarnEnabled()) {
-              log.warn("MONITOR: could not find timer for " + timername);
+          if (log.isDebugEnabled()) {
+              log.debug("MONITOR: could not find timer for " + timername);
           }
         } else {
           timer.setEndDate();

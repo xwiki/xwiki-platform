@@ -24,7 +24,6 @@
 package com.xpn.xwiki.gwt.api.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,6 +36,8 @@ import com.xpn.xwiki.gwt.api.client.User;
 import com.xpn.xwiki.gwt.api.client.XObject;
 import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.Dictionary;
+import com.xpn.xwiki.gwt.api.client.LoginException;
+import com.xpn.xwiki.gwt.api.client.RightException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -96,6 +97,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         xwiki.prepareResources(context);
 
         String username = "XWiki.XWikiGuest";
+        if (context.getMode() == XWikiContext.MODE_GWT)
+            username = "XWiki.superadmin";
         XWikiUser user = context.getWiki().checkAuth(context);
         if (user != null)
             username = user.getUser();
@@ -660,17 +663,29 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
-    protected void assertEditRight(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    protected void assertEditRight(XWikiDocument doc, XWikiContext context) throws XWikiException, LoginException, RightException {
+        if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
+            return;
         if (!hasAccessLevel("edit", doc.getFullName(), context))
-            throw new XWikiException(XWikiException.MODULE_XWIKI_GWT_API, XWikiException.ERROR_XWIKI_ACCESS_DENIED,"edit_denied", null);
+            raiseRightException(context);
     }
 
-    protected void assertViewRight(String fullName, XWikiContext context) throws XWikiException {
+    protected void assertViewRight(String fullName, XWikiContext context) throws XWikiException, LoginException, RightException {
+        if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
+            return;
         if (!hasAccessLevel("view", fullName, context))
-            throw new XWikiException(XWikiException.MODULE_XWIKI_GWT_API, XWikiException.ERROR_XWIKI_ACCESS_DENIED,"view_denied", null);
+            raiseRightException(context);
     }
 
-    protected void assertViewRight(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    protected void raiseRightException(XWikiContext context) throws RightException, LoginException {
+        if (context.getUser().equals("XWiki.XWikiGuest")){
+            throw new LoginException();
+        }
+        else
+            throw new RightException();
+    }
+
+    protected void assertViewRight(XWikiDocument doc, XWikiContext context) throws XWikiException, LoginException, RightException {
         assertViewRight(doc.getFullName(), context);
     }
 
@@ -699,10 +714,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setLanguage(xdoc.getLanguage());
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
-        doc.setUploadURL(xdoc.getExternalURL("upload",  context));  // "ajax=1"
+        doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));  // "ajax=1"
         doc.setViewURL(xdoc.getExternalURL("view", context));
         try {
-            doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", context)); //, "ajax=1"
+            doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", "ajax=1", context)); //, "ajax=1"
         } catch (XWikiException e) {
             e.printStackTrace();
         }

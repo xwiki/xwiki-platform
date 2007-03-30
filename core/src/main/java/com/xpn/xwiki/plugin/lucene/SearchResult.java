@@ -32,6 +32,8 @@ import java.util.Date;
  */
 public class SearchResult
 {
+    private String id;
+
     private float score;
 
     private String name;
@@ -69,6 +71,7 @@ public class SearchResult
         com.xpn.xwiki.api.XWiki xwiki)
     {
         this.score = score;
+        id = doc.get(IndexFields.DOCUMENT_ID);
         name = doc.get(IndexFields.DOCUMENT_NAME);
         web = doc.get(IndexFields.DOCUMENT_WEB);
         wiki = doc.get(IndexFields.DOCUMENT_WIKI);
@@ -92,6 +95,13 @@ public class SearchResult
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * @return the document id as indexed
+     */
+    public String getId() {
+        return id;
     }
 
     /**
@@ -196,11 +206,13 @@ public class SearchResult
     }
 
     /**
-     * @return true when this result points to wiki content (attachment or a wiki page)
+     * @return true when this result points to wiki content (attachment, wiki page or object)
      */
     public boolean isWikiContent()
     {
         return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(type) ||
-            LucenePlugin.DOCTYPE_ATTACHMENT.equals(type));
+            LucenePlugin.DOCTYPE_ATTACHMENT.equals(type) ||
+            LucenePlugin.DOCTYPE_OBJECTS.equals(type));
     }
+
 }

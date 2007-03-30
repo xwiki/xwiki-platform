@@ -47,7 +47,7 @@ public class XWikiDocumentQueue
 
     public synchronized void add(IndexData data)
     {
-        final String key = data.toString();
+        final String key = data.getId();
         if (!documentsByName.containsKey(key)) {
             // document with this name not yet in Queue, so add it
             namesQueue.add(key);

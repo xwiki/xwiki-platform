@@ -55,7 +55,11 @@ public class ObjectData extends IndexData
      */
     public String getType()
     {
-        return LucenePlugin.DOCTYPE_WIKIPAGE;
+        return LucenePlugin.DOCTYPE_OBJECTS;
+    }
+
+    public String getId() {
+        return new StringBuffer(super.getId()).append(".objects").toString();
     }
 
     /**

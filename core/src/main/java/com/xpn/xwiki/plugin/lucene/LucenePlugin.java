@@ -46,6 +46,8 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 {
     public static final String DOCTYPE_WIKIPAGE = "wikipage";
 
+    public static final String DOCTYPE_OBJECTS = "objects";
+
     public static final String DOCTYPE_ATTACHMENT = "attachment";
 
     private static final Logger LOG = Logger.getLogger(LucenePlugin.class);

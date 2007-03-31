@@ -1,7 +1,7 @@
 #if(!$hideTags || $hideTags == 0)
 #set($displayType = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty('displayType').value)
 #set($possibleTags = $tdoc.tagsPossibleValues)
-#if($possibleTags && $possibleTags.size() > 0)
+#if($possibleTags && $possibleTags.size() > 0 && !$displayType.equals('input'))
 #if($displayType == 'select')
   <dl id="selectedTagsForm">
    <dt><label for="tags">$msg.get("tags"): </label></dt>
@@ -75,11 +75,6 @@
     initTagScript();
 // ]]>
     {/pre}</script>
-#elseif($displayType == 'input')
-  <dl>
-   <dt><label for="tags">$msg.get("tags"): </label></dt>
-   <dd><input type="text" id="tags" name="tags" value="$!tdoc.tags"/></dd>
-  </dl>
 #else
 #set($existingTags = $xwiki.arrayList)
 #foreach($tag in $!tdoc.tags.split("[|]"))
@@ -92,5 +87,10 @@
 #end
   </dl>
 #end
+#else
+  <dl>
+   <dt><label for="tags">$msg.get("tags"): </label></dt>
+   <dd><input type="text" id="tags" name="tags" value="$!tdoc.tags"/></dd>
+  </dl>
 #end
 #end

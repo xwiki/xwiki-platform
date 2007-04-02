@@ -97,7 +97,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         xwiki.prepareResources(context);
 
         String username = "XWiki.XWikiGuest";
-        if (context.getMode() == XWikiContext.MODE_GWT)
+        if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
             username = "XWiki.superadmin";
         XWikiUser user = context.getWiki().checkAuth(context);
         if (user != null)

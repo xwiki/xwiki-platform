@@ -427,6 +427,8 @@
         <exclude name="**/hibernate.cfg.xml" />
         <lib refid="libs.main.fileset" />
         <lib refid="libs.hib.fileset" />
+        <lib refid="libs.lucene.fileset" />
+        <lib refid="libs.gwt.fileset" />
         <lib refid="libs.xwiki.fileset" />
         <lib refid="libs.tests.fileset" />
         <lib refid="libs.exo.fileset" />
@@ -525,6 +527,8 @@
         <fileset refid="libs.main.fileset" />
         <fileset refid="libs.hib.fileset" />
         <fileset refid="libs.exo.fileset" />
+        <fileset refid="libs.lucene.fileset" />
+        <fileset refid="libs.gwt.fileset" />
         <fileset refid="libs.xwiki.fileset" />
 	  </copy>
       <copy todir="${release.dir}/web" overwrite="true">
@@ -541,6 +545,8 @@
         <lib refid="libs.main.fileset" />
         <lib refid="libs.hib.fileset" />
         <lib refid="libs.exo.fileset" />
+        <lib refid="libs.lucene.fileset" />
+        <lib refid="libs.gwt.fileset" />
         <lib refid="libs.xwiki.fileset" />
         <fileset dir="${build.dir}/web"/>
         <fileset dir="${web.standard.webapp.main.src.dir}">
@@ -552,7 +558,9 @@
       <mkdir dir="${release.dir}" />
       <war warfile="${exo.warfile}" webxml="${web.exo.webapp.main.src.dir}/WEB-INF/web.xml" >
         <lib refid="libs.main.fileset" />
+        <lib refid="libs.lucene.fileset" />
         <lib refid="libs.exo.fileset" />
+        <lib refid="libs.gwt.fileset" />
         <lib refid="libs.xwiki.fileset" />
         <fileset dir="${build.dir}/web"/>
         <fileset dir="${web.exo.webapp.main.src.dir}">

@@ -763,7 +763,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             } else
                                 throw e;
                         } catch (Throwable e2) {
-                            throw e;
+                            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber()), name};
+                            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
+                                "Exception while loading object '{0}' of class '{1}', number '{2}' and property '{3}'", e, args);
                         }
                     }
 
@@ -774,9 +776,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = { object.getName() };
+            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber()) };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while loading object {0}", e, args);
+                    "Exception while loading object '{0}' of class '{1}' and number '{2}'", e, args);
 
         } finally {
             try {

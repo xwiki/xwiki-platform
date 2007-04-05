@@ -180,7 +180,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
             continue;
         }
         output.append("</tr>");
-        int weeks = (int) Math.ceil((todayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + dayCal.get(Calendar.DAY_OF_WEEK) - dayCal.getFirstDayOfWeek()) / 7.0);
+        int weeks = (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal.get(Calendar.DAY_OF_WEEK) - dayCal.getFirstDayOfWeek() + 7) % 7 ) / 7.0);
         for (int w = 0; w < weeks; w++) {
             output.append("<tr>");
             for (int d = 0; d < 7; d++) {

@@ -26,7 +26,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -43,7 +42,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -665,7 +663,7 @@ public class Package
 
         while ((entry = zis.getNextEntry()) != null) {
             if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
-                description = fromXml(IOUtils.toString(zis));
+                description = fromXml(zis);
                 return description;
             }
         }
@@ -825,13 +823,10 @@ public class Package
         }
     }
 
-    protected Document fromXml(String xml) throws DocumentException
+    protected Document fromXml(InputStream xml) throws DocumentException
     {
         SAXReader reader = new SAXReader();
-        Document domdoc;
-
-        StringReader in = new StringReader(xml);
-        domdoc = reader.read(in);
+        Document domdoc = reader.read(xml);
 
         Element docEl = domdoc.getRootElement();
         Element infosEl = docEl.element("infos");
@@ -888,7 +883,7 @@ public class Package
         int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
-            description = fromXml(IOUtils.toString(new FileInputStream(infofile)));
+            description = fromXml(new FileInputStream(infofile));
             if (description == null) {
                 throw new PackageException(PackageException.ERROR_PACKAGE_NODESCRIPTION,
                     "Cannot read package description file");

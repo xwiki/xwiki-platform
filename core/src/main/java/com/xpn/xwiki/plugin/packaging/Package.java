@@ -26,6 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -664,22 +665,11 @@ public class Package
 
         while ((entry = zis.getNextEntry()) != null) {
             if (entry.getName().compareTo(DefaultPackageFileName) == 0) {
-                description = readPackage(zis);
+                description = fromXml(IOUtils.toString(zis));
                 return description;
             }
         }
         return null;
-    }
-
-    private Document readPackage(InputStream is) throws IOException, DocumentException
-    {
-        byte[] data = new byte[4096];
-        StringBuffer XmlFile = new StringBuffer();
-        int Cnt;
-        while ((Cnt = is.read(data, 0, 4096)) != -1) {
-            XmlFile.append(new String(data, 0, Cnt));
-        }
-        return fromXml(XmlFile.toString());
     }
 
     public String toXml(XWikiContext context)
@@ -898,7 +888,7 @@ public class Package
         int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
-            description = readPackage(new FileInputStream(infofile));
+            description = fromXml(IOUtils.toString(new FileInputStream(infofile)));
             if (description == null) {
                 throw new PackageException(PackageException.ERROR_PACKAGE_NODESCRIPTION,
                     "Cannot read package description file");

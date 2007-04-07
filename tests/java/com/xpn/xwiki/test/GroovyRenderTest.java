@@ -22,17 +22,17 @@
 
 package com.xpn.xwiki.test;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
+import groovy.lang.MetaClassRegistry;
+
+import java.util.Map;
+
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import groovy.lang.MetaClassRegistry;
-
-import java.util.Map;
 
 public class GroovyRenderTest extends HibernateTestCase {
 

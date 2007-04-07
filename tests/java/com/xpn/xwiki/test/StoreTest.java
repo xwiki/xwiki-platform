@@ -28,20 +28,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.suigeneris.jrcs.rcs.Version;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.ParseException;
+import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
-import org.apache.tools.ant.filters.StringInputStream;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 
 public class StoreTest extends HibernateTestCase {
 
@@ -61,7 +60,7 @@ public class StoreTest extends HibernateTestCase {
     public void existsAfterRead(XWikiStoreInterface store, String web, String name) throws XWikiException {
         standardWrite(store, web, name, getXWikiContext());
         XWikiDocument doc2 = new XWikiDocument(web, name);
-        doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+        doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
         boolean result = store.exists(doc2, getXWikiContext());
         assertTrue("Document should exist", result);
     }
@@ -74,17 +73,17 @@ public class StoreTest extends HibernateTestCase {
            store.saveXWikiDoc(doc1, getXWikiContext());
 
            XWikiDocument doc2 = new XWikiDocument(web, name);
-           doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+           doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
 
            String content1 = doc2.getContent();
            assertEquals(Utils.content1, content1);
 
            XWikiDocument doc3 = new XWikiDocument(web, name);
-           doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+           doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
            store.deleteXWikiDoc(doc3, getXWikiContext());
 
            XWikiDocument doc4 = new XWikiDocument(web, name);
-           doc4 = (XWikiDocument) store.loadXWikiDoc(doc4, getXWikiContext());
+           doc4 = store.loadXWikiDoc(doc4, getXWikiContext());
 
            assertTrue("Document should be new", doc4.isNew());
          }
@@ -97,7 +96,7 @@ public class StoreTest extends HibernateTestCase {
            store.saveXWikiDoc(doc1, getXWikiContext());
 
            XWikiDocument doc2 = new XWikiDocument(web, name);
-           doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+           doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
 
            String content1 = doc2.getContent();
            assertEquals("toto", content1);
@@ -105,7 +104,7 @@ public class StoreTest extends HibernateTestCase {
 
     public void versionedReadWrite(XWikiStoreInterface store, XWikiVersioningStoreInterface versioningStore, String web, String name) throws XWikiException {
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         XWikiDocument doc4 = versioningStore.loadXWikiDoc(doc3,Utils.version, getXWikiContext());
         String content4 = doc4.getContent();
         assertEquals(Utils.content1,content4);
@@ -197,7 +196,7 @@ public class StoreTest extends HibernateTestCase {
         store.saveXWikiDoc(doc1, getXWikiContext());
 
         XWikiDocument doc2 = new XWikiDocument(web, name);
-        doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+        doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
         List attachlist = doc2.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attachment2 = (XWikiAttachment) attachlist.get(0);
@@ -223,7 +222,7 @@ public class StoreTest extends HibernateTestCase {
     public void secondAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         XWikiAttachment attachment2 = new XWikiAttachment(doc3, Utils.filename2);
         byte[] attachcontent2 = Utils.getDataAsBytes(new File(Utils.filename2));
         attachment2.setContent(attachcontent2);
@@ -232,7 +231,7 @@ public class StoreTest extends HibernateTestCase {
         store.saveXWikiDoc(doc3, getXWikiContext());
 
         XWikiDocument doc4 = new XWikiDocument(web, name);
-        doc4 = (XWikiDocument) store.loadXWikiDoc(doc4, getXWikiContext());
+        doc4 = store.loadXWikiDoc(doc4, getXWikiContext());
         List attachlist = doc4.getAttachmentList();
         assertEquals("Attachment is not listed", 2, attachlist.size());
         XWikiAttachment attachment4 = (XWikiAttachment) attachlist.get(1);
@@ -253,7 +252,7 @@ public class StoreTest extends HibernateTestCase {
     public void updateAttachmentReadWrite(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         List attachlist = doc3.getAttachmentList();
         XWikiAttachment attachment3 = (XWikiAttachment) attachlist.get(0);
         byte[] attachcontent3 = Utils.getDataAsBytes(new File(Utils.filename2));
@@ -262,7 +261,7 @@ public class StoreTest extends HibernateTestCase {
         store.saveXWikiDoc(doc3, getXWikiContext());
 
         XWikiDocument doc4 = new XWikiDocument(web, name);
-        doc4 = (XWikiDocument) store.loadXWikiDoc(doc4, getXWikiContext());
+        doc4 = store.loadXWikiDoc(doc4, getXWikiContext());
         attachlist = doc4.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attachment4 = (XWikiAttachment) attachlist.get(0);
@@ -283,7 +282,7 @@ public class StoreTest extends HibernateTestCase {
     public void deleteAttachmentReadWrite(XWikiStoreInterface store, XWikiAttachmentStoreInterface attachmentStore, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         List attachlist = doc3.getAttachmentList();
         XWikiAttachment attachment3 = (XWikiAttachment) attachlist.get(0);
 
@@ -293,7 +292,7 @@ public class StoreTest extends HibernateTestCase {
         assertEquals("Attachment is still there", 0, attachlist.size());
 
         XWikiDocument doc4 = new XWikiDocument(web, name);
-        doc4 = (XWikiDocument) store.loadXWikiDoc(doc4, getXWikiContext());
+        doc4 = store.loadXWikiDoc(doc4, getXWikiContext());
         attachlist = doc4.getAttachmentList();
         assertEquals("Attachment is still there", 0, attachlist.size());
     }
@@ -301,7 +300,7 @@ public class StoreTest extends HibernateTestCase {
     public void deleteDocWithAttachment(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
 
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         store.deleteXWikiDoc(doc3, getXWikiContext());
 
         XWikiDocument doc4 = new XWikiDocument(web, name);
@@ -311,7 +310,7 @@ public class StoreTest extends HibernateTestCase {
         store.saveXWikiDoc(doc4, getXWikiContext());
 
         XWikiDocument doc5 = new XWikiDocument(web, name);
-        doc5 = (XWikiDocument) store.loadXWikiDoc(doc5, getXWikiContext());
+        doc5 = store.loadXWikiDoc(doc5, getXWikiContext());
         List attachlist = doc5.getAttachmentList();
         assertEquals("Attachment is still there", 0, attachlist.size());
     }
@@ -341,7 +340,7 @@ public class StoreTest extends HibernateTestCase {
 
     public static void standardRead(XWikiStoreInterface store, String web, String name, XWikiContext context) throws XWikiException {
         XWikiDocument doc2 = new XWikiDocument(web, name);
-        doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, context);
+        doc2 = store.loadXWikiDoc(doc2, context);
         String content2 = doc2.getContent();
         assertEquals(Utils.content1,content2);
         assertEquals(doc2.getVersion(), Utils.version);
@@ -358,7 +357,7 @@ public class StoreTest extends HibernateTestCase {
         doc1.setDefaultLanguage(Utils.defaultLanguage);
         store.saveXWikiDoc(doc1, context);
         XWikiDocument doc2 = new XWikiDocument(web, name);
-        doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, context);
+        doc2 = store.loadXWikiDoc(doc2, context);
         String content2 = doc2.getContent();
         assertEquals(Utils.content1,content2);
         assertEquals(doc2.getVersion(), Utils.version);
@@ -370,7 +369,7 @@ public class StoreTest extends HibernateTestCase {
         doc2.setAuthor(Utils.author2);
         store.saveXWikiDoc(doc2, context);
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, context);
+        doc3 = store.loadXWikiDoc(doc3, context);
         String content3b = doc3.getContent();
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);
@@ -406,7 +405,7 @@ public class StoreTest extends HibernateTestCase {
 
         // Verify data
         XWikiDocument doc1 = new XWikiDocument(Utils.web, Utils.name);
-        doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
+        doc1 = store.loadXWikiDoc(doc1, getXWikiContext());
         List attachlist = doc1.getAttachmentList();
         assertEquals("Attachment is not listed", 1, attachlist.size());
         XWikiAttachment attach1 = (XWikiAttachment) attachlist.get(0);
@@ -497,7 +496,7 @@ public class StoreTest extends HibernateTestCase {
 
     public void deleteDocWithBadAttachment1(XWikiStoreInterface store, String web, String name) throws XWikiException, IOException {
         XWikiDocument doc3 = new XWikiDocument(web, name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         store.deleteXWikiDoc(doc3, getXWikiContext());
 
         XWikiDocument doc4 = new XWikiDocument(web, name);
@@ -507,7 +506,7 @@ public class StoreTest extends HibernateTestCase {
         store.saveXWikiDoc(doc4, getXWikiContext());
 
         XWikiDocument doc5 = new XWikiDocument(web, name);
-        doc5 = (XWikiDocument) store.loadXWikiDoc(doc5, getXWikiContext());
+        doc5 = store.loadXWikiDoc(doc5, getXWikiContext());
         List attachlist = doc5.getAttachmentList();
         assertEquals("Attachment is still there", 0, attachlist.size());
     }

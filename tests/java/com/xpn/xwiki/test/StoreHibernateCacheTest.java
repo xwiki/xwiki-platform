@@ -46,7 +46,7 @@ public class StoreHibernateCacheTest extends HibernateTestCase {
         Utils.setStandardData();
         StoreTest.standardReadWrite(store, Utils.web, Utils.name, getXWikiContext());
         XWikiDocument doc3 = new XWikiDocument(Utils.web, Utils.name);
-        doc3 = (XWikiDocument) store.loadXWikiDoc(doc3, getXWikiContext());
+        doc3 = store.loadXWikiDoc(doc3, getXWikiContext());
         String content3b = doc3.getContent();
         assertEquals(Utils.content3,content3b);
         assertEquals(doc3.getAuthor(), Utils.author2);

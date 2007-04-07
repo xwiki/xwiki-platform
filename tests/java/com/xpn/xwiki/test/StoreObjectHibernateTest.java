@@ -26,8 +26,6 @@ package com.xpn.xwiki.test;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.HibernateException;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -274,7 +272,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
-        BaseObject object = doc.getObject(bclass.getName(), 0);
+        doc.getObject(bclass.getName(), 0);
         writeClass(store, bclass);
     }
 
@@ -283,7 +281,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
-        BaseObject object = doc.getObject(bclass.getName(), 0);
+        doc.getObject(bclass.getName(), 0);
         writeClass(store, bclass);
         readClass(store, bclass);
     }
@@ -293,7 +291,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
          XWikiDocument doc = new XWikiDocument();
          Utils.prepareAdvancedObject(doc);
          BaseClass bclass = doc.getxWikiClass();
-         BaseObject object = doc.getObject(bclass.getName(), 0);
+         doc.getObject(bclass.getName(), 0);
         writeClass(store, bclass);
     }
 
@@ -302,7 +300,7 @@ public class StoreObjectHibernateTest extends AbstractStoreObjectTest {
         XWikiDocument doc = new XWikiDocument();
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
-        BaseObject object = doc.getObject(bclass.getName(), 0);
+        doc.getObject(bclass.getName(), 0);
         writeClass(store, bclass);
         readClass(store, bclass);
     }

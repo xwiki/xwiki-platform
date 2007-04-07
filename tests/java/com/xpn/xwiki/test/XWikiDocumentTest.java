@@ -147,7 +147,7 @@ public class XWikiDocumentTest  extends HibernateTestCase {
 
         Map map = new HashMap();
         map.put("xvalidation", "Test.ValidationGroovy");
-        XWikiRequest request = new XWikiFakeRequest(map);
+        context.setRequest(new XWikiFakeRequest(map));
         assertFalse("Validation should have failed", xwiki.validateDocument(doc, context));
         assertTrue("Validation should have failed with an exception", context.getValidationStatus().hasExceptions());
     }
@@ -254,7 +254,6 @@ public class XWikiDocumentTest  extends HibernateTestCase {
         XWikiDocument doc  = xwiki.getDocument("Test.CustomTest", context);
         doc.setCustomClass(CustomDocumentClass.class.getName());
         xwiki.saveDocument(doc, context);
-
 
         doc  = xwiki.getDocument("Test.NotCustomTest", context);
         xwiki.saveDocument(doc, context);

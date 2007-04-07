@@ -24,19 +24,12 @@
 package com.xpn.xwiki.test;
 
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
-
-import org.hibernate.cfg.Configuration;
+import java.util.List;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public class RenamePageTest extends HibernateTestCase {
@@ -70,7 +63,7 @@ public class RenamePageTest extends HibernateTestCase {
             assertTrue("Link in link list item " + i + " is not correct", ok);
         }
 
-        XWikiDocument newdoc = getXWiki().renamePage(doc1, getXWikiContext(), "Test.NewName");
+        XWikiDocument newdoc = getXWiki().renamePage(doc1, "Test.NewName", getXWikiContext());
 
         assertTrue("Renaming is wrong", newdoc.getFullName().equals("Test.NewName"));
         assertTrue("New doc doesn't exists", getXWiki().getStore().exists(getXWiki().getDocument("Test.NewName", getXWikiContext()), getXWikiContext()) );

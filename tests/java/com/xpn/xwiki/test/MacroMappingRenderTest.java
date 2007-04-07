@@ -90,7 +90,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello)\nHello World\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello)\nHello World\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello World", false, context);
     }
@@ -107,7 +107,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:ludovic}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello2 $name)\nHello $name\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello2 $name)\nHello $name\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello ludovic", false, context);
     }
@@ -124,7 +124,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:I like \"sports\"}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello3 $name)\nHello $name\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello3 $name)\nHello $name\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello I like", false, context);
         AbstractRenderTest.renderTest(wikiengine, doc1, "sports", false, context);
@@ -142,7 +142,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:ludovic|dubost}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello4 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello4 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello ludovic dubost", false, context);
     }
@@ -159,7 +159,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:first_name=ludovic|last_name=dubost}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello5 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello5 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello ludovic dubost", false, context);
     }
@@ -176,7 +176,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:last_name=dubost|first_name=ludovic}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello6 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello6 $first_name $last_name)\nHello $first_name $last_name\n#end\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello ludovic dubost", false, context);
     }
@@ -194,7 +194,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingVelocity", "{hello:last_name=dubost|first_name=ludovic}This is my profile{hello}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.VelocityMacros", "#macro(hello7 $first_name $last_name $content)\nHello $first_name $last_name\nProfile: $content\n#end", store, context);
+        Utils.createDoc("XWiki.VelocityMacros", "#macro(hello7 $first_name $last_name $content)\nHello $first_name $last_name\nProfile: $content\n#end", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello ludovic dubost\nProfile: This is my profile", false, context);
     }
@@ -212,7 +212,7 @@ public class MacroMappingRenderTest extends TestCase {
         XWikiRenderingEngine wikiengine = xwiki.getRenderingEngine();
 
         XWikiDocument doc1 = Utils.createDoc("Test.MacroMappingGroovy", "{hello}", store, context);
-        XWikiDocument doc2 = Utils.createDoc("XWiki.GroovyMacros", "<% def hellogroovy() {\n println \"Hello World from Groovy\" \n}\n %>\n", store, context);
+        Utils.createDoc("XWiki.GroovyMacros", "<% def hellogroovy() {\n println \"Hello World from Groovy\" \n}\n %>\n", store, context);
 
         AbstractRenderTest.renderTest(wikiengine, doc1, "Hello World from Groovy", false, context);
     }

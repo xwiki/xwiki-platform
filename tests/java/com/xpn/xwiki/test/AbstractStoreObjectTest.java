@@ -65,7 +65,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         XWikiDocument doc = new XWikiDocument("Test","TestObject");
 
         // Read object2
-        doc = (XWikiDocument) store.loadXWikiDoc(doc, getXWikiContext());
+        doc = store.loadXWikiDoc(doc, getXWikiContext());
         BaseObject object2 = doc.getxWikiObject();
 
         // Verify object2
@@ -92,13 +92,13 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         XWikiDocument doc = new XWikiDocument("Test","TestObject");
 
         // Load document (needed to delete)
-        doc = (XWikiDocument) store.loadXWikiDoc(doc, getXWikiContext());
+        doc = store.loadXWikiDoc(doc, getXWikiContext());
         // Delete object2
         store.deleteXWikiDoc(doc, getXWikiContext());
         XWikiDocument doc2 = new XWikiDocument("Test","TestObject");
 
         // Read object2
-        doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+        doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
         assertTrue("Document should not exist", doc2.isNew());
     }
 
@@ -170,7 +170,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         XWikiDocument doc = new XWikiDocument("Test","TestClass");
 
         // Read class
-        doc = (XWikiDocument) store.loadXWikiDoc(doc, getXWikiContext());
+        doc = store.loadXWikiDoc(doc, getXWikiContext());
         BaseClass bclass2 = doc.getxWikiClass();
 
         // Verify object2
@@ -184,6 +184,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
+        assertNotNull("Failed to create object", object);
         writeClassInDoc(store, bclass);
     }
 
@@ -193,6 +194,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         Utils.prepareObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
+        assertNotNull("Failed to create object", object);
         writeClassInDoc(store, bclass);
         readClassInDoc(store, bclass);
     }
@@ -203,6 +205,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
+        assertNotNull("Failed to create advanced object", object);
         writeClassInDoc(store, bclass);
     }
 
@@ -212,6 +215,7 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         Utils.prepareAdvancedObject(doc);
         BaseClass bclass = doc.getxWikiClass();
         BaseObject object = doc.getObject(bclass.getName(), 0);
+        assertNotNull("Failed to create advanced object", object);
         writeClassInDoc(store, bclass);
         readClassInDoc(store, bclass);
     }
@@ -219,14 +223,14 @@ public abstract class AbstractStoreObjectTest extends TestCase {
     public void versionedObject(XWikiStoreInterface store, XWikiVersioningStoreInterface versioningStore, BaseObject object, BaseClass bclass) throws  XWikiException {
        Utils.createDoc(store, "Test", "TestVersion", object, bclass, null, getXWikiContext());
        XWikiDocument doc1 = new XWikiDocument("Test", "TestVersion");
-       doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
+       doc1 = store.loadXWikiDoc(doc1, getXWikiContext());
        BaseObject bobject1 = doc1.getxWikiObject();
        BaseProperty bprop1 = ((BaseProperty)bobject1.safeget("age"));
        assertEquals("Age should be 33", new Integer(33), bprop1.getValue());
        bprop1.setValue(new Integer(5));
        store.saveXWikiDoc(doc1, getXWikiContext());
        XWikiDocument doc2 = new XWikiDocument("Test", "TestVersion");
-       doc2 = (XWikiDocument) store.loadXWikiDoc(doc2, getXWikiContext());
+       doc2 = store.loadXWikiDoc(doc2, getXWikiContext());
        BaseObject bobject2 = doc2.getxWikiObject();
        BaseProperty bprop2 = ((BaseProperty)bobject2.safeget("age"));
        assertEquals("Age should be 5", new Integer(5), bprop2.getValue());
@@ -258,9 +262,9 @@ public abstract class AbstractStoreObjectTest extends TestCase {
 
     public void xml(XWikiStoreInterface store, BaseObject bobject, BaseClass bclass) throws XWikiException, DocumentException, IllegalAccessException, ParseException, ClassNotFoundException, InstantiationException {
          XWikiDocument doc0 = Utils.createDoc(store, "Test", "TestVersion", bobject, bclass, null, getXWikiContext());
-         String xml0 = doc0.toXML(getXWikiContext());
+         // String xml0 = doc0.toXML(getXWikiContext());
          XWikiDocument doc1 = new XWikiDocument("Test", "TestVersion");
-         doc1 = (XWikiDocument) store.loadXWikiDoc(doc1, getXWikiContext());
+         doc1 = store.loadXWikiDoc(doc1, getXWikiContext());
          Utils.assertEquals(doc0, doc1);
          String xml1 = doc1.toXML(getXWikiContext());
          // Cannot test this because XML tags can be ordered differently
@@ -287,5 +291,4 @@ public abstract class AbstractStoreObjectTest extends TestCase {
         BaseObject bobject = doc.getObject(bclass.getName(), 0);
         xml(store, bobject, bclass);
     }
-
 }

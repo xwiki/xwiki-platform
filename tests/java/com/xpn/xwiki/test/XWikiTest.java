@@ -17,9 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
- * @author vmassol
- * @author sdumitriu
  */
 
 package com.xpn.xwiki.test;
@@ -35,8 +32,6 @@ import java.util.List;
 import org.hibernate.HibernateException;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -160,7 +155,7 @@ public class XWikiTest extends HibernateTestCase {
         {
             Thread.sleep(1500);
         }
-        catch(Exception e) {};
+        catch(Exception e) {}
 
         assertNull("No lock", doc.getLock(getXWikiContext()));
         Utils.setStringValue("XWiki.XWikiPreferences", "XWiki.XWikiPreferences", "lock_Timeout", "3600", getXWikiContext());

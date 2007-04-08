@@ -1,5 +1,5 @@
 ###
-### Document already exists messge
+### Document already exists message
 ###
 ###
 #template("startpage.vm")

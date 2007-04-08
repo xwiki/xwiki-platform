@@ -129,7 +129,7 @@ public class ChartParamsTest extends TestCase {
 		String name = "font";
 		params.addParam(new FontChartParam(name));
 		params.set(name, "name:Times New Roman;style:bold;size:32");
-		Font font = (Font)params.getFont(name);
+		Font font = params.getFont(name);
 		Assert.assertEquals("Times New Roman", font.getName());
 		Assert.assertEquals(Font.BOLD, font.getStyle());
 		Assert.assertEquals(32, font.getSize());		
@@ -139,7 +139,7 @@ public class ChartParamsTest extends TestCase {
 		String name = "padding";
 		params.addParam(new RectangleInsetsChartParam(name));
 		params.set(name, "top:10;left:20;bottom:30;right:40");
-		RectangleInsets padding = (RectangleInsets)params.getRectangleInsets(name);
+		RectangleInsets padding = params.getRectangleInsets(name);
 		Assert.assertEquals(10, padding.getTop(), 0.0001);
 		Assert.assertEquals(20, padding.getLeft(), 0.0001);
 		Assert.assertEquals(30, padding.getBottom(), 0.0001);
@@ -150,7 +150,7 @@ public class ChartParamsTest extends TestCase {
 		String name = "padding";
 		params.addParam(new RectangleInsetsChartParam(name));
 		params.set(name, "right:10;bottom:20;left:30;top:40");
-		RectangleInsets padding = (RectangleInsets)params.getRectangleInsets(name);
+		RectangleInsets padding = params.getRectangleInsets(name);
 		Assert.assertEquals(10, padding.getRight(), 0.0001);
 		Assert.assertEquals(20, padding.getBottom(), 0.0001);
 		Assert.assertEquals(30, padding.getLeft(), 0.0001);
@@ -179,7 +179,7 @@ public class ChartParamsTest extends TestCase {
 //	}
 	
 	public void testDefaultParams() throws ParamException {
-		ChartParams params = DefaultChartParams2.getInstance();
+		params = DefaultChartParams2.getInstance();
 	}
 	
 	public void testSource() throws ParamException {
@@ -191,6 +191,5 @@ public class ChartParamsTest extends TestCase {
 		Assert.assertEquals("XWiki.TableDataSource", (String)map.get("class"));
 		Assert.assertEquals("1", (String)map.get("number"));
 	}
-	
 	private ChartParams params = new ChartParams();
 }

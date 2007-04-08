@@ -45,6 +45,13 @@ import java.io.File;
 import java.net.URL;
 
 public class ChartingPluginTest extends TestCase {
+    private ChartingPlugin plugin;
+    private XWikiContext xcontext;
+    private XWiki xwiki;
+    private BaseClass xclass;
+    private BaseObject xobject;
+    private XWikiConfig config;
+    private XWikiDocument doc;
 
 	public static void main(String[] args) {
 		junit.textui.TestRunner.run(ChartingPluginTest.class);
@@ -78,7 +85,7 @@ public class ChartingPluginTest extends TestCase {
 		 this.xclass = TestHelper.createTableDataSourceClass(xcontext);
 		 xobject = TestHelper.defineTable(this.xclass, this.doc, this.xcontext, 0, "A1-D4", true, true);
 
-		plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugin.charts.ChartingPlugin", xcontext);
+		 plugin = new ChartingPlugin("charting", "com.xpn.xwiki.plugin.charts.ChartingPlugin", xcontext);
 	}
 
 	protected void tearDown() throws Exception {
@@ -97,12 +104,4 @@ public class ChartingPluginTest extends TestCase {
 		System.out.println(chart.getPageURL());
 		System.out.println(chart.getImageURL());
 	}
-
-	private ChartingPlugin plugin;
-	private XWikiContext xcontext;
-	private XWiki xwiki;
-	private BaseClass xclass;
-	private BaseObject xobject;
-    private XWikiConfig config;
-    private XWikiDocument doc;
 }

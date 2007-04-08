@@ -79,7 +79,7 @@ public class RadeoxHelperBug extends TestCase {
 
 	}
 
-	private String table0, table1;
+	private String table0;
 	private RadeoxHelper rhelper;
     private XWiki xwiki;
     private XWikiDocument doc;

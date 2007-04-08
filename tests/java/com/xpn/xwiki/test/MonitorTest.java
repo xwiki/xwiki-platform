@@ -46,8 +46,6 @@ public class MonitorTest extends HibernateTestCase  {
     private XWikiContext context2;
     private String surl2 = "http://127.0.0.1:9080/xwiki/bin/view/Main/WebHome2";
     private String page2 = "xwiki:Main.WebHome2";
-    private String action2 = "view";
-
 
     public void setUp() throws Exception {
         super.setUp();

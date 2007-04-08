@@ -75,19 +75,19 @@ public class UtilTest extends HibernateClassesTest {
     public void testgetDocumentFromPath() throws XWikiException {
         String path = "/view/Main/WebHome";
         XWikiDocument doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
-        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc web is not correct", "Main", doc.getSpace());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/taratata.doc";
         doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
-        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc web is not correct", "Main", doc.getSpace());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
          path = "/view/Main/WebHome/blabla/tfdfdf.doc";
         doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
-        assertEquals("Doc web is not correct", "Main", doc.getWeb());
+        assertEquals("Doc web is not correct", "Main", doc.getSpace());
         assertEquals("Doc name is not correct", "WebHome", doc.getName());
         path = "/view/Test/Titi/taratata.doc";
        doc = getXWiki().getDocumentFromPath(path, getXWikiContext());
-       assertEquals("Doc web is not correct", "Test", doc.getWeb());
+       assertEquals("Doc web is not correct", "Test", doc.getSpace());
        assertEquals("Doc name is not correct", "Titi", doc.getName());
 
     }

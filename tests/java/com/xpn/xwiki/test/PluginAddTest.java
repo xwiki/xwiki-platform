@@ -1,7 +1,6 @@
 package com.xpn.xwiki.test;
 
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Created by IntelliJ IDEA.

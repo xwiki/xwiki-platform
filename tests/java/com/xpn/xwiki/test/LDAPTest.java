@@ -133,7 +133,6 @@ public class LDAPTest  extends HibernateTestCase {
                 }
             }
 
-            LDAPAttribute  attribute = null;
             LDAPEntry newEntry = null;
             LDAPAttributeSet attributeSet = new LDAPAttributeSet();
             String  dn;

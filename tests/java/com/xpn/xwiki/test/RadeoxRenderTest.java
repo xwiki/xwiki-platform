@@ -43,14 +43,56 @@ public class RadeoxRenderTest extends AbstractRenderTest {
 
         // Test formatting
         renderTest(wikibase, "Hello 1\nThis is a text with *strong* text\nHello 2",
+                "<strong class=\"strong\">strong</strong>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text without * strong * text\nHello 2",
+                "* strong *", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text wi*th strong tex*t\nHello 2",
                 "<strong class=\"strong\">", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with **strong** text\nHello 2",
+                "<strong class=\"strong\">*", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with **strong** text\nHello 2",
+                "*</strong>", false, getXWikiContext());
         renderTest(wikibase, "Hello 1\n*strong*\nHello 2",
                 "<strong class=\"strong\">strong</strong>", false, getXWikiContext());
 
-        renderTest(wikibase, "Hello 1\nThis is a text with __bold__ text\nHello 2",
-                "<b class=\"bold\">", false, getXWikiContext());
-        renderTest(wikibase, "Hello 1\n__bold__\nHello 2",
-                "<b class=\"bold\">bold</b>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ~~italic~~ text\nHello 2",
+                "<em class=\"italic\">italic</em>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text without ~~ italic ~~ text\nHello 2",
+                "~~ italic ~~", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text wi~~th italic tex~~t\nHello 2",
+                "<em class=\"italic\">", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ~~~italic~~~ text\nHello 2",
+                "<em class=\"italic\">~", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ~~~italic~~~ text\nHello 2",
+                "~</em>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\n~~italic~~\nHello 2",
+                "<em class=\"italic\">italic</em>", false, getXWikiContext());
+
+        renderTest(wikibase, "Hello 1\nThis is a text with __underlined__ text\nHello 2",
+                "<span class=\"underline\">", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text without  __ underlined __ text\nHello 2",
+                "__ underlined __", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text wi__th underlined tex__t\nHello 2",
+                "<span class=\"underline\">", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ___underlined___ text\nHello 2",
+                "<span class=\"underline\">_", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ___underlined___ text\nHello 2",
+                "_</span>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\n__underlined__\nHello 2",
+                "<span class=\"underline\">underlined</span>", false, getXWikiContext());
+
+        renderTest(wikibase, "Hello 1\nThis is a text with --striked-- text\nHello 2",
+                "<del class=\"strike\">striked</del>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text without -- striked -- text\nHello 2",
+                "-- striked --", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text wi--th striked tex--t\nHello 2",
+                "<del class=\"strike\">", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ---striked--- text\nHello 2",
+                "<del class=\"strike\">-", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\nThis is a text with ---striked--- text\nHello 2",
+                "-</del>", false, getXWikiContext());
+        renderTest(wikibase, "Hello 1\n--striked--\nHello 2",
+                "<del class=\"strike\">striked</del>", false, getXWikiContext());
 
     }
 
@@ -138,15 +180,15 @@ public class RadeoxRenderTest extends AbstractRenderTest {
         renderTest(wikibase, "Test link: {link:WebHome| http://www.ludovic.org/ }",
                 "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
         renderTest(wikibase, "Test link: [http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, getXWikiContext());
-        renderTest(wikibase, "Test link: [ludovic>http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, getXWikiContext());
-        renderTest(wikibase, "Test link: [ludovic web site>http://www.ludovic.org/]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
-        renderTest(wikibase, "Test link: [ludovic web site> http://www.ludovic.org/ ]",
-                     "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
-        renderTest(wikibase, "Test link: [ludovic>mailto:ludovic@xwiki.org]",
-                     "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, getXWikiContext());
+                     "<a href=\"http://www.ludovic.org/\">http://www.ludovic.org/</a>", false, getXWikiContext());
+        renderTest(wikibase, "Test link: [Ludovic>http://www.ludovic.org/]",
+                     "<span class=\"wikiexternallink\"><a href=\"http://www.ludovic.org/\">Ludovic</a></span>", false, getXWikiContext());
+        renderTest(wikibase, "Test link: [Ludovic web site>http://www.ludovic.org/]",
+                     "<span class=\"wikiexternallink\"><a href=\"http://www.ludovic.org/\">Ludovic web site</a></span>", false, getXWikiContext());
+        renderTest(wikibase, "Test link: [Ludovic web site> http://www.ludovic.org/ ]",
+                     "<span class=\"wikiexternallink\"><a href=\"http://www.ludovic.org/\">Ludovic web site</a></span>", false, getXWikiContext());
+        renderTest(wikibase, "Test link: [Ludovic>mailto:ludovic@xwiki.org]",
+                     "<a href=\"mailto:ludovic@xwiki.org\">Ludovic</a>", false, getXWikiContext());
         
         // test internal links
         renderTest(wikibase, "Test link: [#anchorname]",
@@ -194,15 +236,15 @@ public class RadeoxRenderTest extends AbstractRenderTest {
            renderTestInTable(wikibase, "Test link: {link:WebHome| http://www.ludovic.org/ }",
                    "<a href=\"http://www.ludovic.org/\">WebHome</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#104;ttp://www.ludovic.org/</a>", false, getXWikiContext());
+                        "<a href=\"http://www.ludovic.org/\">http://www.ludovic.org/</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic>http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic</a>", false, getXWikiContext());
+                        "<a href=\"http://www.ludovic.org/\">ludovic</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic web site>http://www.ludovic.org/]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
+                        "<a href=\"http://www.ludovic.org/\">ludovic web site</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic web site> http://www.ludovic.org/ ]",
-                        "<a href=\"http://www.ludovic.org/\">&#108;udovic web site</a>", false, getXWikiContext());
+                        "<a href=\"http://www.ludovic.org/\">ludovic web site</a>", false, getXWikiContext());
            renderTestInTable(wikibase, "Test link: [ludovic>mailto:ludovic@xwiki.org]",
-                        "<a href=\"mailto:ludovic@xwiki.org\">&#108;udovic</a>", false, getXWikiContext());
+                        "<a href=\"mailto:ludovic@xwiki.org\">ludovic</a>", false, getXWikiContext());
        }
 
        public void testHTMLCodeRenderer() throws XWikiException {
@@ -223,7 +265,7 @@ public class RadeoxRenderTest extends AbstractRenderTest {
 
         getXWikiContext().setDatabase("xwikitest2");
         // TODO: Split into several tests if you need a new clean up.
-        StoreHibernateTest.cleanUp(getXWiki().getHibernateStore(), false, true, getXWikiContext());
+        HibernateTestCase.cleanUp(getXWiki().getHibernateStore(), false, true, getXWikiContext());
         Utils.createDoc(getXWiki().getHibernateStore(), "Main", "WebHome", getXWikiContext());
         getXWikiContext().setDatabase("xwikitest");
 

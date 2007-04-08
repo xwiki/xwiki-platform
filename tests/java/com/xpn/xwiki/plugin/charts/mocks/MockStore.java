@@ -228,7 +228,7 @@ public class MockStore implements XWikiStoreInterface, XWikiAttachmentStoreInter
             List list = new LinkedList();
             Object[] prop = obj.getProperties();
             for (int i = 0; i<prop.length; i++) {
-                list.add((BaseProperty)prop[i]);
+                list.add(prop[i]);
             }
             return list;
         }
@@ -292,16 +292,15 @@ public class MockStore implements XWikiStoreInterface, XWikiAttachmentStoreInter
 
     public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{
         return null;
-    };
+    }
     public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException{
         return null;
-    };
-    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException{};
+    }
+    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException{}
 
     public void deleteLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException{}
 
 	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
-		// TODO Auto-generated method stub
 		return null;
-	};
+	}
 }

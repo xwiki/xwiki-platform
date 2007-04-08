@@ -1,5 +1,5 @@
 ###
-### Delete page confirm messge
+### Delete page confirm message
 ###
 ###
 #template("startpage.vm")

@@ -1,5 +1,5 @@
 ###
-### Document does not exist messge
+### Document does not exist message
 ###
 ###
 $response.setStatus(404)

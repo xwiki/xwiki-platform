@@ -73,7 +73,7 @@ public class ServletAuthTest extends ServletTest {
 
     public void stopSmtpServer() {
         try {
-           if (server.isStopped()==false);
+           if (server.isStopped()==false)
                server.stop();
         } catch (Exception e) {}
     }
@@ -400,7 +400,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertTrue("User should not exist", doc.isNew());
         } finally {
             clientTearDown();
@@ -445,7 +445,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertTrue("User should not exist", doc.isNew());
         } finally {
             clientTearDown();
@@ -489,7 +489,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
             assertEquals("Email is wrong", "ludovic@pobox.com", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -539,7 +539,7 @@ public class ServletAuthTest extends ServletTest {
                 assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
                 XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
                 XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-                doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+                doc = hibstore.loadXWikiDoc(doc, context);
                 assertFalse("User should exist", doc.isNew());
                 assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
                 assertEquals("Email is wrong", "ludovic@pobox.com", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -606,7 +606,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
             assertEquals("Email is wrong", "ludovic@pobox.com", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -687,7 +687,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
             assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -739,7 +739,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
             assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -789,7 +789,7 @@ public class ServletAuthTest extends ServletTest {
             assertEquals("Response status should be 200", 200, webResponse.getStatusCode());
             XWikiHibernateStore hibstore = new XWikiHibernateStore(getHibpath());
             XWikiDocument doc = new XWikiDocument("XWiki", "LudovicDubost");
-            doc = (XWikiDocument) hibstore.loadXWikiDoc(doc, context);
+            doc = hibstore.loadXWikiDoc(doc, context);
             assertFalse("User should exist", doc.isNew());
             assertEquals("Password is wrong", "toto", doc.getObject("XWiki.XWikiUsers",0).getStringValue("password"));
             assertEquals("Email is wrong", "ludovic@xwiki.org", doc.getObject("XWiki.XWikiUsers",0).getStringValue("email"));
@@ -803,5 +803,4 @@ public class ServletAuthTest extends ServletTest {
     public void testValidateUserWithEmail() throws Throwable {
         launchTest(false);
     }
-
 }

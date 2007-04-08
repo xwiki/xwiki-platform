@@ -108,7 +108,7 @@ public class XWikiHelperIntegrationTest extends XWikiIntegrationTest {
     userBlog.setFeedHref("http://127.0.0.1:9080/testbin/view/Blog/WebHome?xpage=rdf");
     userBlog.setAlternateHref("http://127.0.0.1:9080/testbin/view/Blog/WebHome");
     
-    assertEquals(userBlog, (UserBlog)userBlogs.get(0));
+    assertEquals(userBlog, userBlogs.get(0));
   }
 
 }

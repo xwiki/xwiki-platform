@@ -64,7 +64,7 @@ public class XWikiTest extends HibernateTestCase {
 
     public void testDefaultSkinFile() throws XWikiException {
         XWikiRenderingEngine wikiengine = new DefaultXWikiRenderingEngine(getXWiki(), getXWikiContext());
-        assertEquals("Skin File should be default",  "/xwiki/skins/default/style.css", getXWiki().getSkinFile("style.css", getXWikiContext()));
+        assertEquals("Skin File should be albatross",  "/xwiki/skins/albatross/style.css", getXWiki().getSkinFile("style.css", getXWikiContext()));
     }
 
     public void testPassword() throws XWikiException, HibernateException {

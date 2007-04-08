@@ -64,14 +64,12 @@ public class RenamePageTest extends HibernateTestCase {
         }
 
         XWikiDocument newdoc = getXWiki().renamePage(doc1, "Test.NewName", getXWikiContext());
+        getXWiki().getHibernateStore().endTransaction(getXWikiContext(), true);
 
         assertTrue("Renaming is wrong", newdoc.getFullName().equals("Test.NewName"));
         assertTrue("New doc doesn't exists", getXWiki().getStore().exists(getXWiki().getDocument("Test.NewName", getXWikiContext()), getXWikiContext()) );
         assertTrue("Old doc still exists", !getXWiki().getStore().exists(doc1, getXWikiContext()) );
         assertTrue("Old doc still exists", !getXWiki().getStore().exists(getXWiki().getDocument("Test.BackLinksTarget", getXWikiContext()), getXWikiContext()) );
-
-        loadedLinks = getXWiki().getStore().loadLinks(getXWiki().getDocument("Test.BacklinksTarget", getXWikiContext()).getId(),getXWikiContext(),true);
-        assertEquals("lists size are not equal", 0, loadedLinks.size());
 
         loadedLinks = getXWiki().getStore().loadLinks(getXWiki().getDocument("Test.NewName", getXWikiContext()).getId(),getXWikiContext(),true);
         assertEquals("lists size are not equal", 3, loadedLinks.size());
@@ -80,6 +78,57 @@ public class RenamePageTest extends HibernateTestCase {
             boolean ok = expected_list1.contains(item);
             assertTrue("Link in link list item " + i + " is not correct", ok);
         }
+    }
+
+    public void testNewRenamePage() throws XWikiException {
+        XWikiDocument doc1 = new XWikiDocument("Test", "BacklinksTarget");
+        doc1.setContent("Bonjour Monde : This is a test " +
+                "with links [Test.AAA] [Test.BBBB] [Test.BacklinksInput]");
+        XWikiDocument bldoc1 = new XWikiDocument("Test", "LinkingDoc1");
+        bldoc1.setContent("This doc links to " +
+                "[Test.BacklinksTarget] [Test.BacklinksInput]");
+        XWikiDocument bldoc2 = new XWikiDocument("Test", "LinkingDoc2");
+        bldoc2.setContent("This doc also links to " +
+                "[Test.BacklinksTarget] [Test.NewName]");
+        List expected_list1 = new ArrayList();
+        expected_list1.add("Test.AAA");
+        expected_list1.add("Test.BBBB");
+        expected_list1.add("Test.BacklinksInput");
+        getXWiki().getStore().saveXWikiDoc(doc1, getXWikiContext());
+        getXWiki().getStore().saveXWikiDoc(bldoc1, getXWikiContext());
+        getXWiki().getStore().saveXWikiDoc(bldoc2, getXWikiContext());
+
+        long docId = doc1.getId();
+        String sql =  ("select xwl_link from xwikilinks where xwl_doc_id = "+docId);
+        getXWiki().getHibernateStore().beginTransaction(getXWikiContext());
+        List result = runSQLwithReturn(getXWiki().getHibernateStore(), sql , getXWikiContext());
+        assertTrue("SQL return is not the same size", result.size() ==  expected_list1.size());
+
+        List loadedLinks = getXWiki().getStore().loadLinks(getXWiki().getDocument("Test.BacklinksTarget", getXWikiContext()).getId(),getXWikiContext(),true);
+        assertEquals("lists size are not equal", 3, loadedLinks.size());
+        for (int i=0;i<loadedLinks.size();i++) {
+            String item = ((XWikiLink)loadedLinks.get(i)).getLink();
+            boolean ok = expected_list1.contains(item);
+            assertTrue("Link in link list item " + i + " is not correct", ok);
+        }
+
+        doc1.rename("Test.NewName", getXWikiContext());
+
+        getXWiki().getHibernateStore().endTransaction(getXWikiContext(), true);
+        assertTrue("Renaming is wrong", doc1.getFullName().equals("Test.NewName"));
+        assertTrue("New doc doesn't exists", getXWiki().getStore().exists(getXWiki().getDocument("Test.NewName", getXWikiContext()), getXWikiContext()) );
+        assertTrue("Old doc still exists", !getXWiki().getStore().exists(getXWiki().getDocument("Test.BackLinksTarget", getXWikiContext()), getXWikiContext()) );
+
+        loadedLinks = getXWiki().getStore().loadLinks(getXWiki().getDocument("Test.NewName", getXWikiContext()).getId(),getXWikiContext(),true);
+        assertEquals("lists size are not equal", 3, loadedLinks.size());
+        for (int i=0;i<loadedLinks.size();i++) {
+            String item = ((XWikiLink)loadedLinks.get(i)).getLink();
+            boolean ok = expected_list1.contains(item);
+            assertTrue("Link in link list item " + i + " is not correct", ok);
+        }
+
+        bldoc1 = getXWiki().getDocument("Test.LinkingDoc1", getXWikiContext());
+        assertTrue("Backlink not updated for document Test.LinkingDoc1", bldoc1.getContent().indexOf("[Test.NewName]") >= 0);
     }
 
     /*

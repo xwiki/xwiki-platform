@@ -59,7 +59,7 @@ public class ClassAdvancedTest extends HibernateTestCase {
         list.add("Tree.Item12");
         doc.setListValue("XWiki.OtherClass", "treeitem", list);
 
-        String[] viewresult = {"Item 2.2.1 Item 1.2"};
+        String[] viewresult = {"Item 2 &gt; Item 2.1 &gt; Item 2.2.1<br />Item 1 &gt; Item 1.2"};
         String[] editresult = {"<select", "Tree.Item1", "Tree.Item21", ">Item 1", ">Item 2", ">&nbsp;Item 2.1", ">&nbsp;&nbsp;Item 2.2.1"};
         ClassesTest.testDisplayer("treeitem", obj, bclass, viewresult, editresult, context);
     }
@@ -99,7 +99,7 @@ public class ClassAdvancedTest extends HibernateTestCase {
         list.add("Tree.Item12");
         doc.setListValue("XWiki.OtherClass", "treeitem", list);
 
-        String[] viewresult = {"Item 2.2.1 Item 1.2"};
+        String[] viewresult = {"Item 2 &gt; Item 2.1 &gt; Item 2.2.1<br />Item 1 &gt; Item 1.2"};
         String[] editresult = {"<select", "multiple", "Tree.Item1", "Tree.Item21", ">Item 1", ">Item 2", ">&nbsp;Item 2.1", ">&nbsp;&nbsp;Item 2.2.1"};
         ClassesTest.testDisplayer("treeitem", obj, bclass, viewresult, editresult, context);
     }

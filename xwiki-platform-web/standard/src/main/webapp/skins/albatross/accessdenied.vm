@@ -1,8 +1,7 @@
 ###
-### Access denied messge
+### Access denied message
 ###
 ###
-
 #template("startpage.vm")
 <div class="main layoutsubsection">
 #if ($xwiki.isReadOnly())

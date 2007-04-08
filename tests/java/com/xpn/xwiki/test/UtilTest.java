@@ -102,7 +102,7 @@ public class UtilTest extends HibernateClassesTest {
       list = getXWikiContext().getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"Main.Toto\")Hi", pattern, 2);
       assertEquals("List should have one items", 1, list.size());
       assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
-      list = getXWikiContext().getUtil().getMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"XWiki.Tata\")Hi", pattern, 2);
+      list = getXWikiContext().getUtil().getAllMatches("Hello#includeTopic(\"Main.Toto\")Hi#includeForm(\"XWiki.Tata\")Hi", pattern, 2);
       assertEquals("List should have two items", 2, list.size());
       assertEquals("List item 1 should be Main.Toto", "Main.Toto", list.get(0));
       assertEquals("List item 2 should be XWiki.Tata", "XWiki.Tata", list.get(1));
@@ -136,7 +136,10 @@ public class UtilTest extends HibernateClassesTest {
     }
     
     public void testTOCGeneration() {
+      XWikiDocument doc = new XWikiDocument("Sandbox", "TOCTest");
       String content = "1.1 a\n1.1 b\n1.1.1 c\n1.1 d\n1 a\n1.1.1.1 f\n1.1.1.1 g\n1.1 h\n1.1 i\n1.1.1.1.1.1 j";
+      doc.setContent(content);
+      getXWikiContext().put("doc", doc);
 
       // test init level 1
       Map result = TOCGenerator.generateTOC(content, 1, 6, true, getXWikiContext());

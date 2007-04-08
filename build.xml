@@ -401,12 +401,13 @@
                     <!-- Excluded because it throws OutOfMemoryException-->
                     <exclude name="**/StoreObjectHibernateTest.java"/>
                     <exclude name="**/StoreTest.java"/>
-                    <!-- Excluded because Rename is not yet ready -->
-                    <exclude name="**/RenamePageTest.java"/>
                     <!-- Excluded because LDAP setup is needed -->
                     <exclude name="**/LDAPTest.java"/>
                     <!-- Excluded because there are not tests -->
                     <exclude name="**/XWikiHelperTest.java"/>
+                    <!-- Excluded because the JCR store is not maintained anymore, and the used APIs have changed-->
+                    <exclude name="**/jcr/*Test.java"/>
+                    <exclude name="**/QueryPluginTest.java"/>
                 </fileset>
             </batchtest>
         </junit>

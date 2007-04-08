@@ -333,6 +333,6 @@ public class DBTreeListClass extends DBListClass {
             }
 
         }
-        return sql;
+        return context.getWiki().parseContent(sql, context);
     }
 }

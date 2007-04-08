@@ -140,7 +140,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                         buffer.append(" target=\"" + target + "\"");
                     }
                     buffer.append(">");
-                    buffer.append(Encoder.toEntity(text.charAt(0)) + text.substring(1));
+                    buffer.append(text);
                     buffer.append("</a></span>");
                     return;
                 }
@@ -151,6 +151,18 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                 if (-1 != hashIndex && hashIndex != href.length() -1) {
                     hash = href.substring(hashIndex + 1);
                     href = href.substring(0, hashIndex);
+                }
+                if(href.trim().equals("")) {
+                    // Internal (anchor) link
+                    buffer.append("<span class=\"wikilink\"><a href=\"#");
+                    buffer.append(hash);
+                    buffer.append("\">");
+                    if(!specificText || text.length() == 0) {
+                        text = Encoder.unescape(hash);
+                    }
+                    buffer.append(text);
+                    buffer.append("</a></span>");
+                    return;
                 }
 
                 /*
@@ -190,9 +202,8 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                     if (wikiEngine.exists(href)) {
                         if(specificText == false) {
                             text = getWikiView(href);
-                            wikiEngine.appendLink(buffer, href, text);
+                            wikiEngine.appendLink(buffer, href, text, hash);
                         } else {
-                            // Do not add hash if an alias was given
                             wikiEngine.appendLink(buffer, href, text, hash);
                         }
                     } else if (wikiEngine.showCreate()) {

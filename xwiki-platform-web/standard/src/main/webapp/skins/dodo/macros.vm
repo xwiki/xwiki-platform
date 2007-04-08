@@ -68,7 +68,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 #end
 
 #macro(skype $id)
-<a href="callto://${id}"><img width="70" height="20" src="http://jyvepresence1.com/qzoxy/${id}.png" border="0"></a>
+<a href="skype:${id}?call"><img width="182" height="44" src="http://mystatus.skype.com/bigclassic/${id}" style="border: none;"></a>
 #end
 
 #macro(yahoo $id)

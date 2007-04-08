@@ -1,4 +1,4 @@
-#macro( template $tname )
+#macro(template $tname)
 $xwiki.parseTemplate($tname)
 #end
 
@@ -6,23 +6,23 @@ $xwiki.parseTemplate($tname)
 $xwiki.renderTemplate($tname)
 #end
 
-#macro( includeTopic $topic )
+#macro(includeTopic $topic)
 $xwiki.includeTopic($topic)
 #end
 
-#macro( includeMacros $topic )
+#macro(includeMacros $topic)
 $xwiki.includeForm($topic)
 #end
 
-#macro( includeForm $topic )
+#macro(includeForm $topic)
 $xwiki.includeForm($topic)
 #end
 
-#macro( includeInContext $topic )
+#macro(includeInContext $topic)
 $xwiki.includeForm($topic)
 #end
 
-#macro( includeServlet $url)
+#macro(includeServlet $url)
 <!-- including $url -->
 $xwiki.invokeServletAndReturnAsString($url)
 <!-- included $url -->
@@ -34,7 +34,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 <a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
 #end
 
-#macro( versions )
+#macro(versions)
 #foreach( $rev in $tdoc.getRecentRevisions(4) )
 <a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
 #end
@@ -46,7 +46,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 #end
 
 ## Display all queued Struts errors
-#macro (errorMarkup)
+#macro(errorMarkup)
     #if ($errors.exist() )
         <ul>
         #foreach ($e in $errors.all )
@@ -57,7 +57,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 #end
 
 ## Display all queued Struts errors for a particular property
-#macro (errorMarkupForProperty $property)
+#macro(errorMarkupForProperty $property)
     #if ($errors.exist($property) )
         <ul>
         #foreach ($er in $errors.get($property))
@@ -72,7 +72,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 #end
 
 #macro(skype $id)
-<a href="callto://${id}"><img width="70" height="20" src="http://jyvepresence1.com/qzoxy/${id}.png" border="0"></a>
+<a href="skype:${id}?call"><img width="182" height="44" src="http://mystatus.skype.com/bigclassic/${id}" style="border: none;"></a>
 #end
 
 #macro(yahoo $id)
@@ -182,7 +182,7 @@ $xwiki.getUserName("xwiki:${username}")
 </applet>
 #end
 
-#macro (toc $pinit $pmax $pnumbered)
+#macro(toc $pinit $pmax $pnumbered)
 #set($init = $pinit)
 #set($max = $pmax)
 #set($numbered = $pnumbered)
@@ -248,7 +248,7 @@ $xwiki.getUserName("xwiki:${username}")
 
 #end
 
-#macro (exportPackage)
+#macro(exportPackage)
 #set($export = $request.get("export"))
 #if ($export == "1")
   #set($dateFormat = "dd MMM yyyy ? HH:mm")
@@ -320,8 +320,7 @@ $xwiki.getUserName("xwiki:${username}")
 #end
 #end
 
-
-#macro (importPackage)
+#macro(importPackage)
 #set($toexport = $request.get("export"))
 #if($toexport == "1")
   #set($appName = $request.get("App"))
@@ -424,7 +423,7 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 ### Insert a span containing a |
 ###
-#macro (sep)
+#macro(sep)
 <span class="separator"> | </span>
 #end
 
@@ -562,7 +561,6 @@ $fielddoc.display($fieldname, $action)
 $html
 </div>
 #end
-
 
 #macro(defaultDisplayObj $document $obj)
  #set($class = $obj.xWikiClass)

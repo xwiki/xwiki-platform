@@ -13,7 +13,8 @@ com.xpn.xwiki.render.filter.UnderlineFilter
 com.xpn.xwiki.render.filter.StrongFilter
 # org.radeox.filter.BoldFilter
 org.radeox.filter.ItalicFilter
-org.radeox.filter.UrlFilter
+# org.radeox.filter.UrlFilter
+com.xpn.xwiki.render.filter.UrlFilter
 org.radeox.filter.MarkFilter
 org.radeox.filter.KeyFilter
 org.radeox.filter.TypographyFilter

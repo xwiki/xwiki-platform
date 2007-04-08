@@ -29,7 +29,7 @@ import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 public class XWikiResourceManagerImpl extends ResourceManagerImpl {
 
     public Resource getResource(String string, int i, String string1) throws ResourceNotFoundException, ParseErrorException, Exception {
-        Resource result = super.getResource(string, i, string1);    //To change body of overriden methods use Options | File Templates.
+        Resource result = super.getResource(string, i, string1);
         return result;
     }
 }

@@ -88,10 +88,8 @@ public class SetCharacterEncodingFilter implements Filter {
      * Take this filter out of service.
      */
     public void destroy() {
-
         this.encoding = null;
         this.filterConfig = null;
-
     }
 
 
@@ -109,17 +107,15 @@ public class SetCharacterEncodingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain)
 	throws IOException, ServletException {
-
         // Conditionally select and set the character encoding to be used
         if (ignore || (request.getCharacterEncoding() == null)) {
             String encoding = selectEncoding(request);
-            if (encoding != null)
+            if (encoding != null) {
                 request.setCharacterEncoding(encoding);
+            }
         }
-
-	// Pass control on to the next filter
+        // Pass control on to the next filter
         chain.doFilter(request, response);
-
     }
 
 
@@ -161,10 +157,6 @@ public class SetCharacterEncodingFilter implements Filter {
      * @param request The servlet request we are processing
      */
     protected String selectEncoding(ServletRequest request) {
-
         return (this.encoding);
-
     }
-
-
 }

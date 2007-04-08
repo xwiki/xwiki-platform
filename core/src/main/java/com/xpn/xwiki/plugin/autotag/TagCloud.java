@@ -4,69 +4,86 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 
-
-public class TagCloud {
+public class TagCloud
+{
     private String[] wordList;
+
     private String text;
+
     private Map countedWordMap;
+
     private Map stemmedWordMap;
+
     private Map stemmedWordFreqMap;
 
-    public Set getTags() {
+    public Set getTags()
+    {
         return tags;
     }
 
-    public void setTags(Set tags) {
+    public void setTags(Set tags)
+    {
         this.tags = tags;
     }
 
     private Set tags;
 
-    public String getText() {
+    public String getText()
+    {
         return text;
     }
 
-    public void setText(String text) {
+    public void setText(String text)
+    {
         this.text = text;
     }
 
-    public String[] getWordList() {
+    public String[] getWordList()
+    {
         return wordList;
     }
 
-    public void setWordList(String[] wordList) {
+    public void setWordList(String[] wordList)
+    {
         this.wordList = wordList;
     }
 
-    public Map getCountedWordMap() {
+    public Map getCountedWordMap()
+    {
         return countedWordMap;
     }
 
-    public void setCountedWordMap(Map countedWordMap) {
+    public void setCountedWordMap(Map countedWordMap)
+    {
         this.countedWordMap = countedWordMap;
     }
 
-    public Map getStemmedWordMap() {
+    public Map getStemmedWordMap()
+    {
         return stemmedWordMap;
     }
 
-    public void setStemmedWordMap(Map stemmedWordMap) {
+    public void setStemmedWordMap(Map stemmedWordMap)
+    {
         this.stemmedWordMap = stemmedWordMap;
     }
 
-    public Map getStemmedWordFreqMap() {
+    public Map getStemmedWordFreqMap()
+    {
         return stemmedWordFreqMap;
     }
 
-    public void setStemmedWordFreqMap(Map stemmedWordFreqMap) {
+    public void setStemmedWordFreqMap(Map stemmedWordFreqMap)
+    {
         this.stemmedWordFreqMap = stemmedWordFreqMap;
     }
 
-    public String getHtml(){
+    public String getHtml()
+    {
         StringBuffer strb = new StringBuffer();
         Iterator it = tags.iterator();
-        while(it.hasNext()){
-            strb.append(((Tag)it.next()).getHtml());
+        while (it.hasNext()) {
+            strb.append(((Tag) it.next()).getHtml());
         }
         return strb.toString();
     }

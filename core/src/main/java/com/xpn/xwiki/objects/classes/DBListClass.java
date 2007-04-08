@@ -152,7 +152,7 @@ public class DBListClass extends ListClass {
             }
 
         }
-        return sql;
+        return context.getWiki().parseContent(sql, context);
     }
 
     public String getSql() {

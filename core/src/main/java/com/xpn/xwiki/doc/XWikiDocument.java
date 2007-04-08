@@ -957,6 +957,9 @@ public class XWikiDocument
 
     public Vector getObjects(String classname)
     {
+        if (classname == null) {
+            return new Vector();
+        }
         if (classname.indexOf(".") == -1) {
             classname = "XWiki." + classname;
         }

@@ -141,8 +141,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      * 
      * @param buffer The output buffer, where the HTML code is printed.
      * @param result The regex match result; input is read from this Reader.
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents.
+     * @param context The FilterContext object, used to get access to the Rendering context.
      * @see org.radeox.filter.ListFilter#action(java.lang.StringBuffer,
      *      org.radeox.regex.MatchResult, org.radeox.filter.context.FilterContext)
      */

@@ -43,7 +43,6 @@ public class SkinAction extends XWikiAction
     {
         XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
-        XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
 
         String baseskin = xwiki.getBaseSkin(context, true);

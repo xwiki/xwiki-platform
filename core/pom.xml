@@ -456,7 +456,8 @@
               **/ViewAction.java,
               **/ZipExplorer*.java,
               **/content/**/*.java,
-              **/XWikiMessageTool.java
+              **/XWikiMessageTool.java,
+              **/XWikiListFilter.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java

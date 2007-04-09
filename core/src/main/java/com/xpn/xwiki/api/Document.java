@@ -1273,6 +1273,7 @@ public class Document extends Api
      */
     public Map getTOC(int init, int max, boolean numbered)
     {
+        getXWikiContext().put("tocNumbered", new Boolean(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
     }
 

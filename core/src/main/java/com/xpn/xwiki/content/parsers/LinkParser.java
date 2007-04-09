@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.content.parsers;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.content.Link;
 
 import java.net.URI;
@@ -151,7 +152,7 @@ public class LinkParser implements ContentParser
             target = content.substring(separatorIndex + 1).trim();
             if (!target.startsWith("_")) {
                 throw new ContentParserException(
-                    ContentParserException.ERROR_XWIKI_CONTENT_LINK_INVALID_TARGET, "Invalid link "
+                    XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_TARGET, "Invalid link "
                     + "format. The target element must start with an underscore, got [" + target
                     + "]");
             }
@@ -185,7 +186,7 @@ public class LinkParser implements ContentParser
                 uri = new URI(text);
             } catch (URISyntaxException e) {
                 throw new ContentParserException(
-                    ContentParserException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI,
+                    XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI,
                     "Invalid mailto URI [" + text + "]", e);
             }
             content.delete(index, content.length());
@@ -199,10 +200,10 @@ public class LinkParser implements ContentParser
                 // exception.
                 String text = content.toString();
                 try {
-                    uri = new URL(text).toURI();
+                    uri = new URI(new URL(text).toString());
                 } catch (Exception e) {
                     throw new ContentParserException(
-                        ContentParserException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI,
+                        XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI,
                         "Invalid URL format [" + text + "]", e);
                 }
                 content.setLength(0);

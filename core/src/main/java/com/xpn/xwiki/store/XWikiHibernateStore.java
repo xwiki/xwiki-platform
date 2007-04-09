@@ -763,7 +763,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             } else
                                 throw e;
                         } catch (Throwable e2) {
-                            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber()), name};
+                            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + ""), name};
                             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                                 "Exception while loading object '{0}' of class '{1}', number '{2}' and property '{3}'", e, args);
                         }
@@ -776,7 +776,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber()) };
+            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + "") };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                     "Exception while loading object '{0}' of class '{1}' and number '{2}'", e, args);
 
@@ -1072,7 +1072,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             try {
                 session.load(bclass, new Integer(bclass.getId()));
 
-                HashMap map = new HashMap();
                 Query query = session.createQuery("select prop.name, prop.classType from PropertyClass as prop where prop.id.id = :id order by prop.number asc");
                 query.setInteger("id", bclass.getId());
                 Iterator it = query.list().iterator();
@@ -1154,7 +1153,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 // in the BaseProperty table or in the inheritated property table
 // We need to delete this data
                 if (isSave)
-                    prop2 = (PropertyClass) property;
+                    prop2 = property;
                 else
                     prop2 = new PropertyClass();
 

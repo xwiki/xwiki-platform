@@ -52,6 +52,7 @@ public class StyleMacro extends BaseLocaleMacro {
         String fl = params.get("float");
         String width = params.get("width");
         String height = params.get("height");
+        String border = params.get("border");
 
         if (("none".equals(type)) || (type == null) || ("".equals(type.trim()))) {
             type = "span";
@@ -91,6 +92,9 @@ public class StyleMacro extends BaseLocaleMacro {
         }
         if ((!"none".equals(height)) && (height != null) && (!"".equals(height.trim()))) {
             str.append("height:" + height.trim() + "; ");
+        }
+        if ((!"none".equals(border)) && (border != null) && (!"".equals(border.trim()))) {
+            str.append("border:" + border.trim() + "; ");
         }
         str.append("\" >");
         if ((!"none".equals(text)) && (text != null) && (!"".equals(text.trim()))) {

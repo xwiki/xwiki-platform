@@ -7,10 +7,12 @@
 #set($spaceviewurl = $spaceDoc.getURL("view"))
 #set($viewurl = $doc.getURL("view"))
 #set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
-#if(!$objuser.getProperty("usertype").value)
+#if($context.user == "XWiki.superadmin")
+#set($isAdvancedUser = true)
+#elseif(!$objuser.getProperty("usertype").value)
 #set($isAdvancedUser = false)
 #else
-#set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"||$context.user.equals("XWiki.superadmin")))
+#set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
 #end
 #set($parent ="<a href='$doc.getParentURL()'>${doc.parent.title}</a>")
 #if($tdoc)

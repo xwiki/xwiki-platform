@@ -32,7 +32,11 @@
   <div id="globallinks">
     <div id="globalmenu">
 #if (!$isguest)
+#if ($context.user == 'XWiki.superadmin')
+      $!msg.get("superadmin") #sep()
+#else
       <a class="glink" href="$!xwiki.getURL($context.user, "view")" id="headeruser">$!xwiki.getUserName($context.user, false)</a> #sep()
+#end
 #end
 #if ($context.action != "loginerror")
 #if ($isguest)

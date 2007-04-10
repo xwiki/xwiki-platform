@@ -1,3 +1,4 @@
+
 /*
                 WikiEditor
 		   
@@ -253,7 +254,8 @@ WikiEditor.prototype.convertExternal = function(content) {
 	var regexp, r;
 	var lines;
 	var lastIndex;
-	for(var i=0; i < this._wsFilters.length; i++) {
+    content = content.replace(/\$(\d)/g, "&#036;$1");
+    for(var i=0; i < this._wsFilters.length; i++) {
 		RegExp.lastIndex = 0;
 		lastIndex = -1;
 		regexp = this._wsFilters[i];
@@ -290,7 +292,8 @@ WikiEditor.prototype.convertInternal = function(content) {
 	var regexp, r;
 	var lines;
 	var lastIndex;
-	for(var i=0; i < this._htmlFilters.length; i++) {
+    content = content.replace(/\$(\d)/g, "&#036;$1");
+    for(var i=0; i < this._htmlFilters.length; i++) {
 		RegExp.lastIndex = 0;
 		lastIndex = -1;
 		regexp = this._htmlFilters[i];
@@ -316,7 +319,8 @@ WikiEditor.prototype.convertInternal = function(content) {
 		}
 	}
 	content = this.trimString(this._removeHtmlTags(content));
-	return content;
+    content = content.replace(/\&#036;/g, "$");
+    return content;
 }
 
 /*

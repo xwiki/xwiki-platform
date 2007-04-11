@@ -9,7 +9,7 @@
 #end
 
 ##---------------------------------------------------------------------------
-## Import the files
+## Import the documents from the selected XAR.
 ##---------------------------------------------------------------------------
 #if($request.action && $request.action=="import")
 
@@ -40,9 +40,12 @@
   #showfilelist($xwiki.package.errors "errors")
 
 ##---------------------------------------------------------------------------
-## Browse the Archives
+## Browse the XARs and let the user select a XAR and the list of documents
+## to import from that XAR.
 ##---------------------------------------------------------------------------
 #else
+
+  <script type="text/javascript" src="$xwiki.getSkinFile("import.js", true)"></script>
 
   <h3 class="heading-1-1">$msg.get("availablefilestoimport")</h3>
   $msg.get("selectfiletoimport"):
@@ -75,22 +78,44 @@
     #end
   </div>
 
-  <h2>$msg.get("selectdocumentstoimport")</h2>
-  <span id="selectDocsActions" style="display: none;">$msg.get("select")
-  <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get("none")</a>, <a  href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a></span>
+  ## List the documents that can be imported from the currently selected XAR.
+  ## If no XAR has been selected explain that the user needs to select one.
+  <h3 class="heading-1-1">$msg.get("availabledocumentstoimport")</h3>
+
+  ## The following div will be hidden by the import.js script when a XAR document is selected.
+  <span id="noSelectedDocs">$msg.get("selectdocumentstoimport")</span>
+
+  ## This div will be made visible if there are no documents inside the selected XAR
+  <span id="noDocsInArchive" style="display: none;">$msg.get("nodocstoimport")</span>
+
+  <span id="selectDocsActions" style="display: none;">
+    $msg.get("select")
+    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get("none")</a>,
+    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a>
+  </span>
+
   <form action="" method="post">
     <div>
       <input type="hidden" name="action" value="import" />
-      <div id="selectedDocs"/>
+
+      ## Placeholder for adding the documents as checkbox input types.
+      ## WARNING: Do NOT try to change <div id="..."></div> below to
+      ##          <div id="..."/> as it'll break it! (the JS we have won't work
+      ##          when it changes the inner HTML value. See http://www.w3.org/TR/xhtml1/#guidelines
+      ##          section C.3).
+      <div id="selectedDocs"></div>
+
+      ## Placeholder for adding the name of the XAR as <input type="hidden">.
       <span id="importDocName"></span>
-      <span id="importDocs" style="display: none;"><input type="submit" value="$msg.get("import")" /></span>
+
+      <span id="importDocs" style="display: none;">
+        <input type="submit" value="$msg.get("import")" />
+      </span>
     </div>
   </form>
 
-  <div id="noSelectedDocs"><h4 class="heading-1-1-1" id="noSelectedDocsTxt">$msg.get("nodocuments")</h4></div>
-
-  <h4 class="heading-1-1-1">$msg.get("uploadnewarchivetoimport")</h4>
-  <script type="text/javascript" src="$xwiki.getSkinFile("import.js", true)"></script>
+  ## Let the user upload XAR files.
+  <h3 class="heading-1-1">$msg.get("uploadnewarchivetoimport")</h3>
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
     <fieldset class="expanded" id="attachform">
       <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
@@ -105,7 +130,3 @@
     </fieldset>
   </form>
 #end
-
-<div id="loading" style="display: none; position: absolute; top: 0px; right: 0px;">
-  $msg.get("loading")...
-</div>

@@ -80,28 +80,41 @@ function showPackageInfos(res)
     var xml = res.responseXML;
     var name = getXmlValue("name", xml);
 
-    $('selectedDocs').innerHTML = "no files";
+    $('selectedDocs').innerHTML = "";
 
     var nodes = xml.getElementsByTagName("file");
-    for (var i = 0; i < nodes.length; i++)
+    if (nodes.length > 0)
     {
-        var doc = nodes[i];
-        var pageName = doc.firstChild.data;
+        hide("noSelectedDocs");
+        hide("noDocsInArchive");
 
-        var language = doc.getAttribute("language");
-        if (language!=null)
-         pageName += ":" + language;
+        for (var i = 0; i < nodes.length; i++)
+        {
+            var doc = nodes[i];
+            var pageName = doc.firstChild.data;
 
-        insertNewDoc("selectedDocs", pageName, language);
+            var language = doc.getAttribute("language");
+            if (language!=null)
+             pageName += ":" + language;
+
+            insertNewDoc("selectedDocs", pageName, language);
+        }
+
+        show("importDocs");
+        show("selectDocsActions");
     }
-
-    show("importDocs");
-    show("selectDocsActions");
-    hide("noSelectedDocs)");
+    else
+    {
+        hide("importDocs");
+        hide("selectDocsActions");
+        show("noSelectedDocs");
+        show("noDocsInArchive");
+    }
 }
 
 function insertNewDoc(id, value, language)
-{var str = "<div class='importDoc'>";
+{
+    var str = "<div class='importDoc'>";
     str += "<input type='checkBox' name='pages' value='" + value + "' class='selCheckedDoc' id='sel_" + value + "' checked />";
 
     // Add language

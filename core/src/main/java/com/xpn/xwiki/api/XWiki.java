@@ -209,7 +209,7 @@ public class XWiki extends Api
 
     public String getURLEncoded(String content)
     {
-        return com.xpn.xwiki.XWiki.getURLEncoded(content);
+        return xwiki.getURLEncoded(content);
     }
 
     /**

@@ -1049,10 +1049,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return scontent;
     }
 
-    public static String getURLEncoded(String content)
+    public String getURLEncoded(String content)
     {
         try {
-            return URLEncoder.encode(content, "UTF-8");
+            return URLEncoder.encode(content, this.getEncoding());
         } catch (UnsupportedEncodingException e) {
             return content;
         }
@@ -3667,10 +3667,31 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             if ((request.getParameter("topic") != null)
                 && (action.equals("edit") || action.equals("inline")))
                 docname = request.getParameter("topic");
-            else
-                docname = getDocumentNameFromPath(request.getPathInfo(), context);
+            else {
+                docname =
+                    getDocumentNameFromPath(fixDecodedURI(request, request.getPathInfo()), context);
+            }
         }
         return docname;
+    }
+
+    /**
+     * Tomcat does not properly handle URIs with non iso characters and thus this method does the
+     * decoding using the XWiki encoding or UTF-8 if no encoding has been specified in xwiki.cfg's
+     * xwiki.encoding property.
+     */
+    private String fixDecodedURI(XWikiRequest request, String uri)
+    {
+        String decodedURI = uri;
+        if (!request.getCharacterEncoding().equals("ISO-8859-1")) {
+            try {
+                byte[] urib = uri.getBytes("ISO-8859-1");
+                decodedURI = new String(urib, getConfig().getProperty("xwiki.encoding", "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                log.error("Unsupported Encoding Exception received, check your xwiki config.", e);
+            }
+        }
+        return decodedURI;
     }
 
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context,
@@ -4608,7 +4629,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
 
     /**
-     * @deprecated use {@link XWikiDocument#renameDocument(String, XWikiContext)} instead
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
      */
     public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context)
         throws XWikiException
@@ -4625,7 +4646,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @deprecated use {@link XWikiDocument#renameDocument(String, XWikiContext)} instead
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
      */
     public XWikiDocument renamePage(XWikiDocument doc, XWikiContext context, String newFullName)
         throws XWikiException

@@ -48,9 +48,13 @@ $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 ##$newdoc.getURL("edit", "template=${template}&parent=${parent}$auxparams"))
 #if($newdoc.isNew())
 #if($tocreate == "post")
-$response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$title"))
+#set($etitle = $xwiki.getURLEncoded($title))
+$response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle"))
 #else
-$response.sendRedirect($newdoc.getURL("edit", "template=${template}&parent=${parent}${auxparams}&title=$title"))
+#set($etitle = $xwiki.getURLEncoded($title))
+#set($etemplate = $xwiki.getURLEncoded("${template}"))
+#set($eparent = $xwiki.getURLEncoded("${parent}${auxparams}"))
+$response.sendRedirect($newdoc.getURL("edit", "template=${etemplate}&parent=${eparent}&title=$etitle"))
 #end
 #else
 $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))

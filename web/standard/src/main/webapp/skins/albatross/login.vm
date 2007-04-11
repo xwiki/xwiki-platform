@@ -8,7 +8,7 @@ $response.sendRedirect($xwiki.getURL("Main.WebHome"))
 #set($qs = "")
 #set($qs = $request.queryString)
 #if(!$request.getParameter("xredirect"))
-#set($qs = "xredirect=$doc.getURL('view')&${qs}")
+#set($qs = "xredirect=$xwiki.getURLEncoded($doc.getURL('view'))&${qs}")
 #end
 $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #else

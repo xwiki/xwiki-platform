@@ -72,7 +72,8 @@ public class DownloadAction extends XWikiAction
         String mimetype = attachment.getMimeType(context);
         response.setContentType(mimetype);
 
-        String ofilename = XWiki.getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
+        String ofilename =
+            context.getWiki().getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more

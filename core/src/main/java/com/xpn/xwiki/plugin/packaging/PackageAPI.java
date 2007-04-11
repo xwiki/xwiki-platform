@@ -158,7 +158,8 @@ public class PackageAPI   extends Api {
 
     public String export() throws IOException, XWikiException {
         getXWikiContext().getResponse().setContentType("application/zip");
-        getXWikiContext().getResponse().addHeader("Content-disposition", "attachment; filename=" + XWiki.getURLEncoded(plugin.getName()) + ".xar");
+        getXWikiContext().getResponse().addHeader("Content-disposition", "attachment; filename="
+            + getXWikiContext().getWiki().getURLEncoded(plugin.getName()) + ".xar");
         getXWikiContext().setFinished(true);
         return  plugin.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
     }

@@ -107,9 +107,7 @@ public class TOCGenerator {
   }
 
   public static String makeHeadingID (String text, int occurence, XWikiContext context) {
-    // Encode to convert unsafe chars
-    //text = Utils.encode(text.trim(), context);
-    text = "H" + XWiki.getURLEncoded(text);
+    text = "H" + context.getWiki().getURLEncoded(text);
     text = text.replaceAll("[^a-zA-Z0-9]", "");
         
     if (occurence > 0) {

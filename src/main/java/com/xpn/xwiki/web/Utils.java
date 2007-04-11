@@ -383,10 +383,9 @@ public class Utils {
         }
     }
 
+    // TODO: Duplicate of XWiki.getURLEncoded(). Keep only one
     public static String encode(String name, XWikiContext context) {
         try {
-            //byte[] bytes = name.getBytes("UTF-8");
-            ///String result = new String(bytes);
             return URLEncoder.encode(name, context.getWiki().getEncoding());
         } catch (Exception e) {
             return name;

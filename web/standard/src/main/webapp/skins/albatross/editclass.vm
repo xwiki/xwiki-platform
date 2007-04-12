@@ -1,4 +1,4 @@
-#if($request.xpage=="editclass")
+#if($request.xpage && $request.xpage=="editclass")
 $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 #else
 #set($formname = "propupdate")

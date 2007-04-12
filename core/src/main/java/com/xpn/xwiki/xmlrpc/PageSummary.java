@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,46 +16,54 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
-
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-public class PageSummary  {
+public class PageSummary
+{
     private String id;
+
     private String space;
+
     private String parentId;
+
     private String title;
+
     private String url;
+
     private int locks;
 
-
-   public PageSummary(String id, String space, String parentId, String title, String url, int locks) {
-       this.setId(id);
-       this.setSpace(space);
-       this.setParentId(parentId);
-       this.setTitle(title);
-       this.setUrl(url);
-       this.setLocks(locks);
-   }
-
-    public PageSummary(Map pageht) {
-        this.setId((String)pageht.get("id"));
-        this.setSpace((String)pageht.get("space"));
-        this.setParentId((String)pageht.get("parentId"));
-        this.setTitle((String)pageht.get("title"));
-        this.setUrl((String)pageht.get("url"));
-        this.setLocks(((Integer)pageht.get("locks")).intValue());
+    public PageSummary(String id, String space, String parentId, String title, String url,
+        int locks)
+    {
+        this.setId(id);
+        this.setSpace(space);
+        this.setParentId(parentId);
+        this.setTitle(title);
+        this.setUrl(url);
+        this.setLocks(locks);
     }
 
-    public PageSummary(XWikiDocument doc, XWikiContext context) {
+    public PageSummary(Map parameters)
+    {
+        this.setId((String) parameters.get("id"));
+        this.setSpace((String) parameters.get("space"));
+        this.setParentId((String) parameters.get("parentId"));
+        this.setTitle((String) parameters.get("title"));
+        this.setUrl((String) parameters.get("url"));
+        if (parameters.containsKey("locks")) {
+            this.setLocks(((Integer) parameters.get("locks")).intValue());
+        }
+    }
+
+    public PageSummary(XWikiDocument doc, XWikiContext context)
+    {
         this.setId(doc.getFullName());
         this.setSpace(doc.getSpace());
         this.setParentId(doc.getParent());
@@ -64,7 +72,8 @@ public class PageSummary  {
         this.setLocks(0);
     }
 
-    Map getParameters() {
+    Map getParameters()
+    {
         Map params = new HashMap();
         params.put("id", getId());
         params.put("space", getSpace());
@@ -75,51 +84,63 @@ public class PageSummary  {
         return params;
     }
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public String getSpace() {
+    public String getSpace()
+    {
         return space;
     }
 
-    public void setSpace(String space) {
+    public void setSpace(String space)
+    {
         this.space = space;
     }
 
-    public String getParentId() {
+    public String getParentId()
+    {
         return parentId;
     }
 
-    public void setParentId(String parentId) {
+    public void setParentId(String parentId)
+    {
         this.parentId = parentId;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 
-    public int getLocks() {
+    public int getLocks()
+    {
         return locks;
     }
 
-    public void setLocks(int locks) {
+    public void setLocks(int locks)
+    {
         this.locks = locks;
     }
 }

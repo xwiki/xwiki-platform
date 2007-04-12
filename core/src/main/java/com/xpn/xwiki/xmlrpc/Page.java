@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,10 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
-
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.XWikiContext;
@@ -28,18 +25,37 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import java.util.Date;
 import java.util.Map;
 
-public class Page extends PageSummary {
+/**
+ * Represents a Page as described in the <a href="Confluence specification">
+ * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
+ *
+ * @todo right now there's no validation done on any parameter and this class accepts null values
+ *       for all parameters. In the future we need a validation strategy defined which corresponds
+ *       to how this class is used: for creating a page, for udpating it, etc. The validation
+ *       needs are different across the use cases so it might even be best to have different
+ *       validation classes used where this class is used in the code.
+ * @version $Id: $
+ */
+public class Page extends PageSummary
+{
     private int version;
+
     private String content;
+
     private Date created;
+
     private String creator;
+
     private Date modified;
+
     private String modifier;
+
     private boolean homepage;
 
     public Page(String id, String space, String parentId, String title, String url,
-                       int version, String content, Date created, String creator,
-                       Date modified, String modifier, boolean homepage, int locks) {
+        int version, String content, Date created, String creator,
+        Date modified, String modifier, boolean homepage, int locks)
+    {
         super(id, space, parentId, title, url, locks);
         this.setVersion(version);
         this.setContent(content);
@@ -50,29 +66,37 @@ public class Page extends PageSummary {
         this.setHomepage(homepage);
     }
 
-   public Page(XWikiDocument doc, XWikiContext context) {
-       super(doc, context);
-       this.setVersion(doc.getRCSVersion().getNumbers()[1]);
-       this.setContent(doc.getContent());
-       this.setCreated(doc.getCreationDate());
-       this.setCreator(doc.getAuthor());
-       this.setModified(doc.getDate());
-       this.setModifier(doc.getAuthor());
-       this.setHomepage((doc.getName().equals("WebHome")));
-   }
-
-    public Page(Map parameters) {
-        super(parameters);
-        this.setVersion(((Integer)parameters.get("version")).intValue());
-        this.setContent((String)parameters.get("content"));
-        this.setCreated((Date)parameters.get("created"));
-        this.setCreator((String)parameters.get("creator"));
-        this.setModified((Date)parameters.get("modified"));
-        this.setModifier((String)parameters.get("modifier"));
-        this.setHomepage(((Boolean)parameters.get("homepage")).booleanValue());
+    public Page(XWikiDocument doc, XWikiContext context)
+    {
+        super(doc, context);
+        this.setVersion(doc.getRCSVersion().getNumbers()[1]);
+        this.setContent(doc.getContent());
+        this.setCreated(doc.getCreationDate());
+        this.setCreator(doc.getAuthor());
+        this.setModified(doc.getDate());
+        this.setModifier(doc.getAuthor());
+        this.setHomepage((doc.getName().equals("WebHome")));
     }
 
-    Map getParameters() {
+    public Page(Map parameters)
+    {
+        super(parameters);
+
+        if (parameters.containsKey("version")) {
+            this.setVersion(((Integer) parameters.get("version")).intValue());
+        }
+        this.setContent((String) parameters.get("content"));
+        this.setCreated((Date) parameters.get("created"));
+        this.setCreator((String) parameters.get("creator"));
+        this.setModified((Date) parameters.get("modified"));
+        this.setModifier((String) parameters.get("modifier"));
+        if (parameters.containsKey("homepage")) {
+            this.setHomepage(((Boolean) parameters.get("homepage")).booleanValue());
+        }
+    }
+
+    Map getParameters()
+    {
         Map params = super.getParameters();
         params.put("version", new Integer(getVersion()));
         params.put("content", getContent());
@@ -84,59 +108,73 @@ public class Page extends PageSummary {
         return params;
     }
 
-    public int getVersion() {
+    public int getVersion()
+    {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(int version)
+    {
         this.version = version;
     }
 
-    public String getContent() {
+    public String getContent()
+    {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(String content)
+    {
         this.content = content;
     }
 
-    public Date getCreated() {
+    public Date getCreated()
+    {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Date created)
+    {
         this.created = created;
     }
 
-    public String getCreator() {
+    public String getCreator()
+    {
         return creator;
     }
 
-    public void setCreator(String creator) {
+    public void setCreator(String creator)
+    {
         this.creator = creator;
     }
 
-    public Date getModified() {
+    public Date getModified()
+    {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Date modified)
+    {
         this.modified = modified;
     }
 
-    public String getModifier() {
+    public String getModifier()
+    {
         return modifier;
     }
 
-    public void setModifier(String modifier) {
+    public void setModifier(String modifier)
+    {
         this.modifier = modifier;
     }
 
-    public boolean isHomepage() {
+    public boolean isHomepage()
+    {
         return homepage;
     }
 
-    public void setHomepage(boolean homepage) {
+    public void setHomepage(boolean homepage)
+    {
         this.homepage = homepage;
     }
 }

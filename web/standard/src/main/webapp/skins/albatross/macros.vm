@@ -43,16 +43,16 @@
 ### Extract and display the panel code from the panel object
 ###
 #macro(displaypanel $name)
-#set($pobj = "")
-#set($paneldoc = $xwiki.getDocument($name))
-#if($paneldoc.fullName==$name)
-#set($pobj = $paneldoc.getObject("Panels.PanelClass"))
-#if(!$pobj)
-## discarded
-#else
-$!doc.display("content", "view", $pobj)
-#end
-#end
+  #set ($pobj = "")
+  #set ($paneldoc = $xwiki.getDocument($name))
+  #if ($paneldoc && $paneldoc.fullName==$name)
+    #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
+    #if (!$pobj)
+      ## discarded
+    #else
+      $!doc.display("content", "view", $pobj)
+    #end
+  #end
 #end
 
 #macro(displayPropName $prop)

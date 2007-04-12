@@ -25,6 +25,17 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Represents a Page as described in the <a href="Confluence specification">
+ * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
+ *
+ * @todo right now there's no validation done on any parameter and this class accepts null values
+ *       for all parameters. In the future we need a validation strategy defined which corresponds
+ *       to how this class is used: for creating a page, for udpating it, etc. The validation
+ *       needs are different across the use cases so it might even be best to have different
+ *       validation classes used where this class is used in the code.
+ * @version $Id: $
+ */
 public class Page extends PageSummary
 {
     private int version;
@@ -70,13 +81,18 @@ public class Page extends PageSummary
     public Page(Map parameters)
     {
         super(parameters);
-        this.setVersion(((Integer) parameters.get("version")).intValue());
+
+        if (parameters.containsKey("version")) {
+            this.setVersion(((Integer) parameters.get("version")).intValue());
+        }
         this.setContent((String) parameters.get("content"));
         this.setCreated((Date) parameters.get("created"));
         this.setCreator((String) parameters.get("creator"));
         this.setModified((Date) parameters.get("modified"));
         this.setModifier((String) parameters.get("modifier"));
-        this.setHomepage(((Boolean) parameters.get("homepage")).booleanValue());
+        if (parameters.containsKey("homepage")) {
+            this.setHomepage(((Boolean) parameters.get("homepage")).booleanValue());
+        }
     }
 
     Map getParameters()

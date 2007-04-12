@@ -16,8 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
 package com.xpn.xwiki.xmlrpc;
 
@@ -52,14 +50,16 @@ public class PageSummary
         this.setLocks(locks);
     }
 
-    public PageSummary(Map pageht)
+    public PageSummary(Map parameters)
     {
-        this.setId((String) pageht.get("id"));
-        this.setSpace((String) pageht.get("space"));
-        this.setParentId((String) pageht.get("parentId"));
-        this.setTitle((String) pageht.get("title"));
-        this.setUrl((String) pageht.get("url"));
-        this.setLocks(((Integer) pageht.get("locks")).intValue());
+        this.setId((String) parameters.get("id"));
+        this.setSpace((String) parameters.get("space"));
+        this.setParentId((String) parameters.get("parentId"));
+        this.setTitle((String) parameters.get("title"));
+        this.setUrl((String) parameters.get("url"));
+        if (parameters.containsKey("locks")) {
+            this.setLocks(((Integer) parameters.get("locks")).intValue());
+        }
     }
 
     public PageSummary(XWikiDocument doc, XWikiContext context)

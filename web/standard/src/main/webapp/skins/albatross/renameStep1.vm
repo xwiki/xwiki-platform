@@ -16,11 +16,14 @@
 <h3 class="heading-1-1">$msg.get("core.rename.title.updateDocs")</h3>
 #foreach($backlink in $backlinks)
 #if(!$xwiki.hasAccessLevel("edit", $context.user, $backlink))
-<div><label style="color: #999;"><input type="checkbox" disabled="disabled"/> $backlink</label></div>
+#set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank' style='color: #999;'>$backlink</a>")
+<div><input type="checkbox" disabled="disabled"/> $alink</div>
 #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
-<div><label style="color: #900;"><input type="checkbox" name="backlink_$backlink"/> $backlink</label></div>
+#set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank' style='color: #900;'>$backlink</a>")
+<div><input type="checkbox" name="backlink_$backlink"/> $alink</div>
 #else
-<div><label><input type="checkbox" name="backlink_$backlink" checked="checked"/> $backlink</label></div>
+#set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank'>$backlink</a>")
+<div><input type="checkbox" name="backlink_$backlink" checked="checked"/> $alink</div>
 #end
 #end
 #end

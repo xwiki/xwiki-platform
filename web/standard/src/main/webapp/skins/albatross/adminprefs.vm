@@ -5,7 +5,6 @@
 ##
 ## Define sections
 ##
-#set($class = $obj.xWikiClass)
 #set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
 #set($sectionitemsmap = $xwiki.hashMap)
 #set($sectionitemsmap.params = ["multilingual", "languages" , "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
@@ -61,10 +60,14 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #set($saveaction = "save")
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
-#set ($classname = "XWiki.XWikiPreferences")
+#set($redirect = "$xwiki.getRequestURL()")
+#set($classname = "XWiki.XWikiPreferences")
 #set($class = $xwiki.getDocument($classname).xWikiClass)
 #set($obj = $doc.getObject($classname, 0))
-#set($redirect = "$xwiki.getRequestURL()")
+#if(!$obj)
+#set($redirect = $xwiki.getRequestURL())
+$response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiPreferences&xredirect=$xwiki.getFormEncoded($redirect)"))
+#end
 <div class="hidden">
 <input type="hidden" name="xcontinue" value="$doc.getURL("admin", "editor=prefs")"/>
 <input type="hidden" name="xredirect" value="$xwiki.getURL("Main.WebHome")"/>

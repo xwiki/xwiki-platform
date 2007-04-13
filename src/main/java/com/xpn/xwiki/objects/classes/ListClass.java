@@ -135,9 +135,8 @@ public abstract class ListClass extends PropertyClass {
 
     public static List getListFromString(String value, String separators, boolean withMap) {
 		List list = new ArrayList();
-		if (value == null)
+        if (value == null)
 			return list;
-
         if (separators==null)
          separators = "|";
 
@@ -146,13 +145,17 @@ public abstract class ListClass extends PropertyClass {
           val = StringUtils.replace(val, "\\" + separators, "%PIPE%");
 
         String[] result = StringUtils.split(val, separators);
-		for (int i = 0; i < result.length; i++) {
+		String item = "";
+        for (int i = 0; i < result.length; i++) {
 		    String element = StringUtils.replace(result[i], "%PIPE%", separators);
             if (withMap&&(element.indexOf('=')!=-1)) {
-              list.add(StringUtils.split(element,"=")[0]);                
+              item = StringUtils.split(element,"=")[0];
             }
-            else
-              list.add(element);
+            else {
+              item = element;
+            }
+            if (!item.trim().equals(""))
+             list.add(item);
         }
         return list;
 	}
@@ -221,9 +224,12 @@ public abstract class ListClass extends PropertyClass {
         }
 
         // If Multiselect and multiple results
-        for (int i = 0; i < strings.length; i++)
-			list.add(strings[i]);
-		return prop;
+        for (int i = 0; i < strings.length; i++) {
+            String item = strings[i];
+            if (!item.trim().equals(""))
+                list.add(item);
+        }
+        return prop;
 	}
 
 	public BaseProperty newPropertyfromXML(Element ppcel) {
@@ -371,8 +377,10 @@ public abstract class ListClass extends PropertyClass {
 			displaySelectEdit(buffer, name, prefix, object, context);
 		}
 
-        org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
-        buffer.append(hidden);
+        if (!getDisplayType().equals("input")) {
+            org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
+            buffer.append(hidden);
+        }
     }
 
 	protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
@@ -388,6 +396,13 @@ public abstract class ListClass extends PropertyClass {
         } else {
             selectlist = new ArrayList();
             selectlist.add(prop.getValue());
+        }
+
+        // TODO: add elements that are in the values but not in the predefined list..
+        for (Iterator it = selectlist.iterator(); it.hasNext();) {
+            String item = (String) it.next();
+            if (!list.contains(item))
+              list.add(item);
         }
 
         // Add options from Set
@@ -463,7 +478,15 @@ public abstract class ListClass extends PropertyClass {
 			selectlist.add(prop.getValue());
 		}
 
-		// Add options from Set
+
+        // TODO: add elements that are in the values but not in the predefined list..
+        for (Iterator it = selectlist.iterator(); it.hasNext();) {
+            String item = (String) it.next();
+            if (!list.contains(item))
+              list.add(item);
+        }
+
+        // Add options from Set
 		for (Iterator it = list.iterator(); it.hasNext();) {
             Object rawvalue = it.next();
             String value = getElementValue(rawvalue);
@@ -475,7 +498,7 @@ public abstract class ListClass extends PropertyClass {
 			select.addElement(option);
 		}
 
-		buffer.append(select.toString());
+        buffer.append(select.toString());
 	}
 
 	public abstract List getList(XWikiContext context);

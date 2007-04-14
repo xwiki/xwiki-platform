@@ -3,10 +3,10 @@ com.xpn.xwiki.render.filter.MacroFilter
 com.xpn.xwiki.render.filter.XWikiHeadingFilter
 com.xpn.xwiki.render.filter.XWikiLinkFilter
 org.radeox.filter.LineFilter
+org.radeox.filter.NewlineFilter
 # org.radeox.filter.ListFilter
 com.xpn.xwiki.render.filter.XWikiListFilter
 org.radeox.filter.StrikeThroughFilter
-org.radeox.filter.NewlineFilter
 org.radeox.filter.ParagraphFilter
 com.xpn.xwiki.render.filter.UnderlineFilter
 com.xpn.xwiki.render.filter.StrongFilter

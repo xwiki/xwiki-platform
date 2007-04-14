@@ -1092,8 +1092,13 @@ WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, c
     if ((vcomment.indexOf("\n") > -1) || (vcomment.indexOf("<p") > -1)) {
         str = "#*" + vcomment + "*#";
     } else {
-        str = "##" + vcomment;
+        if (this.core.isMSIE) {
+            str = "\r\n" + "##" + vcomment + "\r\n";
+        } else {
+            str = "##" + vcomment;
+        }
     }
+
     if (result[4] != null) {
         str += result[4];
     }

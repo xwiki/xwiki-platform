@@ -617,7 +617,9 @@ $fn
  <a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get("core.footnotes.gotofootnote", [${footnote_id}]): $text">\[$footnote_id\]</a>
 </sup>
 #end
-
+##
+##
+##
 #macro(putFootnotes)
 #if($page_footnotes && ($page_footnotes.size() > 0))
 <div class="footnotes">
@@ -631,5 +633,34 @@ $fn
 </div>
 #set($discard = $page_footnotes.clear())
 #set($footnote_group_id = $footnote_group_id + 1)
+#end
+#end
+##
+##
+##  Generate navigation links for paged documents
+##
+#macro(pagedViewLinks $itemsPerPage $totalPages $crtPageNumber)
+#if($totalPages > 0)
+<div class="pagedNavigation">
+#if($crtPageNumber > 0)
+#set($prevPage = $crtPageNumber - 1)
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&ipp=${itemsPerPage}")">$msg.get("core.paging.firstPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&ipp=${itemsPerPage}")">$msg.get("core.paging.previousPage")</a></span>
+#else
+<span class="pagedLink inactive">$msg.get("core.paging.firstPage")</span>
+<span class="pagedLink inactive">$msg.get("core.paging.previousPage")</span>
+#end
+#set($displayCrtPageNumber = $crtPageNumber + 1)
+#set($displayTotalPages = $totalPages + 1)
+<span class="pagedStatus">$msg.get("core.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
+#if($crtPageNumber < $totalPages)
+#set($nextPage = $crtPageNumber + 1)
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&ipp=${itemsPerPage}")">$msg.get("core.paging.nextPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&ipp=${itemsPerPage}")">$msg.get("core.paging.lastPage")</a></span>
+#else
+<span class="pagedLink inactive">$msg.get("core.paging.nextPage")</span>
+<span class="pagedLink inactive">$msg.get("core.paging.lastPage")</span>
+#end
+</div>
 #end
 #end

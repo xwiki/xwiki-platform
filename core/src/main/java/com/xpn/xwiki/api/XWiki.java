@@ -2351,6 +2351,37 @@ public class XWiki extends Api
     }
 
     /**
+     * API to display a select box for the list of available field for a specific class This field
+     * data can then be used to generate the order element of an XWiki Query showing a table with the relevant data
+     *
+     * @param className XWiki Class Name to display the list of columns for
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    public String displaySearchOrder(String className, XWikiQuery query) throws XWikiException
+    {
+        return xwiki.displaySearchOrder(className, "", query, getXWikiContext());
+    }
+
+    /**
+     * API to display a select box for the list of available field for a specific class, optionally
+     * adding a prefix This field data can then be used to generate the order element of an XWiki Query showing a table
+     * with the relevant data
+     *
+     * @param className XWiki Class Name to display the list of columns for
+     * @param prefix Prefix to add to the field name
+     * @param query Query to pre-select the currently selected columns
+     * @return text of the select field
+     * @throws XWikiException exception is a failure occured
+     */
+    public String displaySearchOrder(String className, String prefix, XWikiQuery query)
+        throws XWikiException
+    {
+        return xwiki.displaySearchOrder(className, prefix, query, getXWikiContext());
+    }
+
+    /**
      * API to display a field in search mode for a specific class without preselected values This
      * field data can then be used to generate an XWiki Query showing a table with the relevant data
      * 
@@ -2535,4 +2566,17 @@ public class XWiki extends Api
     public String clearAccents(String text) {
         return Util.noaccents(text);
     }
+
+    /**
+     * Get a Class
+     *
+     * @return class object
+     * @throws XWikiException
+     */
+    public Class getClass(String name) throws XWikiException
+    {
+        return new Class(xwiki.getDocument(name, context).getxWikiClass(), context);
+    }
+
+
 }

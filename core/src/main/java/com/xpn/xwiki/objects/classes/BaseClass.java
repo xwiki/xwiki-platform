@@ -49,6 +49,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
@@ -679,6 +680,39 @@ public class BaseClass extends BaseCollection implements ClassInterface {
             option.addElement(displayValue);
             option.setValue(value);
             if (selectlist.contains(value))
+                option.setSelected(true);
+            select.addElement(option);
+        }
+
+        return select.toString();
+    }
+
+    public String displaySearchOrder(String prefix, XWikiQuery query, XWikiContext context) {
+        select select = new select(prefix + "searchorder", 5);
+        select.setMultiple(true);
+        select.setName(prefix + "searchorder");
+        select.setID(prefix + "searchorder");
+
+        List list = Arrays.asList(getPropertyNames());
+        Map prettynamesmap = new HashMap();
+        for (int i=0;i<list.size();i++) {
+            String propname = (String) list.get(i);
+            list.set(i, prefix + propname);
+            prettynamesmap.put(prefix + propname, ((PropertyClass)get(propname)).getPrettyName());
+        }
+
+        OrderClause order = null;
+        if ((query!=null)&&(query.getOrderProperties()!=null)&&(query.getOrderProperties().size()>0))
+            order = (OrderClause) query.getOrderProperties().get(0);
+
+        // Add options from Set
+        for (Iterator it=list.iterator();it.hasNext();) {
+            String value = it.next().toString();
+            String displayValue = (String) prettynamesmap.get(value);
+            option option = new option(displayValue, displayValue);
+            option.addElement(displayValue);
+            option.setValue(value);
+            if ((order!=null)&&(value.equals(order.getProperty())))
                 option.setSelected(true);
             select.addElement(option);
         }

@@ -3697,23 +3697,30 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context,
-        VelocityContext vcontext) throws XWikiException
+                                    VelocityContext vcontext) throws XWikiException
     {
         XWikiDocument doc;
         String docName = getDocumentName(request, context);
-        try {
-            doc = getDocument(docName, context);
-        } catch (XWikiException e) {
-            doc = context.getDoc();
-            if (context.getAction().equals("delete")) {
-                if (doc == null) {
-                    setPhonyDocument(docName, context, vcontext);
-                }
-                if (!checkAccess("admin", doc, context)) {
+        if (context.getAction().equals("register")) {
+            setPhonyDocument(docName, context, vcontext);
+            context.getWiki().prepareResources(context);
+            doc = context.getDoc();        
+        } else {
+
+            try {
+                doc = getDocument(docName, context);
+            } catch (XWikiException e) {
+                doc = context.getDoc();
+                if (context.getAction().equals("delete")) {
+                    if (doc == null) {
+                        setPhonyDocument(docName, context, vcontext);
+                    }
+                    if (!checkAccess("admin", doc, context)) {
+                        throw e;
+                    }
+                } else {
                     throw e;
                 }
-            } else {
-                throw e;
             }
         }
 
@@ -3723,19 +3730,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             Object[] args = {doc.getFullName(), context.getUser()};
             setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access to document {0} has been denied to user {1}",
-                null,
-                args);
+                    XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access to document {0} has been denied to user {1}",
+                    null,
+                    args);
         } else if (checkActive(context) == 0) {
             Object[] args = {context.getUser()};
             setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                "User {0} account is inactive",
-                null,
-                args);
+                    XWikiException.ERROR_XWIKI_USER_INACTIVE,
+                    "User {0} account is inactive",
+                    null,
+                    args);
         }
+
+
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));

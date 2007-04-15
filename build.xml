@@ -509,7 +509,8 @@
             private="yes"
             windowtitle="${app.name} API"
             doctitle="${app.name}"
-            bottom="Copyright 2003 Ludovic Dubost"
+            bottom="Copyright 2003-2007 XPertNet SARL, and individual contributors as indicated"
+            additionalparam='-tag todo:a:"To Do:"'
             >
         </javadoc>
     </target>

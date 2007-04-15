@@ -106,35 +106,30 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("IndexUpdater: documents in queue, start indexing");
                 }
-                // we need a searcher to find old versions of documents
-                openSearcher();
-                openWriter(false);
-                List oldDocs = new ArrayList();
 
                 while (!queue.isEmpty()) {
                     XWikiContext context = (XWikiContext) this.context.clone();
                     context.getWiki().getStore().cleanUp(context);
                     IndexData data = queue.remove();
                     try {
-                        oldDocs.addAll(getOldIndexDocIds(data));
+                        // Let's delete previous docs
+                        openSearcher();
+                        deleteOldDocs(getOldIndexDocIds(data));
+                        closeSearcher();
+
                         XWikiDocument doc = xwiki.getDocument(data.getFullName(), context);
+
+                        // Let's index the new one
+                        openWriter(false);
                         addToIndex(data, doc, context);
+                        closeWriter();
+
                     } catch (Exception e) {
                         LOG.error("error retrieving doc from own context: " + e.getMessage(), e);
                         e.printStackTrace();
                     }
                     context.getWiki().getStore().cleanUp(context);
                 }
-                closeWriter();
-                // the following searcher close/open cycle is necessary because
-                // the old reader is not valid for document deletion anymore
-                // after
-                // updating the index
-                closeSearcher();
-                openSearcher();
-                deleteOldDocs(oldDocs);
-                closeSearcher();
-                // readers and searchers should be reopened after index update
                 plugin.openSearchers();
             }
             try {
@@ -204,7 +199,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      * @param data
      * @return
      */
-    private Collection getOldIndexDocIds(IndexData data)
+    private List getOldIndexDocIds(IndexData data)
     {
         List retval = new ArrayList(3);
         Query query = data.buildQuery();

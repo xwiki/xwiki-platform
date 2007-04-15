@@ -1817,6 +1817,7 @@ public class XWikiDocument
 
     public void copyAttachments(XWikiDocument xWikiSourceDocument)
     {
+        getAttachmentList().clear();
         Iterator attit = xWikiSourceDocument.getAttachmentList().iterator();
         while (attit.hasNext()) {
             XWikiAttachment attachment = (XWikiAttachment) attit.next();

@@ -28,12 +28,16 @@ public class JcrQuery implements IQuery {
 		return (XWikiJcrStore) ((XWikiJcrBaseStore)qf.getContext().getWiki().getNotCacheStore());
 	}
 
-	public List list() throws XWikiException {
+    public String getNativeQuery() {
+        return "store"+query;
+    }
+
+    public List list() throws XWikiException {
 		final List result = new ArrayList();
 		try {
 			getStore().executeRead(qf.getContext(), new JcrCallBack() {
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
-					Query q = session.getQueryManager().createQuery("store"+query, language);
+					Query q = session.getQueryManager().createQuery(getNativeQuery(), language);
 					QueryResult qr = q.execute();
 					RowIterator ri = qr.getRows();
 					if (ri!=null) {

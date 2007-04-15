@@ -33,4 +33,5 @@ public interface IQuery {
 	public IQuery setMaxResults(int fs);
 	public IQuery setFirstResult(int fr);
 	public IQuery setDistinct(boolean d);
+    public String getNativeQuery();
 }

@@ -42,7 +42,11 @@ public class DefaultQuery implements IQuery {
 		return null;
 	}
 
-	protected int _fetchSize=-1;
+    public String getNativeQuery() {
+        return null;
+    }
+
+    protected int _fetchSize=-1;
 	protected int _firstResult=-1;
 	protected boolean _isdistinct=false;
 	public IQuery setMaxResults(int fs)		{ _fetchSize = fs; return this; }

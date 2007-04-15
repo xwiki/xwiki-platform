@@ -88,28 +88,34 @@ public class HibernateQuery extends DefaultQuery {
 		}
 		return true;
 	}
-	public List list() throws XWikiException {
-		if (translator==null)
-			translator = new XWikiHibernateQueryTranslator( getQueryTree() );
-		StringBuffer _result = new StringBuffer();
-		if (_select.length()>0)
-			_result.append("select ").append(_select);
-		_result.append(" from ").append(_from);
-		
-		constructWhere(_result);
-		
-		if (_order.length()>0)
-			_result.append(" order by ").append(_order);
-		
-		String hql = _result.toString();
-		
-		if (log.isDebugEnabled())
-			log.debug("hql: "+hql);
-		
+    
+    public List list() throws XWikiException {
+        String hql = getNativeQuery();
 		return hqlexec(hql, _hqlparams, _fetchSize, _firstResult);
 	}
-	
-	protected SepStringBuffer	_select		= new SepStringBuffer(",");
+
+    public String getNativeQuery() {
+        if (translator==null)
+            translator = new XWikiHibernateQueryTranslator( getQueryTree() );
+        StringBuffer _result = new StringBuffer();
+        if (_select.length()>0)
+            _result.append("select ").append(_select);
+        _result.append(" from ").append(_from);
+
+        constructWhere(_result);
+
+        if (_order.length()>0)
+            _result.append(" order by ").append(_order);
+
+        String hql = _result.toString();
+
+        if (log.isDebugEnabled())
+            log.debug("hql: "+hql);
+
+        return hql;
+    }
+
+    protected SepStringBuffer	_select		= new SepStringBuffer(",");
 	protected SepStringBuffer	_from		= new SepStringBuffer(",");
 	protected SepStringBuffer	_where		= new SepStringBuffer(" and ");
 	protected SepStringBuffer	_userwhere	= new SepStringBuffer(" and ");
@@ -807,8 +813,8 @@ public class HibernateQuery extends DefaultQuery {
 			translator = null;
 		return super.setDistinct(d);
 	}
-	
-	Map _hqlparams = new HashMap();
+
+    Map _hqlparams = new HashMap();
 	protected void _addHqlParam(String pn, Object v) {
 		_hqlparams.put(pn, v);
 	}

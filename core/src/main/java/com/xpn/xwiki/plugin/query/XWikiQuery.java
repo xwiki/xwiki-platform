@@ -31,6 +31,8 @@ public class XWikiQuery extends XWikiCriteria {
         super();
         String[] columns = request.getParameterValues(className + "_" + "searchcolumns");
         setDisplayProperties(columns);
+        String[] order = request.getParameterValues(className + "_" + "searchorder");
+        setOrderProperties(order);
         BaseClass bclass = context.getWiki().getDocument(className, context).getxWikiClass();
         Set properties = bclass.getPropertyList();
         Iterator propid = properties.iterator();
@@ -38,6 +40,16 @@ public class XWikiQuery extends XWikiCriteria {
             String propname = (String) propid.next();
             Map map = Util.getObject(request, className + "_" + propname);
             ((PropertyClass)(bclass.get(propname))).fromSearchMap(this, map);
+        }
+    }
+
+    private void setOrderProperties(String[] order) {
+        orderProperties.clear();
+        if (order!=null) {
+         for (int i=0;i<order.length;i++) {
+            OrderClause oclause = new OrderClause(order[i], OrderClause.ASC);
+            orderProperties.add(oclause);
+         }
         }
     }
 

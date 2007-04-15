@@ -353,3 +353,25 @@ a.footnoteBackRef{
   text-decoration: none;
   font-weight: bold;
 }
+
+.pagedNavigation {
+  text-align: center;
+  padding: 8px 0px;
+  margin: auto;
+}
+.pagedNavigation span{
+  padding: 0px 8px;
+}
+.pagedNavigation .pagedLink{
+  background-color: #E5F0FE;
+}
+.pagedNavigation .inactive{
+  color: #CCC;
+}
+.pagedNavigation .pagedLink a{
+  text-decoration: none;
+  color: #2E5A87 !important;
+}
+.pagedNavigation .pagedLink a:hover{
+  color: #D70 !important;
+}

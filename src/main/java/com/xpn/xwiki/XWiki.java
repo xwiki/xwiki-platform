@@ -1409,7 +1409,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
         try {
             if (skin.indexOf(".") != -1) {
-                if (!checkAccess("view", getDocument(skin, context), context))
+                if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context))
                     skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
             }
         } catch (XWikiException e) {
@@ -2909,6 +2909,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
+        if (action.equals("skin")&doc.getSpace().equals("skins"))
+         return true;
         return getRightService().checkAccess(action, doc, context);
     }
 
@@ -4626,7 +4628,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         else
             return dweb;
     }
-
+                            
 
     /**
      * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
@@ -4909,7 +4911,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (pclass == null)
             return "";
         else
-            return pclass.displaySearch(fieldname, prefix + "XWiki.XWikiUsers_", criteria,
+            return pclass.displaySearch(fieldname, prefix + className + "_", criteria,
                 context);
     }
 
@@ -4927,6 +4929,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (query == null)
             query = new XWikiQuery();
         return bclass.displaySearchColumns(className + "_" + prefix, query, context);
+    }
+
+    public String displaySearchOrder(String className, XWikiQuery query, XWikiContext context)
+        throws XWikiException
+    {
+        return displaySearchOrder(className, "", query, context);
+    }
+
+    public String displaySearchOrder(String className, String prefix, XWikiQuery query,
+        XWikiContext context) throws XWikiException
+    {
+        BaseClass bclass = getDocument(className, context).getxWikiClass();
+
+        if (query == null)
+            query = new XWikiQuery();
+        return bclass.displaySearchOrder(className + "_" + prefix, query, context);
     }
 
     public List search(XWikiQuery query, XWikiContext context) throws XWikiException

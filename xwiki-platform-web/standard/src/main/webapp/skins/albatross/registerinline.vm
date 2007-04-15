@@ -1,4 +1,4 @@
-#if($xwiki.getDocument("XWiki.Registration").isNew())
+#if(!$xwiki.hasAccessLevel("view","XWiki.Registration")||$xwiki.getDocument("XWiki.Registration").isNew())
   <h1>$msg.get("Registration")</h1>
   #if(!$reg||$reg<0 )
     <p>$msg.get("registerwelcome")</p>
@@ -22,8 +22,7 @@
       <div>
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
         <input type="hidden" name="register" value="1">
-        #set( $class = $xwiki.getDocument("XWiki.XWikiUsers").xWikiClass)
-        #set( $serverclass = $xwiki.getDocument("XWiki.XWikiServerClass").xWikiClass)
+        #set( $class = $xwiki.getClass("XWiki.XWikiUsers"))
         #set( $obj = $class.newObject() )
         #set( $serverobj = $class.newObject() )
         #set( $ok = $doc.use("XWiki.XWikiUsers"))

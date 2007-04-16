@@ -24,6 +24,9 @@
         <property name="connection.password">xwiki</property>
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+        <property name="connection.pool_size">2</property>
+        <property name="statement_cache.size">2</property>
 
         <!-- Mapping files
              Comment it to use for Oracle -->
@@ -37,6 +40,9 @@
         <property name="connection.password"></property>
         <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
         <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+        <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+        <property name="connection.pool_size">2</property>
+        <property name="statement_cache.size">2</property>
         -->
 
         <!-- Uncomment if you want to use Oracle and comment the previous MySQL configuration
@@ -46,14 +52,14 @@
         <property name="connection.password">xwiki</property>
         <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
         <property name="dialect">org.hibernate.dialect.OracleDialect</property>
+        <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+        <property name="connection.pool_size">2</property>
+        <property name="statement_cache.size">2</property>
 
         <mapping resource="xwiki.oracle.hbm.xml"/>
         <mapping resource="feeds.oracle.hbm.xml"/>
         -->
 
-        <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
-        <property name="connection.pool_size">2</property>
-        <property name="statement_cache.size">2</property>
 
     </session-factory>
 </hibernate-configuration>

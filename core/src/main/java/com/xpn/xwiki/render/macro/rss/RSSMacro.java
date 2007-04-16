@@ -407,7 +407,7 @@ public class RSSMacro extends BaseLocaleMacro {
             paramObj.setFeed(feedURLString);
         }
         catch (MalformedURLException ex) {
-            Logger.warn("Invalid feed URL: " + feedURLString, ex);
+            Logger.warn("Invalid feed URL: " + feedURLString);
             throw new IllegalArgumentException("Invalid feed URL: " + feedURLString);
         }
         for (int i = 0; i < PARAM_NAMES.length; i++) {

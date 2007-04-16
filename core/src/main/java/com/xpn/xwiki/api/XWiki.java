@@ -2568,14 +2568,27 @@ public class XWiki extends Api
     }
 
     /**
-     * Get a Class
+     * Get the XWiki Class object defined in the passed Document name.
      *
-     * @return class object
-     * @throws XWikiException
+     * <p>Note: This method doesn't require any rights for accessing the passed Document (as
+     *          opposed to the {@link com.xpn.xwiki.api.Document#getxWikiClass()} method which
+     *          does require to get a Document object first. This is thus useful in cases where
+     *          the calling code doesn't have the access right to the specified Document. It is
+     *          safe because there are no sensitive data stored in a Class definition.
+     * </p>
+     * 
+     * @param documentName the name of the document for which to get the Class object.
+     *        For example "XWiki.XWikiPreferences"
+     * @return the XWiki Class object defined in the passed Document name. If the passed Document
+     *         name points to a Document with no Class defined then an empty Class object is
+     *         returned (i.e. a Class object with no properties).
+     * @throws XWikiException if the passed document name doesn't point to a valid Document
      */
-    public Class getClass(String name) throws XWikiException
+    public Class getClass(String documentName) throws XWikiException
     {
-        return new Class(xwiki.getDocument(name, context).getxWikiClass(), context);
+        // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
+        // delegate all implementations to that Class.
+        return new Class(xwiki.getDocument(documentName, context).getxWikiClass(), context);
     }
 
 

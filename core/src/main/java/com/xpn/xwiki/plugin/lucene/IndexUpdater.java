@@ -114,15 +114,21 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     try {
                         // Let's delete previous docs
                         openSearcher();
-                        deleteOldDocs(getOldIndexDocIds(data));
-                        closeSearcher();
+                        try {
+                            deleteOldDocs(getOldIndexDocIds(data));
+                        } finally {
+                            closeSearcher();
+                        }
 
                         XWikiDocument doc = xwiki.getDocument(data.getFullName(), context);
 
                         // Let's index the new one
                         openWriter(false);
-                        addToIndex(data, doc, context);
-                        closeWriter();
+                        try {
+                            addToIndex(data, doc, context);
+                        } finally {
+                            closeWriter();
+                        }
 
                     } catch (Exception e) {
                         LOG.error("error retrieving doc from own context: " + e.getMessage(), e);

@@ -322,12 +322,12 @@ public class XWikiDocument
 
     public String getParent()
     {
-        return parent.trim();
+        return parent != null ? parent : "";
     }
 
     public void setParent(String parent)
     {
-        if (!parent.equals(this.parent)) {
+        if (parent != null && !parent.equals(this.parent)) {
             setMetaDataDirty(true);
         }
         this.parent = parent;
@@ -398,11 +398,7 @@ public class XWikiDocument
 
     public String getTitle()
     {
-        if (title == null) {
-            return "";
-        } else {
-            return title;
-        }
+			return (title != null) ? title : "";
     }
 
     /**
@@ -473,10 +469,7 @@ public class XWikiDocument
 
     public void setTitle(String title)
     {
-        if (title == null) {
-            title = "";
-        }
-        if (!title.equals(this.title)) {
+        if (title != null && !title.equals(this.title)) {
             setContentDirty(true);
         }
         this.title = title;
@@ -484,11 +477,7 @@ public class XWikiDocument
 
     public String getFormat()
     {
-        if (format == null) {
-            return "";
-        } else {
-            return format;
-        }
+			return format != null ? format : "";
     }
 
     public void setFormat(String format)
@@ -501,25 +490,17 @@ public class XWikiDocument
 
     public String getAuthor()
     {
-        if (author == null) {
-            return "";
-        } else {
-            return author.trim();
-        }
+			return author != null ? author.trim() : "";
     }
 
     public String getContentAuthor()
     {
-        if (contentAuthor == null) {
-            return "";
-        } else {
-            return contentAuthor.trim();
-        }
+			return contentAuthor != null ? contentAuthor.trim() : "";
     }
 
     public void setAuthor(String author)
     {
-        if (!getAuthor().equals(this.author)) {
+        if (!getAuthor().equals(author)) {
             setMetaDataDirty(true);
         }
         this.author = author;
@@ -527,7 +508,7 @@ public class XWikiDocument
 
     public void setContentAuthor(String contentAuthor)
     {
-        if (!getContentAuthor().equals(this.contentAuthor)) {
+        if (!getContentAuthor().equals(contentAuthor)) {
             setMetaDataDirty(true);
         }
         this.contentAuthor = contentAuthor;
@@ -535,16 +516,12 @@ public class XWikiDocument
 
     public String getCreator()
     {
-        if (creator == null) {
-            return "";
-        } else {
-            return creator.trim();
-        }
+			return creator != null ? creator.trim() : "";
     }
 
     public void setCreator(String creator)
     {
-        if (!getCreator().equals(this.creator)) {
+        if (!getCreator().equals(creator)) {
             setMetaDataDirty(true);
         }
         this.creator = creator;
@@ -582,7 +559,7 @@ public class XWikiDocument
 
     public void setCreationDate(Date date)
     {
-        if ((date != null) && (!creationDate.equals(this.creationDate))) {
+        if ((date != null) && (!date.equals(creationDate))) {
             setMetaDataDirty(true);
         }
 

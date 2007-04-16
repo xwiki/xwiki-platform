@@ -30,6 +30,12 @@ import org.radeox.api.engine.RenderEngine;
 import java.io.Writer;
 import java.io.IOException;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+
 public class StyleMacro extends BaseLocaleMacro {
     public String getLocaleKey() {
         return "macro.style";
@@ -39,6 +45,7 @@ public class StyleMacro extends BaseLocaleMacro {
             throws IllegalArgumentException, IOException {
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getContext();
 
         String text = params.getContent();
         String type = params.get("type");
@@ -53,6 +60,41 @@ public class StyleMacro extends BaseLocaleMacro {
         String width = params.get("width");
         String height = params.get("height");
         String border = params.get("border");
+        String document = params.get("document");
+        String icon = params.get("icon");
+
+        if (null == document || document.indexOf("=") != -1) {
+            document = null;
+        }
+        // Get the target document
+        XWikiDocument doc = null;
+
+        if (document != null && !("".equals(document))) {
+            String space = "";
+            if (document.contains(".")) {
+                space = document.substring(0, document.indexOf(".")).trim();
+                document = document.substring(document.indexOf(".") + 1, document.length()).trim();
+            }
+            try {
+                if (space.equals("")) {
+                    space = xcontext.getDoc().getSpace();
+                }
+                doc = xcontext.getWiki().getDocument(space, document, xcontext);
+            } catch (XWikiException e) {
+                // NullPointer or ClassCast
+            }
+        } else {
+            doc = xcontext.getDoc();
+        }
+
+        XWikiAttachment image = doc.getAttachment(icon);
+        String path = "";
+        if (image != null) {
+            path = doc.getAttachmentURL(icon, "download", xcontext);
+        } else {
+            icon = "icons/" + icon; // icons default directory that contain icon image. 
+            path = xcontext.getWiki().getSkinFile(icon, xcontext);
+        }
 
         if (("none".equals(type)) || (type == null) || ("".equals(type.trim()))) {
             type = "span";
@@ -63,14 +105,21 @@ public class StyleMacro extends BaseLocaleMacro {
         if ((!"none".equals(id)) && (id != null) && (!"".equals(id.trim()))) {
             str.append("id=\"" + id.trim() + "\" ");
         }
+
         if ((!"none".equals(classes)) && (classes != null) && (!"".equals(classes.trim()))) {
             str.append("class=\"" + classes.trim() + "\" ");
+        } else {
+            str.append("class=\"stylemacro\" ");
         }
         if ((!"none".equals(name)) && (name != null) && (!"".equals(name.trim()))) {
             str.append("name=\"" + name.trim() + "\" ");
         }
 
         str.append("style=\"");
+
+        if ((!"none".equals(icon)) && (icon != null) && (!"".equals(icon.trim()))) {
+            str.append("background-image: url(" + path + "); ");
+        }
 
         if ((!"none".equals(size)) && (size != null) && (!"".equals(size.trim()))) {
             str.append("font-size:" + size.trim() + "; ");

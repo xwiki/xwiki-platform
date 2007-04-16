@@ -1009,6 +1009,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
         else if (att == "type") {
             tag = value;
         }
+        else if (att == "icon") {
+            style += "background-image: url(" + value + ");";
+        }
         else {
             style += att + ":" + value + ";";
         }
@@ -1020,6 +1023,8 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
 
     if (myclass != "") {
         str += " class=\"" + myclass + "\"";
+    } else {
+        str += " class=\"stylemacro\"";
     }
     if (name != "") {
         str += " name=\"" + name + "\"";
@@ -1048,7 +1053,7 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
             str += "|id=" + attributes["id"] ;
         }
 
-        if (attributes && attributes["class"]) {
+        if (attributes && attributes["class"] && attributes["class"] != "stylemacro") {
             str += "|class=" + attributes["class"] ;
         }
 
@@ -1061,7 +1066,20 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
             for (var i=0; i < atts.length ; i++) {
                 var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
                 var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
-                str += "|" + att + "=" + value;
+                var styleAtts = ["font-size", "font-family", "background-color", "color", "width", "height", "float", "border"];
+                for (var j=0 ; j < styleAtts.length; j++) {
+                    if (att == styleAtts[j]) {
+                        str += "|" + att + "=" + value;
+                        break;
+                    }
+                }
+                if (att == "background-image") {
+                    var iconimage ;
+                    if (value.indexOf("url") >= 0) {
+                        iconimage = value.substring(value.indexOf("(") + 2, value.indexOf(")")-1);
+                        str += "|icon=" + iconimage;
+                    }
+                }
             }
         }
         str += "}";

@@ -174,11 +174,11 @@ public class XWikiAttachment {
     }
 
     public String getComment() {
-        return comment;
+        return comment != null ? comment : "";
     }
 
     public void setComment(String comment) {
-        if (!comment.equals(this.comment)) {
+        if (!getComment().equals(comment)) {
             setMetaDataDirty(true);
         }
         this.comment = comment;
@@ -512,4 +512,5 @@ public class XWikiAttachment {
     }
 
 }
+
 

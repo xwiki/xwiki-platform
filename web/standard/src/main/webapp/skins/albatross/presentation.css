@@ -389,3 +389,15 @@ Diffs
   border-left: 8px solid #0F0;
   font-size: x-small;
 }
+/*
+---------------------------------
+Style macro
+---------------------------------
+*/
+.stylemacro {
+  margin: 4px 0px 4px;
+  padding: 8px 8px 8px 28px;
+  background-repeat: no-repeat;
+  background-position: 8px 8px;
+  text-align: left;
+}

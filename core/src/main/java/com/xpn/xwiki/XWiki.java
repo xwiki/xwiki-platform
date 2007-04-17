@@ -2515,7 +2515,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             XWikiRequest request = context.getRequest();
             Map map = Util.getObject(request, "register");
-            String content = "#includeForm(\"XWiki.XWikiUserTemplate\")";
+            String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
             String xwikiname = request.getParameter("xwikiname");
             String password2 = request.getParameter("register2_password");
             String password = ((String[]) map.get("password"))[0];

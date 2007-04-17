@@ -123,13 +123,13 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                                 }
                             }
                         }
-                        String docName = data.getFullName();
-                        LOG.debug("Adding " + docName + " to index list");
-                        if (toIndex.containsKey(docName)) {
-                            LOG.debug("Found " + docName + " already in list while adding it to index list");
-                            toIndex.remove(docName);
+                        String id = data.getId();
+                        LOG.debug("Adding " + id + " to index list");
+                        if (toIndex.containsKey(id)) {
+                            LOG.debug("Found " + id + " already in list while adding it to index list");
+                            toIndex.remove(id);
                         }
-                        toIndex.put(docName, data);
+                        toIndex.put(id, data);
                     }
                 } catch (Exception e) {
                     LOG.error("error preparing index queue", e);
@@ -160,14 +160,16 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     openWriter(false);
                     Iterator docIt = toIndex.keySet().iterator();
                     while (docIt.hasNext()) {
-                        String docName = (String) docIt.next();
+                        String id = (String) docIt.next();
                         try {
-                            IndexData data = (IndexData) toIndex.get(docName);
-                            XWikiDocument doc = xwiki.getDocument(docName, context);
+                            IndexData data = (IndexData) toIndex.get(id);
+                            XWikiDocument doc = xwiki.getDocument(data.getFullName(), context);
+                            if ((data.getLanguage()!=null)&&(!data.getLanguage().equals("")))
+                             doc = doc.getTranslatedDocument(data.getLanguage(),context);
                             addToIndex(data,doc,context);
                             nb++;
                         } catch (Exception e) {
-                            LOG.error("error indexing document" + docName, e);
+                            LOG.error("error indexing document" + id, e);
                             e.printStackTrace();
                         }
                     }

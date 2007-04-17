@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
 
@@ -58,7 +60,7 @@ public class SearchResult
 
     private String creator;
 
-    private static final Logger LOG = Logger.getLogger(SearchResult.class);
+    private static final Log LOG = LogFactory.getLog(SearchResult.class);
 
     /**
      * @todo add fallback for unknown index field names (read values into a map accessible from

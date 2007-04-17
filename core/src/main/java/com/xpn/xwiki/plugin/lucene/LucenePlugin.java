@@ -28,6 +28,8 @@ import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
@@ -50,7 +52,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
     public static final String DOCTYPE_ATTACHMENT = "attachment";
 
-    private static final Logger LOG = Logger.getLogger(LucenePlugin.class);
+    private static final Log LOG = LogFactory.getLog(LucenePlugin.class);
 
     private Analyzer analyzer;
 

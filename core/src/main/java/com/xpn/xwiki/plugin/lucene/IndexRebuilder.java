@@ -25,6 +25,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
@@ -44,7 +46,7 @@ import java.util.*;
  */
 public class IndexRebuilder
 {
-    private static final Logger LOG = Logger.getLogger(IndexRebuilder.class);
+    private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
 
     private IndexUpdater indexUpdater;
 

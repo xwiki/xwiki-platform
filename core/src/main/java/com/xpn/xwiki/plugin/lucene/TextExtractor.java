@@ -27,6 +27,8 @@ import com.xpn.xwiki.plugin.lucene.textextraction.PDFTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.PlainTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.XmlTextExtractor;
 import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +42,7 @@ import java.util.Map;
  */
 public class TextExtractor
 {
-    private static final Logger LOG = Logger.getLogger(TextExtractor.class);
+    private static final Log LOG = LogFactory.getLog(TextExtractor.class);
 
     static final Map textExtractors = new HashMap();
 

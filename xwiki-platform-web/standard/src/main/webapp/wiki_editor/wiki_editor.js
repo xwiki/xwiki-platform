@@ -72,7 +72,9 @@ WikiEditor.prototype.init = function(params) {
 	params["relative_urls"] = true;
     params["remove_linebreaks"] = false;
 
-    params["use_linkeditor_tabs"] = "wiki_tab, web_tab, attachments_tab, email_tab, file_tab";
+    if(params["use_linkeditor_tabs"] == null) {
+        params["use_linkeditor_tabs"] = "wiki_tab, web_tab, attachments_tab, email_tab, file_tab";
+    }
     // if don't have this param then it's always default by wiki_tab
 
     this.setImagePath((params["wiki_images_path"] == null) ? "" : params["wiki_images_path"]);

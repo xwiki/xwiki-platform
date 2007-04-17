@@ -130,7 +130,7 @@ public class AttachmentData extends IndexData
     {
         return new StringBuffer(super.getId()).append(".file.").append(filename).toString();
     }
-
+    
     /**
      * @return a string containing the result of {@link IndexData#getFullText} plus the full text
      *         content of this attachment, as far as it could be extracted.

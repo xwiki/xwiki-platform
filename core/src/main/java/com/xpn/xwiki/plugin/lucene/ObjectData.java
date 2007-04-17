@@ -29,6 +29,8 @@ import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +41,7 @@ import java.util.Map;
  */
 public class ObjectData extends IndexData
 {
-    private static final Logger LOG = Logger.getLogger(ObjectData.class);
+    private static final Log LOG = LogFactory.getLog(ObjectData.class);
 
     public ObjectData(final XWikiDocument doc, final XWikiContext context)
     {

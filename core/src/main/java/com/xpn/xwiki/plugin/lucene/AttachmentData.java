@@ -25,6 +25,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +56,7 @@ public class AttachmentData extends IndexData
         MIMETYPES.put("xls", "application/ms-excel");
     }
 
-    private static final Logger LOG = Logger.getLogger(AttachmentData.class);
+    private static final Log LOG = LogFactory.getLog(AttachmentData.class);
 
     private int size;
 

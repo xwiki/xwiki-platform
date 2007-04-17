@@ -2,6 +2,8 @@ package com.xpn.xwiki.plugin.lucene.textextraction;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
@@ -17,7 +19,7 @@ import java.util.Date;
  */
 public class MSExcelTextExtractor implements MimetypeTextExtractor {
 
-    private static final Logger LOG = Logger.getLogger(MSExcelTextExtractor.class);
+    private static final Log LOG = LogFactory.getLog(MSExcelTextExtractor.class);
     /**
      * The currently preparing Excel workbook.
      */

@@ -26,6 +26,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -35,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public abstract class IndexData
 {
-    private static final Logger LOG = Logger.getLogger(IndexData.class);
+    private static final Log LOG = LogFactory.getLog(IndexData.class);
 
     private String documentName;
 

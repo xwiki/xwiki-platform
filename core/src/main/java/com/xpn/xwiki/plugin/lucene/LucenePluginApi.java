@@ -23,6 +23,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Context;
 import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This plugin allows index based search in the contents of Wiki Pages and their attachments, as
@@ -37,7 +39,7 @@ import org.apache.log4j.Logger;
  */
 public class LucenePluginApi extends Api
 {
-    private static final Logger LOG = Logger.getLogger(LucenePluginApi.class);
+    private static final Log LOG = LogFactory.getLog(LucenePluginApi.class);
 
     private LucenePlugin plugin;
 

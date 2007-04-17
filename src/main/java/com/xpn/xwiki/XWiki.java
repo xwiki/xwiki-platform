@@ -2909,8 +2909,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        if (action.equals("skin")&doc.getSpace().equals("skins"))
-         return true;
+        if (action.equals("skin") && doc.getSpace().equals("skins"))
+            return true;
         return getRightService().checkAccess(action, doc, context);
     }
 

@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.lucene;
 import com.xpn.xwiki.api.XWiki;
 import org.apache.log4j.Logger;
 import org.apache.lucene.search.Hits;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ public class SearchResults
 
     private final Hits hits;
 
-    private static final Logger LOG = Logger.getLogger(SearchResults.class);
+    private static final Log LOG = LogFactory.getLog(SearchResults.class);
 
     private List relevantResults;
 

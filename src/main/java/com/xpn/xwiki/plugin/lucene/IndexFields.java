@@ -20,6 +20,8 @@
 package com.xpn.xwiki.plugin.lucene;
 
 import org.apache.commons.lang.time.FastDateFormat;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 
 import java.text.SimpleDateFormat;
@@ -110,7 +112,7 @@ public abstract class IndexFields
     private static final FastDateFormat df = FastDateFormat
         .getInstance(IndexFields.DATE_FORMAT);
 
-    private static final Logger LOG = Logger.getLogger(IndexFields.class);
+    private static final Log LOG = LogFactory.getLog(IndexFields.class);
 
     public static final String dateToString(Date date)
     {

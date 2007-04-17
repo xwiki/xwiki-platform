@@ -238,7 +238,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 LOG.debug("delete doc " + id);
             }
             try {
-                reader.deleteDocument(id);
+                reader.deleteDocument(id.intValue());
                 nb++;
             } catch (IOException e1) {
                 LOG.error("error deleting doc " + id, e1);

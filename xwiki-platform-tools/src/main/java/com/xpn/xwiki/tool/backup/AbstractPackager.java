@@ -60,6 +60,9 @@ public class AbstractPackager
         config.put("xwiki.store.hibernate.updateschema", "1");
         config.put("xwiki.virtual", "1");
 
+        // Enable backlinks so that when documents are imported their backlinks will be saved too
+        config.put("xwiki.backlinks", "1");
+
         XWiki xwiki = new XWiki(config, context);
         context.setWiki(xwiki);
 

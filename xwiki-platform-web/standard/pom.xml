@@ -1,6 +1,6 @@
 <!--
  *
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,7 +20,9 @@
  *
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
@@ -29,68 +31,58 @@
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
   <name>XWiki Web - Standard</name>
-  <packaging>war</packaging>
+  <!-- We're using a pom packaging type instead of a WAR as we're using the Assembly plugin
+       in order to generate the WAR as a secondary artifact with a classifier name as this is not
+       possible with a primary artifact -->
+  <packaging>pom</packaging>
   <description>The standard XWiki WAR</description>
-  <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/standard</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web/standard</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/web/standard</url>
-  </scm>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>${version}</version>
     </dependency>
-    <dependency>
-      <groupId>velocity-tools</groupId>
-      <artifactId>velocity-tools</artifactId>
-      <version>1.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>com.xpn.xwiki</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${version}</version>
       <type>war</type>
-    </dependency>    
+    </dependency-->
   </dependencies>
   <build>
-    <resources>
-      <resource> <!-- empty resources. ./src/main/resources is handled by maven-war-plugin. -->
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>**</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <!-- org.mortbay.jetty:maven-jetty-plugin:run-war - run xwiki on jetty by maven. no configuration, no web-server is needed. useful for testing -->
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>maven-jetty-plugin</artifactId>
-          <configuration>
-            <contextPath>/xwiki</contextPath>
-            <webApp>${project.build.directory}/${project.build.finalName}-${xwiki.db}.war</webApp>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-war-plugin</artifactId>
-          <configuration>
-            <warName>${project.build.finalName}-${xwiki.db}</warName>
-            <webResources>
-              <resource>
-                <directory>src/main/resources</directory>
-                <targetPath>WEB-INF</targetPath>
-                <filtering>true</filtering>
-              </resource>
-            </webResources>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assemble/war.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Run 'mvn org.mortbay.jetty:maven-jetty-plugin:run-war' to generate the WAR and
+             execute it in Jetty. Useful for testing
+             Note: You'll need a database set up and running. If you use the HSQLDB profile
+             the database is looked for in target/database so it's very likely you'll get an
+             empty wiki. -->
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <configuration>
+          <contextPath>/xwiki</contextPath>
+          <webApp>${project.build.directory}/${project.build.finalName}-${xwiki.db}.war</webApp>
+        </configuration>
+      </plugin>
+
+    </plugins>
   </build>
   <profiles>
     <profile>
@@ -107,8 +99,8 @@
         </dependency>
       </dependencies>
       <properties>
-        <xwiki.db>hsqldb</xwiki.db>
-        <xwiki.db.connection.url>jdbc:hsqldb:file:target/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
+        <xwiki.db.connection.url>jdbc:hsqldb:file:target/database/xwiki_db;shutdown=true
+        </xwiki.db.connection.url>
         <xwiki.db.connection.username>sa</xwiki.db.connection.username>
         <xwiki.db.connection.password></xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
@@ -126,8 +118,8 @@
         </dependency>
       </dependencies>
       <properties>
-        <xwiki.db>mysql</xwiki.db>
-        <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useServerPrepStmts=false</xwiki.db.connection.url>
+        <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useServerPrepStmts=false
+        </xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
@@ -145,7 +137,6 @@
         </dependency>
       </dependencies>
       <properties>
-        <xwiki.db>pgsql</xwiki.db>
         <xwiki.db.connection.url>jdbc:postgresql:xwiki</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>

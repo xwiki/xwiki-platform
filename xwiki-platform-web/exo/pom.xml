@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  *
  * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
@@ -32,7 +30,7 @@
   </parent>
   <artifactId>xwiki-web-exo</artifactId>
   <name>XWiki Web - Exo</name>
-  <packaging>war</packaging>
+  <packaging>pom</packaging>
   <description>The Exoplatform XWiki WAR</description>
   <dependencies>
     <dependency>
@@ -40,7 +38,29 @@
       <artifactId>xwiki-web-standard</artifactId>
       <version>${version}</version>
       <type>war</type>
+      <classifier>${xwiki.db}</classifier>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/assemble/war.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
         

@@ -18,10 +18,10 @@
     #info("$xwiki.getUserName($xwname) ($request.xwikiname): $msg.get('registersuccessful').")
   #end
   #if(!$reg||$reg<0 )
-    <form id="register" name="register" action="" action="" method="post">
+    <form id="register" name="register" action="" method="post">
       <div>
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
-        <input type="hidden" name="register" value="1">
+        <input type="hidden" name="register" value="1"/>
         #set( $class = $xwiki.getClass("XWiki.XWikiUsers"))
         #set( $obj = $class.newObject() )
         #set( $serverobj = $class.newObject() )
@@ -53,7 +53,7 @@
           <dt>$msg.get("email"):</dt>
           <dd>$doc.displayEdit($prop, "register_",  $obj)</dd>
         </dl>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get("iregister")"></span>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get("iregister")"/></span>
       </div>
     </form>
   #end

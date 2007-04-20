@@ -1,6 +1,12 @@
 #template("xwiki.vm")
-#template("httpheader.vm")
+$doc.use("XWiki.PDFClass")
+#template("pdfhtmlheader.vm")
+#set($pdfheader = $doc.display("header"))
+#if($pdfheader=="")
 #template("pdfheader.vm")
+#else
+$pdfheader
+#end
 <div id="xwikicontent">
 $cdoc.getRenderedContent()
 </div>
@@ -17,4 +23,10 @@ $cdoc.getRenderedContent()
 #end
 </div>
 #end
+$doc.use("XWiki.PDFClass")
+#set($pdffooter = $doc.display("footer"))
+#if($pdffooter=="")
 #template("pdffooter.vm")
+#else
+$pdffooter
+#end

@@ -26,11 +26,12 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
+public class XWikiXMLRPCRequest extends XWikiServletRequest
+{
 
-public class XWikiXMLRPCRequest extends XWikiServletRequest {
-
- public XWikiXMLRPCRequest(HttpServletRequest request) {
-     super(request);
- }
+    public XWikiXMLRPCRequest(HttpServletRequest request)
+    {
+        super(request);
+    }
 
 }

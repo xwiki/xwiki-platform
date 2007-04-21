@@ -30,97 +30,97 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Represents an Attachment as described in the <a href="Confluence specification">
  * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
- *
- * @TODO We're missing the Comment field as described in the Confluence specification.
+ * 
+ * @todo We're missing the Comment field as described in the Confluence specification.
  * @version $Id: $
  */
-public class Attachment 
-{           
+public class Attachment
+{
     /**
      * @see #getId()
      */
     private static final String ID = "id";
-    
+
     /**
      * @see #getPageId()
      */
     private static final String PAGE_ID = "pageId";
-    
+
     /**
-     * @see #getTitle()  
+     * @see #getTitle()
      */
     private static final String TITLE = "title";
-    
+
     /**
-     * @see #getFileName() 
+     * @see #getFileName()
      */
     private static final String FILE_NAME = "fileName";
-    
+
     /**
      * @see #getFileSize()
      */
     private static final String FILE_SIZE = "fileSize";
-    
+
     /**
      * @see #getContentType()
      */
     private static final String CONTENT_TYPE = "contentType";
-    
+
     /**
-     * @see #getCreated() 
+     * @see #getCreated()
      */
     private static final String CREATED = "created";
-    
+
     /**
      * @see #getCreator()
      */
     private static final String CREATOR = "creator";
-    
+
     /**
-     * @see #getUrl() 
+     * @see #getUrl()
      */
     private static final String URL = "url";
-    
+
     /**
-     * @see #getId() 
+     * @see #getId()
      */
     private String id;
-    
+
     /**
      * @see #getPageId()
      */
     private String pageId;
-    
+
     /**
      * @see #getTitle()
      */
     private String title;
-    
+
     /**
      * @see #getFileName()
      */
     private String fileName;
-    
+
     /**
      * @see #getFileSize()
      */
     private String fileSize;
-    
+
     /**
-     * @see #getContentType() 
+     * @see #getContentType()
      */
     private String contentType;
-    
+
     /**
      * @see #getCreated()
      */
     private Date created;
-    
+
     /**
      * @see #getCreator()
      */
     private String creator;
-    
+
     /**
      * @see #getUrl()
      */
@@ -128,15 +128,15 @@ public class Attachment
 
     /**
      * @param doc the (@link com.xpn.xwiki.XWikiDocument) object, used to create the Attachment
-     *        object. The reason we need its that some information for creating that object is
-     *        available only from the XWikiDocument object and not in the passed XWikiAttachment
-     *        object
+     *            object. The reason we need its that some information for creating that object is
+     *            available only from the XWikiDocument object and not in the passed XWikiAttachment
+     *            object
      * @param attachment the (@link com.xpn.xwiki.XWikiAttachment) object, used to create the
-     *        Attachment object
+     *            Attachment object
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *        primitives for loading documents
+     *            primitives for loading documents
      */
-    public Attachment(XWikiDocument doc, XWikiAttachment attachment, XWikiContext context) 
+    public Attachment(XWikiDocument doc, XWikiAttachment attachment, XWikiContext context)
     {
         setId(attachment.getFilename());
         setPageId(doc.getFullName());
@@ -153,7 +153,7 @@ public class Attachment
      * @return the Attachment object represented by a Map. The Map keys are the XML-RPC ids and the
      *         values are the property values. This map will be used to build a XML-RPC message.
      */
-    Map getParameters() 
+    Map getParameters()
     {
         Map params = new HashMap();
         params.put(ID, getId());
@@ -179,7 +179,7 @@ public class Attachment
 
     /**
      * @param contentType the content type of the attachment
-     * @see #getContentType() 
+     * @see #getContentType()
      */
     public void setContentType(String contentType)
     {
@@ -247,7 +247,7 @@ public class Attachment
 
     /**
      * @param fileSize the attachment size in bytes
-     * @see #getFileSize() 
+     * @see #getFileSize()
      */
     public void setFileSize(String fileSize)
     {
@@ -255,8 +255,8 @@ public class Attachment
     }
 
     /**
-     * @return the id of the attachment (the id is the filename of the XWikiAttachment object
-     *         used to construct this Attachment object)
+     * @return the id of the attachment (the id is the filename of the XWikiAttachment object used
+     *         to construct this Attachment object)
      */
     public String getId()
     {
@@ -264,9 +264,9 @@ public class Attachment
     }
 
     /**
-     * @param id the id of the attachment (the id is the filename of the XWikiAttachment object
-     *           used to construct this Attachment object)
-     * @see #getId() 
+     * @param id the id of the attachment (the id is the filename of the XWikiAttachment object used
+     *            to construct this Attachment object)
+     * @see #getId()
      */
     public void setId(String id)
     {
@@ -284,7 +284,7 @@ public class Attachment
 
     /**
      * @param pageId the full name of the document to which this attachment is attached to. For
-     *               example "Space.Doc".
+     *            example "Space.Doc".
      */
     public void setPageId(String pageId)
     {
@@ -292,8 +292,8 @@ public class Attachment
     }
 
     /**
-     * @return the attachment title (we're using the comment associated with the attachment, this
-     *         is the comment entered by the person who attached the object)
+     * @return the attachment title (we're using the comment associated with the attachment, this is
+     *         the comment entered by the person who attached the object)
      */
     public String getTitle()
     {
@@ -302,7 +302,7 @@ public class Attachment
 
     /**
      * @param title the attachment title (we're using the comment associated with the attachment,
-     *              this is the comment entered by the person who attached the object)
+     *            this is the comment entered by the person who attached the object)
      * @see #getTitle()
      */
     public void setTitle(String title)
@@ -320,10 +320,10 @@ public class Attachment
 
     /**
      * @param url the url to download the attachment
-     * @see #getUrl() 
+     * @see #getUrl()
      */
     public void setUrl(String url)
     {
         this.url = url;
-    }    
+    }
 }

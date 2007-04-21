@@ -23,40 +23,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents the details of a Space (SpaceSummary) as described in the
- * <a href="Confluence specification">
- * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
- *
- * @TODO We're missing the Space Type field as described in the Confluence specification.
+ * Represents the details of a Space (SpaceSummary) as described in the <a href="Confluence
+ * specification"> http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
+ * 
+ * @todo We're missing the Space Type field as described in the Confluence specification.
  * @version $Id: $
  */
-public class SpaceSummary 
+public class SpaceSummary
 {
     /**
      * @see #getKey()
-     */    
+     */
     private static final String KEY = "key";
-    
+
     /**
      * @see #getName()
      */
     private static final String NAME = "name";
-    
+
     /**
      * @see #getUrl()
      */
     private static final String URL = "url";
-    
+
     /**
      * @see #getKey()
      */
     private String key;
-    
+
     /**
      * @see #getName()
      */
     private String name;
-    
+
     /**
      * @see #getUrl()
      */
@@ -67,7 +66,7 @@ public class SpaceSummary
      * @param name of the space
      * @param url to view the space online. Example: "http://server/xwiki/bin/view/Space/WebHome"
      */
-    public SpaceSummary(String key, String name, String url) 
+    public SpaceSummary(String key, String name, String url)
     {
         this.setKey(key);
         this.setName(name);
@@ -75,28 +74,25 @@ public class SpaceSummary
     }
 
     /**
-     * @param spaceSummaryProperties te Map containing all informations to setup a
-     *        SpaceSummary object. More specifically in the map there <b>must</b> be the following
-     *        keys:
-     *        <ul>
-     *          <li>"key": key of the SpaceSummary</li>
-     *          <li>"name": name of the SpaceSummary</li>
-     *          <li>"url": url to view the space online</li>
-     *       </ul>
+     * @param spaceSummaryProperties te Map containing all informations to setup a SpaceSummary
+     *            object. More specifically in the map there <b>must</b> be the following keys:
+     *            <ul>
+     *            <li>"key": key of the SpaceSummary</li>
+     *            <li>"name": name of the SpaceSummary</li>
+     *            <li>"url": url to view the space online</li>
+     *            </ul>
      * @see #SpaceSummary(String, String, String)
      */
-    public SpaceSummary(Map spaceSummaryProperties) 
+    public SpaceSummary(Map spaceSummaryProperties)
     {
-        this((String) spaceSummaryProperties.get(KEY),
-            (String) spaceSummaryProperties.get(NAME),
+        this((String) spaceSummaryProperties.get(KEY), (String) spaceSummaryProperties.get(NAME),
             (String) spaceSummaryProperties.get(URL));
     }
 
     /**
-     * @return the SpaceSummary object represented by a Map. The Map keys are the XML-RPC 
-     *         ids and the values are the property values. This map will be used to 
-     *         build a XML-RPC message.
-     */     
+     * @return the SpaceSummary object represented by a Map. The Map keys are the XML-RPC ids and
+     *         the values are the property values. This map will be used to build a XML-RPC message.
+     */
     Map getParameters()
     {
         Map params = new HashMap();
@@ -141,8 +137,8 @@ public class SpaceSummary
     }
 
     /**
-     * @return the url to view this space online.
-     *         Example: "http://server/xwiki/bin/view/Space/WebHome"
+     * @return the url to view this space online. Example:
+     *         "http://server/xwiki/bin/view/Space/WebHome"
      */
     public String getUrl()
     {

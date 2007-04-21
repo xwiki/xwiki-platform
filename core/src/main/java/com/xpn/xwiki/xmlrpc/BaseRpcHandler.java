@@ -34,32 +34,40 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-public class BaseRpcHandler implements RequestInitializableHandler {
+public class BaseRpcHandler implements RequestInitializableHandler
+{
 
     private XWikiEngineContext econtext;
+
     private XWikiRequest request;
-    private XWikiResponse response;	
-        
-	public void init(Servlet servlet, ServletRequest request) throws XWikiException {
-        this.request = new XWikiXMLRPCRequest((HttpServletRequest)request); // use the real request
+
+    private XWikiResponse response;
+
+    public void init(Servlet servlet, ServletRequest request) throws XWikiException
+    {
+        this.request = new XWikiXMLRPCRequest((HttpServletRequest) request); // use the real
+                                                                                // request
         this.response = new XWikiXMLRPCResponse(new MockXWikiResponse()); // use fake response
-        
+
         ServletContext sContext = null;
         try {
-        	sContext = servlet.getServletConfig().getServletContext();
-        } catch (Exception ignore) { }
+            sContext = servlet.getServletConfig().getServletContext();
+        } catch (Exception ignore) {
+        }
         if (sContext != null) {
-        	this.econtext = new XWikiXMLRPCContext(sContext);
+            this.econtext = new XWikiXMLRPCContext(sContext);
         } else {
-        	this.econtext = new XWikiXMLRPCContext(new MockXWikiServletContext());
+            this.econtext = new XWikiXMLRPCContext(new MockXWikiServletContext());
         }
     }
 
-    protected XWikiContext getXWikiContext() throws XWikiException {
+    protected XWikiContext getXWikiContext() throws XWikiException
+    {
         XWikiContext context = Utils.prepareContext("", request, response, econtext);
         context.setDatabase("xwikitest");
         XWiki xwiki = XWiki.getXWiki(context);
-        XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+        XWikiURLFactory urlf =
+            xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
         XWikiVelocityRenderer.prepareContext(context);
         return context;

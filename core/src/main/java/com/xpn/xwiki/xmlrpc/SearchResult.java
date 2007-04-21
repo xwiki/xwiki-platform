@@ -27,15 +27,20 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import java.util.Map;
 import java.util.HashMap;
 
-public class SearchResult {
-   private String title;
-   private String url;
-   private String excerpt;
-   private String id;
-   private String type;
+public class SearchResult
+{
+    private String title;
 
+    private String url;
 
-    public SearchResult(String title, String url, String excerpt, String id, String type) {
+    private String excerpt;
+
+    private String id;
+
+    private String type;
+
+    public SearchResult(String title, String url, String excerpt, String id, String type)
+    {
         setTitle(title);
         setUrl(url);
         setExcerpt(excerpt);
@@ -43,19 +48,22 @@ public class SearchResult {
         setType(type);
     }
 
-    public SearchResult(XWikiDocument document) {
+    public SearchResult(XWikiDocument document)
+    {
         setTitle(document.getFullName());
         setId(document.getFullName());
-        setUrl("http://127.0.0.1:9080/xwiki/bin/view/" + document.getSpace() + "/" + document.getName());
+        setUrl("http://127.0.0.1:9080/xwiki/bin/view/" + document.getSpace() + "/"
+            + document.getName());
         setType("page");
         String content = document.getContent();
-        if (content.length()<=256)
-         setExcerpt(content);
+        if (content.length() <= 256)
+            setExcerpt(content);
         else
-         setExcerpt(content.substring(0,256));
+            setExcerpt(content.substring(0, 256));
     }
 
-    Map getParameters() {
+    Map getParameters()
+    {
         Map params = new HashMap();
         params.put("title", getTitle());
         params.put("url", getUrl());
@@ -65,43 +73,53 @@ public class SearchResult {
         return params;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 
-    public String getExcerpt() {
+    public String getExcerpt()
+    {
         return excerpt;
     }
 
-    public void setExcerpt(String excerpt) {
+    public void setExcerpt(String excerpt)
+    {
         this.excerpt = excerpt;
     }
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
         this.type = type;
     }
 }

@@ -71,7 +71,7 @@ public class StyleMacro extends BaseLocaleMacro {
 
         if (document != null && !("".equals(document))) {
             String space = "";
-            if (document.contains(".")) {
+            if (document.indexOf(".") >= 0) {
                 space = document.substring(0, document.indexOf(".")).trim();
                 document = document.substring(document.indexOf(".") + 1, document.length()).trim();
             }

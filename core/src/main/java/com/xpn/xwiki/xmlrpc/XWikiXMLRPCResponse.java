@@ -29,17 +29,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class XWikiXMLRPCResponse extends XWikiServletResponse {
+public class XWikiXMLRPCResponse extends XWikiServletResponse
+{
 
-    public XWikiXMLRPCResponse(HttpServletResponse response) {
+    public XWikiXMLRPCResponse(HttpServletResponse response)
+    {
         super(response);
     }
 
-    public PrintWriter getWriter() throws IOException {
+    public PrintWriter getWriter() throws IOException
+    {
         return null;
     }
 
-    public ServletOutputStream getOutputStream() throws IOException {
+    public ServletOutputStream getOutputStream() throws IOException
+    {
         return null;
     }
 }

@@ -28,16 +28,24 @@ import com.xpn.xwiki.objects.BaseObject;
 
 import java.util.Date;
 
-public class Comment {
+public class Comment
+{
     private String id;
+
     private String pageId;
+
     private String title;
+
     private String content;
+
     private String url;
+
     private Date created;
+
     private String creator;
 
-    public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context) {
+    public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context)
+    {
         setId("" + obj.getNumber());
         setPageId(doc.getFullName());
         setTitle(obj.getStringValue("title"));
@@ -47,59 +55,73 @@ public class Comment {
         setUrl(doc.getURL("view", context));
     }
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public String getPageId() {
+    public String getPageId()
+    {
         return pageId;
     }
 
-    public void setPageId(String pageId) {
+    public void setPageId(String pageId)
+    {
         this.pageId = pageId;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getContent() {
+    public String getContent()
+    {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(String content)
+    {
         this.content = content;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 
-    public Date getCreated() {
+    public Date getCreated()
+    {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Date created)
+    {
         this.created = created;
     }
 
-    public String getCreator() {
+    public String getCreator()
+    {
         return creator;
     }
 
-    public void setCreator(String creator) {
+    public void setCreator(String creator)
+    {
         this.creator = creator;
     }
 }

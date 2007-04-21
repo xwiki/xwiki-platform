@@ -26,8 +26,10 @@ import com.xpn.xwiki.web.XWikiServletContext;
 
 import javax.servlet.ServletContext;
 
-public class XWikiXMLRPCContext extends XWikiServletContext {
-    public XWikiXMLRPCContext(ServletContext scontext) {
+public class XWikiXMLRPCContext extends XWikiServletContext
+{
+    public XWikiXMLRPCContext(ServletContext scontext)
+    {
         super(scontext);
     }
 }

@@ -28,24 +28,27 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.List;
 
-public class XWikiRpcHandler extends BaseRpcHandler implements XWikiRpcInterface {
+public class XWikiRpcHandler extends BaseRpcHandler implements XWikiRpcInterface
+{
 
-    public String getPage(String name) throws XWikiException, Exception {
+    public String getPage(String name) throws XWikiException, Exception
+    {
         try {
-          XWikiContext context = getXWikiContext();
-          XWikiDocument doc = context.getWiki().getDocument(name, context);
-          return doc.getContent();
+            XWikiContext context = getXWikiContext();
+            XWikiDocument doc = context.getWiki().getDocument(name, context);
+            return doc.getContent();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
     }
 
-    public List getAllPages() throws XWikiException, Exception {
+    public List getAllPages() throws XWikiException, Exception
+    {
         try {
-        XWikiContext context = getXWikiContext();
-        List doclist = context.getWiki().getStore().searchDocumentsNames("", context);
-        return doclist;
+            XWikiContext context = getXWikiContext();
+            List doclist = context.getWiki().getStore().searchDocumentsNames("", context);
+            return doclist;
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

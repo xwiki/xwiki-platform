@@ -28,12 +28,12 @@ import java.util.Map;
 /**
  * Represents a Page as described in the <a href="Confluence specification">
  * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
- *
+ * 
  * @todo right now there's no validation done on any parameter and this class accepts null values
  *       for all parameters. In the future we need a validation strategy defined which corresponds
- *       to how this class is used: for creating a page, for udpating it, etc. The validation
- *       needs are different across the use cases so it might even be best to have different
- *       validation classes used where this class is used in the code.
+ *       to how this class is used: for creating a page, for udpating it, etc. The validation needs
+ *       are different across the use cases so it might even be best to have different validation
+ *       classes used where this class is used in the code.
  * @version $Id: $
  */
 public class Page extends PageSummary
@@ -52,9 +52,9 @@ public class Page extends PageSummary
 
     private boolean homepage;
 
-    public Page(String id, String space, String parentId, String title, String url,
-        int version, String content, Date created, String creator,
-        Date modified, String modifier, boolean homepage, int locks)
+    public Page(String id, String space, String parentId, String title, String url, int version,
+        String content, Date created, String creator, Date modified, String modifier,
+        boolean homepage, int locks)
     {
         super(id, space, parentId, title, url, locks);
         this.setVersion(version);

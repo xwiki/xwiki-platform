@@ -28,27 +28,34 @@ import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 
-public class PageHistorySummary {
+public class PageHistorySummary
+{
     private String id;
+
     private int version;
+
     private Date modified;
+
     private String modifier;
 
-    public PageHistorySummary(String id, int version, Date modified, String modifier) {
+    public PageHistorySummary(String id, int version, Date modified, String modifier)
+    {
         setId(id);
         setVersion(version);
         setModified(modified);
         setModifier(modifier);
     }
 
-    public PageHistorySummary(XWikiDocument document) {
+    public PageHistorySummary(XWikiDocument document)
+    {
         this.id = document.getFullName();
         this.version = document.getRCSVersion().getNumbers()[1];
         this.modified = document.getDate();
         this.modifier = document.getAuthor();
     }
 
-    Map getParameters() {
+    Map getParameters()
+    {
         Map params = new HashMap();
         params.put("id", getId());
         params.put("version", new Integer(getVersion()));
@@ -57,35 +64,43 @@ public class PageHistorySummary {
         return params;
     }
 
-    public String getId() {
+    public String getId()
+    {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public int getVersion() {
+    public int getVersion()
+    {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(int version)
+    {
         this.version = version;
     }
 
-    public Date getModified() {
+    public Date getModified()
+    {
         return modified;
     }
 
-    public void setModified(Date modified) {
+    public void setModified(Date modified)
+    {
         this.modified = modified;
     }
 
-    public String getModifier() {
+    public String getModifier()
+    {
         return modifier;
     }
 
-    public void setModifier(String modifier) {
+    public void setModifier(String modifier)
+    {
         this.modifier = modifier;
     }
 }

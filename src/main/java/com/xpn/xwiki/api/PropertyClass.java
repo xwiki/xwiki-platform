@@ -42,7 +42,7 @@ public class PropertyClass extends Collection
         return getCollection().getClassName();
     }
 
-    protected com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass()
+    public com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass()
     {
         if (hasProgrammingRights()) {
             return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();

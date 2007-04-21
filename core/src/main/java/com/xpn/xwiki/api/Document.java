@@ -26,6 +26,22 @@
  */
 package com.xpn.xwiki.api;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
+import org.suigeneris.jrcs.diff.DifferentiationFailedException;
+import org.suigeneris.jrcs.rcs.Version;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -40,21 +56,6 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.fileupload.DefaultFileItem;
-import org.apache.commons.io.CopyUtils;
-import org.suigeneris.jrcs.diff.DifferentiationFailedException;
-import org.suigeneris.jrcs.rcs.Version;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 public class Document extends Api
 {
@@ -1567,7 +1568,7 @@ public class Document extends Api
 
         Iterator it = fileuploadlist.iterator();
         while (it.hasNext()) {
-            DefaultFileItem item = (DefaultFileItem) it.next();
+            DiskFileItem item = (DiskFileItem) it.next();
             String name = item.getFieldName();
             if (fieldName != null && !fieldName.equals(name)) {
                 continue;
@@ -1603,7 +1604,7 @@ public class Document extends Api
         throws XWikiException, IOException
     {
         ByteArrayOutputStream bAOut = new ByteArrayOutputStream();
-        CopyUtils.copy(iStream, bAOut);
+        IOUtils.copy(iStream, bAOut);
         return addAttachment(fileName, bAOut.toByteArray());
     }
 

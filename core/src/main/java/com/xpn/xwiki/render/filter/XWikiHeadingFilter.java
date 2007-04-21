@@ -81,6 +81,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 		XWikiContext xcontext  = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
         XWikiDocument doc = xcontext.getDoc();
 
+        log.debug("Processing '" + text + "'");
 		// generate unique ID of the heading
 		List processedHeadings = (List) rcontext.get("processedHeadings");
 		if (processedHeadings == null) {
@@ -95,6 +96,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         if (occurence != 0)
             id = TOCGenerator.makeHeadingID(text, occurence, xcontext);
 		processedHeadings.add(id);
+        log.debug("Generated heading id '" + id + "'");
 
 		//  add numbering if the flag is set
 		if (xcontext.containsKey(TOC_NUMBERED) && ((Boolean)xcontext.get(TOC_NUMBERED)).booleanValue()) {
@@ -105,7 +107,6 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 		}
 
         String heading = formatter.format(new Object[]{id, level.replaceAll("\\.", "-"), numbering, text, hlevel});
-
 
         Object beforeAction = xcontext.get("action");
         boolean showEditButton = false;
@@ -126,7 +127,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
 
             if (level.equals("1") || level.equals("1.1") ) {
-                if(doc.getContent().indexOf(title.trim()) != -1) {
+                if(doc != null && doc.getContent().indexOf(title.trim()) != -1) {
                     sectionNumber++;
                     StringBuffer editparams = new StringBuffer();
                     if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg"))

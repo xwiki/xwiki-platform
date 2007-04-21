@@ -19,46 +19,54 @@
  *
  */
 
-
 package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 
+public class PropertyClass extends Collection
+{
 
-public class PropertyClass extends Collection {
-
-    public PropertyClass(com.xpn.xwiki.objects.classes.PropertyClass property, XWikiContext context) {
+    public PropertyClass(com.xpn.xwiki.objects.classes.PropertyClass property,
+        XWikiContext context)
+    {
         super(property, context);
     }
 
-    protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass() {
+    protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass()
+    {
         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
     }
 
-    public String getClassName() {
+    public String getClassName()
+    {
         return getCollection().getClassName();
     }
 
-    protected com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass() {
-        if (hasProgrammingRights())
-         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
-        else
-         return null;
+    protected com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass()
+    {
+        if (hasProgrammingRights()) {
+            return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
+        }
+        return null;
     }
 
-    public String getPrettyName() {
+    public String getPrettyName()
+    {
         return getBasePropertyClass().getPrettyName();
     }
 
-    public String getValidationMessage() {
+    public String getValidationMessage()
+    {
         return getBasePropertyClass().getValidationMessage();
     }
 
-    public String getValidationRegExp() {
+    public String getValidationRegExp()
+    {
         return getBasePropertyClass().getValidationRegExp();
     }
 
-    public String getTooltip() {
+    public String getTooltip()
+    {
         return getBasePropertyClass().getTooltip();
     }
 

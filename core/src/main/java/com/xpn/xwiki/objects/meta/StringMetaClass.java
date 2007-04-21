@@ -27,23 +27,26 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-public class StringMetaClass extends PropertyMetaClass {
+public class StringMetaClass extends PropertyMetaClass
+{
 
-   public StringMetaClass() {
-    super();
-    // setType("stringmetaclass");
-    setPrettyName("String Class");
-    setName(StringClass.class.getName());
+    public StringMetaClass()
+    {
+        super();
+        // setType("stringmetaclass");
+        setPrettyName("String Class");
+        setName(StringClass.class.getName());
 
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
-    safeput("size", size_class);
-  }
+        NumberClass size_class = new NumberClass(this);
+        size_class.setName("size");
+        size_class.setPrettyName("Size");
+        size_class.setSize(5);
+        size_class.setNumberType("integer");
+        safeput("size", size_class);
+    }
 
-    public BaseCollection newObject(XWikiContext context) {
-          return new StringClass();
+    public BaseCollection newObject(XWikiContext context)
+    {
+        return new StringClass();
     }
 }

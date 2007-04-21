@@ -15,19 +15,23 @@ import org.dom4j.Element;
 
 import java.util.*;
 
-public class GroupsClass extends ListClass {
+public class GroupsClass extends ListClass
+{
 
-    public GroupsClass(PropertyMetaClass wclass) {
+    public GroupsClass(PropertyMetaClass wclass)
+    {
         super("groupslist", "Groups List", wclass);
         setSize(6);
         setUsesList(true);
     }
 
-    public GroupsClass() {
+    public GroupsClass()
+    {
         this(null);
     }
 
-    public List getList(XWikiContext context) {
+    public List getList(XWikiContext context)
+    {
         List list;
         try {
             list = context.getWiki().getGroupService(context).listAllGroups(context);
@@ -40,29 +44,35 @@ public class GroupsClass extends ListClass {
         return list;
     }
 
-    public Map getMap(XWikiContext context) {
+    public Map getMap(XWikiContext context)
+    {
         return new HashMap();
     }
 
-    public boolean isUsesList() {
-        return (getIntValue("usesList")==1);
+    public boolean isUsesList()
+    {
+        return (getIntValue("usesList") == 1);
     }
 
-    public void setUsesList(boolean usesList) {
-        setIntValue("usesList",usesList ? 1 : 0);
+    public void setUsesList(boolean usesList)
+    {
+        setIntValue("usesList", usesList ? 1 : 0);
     }
 
-    public BaseProperty newProperty() {
+    public BaseProperty newProperty()
+    {
         return new StringProperty();
     }
 
-    public BaseProperty fromString(String value) {
+    public BaseProperty fromString(String value)
+    {
         BaseProperty prop = newProperty();
         prop.setValue(value);
         return prop;
     }
 
-    public BaseProperty fromStringArray(String[] strings) {
+    public BaseProperty fromStringArray(String[] strings)
+    {
         List list = new ArrayList();
         for (int i = 0; i < strings.length; i++)
             list.add(strings[i]);
@@ -71,14 +81,15 @@ public class GroupsClass extends ListClass {
         return prop;
     }
 
-    public String getText(String value, XWikiContext context) {
-        if (value.indexOf(":")!=-1)
-         return value;
-        else
-         return value.substring(value.lastIndexOf(".")+1);
+    public String getText(String value, XWikiContext context)
+    {
+        if (value.indexOf(":") != -1)
+            return value;
+        return value.substring(value.lastIndexOf(".") + 1);
     }
 
-    public static List getListFromString(String value) {
+    public static List getListFromString(String value)
+    {
         List list = new ArrayList();
         if (value == null)
             return list;
@@ -90,7 +101,9 @@ public class GroupsClass extends ListClass {
         return list;
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
+    {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
@@ -103,28 +116,28 @@ public class GroupsClass extends ListClass {
 
         List selectlist;
 
-        BaseProperty prop =  (BaseProperty)object.safeget(name);
-        if (prop==null) {
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop == null) {
             selectlist = new ArrayList();
         } else {
-            selectlist = getListFromString((String)prop.getValue());
+            selectlist = getListFromString((String) prop.getValue());
         }
 
         list.remove("XWiki.XWikiAllGroup");
-        list.add(0,"XWiki.XWikiAllGroup");
-        if ((context.getWiki().isVirtual()&&(!context.getDatabase().equals("xwiki")))) {
+        list.add(0, "XWiki.XWikiAllGroup");
+        if ((context.getWiki().isVirtual() && (!context.getDatabase().equals("xwiki")))) {
             list.remove("xwiki:XWiki.XWikiAllGroup");
-            list.add(1,"xwiki:XWiki.XWikiAllGroup");
+            list.add(1, "xwiki:XWiki.XWikiAllGroup");
         }
 
         // Add options from Set
 
-        for (Iterator it=selectlist.iterator();it.hasNext();) {
+        for (Iterator it = selectlist.iterator(); it.hasNext();) {
             String value = it.next().toString();
             if (!list.contains(value))
                 list.add(value);
         }
-        for (Iterator it=list.iterator();it.hasNext();) {
+        for (Iterator it = list.iterator(); it.hasNext();) {
             String value = it.next().toString();
             String display = getText(value, context);
             option option = new option(display, value);
@@ -136,7 +149,7 @@ public class GroupsClass extends ListClass {
 
         buffer.append(select.toString());
 
-         if (!isUsesList()) {
+        if (!isUsesList()) {
             input in = new input();
             in.setName(prefix + "newgroup");
             in.setID(prefix + "newgroup");
@@ -154,10 +167,11 @@ public class GroupsClass extends ListClass {
         input in = new input();
         in.setType("hidden");
         in.setName(prefix + name);
-        buffer.append(in.toString());        
+        buffer.append(in.toString());
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel) {
+    public BaseProperty newPropertyfromXML(Element ppcel)
+    {
         String value = ppcel.getText();
         return fromString(value);
     }

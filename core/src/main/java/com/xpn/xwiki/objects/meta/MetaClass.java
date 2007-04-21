@@ -69,7 +69,7 @@ public class MetaClass extends BaseClass {
     }
 
     public PropertyInterface safeget(String name) {
-        return super.safeget("meta" + name);    //To change body of overriden methods use Options | File Templates.
+        return super.safeget("meta" + name);
     }
 
     public PropertyInterface get(String name) {

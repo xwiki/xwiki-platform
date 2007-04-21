@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,48 +17,52 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
  */
 
 package com.xpn.xwiki.objects;
 
-
-
-public class BaseStringProperty extends BaseProperty {
+public class BaseStringProperty extends BaseProperty
+{
     private String value;
 
-
-    public BaseStringProperty() {
+    public BaseStringProperty()
+    {
     }
 
-    public Object getValue() {
+    public Object getValue()
+    {
         return value;
     }
 
-    public void setValue(Object value) {
-        this.value = (String)value;
+    public void setValue(Object value)
+    {
+        this.value = (String) value;
     }
 
-    public String toText() {
-        String value = (String)getValue();
-        if (value!=null)
-         return value;
-        else
-         return "";
+    public String toText()
+    {
+        String value = (String) getValue();
+        if (value != null) {
+            return value;
+        }
+        return "";
     }
 
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
-         return false;
+    public boolean equals(Object obj)
+    {
+        if (!super.equals(obj)) {
+            return false;
+        }
 
-       if ((getValue()==null)
-            && (((BaseStringProperty)obj).getValue()==null))
-         return true;
+        if ((getValue() == null) && (((BaseStringProperty) obj).getValue() == null)) {
+            return true;
+        }
 
-       return getValue().equals(((BaseStringProperty)obj).getValue());
+        return getValue().equals(((BaseStringProperty) obj).getValue());
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         BaseStringProperty property = (BaseStringProperty) super.clone();
         property.setValue(getValue());
         return property;

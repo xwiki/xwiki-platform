@@ -33,81 +33,91 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ListProperty extends BaseProperty {
+public class ListProperty extends BaseProperty
+{
     protected List list = new ArrayList();
+
     private String formStringSeparator = "|";
 
-    public String getFormStringSeparator() {
+    public String getFormStringSeparator()
+    {
         return formStringSeparator;
     }
 
-    public void setFormStringSeparator(String formStringSeparator) {
+    public void setFormStringSeparator(String formStringSeparator)
+    {
         this.formStringSeparator = formStringSeparator;
     }
 
-    public Object getValue() {
+    public Object getValue()
+    {
         return getList();
     }
 
-    public void setValue(Object value) {
-        this.setList((List)value);
+    public void setValue(Object value)
+    {
+        this.setList((List) value);
     }
 
-    public String getTextValue() {
+    public String getTextValue()
+    {
         return toFormString();
     }
 
-    public String toText() {
-         if ((getList() instanceof PersistentCollection)
-            &&(!((PersistentCollection)getList()).wasInitialized()))
-           return "";
-        else
-           return StringUtils.join(getList().toArray(), " ");
+    public String toText()
+    {
+        if ((getList() instanceof PersistentCollection)
+            && (!((PersistentCollection) getList()).wasInitialized()))
+            return "";
+        return StringUtils.join(getList().toArray(), " ");
     }
 
-    public String toSingleFormString() {
+    public String toSingleFormString()
+    {
         return super.toFormString();
     }
 
-    public String toFormString() {
+    public String toFormString()
+    {
         CharacterFilter filter = new CharacterFilter();
         filter.addAttribute(formStringSeparator, "\\" + formStringSeparator);
 
         List list = getList();
         Iterator it = list.iterator();
         if (!it.hasNext()) {
-             return "";
+            return "";
         }
         StringBuffer result = new StringBuffer();
         result.append(it.next());
         while (it.hasNext()) {
             result.append(formStringSeparator);
-            result.append(filter.process((String)it.next()));
+            result.append(filter.process((String) it.next()));
         }
         return result.toString();
     }
 
-    public boolean equals(Object obj) {
+    public boolean equals(Object obj)
+    {
         if (!super.equals(obj))
-         return false;
+            return false;
 
         List list1 = (List) getValue();
-        List list2 = (List) ((BaseProperty)obj).getValue();
+        List list2 = (List) ((BaseProperty) obj).getValue();
 
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
         if ((list1 instanceof PersistentCollection)
-            &&(!((PersistentCollection)list1).wasInitialized()))
+            && (!((PersistentCollection) list1).wasInitialized()))
             return true;
 
         if ((list2 instanceof PersistentCollection)
-                    &&(!((PersistentCollection)list2).wasInitialized()))
+            && (!((PersistentCollection) list2).wasInitialized()))
             return true;
 
-        if (list1.size()!=list2.size())
-         return false;
+        if (list1.size() != list2.size())
+            return false;
 
-        for (int i=0;i<list1.size();i++) {
+        for (int i = 0; i < list1.size(); i++) {
             Object obj1 = list1.get(i);
             Object obj2 = list2.get(i);
 
@@ -117,45 +127,49 @@ public class ListProperty extends BaseProperty {
         return true;
     }
 
-
-    public Object clone() {
+    public Object clone()
+    {
         ListProperty property = (ListProperty) super.clone();
         List list = new ArrayList();
-        for (Iterator it=getList().iterator();it.hasNext();) {
-                    list.add(it.next());
-                }
+        for (Iterator it = getList().iterator(); it.hasNext();) {
+            list.add(it.next());
+        }
         property.setValue(list);
         return property;
     }
 
-    public List getList() {
+    public List getList()
+    {
         return list;
     }
 
-    public void setList(List list) {
-        if (list==null)
-         this.list = new ArrayList();
+    public void setList(List list)
+    {
+        if (list == null)
+            this.list = new ArrayList();
         else
-         this.list = list;
+            this.list = list;
     }
 
-    public Element toXML() {
+    public Element toXML()
+    {
         Element el = new DOMElement(getName());
-        List list = (List)getValue();
-        for (int i=0;i<list.size();i++) {
+        List list = (List) getValue();
+        for (int i = 0; i < list.size(); i++) {
             String value = list.get(i).toString();
             Element vel = new DOMElement("value");
-            vel.setText((value==null) ? "" : value.toString());
+            vel.setText((value == null) ? "" : value.toString());
             el.add(vel);
         }
         return el;
     }
 
     // This is important.. Otherwise we can get a stackoverflow calling toXML()
-    public String toString() {
+    public String toString()
+    {
         if ((getList() instanceof PersistentCollection)
-               &&(!((PersistentCollection)getList()).wasInitialized()))
-              return "";
+            && (!((PersistentCollection) getList()).wasInitialized()))
+            return "";
         return toXMLString();
     }
 

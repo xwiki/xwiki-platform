@@ -23,42 +23,51 @@ package com.xpn.xwiki.xmlrpc;
 
 import java.util.Map;
 
-public class Space extends SpaceSummary {
+public class Space extends SpaceSummary
+{
     private String description;
+
     private String homepage;
 
-    public Space(String key, String name, String url, String description, String homepage) {
+    public Space(String key, String name, String url, String description, String homepage)
+    {
         super(key, name, url);
         this.setDescription(description);
         this.setHomepage(homepage);
     }
 
-    public Space(Map parameters) {
+    public Space(Map parameters)
+    {
         super(parameters);
         this.setDescription(((String) parameters.get("description")));
         this.setHomepage(((String) parameters.get("homepage")));
-    }    
-    
-    Map getParameters() {
+    }
+
+    Map getParameters()
+    {
         Map params = super.getParameters();
         params.put("description", getDescription());
         params.put("homepage", getHomepage());
         return params;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
-    public String getHomepage() {
+    public String getHomepage()
+    {
         return homepage;
     }
 
-    public void setHomepage(String homepage) {
+    public void setHomepage(String homepage)
+    {
         this.homepage = homepage;
     }
 

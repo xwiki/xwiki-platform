@@ -39,23 +39,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface {
-	private static final Log log = LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
-	
-    public class RemoteUser {
+public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface
+{
+    private static final Log log =
+        LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
 
-        public RemoteUser (String username, String ip) {
+    public class RemoteUser
+    {
+
+        public RemoteUser(String username, String ip)
+        {
             this.ip = ip;
             this.username = username;
         }
 
         public String ip;
+
         public String username;
     }
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#login(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#login(String, String)
      */
     public String login(String username, String password) throws XWikiException
     {
@@ -65,48 +71,56 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         // Guest users are always allowed, others need to be checked
         if (username.equals("guest")
-            || xwiki.getAuthService().authenticate(username, password, context) != null)
-        {
+            || xwiki.getAuthService().authenticate(username, password, context) != null) {
             // Token should be unique for each session. Use a random number that doesn't guarantee
             // uniqueness but that should be unique enough to be good enough.
             token = xwiki.generateValidationKey(128);
             String ip = context.getRequest().getRemoteAddr();
             getTokens(context).put(token, new RemoteUser("XWiki." + username, ip));
+            log.info("Logged in '" + username + "'");
         } else {
             // TODO: Throw an exception instead of returning null
+            log.info("Failed authentication for '" + username + "'");
             token = null;
         }
 
         return token;
-    }    
-    
-    private Map getTokens(XWikiContext context) {
+    }
+
+    private Map getTokens(XWikiContext context)
+    {
         Map tokens = (Map) context.getEngineContext().getAttribute("xmlrpc_tokens");
-        if (tokens==null) {
+        if (tokens == null) {
             tokens = new HashMap();
             context.getEngineContext().setAttribute("xmlrpc_tokens", tokens);
         }
         return tokens;
     }
 
-    private void checkToken(String token, XWikiContext context) throws XWikiException {
+    private void checkToken(String token, XWikiContext context) throws XWikiException
+    {
         RemoteUser user = null;
         String ip = context.getRequest().getRemoteAddr();
         if (token != null)
-             user = (RemoteUser)getTokens(context).get(token);
-        if ((user==null)||(!user.ip.equals(ip))) {
-            Object[] args = { token, ip };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_TOKEN_INVALID,
-                                     "Access Denied: authentification token {0} for ip {1} is invalid", null, args);
+            user = (RemoteUser) getTokens(context).get(token);
+        if ((user == null) || (!user.ip.equals(ip))) {
+            Object[] args = {token, ip};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                XWikiException.ERROR_XWIKI_ACCESS_TOKEN_INVALID,
+                "Access Denied: authentification token {0} for ip {1} is invalid",
+                null,
+                args);
         }
         context.setUser(user.username);
     }
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#logout(String) 
+     * 
+     * @see ConfluenceRpcInterface#logout(String)
      */
-    public boolean logout(String token) throws XWikiException {
+    public boolean logout(String token) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
 
         // Verify authentication token
@@ -118,18 +132,23 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfluenceRpcInterface#getServerInfo(String)
      */
-    public Map getServerInfo(String token) throws XWikiException {
+    public Map getServerInfo(String token) throws XWikiException
+    {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented");
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getSpaces(String) 
+     * 
+     * @see ConfluenceRpcInterface#getSpaces(String)
      */
-    public Object[] getSpaces(String token) throws XWikiException {
+    public Object[] getSpaces(String token) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -138,9 +157,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         List webs = xwiki.search("select distinct doc.web from XWikiDocument doc", context);
         ArrayList spaces = new ArrayList(webs.size());
-        for (int i=0; i<webs.size(); i++) {
-            String web = (String)webs.get(i);
-            SpaceSummary spacesum = new SpaceSummary(web, web, "http://127.0.0.1:9080/xwiki/bin/view/" + web + "/WebHome");
+        for (int i = 0; i < webs.size(); i++) {
+            String web = (String) webs.get(i);
+            SpaceSummary spacesum =
+                new SpaceSummary(web, web, "http://127.0.0.1:9080/xwiki/bin/view/" + web
+                    + "/WebHome");
             spaces.add(spacesum.getParameters());
         }
         return spaces.toArray();
@@ -148,33 +169,40 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getSpace(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getSpace(String, String)
      */
-    public Map getSpace(String token, String spaceKey) throws XWikiException {
+    public Map getSpace(String token, String spaceKey) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
 
         // Verify authentication token
         checkToken(token, context);
 
         XWikiDocument doc = new XWikiDocument(spaceKey, "WebHome");
-        return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome")).getParameters();
+        return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome"))
+            .getParameters();
     }
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getPages(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getPages(String, String)
      */
-    public Object[] getPages(String token, String spaceKey) throws XWikiException {
+    public Object[] getPages(String token, String spaceKey) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        List docs = xwiki.getStore().searchDocumentsNames("where doc.web='" + Utils.SQLFilter(spaceKey) + "'", context);
+        List docs =
+            xwiki.getStore().searchDocumentsNames(
+                "where doc.web='" + Utils.SQLFilter(spaceKey) + "'", context);
         ArrayList pages = new ArrayList(docs.size());
-        for (int i=0;i<docs.size();i++) {
-            String docname = (String)docs.get(i);
+        for (int i = 0; i < docs.size(); i++) {
+            String docname = (String) docs.get(i);
             XWikiDocument doc = xwiki.getDocument(docname, context);
             PageSummary pagesum = new PageSummary(doc, context);
             pages.add(pagesum.getParameters());
@@ -184,9 +212,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getPage(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getPage(String, String)
      */
-    public Map getPage(String token, String pageId) throws XWikiException {
+    public Map getPage(String token, String pageId) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -200,9 +230,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getPageHistory(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getPageHistory(String, String)
      */
-    public Object[] getPageHistory(String token, String pageId) throws XWikiException {
+    public Object[] getPageHistory(String token, String pageId) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
@@ -212,7 +244,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWikiDocument doc = xwiki.getDocument(pageId, context);
         Version[] versions = doc.getRevisions(context);
         ArrayList result = new ArrayList(versions.length);
-        for (int i=0;i<versions.length;i++) {
+        for (int i = 0; i < versions.length; i++) {
             String version = versions[i].toString();
             XWikiDocument revdoc = xwiki.getDocument(doc, version, context);
             result.add((new PageHistorySummary(revdoc)).getParameters());
@@ -222,23 +254,27 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#search(String, String, int) 
+     * 
+     * @see ConfluenceRpcInterface#search(String, String, int)
      */
-    public Object[] search(String token, String query, int maxResults) throws XWikiException {
+    public Object[] search(String token, String query, int maxResults) throws XWikiException
+    {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
 
         // Verify authentication token
         checkToken(token, context);
 
-        List doclist = xwiki.getStore().searchDocumentsNames("where doc.content like '%" + Utils.SQLFilter(query) +
-                "%' or doc.name like '%" + Utils.SQLFilter(query) + "%'", context);
+        List doclist =
+            xwiki.getStore().searchDocumentsNames(
+                "where doc.content like '%" + Utils.SQLFilter(query) + "%' or doc.name like '%"
+                    + Utils.SQLFilter(query) + "%'", context);
         if (doclist == null)
             return new Object[0];
 
         List result = new ArrayList(doclist.size());
-        for (int i=0;i<doclist.size();i++) {
-            String docname = (String)doclist.get(i);
+        for (int i = 0; i < doclist.size(); i++) {
+            String docname = (String) doclist.get(i);
             XWikiDocument document = xwiki.getDocument(docname, context);
             SearchResult sresult = new SearchResult(document);
             result.add(sresult.getParameters());
@@ -248,7 +284,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#renderContent(String, String, String, String) 
+     * 
+     * @see ConfluenceRpcInterface#renderContent(String, String, String, String)
      */
     public String renderContent(String token, String spaceKey, String pageId, String content)
         throws XWikiException
@@ -265,7 +302,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
             XWikiDocument document = xwiki.getDocument(pageId, context);
             context.setDoc(document);
-            xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
+            xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+                .get("vcontext"));
             result = xwiki.getRenderingEngine().renderText(content, document, context);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -276,9 +314,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getAttachments(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getAttachments(String, String)
      */
-    public Object[] getAttachments(String token, String pageId) throws XWikiException {
+    public Object[] getAttachments(String token, String pageId) throws XWikiException
+    {
         XWikiContext context = null;
         context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -289,12 +329,14 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         XWikiDocument document = xwiki.getDocument(pageId, context);
         context.setDoc(document);
-        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
 
         List attachlist = document.getAttachmentList();
         ArrayList result = new ArrayList(attachlist.size());
-        for (int i=0;i<attachlist.size();i++) {
-            Attachment attach = new Attachment(document, (XWikiAttachment)attachlist.get(i), context);
+        for (int i = 0; i < attachlist.size(); i++) {
+            Attachment attach =
+                new Attachment(document, (XWikiAttachment) attachlist.get(i), context);
             result.add(attach.getParameters());
         }
         return result.toArray();
@@ -302,9 +344,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#getComments(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#getComments(String, String)
      */
-    public Object[] getComments(String token, String pageId) throws XWikiException {
+    public Object[] getComments(String token, String pageId) throws XWikiException
+    {
         XWikiContext context = null;
         context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -315,13 +359,14 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         XWikiDocument document = xwiki.getDocument(pageId, context);
         context.setDoc(document);
-        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
 
         List commentlist = document.getObjects("XWiki.XWikiComments");
-        if (commentlist!=null) {
+        if (commentlist != null) {
             ArrayList result = new ArrayList(commentlist.size());
-            for (int i=0;i<commentlist.size();i++) {
-                Comment comment = new Comment(document, (BaseObject)commentlist.get(i), context);
+            for (int i = 0; i < commentlist.size(); i++) {
+                Comment comment = new Comment(document, (BaseObject) commentlist.get(i), context);
                 result.add(comment);
             }
             return result.toArray();
@@ -331,32 +376,35 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#storePage(String, java.util.Map) 
+     * 
+     * @see ConfluenceRpcInterface#storePage(String, java.util.Map)
      */
-    public Map storePage(String token, Map pageht) throws XWikiException {
+    public Map storePage(String token, Map pageht) throws XWikiException
+    {
         try {
-        Page page = new Page(new HashMap(pageht));
+            Page page = new Page(new HashMap(pageht));
 
-        XWikiContext context = null;
-        context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
-        context.setAction("save");
+            XWikiContext context = null;
+            context = getXWikiContext();
+            XWiki xwiki = context.getWiki();
+            context.setAction("save");
 
-        // Verify authentication token
-        checkToken(token, context);
+            // Verify authentication token
+            checkToken(token, context);
 
-        XWikiDocument document = xwiki.getDocument(page.getId(), context);
-        context.setDoc(document);
-        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
+            XWikiDocument document = xwiki.getDocument(page.getId(), context);
+            context.setDoc(document);
+            xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+                .get("vcontext"));
 
-        XWikiDocument newdoc = (XWikiDocument) document.clone();
-        if (page.getParentId()!=null)
-         newdoc.setParent(page.getParentId());
+            XWikiDocument newdoc = (XWikiDocument) document.clone();
+            if (page.getParentId() != null)
+                newdoc.setParent(page.getParentId());
 
-        newdoc.setAuthor(context.getUser());
-        newdoc.setContent(page.getContent());
-        context.getWiki().saveDocument(newdoc, document, context);
-        return (new Page(newdoc, context)).getParameters();
+            newdoc.setAuthor(context.getUser());
+            newdoc.setContent(page.getContent());
+            context.getWiki().saveDocument(newdoc, document, context);
+            return (new Page(newdoc, context)).getParameters();
         } catch (XWikiException e) {
             e.printStackTrace();
             throw e;
@@ -365,9 +413,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#deletePage(String, String) 
+     * 
+     * @see ConfluenceRpcInterface#deletePage(String, String)
      */
-    public void deletePage(String token, String pageId) throws XWikiException {
+    public void deletePage(String token, String pageId) throws XWikiException
+    {
         XWikiContext context = null;
         context = getXWikiContext();
         XWiki xwiki = context.getWiki();
@@ -378,66 +428,85 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         XWikiDocument document = xwiki.getDocument(pageId, context);
         context.setDoc(document);
-        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext)context.get("vcontext"));
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
         context.getWiki().deleteDocument(document, context);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfluenceRpcInterface#getUser(String, String)
      */
-    public Map getUser(String token, String username) throws XWikiException {
+    public Map getUser(String token, String username) throws XWikiException
+    {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented"); 
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#addUser(String, java.util.Map, String) 
+     * 
+     * @see ConfluenceRpcInterface#addUser(String, java.util.Map, String)
      */
-    public void addUser(String token, Map user, String password) throws XWikiException {
+    public void addUser(String token, Map user, String password) throws XWikiException
+    {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented");
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfluenceRpcInterface#addGroup(String, String)
      */
-    public void addGroup(String token, String group) throws XWikiException {
+    public void addGroup(String token, String group) throws XWikiException
+    {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented");
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfluenceRpcInterface#getUserGroups(String, String)
      */
-    public Object[] getUserGroups(String token, String username) throws XWikiException {
+    public Object[] getUserGroups(String token, String username) throws XWikiException
+    {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented");
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfluenceRpcInterface#addUserToGroup(String, String, String)
      */
     public void addUserToGroup(String token, String username, String groupname)
         throws XWikiException
     {
         throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
-            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED, "Not implemented");
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "Not implemented");
     }
 
-    protected String handleException(Throwable e, XWikiContext context) {
+    protected String handleException(Throwable e, XWikiContext context)
+    {
 
         if (!(e instanceof XWikiException)) {
-            e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Uncaught exception", e);
+            e =
+                new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                    XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Uncaught exception",
+                    e);
         }
 
-        VelocityContext vcontext = ((VelocityContext)context.get("vcontext"));
-        if (vcontext==null) {
+        VelocityContext vcontext = ((VelocityContext) context.get("vcontext"));
+        if (vcontext == null) {
             vcontext = new VelocityContext();
             context.put("vcontext", vcontext);
         }
@@ -453,7 +522,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         }
     }
 
-    private String parseTemplate(String template, XWikiContext context) {
+    private String parseTemplate(String template, XWikiContext context)
+    {
         context.setMode(XWikiContext.MODE_XMLRPC);
         String content = context.getWiki().parseTemplate(template + ".vm", context);
         return content;
@@ -461,13 +531,14 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     /**
      * {@inheritDoc}
-     * @see ConfluenceRpcInterface#addSpace(String, java.util.Map)  
+     * 
+     * @see ConfluenceRpcInterface#addSpace(String, java.util.Map)
      */
-    public Map addSpace(String token, Map spaceProperties) throws XWikiException {
+    public Map addSpace(String token, Map spaceProperties) throws XWikiException
+    {
         Space space = new Space(new HashMap(spaceProperties));
 
         XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
         context.setAction("save");
 
         // Verify authentication token
@@ -481,8 +552,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         // Set space settings
         space.setUrl(document.getURL("view", context));
-        space.setHomepage( new Long(document.getId()).toString());
+        space.setHomepage(new Long(document.getId()).toString());
 
         return space.getParameters();
-   }
+    }
 }

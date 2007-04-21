@@ -28,11 +28,14 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import java.net.URL;
 
-public class XWikiXMLRPCURLFactory extends XWikiServletURLFactory {
-    public XWikiXMLRPCURLFactory() {
+public class XWikiXMLRPCURLFactory extends XWikiServletURLFactory
+{
+    public XWikiXMLRPCURLFactory()
+    {
     }
 
-    public String getURL(URL url, XWikiContext context) {
+    public String getURL(URL url, XWikiContext context)
+    {
         return url.toString();
     }
 }

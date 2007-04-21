@@ -24,15 +24,22 @@ package com.xpn.xwiki.xmlrpc;
 import java.util.Map;
 import java.util.HashMap;
 
-public class ServerInfo {
-   private int majorVersion;
-   private int minorVersion;
-   private int patchLevel;
-   private String buildId;
-   private boolean developmentBuild;
-   private String baseUrl;
+public class ServerInfo
+{
+    private int majorVersion;
 
-    Map getParameters() {
+    private int minorVersion;
+
+    private int patchLevel;
+
+    private String buildId;
+
+    private boolean developmentBuild;
+
+    private String baseUrl;
+
+    Map getParameters()
+    {
         Map params = new HashMap();
         params.put("majorVersion", new Integer(getMajorVersion()));
         params.put("minorVersion", new Integer(getMinorVersion()));
@@ -43,51 +50,63 @@ public class ServerInfo {
         return params;
     }
 
-    public int getMajorVersion() {
+    public int getMajorVersion()
+    {
         return majorVersion;
     }
 
-    public void setMajorVersion(int majorVersion) {
+    public void setMajorVersion(int majorVersion)
+    {
         this.majorVersion = majorVersion;
     }
 
-    public int getMinorVersion() {
+    public int getMinorVersion()
+    {
         return minorVersion;
     }
 
-    public void setMinorVersion(int minorVersion) {
+    public void setMinorVersion(int minorVersion)
+    {
         this.minorVersion = minorVersion;
     }
 
-    public int getPatchLevel() {
+    public int getPatchLevel()
+    {
         return patchLevel;
     }
 
-    public void setPatchLevel(int patchLevel) {
+    public void setPatchLevel(int patchLevel)
+    {
         this.patchLevel = patchLevel;
     }
 
-    public String getBuildId() {
+    public String getBuildId()
+    {
         return buildId;
     }
 
-    public void setBuildId(String buildId) {
+    public void setBuildId(String buildId)
+    {
         this.buildId = buildId;
     }
 
-    public boolean isDevelopmentBuild() {
+    public boolean isDevelopmentBuild()
+    {
         return developmentBuild;
     }
 
-    public void setDevelopmentBuild(boolean developmentBuild) {
+    public void setDevelopmentBuild(boolean developmentBuild)
+    {
         this.developmentBuild = developmentBuild;
     }
 
-    public String getBaseUrl() {
+    public String getBaseUrl()
+    {
         return baseUrl;
     }
 
-    public void setBaseUrl(String baseUrl) {
+    public void setBaseUrl(String baseUrl)
+    {
         this.baseUrl = baseUrl;
     }
 }

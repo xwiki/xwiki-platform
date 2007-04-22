@@ -245,35 +245,35 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      * closing and opening any needed lists/items.
      * 
      * @param buffer The output buffer to write HTML to.
-     * @param before The previous list type configuration.
-     * @param after The new list type configuration.
+     * @param previousBullets The previous list type configuration.
+     * @param crtBullets The new list type configuration.
      */
-    private void interpolateLists(StringBuffer buffer, char[] prev, char[] crt)
+    private void interpolateLists(StringBuffer buffer, char[] previousBullets, char[] crtBullets)
     {
         int sharedPrefixEnd;
         for (sharedPrefixEnd = 0;; sharedPrefixEnd++) {
-            if ((crt.length <= sharedPrefixEnd)
-                || (prev.length <= sharedPrefixEnd)
-                || (crt[sharedPrefixEnd] != prev[sharedPrefixEnd])) {
+            if ((crtBullets.length <= sharedPrefixEnd)
+                || (previousBullets.length <= sharedPrefixEnd)
+                || (crtBullets[sharedPrefixEnd] != previousBullets[sharedPrefixEnd])) {
                 break;
             }
         }
 
         // Close old lists
-        for (int i = prev.length - 1; i >= sharedPrefixEnd; i--) {
-            closeItem(buffer, prev[i]);
-            closeList(buffer, prev[i]);
+        for (int i = previousBullets.length - 1; i >= sharedPrefixEnd; i--) {
+            closeItem(buffer, previousBullets[i]);
+            closeList(buffer, previousBullets[i]);
         }
 
         // Open new lists
-        for (int i = sharedPrefixEnd; i < crt.length; i++) {
+        for (int i = sharedPrefixEnd; i < crtBullets.length; i++) {
             if (i > 0 && i > sharedPrefixEnd) {
                 buffer.append("<li class=\"innerlist\">");
             }
-            openList(buffer, crt[i]);
+            openList(buffer, crtBullets[i]);
         }
-        if (crt.length == sharedPrefixEnd) {
-            closeItem(buffer, prev[sharedPrefixEnd - 1]);
+        if (crtBullets.length == sharedPrefixEnd) {
+            closeItem(buffer, previousBullets[sharedPrefixEnd - 1]);
         }
     }
 }

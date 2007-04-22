@@ -10,9 +10,14 @@
 <style type="text/css">
 @import "/xwiki/yui/treeview/assets/tree.css";
 </style>
-<script type="text/javascript" src="/xwiki/yui/yahoo/yahoo-min.js" ></script>
-<script type="text/javascript" src="/xwiki/yui/treeview/treeview-min.js" ></script>
-<script type="text/javascript" src="/xwiki/yui/treeview/checknode.js"></script>
+<script type="text/javascript">
+if (!ytreeview) {
+  ytreeview = 1;
+  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/yahoo/yahoo-min.js' ></scr" + "ipt>");
+  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/treeview/treeview-min.js' ></scr" + "ipt>");
+  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/treeview/checknode.js'></scr" + "ipt>");
+}
+</script>
 #end
 <div id="treeview${treeviewid}"></div>
 <script type="text/javascript">

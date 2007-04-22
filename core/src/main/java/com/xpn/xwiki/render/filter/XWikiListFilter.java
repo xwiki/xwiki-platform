@@ -248,31 +248,32 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      * @param before The previous list type configuration.
      * @param after The new list type configuration.
      */
-    private void interpolateLists(StringBuffer buffer, char[] before, char[] after)
+    private void interpolateLists(StringBuffer buffer, char[] prev, char[] crt)
     {
         int sharedPrefixEnd;
         for (sharedPrefixEnd = 0;; sharedPrefixEnd++) {
-            if (after.length <= sharedPrefixEnd || before.length <= sharedPrefixEnd
-                || after[sharedPrefixEnd] != before[sharedPrefixEnd]) {
+            if ((crt.length <= sharedPrefixEnd)
+                || (prev.length <= sharedPrefixEnd)
+                || (crt[sharedPrefixEnd] != prev[sharedPrefixEnd])) {
                 break;
             }
         }
 
         // Close old lists
-        for (int i = before.length - 1; i >= sharedPrefixEnd; i--) {
-            closeItem(buffer, before[i]);
-            closeList(buffer, before[i]);
+        for (int i = prev.length - 1; i >= sharedPrefixEnd; i--) {
+            closeItem(buffer, prev[i]);
+            closeList(buffer, prev[i]);
         }
 
         // Open new lists
-        for (int i = sharedPrefixEnd; i < after.length; i++) {
+        for (int i = sharedPrefixEnd; i < crt.length; i++) {
             if (i > 0 && i > sharedPrefixEnd) {
                 buffer.append("<li class=\"innerlist\">");
             }
-            openList(buffer, after[i]);
+            openList(buffer, crt[i]);
         }
-        if (after.length == sharedPrefixEnd) {
-            closeItem(buffer, before[sharedPrefixEnd - 1]);
+        if (crt.length == sharedPrefixEnd) {
+            closeItem(buffer, prev[sharedPrefixEnd - 1]);
         }
     }
 }

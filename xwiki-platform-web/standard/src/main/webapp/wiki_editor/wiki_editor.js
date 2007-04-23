@@ -280,6 +280,7 @@ WikiEditor.prototype.convertExternal = function(content) {
 			}
 		}
 	}
+    content = unescape(content);
 //	alert(content);
 	return content;
 }
@@ -321,6 +322,7 @@ WikiEditor.prototype.convertInternal = function(content) {
 		}
 	}
 	content = this.trimString(this._removeHtmlTags(content));
+    content = unescape(content);
     content = content.replace(/\&#036;/g, "$");
     return content;
 }
@@ -466,6 +468,33 @@ WikiEditor.prototype._removeHtmlTags = function(str) {
 WikiEditor.prototype.__removeHtmlTags = function(str) {
 	var remove_html_tags_regexp = /<[^>]*>/g;
 	return str.replace(remove_html_tags_regexp, "");
+}
+
+WikiEditor.prototype._escapeText = function(str){
+    var newstr='';
+    var t;
+    var chr = "";
+    var cc = "";
+    var tn = "";
+    for(var i=0; i<256; i++){
+        tn = i.toString(16);
+        if(tn.length < 2) tn = "0" + tn;
+        cc += tn;
+        chr += unescape("%" + tn);
+    }
+    cc = cc.toUpperCase();
+    str.replace(String.fromCharCode(13) + "", "%13");
+    for(var q=0; q < str.length; q++){
+        t = str.substr(q, 1);
+        for(var i=0; i<chr.length; i++){
+            if(t == chr.substr(i, 1)){
+                t = t.replace(chr.substr(i, 1), "%" + cc.substr(i*2, 2));
+                i=chr.length;
+            }
+        }
+        newstr += t;
+    }
+    return newstr;
 }
 <!-- Initilization global variable and include core editor -->
 wikiEditor = new WikiEditor();

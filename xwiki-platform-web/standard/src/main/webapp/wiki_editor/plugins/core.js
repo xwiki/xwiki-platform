@@ -9,6 +9,10 @@
 WikiEditor.prototype.initCorePlugin = function() {
 
 	// External/Internal conversion setup
+    this.addExternalProcessor((/\{code(.*?)\}([\s\S]+?)\{code\}/i),"convertCodeMacroExternal");
+    this.addInternalProcessor(/<div\s*([^>]*)(class=\"code\")\s*([^>]*)>\s*<pre>([\s\S]+?)<\/pre>\s*<\/div>/i, 'convertCodeMacroInternal');
+    //this.addInteralProcessor((),)
+
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
 	this.addInternalProcessor((/\s*<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
 
@@ -1120,5 +1124,24 @@ WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, c
     if (result[4] != null) {
         str += result[4];
     }
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertCodeMacroExternal = function(regexp, result, content) {
+    var str = "";
+    str += "<div class=\"code\"><pre>";
+    str += result[2].toString().replace(/</g, "&#60").replace(/>/g, "&#62");;
+    str += "</pre></div>";
+    str = this._escapeText(str);
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertCodeMacroInternal = function(regexp, result, content) {
+    var str = "";
+    var temp = result[4];
+    str += "{code:xml}\r\n";
+    str += this._escapeText(this.trimString(result[4]).replace(/<br \/>/g, "\r\n"));
+    if (this.core.isMSIE) str += "\r\n";
+    str += "{code}";
     return content.replace(regexp, str);
 }

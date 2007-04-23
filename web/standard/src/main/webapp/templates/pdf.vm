@@ -1,7 +1,12 @@
 #template("xwiki.vm")
-$doc.use("XWiki.PDFClass")
+#if($request.pdftemplate)
+#set($pdfdoc = $xwiki.getDocument($request.pdftemplate))
+#else
+#set($pdfdoc = $doc)
+#end
+$pdfdoc.use("XWiki.PDFClass")
 #template("pdfhtmlheader.vm")
-#set($pdfheader = $doc.display("header"))
+#set($pdfheader = $pdfdoc.display("header","rendered"))
 #if($pdfheader=="")
 #template("pdfheader.vm")
 #else
@@ -23,8 +28,8 @@ $cdoc.getRenderedContent()
 #end
 </div>
 #end
-$doc.use("XWiki.PDFClass")
-#set($pdffooter = $doc.display("footer"))
+$pdfdoc.use("XWiki.PDFClass")
+#set($pdffooter = $pdfdoc.display("footer", "rendered"))
 #if($pdffooter=="")
 #template("pdffooter.vm")
 #else

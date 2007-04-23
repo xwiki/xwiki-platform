@@ -3,8 +3,8 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 #else
 #set($formname = "propupdate")
 #set($saveaction = "propupdate")
-#set( $class = $doc.getxWikiClass())
-#set( $redirect = $xwiki.getRequestURL())
+#set($class = $doc.getxWikiClass())
+#set($redirect = $xwiki.getRequestURL())
 <form id="$formname" method="post" action="$doc.getURL("preview")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent" class="clear">
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=class")"/></div>

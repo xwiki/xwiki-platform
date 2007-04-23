@@ -10,21 +10,17 @@
 <style type="text/css">
 @import "/xwiki/yui/treeview/assets/tree.css";
 </style>
-<script type="text/javascript">
-if (!ytreeview) {
-  ytreeview = 1;
-  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/yahoo/yahoo-min.js' ></scr" + "ipt>");
-  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/treeview/treeview-min.js' ></scr" + "ipt>");
-  document.write("<scri" + "pt type='text/javascript' src='/xwiki/yui/treeview/checknode.js'></scr" + "ipt>");
-}
-</script>
+<script type='text/javascript' src='/xwiki/yui/yahoo/yahoo-min.js' ></script>
+<script type='text/javascript' src='/xwiki/yui/treeview/treeview-min.js' ></script>
+<script type='text/javascript' src='/xwiki/yui/treeview/checknode.js'></script>
 #end
-<div id="treeview${treeviewid}"></div>
+#set($tviewid = $xwiki.getCounter("treeviewid"))
+<div id="treeview${tviewid}"></div>
 <script type="text/javascript">
-	var tree${treeviewid};
-	var nodes${treeviewid} = {};
-	var nodeIndex${treeviewid};
-
+	var tree${tviewid};
+	var nodes${tviewid} = {};
+	var nodeIndex${tviewid};
+	
     function addTreeElement(tree, nodes, id, text, parent, checked) {
 	    var parent2;
 	    if (parent=="")
@@ -47,8 +43,8 @@ if (!ytreeview) {
 	var callback = null;
     function onCheckClick(eventType, args, tree) {
         var out = [];
-        for (var i in tree${treeviewid}._nodes) {
-            var n = tree${treeviewid}._nodes[i];
+        for (var i in tree${tviewid}._nodes) {
+            var n = tree${tviewid}._nodes[i];
             if (n && "undefined" != typeof n.checkState) {
                 if (n.checkState>0) {
                   out.push(n.data);
@@ -60,8 +56,8 @@ if (!ytreeview) {
 
     function showTreeState() {
         var out = [];
-        for (var i in tree${treeviewid}._nodes) {
-            var n = tree${treeviewid}._nodes[i];
+        for (var i in tree${tviewid}._nodes) {
+            var n = tree${tviewid}._nodes[i];
             if (n && "undefined" != typeof n.checkState) {
                 if (n.checkState>0) {
                   out.push(n.data);
@@ -71,10 +67,10 @@ if (!ytreeview) {
         alert(out.join("|"));
     }
 
-	function treeInit${treeviewid}() {
-		tree${treeviewid} = new YAHOO.widget.TreeView("treeview${treeviewid}");
-	    var tree = tree${treeviewid};
-        var nodes = nodes${treeviewid};
+	function treeInit${tviewid}() {
+		tree${tviewid} = new YAHOO.widget.TreeView("treeview${tviewid}");
+	    var tree = tree${tviewid};
+        var nodes = nodes${tviewid};
         #foreach($item in $treelist)
         #set($checked = $selectlist.contains($item.getId()))
         #if ($item.value.length() > 80)
@@ -96,5 +92,5 @@ if (!ytreeview) {
 	}
 
     // Init the tree
-    treeInit${treeviewid}();
+    treeInit${tviewid}();
 </script>

@@ -32,6 +32,7 @@ import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
 import org.suigeneris.jrcs.diff.Chunk;
 
 import java.awt.image.BufferedImage;
@@ -2592,4 +2593,19 @@ public class XWiki extends Api
     }
 
 
+    /**
+     * Provides an absolute counter
+     * @param name Counter name
+     * @return  String
+     */
+    public String getCounter(String name) {
+        XWikiEngineContext econtext = context.getEngineContext();
+        Integer counter = (Integer) econtext.getAttribute(name);
+        if (counter==null) {
+           counter = new Integer(0);
+        }
+        counter = new Integer(counter.intValue() + 1);
+        econtext.setAttribute(name, counter);
+        return counter.toString();
+    }
 }

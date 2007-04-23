@@ -1,3 +1,5 @@
+if (typeof ychecknode=="undefined") {
+    ychecknode = 1;
 /**
  * The check box marks an item selected.  It is a simulated form field
  * with three states ...
@@ -251,3 +253,4 @@ YAHOO.widget.CheckNode.prototype.toString = function() {
     return "CheckNode (" + this.index + ") " + this.label;
 };
 
+}

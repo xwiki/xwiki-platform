@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.render.filter;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
-import com.xpn.xwiki.util.TOCGenerator;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
@@ -33,11 +33,11 @@ import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import com.xpn.xwiki.util.TOCGenerator;
 
 
 /**
@@ -90,11 +90,10 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 		}
 		id = TOCGenerator.makeHeadingID(text, 0, xcontext);
         int occurence = 0;
-        for (Iterator iter = processedHeadings.iterator(); iter.hasNext();){
-            if (iter.next().equals(id)) occurence++;
-        }
-        if (occurence != 0)
+        while(processedHeadings.contains(id)) {
+            occurence++;
             id = TOCGenerator.makeHeadingID(text, occurence, xcontext);
+        }
 		processedHeadings.add(id);
         log.debug("Generated heading id '" + id + "'");
 

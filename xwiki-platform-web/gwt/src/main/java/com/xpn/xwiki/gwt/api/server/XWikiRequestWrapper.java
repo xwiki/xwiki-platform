@@ -53,6 +53,10 @@ public class XWikiRequestWrapper implements XWikiRequest {
         return request.getHttpServletRequest();
     }
 
+    public Cookie getCookie(String cookieName) {
+        return request.getCookie(cookieName);
+    }
+
     public String getAuthType() {
         return request.getAuthType();
     }

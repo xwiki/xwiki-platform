@@ -62,10 +62,15 @@ public class StyleMacro extends BaseLocaleMacro {
         String border = params.get("border");
         String document = params.get("document");
         String icon = params.get("icon");
+        boolean hasIcon = false;
 
         if (null == document || document.indexOf("=") != -1) {
             document = null;
         }
+
+        if ((!"none".equals(icon)) && (icon != null) && (!"".equals(icon.trim()))) {
+            hasIcon = true;
+        } 
         // Get the target document
         XWikiDocument doc = null;
 
@@ -105,10 +110,9 @@ public class StyleMacro extends BaseLocaleMacro {
         if ((!"none".equals(id)) && (id != null) && (!"".equals(id.trim()))) {
             str.append("id=\"" + id.trim() + "\" ");
         }
-
         if ((!"none".equals(classes)) && (classes != null) && (!"".equals(classes.trim()))) {
             str.append("class=\"" + classes.trim() + "\" ");
-        } else {
+        } else if (hasIcon) {
             str.append("class=\"stylemacro\" ");
         }
         if ((!"none".equals(name)) && (name != null) && (!"".equals(name.trim()))) {
@@ -117,10 +121,9 @@ public class StyleMacro extends BaseLocaleMacro {
 
         str.append("style=\"");
 
-        if ((!"none".equals(icon)) && (icon != null) && (!"".equals(icon.trim()))) {
+        if (hasIcon) {
             str.append("background-image: url(" + path + "); ");
         }
-
         if ((!"none".equals(size)) && (size != null) && (!"".equals(size.trim()))) {
             str.append("font-size:" + size.trim() + "; ");
         }

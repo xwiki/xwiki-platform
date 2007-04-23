@@ -59,7 +59,7 @@ public class PasswordMetaClass extends StringMetaClass
         encryptAlgorithm_class.setName(ALGORITHM_KEY);
         encryptAlgorithm_class.setPrettyName("Encryption/hash algorithm");
         encryptAlgorithm_class.setSize(20);
-        safeput("encryptAlgorithm", encryptAlgorithm_class);
+        safeput(ALGORITHM_KEY, encryptAlgorithm_class);
     }
 
     public BaseCollection newObject(XWikiContext context)

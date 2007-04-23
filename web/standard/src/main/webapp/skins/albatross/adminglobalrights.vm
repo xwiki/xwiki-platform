@@ -7,7 +7,8 @@
 <div id="xwikieditcontent">
 <div style="overflow:auto">
 <div>
-<div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=")"/>
+<div class="hidden">
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=globalrights&amp;global=1")"/>
 <input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
 </div>
 #set ($first = 1)

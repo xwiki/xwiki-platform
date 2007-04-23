@@ -47,7 +47,7 @@
       <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get("logout")</a>#sep()
 #end
 #end
-#if($isguest)
+#if($isguest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
       <a class="glink" href="$!regurl" id="headerregister">$!msg.get("register")</a>#sep()
 #end

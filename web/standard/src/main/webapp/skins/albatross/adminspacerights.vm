@@ -6,7 +6,7 @@
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
 <div id="xwikieditcontent">
 <div class="hidden">
-<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spacerights")"/>
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spacerights&amp;global=1&amp;space=${doc.space}")"/>
 <input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
 </div>
 <div id="xwikichangespace">

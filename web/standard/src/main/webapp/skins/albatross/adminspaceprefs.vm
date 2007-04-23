@@ -91,7 +91,7 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #set($redirect = "$xwiki.getRequestURL()")
 <div>
 <div class="hidden">
-<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spaceprefs")"/>
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=spaceprefs&amp;global=1&amp;space=${doc.space}")"/>
 <input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
 <input type="hidden" name="classname" value="XWiki.XWikiPreferences" />
 <input type="hidden" name="global" value="1" />

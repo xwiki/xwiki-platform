@@ -22,14 +22,13 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.web.Utils;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,11 +36,15 @@ import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiAuthServiceImpl implements XWikiAuthService
 {
@@ -390,6 +393,10 @@ public class XWikiAuthServiceImpl implements XWikiAuthService
             // We only allow empty password from users having a XWikiUsers object.
             if (doc.getObject("XWiki.XWikiUsers") != null) {
                 String passwd = doc.getStringValue("XWiki.XWikiUsers", "password");
+                password =
+                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context)
+                        .getField("password")).getEquivalentPassword(passwd, password);
+
                 result = (password.equals(passwd));
             }
 

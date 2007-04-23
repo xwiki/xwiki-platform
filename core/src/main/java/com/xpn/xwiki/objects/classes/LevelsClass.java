@@ -35,14 +35,13 @@ public class LevelsClass extends ListClass {
         }
 
         XWikiRequest req = context.getRequest();
-        if (("editrights".equals(req.get("xpage")))
+        if (("editrights".equals(req.get("xpage")) || "rights".equals(req.get("editor")))
 		&&(!"1".equals(req.get("global")))) {
             list.remove("admin");
             list.remove("programming");
             list.remove("delete");
             list.remove("register");
         }
-
         return list;
     }
 
@@ -62,8 +61,11 @@ public class LevelsClass extends ListClass {
 
     public BaseProperty fromStringArray(String[] strings) {
         List list = new ArrayList();
-        for (int i = 0; i < strings.length; i++)
-            list.add(strings[i]);
+        for (int i = 0; i < strings.length; i++) {
+            if (!strings[i].trim().equals("")) {
+                list.add(strings[i]);
+            }
+        }
         BaseProperty prop = newProperty();
         prop.setValue(StringUtils.join(list.toArray(), ","));
         return prop;

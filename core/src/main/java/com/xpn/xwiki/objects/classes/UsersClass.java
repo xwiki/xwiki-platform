@@ -67,8 +67,11 @@ public class UsersClass extends ListClass {
 
     public BaseProperty fromStringArray(String[] strings) {
         List list = new ArrayList();
-        for (int i = 0; i < strings.length; i++)
-            list.add(strings[i]);
+        for (int i = 0; i < strings.length; i++) {
+            if (!strings[i].trim().equals("")) {
+                list.add(strings[i]);
+            }
+        }
         BaseProperty prop = newProperty();
         prop.setValue(StringUtils.join(list.toArray(), ","));
         return prop;

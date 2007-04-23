@@ -462,7 +462,8 @@
               **/ZipExplorer*.java,
               **/content/**/*.java,
               **/XWikiMessageTool.java,
-              **/XWikiListFilter.java
+              **/XWikiListFilter.java,
+              **/MyPersistentLoginManager.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java

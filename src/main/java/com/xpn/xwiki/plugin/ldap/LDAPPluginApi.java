@@ -25,6 +25,7 @@ package com.xpn.xwiki.plugin.ldap;
 import com.novell.ldap.LDAPConnection;
 import com.novell.ldap.LDAPException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 
 import java.util.HashMap;
@@ -75,5 +76,41 @@ public class LDAPPluginApi extends Api {
 
     public HashMap getEntry(String dn, HashMap connection) throws LDAPException {
         return plugin.getEntry(dn, connection, getXWikiContext());
-    }    
+    }
+
+    /**
+     * Method to create an XWiki user from LDAP information. Information is retrieved from the LDAP server specified in the XWiki Preferences.
+     * Bind to the LDAP server can be done using Admin binding (in this case bindusernamd and bindpassword are not used)
+     * or User binding (in this case bindusername and bindpassword are used)
+     * @param wikiname Wiki page name to use for the user. If null it will be generated from LDAP
+     * @param uid UID to search user information in LDAP
+     * @param bindusername bind username if binding is user binding
+     * @param bindpassword bind password if binding is user binding
+     * @return  success or failure of create user
+     * @throws com.xpn.xwiki.XWikiException
+     */
+    public boolean createUserFromLDAP(String wikiname, String uid, String bindusername, String bindpassword) throws XWikiException {
+        if (hasProgrammingRights())
+            return createUserFromLDAP(wikiname, uid, bindusername, bindpassword);
+        else
+            return false;
+    }
+
+    /**
+     * Method allowing to create a user from LDAP attributes stored in a HashMap
+     * The mapping is declared in the XWiki Parameters
+     * The 'name' mapping is used to define which ldap field to use to define the wiki page name
+     * All special characters are cleared to generate the wiki page name
+     * @param wikiname Wiki page name to use. If null generate from ldap fields
+     * @param attributes
+     * @throws XWikiException
+     */
+    public boolean createUserFromLDAP(String wikiname, HashMap attributes) throws XWikiException {
+        if (hasProgrammingRights()) {
+            plugin.createUserFromLDAP(wikiname, attributes, context);
+            return true;
+        }
+        else
+            return false;
+    }
 }

@@ -29,6 +29,7 @@ import java.security.Principal;
 
 public interface XWikiAuthService {
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException;
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context) throws XWikiException;
     public void showLogin(XWikiContext context) throws XWikiException;
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException;
 }

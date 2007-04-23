@@ -70,6 +70,24 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         }
     }
 
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context) throws XWikiException {
+        if (context.getMode() == XWikiContext.MODE_PORTLET) {
+            String user = context.getRequest().getRemoteUser();
+            if ((user == null) || user.equals(""))
+                user = "XWiki.XWikiGuest";
+            else
+                user = "XWiki." + user;
+            context.setUser(user);
+            return new XWikiUser(user);
+        } else {
+            XWikiUser user = super.checkAuth(username, password, rememberme, context);
+            if (user == null)
+                return new XWikiUser("XWiki.XWikiGuest");
+            else
+                return new XWikiUser("XWiki." + user.getUser());
+        }
+    }
+
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         String superadmin = "superadmin";
         SecurityService securityService = getSecurityService();
@@ -156,7 +174,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
 
     }
 
-    private String getParam(String name, XWikiContext context) {
+    protected String getParam(String name, XWikiContext context) {
         String param = "";
         try {
             param = context.getWiki().getXWikiPreference(name, context);

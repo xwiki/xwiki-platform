@@ -56,6 +56,21 @@ public class MyBasicAuthenticator extends BasicAuthenticator  implements XWikiAu
                 return false;
     }
 
+    public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
+        Principal principal = authenticate(username, password, context);
+        if (principal != null) {
+            // login successful
+            request.getSession().removeAttribute(LOGIN_ATTEMPTS);
+            request.setUserPrincipal(principal);
+            return false;
+        } else {
+            // login failed
+            // show the basic authentication window again.
+            showLogin(request.getCurrentRequest(), response);
+            return true;
+        }              
+    }
+
     private static String convertUsername(String username, XWikiContext context) {
         return context.getWiki().convertUsername(username, context);
     }

@@ -25,6 +25,7 @@ package com.xpn.xwiki.user.impl.xwiki;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -50,7 +51,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException {
         if (authenticator != null)
             return authenticator;
-        
+
         try {
             XWiki xwiki = context.getWiki();
 
@@ -64,11 +65,11 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                     sconfig.setRealmName("XWiki");
                 authenticator.init(null, sconfig);
             } else {
-            	authenticator = new MyFormAuthenticator();
+                authenticator = new MyFormAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
-                
+
                 sconfig.setAuthMethod("FORM");
-                
+
                 if (xwiki.Param("xwiki.authentication.realname") != null)
                     sconfig.setRealmName(xwiki.Param("xwiki.authentication.realname"));
                 else
@@ -101,7 +102,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                     String[] cdomains = StringUtils.split(xwiki.Param("xwiki.authentication.cookiedomains"), ",");
                     persistent.setCookieDomains(cdomains);
                 }
-                
+
                 if (xwiki.Param("xwiki.authentication.cookielife") != null)
                     persistent.setCookieLife(xwiki.Param("xwiki.authentication.cookielife"));
 
@@ -172,6 +173,50 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
             }
 
             if (auth.processLogin(wrappedRequest, response, context)) {
+                return null;
+            }
+
+            Principal user = wrappedRequest.getUserPrincipal();
+            if (log.isInfoEnabled()) {
+                if (user != null)
+                    log.info("User " + user.getName() + " is authentified");
+            }
+
+            if (user == null)
+                return null;
+            return new XWikiUser(user.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Method to authenticate and set the cookie from a username and password passed as parameters
+     * @param username
+     * @param password
+     * @param context
+     * @return null if the user is not authenticated properly
+     * @throws XWikiException
+     */
+    public XWikiUser checkAuth(String username, String password, String rememberme, XWikiContext context) throws XWikiException {
+        HttpServletRequest request = null;
+        HttpServletResponse response = null;
+
+        if (context.getRequest() != null)
+            request = context.getRequest().getHttpServletRequest();
+
+        if (context.getResponse() != null)
+            response = context.getResponse().getHttpServletResponse();
+
+        if (request == null)
+            return null;
+
+        XWikiAuthenticator auth = getAuthenticator(context);
+        SecurityRequestWrapper wrappedRequest = new SecurityRequestWrapper(request, null,
+                null, auth.getAuthMethod());
+        try {
+            if (auth.processLogin(username, password, rememberme, wrappedRequest, response, context)) {
                 return null;
             }
 
@@ -273,7 +318,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
                             }
                         } else {
                             context.put("message", "wronguser");
-                            return null;                            
+                            return null;
                         }
                     } catch (Exception e) {
                         context.put("message", "loginfailed");
@@ -337,4 +382,44 @@ public class XWikiAuthServiceImpl implements XWikiAuthService {
             return false;
         }
     }
+
+    protected String getParam(String name, XWikiContext context) {
+        String param = "";
+        try {
+            param = context.getWiki().getXWikiPreference(name, context);
+        } catch (Exception e) {
+        }
+        if (param == null || "".equals(param)) {
+            try {
+                param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "auth_", "."));
+            } catch (Exception e) {
+            }
+        }
+        if (param == null)
+            param = "";
+        return param;
+    }
+
+    protected void createUser(String user, XWikiContext context) throws XWikiException {
+        String createuser = getParam("auth_createuser", context);
+        if (createuser!=null) {
+            String wikiname = context.getWiki().clearName(user, true, true, context);
+            XWikiDocument userdoc = context.getWiki().getDocument("XWiki." + wikiname, context);
+            if (userdoc.isNew()) {
+                if ("ldap".equals(createuser)) {
+                    // Let's create the user from ldap
+                    LDAPPlugin ldapplugin = (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
+                    if (ldapplugin!=null) {
+                        ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
+                    } else {
+                        if (log.isErrorEnabled())
+                            log.error("Impossible to create user from LDAP because LDAP plugin is not activated");
+                    }
+                } else if ("empty".equals(createuser)) {
+                    context.getWiki().createEmptyUser(wikiname, "edit", context);
+                }
+            }
+        }
+    }
+
 }

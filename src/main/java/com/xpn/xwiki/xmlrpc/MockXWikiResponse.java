@@ -1,6 +1,7 @@
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import javax.portlet.*;
 import javax.servlet.ServletOutputStream;
@@ -23,6 +24,10 @@ public class MockXWikiResponse implements XWikiResponse
 
     public void setCharacterEncoding(String s)
     {
+        // method stub
+    }
+
+    public void removeCookie(String cookieName, XWikiRequest request) {
         // method stub
     }
 

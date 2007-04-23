@@ -39,6 +39,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.util.Util;
+
 public class XWikiServletRequest implements XWikiRequest {
     private HttpServletRequest request;
 
@@ -60,6 +62,10 @@ public class XWikiServletRequest implements XWikiRequest {
 
     public Cookie[] getCookies() {
         return request.getCookies();
+    }
+
+    public Cookie getCookie(String cookieName) {
+        return Util.getCookie(cookieName, this);
     }
 
     public long getDateHeader(String s) {

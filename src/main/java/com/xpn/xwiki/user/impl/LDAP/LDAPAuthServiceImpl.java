@@ -176,7 +176,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
                 XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
-                doc.setContent("#includeForm(\"XWiki.XWikiUserTemplate\")");
+                doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
 
                 context.getWiki().ProtectUserPage(context, fullwikiname, "edit", doc);
 
@@ -421,7 +421,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         return result;
     }
 
-    private String getParam(String name, XWikiContext context) {
+    protected String getParam(String name, XWikiContext context) {
         String param = "";
         try {
             param = context.getWiki().getXWikiPreference(name, context);

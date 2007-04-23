@@ -28,4 +28,5 @@ import javax.servlet.http.HttpServletResponse;
 public interface XWikiResponse extends HttpServletResponse, RenderResponse, ActionResponse {
     public HttpServletResponse getHttpServletResponse();
     public void setCharacterEncoding(String s);
+    public void removeCookie(String cookieName, XWikiRequest request);    
 }

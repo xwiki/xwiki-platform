@@ -26,6 +26,7 @@ import javax.portlet.*;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -99,6 +100,23 @@ public class XWikiServletResponse implements XWikiResponse {
     public void addCookie(Cookie cookie) {
         response.addCookie(cookie);
     }
+
+    /**
+     * Remove a cookie.
+     *
+     * @param request The servlet request needed to find the cookie to remove
+     * @param cookieName The name of the cookie that must be removed.
+     */
+    public void removeCookie(String cookieName, XWikiRequest request)
+    {
+        Cookie cookie = request.getCookie(cookieName);
+        if (cookie != null) {
+            cookie.setMaxAge(0);
+            cookie.setPath(cookie.getPath());
+            addCookie(cookie);
+        }
+    }
+
 
     public void setLocale(Locale locale) {
         response.setLocale(locale);

@@ -37,6 +37,7 @@ import java.io.StringReader;
 import java.util.*;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -566,7 +567,11 @@ public class Util {
     }
 
     public static Cookie getCookie(String cookieName, XWikiContext context) {
-        Cookie[] cookies = context.getRequest().getCookies();
+        return getCookie(cookieName, context.getRequest());
+    }
+
+    public static Cookie getCookie(String cookieName, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
                 Cookie cookie = cookies[i];

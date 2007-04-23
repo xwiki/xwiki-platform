@@ -24,6 +24,7 @@ import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
@@ -2608,4 +2609,30 @@ public class XWiki extends Api
         econtext.setAttribute(name, counter);
         return counter.toString();
     }
+
+    /**
+     * Check authentication from request and set according persitent login information
+     * If it fails user is unlogged
+     * @return  null if failed, non null XWikiUser if sucess
+     * @throws XWikiException
+     */
+    public XWikiUser checkAuth() throws XWikiException
+    {
+        return context.getWiki().getAuthService().checkAuth(context);
+    }
+
+    /**
+     * Check authentication from username and password and set according persitent login information
+     * If it fails user is unlogged
+     * @param username  username to check
+     * @param password  password to check
+     * @param rememberme "1" if you want to remember the login accross navigator restart
+     * @return  null if failed, non null XWikiUser if sucess
+     * @throws XWikiException
+     */
+    public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
+    {
+        return context.getWiki().getAuthService().checkAuth(username, password, rememberme, context);
+    }
+
 }

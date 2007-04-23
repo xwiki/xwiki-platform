@@ -104,4 +104,3 @@ YAHOO.extend = function(subclass, superclass) {
 YAHOO.namespace("util");
 YAHOO.namespace("widget");
 YAHOO.namespace("example");
-

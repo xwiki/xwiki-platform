@@ -108,6 +108,22 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         if (request.getMatchableURL().endsWith(loginSubmitPattern)) {
             String username = convertUsername(request.getParameter(FORM_USERNAME), context);
             String password = request.getParameter(FORM_PASSWORD);
+            String rememberme = request.getParameter(FORM_REMEMBERME);
+            return processLogin(username, password, rememberme, request, response, context);
+        }
+        return false;
+    }
+
+    /**
+     * Process any login information passed in parameter (username, password).
+     * Returns true if SecurityFilter should abort further processing after the method completes (for example, if a
+     * redirect was sent as part of the login processing).
+     *
+     * @param request
+     * @param response
+     * @return true if the filter should return after this method ends, false otherwise
+     */
+    public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context) throws Exception {
             Principal principal = authenticate(username, password, context);
             if (principal != null) {
                 // login successful
@@ -120,7 +136,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                 // manage persistent login info, if persistent login management is enabled
                 if (persistentLoginManager != null) {
-                    String rememberme = request.getParameter(FORM_REMEMBERME);
                     // did the user request that their login be persistent?
                     if (rememberme != null) {
                         // remember login
@@ -154,8 +169,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
             }
             return true;
-        }
-        return false;
     }
 
     /**

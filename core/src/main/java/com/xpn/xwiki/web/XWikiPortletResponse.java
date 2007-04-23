@@ -240,6 +240,26 @@ public class XWikiPortletResponse implements XWikiResponse {
             getHttpServletResponse().addCookie(cookie);
     }
 
+    /**
+     * Remove a cookie.
+     *
+     * @param request The servlet request needed to find the cookie to remove
+     * @param cookieName The name of the cookie that must be removed.
+     */
+    public void removeCookie(String cookieName, XWikiRequest request)
+    {
+        if (response instanceof HttpServletResponse) {
+            Cookie cookie = request.getCookie(cookieName);
+            if (cookie != null) {
+                cookie.setMaxAge(0);
+                cookie.setPath(cookie.getPath());
+                getHttpServletResponse().addCookie(cookie);
+            }
+        }
+    }
+
+
+
     public void setContentLength(int length) {
         if (response instanceof HttpServletResponse)
             getHttpServletResponse().setContentLength(length);

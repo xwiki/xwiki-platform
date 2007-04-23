@@ -401,5 +401,9 @@ public class XWikiFakeRequest implements XWikiRequest {
     public HttpServletRequest getHttpServletRequest() {
         return null;  
     }
+
+    public Cookie getCookie(String cookieName) {
+        return null;
+    }
 }
 

@@ -2583,6 +2583,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * Method allows to create an empty user with no password (he won't be able to login)
+     * This method is usefull for authentication like LDAP or App Server trusted
+     * @param xwikiname
+     * @param userRights
+     * @param context
+     * @return  true if success
+     * @throws XWikiException
+     */
+    public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException {
+        HashMap map = new HashMap();
+        map.put("active", "1");
+        map.put("first_name", xwikiname);
+        String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
+        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, userRights, context)==1)
+         return true;
+        else
+         return false;
+    }
+
     public void sendConfirmationEmail(String xwikiname, String password, String email,
         String message, String contentfield, XWikiContext context) throws XWikiException
     {

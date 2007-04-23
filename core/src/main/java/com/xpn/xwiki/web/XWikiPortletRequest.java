@@ -40,6 +40,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.util.Util;
+
 public class XWikiPortletRequest implements XWikiRequest {
     protected final Log logger = LogFactory.getLog(getClass());
     public static final String ROOT_SPACE_PREF_NAME = "rootSpace";
@@ -267,6 +269,13 @@ public class XWikiPortletRequest implements XWikiRequest {
         return null;
     }
 
+    public Cookie getCookie(String cookieName) {
+        if (request instanceof HttpServletRequest)
+            return Util.getCookie(cookieName, getHttpServletRequest());
+        else
+            return null;
+    }
+    
     public long getDateHeader(String s) {
         if (request instanceof HttpServletRequest)
             return getHttpServletRequest().getDateHeader(s);

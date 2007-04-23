@@ -96,6 +96,9 @@ public class SecHibernateQuery extends HibernateQuery {
 	}
 
     public String getNativeQuery() {
+        if (translator==null)
+            translator = new XWikiHibernateQueryTranslator(getQueryTree());
+
         _allowdocs.clear();
         String docname = translator.getLastNameClass(qn_xwiki_document);
         if (docname==null) {

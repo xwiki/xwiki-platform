@@ -4,8 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>
-$doc.use("XWiki.PDFClass")
-#set($title = $doc.display("title"))
+$pdfdoc.use("XWiki.PDFClass")
+#set($title = $pdfdoc.display("title", "rendered"))
 #if((!$title)||($title==""))
 #set( $title = $!xwiki.getWebPreference("title"))
 #if ( $title != "")

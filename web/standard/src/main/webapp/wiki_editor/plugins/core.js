@@ -997,7 +997,8 @@ WikiEditor.prototype._convertListInternal = function(content, lclass) {
 WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     var str = "";
     var atts = result[1].split("|");
-    var tag = "font", style = "", myclass = "", id = "", name = "";
+    var tag = "font", style = "", myclass = "", id = "", name = "", doc = "";
+    var hasIcon = false;
     for (var i=0; i < atts.length; i++) {
         var att = this.trimString(atts[i].substring(0, atts[i].indexOf("=")));
         var value = this.trimString(atts[i].substring(atts[i].indexOf("=") + 1, atts[i].length));
@@ -1015,8 +1016,8 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
         }
         else if (att == "icon") {
             style += "background-image: url(" + value + ");";
-        }
-        else {
+            hasIcon = true;
+        } else {
             style += att + ":" + value + ";";
         }
     }
@@ -1024,10 +1025,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     if (id != "") {
         str += " id=\"" + id + "\"";
     }
-
     if (myclass != "") {
         str += " class=\"" + myclass + "\"";
-    } else {
+    } else if (hasIcon){
         str += " class=\"stylemacro\"";
     }
     if (name != "") {

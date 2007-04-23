@@ -755,6 +755,12 @@ public class Package
             ZipEntry zipentry = new ZipEntry(zipname);
             zos.putNextEntry(zipentry);
             String docXml = doc.toXML(true, false, true, withVersions, context);
+            if (!context.getWiki().getRightService().hasAdminRights(context)) {
+                docXml =
+                    context.getUtil().substitute(
+                        "s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
+                        docXml);
+            }
             zos.write(docXml.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } catch (Exception e) {
@@ -786,6 +792,12 @@ public class Package
             }
             File file = new File(spacedir, filename);
             String xml = doc.toXML(true, false, true, withVersions, context);
+            if (!context.getWiki().getRightService().hasAdminRights(context)) {
+                xml =
+                    context.getUtil().substitute(
+                        "s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
+                        xml);
+            }
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(xml.getBytes(context.getWiki().getEncoding()));
             fos.flush();

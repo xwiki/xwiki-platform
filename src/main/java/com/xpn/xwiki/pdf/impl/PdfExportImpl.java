@@ -22,51 +22,64 @@
 
 package com.xpn.xwiki.pdf.impl;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.pdf.api.PdfExport;
-import com.xpn.xwiki.util.Util;
-import org.apache.avalon.framework.logger.ConsoleLogger;
-import org.apache.avalon.framework.logger.Logger;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.fop.apps.*;
-import org.w3c.tidy.Configuration;
-import org.w3c.tidy.Tidy;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.dom4j.io.SAXReader;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.dom4j.Element;
+import info.informatica.doc.dom4j.CSSStylableElement;
+import info.informatica.doc.dom4j.XHTMLDocument;
+import info.informatica.doc.dom4j.XHTMLDocumentFactory;
+import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
+import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
-import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.util.Properties;
 
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
-import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.FormattingResults;
+import org.apache.fop.apps.MimeConstants;
+import org.apache.fop.apps.PageSequenceResults;
+import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+import org.w3c.dom.Document;
+import org.w3c.tidy.Tidy;
+import org.xml.sax.InputSource;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.pdf.api.PdfExport;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class PdfExportImpl implements PdfExport {
     private Tidy tidy;
     private String xhtmlxsl = "xhtml2fo.xsl";
     private String fopxsl = "fop.xsl";
-    private static final int PDF = 0;
-    private static final int RTF = 1;
+    public static final int PDF = 0;
+    public static final int RTF = 1;
 
     public PdfExportImpl() {
         tidy = new Tidy();
@@ -78,7 +91,6 @@ public class PdfExportImpl implements PdfExport {
         props.setProperty("tidyMark", "false");
         props.setProperty("clean", "true");
         tidy.setConfigurationFromProps(props);
-        tidy.setCharEncoding(Configuration.LATIN1);
     }
 
     public String getXhtmlxsl() {
@@ -111,8 +123,6 @@ public class PdfExportImpl implements PdfExport {
         // XSL Transformation to XML-FO
 
         try {
-            Logger logger = new ConsoleLogger(ConsoleLogger.LEVEL_DEBUG);
-
             FopFactory fopFactory = FopFactory.newInstance();
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
             // configure foUserAgent as desired
@@ -177,6 +187,8 @@ public class PdfExportImpl implements PdfExport {
     public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException {
         File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
+        tidy.setOutputEncoding(context.getWiki().getEncoding());
+        tidy.setInputEncoding(context.getWiki().getEncoding());
         try {
             tempdir.mkdirs();
             context.put("pdfexportdir", tempdir);

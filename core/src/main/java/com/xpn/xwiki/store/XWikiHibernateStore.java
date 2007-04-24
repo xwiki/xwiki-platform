@@ -1455,11 +1455,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             context.remove("links");
 
             // call to RenderEngine and converting the list of links into a list of backlinks
+            // Note: We need to set the passed document as the current document as the "wiki"
+            //       renderer uses context.getDoc().getSpace() to find out the space name if no
+            //       space is specified in the link. A better implementation would be to pass
+            //       explicitely the current space to the render() method.
+            XWikiDocument originalDocument = context.getDoc();
+            context.setDoc(doc);
             try {
                 XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
                 renderer.render(doc.getContent(), doc, doc, context);
             } catch (Exception e) {
                 // If the rendering fails lets forget backlinks without errors
+            } finally {
+                context.setDoc(originalDocument);    
             }
 
             List links = (List)context.get("links");

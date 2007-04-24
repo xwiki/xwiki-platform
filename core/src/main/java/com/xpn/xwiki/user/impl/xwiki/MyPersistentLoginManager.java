@@ -177,7 +177,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
 
         // Remember me
-        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, sessionCookie + "");
+        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
 
         if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {

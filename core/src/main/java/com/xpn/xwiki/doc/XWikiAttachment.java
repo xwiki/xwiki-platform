@@ -302,7 +302,7 @@ public class XWikiAttachment {
             if (aarchive!=null) {
                 el = new DOMElement("versions");
                 try {
-                    el.addText(aarchive.getArchive().toString());
+                    el.addText(new String(aarchive.getArchive()));
                 } catch (XWikiException e) {
                     return null;
                 }

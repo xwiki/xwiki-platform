@@ -38,7 +38,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
  * Class responsible for remembering the login information between requests. It uses (encrypted)
  * cookies for this. The encryption key is stored in xwiki.cfg, xwiki.authentication.encryptionKey
  * parameter.
- * 
+ *
  * The cookies used are:
  * <dl>>
  * <dt>username</dt>
@@ -54,7 +54,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
  * xwiki.authentication.useip . The secret parameter is specified in
  * xwiki.authentication.validationKey</dd>
  * </dl>
- * 
+ *
  * @version $Id: $
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
@@ -97,7 +97,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setter for the {@link #cookieDomains} parameter.
-     * 
+     *
      * @param cdlist The new value for {@link #cookieDomains}.
      * @see #cookieDomains
      */
@@ -108,7 +108,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setter for the {@link #cookiePath} parameter.
-     * 
+     *
      * @param cp The new value for {@link #cookiePath}.
      * @see #cookiePath
      */
@@ -119,7 +119,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Setup a cookie: expiration date, path, domain + send it to the response.
-     * 
+     *
      * @param cookie The cookie to setup.
      * @param sessionCookie Whether the cookie is only for this session, or for a longer period.
      * @param cookieDomain The domain for which the cookie is set.
@@ -140,7 +140,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Remember a specific login using cookies.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @param username The username that's being remembered.
@@ -177,7 +177,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
 
         // Remember me
-        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, sessionCookie + "");
+        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
 
         if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
@@ -202,7 +202,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Sets the maximum age for cookies. The maximum age is configured in xwiki.cfg using the
      * xwiki.authentication.cookielife parameter (number of days). The default age is 14 days.
-     * 
+     *
      * @param cookie The cookie for which the expiration date is configured.
      */
     private void setMaxAge(Cookie cookie)
@@ -218,7 +218,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Adds a cookie to the response.
-     * 
+     *
      * @param response The servlet response.
      * @param cookie The cookie to be sent.
      */
@@ -235,7 +235,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Compute the actual domain the cookie is supposed to be set for. Search through the list of
      * generalized domains for a partial match. If no match is found, then no specific domain is
      * used, which means that the cookie will be valid only for the requested domain.
-     * 
+     *
      * @param request The servlet request.
      * @return The configured domain generalization that matches the request, or null if no match is
      *         found.
@@ -261,10 +261,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Get validation hash for the specified parameters. The hash includes a secret password, and
      * optionally binds the cookie to the requester's IP.
-     * 
+     *
      * The hash secret is configured using the xwiki.authentication.validationKey parameter. The IP
      * binding is enabled using the xwiki.authentication.useip parameter.
-     * 
+     *
      * @param username The remembered username.
      * @param password The remembered password.
      * @param clientIP The client IP of the request.
@@ -319,7 +319,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Encrypt a string. The encryption is password-based. The password can be configured using the
      * xwiki.authentication.encryptionKey parameter.
-     * 
+     *
      * @param clearText The text to be encrypted.
      * @return clearText, encrypted.
      * @todo Optimize this code by creating the Cipher only once.
@@ -351,7 +351,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Forget a login by removing the authentication cookies.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      */
@@ -369,7 +369,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Given an array of cookies and a name, this method tries to find and return the cookie from
      * the array that has the given name. If there is no cookie matching the name in the array, null
      * is returned.
-     * 
+     *
      * @param cookies The list of cookies sent by the client.
      * @param cookieName The name of the cookie to be retrieved.
      * @return The requested cookie, or null if no cookie with the given name was found.
@@ -389,7 +389,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Remove a cookie.
-     * 
+     *
      * @param request The servlet request.
      * @param response The servlet response.
      * @param cookieName The name of the cookie that must be removed.
@@ -411,7 +411,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Check if a text is supposed to be an affirmative value ("true", "yes" or "1").
-     * 
+     *
      * @param text The text to check.
      * @return true if the text is one of "true", "yes" or "1", false otherwise.
      */

@@ -71,7 +71,11 @@ public class PasswordClass extends StringClass
             return null;
         }
         BaseProperty property = newProperty();
-        property.setValue(getProcessedPassword(value));
+        if(value.startsWith(HASH_IDENTIFIER + SEPARATOR) || value.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
+            property.setValue(value);
+        } else {
+            property.setValue(getProcessedPassword(value));
+        }
         return property;
     }
 

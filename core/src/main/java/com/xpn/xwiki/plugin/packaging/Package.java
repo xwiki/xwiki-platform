@@ -755,12 +755,18 @@ public class Package
             ZipEntry zipentry = new ZipEntry(zipname);
             zos.putNextEntry(zipentry);
             String docXml = doc.toXML(true, false, true, withVersions, context);
+
+            // Ensure that a non-admin user do not get to see user's passwords. Note that this
+            // is for backward compatibility for passwords that are stored in clear. As of
+            // XWiki 1.0 RC2 passwords are now hashed and thus it's no longer important that users
+            // get to see them.
             if (!context.getWiki().getRightService().hasAdminRights(context)) {
                 docXml =
                     context.getUtil().substitute(
                         "s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
                         docXml);
             }
+
             zos.write(docXml.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } catch (Exception e) {

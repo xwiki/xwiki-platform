@@ -55,6 +55,14 @@
         <enabled>true</enabled>
       </releases>
     </repository>
+    <repository>
+      <id>jtidy</id>
+      <name>JTidy Maven2 Remote Repository</name>
+      <url>http://jtidy.sourceforge.net/snapshots/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
   </repositories>
 </project>
         

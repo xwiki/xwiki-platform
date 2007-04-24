@@ -145,7 +145,7 @@
         groovy-all-1.0-jsr-06.jar,
         xalan-2.7.0.jar,xerces-2.7.1.jar,xml-apis-2.0.2,
     	jimi.jar,
-    	avalon-framework-4.1.5.jar,fop-0.93.jar,jtidy-8.0-SNAPSHOT.jar,css4j-0.4.0.jar,jclf-2.3.0.jar,xmlgraphics-commons-1.1.jar,
+    	avalon-framework-4.1.5.jar,fop-0.93.jar,jtidy-8.0-20060801.131059-3.jar,css4j-0.4.0.jar,jclf-2.3.0.jar,xmlgraphics-commons-1.1.jar,
         batik-all-1.6.jar,
         ldap-UNKNOWN.jar,
         rome-0.8.jar,rome-fetcher-0.7.jar,

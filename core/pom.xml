@@ -152,13 +152,6 @@
       <version>0.7</version>
     </dependency>
 
-    <!-- We need to find out what version of jtidy we're using and then upload it to the central repository -->
-    <dependency>
-      <groupId>jtidy</groupId>
-      <artifactId>jtidy</artifactId>
-      <version>8.0-SNAPSHOT</version>
-    </dependency>
-
     <!-- We need to get JCaptcha to upload its jar to the central repository.
          See http://forge.octo.com/jcaptcha/jira/browse/FWK-65 -->
     <dependency>
@@ -430,6 +423,17 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
       <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>8.0-20060801.131059-3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>dom3-xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

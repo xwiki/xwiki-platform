@@ -33,11 +33,11 @@ public class DeleteAttachmentAction extends XWikiAction {
         XWikiDocument doc = context.getDoc();
         XWikiAttachment attachment = null;
         String filename;
-        String path = request.getPathInfo();
+        String requestUri = request.getRequestURI();
         if (context.getMode() == XWikiContext.MODE_PORTLET)
             filename = request.getParameter("filename");
         else
-            filename = Utils.decode(path.substring(path.lastIndexOf("/") + 1), context);
+            filename = Utils.decode(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
 
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));

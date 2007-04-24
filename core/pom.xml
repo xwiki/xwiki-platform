@@ -463,8 +463,7 @@
               **/content/**/*.java,
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,
-              **/MyPersistentLoginManager.java,
-              **/BaseClass.java
+              **/MyPersistentLoginManager.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java

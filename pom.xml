@@ -33,7 +33,7 @@
   <artifactId>xwiki-root</artifactId>
   <name>XWiki Root</name>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <scm>
     <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk</connection>
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk</developerConnection>
@@ -51,6 +51,14 @@
       <id>xwiki</id>
       <name>XWiki Maven2 Remote Repository</name>
       <url>http://maven.xwiki.org</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>jtidy</id>
+      <name>JTidy Maven2 Remote Repository</name>
+      <url>http://jtidy.sourceforge.net/snapshots/</url>
       <releases>
         <enabled>true</enabled>
       </releases>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,8 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
 package com.xpn.xwiki.web;
 
@@ -26,18 +24,23 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DeleteAttachmentAction extends XWikiAction {
-    public boolean action(XWikiContext context) throws XWikiException {
+public class DeleteAttachmentAction extends XWikiAction
+{
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         XWikiAttachment attachment = null;
         String filename;
-        String path = request.getPathInfo();
-        if (context.getMode() == XWikiContext.MODE_PORTLET)
+        if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
-        else
-            filename = Utils.decode(path.substring(path.lastIndexOf("/") + 1), context);
+        } else {
+            // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
+            // we want to use our own decoding.
+            String requestUri = request.getRequestURI();
+            filename = Utils.decode(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+        }
 
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));

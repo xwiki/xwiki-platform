@@ -3670,8 +3670,42 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 && (action.equals("edit") || action.equals("inline")))
                 docname = request.getParameter("topic");
             else {
+                // TODO: Introduce a XWikiURL class in charge of getting the information relevant
+                // to XWiki from a request URL (action, space, document name, file, etc)
+
+                // Important: We cannot use getPathInfo() as the container encodes it and different
+                // containers encode it differently, depending on their internal behavior and how
+                // they are configured. Thus to make this container-proof we use the
+                // getRequestURI() which isn't modified by the container and is thus only
+                // URL-encoded.
+
+                // Note: Ideally we should modify the getDocumentNameFromPath method but in order
+                // not to introduce any new bug right now we're reconstructing a path info that we
+                // pass to it using the following algorithm:
+                //    path info = requestURI - (contextPath + servletPath)
+                String path;
+                if (!request.getRequestURI().startsWith(
+                    request.getContextPath() + request.getServletPath()))
+                {
+                    log.warn("Request URI [" + request.getRequestURI() + "] should have matched "
+                        + "context path [" + request.getContextPath() + "] and servlet path ["
+                        + request.getServletPath() + "]");
+                    // Even though this branch shouldn't get executed we never know what containers
+                    // will return and thus in order to be safe we fall back to the previous
+                    // behavior which was to use getPathInfo() for getting the path (with the
+                    // potential issue with i18n encoding as stated above).
+                    path = request.getPathInfo();
+                } else {
+                    path = request.getRequestURI().substring(
+                        request.getContextPath().length() + request.getServletPath().length());
+                }
+
+                // TODO: I think it's safe to remove the fixDecodedURI now that we're not using
+                // getPathInfo() and thus the container doesn't encode anything but I don't want
+                // to break anything at this late stage (we're releasing 1.0 RC2). Remove it when
+                // we start working on 1.1.
                 docname =
-                    getDocumentNameFromPath(fixDecodedURI(request, request.getPathInfo()), context);
+                    getDocumentNameFromPath(fixDecodedURI(request, path), context);
             }
         }
         return docname;

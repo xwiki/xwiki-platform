@@ -320,7 +320,7 @@ public class PdfExportImpl implements PdfExport {
             if (node instanceof CSSStylableElement) {
                 CSSStylableElement styleElement = (CSSStylableElement) node;
                 if (styleElement.getComputedStyle()!=null)
-                 styleElement.setAttributeValue("style", styleElement.getComputedStyle().getCssText());
+                 styleElement.addAttribute("style", styleElement.getComputedStyle().getCssText());
             }
             if (node instanceof Element) {
                 applyInlineStyle((Element) node);

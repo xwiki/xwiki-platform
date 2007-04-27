@@ -140,7 +140,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                         buffer.append(" target=\"" + target + "\"");
                     }
                     buffer.append(">");
-                    buffer.append(text);
+                    buffer.append(text.replaceAll("http://", "&#104;ttp://").replaceAll("ftp://", "&#102;tp://"));
                     buffer.append("</a></span>");
                     return;
                 }
@@ -160,7 +160,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter {
                     if(!specificText || text.length() == 0) {
                         text = Encoder.unescape(hash);
                     }
-                    buffer.append(text);
+                    buffer.append(text.replaceAll("http://", "&#104;ttp://").replaceAll("ftp://", "&#102;tp://"));
                     buffer.append("</a></span>");
                     return;
                 }

@@ -91,6 +91,7 @@ public class PdfExportImpl implements PdfExport {
         props.setProperty("tidyMark", "false");
         props.setProperty("clean", "true");
         tidy.setConfigurationFromProps(props);
+        tidy.setTrimEmptyElements(false);
     }
 
     public String getXhtmlxsl() {

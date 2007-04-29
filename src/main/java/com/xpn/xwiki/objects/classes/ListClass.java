@@ -156,15 +156,17 @@ public abstract class ListClass extends PropertyClass
     public static List getListFromString(String value, String separators, boolean withMap)
     {
         List list = new ArrayList();
-        if (value == null)
+        if (value == null) {
             return list;
+        }
         if (separators == null) {
             separators = "|";
         }
 
         String val = value;
-        if (separators.length() == 1)
+        if (separators.length() == 1) {
             val = StringUtils.replace(val, "\\" + separators, "%PIPE%");
+        }
 
         String[] result = StringUtils.split(val, separators);
         String item = "";
@@ -175,8 +177,9 @@ public abstract class ListClass extends PropertyClass
             } else {
                 item = element;
             }
-            if (!item.trim().equals(""))
+            if (!item.trim().equals("")) {
                 list.add(item);
+            }
         }
         return list;
     }
@@ -184,8 +187,9 @@ public abstract class ListClass extends PropertyClass
     public static Map getMapFromString(String value)
     {
         Map map = new HashMap();
-        if (value == null)
+        if (value == null) {
             return map;
+        }
 
         String val = StringUtils.replace(value, "\\|", "%PIPE%");
         String[] result = StringUtils.split(val, "|");
@@ -194,8 +198,9 @@ public abstract class ListClass extends PropertyClass
             if (element.indexOf('=') != -1) {
                 String[] data = StringUtils.split(element, "=");
                 map.put(data[0], new ListItem(data[0], data[1]));
-            } else
+            } else {
                 map.put(element, new ListItem(element, element));
+            }
         }
         return map;
     }
@@ -204,12 +209,13 @@ public abstract class ListClass extends PropertyClass
     {
         BaseProperty lprop;
 
-        if (isRelationalStorage() && isMultiSelect())
+        if (isRelationalStorage() && isMultiSelect()) {
             lprop = new DBStringListProperty();
-        else if (isMultiSelect())
+        } else if (isMultiSelect()) {
             lprop = new StringListProperty();
-        else
+        } else {
             lprop = new StringProperty();
+        }
 
         if (isMultiSelect() && getDisplayType().equals("input")) {
             ((ListProperty) lprop).setFormStringSeparator("" + getSeparators().charAt(0));
@@ -223,25 +229,28 @@ public abstract class ListClass extends PropertyClass
         BaseProperty prop = newProperty();
         if (isMultiSelect()) {
             ((ListProperty) prop).setList(getListFromString(value, getSeparators(), false));
-        } else
+        } else {
             prop.setValue(value);
+        }
         return prop;
     }
 
     public BaseProperty fromStringArray(String[] strings)
     {
-        BaseProperty prop = newProperty();
-        if (prop instanceof StringProperty)
+        if (!isMultiSelect()) {
             return fromString(strings[0]);
+        }
+        BaseProperty prop = newProperty();
+        if (prop instanceof StringProperty) {
+            return fromString(strings[0]);
+        }
 
         List list = new ArrayList();
         ((ListProperty) prop).setList(list);
 
-        if (strings.length == 0)
+        if (strings.length == 0) {
             return prop;
-
-        if (!isMultiSelect())
-            return fromString(strings[0]);
+        }
 
         if ((strings.length == 1) && (getDisplayType().equals("input") || isMultiSelect())) {
             ((ListProperty) prop).setList(getListFromString(strings[0], getSeparators(), false));
@@ -251,16 +260,18 @@ public abstract class ListClass extends PropertyClass
         // If Multiselect and multiple results
         for (int i = 0; i < strings.length; i++) {
             String item = strings[i];
-            if (!item.trim().equals(""))
+            if (!item.trim().equals("")) {
                 list.add(item);
+            }
         }
         return prop;
     }
 
     public BaseProperty newPropertyfromXML(Element ppcel)
     {
-        if ((!isRelationalStorage()) && (!isMultiSelect()))
+        if ((!isRelationalStorage()) && (!isMultiSelect())) {
             return super.newPropertyfromXML(ppcel);
+        }
 
         List elist = ppcel.elements("value");
         BaseProperty lprop = newProperty();
@@ -367,8 +378,9 @@ public abstract class ListClass extends PropertyClass
     {
         input input = new input();
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop != null)
+        if (prop != null) {
             input.setValue(prop.toFormString());
+        }
 
         input.setType("hidden");
         input.setName(prefix + name);
@@ -401,8 +413,9 @@ public abstract class ListClass extends PropertyClass
         if (getDisplayType().equals("input")) {
             input input = new input();
             BaseProperty prop = (BaseProperty) object.safeget(name);
-            if (prop != null)
+            if (prop != null) {
                 input.setValue(prop.toFormString());
+            }
             input.setType("text");
             input.setSize(getSize());
             input.setName(prefix + name);
@@ -440,8 +453,9 @@ public abstract class ListClass extends PropertyClass
         // TODO: add elements that are in the values but not in the predefined list..
         for (Iterator it = selectlist.iterator(); it.hasNext();) {
             String item = (String) it.next();
-            if (!list.contains(item))
+            if (!list.contains(item)) {
                 list.add(item);
+            }
         }
 
         // Add options from Set
@@ -480,14 +494,17 @@ public abstract class ListClass extends PropertyClass
             ListItem s1 = (ListItem) map.get(o1);
             ListItem s2 = (ListItem) map.get(o2);
 
-            if ((s1 == null) && (s2 == null))
+            if ((s1 == null) && (s2 == null)) {
                 return 0;
+            }
 
-            if (s1 == null)
+            if (s1 == null) {
                 return -1;
+            }
 
-            if (s2 == null)
+            if (s2 == null) {
                 return 1;
+            }
 
             return s1.getValue().compareTo(s2.getValue());
         }
@@ -507,10 +524,12 @@ public abstract class ListClass extends PropertyClass
 
         String sort = getSort();
         if (!"none".equals(sort)) {
-            if ("id".equals(sort))
+            if ("id".equals(sort)) {
                 Collections.sort(list);
-            if ("value".equals(sort))
+            }
+            if ("value".equals(sort)) {
                 Collections.sort(list, new MapComparator(map));
+            }
         }
 
         List selectlist;
@@ -528,8 +547,9 @@ public abstract class ListClass extends PropertyClass
         // TODO: add elements that are in the values but not in the predefined list..
         for (Iterator it = selectlist.iterator(); it.hasNext();) {
             String item = (String) it.next();
-            if (!list.contains(item))
+            if (!list.contains(item)) {
                 list.add(item);
+            }
         }
 
         // Add options from Set
@@ -539,8 +559,9 @@ public abstract class ListClass extends PropertyClass
             String display = getDisplayValue(rawvalue, name, map, context);
             option option = new option(display, value);
             option.addElement(display);
-            if (selectlist.contains(value))
+            if (selectlist.contains(value)) {
                 option.setSelected(true);
+            }
             select.addElement(option);
         }
 
@@ -586,8 +607,9 @@ public abstract class ListClass extends PropertyClass
                 new input(getDisplayType().equals("radio") ? input.radio : input.checkbox, prefix
                     + name, value);
 
-            if (selectlist.contains(value))
+            if (selectlist.contains(value)) {
                 radio.setChecked(true);
+            }
             radio.addElement(display);
             buffer.append(radio.toString());
             if (it.hasNext()) {
@@ -625,8 +647,9 @@ public abstract class ListClass extends PropertyClass
             String display = getDisplayValue(rawvalue, name, getMap(context), context);
             option option = new option(display, value);
             option.addElement(display);
-            if (selectlist.contains(value))
+            if (selectlist.contains(value)) {
                 option.setSelected(true);
+            }
             select.addElement(option);
         }
 
@@ -657,7 +680,8 @@ public abstract class ListClass extends PropertyClass
     public void fromSearchMap(XWikiQuery query, Map map)
     {
         String[] data = (String[]) map.get("");
-        if (data != null)
+        if (data != null) {
             query.setParam(getObject().getName() + "_" + getName(), data);
+        }
     }
 }

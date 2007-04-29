@@ -58,6 +58,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -4422,7 +4423,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
-        client.getState().setCredentials(null, null,
+        client.getState().setCredentials(new AuthScope(null, -1, null),
             new UsernamePasswordCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming
@@ -4476,7 +4477,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains
         // an arbitrary realm change this to null.
-        client.getState().setCredentials(null, null,
+        client.getState().setCredentials(new AuthScope(null, -1, null),
             new UsernamePasswordCredentials(username, password));
 
         // create a GET method that reads a file over HTTPS, we're assuming

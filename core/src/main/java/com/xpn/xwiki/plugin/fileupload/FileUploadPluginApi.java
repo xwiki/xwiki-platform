@@ -97,7 +97,7 @@ public class FileUploadPluginApi extends PluginApi {
      * @throws XWikiException Exception is thrown if the data could not be read
      */
     public String getFileItem(String name) throws XWikiException {
-        return getFileUploadPlugin().getFileItem(name, getXWikiContext());
+        return getFileUploadPlugin().getFileItemAsString(name, getXWikiContext());
     }
 
     /**

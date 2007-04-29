@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,12 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
- * @author torcq
  */
-
-
-
 
 package com.xpn.xwiki.web;
 
@@ -30,26 +25,38 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
 public class EditForm extends XWikiForm
 {
 
     // ---- Form fields -------------------------------------------------
     private String content;
+
     private String web;
+
     private String name;
+
     private String parent;
+
     private String creator;
+
     private String template;
+
     private String language;
+
     private String defaultLanguage;
+
     private String defaultTemplate;
+
     private String title;
+
     private String comment;
+
     private String tags;
+
     private boolean lockForce;
 
-    public void readRequest() {
+    public void readRequest()
+    {
         XWikiRequest request = getRequest();
         setContent(request.getParameter("content"));
         setWeb(request.getParameter("web"));
@@ -66,7 +73,8 @@ public class EditForm extends XWikiForm
         setLockForce("1".equals(request.getParameter("force")));
     }
 
-    public void setTags(String[] parameter) {
+    public void setTags(String[] parameter)
+    {
         if (parameter == null) {
             this.tags = "";
             return;
@@ -77,8 +85,7 @@ public class EditForm extends XWikiForm
             if (!parameter[i].equals("")) {
                 if (first) {
                     first = false;
-                }
-                else {
+                } else {
                     tags.append("|");
                 }
                 tags.append(parameter[i]);
@@ -87,126 +94,151 @@ public class EditForm extends XWikiForm
         this.tags = tags.toString();
     }
 
-    public String getTags(){
+    public String getTags()
+    {
         return tags;
     }
 
-
-    public String getContent() {
+    public String getContent()
+    {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(String content)
+    {
         this.content = content;
     }
 
-    public String getWeb() {
+    public String getWeb()
+    {
         return web;
     }
 
-    public void setWeb(String web) {
+    public void setWeb(String web)
+    {
         this.web = web;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getLanguage() {
+    public String getLanguage()
+    {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(String language)
+    {
         this.language = language;
     }
 
-    public int getObjectNumbers(String prefix) {
+    public int getObjectNumbers(String prefix)
+    {
         String nb = getRequest().getParameter(prefix + "_nb");
-        if ((nb==null)||(nb.equals("")))
-         return 0;
+        if ((nb == null) || (nb.equals("")))
+            return 0;
         return Integer.parseInt(nb);
     }
 
-    public Map getObject(String prefix) {
+    public Map getObject(String prefix)
+    {
         Map map = getRequest().getParameterMap();
         HashMap map2 = new HashMap();
         Iterator it = map.keySet().iterator();
         while (it.hasNext()) {
-          String name = (String) it.next();
-          if (name.startsWith(prefix + "_")) {
-              String newname = name.substring(prefix.length()+1);
-              map2.put(newname, map.get(name));
-          }
+            String name = (String) it.next();
+            if (name.startsWith(prefix + "_")) {
+                String newname = name.substring(prefix.length() + 1);
+                map2.put(newname, map.get(name));
+            }
         }
         return map2;
     }
 
-    public String getParent() {
+    public String getParent()
+    {
         return parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(String parent)
+    {
         this.parent = parent;
     }
 
-    public String getCreator() {
+    public String getCreator()
+    {
         return creator;
     }
 
-    public void setCreator(String creator) {
+    public void setCreator(String creator)
+    {
         this.creator = creator;
     }
 
-    public String getTemplate() {
+    public String getTemplate()
+    {
         return template;
     }
 
-    public void setTemplate(String template) {
+    public void setTemplate(String template)
+    {
         this.template = template;
     }
 
-	public String getDefaultTemplate() {
-		return defaultTemplate;
-	}
+    public String getDefaultTemplate()
+    {
+        return defaultTemplate;
+    }
 
-	public void setDefaultTemplate(String defaultTemplate) {
-		this.defaultTemplate = defaultTemplate;
-	}
-    
-    public String getDefaultLanguage() {
+    public void setDefaultTemplate(String defaultTemplate)
+    {
+        this.defaultTemplate = defaultTemplate;
+    }
+
+    public String getDefaultLanguage()
+    {
         return defaultLanguage;
     }
 
-    public void setDefaultLanguage(String defaultLanguage) {
+    public void setDefaultLanguage(String defaultLanguage)
+    {
         this.defaultLanguage = defaultLanguage;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getComment() {
+    public String getComment()
+    {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public void setComment(String comment)
+    {
         this.comment = comment;
     }
 
-    public boolean isLockForce() {
+    public boolean isLockForce()
+    {
         return lockForce;
     }
 
-    public void setLockForce(boolean lockForce) {
+    public void setLockForce(boolean lockForce)
+    {
         this.lockForce = lockForce;
     }
 }
-

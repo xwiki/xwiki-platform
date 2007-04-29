@@ -23,15 +23,15 @@
 
 package com.xpn.xwiki.objects;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class ListProperty extends BaseProperty
 {
@@ -67,8 +67,9 @@ public class ListProperty extends BaseProperty
     public String toText()
     {
         if ((getList() instanceof PersistentCollection)
-            && (!((PersistentCollection) getList()).wasInitialized()))
+            && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
+        }
         return StringUtils.join(getList().toArray(), " ");
     }
 
@@ -98,8 +99,9 @@ public class ListProperty extends BaseProperty
 
     public boolean equals(Object obj)
     {
-        if (!super.equals(obj))
+        if (!super.equals(obj)) {
             return false;
+        }
 
         List list1 = (List) getValue();
         List list2 = (List) ((BaseProperty) obj).getValue();
@@ -107,22 +109,26 @@ public class ListProperty extends BaseProperty
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
         if ((list1 instanceof PersistentCollection)
-            && (!((PersistentCollection) list1).wasInitialized()))
+            && (!((PersistentCollection) list1).wasInitialized())) {
             return true;
+        }
 
         if ((list2 instanceof PersistentCollection)
-            && (!((PersistentCollection) list2).wasInitialized()))
+            && (!((PersistentCollection) list2).wasInitialized())) {
             return true;
+        }
 
-        if (list1.size() != list2.size())
+        if (list1.size() != list2.size()) {
             return false;
+        }
 
         for (int i = 0; i < list1.size(); i++) {
             Object obj1 = list1.get(i);
             Object obj2 = list2.get(i);
 
-            if (!obj1.equals(obj2))
+            if (!obj1.equals(obj2)) {
                 return false;
+            }
         }
         return true;
     }
@@ -145,10 +151,11 @@ public class ListProperty extends BaseProperty
 
     public void setList(List list)
     {
-        if (list == null)
+        if (list == null) {
             this.list = new ArrayList();
-        else
+        } else {
             this.list = list;
+        }
     }
 
     public Element toXML()
@@ -168,9 +175,9 @@ public class ListProperty extends BaseProperty
     public String toString()
     {
         if ((getList() instanceof PersistentCollection)
-            && (!((PersistentCollection) getList()).wasInitialized()))
+            && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
+        }
         return toXMLString();
     }
-
 }

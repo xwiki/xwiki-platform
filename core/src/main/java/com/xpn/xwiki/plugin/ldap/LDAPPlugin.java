@@ -41,8 +41,8 @@ import java.util.Enumeration;
 import java.text.MessageFormat;
 
 public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-    private static Log log =
-            LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.ldap.LDAPPlugin.class);
+    private static final Log log = LogFactory.getLog(LDAPPlugin.class);
+
 
     public LDAPPlugin(String name, String className, XWikiContext context) {
         super(name, className, context);
@@ -241,14 +241,16 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @throws XWikiException
      */
     public boolean createUserFromLDAP(String wikiname, String uid, String bindusername, String bindpassword, XWikiContext context) throws XWikiException {
+        if (log.isDebugEnabled())
+            log.debug("Check LDAP");
+
         LDAPConnection lc = new LDAPConnection();
-        boolean result = false;
         String foundDN;
         HashMap attributes = new HashMap();
 
         try {
             if (log.isDebugEnabled())
-                log.debug("LDAP Password check for user " + bindusername);
+                log.debug("LDAP Password check for user " + uid);
 
             int ldapPort = getLDAPPort(context);
             int ldapVersion = LDAPConnection.LDAP_V3;
@@ -266,12 +268,16 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             // Connect and bind to LDAP server
             lc = connect(ldapHost, ldapPort, ldapVersion, bindDN, bindPassword);
 
-            if (result) {
+            if (lc!=null) {
+                String searchquery = "("+ getParam("ldap_UID_attr",context) + "=" + uid + ")";
+
+                if (log.isDebugEnabled())
+                    log.debug("LDAP searching for user with query " + searchquery);
+
                 LDAPSearchResults searchResults =
                         lc.search(  baseDN,
                                 LDAPConnection.SCOPE_SUB ,
-                                "("+ getParam("ldap_UID_attr",context) +
-                                        "=" + uid + ")",
+                                searchquery,
                                 null,          // return all attributes
                                 false);        // return attrs and values
 
@@ -286,45 +292,52 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     if (log.isDebugEnabled())
                         log.debug("LDAP searching found DN: " + foundDN);
 
-                    if (result)
-                    {
-                        if (log.isDebugEnabled())
-                            log.debug("LDAP adding user attributes");
+                    if (log.isDebugEnabled())
+                        log.debug("LDAP adding user attributes");
 
-                        LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
-                        Iterator allAttributes = attributeSet.iterator();
+                    LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
+                    Iterator allAttributes = attributeSet.iterator();
 
-                        while(allAttributes.hasNext()) {
-                            LDAPAttribute attribute =
-                                    (LDAPAttribute)allAttributes.next();
-                            String attributeName = attribute.getName();
+                    while(allAttributes.hasNext()) {
+                        LDAPAttribute attribute =
+                                (LDAPAttribute)allAttributes.next();
+                        String attributeName = attribute.getName();
 
-                            Enumeration allValues = attribute.getStringValues();
+                        Enumeration allValues = attribute.getStringValues();
 
-                            if( allValues != null) {
-                                while(allValues.hasMoreElements()) {
-                                    if (log.isDebugEnabled())
-                                        log.debug("LDAP adding user attribute " + attributeName);
+                        if( allValues != null) {
+                            while(allValues.hasMoreElements()) {
+                                if (log.isDebugEnabled())
+                                    log.debug("LDAP adding user attribute " + attributeName);
 
-                                    String Value = (String) allValues.nextElement();
-                                    attributes.put(attributeName, Value);
-                                }
+                                String Value = (String) allValues.nextElement();
+                                attributes.put(attributeName, Value);
                             }
                         }
-                        attributes.put("dn", foundDN);
-                        createUserFromLDAP(wikiname, attributes, context);
                     }
-                    else {
-                        if (log.isDebugEnabled())
-                            log.debug("LDAP search user failed");
+                    attributes.put("dn", foundDN);
+                    if (createUserFromLDAP(wikiname, attributes, context)) {
+                        if (log.isInfoEnabled()) {
+                            log.info("LDAP create user for user " + uid + " successfull");
+                        }
+                        return true;
+                    } else {
+                        if (log.isInfoEnabled()) {
+                            log.info("LDAP create user for user " + uid + " failed");
+                        }
+                        return false;
                     }
                 }
-            }
-            if (log.isInfoEnabled()) {
-                if (result)
-                    log.info("LDAP create user for user " + uid + " successfull");
-                else
-                    log.info("LDAP create user for user " + uid + " failed");
+                else {
+                    if (log.isDebugEnabled())
+                        log.debug("LDAP search user failed");
+                    return false;
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.info("LDAP connect failed");
+                }
+                return false;
             }
         }
         catch( LDAPException e ) {
@@ -346,7 +359,7 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 e.printStackTrace();
             }
         }
-        return result;
+        return false;
     }
 
     /**
@@ -359,7 +372,7 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
      * @param context
      * @throws XWikiException
      */
-    public void createUserFromLDAP(String wikiname, HashMap attributes, XWikiContext context) throws XWikiException {
+    public boolean createUserFromLDAP(String wikiname, HashMap attributes, XWikiContext context) throws XWikiException {
         String ldapFieldMapping = getParam("ldap_fields_mapping",context);
         if (log.isDebugEnabled())
             log.debug("Ready to create user from LDAP with field " + ldapFieldMapping);
@@ -408,8 +421,10 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
                 context.getWiki().saveDocument(doc, null, context);
                 context.getWiki().setUserDefaultGroup(fullwikiname, context);
+                return true;
             }
         }
+        return false;
     }
 
 }

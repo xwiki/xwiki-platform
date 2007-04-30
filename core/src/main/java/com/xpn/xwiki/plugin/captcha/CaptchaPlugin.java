@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class CaptchaPlugin extends XWikiDefaultPlugin
 {
     private static Log mLogger =
-        LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.captcha.CaptchaPlugin.class);
+        LogFactory.getLog(com.xpn.xwiki.plugin.captcha.CaptchaPlugin.class);
 
     public CaptchaPlugin(String name, String className, XWikiContext context)
     {

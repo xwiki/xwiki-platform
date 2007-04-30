@@ -42,7 +42,7 @@ import java.util.List;
 
 public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
     private static Log mLogger =
-            LogFactory.getFactory().getInstance(FileUploadPlugin.class);
+            LogFactory.getLog(FileUploadPlugin.class);
 
     private static final long UPLOAD_DEFAULT_MAXSIZE = 10000000L;
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;

@@ -51,7 +51,7 @@ import com.xpn.xwiki.xmlrpc.ConfluenceRpcInterface;
 import com.xpn.xwiki.xmlrpc.XWikiRpcInterface;
 
 public class XMLRpcTest  extends TestCase {
-	private static final Log log = LogFactory.getFactory().getInstance(XMLRpcTest.class);
+	private static final Log log = LogFactory.getLog(XMLRpcTest.class);
 	
     public String hibpath = "hibernate-test.cfg.xml";
     public XWikiContext context = new XWikiContext();

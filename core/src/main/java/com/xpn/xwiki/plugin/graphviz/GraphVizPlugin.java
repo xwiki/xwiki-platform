@@ -35,7 +35,7 @@ import java.io.*;
 
 public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
+                LogFactory.getLog(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
 
         private File tempDir;
         private String dotPath;

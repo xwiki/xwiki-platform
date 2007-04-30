@@ -163,10 +163,13 @@ public class ListProperty extends BaseProperty
         Element el = new DOMElement(getName());
         List list = (List) getValue();
         for (int i = 0; i < list.size(); i++) {
-            String value = list.get(i).toString();
-            Element vel = new DOMElement("value");
-            vel.setText((value == null) ? "" : value.toString());
-            el.add(vel);
+            Object obj = list.get(i);
+            if (obj!=null) {
+                String value = obj.toString();
+                Element vel = new DOMElement("value");
+                vel.setText((value == null) ? "" : value.toString());
+                el.add(vel);
+            }
         }
         return el;
     }

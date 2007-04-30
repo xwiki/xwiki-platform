@@ -33,11 +33,8 @@ import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
-import com.sun.syndication.fetcher.FeedFetcher;
-import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
@@ -209,15 +206,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public SyndFeed getFeedForce(String sfeed, boolean ignoreInvalidFeeds, XWikiContext context) throws IOException {
             try {
-                //SyndFeedInput input = new SyndFeedInput();
-                //SyndFeed feed = null;
                 URL feedURL = new URL(sfeed);
-
-                FeedFetcher feedFetcher = new HttpURLFeedFetcher();
-                feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent", "XWikiBot/1.0"));
-                SyndFeed feed = feedFetcher.retrieveFeed(feedURL);
-
-                //feed = input.build(new XmlReader(feedURL));
+                XWikiFeedFetcher feedFetcher = new XWikiFeedFetcher();
+                feedFetcher.setUserAgent(context.getWiki().Param("xwiki.plugins.feed.useragent", context.getWiki().getHttpUserAgent(context)));
+                SyndFeed feed = feedFetcher.retrieveFeed(feedURL, (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.timeout", context.getWiki().getHttpTimeout(context)) );
                 return feed;
             }
             catch (Exception ex) {
@@ -529,7 +521,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             String url = entry.getLink();
             if ((url!=null)&&(!url.trim().equals(""))) {
                 try {
-                    String sfullContent = context.getWiki().getURLContent(url);
+                    String sfullContent = context.getWiki().getURLContent(url, context);
                     obj.setLargeStringValue("fullContent", (sfullContent.length()>65000) ? sfullContent.substring(0,65000) : sfullContent);
                 } catch (Exception e) {
                     obj.setLargeStringValue("fullContent", "Exception while reading fullContent: " + e.getMessage());

@@ -107,7 +107,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         validTypesMap.put("com.xpn.xwiki.objects.classes.BooleanClass" , boolean_types);
     }
 
-
     /**
      * Allows to create a new wiki database
      * and initialize the default tables
@@ -124,7 +123,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
             Connection connection = session.connection();
             stmt = connection.createStatement();
-            stmt.execute("create database " + wikiName);
+
+            String dbproduct = getDatabaseProductName(context);
+            if ("Oracle".equals(dbproduct)) {
+                stmt.execute("create user " + wikiName + " identified by " + wikiName);
+                stmt.execute("grant resource to " + wikiName);
+            } else {
+                stmt.execute("create database " + wikiName);
+            }
+
             endTransaction(context, true);
         }
         catch (Exception e) {
@@ -1541,7 +1548,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
 
-            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc where (doc.xWikiClassXML is not null and doc.xWikiClassXML<>'')");
+            Query query = session.createQuery("select doc.fullName from XWikiDocument as doc where (doc.xWikiClassXML is not null and doc.xWikiClassXML like '%')");
             Iterator it = query.list().iterator();
             List list = new ArrayList();
             while (it.hasNext()) {

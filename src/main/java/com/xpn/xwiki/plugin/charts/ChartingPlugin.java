@@ -206,6 +206,6 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
         return new File(tempDir, filename);
     }
     
-    private static Log log = LogFactory.getFactory().getInstance(ChartingPlugin.class);
+    private static Log log = LogFactory.getLog(ChartingPlugin.class);
     private File tempDir;
 }

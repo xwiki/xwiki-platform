@@ -310,7 +310,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context) throws ParserException, IOException {
         CalendarBuilder builder = new CalendarBuilder();
-        String sical = context.getWiki().getURLContent(surl);
+        String sical = context.getWiki().getURLContent(surl, context);
         StringReader reader = new StringReader(sical);
         net.fortuna.ical4j.model.Calendar calendar = builder.build(reader);
         return calendar;
@@ -319,7 +319,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password, XWikiContext context) throws ParserException,
             IOException {
         CalendarBuilder builder = new CalendarBuilder();
-        String sical = context.getWiki().getURLContent(surl, username, password);
+        String sical = context.getWiki().getURLContent(surl, username, password, context);
         StringReader reader = new StringReader(sical);
         net.fortuna.ical4j.model.Calendar calendar = builder.build(reader);
         return calendar;

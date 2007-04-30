@@ -2055,7 +2055,7 @@ public class XWiki extends Api
     public String getURLContent(String surl, String username, String password) throws IOException
     {
         try {
-            return xwiki.getURLContent(surl, username, password);
+            return xwiki.getURLContent(surl, username, password, context);
         } catch (Exception e) {
             return "";
         }
@@ -2071,11 +2071,48 @@ public class XWiki extends Api
     public String getURLContent(String surl) throws IOException
     {
         try {
-            return xwiki.getURLContent(surl);
+            return xwiki.getURLContent(surl, context);
         } catch (Exception e) {
             return "";
         }
     }
+
+    /**
+     * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
+     *
+     * @param surl url to retrieve
+     * @param username username for the basic authentication
+     * @param password password for the basic authentication
+     * @param timeout manuel timeout in milliseconds
+     * @return Content of the specified URL
+     * @throws IOException
+     */
+    public String getURLContent(String surl, String username, String password, int timeout) throws IOException
+    {
+        try {
+            return xwiki.getURLContent(surl, username, password, timeout, xwiki.getHttpUserAgent(context));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Returns the content of an HTTP/HTTPS URL
+     *
+     * @param surl url to retrieve
+     * @param timeout manuel timeout in milliseconds
+     * @return Content of the specified URL
+     * @throws IOException
+     */
+    public String getURLContent(String surl, int timeout) throws IOException
+    {
+        try {
+            return xwiki.getURLContent(surl, timeout, xwiki.getHttpUserAgent(context));
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication as Bytes
@@ -2090,7 +2127,7 @@ public class XWiki extends Api
         throws IOException
     {
         try {
-            return xwiki.getURLContentAsBytes(surl, username, password);
+            return xwiki.getURLContentAsBytes(surl, username, password, context);
         } catch (Exception e) {
             return null;
         }
@@ -2106,7 +2143,7 @@ public class XWiki extends Api
     public byte[] getURLContentAsBytes(String surl) throws IOException
     {
         try {
-            return xwiki.getURLContentAsBytes(surl);
+            return xwiki.getURLContentAsBytes(surl, context);
         } catch (Exception e) {
             return null;
         }

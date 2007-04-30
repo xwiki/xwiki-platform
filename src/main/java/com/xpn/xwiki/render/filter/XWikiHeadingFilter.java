@@ -44,7 +44,7 @@ import com.xpn.xwiki.util.TOCGenerator;
  * A customized version of Radeox Heading Filter
  */
 public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheFilter {
-	private static Log log = LogFactory.getFactory().getInstance(XWikiHeadingFilter.class);
+	private static Log log = LogFactory.getLog(XWikiHeadingFilter.class);
 
 	private final String TOC_NUMBERED = "tocNumbered";
 	private final String TOC_DATA = "tocData";

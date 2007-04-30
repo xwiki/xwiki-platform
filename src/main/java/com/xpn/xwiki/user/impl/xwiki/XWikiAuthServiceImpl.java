@@ -437,24 +437,34 @@ public class XWikiAuthServiceImpl implements XWikiAuthService
     protected void createUser(String user, XWikiContext context) throws XWikiException
     {
         String createuser = getParam("auth_createuser", context);
+        if (log.isDebugEnabled())
+            log.debug("Create user param is " + createuser);
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc = context.getWiki().getDocument("XWiki." + wikiname, context);
             if (userdoc.isNew()) {
+                if (log.isDebugEnabled())
+                    log.debug("User page does not exist for user " + user);
                 if ("ldap".equals(createuser)) {
                     // Let's create the user from ldap
                     LDAPPlugin ldapplugin =
                         (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
                     if (ldapplugin != null) {
+                        if (log.isDebugEnabled())
+                            log.debug("Creating user from ldap for user " + user);
                         ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
                     } else {
                         if (log.isErrorEnabled())
-                            log
-                                .error("Impossible to create user from LDAP because LDAP plugin is not activated");
+                            log.error("Impossible to create user from LDAP because LDAP plugin is not activated");
                     }
                 } else if ("empty".equals(createuser)) {
+                    if (log.isDebugEnabled())
+                        log.debug("Creating emptry user for user " + user);                            
                     context.getWiki().createEmptyUser(wikiname, "edit", context);
                 }
+            } else {
+                if (log.isDebugEnabled())
+                    log.debug("User page already exists for user " + user);
             }
         }
     }

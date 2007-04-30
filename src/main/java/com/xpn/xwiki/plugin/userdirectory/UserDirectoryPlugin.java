@@ -44,7 +44,7 @@ import java.util.List;
 
 public class UserDirectoryPlugin  extends XWikiDefaultPlugin implements XWikiPluginInterface {
     private static Log mLogger =
-            LogFactory.getFactory().getInstance(UserDirectoryPlugin.class);
+            LogFactory.getLog(UserDirectoryPlugin.class);
 
     public static final String DEFAULT_PLUGIN_SPACE = "Directory";
     public static final String DEFAULT_GROUP_TEMPLATE= "XWiki.DirectoryGroupTemplate";

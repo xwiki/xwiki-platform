@@ -39,7 +39,7 @@ import java.util.Vector;
 
 public class SVGPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.svg.SVGPlugin.class);
+                LogFactory.getLog(com.xpn.xwiki.plugin.svg.SVGPlugin.class);
 
         private File tempDir;
  

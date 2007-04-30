@@ -13,9 +13,11 @@ import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
+import org.hibernate.mapping.Table;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.impl.SessionImpl;
@@ -28,6 +30,7 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.Iterator;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationHandler;
 
@@ -112,6 +115,17 @@ public class XWikiHibernateBaseStore {
      */
     public void setHibUrl(URL hiburl) {
         this.hiburl = hiburl;
+    }
+
+    /**
+     * Get Database Product Name
+     */
+    public String getDatabaseProductName(XWikiContext context) {
+        try {
+            return getSession(context).connection().getMetaData().getDatabaseProductName();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -279,16 +293,27 @@ public class XWikiHibernateBaseStore {
         Statement stmt=null;
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
         boolean bTransaction = true;
+        String dschema = null;
+        boolean isOracle = false;
 
         try {
             bTransaction = beginTransaction(false, context);
             session = getSession(context);
             connection = session.connection();
             setDatabase(session, context);
+            isOracle = "Oracle".equals(connection.getMetaData().getDatabaseProductName());
 
+            if (isOracle) {
+                dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
+                config.setProperty(Environment.DEFAULT_SCHEMA, context.getDatabase());
+                Iterator iter = config.getTableMappings();
+                while ( iter.hasNext() ) {
+                    Table table = (Table) iter.next();
+                    table.setSchema(context.getDatabase());
+                }
+            }
             meta = new DatabaseMetadata(connection, dialect);
             stmt = connection.createStatement();
-
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
         }
         catch (Exception e) {
@@ -299,6 +324,8 @@ public class XWikiHibernateBaseStore {
                 if (stmt!=null) stmt.close();
                 if (bTransaction)
                     endTransaction(context, false, false);
+                if (dschema!=null)
+                    config.setProperty(Environment.DEFAULT_SCHEMA, dschema);
             }
             catch (Exception e) {
             }
@@ -420,8 +447,22 @@ public class XWikiHibernateBaseStore {
             try {
                 if ( log.isDebugEnabled() ) log.debug("Switch database to: " + database);
                 if (database!=null) {
-                    if (!database.equals(session.connection().getCatalog()))
-                          session.connection().setCatalog(database);
+                    if ("Oracle".equals(getDatabaseProductName(context))) {
+                        Statement stmt = null;
+                        try {
+                            stmt = session.connection().createStatement();
+                            stmt.execute("alter session set current_schema = " + database);
+                        } finally {
+                            try {
+                                if (stmt!=null)
+                                    stmt.close();
+                            } catch (Exception e) {}
+                        }
+
+                    } else {
+                        if (!database.equals(session.connection().getCatalog()))
+                            session.connection().setCatalog(database);
+                    }
                 }
             } catch (Exception e) {
                 Object[] args = { database };

@@ -19,7 +19,11 @@ public class AppServerTrustedAuthServiceImpl  extends XWikiAuthServiceImpl {
             return super.checkAuth(context);
         }
         else {
+            if (log.isDebugEnabled())
+                log.debug("Launching create user for " + user);            
             createUser(user, context);
+            if (log.isDebugEnabled())
+                log.debug("Create user done for " + user);
             user = "XWiki." + user;
         }
         context.setUser(user);

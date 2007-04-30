@@ -3868,8 +3868,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    if (isExo())
-                        groupService = new ExoGroupServiceImpl();
+                    // If eXo we still want to use instanciation to not have class dependency
+                    // for java 1.4 compatibility
+                    if (isExo()) {
+                        try {
+                            groupService = (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl").newInstance();
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
+                    }
                     else
                         groupService = new XWikiGroupServiceImpl();
                 }
@@ -4396,9 +4403,38 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public String getURLContent(String surl) throws IOException
-    {
+    public int getHttpTimeout(XWikiContext context) {
+        int defaulttimeout = 60000;
+        return (context==null) ? defaulttimeout : (int) context.getWiki().ParamAsLong("xwiki.http.timeout", defaulttimeout);
+    }
+
+    public String getHttpUserAgent(XWikiContext context) {
+        if (context!=null)
+         return context.getWiki().Param("xwiki.http.useragent", "XWikiBot/1.0");
+        else
+         return "XWikiBot/1.0";
+    }
+
+    public static HttpClient getHttpClient(int timeout, String userAgent) {
         HttpClient client = new HttpClient();
+
+        if (timeout!=0) {
+         client.getParams().setSoTimeout(timeout);
+         client.getParams().setParameter("http.connection.timeout", timeout);
+        }
+
+        client.getParams().setParameter("http.useragent", userAgent);
+        return client;
+    }
+
+    public String getURLContent(String surl, XWikiContext context) throws IOException
+    {
+        return getURLContent(surl, getHttpTimeout(context), getHttpUserAgent(context));
+    }
+
+    public String getURLContent(String surl, int timeout, String userAgent) throws IOException
+    {
+        HttpClient client = getHttpClient(timeout, userAgent);
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.
@@ -4416,9 +4452,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public String getURLContent(String surl, String username, String password) throws IOException
+    public String getURLContent(String surl, String username, String password, XWikiContext context) throws IOException
     {
-        HttpClient client = new HttpClient();
+        return getURLContent(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
+    }
+
+    public String getURLContent(String surl, String username, String password, int timeout, String userAgent) throws IOException
+    {
+        HttpClient client = getHttpClient(timeout, userAgent);
 
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains
@@ -4449,9 +4490,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public byte[] getURLContentAsBytes(String surl) throws IOException
+    public byte[] getURLContentAsBytes(String surl, XWikiContext context) throws IOException
     {
-        HttpClient client = new HttpClient();
+        return getURLContentAsBytes(surl, getHttpTimeout(context), getHttpUserAgent(context));
+    }
+
+    public byte[] getURLContentAsBytes(String surl, int timeout, String userAgent) throws IOException
+    {
+        HttpClient client = getHttpClient(timeout, userAgent);
 
         // create a GET method that reads a file over HTTPS, we're assuming
         // that this file requires basic authentication using the realm above.
@@ -4469,10 +4515,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public byte[] getURLContentAsBytes(String surl, String username, String password)
+    public byte[] getURLContentAsBytes(String surl, String username, String password, XWikiContext context) throws IOException
+    {
+        return getURLContentAsBytes(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
+    }
+
+    public byte[] getURLContentAsBytes(String surl, String username, String password, int timeout, String userAgent)
         throws IOException
     {
-        HttpClient client = new HttpClient();
+        HttpClient client = getHttpClient(timeout, userAgent);
 
         // pass our credentials to HttpClient, they will only be used for
         // authenticating to servers with realm "realm", to authenticate agains

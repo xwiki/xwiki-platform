@@ -38,7 +38,7 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class PasswordClass extends StringClass
 {
-    protected static Log log = LogFactory.getFactory().getInstance(PasswordClass.class);
+    protected static Log log = LogFactory.getLog(PasswordClass.class);
 
     protected static final String DEFAULT_STORAGE = PasswordMetaClass.HASH;
 

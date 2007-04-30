@@ -42,7 +42,7 @@ import java.util.ArrayList;
 public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface
 {
     private static final Log log =
-        LogFactory.getFactory().getInstance(ConfluenceRpcHandler.class);
+        LogFactory.getLog(ConfluenceRpcHandler.class);
 
     public class RemoteUser
     {

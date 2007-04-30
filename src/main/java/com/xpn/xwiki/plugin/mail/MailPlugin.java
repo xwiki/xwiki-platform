@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class MailPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
         private static Log mLogger =
-                LogFactory.getFactory().getInstance(com.xpn.xwiki.plugin.mail.MailPlugin.class);
+                LogFactory.getLog(com.xpn.xwiki.plugin.mail.MailPlugin.class);
 
         public MailPlugin(String name, String className, XWikiContext context) {
             super(name, className, context);

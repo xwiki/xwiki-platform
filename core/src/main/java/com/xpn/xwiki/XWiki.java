@@ -4420,7 +4420,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         if (timeout!=0) {
          client.getParams().setSoTimeout(timeout);
-         client.getParams().setParameter("http.connection.timeout", timeout);
+         client.getParams().setParameter("http.connection.timeout", "" + timeout);
         }
 
         client.getParams().setParameter("http.useragent", userAgent);

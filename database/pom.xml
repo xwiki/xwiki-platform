@@ -1,0 +1,120 @@
+<!--
+ *
+ * Copyright 2007, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki</groupId>
+    <artifactId>xwiki-root</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-database</artifactId>
+  <name>XWiki Standalone Database</name>
+  <packaging>pom</packaging>
+  <description>The Standalone XWiki Database</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-application-wiki-default</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <type>xar</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Step 1: Expand the XAR file -->
+      <plugin>
+        <groupId>com.xpn.xwiki</groupId>
+        <artifactId>xwiki-build-xar-handlers</artifactId>
+        <configuration>
+          <groupId>com.xpn.xwiki</groupId>
+          <artifactId>xwiki-application-wiki-default</artifactId>
+          <outputDirectory>${project.build.directory}/xar</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>unxar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>hsqldb</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Step 2: Import the XAR content in the HSQL Database -->
+          <plugin>
+            <groupId>com.xpn.xwiki</groupId>
+            <artifactId>xwiki-packager</artifactId>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/xar</sourceDirectory>
+              <hibernateConfig>${basedir}/src/packager/hibernate.cfg.hsqldb.xml</hibernateConfig>
+            </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>1.8.0.1</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>import</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Step 3: Zip the generated database -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assemble/database.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

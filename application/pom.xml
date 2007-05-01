@@ -1,6 +1,6 @@
 <!--
  *
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -26,28 +26,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki-web</artifactId>
+    <artifactId>xwiki-root</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-web-standard</artifactId>
-  <name>XWiki Web - Standard</name>
-  <!-- We're using a pom packaging type instead of a WAR as we're using the Assembly plugin
-       in order to generate the WAR as a secondary artifact with a classifier name as this is not
-       possible with a primary artifact -->
+  <artifactId>xwiki-application</artifactId>
+  <name>XWiki Standalone Application</name>
   <packaging>pom</packaging>
-  <description>The standard XWiki WAR</description>
+  <description>The Standalone XWiki Application</description>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>${version}</version>
-    </dependency>
-    <!--dependency>
-      <groupId>com.xpn.xwiki</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
+      <artifactId>xwiki-web-standard</artifactId>
       <version>${version}</version>
       <type>war</type>
-    </dependency-->
+      <classifier>${xwiki.db}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-database</artifactId>
+      <version>${version}</version>
+      <classifier>${xwiki.db}</classifier>
+      <type>zip</type>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -56,7 +56,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/assemble/war.xml</descriptor>
+            <descriptor>src/assemble/application.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
@@ -68,20 +68,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <!-- Run 'mvn org.mortbay.jetty:maven-jetty-plugin:run-war' to generate the WAR and
-             execute it in Jetty. Useful for testing
-             Note: You'll need a database set up and running. If you use the HSQLDB profile
-             the database is looked for in target/database so it's very likely you'll get an
-             empty wiki. -->
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <configuration>
-          <contextPath>/xwiki</contextPath>
-          <webApp>${project.build.directory}/${project.build.finalName}-${xwiki.db}.war</webApp>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
 </project>

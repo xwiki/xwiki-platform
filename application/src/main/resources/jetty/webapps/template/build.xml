@@ -1,0 +1,77 @@
+
+<project name="template" default="classes" basedir=".">
+
+  <property name="src"            value="${basedir}/src"/>
+  <property name="webinf"         value="${basedir}/WEB-INF"/>
+  <property name="webinf.lib"     value="${webinf}/lib"/>
+  <property name="webinf.classes" value="${webinf}/classes"/>
+  <property name="lib"            value="${basedir}/../../lib" />
+  <property name="ext"            value="${basedir}/../../ext" />
+  <property name="war"            value="${basedir}/../${ant.project.name}.war" />
+  <property name="javac.debug"    value="true" />
+  <property name="javac.optimize" value="true" />
+  <property name="javac.deprecation" value="true" />
+
+
+  <target name="classpath">
+    <mkdir dir="${webinf.lib}"/> 
+    <path id="classpath">
+      <fileset dir="${webinf.lib}">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${lib}">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="${ext}">
+        <include name="*.jar"/>
+      </fileset>
+    </path>
+
+    <property name="expanded.classpath" refid="classpath"/>
+    <echo message="classpath=${expanded.classpath}" level="info"/>
+ </target>
+
+
+  <target name="classes" depends="classpath" description="Compile classes">
+    <mkdir dir="${webinf.classes}"/> 
+    <javac srcdir="${src}"
+           destdir="${webinf.classes}"
+           debug="${javac.debug}"
+           optimize="${javac.optimize}"
+           deprecation="${javac.deprecation}"
+           >
+       <classpath>
+         <path refid="classpath"/>
+       </classpath>
+
+       <include name="**/*.java"/>
+    </javac>
+  </target>
+
+  <target name="war" depends="classes" description="build WAR"> 
+    <war destfile="${war}"
+         webxml="${webinf}/web.xml"
+         basedir="${basedir}">
+      <exclude name="build.xml"/>
+      <exclude name="WEB-INF/web.xml"/>
+      <exclude name="**/CVS/**"/>
+      <exclude name="src/**"/>
+    </war>
+  </target>
+
+  <target name="clean" description="Remove generated files"> 
+    <delete file="${war}" quiet="false"/>
+    <delete quiet="false" includeemptydirs="true">
+      <fileset dir="${webinf}">
+        <include name="classes/**"/>
+        <include name="lib/*"/>
+        <exclude name="*/.*"/>
+        <exclude name="*/CVS/**"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>
+
+
+

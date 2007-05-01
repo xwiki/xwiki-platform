@@ -1,0 +1,49 @@
+<HTML>
+  <HEAD>
+    <TITLE>Powered By Jetty</TITLE>
+    <META http-equiv="Pragma" content="no-cache">
+    <META http-equiv="Cache-Control" content="no-cache,no-store">
+  </HEAD>
+<BODY>
+<A HREF="http://jetty.mortbay.org"><IMG SRC="jetty_banner.gif"></A>
+<P>
+This is a template web application context, which can be used as the
+basis of your own web application.  It contains some static content
+and a <a href="dump">Dump Servlet</a>.
+It's location is $JETTY_HOME/webapps/template.
+<p>
+If you want to see a full demonstration of Jetty, then you will need 
+to have either the Jetty-5.0.x-extra or Jetty-5.0.x-all package installed.
+You will then be able to run the demo with:<PRE>
+  java -jar start.jar etc/admin.xml etc/demo.xml
+</PRE>
+<p>
+For a standard installation of Jetty, the <a href="/javadoc">javadoc</a>
+will be available.
+<p>
+If this server was started with the etc/admin.xml configuration, then
+a <A href="http://localhost:8081">simple admin UI</a> may be
+available (default username/password is admin/admin).
+<p>
+If this server was started via JMX, then a 
+<A href="http://localhost:8082">JMX console UI</a> should be available.
+To start Jetty with JMX use:  <PRE>
+  java -Dmain.class=org.mortbay.xml.XmlConfiguration -jar start.jar etc/jetty-jmx.xml
+</PRE>
+For java &gt;=1.5 you will also need to add <code>
+-Djavax.management.builder.initial=mx4j.server.MX4JMBeanServerBuilder
+</code> to the command line to avoid a clash with the internal jmx implementation.
+<p>
+To start a server using the jars and resource in the extra packages, use:
+<PRE>
+java -DSTART=extra/etc/start.config -jar start.jar
+</PRE>
+or
+<PRE>
+java -Dmain.class=org.mortbay.jetty.plus.Server -DSTART=extra/etc/start.config -jar start.jar
+</PRE>
+
+
+
+</BODY>
+</HTML>

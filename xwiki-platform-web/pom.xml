@@ -42,28 +42,5 @@
     <!-- Enable again when the GWT module will build fine -->
     <!--module>gwt</module-->
   </modules>
-  <profiles>
-    <profile>
-      <id>hsqldb</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <xwiki.db>hsqldb</xwiki.db>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <properties>
-        <xwiki.db>mysql</xwiki.db>
-      </properties>
-    </profile>
-    <profile>
-      <id>pgsql</id>
-      <properties>
-        <xwiki.db>pgsql</xwiki.db>
-      </properties>
-    </profile>
-  </profiles>
 </project>
         

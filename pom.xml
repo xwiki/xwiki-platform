@@ -61,7 +61,7 @@
       </dependencies>
       <properties>
         <xwiki.db>hsqldb</xwiki.db>
-        <xwiki.db.connection.url>jdbc:hsqldb:file:target/database/xwiki_db;shutdown=true</xwiki.db.connection.url>
+        <xwiki.db.connection.url>jdbc:hsqldb:file:database/xwiki_db;shutdown=true</xwiki.db.connection.url>
         <xwiki.db.connection.username>sa</xwiki.db.connection.username>
         <xwiki.db.connection.password></xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>

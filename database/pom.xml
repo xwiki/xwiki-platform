@@ -42,8 +42,27 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
-      <!-- Step 1: Expand the XAR file -->
+      <!-- Step 1: Copy and filter the Hibernate config file which will be used by the packager
+           plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Step 2: Expand the XAR file -->
       <plugin>
         <groupId>com.xpn.xwiki</groupId>
         <artifactId>xwiki-build-xar-handlers</artifactId>
@@ -69,15 +88,18 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <xwiki.db.connection.url>jdbc:hsqldb:file:${project.build.directory}/database/xwiki_db;shutdown=true</xwiki.db.connection.url>         
+      </properties>
       <build>
         <plugins>
-          <!-- Step 2: Import the XAR content in the HSQL Database -->
+          <!-- Step 3: Import the XAR content in the HSQL Database -->
           <plugin>
             <groupId>com.xpn.xwiki</groupId>
             <artifactId>xwiki-packager</artifactId>
             <configuration>
               <sourceDirectory>${project.build.directory}/xar</sourceDirectory>
-              <hibernateConfig>${basedir}/src/packager/hibernate.cfg.hsqldb.xml</hibernateConfig>
+              <hibernateConfig>${project.build.directory}/classes/hibernate.cfg.xml</hibernateConfig>
             </configuration>
             <dependencies>
               <dependency>
@@ -95,7 +117,7 @@
               </execution>
             </executions>
           </plugin>
-          <!-- Step 3: Zip the generated database -->
+          <!-- Step 4: Zip the generated database -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>

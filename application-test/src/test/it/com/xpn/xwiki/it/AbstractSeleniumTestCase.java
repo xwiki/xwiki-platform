@@ -50,6 +50,8 @@ public abstract class AbstractSeleniumTestCase extends TestCase
         this.selenium =
             new DefaultSelenium("localhost", SeleniumServer.DEFAULT_PORT, browser, BASE_URL);
         this.selenium.start();
+
+        open("/xwiki/bin/view/Main/");
     }
 
     public void tearDown()
@@ -142,6 +144,24 @@ public abstract class AbstractSeleniumTestCase extends TestCase
         assertTrue("User wasn't authenticated.", isAuthenticated());
         clickLinkWithLocator("headerlogout");
         assertFalse("The user is always authenticated after a logout.", isAuthenticated());
+    }
+
+    public void login(String username, String password, boolean rememberme)
+    {
+        if (isAuthenticated()) {
+            logout();
+        }
+        
+        goToLoginPage();
+
+        setFieldValue("j_username", username);
+        setFieldValue("j_password", password);
+        if (rememberme) {
+            checkField("rememberme");
+        }
+        submit();
+
+        assertTrue("User has not been authenticated", isAuthenticated());
     }
 
     public void goToLoginPage()

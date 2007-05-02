@@ -20,49 +20,19 @@
 package com.xpn.xwiki.it;
 
 /**
- * Verify the login and logout features of XWiki.
+ * Test cases setup that logs in the user for test cases requiring the user to be logged in.
  *
  * @version $Id: $
  */
-public class LoginTest extends AbstractSeleniumTestCase
+public abstract class AbstractAuthenticatedTestCase extends AbstractSeleniumTestCase
 {
     public void setUp() throws Exception
     {
         super.setUp();
-
-        // Verify that the user isn't logged in
-        if (isAuthenticated()) {
-            logout();
-        }
-
-        goToLoginPage();
+        login(getUsername(), getPassword(), false);
     }
 
-    public void testLogAsAdmin()
-    {
-        setFieldValue("j_username", "Admin");
-        setFieldValue("j_password", "admin");
-        checkField("rememberme");
-        submit();
+    public abstract String getUsername();
 
-        assertTrue("Admin user has not been authenticated", isAuthenticated());
-    }
-
-    public void testLogWithWrongPassword()
-    {
-        setFieldValue("j_username", "Admin");
-        setFieldValue("j_password", "wrong password");
-        submit();
-
-        assertTextPresent("Wrong password");
-    }
-
-    public void testLogWithInvalidUsername()
-    {
-        setFieldValue("j_username", "non existent user");
-        setFieldValue("j_password", "admin");
-        submit();
-
-        assertTextPresent("Wrong user name");
-    }
+    public abstract String getPassword();
 }

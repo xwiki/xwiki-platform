@@ -44,6 +44,7 @@
     <module>web</module>
     <module>database</module>
     <module>application</module>
+    <module>application-test</module>
   </modules>
   <profiles>
     <profile>

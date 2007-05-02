@@ -961,9 +961,6 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 	if(bounds && bounds["start"] > -1) {
         str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]), lclass);
         newContent = content.substring(0, bounds["start"]) + "\r\n";
-        if (!this.core.isMSIE) {
-            str = this.trimString(str);
-        }
         newContent += str + content.substring(bounds["end"], content.length);
         return newContent;
 	}

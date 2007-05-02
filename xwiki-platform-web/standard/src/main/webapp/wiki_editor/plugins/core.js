@@ -18,17 +18,21 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
 
+    this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
+
     this.addExternalProcessor((/^\s*((\*+)|#|(1\.))\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
-
-	this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
+    
+    this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
 	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
 
     // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
-	this.addInternalProcessor((/<\s*p\s*([^>]*)>(.*?)<\s*\/\s*p\s*>/gi), '\r\n$2\r\n');
+	this.addInternalProcessor((/<\s*p\s*([^>]*)>\s*(.*?)\s*<\s*\/\s*p\s*>/i), 'convertParagraphInternal');
+
+    this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\\r\n');
 
     this.addExternalProcessor((/\[(.*?)((>|\|)(.*?))?((>|\|)(.*?))?\]/i), 'convertLinkExternal');
     this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
@@ -44,9 +48,6 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/__(\s*)(.+?)(\s*)__/gi), '$1<u>$2<\/u>$3');
     this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/i), 'convertUnderLineTextInternal');
-
-    this.addExternalProcessor((/\\\\/gi), '<br />');
-    this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\\r\n');
 
     this.addExternalProcessor((/--(\s*)(.+?(\s*))--/gi),  '$1<strike class="strike">$2<\/strike>$3');
 	this.addInternalProcessor((/<strike[^>]*>(\s*)(.*?)(\s*)<\/strike>/i), 'convertStrikeTextInternal');
@@ -190,6 +191,10 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         var cols = rows[i].split("<\/td>");
         for(var j=0; j< cols.length-1; j++) {
             cols[j] = cols[j].replace(/<td\s*([^>]*)>/g, "");  // remove <td> tag
+            cols[j] = this.trimString(cols[j]);
+            if (cols[j].lastIndexOf("\\\\") == (cols[j].length - 2)) {
+                cols[j] = cols[j].substring(0, cols[j].lastIndexOf("\\\\"));
+            }
             var lines = this._getLines(cols[j]);
             var colj = "";
             if (lines.length == 1) colj = cols[j].replace(/<br \/>/g, "").replace(/\r\n/g, "");
@@ -198,10 +203,10 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
                     lines[l] = lines[l].replace(/<br \/>|\r|\n/g, "");
                 for (var k=0; k < lines.length; k++)
                     if (lines[k] != "")
-                        if (k < (lines.length - 2)) colj += (lines[k] + "\\\\" + "\r\n");
+                        if (k < (lines.length - 2)) colj += (lines[k] + "" + "\r\n");
                         else if (k == (lines.length - 2))
                             if (lines[k+1] != "")
-                                colj += lines[k] + "\\\\" + "\r\n" + lines[k+1];
+                                colj += lines[k] + "" + "\r\n" + lines[k+1];
                             else colj += lines[k];
             if (j != (cols.length - 2)) str += (colj + "|") ;
             else str += (colj + "\r\n");
@@ -689,6 +694,19 @@ WikiEditor.prototype.getTextControls = function(button_name) {
 	return str;
 }
 
+WikiEditor.prototype.convertParagraphInternal = function(regexp, result, content) {
+    var str = this.trimString(result[2]);
+    // remove // at the end of a paragraph
+    if (str.substring(str.length - 6) == "<br />") {
+        str = str.substring(0, str.lastIndexOf("<br />"));
+    }
+    str = "\r\n" + str;
+    if (this.core.isMSIE) {
+        str += "\r\n";
+    }
+    return content.replace(regexp, str);
+}
+
 WikiEditor.prototype.PARAGRAPH_CLASS_NAME = "paragraph";
 
 WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content) {
@@ -708,7 +726,8 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 		// Consume blank spaces
 		line = this.trimString(lines[i]);
 		var hh = this._hasHTML(line);
-		if(line != "" && !hh) {
+        var hbr = this._onlyHasBr(line);
+        if(line != "" && (!hh || hbr)) {
 			if(!insideP) {
 				insideP=true;
 				firstLine = true;
@@ -751,7 +770,13 @@ WikiEditor.prototype._getLines = function(content) {
 
 WikiEditor.prototype._hasHTML = function(str) {
 	var reg = /<[^>]+>/i;
-	return (reg.exec(str)!=null);
+    return (reg.exec(str)!=null);
+}
+
+WikiEditor.prototype._onlyHasBr = function(str) {
+    str = str.replace(/<br \/>/g, " ");
+    var reg = /<[^>]+>/i;
+    return (reg.exec(str) == null);
 }
 
 WikiEditor.prototype.LIST_NORMAL_CLASS_NAME = "star";
@@ -935,9 +960,9 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
     var str = "";
 	if(bounds && bounds["start"] > -1) {
         str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]), lclass);
-        newContent = content.substring(0, bounds["start"]);
-        if (this.core.isMSIE) {
-            newContent += "\r\n"
+        newContent = content.substring(0, bounds["start"]) + "\r\n";
+        if (!this.core.isMSIE) {
+            str = this.trimString(str);
         }
         newContent += str + content.substring(bounds["end"], content.length);
         return newContent;
@@ -951,21 +976,26 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 	TODO: can be optimized with String.match() function
 */
 WikiEditor.prototype._convertListInternal = function(content, lclass) {
-	var list_regexp = /<\s*li\s*([^>]*)>(.*?)<\/\s*li\s*>/gi;
+    var list_regexp = /<\s*li\s*([^>]*)>\s*(.*?)\s*<\/\s*li\s*>/gi;
 	var result;
 	var str = "";
 
 	while( (result = list_regexp.exec(content)) ) {
-		var attributes = this.readAttributes(result[1]);
+        var attributes = this.readAttributes(result[1]);
 		RegExp.lastIndex = result["index"];  // Reset position so it will find the same tag when replacing
 
 		var tstr = result[2];
 
         if (tstr == "<br />") {
-            tstr = "&nbsp;<br />";
+            tstr = "&nbsp;";
         } else if (this.trimString(tstr) == "") {
             tstr = "&nbsp;";
         }
+
+        var start = tstr.length - 6;
+        if (tstr.substring(start) == "<br />")
+          tstr = tstr.substring(0, start);
+
         if(attributes && attributes["wikieditorlisttype"] && attributes["wikieditorlistdepth"]) { // Must have at least 2 wikieditor attributes + the string
 
 			//tstr = this.convertBlockInternal(tstr); // Read line and convert

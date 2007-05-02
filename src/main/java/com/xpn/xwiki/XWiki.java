@@ -2779,9 +2779,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             saveDocument(doc, null, context);
 
-            if (log.isWarnEnabled())
-                log.warn("createUser: before get All Group");
-
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(fullwikiname, context);
 

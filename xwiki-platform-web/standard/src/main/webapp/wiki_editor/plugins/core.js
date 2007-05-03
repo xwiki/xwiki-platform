@@ -1000,10 +1000,11 @@ WikiEditor.prototype._convertListInternal = function(content, lclass) {
 			// TODO: class will differentiate between list types in conjuction with the list type: ul, ol
 			switch(attributes["wikieditorlisttype"]) {
 				case 'ul':
-                    if ((lclass != null) && (lclass == "star")) {  //  Normal list
-                        str += this.buildString("*", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
-                    } else if ((lclass != null) && (lclass == "minus")) {
+                    if ((lclass != null) && (lclass == "minus")) {
                         str += this.buildString("-", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
+                    } else {
+                        //  Normal list
+                        str += this.buildString("*", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
                     }
                     str.replace(/<div>([\s\S]+?)<\/div>/g,'$1');
 					break;

@@ -19,8 +19,12 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
-    this.addExternalProcessor((/^\s*((\*+)|#|(1\.)|(\-+))\s+([^\r\n]+)$/im), 'convertListExternal');
-	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
+    this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(#)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(1\.)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(\-+)\s+([^\r\n]+)$/im), 'convertListExternal');
+
+    this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
     
     this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
 	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
@@ -781,7 +785,7 @@ WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME = "";
 WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME_1 = "norder";
 
 WikiEditor.prototype.convertListExternal = function(regexp, result, content) {
-	var subContent = content.substring(result["index"], content.length);
+    var subContent = content.substring(result["index"], content.length);
     subContent = this._convertNewLine2BrInList(subContent);
     var str = "";
     switch (result[1].charAt(0)) {
@@ -830,7 +834,7 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 	var _content = content;
 	RegExp.lastIndex = 0;
     while( (r = regexp.exec(_content)) && r["index"] == 0) {
-        str += "<li>" + this.trimString(r[5]) + "<\/li>\r\n";
+        str += "<li>" + this.trimString(r[2]) + "<\/li>\r\n";
 		_content = _content.substring(r[0].length, _content.length);
 		RegExp.lastIndex = 0;
 	}
@@ -854,7 +858,7 @@ WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, d
 	}
 
 	if(currdepth > 0) {
-        str += "<li>" + this.trimString(r[5]) + "<\/li>\r\n";
+        str += "<li>" + this.trimString(r[2]) + "<\/li>\r\n";
         str += this._convertRecursiveListExternal(regexp, subContent, currdepth, classname);
 	} else {
 		str += content;

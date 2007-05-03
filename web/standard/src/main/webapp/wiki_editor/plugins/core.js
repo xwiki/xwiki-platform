@@ -11,7 +11,6 @@ WikiEditor.prototype.initCorePlugin = function() {
 	// External/Internal conversion setup
     this.addExternalProcessor((/\{code(.*?)\}([\s\S]+?)\{code\}/i),"convertCodeMacroExternal");
     this.addInternalProcessor(/<div\s*([^>]*)(class=\"code\")\s*([^>]*)>\s*<pre>([\s\S]+?)<\/pre>\s*<\/div>/i, 'convertCodeMacroInternal');
-    //this.addInteralProcessor((),)
 
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
 	this.addInternalProcessor((/\s*<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
@@ -20,7 +19,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
-    this.addExternalProcessor((/^\s*((\*+)|#|(1\.))\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*((\*+)|#|(1\.)|(\-+))\s+([^\r\n]+)$/im), 'convertListExternal');
 	this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
     
     this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
@@ -99,7 +98,7 @@ WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
     str = str.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<\/?p[^>]*>/gi, "");
-    str = str.replace(/<br\s*\/>/g, '\\');
+    str = str.replace(/<br\s*\/>/g, '\\\\');
     return str;
 }
 
@@ -234,7 +233,7 @@ WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) 
 		}
 	}
     str += "\r\n";
-	return content.replace(regexp, str);
+    return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.fixTitle = function(editor_id, node) {
@@ -700,10 +699,7 @@ WikiEditor.prototype.convertParagraphInternal = function(regexp, result, content
     if (str.substring(str.length - 6) == "<br />") {
         str = str.substring(0, str.lastIndexOf("<br />"));
     }
-    str = "\r\n" + str;
-    if (this.core.isMSIE) {
-        str += "\r\n";
-    }
+    str = "\r\n" + str + "\r\n";
     return content.replace(regexp, str);
 }
 
@@ -780,18 +776,22 @@ WikiEditor.prototype._onlyHasBr = function(str) {
 }
 
 WikiEditor.prototype.LIST_NORMAL_CLASS_NAME = "star";
+WikiEditor.prototype.LIST_MINUS_CLASS_NAME = "minus";
 WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME = "";
 WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME_1 = "norder";
 
 WikiEditor.prototype.convertListExternal = function(regexp, result, content) {
 	var subContent = content.substring(result["index"], content.length);
-	subContent = this._convertNewLine2BrInList(subContent);
+    subContent = this._convertNewLine2BrInList(subContent);
     var str = "";
     switch (result[1].charAt(0)) {
 		case '*':
-			str = this._convertRecursiveListExternal(regexp, subContent, 0);
+			str = this._convertRecursiveListExternal(regexp, subContent, 0 , this.LIST_NORMAL_CLASS_NAME);
 			break;
-		case '#':
+        case '-':
+            str = this._convertRecursiveListExternal(regexp, subContent, 0, this.LIST_MINUS_CLASS_NAME);
+			break;
+        case '#':
             str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME);
 			break;
         case '1':
@@ -830,7 +830,7 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 	var _content = content;
 	RegExp.lastIndex = 0;
     while( (r = regexp.exec(_content)) && r["index"] == 0) {
-        str += "<li>" + this.trimString(r[4]) + "<\/li>\r\n";
+        str += "<li>" + this.trimString(r[5]) + "<\/li>\r\n";
 		_content = _content.substring(r[0].length, _content.length);
 		RegExp.lastIndex = 0;
 	}
@@ -840,22 +840,22 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 	return str;
 }
 
-WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, depth) {
+WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, depth, classname) {
     var str = "";
     RegExp.lastIndex = 0;
 	var r = regexp.exec(content);
-    var currdepth = (r != null && r[1].charAt(0) == '*' && r["index"]==0) ? r[1].length : 0; // number of "*", if no list element found on next line then list section is over
+    var currdepth = (r != null && ((r[1].charAt(0) == '*') || (r[1].charAt(0) == '-')) && r["index"]==0) ? r[1].length : 0; // number of "*", if no list element found on next line then list section is over
 	var lastPos = (currdepth > 0) ? r[0].length : 0;
 	var subContent = content.substring(lastPos, content.length);
     var depthdif = currdepth - depth;
-	var tag = (depthdif > 0) ? "<ul class=\"" + this.LIST_NORMAL_CLASS_NAME + "\">" : "<\/ul>";
+	var tag = (depthdif > 0) ? "<ul class=\"" + classname + "\">" : "<\/ul>";
 	for(var i=0; i < Math.abs(currdepth-depth);i++) {
 		str += tag + "\r\n";
 	}
 
 	if(currdepth > 0) {
-        str += "<li>" + this.trimString(r[4]) + "<\/li>\r\n";
-        str += this._convertRecursiveListExternal(regexp, subContent, currdepth);
+        str += "<li>" + this.trimString(r[5]) + "<\/li>\r\n";
+        str += this._convertRecursiveListExternal(regexp, subContent, currdepth, classname);
 	} else {
 		str += content;
 	}
@@ -1000,8 +1000,11 @@ WikiEditor.prototype._convertListInternal = function(content, lclass) {
 			// TODO: class will differentiate between list types in conjuction with the list type: ul, ol
 			switch(attributes["wikieditorlisttype"]) {
 				case 'ul':
-					// Normal list
-					str += this.buildString("*", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
+                    if ((lclass != null) && (lclass == "star")) {  //  Normal list
+                        str += this.buildString("*", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
+                    } else if ((lclass != null) && (lclass == "minus")) {
+                        str += this.buildString("-", parseInt(attributes["wikieditorlistdepth"], 10)) + " " + tstr + "\r\n";
+                    }
                     str.replace(/<div>([\s\S]+?)<\/div>/g,'$1');
 					break;
 				case 'ol':

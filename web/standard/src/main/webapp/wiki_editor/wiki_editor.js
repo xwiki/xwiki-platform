@@ -281,6 +281,7 @@ WikiEditor.prototype.convertExternal = function(content) {
 		}
 	}
     content = unescape(content);
+    content = content.replace(/\\<(.*?)\\>/g, '&lt;$1&gt;');
 //	alert(content);
 	return content;
 }
@@ -324,6 +325,11 @@ WikiEditor.prototype.convertInternal = function(content) {
 	content = this.trimString(this._removeHtmlTags(content));
     content = unescape(content);
     content = content.replace(/\&#036;/g, "$");
+    content = content.replace(/[\r\n]{5,}/g, "\r\n\r\n");
+    if (content.substring(content.length - 2) == "\\\\") {
+        content = content.substring(0, content.lastIndexOf("\\\\"));
+    }
+    content = content.replace(/<(.*?)>/g, '\\<$1\\>');
     return content;
 }
 

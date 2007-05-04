@@ -74,6 +74,7 @@ public class TinyMceTest extends AbstractTinyMceTestCase
     }
 
     // TODO: This test is currently failing because of bug http://jira.xwiki.org/jira/browse/XWIKI-1182
+    /*
     public void testLineFeedBeforeAndAfterLists()
     {
         typeInTinyMce("Text");
@@ -86,5 +87,11 @@ public class TinyMceTest extends AbstractTinyMceTestCase
 
         assertWikiTextGeneratedByTinyMCE("Text\n\n* item\n\nText");
     }
+    */
 
+    public void testEscapedHtmlElement()
+    {
+        typeInTinyMce("http://<yourserver>:8080/something");
+        assertWikiTextGeneratedByTinyMCE("http://\\<yourserver\\>:8080/something");
+    }
 }

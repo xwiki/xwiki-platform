@@ -74,7 +74,7 @@ public class TinyMceTest extends AbstractTinyMceTestCase
     }
 
     // TODO: This test is currently failing because of bug http://jira.xwiki.org/jira/browse/XWIKI-1182
-    public void testLineFeedBeforeList()
+    public void testLineFeedBeforeAndAfterLists()
     {
         typeInTinyMce("Text");
         typeEnterInTinyMce();

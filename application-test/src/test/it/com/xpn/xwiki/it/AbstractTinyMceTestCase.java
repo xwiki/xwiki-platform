@@ -49,6 +49,12 @@ public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdmin
         getSelenium().keyPress(LOCATOR_FOR_KEY_EVENTS, "\\13");
     }
 
+    public void typeShiftEnterInTinyMce()
+    {
+        getSelenium().shiftKeyDown();
+        getSelenium().keyPress(LOCATOR_FOR_KEY_EVENTS, "\\13");
+    }
+
     public void clickTinyMceUnorderedListButton()
     {
         clickLinkWithLocator("//img[@title='Unordered list']", false);

@@ -41,7 +41,6 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         typeInTinyMce("item2");
         typeEnterInTinyMce();
         typeInTinyMce("item3");
-        saveAndViewEdition();
 
         assertWikiTextGeneratedByTinyMCE("* item1\n* item2\n* item3");
     }
@@ -54,5 +53,23 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         typeInTinyMce("some indented text");
 
         assertWikiTextGeneratedByTinyMCE("Text\n<blockquote>\nsome indented text\n</blockquote>");
+    }
+
+    public void testLineFeed()
+    {
+        typeInTinyMce("Text");
+        typeEnterInTinyMce();
+        typeInTinyMce("Text");
+
+        assertWikiTextGeneratedByTinyMCE("Text\n\nText");
+    }
+
+    public void testLineFeedWhenUsingShiftEnter()
+    {
+        typeInTinyMce("Text");
+        typeShiftEnterInTinyMce();
+        typeInTinyMce("Text");
+
+        assertWikiTextGeneratedByTinyMCE("Text\\\\\nText");
     }
 }

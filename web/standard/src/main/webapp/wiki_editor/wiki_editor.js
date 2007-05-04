@@ -330,6 +330,7 @@ WikiEditor.prototype.convertInternal = function(content) {
         content = content.substring(0, content.lastIndexOf("\\\\"));
     }
     content = content.replace(/<(.*?)>/g, '\\<$1\\>');
+    content = content.replace(/\\<((\/)*blockquote)\\>/g, '<$1>');
     return content;
 }
 

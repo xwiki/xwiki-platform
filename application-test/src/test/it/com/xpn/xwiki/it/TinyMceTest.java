@@ -72,4 +72,19 @@ public class TinyMceTest extends AbstractTinyMceTestCase
 
         assertWikiTextGeneratedByTinyMCE("Text\\\\\nText");
     }
+
+    // TODO: This test is currently failing because of bug http://jira.xwiki.org/jira/browse/XWIKI-1182
+    public void testLineFeedBeforeList()
+    {
+        typeInTinyMce("Text");
+        typeEnterInTinyMce();
+        typeInTinyMce("item");
+        clickTinyMceUnorderedListButton();
+        typeEnterInTinyMce();
+        clickTinyMceUnorderedListButton();
+        typeInTinyMce("Text");
+
+        assertWikiTextGeneratedByTinyMCE("Text\n\n* item\n\nText");
+    }
+
 }

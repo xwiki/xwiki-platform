@@ -26,7 +26,7 @@ package com.xpn.xwiki.it;
  */
 public abstract class AbstractAuthenticatedTestCase extends AbstractSeleniumTestCase
 {
-    public void setUp() throws Exception
+    protected void setUp() throws Exception
     {
         super.setUp();
         login(getUsername(), getPassword(), false);

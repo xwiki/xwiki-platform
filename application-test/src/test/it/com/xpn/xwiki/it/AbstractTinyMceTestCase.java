@@ -28,6 +28,11 @@ public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdmin
 {
     private static final String LOCATOR_FOR_KEY_EVENTS = "mceSpanFonts";
 
+    public void editInTinyMce(String space, String page)
+    {
+        open("/xwiki/bin/edit/" + space + "/" + page + "?editor=wysiwyg");
+    }
+
     public void clearTinyMceContent()
     {
         getSelenium().waitForCondition(
@@ -47,6 +52,11 @@ public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdmin
     public void clickTinyMceUnorderedListButton()
     {
         clickLinkWithLocator("//img[@title='Unordered list']", false);
+    }
+
+    public void clickTinyMceIndentButton()
+    {
+        clickLinkWithLocator("//img[@title='Indent']", false);
     }
 
     public void assertWikiTextGeneratedByTinyMCE(String text)

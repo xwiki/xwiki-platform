@@ -26,10 +26,15 @@ package com.xpn.xwiki.it;
  */
 public class TinyMceTest extends AbstractTinyMceTestCase
 {
-    public void testSimpleList() throws Exception
+    protected void setUp() throws Exception
     {
-        open("/xwiki/bin/edit/Test/TestTinyMCE");
+        super.setUp();
+        editInTinyMce("Test", "TestTinyMCE");
         clearTinyMceContent();
+    }
+
+    public void testSimpleList()
+    {
         typeInTinyMce("item1");
         clickTinyMceUnorderedListButton();
         typeEnterInTinyMce();
@@ -39,5 +44,15 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         saveAndViewEdition();
 
         assertWikiTextGeneratedByTinyMCE("* item1\n* item2\n* item3");
+    }
+
+    public void testIndentation()
+    {
+        typeInTinyMce("Text");
+        typeEnterInTinyMce();
+        clickTinyMceIndentButton();
+        typeInTinyMce("some indented text");
+
+        assertWikiTextGeneratedByTinyMCE("Text\n<blockquote>\nsome indented text\n</blockquote>");
     }
 }

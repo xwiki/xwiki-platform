@@ -65,6 +65,26 @@ public abstract class AbstractSeleniumTestCase extends TestCase
         return this.selenium;
     }
 
+    public void previewEdition()
+    {
+        submit("formactionpreview");
+    }
+
+    public void saveAndContinueEdition()
+    {
+        submit("formactionsac");
+    }
+
+    public void cancelEdition()
+    {
+        submit("formactioncancel");
+    }
+
+    public void saveAndViewEdition()
+    {
+        submit("formactionsave");
+    }
+
     public void open(String url)
     {
         getSelenium().open(url);

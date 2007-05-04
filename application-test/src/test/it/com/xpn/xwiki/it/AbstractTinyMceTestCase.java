@@ -26,11 +26,32 @@ package com.xpn.xwiki.it;
  */
 public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdminTestCase
 {
-    public void typeInTinyMce(String content)
+    private static final String LOCATOR_FOR_KEY_EVENTS = "mceSpanFonts";
+
+    public void clearTinyMceContent()
     {
         getSelenium().waitForCondition(
-            "selenium.browserbot.getCurrentWindow().tinyMCE.getInstanceById(\"mce_editor_1\") ;"
-                + "selenium.browserbot.getCurrentWindow().tinyMCE.setContent(\"" + content
-                + "\"); true", "18000");
+            "selenium.browserbot.getCurrentWindow().tinyMCE.setContent(\"\"); true", "18000");
+    }
+
+    public void typeInTinyMce(String text)
+    {
+        getSelenium().typeKeys(LOCATOR_FOR_KEY_EVENTS, text);
+    }
+
+    public void typeEnterInTinyMce()
+    {
+        getSelenium().keyPress(LOCATOR_FOR_KEY_EVENTS, "\\13");
+    }
+
+    public void clickTinyMceUnorderedListButton()
+    {
+        clickLinkWithLocator("//img[@title='Unordered list']", false);
+    }
+
+    public void assertWikiTextGeneratedByTinyMCE(String text)
+    {
+        clickLinkWithText("Wiki");
+        assertEquals(text, getSelenium().getValue("content"));
     }
 }

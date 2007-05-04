@@ -26,12 +26,18 @@ package com.xpn.xwiki.it;
  */
 public class TinyMceTest extends AbstractTinyMceTestCase
 {
-    public void testSimple() throws Exception
+    public void testSimpleList() throws Exception
     {
         open("/xwiki/bin/edit/Test/TestTinyMCE");
-        typeInTinyMce("lorem ipsum");
-        submit("formactionsave");
+        clearTinyMceContent();
+        typeInTinyMce("item1");
+        clickTinyMceUnorderedListButton();
+        typeEnterInTinyMce();
+        typeInTinyMce("item2");
+        typeEnterInTinyMce();
+        typeInTinyMce("item3");
+        saveAndViewEdition();
 
-        assertTextPresent("lorem ipsum");
+        assertWikiTextGeneratedByTinyMCE("* item1\n* item2\n* item3");
     }
 }

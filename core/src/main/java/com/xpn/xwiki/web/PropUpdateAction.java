@@ -45,15 +45,13 @@ public class PropUpdateAction extends XWikiAction {
 		BaseClass bclass2 = (BaseClass) bclass.clone();
 		bclass2.setFields(new HashMap());
 
-		doc.setxWikiClass(bclass2);
-
 		// Prepare a Map for field renames
 		Map fieldsToRename = new HashMap();
 
 		Iterator it = bclass.getFieldList().iterator();
 		while (it.hasNext()) {
-			PropertyClass property = (PropertyClass) it.next();
-			PropertyClass origproperty = (PropertyClass) property.clone();
+			PropertyClass origproperty = (PropertyClass) it.next();
+			PropertyClass property = (PropertyClass) origproperty.clone();
 			String name = property.getName();
 			Map map = ((EditForm) form).getObject(name);
 			property.getxWikiClass(context).fromMap(map, property);
@@ -74,6 +72,8 @@ public class PropUpdateAction extends XWikiAction {
 				bclass2.addPropertyForRemoval(origproperty);
 			}
 		}
+
+		doc.setxWikiClass(bclass2);
 		doc.renameProperties(bclass.getName(), fieldsToRename);
 		xwiki.saveDocument(doc, olddoc, context);
 

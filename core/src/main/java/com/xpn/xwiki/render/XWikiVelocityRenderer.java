@@ -300,14 +300,20 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     private void addVelocityMacros(StringBuffer result, XWikiContext context) {
         Object macroAdded = context.get("velocityMacrosAdded");
         if (macroAdded==null) {
-          context.put("velocityMacrosAdded", "1");
-          String inclDocName = context.getWiki().getXWikiPreference("macros_velocity", context);
-            try {
-                XWikiDocument doc = context.getWiki().getDocument(inclDocName, context);
-                result.append(doc.getContent());
-            } catch (XWikiException e) {
-                if (LOG.isErrorEnabled())
-                LOG.error("Impossible to load velocity macros doc " + inclDocName);
+            context.put("velocityMacrosAdded", "1");
+            String velocityMacrosDocumentName =
+                context.getWiki().getXWikiPreference("macros_velocity", context);
+            if (velocityMacrosDocumentName.trim().length() > 0)
+            {
+                try {
+                    XWikiDocument doc =
+                        context.getWiki().getDocument(velocityMacrosDocumentName, context);
+                    result.append(doc.getContent());
+                } catch (XWikiException e) {
+                    if (LOG.isErrorEnabled())
+                        LOG.error("Impossible to load velocity macros doc "
+                            + velocityMacrosDocumentName);
+                }
             }
         }
     }

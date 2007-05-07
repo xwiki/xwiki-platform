@@ -667,7 +667,7 @@ WikiEditor.prototype.getListControls = function(button_name) {
 			str = this.createButtonHTML('bullist', 'bullist.gif', 'lang_bullist_desc', 'InsertUnorderedList');
 			break;
 		case 'numlist':
-            str = this.createButtonHTML('numlist', 'numlist.gif', '$lang_numlist_desc', 'InsertOrderedList');
+            str = this.createButtonHTML('numlist', 'numlist.gif', 'lang_numlist_desc', 'InsertOrderedList');
 			break;
 	}
 

@@ -2,7 +2,8 @@ toc=velocity:toc:initlevel,maxlevel,numbered
 includeForm=velocity:includeForm:topic
 includeTopic=velocity:includeTopic:topic
 includeMacros=velocity:includeMacros:topic
-code=radeox:code:type:contentskype=velocity:skype:id
+code=radeox:code:type:content
+skype=velocity:skype:id
 yahoo=velocity:yahoo:id
 jabber=velocity:jabber:id
 aim=velocity:aim:id

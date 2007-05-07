@@ -232,4 +232,20 @@
       </releases>
     </repository>
   </repositories>
+  <!-- For the time being we have uploaded a snapshot version of the selenium plugin in our custom
+       repo as we need features not released yet. In the future when The selenium plugin v1.0-beta-2
+       is released we'll be able to remove this -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>xwiki.plugin.snapshot</id>
+      <name>XWiki Plugin Snapshots</name>
+      <url>http://maven.xwiki.org</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

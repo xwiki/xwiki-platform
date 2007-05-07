@@ -609,10 +609,29 @@ textarea {
   padding: 2px;
 }
 
+textarea[disabled] {
+  background-image: url("black-textareabg-disabled.png");
+  background-position: 0px 0px;
+  background-repeat: no-repeat;
+  background-color: #e4e4e4;
+  border: 1px solid #000;
+  padding: 2px;
+}
+
 input[type=text], input[type=password], input[type=checkbox], input[type=file], select{
   background: #e6eaee url("black-textareabg.png") 0px 0px no-repeat;
   border: 1px solid #000;
   padding: 2px;
+}
+
+input[disabled], select[disabled]  {
+  background: #e4e4e4 url("black-textareabg-disabled.png") 0px 0px no-repeat;
+  border: 1px solid #000;
+  padding: 2px;
+}
+
+input[type="radio"][disabled] {
+  background-image: none;
 }
 
 /*ie nescessite de passer par une classe ou un selecteur sinon il pose des problemes*/

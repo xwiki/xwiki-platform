@@ -111,7 +111,9 @@ public class SaveAction extends PreviewAction {
             // Make sure we have at least the meta data dirty status
             tdoc.setMetaDataDirty(true);
 
-            xwiki.saveDocument(tdoc, olddoc, context);
+            // We get the comment to be used from the document
+            // It was read using readFromForm
+            xwiki.saveDocument(tdoc, olddoc, tdoc.getComment(), context);
 			XWikiLock lock = tdoc.getLock(context);
 			if (lock != null)
 				tdoc.removeLock(context);

@@ -148,6 +148,9 @@ public class XWikiDocument
 
     private BaseObject tags;
 
+    // Comment on the latest modification
+    private String comment;
+
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = true;
 
@@ -313,6 +316,7 @@ public class XWikiDocument
         this.defaultLanguage = "";
         this.attachmentList = new ArrayList();
         this.customClass = "";
+        this.comment = "";
     }
 
     public XWikiDocument getParentDoc()
@@ -1502,6 +1506,12 @@ public class XWikiDocument
             setParent(parent);
         }
 
+        // Read the comment from the form
+        String comment = eform.getComment();
+        if (comment != null) {
+            setComment(comment);
+        }
+
         String tags = eform.getTags();
         if (tags != null) {
             setTags(tags, context);
@@ -1738,6 +1748,7 @@ public class XWikiDocument
         setTranslation(document.getTranslation());
         setxWikiClass((BaseClass) document.getxWikiClass().clone());
         setxWikiClassXML(document.getxWikiClassXML());
+        setComment(document.getComment());
 
         clonexWikiObjects(document);
         copyAttachments(document);
@@ -1783,6 +1794,7 @@ public class XWikiDocument
             doc.setTranslation(getTranslation());
             doc.setxWikiClass((BaseClass) getxWikiClass().clone());
             doc.setxWikiClassXML(getxWikiClassXML());
+            doc.setComment(getComment());
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
             doc.elements = elements;
@@ -1897,6 +1909,10 @@ public class XWikiDocument
         }
 
         if (!getValidationScript().equals(doc.getValidationScript())) {
+            return false;
+        }
+
+        if (!getComment().equals(doc.getComment())) {
             return false;
         }
 
@@ -2089,6 +2105,10 @@ public class XWikiDocument
         el.addText(getValidationScript());
         docel.add(el);
 
+        el = new DOMElement("comment");
+        el.addText(getComment());
+        docel.add(el);
+
         List alist = getAttachmentList();
         for (int ai = 0; ai < alist.size(); ai++) {
             XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
@@ -2270,6 +2290,7 @@ public class XWikiDocument
         setTitle(getElement(docel, "title"));
         setDefaultTemplate(getElement(docel, "defaultTemplate"));
         setValidationScript(getElement(docel, "validationScript"));
+        setComment(getElement(docel, "comment"));
 
         String strans = getElement(docel, "translation");
         if ((strans == null) || strans.equals("")) {
@@ -3924,6 +3945,20 @@ public class XWikiDocument
         } else {
             return validationScript;
         }
+    }
+
+    public String getComment()
+    {
+        if (comment == null) {
+            return "";
+        }
+        return comment;
+    }
+
+    public void setComment(String comment)
+    {
+        this.comment = comment;
+        setMetaDataDirty(true);
     }
 
     public BaseObject newObject(String classname, XWikiContext context) throws XWikiException

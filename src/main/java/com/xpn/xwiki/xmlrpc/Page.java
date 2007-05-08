@@ -52,9 +52,11 @@ public class Page extends PageSummary
 
     private boolean homepage;
 
+    private String comment;
+
     public Page(String id, String space, String parentId, String title, String url, int version,
         String content, Date created, String creator, Date modified, String modifier,
-        boolean homepage, int locks)
+        boolean homepage, String comment, int locks)
     {
         super(id, space, parentId, title, url, locks);
         this.setVersion(version);
@@ -64,6 +66,7 @@ public class Page extends PageSummary
         this.setModified(modified);
         this.setModifier(modifier);
         this.setHomepage(homepage);
+        this.setComment(comment);
     }
 
     public Page(XWikiDocument doc, XWikiContext context)
@@ -75,6 +78,7 @@ public class Page extends PageSummary
         this.setCreator(doc.getAuthor());
         this.setModified(doc.getDate());
         this.setModifier(doc.getAuthor());
+        this.setComment(doc.getComment());
         this.setHomepage((doc.getName().equals("WebHome")));
     }
 
@@ -90,6 +94,7 @@ public class Page extends PageSummary
         this.setCreator((String) parameters.get("creator"));
         this.setModified((Date) parameters.get("modified"));
         this.setModifier((String) parameters.get("modifier"));
+        this.setComment((String) parameters.get("comment"));
         if (parameters.containsKey("homepage")) {
             this.setHomepage(((Boolean) parameters.get("homepage")).booleanValue());
         }
@@ -104,6 +109,7 @@ public class Page extends PageSummary
         params.put("creator", getCreator());
         params.put("modified", getModified());
         params.put("modifier", getModifier());
+        params.put("comment", getComment());
         params.put("homepage", new Boolean(isHomepage()));
         return params;
     }
@@ -177,4 +183,13 @@ public class Page extends PageSummary
     {
         this.homepage = homepage;
     }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
 }

@@ -174,13 +174,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
             if (name != null && name.length() > 0) {
                 XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
                 doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
 
                 context.getWiki().ProtectUserPage(context, fullwikiname, "edit", doc);
 
-                context.getWiki().saveDocument(doc, null, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createduser"), context);
 
                 context.getWiki().SetUserDefaultGroup(context, fullwikiname);
             }

@@ -163,7 +163,7 @@
         </property>
 
         <property name="comment" type="string">
-            <column name="XWA_COMMENT" length="255" />
+            <column name="XWA_COMMENT" length="1023" />
         </property>
     </class>
 
@@ -361,6 +361,9 @@
         </property>
         <property name="validationScript"  type="string">
             <column name="XWO_VALIDATION_SCRIPT" sql-type="clob" />
+        </property>
+        <property name="comment" type="string">
+            <column name="XWD_COMMENT" length="1023"/>
         </property>
     </class>
 

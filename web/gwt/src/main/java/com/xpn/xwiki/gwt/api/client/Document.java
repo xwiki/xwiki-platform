@@ -68,6 +68,7 @@ public class Document implements IsSerializable {
     private String saveURL;
     private String viewURL;
     private int hasElement;
+    private String comment;
 
     public Document() {
     }
@@ -425,5 +426,13 @@ public class Document implements IsSerializable {
 
     public void setViewURL(String viewURL) {
         this.viewURL = viewURL;
+    }
+
+    public String getComment() {
+       return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

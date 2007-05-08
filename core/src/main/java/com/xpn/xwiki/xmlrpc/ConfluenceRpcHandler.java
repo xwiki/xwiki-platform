@@ -403,7 +403,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
             newdoc.setAuthor(context.getUser());
             newdoc.setContent(page.getContent());
-            context.getWiki().saveDocument(newdoc, document, context);
+            context.getWiki().saveDocument(newdoc, document, page.getComment(), context);
             return (new Page(newdoc, context)).getParameters();
         } catch (XWikiException e) {
             e.printStackTrace();

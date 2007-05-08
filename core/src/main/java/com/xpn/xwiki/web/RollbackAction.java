@@ -26,6 +26,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class RollbackAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
@@ -63,7 +66,9 @@ public class RollbackAction extends XWikiAction {
         newdoc.setRCSVersion(tdoc.getRCSVersion());
         newdoc.setVersion(tdoc.getVersion());
         newdoc.setContentDirty(true);
-        xwiki.saveDocument(newdoc, olddoc, context);
+        List params = new ArrayList();
+        params.add(rev);
+        xwiki.saveDocument(newdoc, olddoc, context.getMessageTool().get("core.comment.rollback", params), context);
 
         // forward to view
         String redirect = Utils.getRedirect("view", context);

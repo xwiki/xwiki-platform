@@ -95,6 +95,10 @@
             <column name="XWD_VALIDATION_SCRIPT"  not-null="true" />
         </property>
 
+        <property name="comment" type="string">
+            <column name="XWD_COMMENT" length="1023" not-null="true" />
+        </property>
+        
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiDocumentArchive" table="xwikidoc">

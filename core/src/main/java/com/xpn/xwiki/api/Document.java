@@ -286,6 +286,14 @@ public class Document extends Api
     }
 
     /**
+     * return the comment of the latest update of the document
+     */
+    public String getComment()
+    {
+        return doc.getComment();
+    }
+
+    /**
      * return the list of possible traduction for this document
      */
     public List getTranslationList() throws XWikiException
@@ -1398,10 +1406,20 @@ public class Document extends Api
         getDoc().setDefaultTemplate(dtemplate);
     }
 
+    public void setComment(String comment)
+    {
+        getDoc().setComment(comment);
+    }
+
     public void save() throws XWikiException
     {
+        save("");
+    }
+
+    public void save(String comment) throws XWikiException
+    {
         if (hasAccessLevel("edit")) {
-            saveDocument();
+            saveDocument(comment);
         } else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1412,8 +1430,14 @@ public class Document extends Api
 
     public void saveWithProgrammingRights() throws XWikiException
     {
+        saveWithProgrammingRights("");
+
+    }
+
+    public void saveWithProgrammingRights(String comment) throws XWikiException
+    {
         if (hasProgrammingRights()) {
-            saveDocument();
+            saveDocument(comment);
         } else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1422,9 +1446,9 @@ public class Document extends Api
         }
     }
 
-    private void saveDocument() throws XWikiException
+    private void saveDocument(String comment) throws XWikiException
     {
-        getXWikiContext().getWiki().saveDocument(getDoc(), olddoc, getXWikiContext());
+        getXWikiContext().getWiki().saveDocument(getDoc(), olddoc, comment, getXWikiContext());
         olddoc = doc;
     }
 

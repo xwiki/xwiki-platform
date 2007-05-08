@@ -885,24 +885,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String server = null, database = null;
-        try {
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
-            getStore().saveXWikiDoc(doc, context);
-        } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
-        }
+        // If no comment is provided we should use an empty comment
+        saveDocument(doc, "", context);
     }
 
-    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context)
-        throws XWikiException
+    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context) throws XWikiException
     {
         String server = null, database = null;
         try {
@@ -912,9 +899,42 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 database = context.getDatabase();
                 context.setDatabase(server);
             }
+
+            // Setting comment before saving
+            doc.setComment((comment==null) ? "" : comment);
+
+            getStore().saveXWikiDoc(doc, context);
+        } finally {
+            if ((server != null) && (database != null)) {
+                context.setDatabase(database);
+            }
+        }
+    }
+
+    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context) throws XWikiException
+    {
+        // If no comment is provided we should use an empty comment
+        saveDocument(doc, olddoc, "", context);
+    }
+
+    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, String comment, XWikiContext context)
+            throws XWikiException
+    {
+        String server = null, database = null;
+        try {
+            server = doc.getDatabase();
+
+            if (server != null) {
+                database = context.getDatabase();
+                context.setDatabase(server);
+            }
+
+            // Setting comment before saving
+            doc.setComment((comment==null) ? "" : comment);
+    
             getStore().saveXWikiDoc(doc, context);
             getNotificationManager().verify(doc, olddoc,
-                XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+                    XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } finally {
             if ((server != null) && (database != null)) {
                 context.setDatabase(database);
@@ -2758,10 +2778,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // TODO: Verify existing user
             XWikiDocument doc = getDocument(fullwikiname, context);
+
             if (!doc.isNew()) {
                 // TODO: throws Exception
                 return -3;
             }
+
+            XWikiDocument oldDoc = (XWikiDocument) doc.clone();
 
             /*
              * if(!this.checkAccess("register", doc, context)){ return -1; }
@@ -2777,7 +2800,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             protectUserPage(fullwikiname, userRights, doc, context);
 
-            saveDocument(doc, null, context);
+            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createduser"), context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(fullwikiname, context);
@@ -2799,6 +2822,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         BaseClass gclass = getGroupClass(context);
 
         XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
+        XWikiDocument oldDoc = (XWikiDocument) allgroupdoc.clone();
+
 
         BaseObject memberobj = (BaseObject) gclass.newObject(context);
         memberobj.setClassName(gclass.getName());
@@ -2806,7 +2831,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         memberobj.setStringValue("member", fullwikiname);
         allgroupdoc.addObject(gclass.getName(), memberobj);
         if (allgroupdoc.isNew()) {
-            saveDocument(allgroupdoc, null, context);
+            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get("core.comment.addedusertogroup"), context);
         } else {
             getHibernateStore().saveXWikiObject(memberobj, context, true);
         }
@@ -4740,7 +4765,47 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         else
             return dweb;
     }
-                            
+
+    public boolean hasEditComment(XWikiContext context)
+    {
+        String bl = getXWikiPreference("editcomment", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.editcomment", "0"));
+    }
+
+    public boolean isEditCommentFieldHidden(XWikiContext context)
+    {
+        String bl = getXWikiPreference("editcomment_hidden", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.editcomment.hidden", "0"));
+    }
+
+    public boolean isEditCommentSuggested(XWikiContext context)
+    {
+        String bl = getXWikiPreference("editcomment_suggested", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.editcomment.suggested", "0"));
+    }
+
+    public boolean isEditCommentMandatory(XWikiContext context)
+    {
+        String bl = getXWikiPreference("editcomment_mandatory", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
+    }
+
 
     /**
      * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead

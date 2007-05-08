@@ -2233,6 +2233,47 @@ public class XWiki extends Api
         return xwiki.hasTags(getXWikiContext());
     }
 
+
+    /**
+     * API to check if the edit comment feature is active
+     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * @return
+     */
+    public boolean hasEditComment()
+    {
+        return xwiki.hasEditComment(context);
+    }
+
+    /**
+     * API to check if the edit comment field is shown in the edit form
+     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * @return
+     */
+    public boolean isEditCommentFieldHidden()
+    {
+        return xwiki.isEditCommentFieldHidden(context);
+    }
+
+    /**
+     * API to check if the edit comment is suggested (prompted once by Javascript if empty)
+     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * @return
+     */
+    public boolean isEditCommentSuggested()
+    {
+        return xwiki.isEditCommentSuggested(context);
+    }
+
+    /**
+     * API to check if the edit comment is mandatory (prompted by Javascript if empty)
+     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * @return
+     */
+    public boolean isEditCommentMandatory()
+    {
+        return xwiki.isEditCommentMandatory(context);
+    }
+
     /**
      * API to rename a page (experimental) Rights are necessary to edit the source and target page
      * All objects and attachments ID are modified in the process to link to the new page name

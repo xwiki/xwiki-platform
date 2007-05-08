@@ -18,5 +18,6 @@ $velocityCount: $line
 <a href="$doc.getURL("view", "viewer=code&showlinenumbers=1&$docvariant")">$msg.get("showlinenumbers")</a>
 <br />
 <br />
-<textarea readonly="readonly" style="width: 100%; height: 300px;">$tdoc.translatedContent</textarea>
+<textarea readonly="readonly" style="width: 100%; height: 300px;">
+$tdoc.translatedContent</textarea>
 #end

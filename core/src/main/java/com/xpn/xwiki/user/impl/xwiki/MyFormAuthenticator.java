@@ -105,7 +105,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
 
         // process login form submittal
-        if (request.getMatchableURL().endsWith(loginSubmitPattern)) {
+        if ((loginSubmitPattern!=null)&&request.getMatchableURL().endsWith(loginSubmitPattern)) {
             String username = convertUsername(request.getParameter(FORM_USERNAME), context);
             String password = request.getParameter(FORM_PASSWORD);
             String rememberme = request.getParameter(FORM_REMEMBERME);

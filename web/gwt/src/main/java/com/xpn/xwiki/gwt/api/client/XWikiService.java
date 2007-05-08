@@ -40,64 +40,64 @@ import java.util.Map;
  */
 public interface XWikiService extends RemoteService {
 
-    public Document getDocument(String fullName);
-    public Document getDocument(String fullName, boolean withObject, boolean withRenderedContent);
-    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers);
+    public Document getDocument(String fullName) throws XWikiGWTException;
+    public Document getDocument(String fullName, boolean withObject, boolean withRenderedContent) throws XWikiGWTException;
+    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers) throws XWikiGWTException;
 
-    public Document getDocument(String fullName, boolean withObject, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent);
+    public Document getDocument(String fullName, boolean withObject, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent) throws XWikiGWTException;
 
-    public String getUniquePageName(String space);
-    public String getUniquePageName(String space, String pageName);
-    public Document getUniqueDocument(String space, String pageName);
-    public Document getUniqueDocument(String space);
+    public String getUniquePageName(String space) throws XWikiGWTException;
+    public String getUniquePageName(String space, String pageName) throws XWikiGWTException;
+    public Document getUniqueDocument(String space, String pageName) throws XWikiGWTException;
+    public Document getUniqueDocument(String space) throws XWikiGWTException;
 
-    public User getUser(String fullName);
-    public User getUser();
+    public User getUser(String fullName) throws XWikiGWTException;
+    public User getUser() throws XWikiGWTException;
 
-    public User[] getUserList(int nb, int start);
+    public User[] getUserList(int nb, int start) throws XWikiGWTException;
 
-    public boolean updateProperty(String docname, String className, String propertyname, String value);
-    public boolean updateProperty(String docname, String className, String propertyname, int value);
-    public boolean updateProperty(String docname, String className, String propertyname, List value);
+    public boolean updateProperty(String docname, String className, String propertyname, String value) throws XWikiGWTException;
+    public boolean updateProperty(String docname, String className, String propertyname, int value) throws XWikiGWTException;
+    public boolean updateProperty(String docname, String className, String propertyname, List value) throws XWikiGWTException;
 
 
-    public List searchDocuments(String sql, int nb, int start);
+    public List searchDocuments(String sql, int nb, int start) throws XWikiGWTException;
     
-    public List getDocuments(String sql, int nb, int start);
-    public List getDocuments(String sql, int nb, int start, boolean fullName);
-    public List getDocuments(String sql, int nb, int start, boolean fullName, boolean viewDisplayers, boolean editDisplayers);
+    public List getDocuments(String sql, int nb, int start) throws XWikiGWTException;
+    public List getDocuments(String sql, int nb, int start, boolean fullName) throws XWikiGWTException;
+    public List getDocuments(String sql, int nb, int start, boolean fullName, boolean viewDisplayers, boolean editDisplayers) throws XWikiGWTException;
 
-    public List getObjects(String sql, String className, int nb, int start);
-    public XObject getFirstObject(String sql, String className);
+    public List getObjects(String sql, String className, int nb, int start) throws XWikiGWTException;
+    public XObject getFirstObject(String sql, String className) throws XWikiGWTException;
 
-    public XObject addObject(String fullName, String className);
-    public List addObject(String fullName, List classesName);
-    public boolean addObject(String docname, XObject xobject);
+    public XObject addObject(String fullName, String className) throws XWikiGWTException;
+    public List addObject(String fullName, List classesName) throws XWikiGWTException;
+    public boolean addObject(String docname, XObject xobject) throws XWikiGWTException;
 
-    public Boolean lockDocument(String fullName, boolean force);
-    public void unlockDocument(String fullName);
-    public Boolean isLastDocumentVersion(String fullName, String version);
+    public Boolean lockDocument(String fullName, boolean force) throws XWikiGWTException;
+    public void unlockDocument(String fullName) throws XWikiGWTException;
+    public Boolean isLastDocumentVersion(String fullName, String version) throws XWikiGWTException;
 
-    public String getLoginURL();
+    public String getLoginURL() throws XWikiGWTException;
 
-    public Boolean saveDocumentContent(String fullName, String content);
-    public Boolean saveObject(XObject object);
-    public Boolean saveObjects(List objects);
+    public Boolean saveDocumentContent(String fullName, String content) throws XWikiGWTException;
+    public Boolean saveObject(XObject object) throws XWikiGWTException;
+    public Boolean saveObjects(List objects) throws XWikiGWTException;
 
-    public Boolean deleteObject(XObject object);
-    public Boolean deleteObject(String docName, String className, int number);
+    public Boolean deleteObject(XObject object) throws XWikiGWTException;
+    public Boolean deleteObject(String docName, String className, int number) throws XWikiGWTException;
 
-    public boolean addComment(String docname, String message);
+    public boolean addComment(String docname, String message) throws XWikiGWTException;
 
-    public List customQuery(String queryPage);
-    public List customQuery(String queryPage, int nb, int start);
-    public String getDocumentContent(String fullName);
-    public String getDocumentContent(String fullName, boolean rendered);
-    public String getDocumentContent(String fullName, boolean rendered, Map params);
+    public List customQuery(String queryPage) throws XWikiGWTException;
+    public List customQuery(String queryPage, int nb, int start) throws XWikiGWTException;
+    public String getDocumentContent(String fullName) throws XWikiGWTException;
+    public String getDocumentContent(String fullName, boolean rendered) throws XWikiGWTException;
+    public String getDocumentContent(String fullName, boolean rendered, Map params) throws XWikiGWTException;
 
-    public void logJSError(Map infos);
+    public void logJSError(Map infos) throws XWikiGWTException;
 
-    public Dictionary getTranslation(String translationPage, String local);
+    public Dictionary getTranslation(String translationPage, String local) throws XWikiGWTException;
 
 
     /**

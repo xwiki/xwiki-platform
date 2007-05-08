@@ -30,14 +30,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.gwt.api.client.Attachment;
-import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.gwt.api.client.User;
-import com.xpn.xwiki.gwt.api.client.XObject;
-import com.xpn.xwiki.gwt.api.client.XWikiService;
-import com.xpn.xwiki.gwt.api.client.Dictionary;
-import com.xpn.xwiki.gwt.api.client.LoginException;
-import com.xpn.xwiki.gwt.api.client.RightException;
+import com.xpn.xwiki.gwt.api.client.*;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -110,58 +103,73 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
 
-    public Document getDocument(String fullName) {
+    protected XWikiGWTException getXWikiGWTException(Exception e) {
+        // let's make sure we are informed
+        if (log.isErrorEnabled()) {
+            log.error("Unhandled exception on the server", e);
+        }
+
+        XWikiException exp;
+        if (e instanceof XWikiException)
+         exp = (XWikiException) e;
+        else
+         exp = new XWikiException(XWikiException.MODULE_XWIKI_GWT_API, XWikiException.ERROR_XWIKI_UNKNOWN, "Unknown GWT Exception", e);
+
+        return new XWikiGWTException(exp.getMessage(), exp.getFullMessage(), exp.getCode(), exp.getModule());
+    }
+
+    public Document getDocument(String fullName) throws XWikiGWTException {
         return getDocument(fullName, false, false, false, false);
     }
 
 
-    public Document getDocument(String fullName, boolean full, boolean withRenderedContent) {
+    public Document getDocument(String fullName, boolean full, boolean withRenderedContent) throws XWikiGWTException {
         return getDocument(fullName, full, false, false, withRenderedContent);
     }
 
-    public String getUniquePageName(String space){
+    public String getUniquePageName(String space) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return context.getWiki().getUniquePageName(space, context);
-        } catch (XWikiException e) {
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public String getUniquePageName(String space, String pageName){
+    public String getUniquePageName(String space, String pageName) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return context.getWiki().getUniquePageName(space, pageName, context);
-        } catch (XWikiException e) {
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public Document getUniqueDocument(String space, String pageName) {
+    public Document getUniqueDocument(String space, String pageName) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             String fullName = context.getWiki().getUniquePageName(space, pageName, context);
             return getDocument(fullName);
-        } catch (XWikiException e) {
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public Document getUniqueDocument(String space) {
+    public Document getUniqueDocument(String space) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             String fullName = context.getWiki().getUniquePageName(space, context);
             return getDocument(space + "." + fullName);
-        } catch (XWikiException e) {
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers) {
+    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers) throws XWikiGWTException {
 		return getDocument(fullName, full, viewDisplayers, editDisplayers, false);
 	}
 
-    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent) {
+    public Document getDocument(String fullName, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context) == true) {
@@ -172,21 +180,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 return null;
             }
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    public User getUser(){
+    public User getUser() throws XWikiGWTException {
         try {
             return getUser(getXWikiContext().getUser());
-        } catch (XWikiException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
     }
 
-    public User getUser(String fullName) {
+    public User getUser(String fullName) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
@@ -196,12 +202,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 return null;
             }
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    public User[] getUserList(int nb, int start) {
+    public User[] getUserList(int nb, int start) throws XWikiGWTException {
         User[] users = new User[nb];
         try {
             XWikiContext context = getXWikiContext();
@@ -217,95 +222,92 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
             return users;
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return new User[0];
+            throw getXWikiGWTException(e);
         }
     }
 
-    public List searchDocuments(String sql, int nb, int start) {
+    public List searchDocuments(String sql, int nb, int start) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return searchDocuments(sql, nb, start, context);
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    public List getDocuments(String sql, int nb, int start) {
+    public List getDocuments(String sql, int nb, int start) throws XWikiGWTException {
         return getDocuments(sql, nb, start, false);
     }
 
-    public List getDocuments(String sql, int nb, int start, boolean full) {
+    public List getDocuments(String sql, int nb, int start, boolean full) throws XWikiGWTException {
         return getDocuments(sql, nb, start, full, false, false);
     }
 
-    public List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers) {
+    public List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, false, context);
         } catch (Exception e) {
-           e.printStackTrace();
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    public boolean updateProperty(String docname, String className, String propertyname, String value) {
+    public boolean updateProperty(String docname, String className, String propertyname, String value) throws XWikiGWTException {
         XWikiContext context = null;
         try {
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setStringValue(className, propertyname, value);
-                context.getWiki().saveDocument(doc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateproperty"), context);
                 return true;
             } else
                 return false;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public boolean updateProperty(String docname, String className, String propertyname, int value) {
+    public boolean updateProperty(String docname, String className, String propertyname, int value) throws XWikiGWTException {
         XWikiContext context = null;
         try {
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setIntValue(className, propertyname, value);
-                context.getWiki().saveDocument(doc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateproperty"), context);
                 return true;
             } else
                 return false;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public boolean updateProperty(String docname, String className, String propertyname, List value) {
+    public boolean updateProperty(String docname, String className, String propertyname, List value) throws XWikiGWTException {
         XWikiContext context = null;
         try {
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setListValue(className, propertyname, value);
-                context.getWiki().saveDocument(doc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateproperty"), context);
                 return true;
             } else
                 return false;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, XWikiContext context) {
+    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, XWikiContext context) throws XWikiGWTException {
 		return getDocuments(sql, nb, start, full, viewDisplayers, editDisplayers, false, context);	
 	}
 
-    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent, XWikiContext context) {
+    private List getDocuments(String sql, int nb, int start, boolean full, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent, XWikiContext context) throws XWikiGWTException {
           List newlist = new ArrayList();
         try {
             List list = context.getWiki().getStore().searchDocumentsNames(sql, nb, start, context);
@@ -321,12 +323,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
             return newlist;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    private List searchDocuments(String sql, int nb, int start, XWikiContext context) {
+    private List searchDocuments(String sql, int nb, int start, XWikiContext context) throws XWikiGWTException {
         List newlist = new ArrayList();
         try {
             List list = context.getWiki().getStore().searchDocumentsNames(sql, nb, start, context);
@@ -340,12 +341,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
             return newlist;
         } catch (Exception e) {
-            e.printStackTrace();  
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    public List getObjects(String sql, String className, int nb, int start){
+    public List getObjects(String sql, String className, int nb, int start) throws XWikiGWTException {
         List docs = getDocuments(sql, nb, start, true);
         List objects = new ArrayList();
         Iterator it = docs.iterator();
@@ -358,26 +358,24 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return objects;
     }
 
-    public XObject getFirstObject(String sql, String className){
+    public XObject getFirstObject(String sql, String className) throws XWikiGWTException {
         List objs = getObjects(sql, className, 1, 0);
         if (objs != null && objs.size() > 0)
             return (XObject) objs.get(0);
         return null;
     }
 
-    public XObject addObject(XWikiDocument doc, String className){
+    public XObject addObject(XWikiDocument doc, String className) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             int index = doc.createNewObject(className, context);
             return newObject(new XObject(), doc.getObject(className, index), false, false, context);
-        } catch (XWikiException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
-
     }
 
-    public XObject addObject(String fullName, String className) {
+    public XObject addObject(String fullName, String className) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
@@ -386,18 +384,17 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
                 XObject obj = addObject(doc, className);
 
-                context.getWiki().saveDocument(doc, oldDoc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateproperty"), context);
 
                 return obj;
             }
             return null;
-        } catch (XWikiException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
     }
 
-    public List addObject(String fullName, List classesName){
+    public List addObject(String fullName, List classesName) throws XWikiGWTException {
         try{
             XWikiContext context = getXWikiContext();
             XWikiDocument doc = context.getWiki().getDocument(fullName, context);
@@ -407,31 +404,31 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             while(it.hasNext()){
                 objs.add(addObject(doc, (String) it.next()));
             }
-            context.getWiki().saveDocument(doc, oldDoc, context);
+
+            context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addobject"), context);
             return objs;
-        } catch (XWikiException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
     }
 
 
-    public boolean addObject(String docname, XObject xobject) {
+    public boolean addObject(String docname, XObject xobject) throws XWikiGWTException {
         XWikiContext context = null;
         try {
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseObject newObject = doc.newObject(xobject.getClassName(), context);
 
                 mergeObject(xobject, newObject, context);
-                context.getWiki().saveDocument(doc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addobject"), context);
                 return true;
             } else
                 return false;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
@@ -443,7 +440,18 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
      * @param content
      * @return
      */
-    public Boolean saveDocumentContent(String fullName, String content) {
+    public Boolean saveDocumentContent(String fullName, String content) throws XWikiGWTException {
+        return saveDocumentContent(fullName, content, null);
+    }
+
+    /**
+     * save only the content of a document
+     * TODO manage translations
+     * @param fullName
+     * @param content
+     * @return
+     */
+    public Boolean saveDocumentContent(String fullName, String content, String comment) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
@@ -453,18 +461,18 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, context);
+                context.getWiki().saveDocument(doc, oldDoc, (comment==null) ? context.getMessageTool().get("core.comment.updatecontent") : comment, context);
                 return Boolean.valueOf(true);
+            } else {
+                return Boolean.valueOf(false);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            throw getXWikiGWTException(e);
         }
-        return Boolean.valueOf(false);
     }
 
 
-    public Boolean saveObject(XObject object) {
+    public Boolean saveObject(XObject object) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), object.getName(), context)) {
@@ -475,21 +483,21 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateobject"), context);
                 return Boolean.valueOf(true);
+            } else {
+                return Boolean.valueOf(false);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            throw getXWikiGWTException(e);
         }
-        return Boolean.valueOf(false);
     }
 
-    public Boolean deleteObject(XObject object) {
+    public Boolean deleteObject(XObject object) throws XWikiGWTException {
         return deleteObject(object.getName(), object.getClassName(), object.getNumber());   
     }
 
-    public Boolean deleteObject(String docName, String className, int number) {
+    public Boolean deleteObject(String docName, String className, int number) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docName, context)) {
@@ -504,17 +512,18 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.deleteobject"), context);
                 return Boolean.valueOf(true);
+            } else {
+                return Boolean.valueOf(false);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw getXWikiGWTException(e);
         }
-        return Boolean.valueOf(false);
     }
 
 
-    public Boolean saveObjects(List objects) {
+    public Boolean saveObjects(List objects) throws XWikiGWTException {
         Iterator it = objects.iterator();
         boolean error = false;
         while(it.hasNext()){
@@ -532,7 +541,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
      * @param force
      * @return
      */
-    public Boolean lockDocument(String fullName, boolean force) {
+    public Boolean lockDocument(String fullName, boolean force) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             XWikiDocument doc = context.getWiki().getDocument(fullName, context);
@@ -551,12 +560,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             else
                 return Boolean.valueOf(false);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw getXWikiGWTException(e);
             }
-        return null;
     }
 
-    public void unlockDocument(String fullName) {
+    public void unlockDocument(String fullName) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
 
@@ -564,56 +572,54 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiLock lock = doc.getLock(context);
             if (lock != null)
                 doc.removeLock(context);
-        } catch (XWikiException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public Boolean isLastDocumentVersion(String fullName, String version) {
+    public Boolean isLastDocumentVersion(String fullName, String version) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return Boolean.valueOf(context.getWiki().getDocument(fullName, context).getVersion().equals(version));
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public String getLoginURL() {
+    public String getLoginURL() throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             return context.getWiki().getDocument("XWiki.XWikiLogin", context).getExternalURL("login", context);
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return null;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public boolean addComment(String docname, String message) {
+    public boolean addComment(String docname, String message) throws XWikiGWTException {
         XWikiContext context = null;
         try {
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("comment", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
+                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseObject newObject = doc.newObject("XWiki.XWikiComments", context);
                 newObject.set("author", context.getUser(), context);
                 newObject.set("date", new Date(), context);
                 newObject.set("comment", message, context);
-                context.getWiki().saveDocument(doc, context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addcomment"), context);
                 return true;
             } else
                 return false;
-        } catch (XWikiException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
     }
 
-    public List customQuery(String queryPage) {
+    public List customQuery(String queryPage) throws XWikiGWTException {
         return customQuery(queryPage, 0, 0);
     }
 
-    public List customQuery(String queryPage, int nb, int start) {
+    public List customQuery(String queryPage, int nb, int start) throws XWikiGWTException {
         List newlist = new ArrayList();
         try {
             XWikiContext context = getXWikiContext();
@@ -632,12 +638,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             }
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
-    protected User newUser(User user, XWikiDocument xdoc, XWikiContext context) {
+    protected User newUser(User user, XWikiDocument xdoc, XWikiContext context) throws XWikiGWTException {
         newDocument(user, xdoc, context);
         user.setFirstName(xdoc.getStringValue("XWiki.XWikiUsers", "first_name"));
         user.setLastName(xdoc.getStringValue("XWiki.XWikiUsers", "last_name"));
@@ -645,52 +650,51 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return user;
     }
 
-    protected Document newDocument(Document doc, XWikiDocument xdoc, XWikiContext context) {
+    protected Document newDocument(Document doc, XWikiDocument xdoc, XWikiContext context) throws XWikiGWTException {
         return newDocument(doc, xdoc, false, context);
     }
 
-    protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, XWikiContext context) {
+    protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, XWikiContext context) throws XWikiGWTException {
         return newDocument(doc, xdoc, withObjects, false, false, false, context);
     }
 
-    public boolean hasAccessLevel(String level, String fullName, XWikiContext context)
-    {
+    public boolean hasAccessLevel(String level, String fullName, XWikiContext context) throws XWikiGWTException {
         try {
             return getXWikiContext().getWiki().getRightService().hasAccessLevel(level,
                 context.getUser(), fullName, context);
         } catch (Exception e) {
-            return false;
+            throw getXWikiGWTException(e);
         }
     }
 
-    protected void assertEditRight(XWikiDocument doc, XWikiContext context) throws XWikiException, LoginException, RightException {
+    protected void assertEditRight(XWikiDocument doc, XWikiContext context) throws XWikiGWTException, XWikiException {
         if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
             return;
         if (!hasAccessLevel("edit", doc.getFullName(), context))
             raiseRightException(context);
     }
 
-    protected void assertViewRight(String fullName, XWikiContext context) throws XWikiException, LoginException, RightException {
+    protected void assertViewRight(String fullName, XWikiContext context) throws XWikiGWTException, XWikiException {
         if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
             return;
         if (!hasAccessLevel("view", fullName, context))
             raiseRightException(context);
     }
 
-    protected void raiseRightException(XWikiContext context) throws RightException, LoginException {
+    protected void raiseRightException(XWikiContext context) throws XWikiException {
         if (context.getUser().equals("XWiki.XWikiGuest")){
-            throw new LoginException();
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_TOKEN_INVALID, "User needs to be logged-in");
         }
         else
-            throw new RightException();
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED, "User needs appropriate rights");
     }
 
-    protected void assertViewRight(XWikiDocument doc, XWikiContext context) throws XWikiException, LoginException, RightException {
+    protected void assertViewRight(XWikiDocument doc, XWikiContext context) throws XWikiGWTException, XWikiException {
         assertViewRight(doc.getFullName(), context);
     }
 
     protected Document newDocument(Document doc, XWikiDocument xdoc, boolean withObjects, boolean withViewDisplayers,
-                                 boolean withEditDisplayers, boolean withRenderedContent, XWikiContext context) {
+                                 boolean withEditDisplayers, boolean withRenderedContent, XWikiContext context) throws XWikiGWTException {
         doc.setId(xdoc.getId());
         doc.setTitle(xdoc.getTitle());
         doc.setFullName(xdoc.getFullName());
@@ -714,18 +718,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setLanguage(xdoc.getLanguage());
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
+        doc.setComment(xdoc.getComment());
         doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));  // "ajax=1"
         doc.setViewURL(xdoc.getExternalURL("view", context));
         try {
             doc.setSaveURL(context.getWiki().getExternalURL(xdoc.getFullName(), "save", "ajax=1", context)); //, "ajax=1"
-        } catch (XWikiException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
         doc.setHasElement(xdoc.getElements());
         try {
             doc.setEditRight(context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), xdoc.getFullName(), context));
-        } catch (XWikiException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
         if (withObjects) {
             Iterator it = xdoc.getxWikiObjects().values().iterator();
@@ -752,8 +757,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         if (withRenderedContent){
             try {
                 doc.setRenderedContent(xdoc.getRenderedContent(context));
-            } catch (XWikiException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                throw getXWikiGWTException(e);
             }
         }
         return doc;
@@ -826,7 +831,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
-    public String getDocumentContent(String fullName) {
+    public String getDocumentContent(String fullName) throws XWikiGWTException {
         return getDocumentContent(fullName, false, null);
     }
 
@@ -843,11 +848,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return baseObject;
     }
 
-    public String getDocumentContent(String fullName, boolean rendered) {
+    public String getDocumentContent(String fullName, boolean rendered) throws XWikiGWTException {
         return getDocumentContent(fullName, rendered, null);
     }
 
-    public String getDocumentContent(String fullName, boolean rendered, Map params) {
+    public String getDocumentContent(String fullName, boolean rendered, Map params) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
@@ -865,8 +870,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 return null;
             }
         } catch (Exception e) {
-            e.printStackTrace();  
-            return null;
+            throw getXWikiGWTException(e);
         }
     }
 
@@ -876,16 +880,15 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                // + "stacktrace" + infos.get("stacktrace"));
     }
 
-    public Dictionary getTranslation(String translationPage, String local){
+    public Dictionary getTranslation(String translationPage, String local) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
             Properties properties = msg.getDocumentBundleProperties(translationPage, context);
             return new Dictionary(properties);
-        } catch (XWikiException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
         }
-        return null;
     }
 
 

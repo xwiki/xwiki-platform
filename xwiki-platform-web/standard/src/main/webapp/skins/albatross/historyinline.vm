@@ -10,6 +10,9 @@
           <th>$msg.get("version")</th>
           <th>$msg.get("reveditor")</th>
           <th>$msg.get("date")</th>
+#if($xwiki.hasEditComment())
+          <th>$msg.get("comment")</th>
+#end
 #if($hasedit || $hasadmin)
           <th></th>
 #end
@@ -37,6 +40,9 @@
 #else
           <td>$xwiki.getLocalUserName($newdoc.author)</td>
           <td>$xwiki.formatDate($newdoc.date, "dd/MM/yyyy hh:mm")</td>
+#end
+#if($xwiki.hasEditComment())
+          <td>$!{newdoc.comment}</td>
 #end
 #if($hasedit || $hasadmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>

@@ -19,10 +19,32 @@ function checkDocumentContent() {
       return false ;
     }
   }
-  return true; // There is only the wiki editor, with some content
+
+#if($xwiki.isEditCommentSuggested()||$xwiki.isEditCommentMandatory())
+ #if($xwiki.isEditCommentMandatory())
+  var commentField = document.forms.${formname}.comment
+  while (commentField.value=="") {
+    commentField.value = prompt("${msg.get("core.comment.prompt")}");
+  }
+ #else
+  var commentField = document.forms.${formname}.comment
+  if (commentField.value=="") {
+    commentField.value = prompt("${msg.get("core.comment.prompt")}");
+  }
+ #end
+#end
+ return true; // There is only the wiki editor, with some content
 }
 // ]]>
 </script>
+#if((!$commentFieldAdded)&&($xwiki.hasEditComment())
+#set($commentFieldAdded = 1)
+#if($xwiki.isEditCommentHidden())
+<input type="hidden" name="comment" value="" size="80" />
+#else
+$msg.get("core.comment"): <input type="hidden" name="comment" value="" size="80" />
+#end
+#end
 #set($param = "")
 #if ($sectionNumber && ($sectionNumber != 0))
    #set($param = "section=$sectionNumber")

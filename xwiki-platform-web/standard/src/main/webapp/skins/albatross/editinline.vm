@@ -19,6 +19,7 @@ $msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 <a href="$doc.getURL("inline", "$!request.getQueryString()&force=1")">$msg.get("forcelock")</a>
 </div>
 #else
+#set($editactions = "top")
 <div class="topbuttons">#template("editactions.vm")</div>
 <div class="clear">
 #foreach($class in $doc.xWikiClasses)
@@ -27,6 +28,7 @@ $msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
 #end
 $cdoc.getRenderedContent()
 </div>  ## clear
+#set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 #end
 </div> ## form

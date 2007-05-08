@@ -31,6 +31,8 @@ $tdoc.getRenderedContent($tdoc.content)
 <input type="hidden" name="xredirect" value="$!request.getParameter("xredirect")" />
 <input type="hidden" name="xnotification" value="$!request.getParameter("xnotification")" />
 <input type="hidden" name="language" value="$!request.getParameter("language")" />
+<input type="hidden" name="isResponsePreviewCorrect" value="$isResponseCorrect">
+<input type="hidden" name="comment" value="$!doc.getComment()" />
 </div>
 <div id="xwikiobject">
 #template("hiddenobject.vm")

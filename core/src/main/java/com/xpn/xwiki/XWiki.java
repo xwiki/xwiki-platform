@@ -1089,7 +1089,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         textarea.setCols(cols);
         textarea.setName("content");
         textarea.setID("content");
-        textarea.addElement(scontent);
+        // Forcing a new line after the <textarea> tag, as
+        // http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 causes an empty line at the start
+        // of the document content to be trimmed. 
+        textarea.addElement("\n" + scontent);
         return textarea.toString();
     }
 

@@ -45,6 +45,8 @@ import java.util.*;
 public class XWikiRightServiceImpl implements XWikiRightService {
     private static final Log log = LogFactory.getLog(XWikiRightServiceImpl.class);
     private static Map actionMap;
+    private static List allLevels = Arrays.asList(
+        new String[] {"admin","view","edit","comment","delete","register","programming"});
 
     protected void logAllow(String username, String page, String action, String info) {
         if (log.isDebugEnabled())
@@ -63,11 +65,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
     public List listAllLevels(XWikiContext context) throws XWikiException {
         List list = new ArrayList();
-        String levels = "admin,view,edit,comment,delete,register,programming";
-        String[] level = levels.split(",");
-        for (int i = 0; i < level.length; i++) {
-            list.add(level[i]);
-        }
+        list.addAll(allLevels);
         return list;
     }
 

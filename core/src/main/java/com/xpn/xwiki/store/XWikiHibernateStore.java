@@ -889,7 +889,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
 
-            session.load(property, (Serializable) property);
+            try {
+                session.load(property, (Serializable) property);
+            } catch (ObjectNotFoundException e) {
+                // Let's accept that there is no data in property tables
+                // but log it
+                if (log.isErrorEnabled())
+                 log.error("No data for property " + property.getName() + " of object id " + property.getId());
+            }
 
             // TODO: understand why collections are lazy loaded
             // Let's force reading lists if there is a list

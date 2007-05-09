@@ -323,9 +323,9 @@ WikiEditor.prototype.convertInternal = function(content) {
 		}
 	}
 	content = this.trimString(this._removeHtmlTags(content));
+    content = content.replace(/<(.*?)>/g, '\\<$1\\>');
     content = unescape(content);
     content = content.replace(/\&#036;/g, "$");
-    content = content.replace(/<(.*?)>/g, '\\<$1\\>');
     content = content.replace(/\\<((\/)*blockquote)\\>/g, '<$1>');
     content = content.replace(/<blockquote>((<(\/)?blockquote>)|(\s*))*<\/blockquote>/g, '');
     content = content.replace(/[\r\n]{4,}/g, "\r\n\r\n");

@@ -1481,7 +1481,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
                 // If the rendering fails lets forget backlinks without errors
             } finally {
-                context.setDoc(originalDocument);    
+                if (originalDocument != null) {
+                    context.setDoc(originalDocument);
+                }
             }
 
             List links = (List)context.get("links");

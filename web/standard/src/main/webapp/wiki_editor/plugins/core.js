@@ -1164,7 +1164,13 @@ WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, c
 
 WikiEditor.prototype.convertCodeMacroExternal = function(regexp, result, content) {
     var str = "";
-    str += "<div class=\"code\"><pre>";
+    var type = "";
+    if (result[1] != null && result[1] != "") {
+        type = this.trimString(result[1].substring(result[1].indexOf(":") + 1, result[1].length));
+    }
+    str += "<div";
+    if (type != "") str += " id=\"" + type + "\"";    // use id property to store type of code because another atts will be remove in tinymce
+    str += " class=\"code\"><pre>";
     str += result[2].toString().replace(/</g, "&#60").replace(/>/g, "&#62");;
     str += "</pre></div>";
     str = this._escapeText(str);
@@ -1174,9 +1180,13 @@ WikiEditor.prototype.convertCodeMacroExternal = function(regexp, result, content
 WikiEditor.prototype.convertCodeMacroInternal = function(regexp, result, content) {
     var str = "";
     var temp = result[4];
-    str += "{code:xml}\r\n";
+    var attributes = this.readAttributes(result[1] + result[3]);
+    str += "{code";
+    if (attributes && attributes["id"]) str += ":" +  this.trimString(attributes["id"].toString());
+    str += "}\r\n";
     str += this._escapeText(this.trimString(result[4]).replace(/<br \/>/g, "\r\n"));
     if (this.core.isMSIE) str += "\r\n";
     str += "{code}";
+    if (this.core.isMSIE) str = "\r\n" + str + "\r\n";
     return content.replace(regexp, str);
 }

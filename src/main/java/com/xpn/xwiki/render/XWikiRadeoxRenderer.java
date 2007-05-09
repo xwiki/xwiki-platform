@@ -32,6 +32,7 @@ import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
 import org.radeox.engine.context.BaseRenderContext;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 
@@ -54,6 +55,7 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         RenderContext rcontext = (RenderContext) context.get("rcontext");
         if (rcontext==null) {
             rcontext = new BaseRenderContext();
+            rcontext.setParameters(new HashMap());
             rcontext.set("xcontext", context);
         }
         if (rcontext.getRenderEngine()==null) {
@@ -62,6 +64,7 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
             Locale locale = new Locale("xwiki", "xwiki");
             ircontext.set(RenderContext.INPUT_LOCALE, locale);
             ircontext.set(RenderContext.OUTPUT_LOCALE, locale);
+            ircontext.setParameters(new HashMap());
 
             XWikiRadeoxRenderEngine radeoxengine = new XWikiRadeoxRenderEngine(ircontext, context);
             rcontext.setRenderEngine(radeoxengine);

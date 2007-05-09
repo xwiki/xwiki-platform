@@ -3245,6 +3245,10 @@ public class XWikiDocument
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
 
+        if (isNew()) {
+            return;
+        }
+
         // This link handler recognizes that 2 links are the same when they point to the same
         // document (regardless of query string, target or alias). It keeps the query string,
         // target and alias from the link being replaced.

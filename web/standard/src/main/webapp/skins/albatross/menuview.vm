@@ -48,6 +48,7 @@
 ##
 ## Show menu
 ##
+#if(!$doc.isNew())
 #xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show")  "tmShow")
 #if($isAdvancedUser)
 #submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("viewcode"))
@@ -58,13 +59,16 @@
 #submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("viewattachments"))
 #submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("viewhistory"))
 #xwikitopmenuentryend()
+#end ## isNew
 ##
 ## Print menu
 ##
+#if(!$doc.isNew())
 #xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("print") "tmPrint")
 #submenuitem($doc.getURL("pdf", $docvariant) $msg.get("pdf"))
 #submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("preview"))
 #xwikitopmenuentryend()
+#end ## isNew
 ##
 ## Watch menu
 ##
@@ -76,13 +80,13 @@
 ##
 ## Delete menu
 ##
-#if($hasadmin)
+#if((!$doc.isNew()) && $hasadmin)
 #xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("delete") "tmDelete")
 #end
 ##
 ## Rename menu
 ##
-#if($hasedit)
+#if((!$doc.isNew()) && $hasedit)
 #xwikitopmenuentry($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("rename") "tmRename")
 #end
 </div>

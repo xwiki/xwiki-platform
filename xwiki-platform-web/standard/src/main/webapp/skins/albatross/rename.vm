@@ -3,6 +3,12 @@
 ###
 #if(!$xwiki.hasAccessLevel("edit"))
 #template("accessdenied.vm")
+#elseif($doc.isNew())
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#error("$msg.get('core.rename.nonexistingDocument')")
+</div>
+#template("endpage.vm")
 #else
 #template("startpage.vm")
 ## TODO: Improve the interface, splitting the operation into more steps.

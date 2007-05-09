@@ -37,7 +37,7 @@ function checkDocumentContent() {
 }
 // ]]>
 </script>
-#if((!$commentFieldAdded)&&($xwiki.hasEditComment())
+#if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
 #set($commentFieldAdded = 1)
 #if($xwiki.isEditCommentHidden())
 <input type="hidden" name="comment" value="" size="80" />

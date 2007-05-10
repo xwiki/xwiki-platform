@@ -79,5 +79,12 @@ public class ListMetaClass extends PropertyMetaClass {
         sort_class.setPrettyName("Sort");
         sort_class.setValues("none|id|value");
         safeput("sort", sort_class);
+
+        BooleanClass cache_class = new BooleanClass(this);
+        cache_class.setName("cache");
+        cache_class.setPrettyName("Cache");
+        cache_class.setDisplayType("yesno");
+        cache_class.setUnmodifiable(true);
+        safeput("cache", cache_class);
     }
 }

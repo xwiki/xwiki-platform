@@ -34,6 +34,7 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 public class DBListClass extends ListClass
 {
+    private List cachedDBList;
 
     public DBListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -74,21 +75,30 @@ public class DBListClass extends ListClass
 
     public List getDBList(XWikiContext context)
     {
-        XWiki xwiki = context.getWiki();
-        String query = getQuery(context);
+        List list = getCachedDBList();
+        if (list==null) {
 
-        if (query == null)
-            return new ArrayList();
+            XWiki xwiki = context.getWiki();
+            String query = getQuery(context);
 
-        try {
-            if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
-                return makeList(xwiki.search(query, context));
+            if (query == null)
+                list = new ArrayList();
+            else {
+
+                try {
+                    if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
+                        list = makeList(xwiki.search(query, context));
+                    } else  {
+                        list = makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(query).list());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    list = new ArrayList();
+                }
             }
-            return makeList(((QueryPlugin) xwiki.getPlugin("query", context)).xpath(query).list());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList();
+            setCachedDBList(list);
         }
+        return list;
     }
 
     public List getList(XWikiContext context)
@@ -210,5 +220,17 @@ public class DBListClass extends ListClass
     public void setValueField(String valueField)
     {
         setStringValue("valueField", valueField);
+    }
+
+    public List getCachedDBList() {
+        return cachedDBList;
+    }
+
+    public void setCachedDBList(List cachedDBList) {
+        this.cachedDBList = cachedDBList;
+    }
+
+    public void flushCache() {
+        setCachedDBList(null);
     }
 }

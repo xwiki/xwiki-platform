@@ -757,4 +757,15 @@ public class BaseClass extends BaseCollection implements ClassInterface {
              return false;
         }
     }
+
+    public void flushCache() {
+        Object[] props = getPropertyNames();
+        for (int i=0;i<props.length;i++) {
+            String propname = (String) props[i];
+            PropertyClass propclass = (PropertyClass) get(propname);
+            if (propclass!=null)
+             propclass.flushCache();
+        }
+    }
+
 }

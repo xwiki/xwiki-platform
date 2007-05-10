@@ -516,4 +516,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             return false;
         }
     }
+
+    public void flushCache()
+    {
+    }
 }

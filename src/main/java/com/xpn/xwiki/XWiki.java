@@ -2021,6 +2021,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (pmanager != null)
             pmanager.flushCache(context);
 
+        // Make sure we call all classes flushCache function
+        try {
+            List classes = getClassList(context);
+            for (int i=0;i<classes.size();i++) {
+                String className = (String) classes.get(i);
+                try {
+                    getClass(className, context).flushCache();
+                } catch (Exception e) {
+                }
+            }
+        } catch (Exception e) {
+        }
+
     }
 
     public XWikiPluginManager getPluginManager()

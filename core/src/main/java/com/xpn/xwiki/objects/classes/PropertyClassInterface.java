@@ -37,6 +37,6 @@ public interface PropertyClassInterface extends ObjectInterface {
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context);
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context);
-
-    BaseProperty newProperty();
+    public BaseProperty newProperty();
+    public void flushCache();
 }

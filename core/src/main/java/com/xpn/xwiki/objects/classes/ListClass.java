@@ -53,6 +53,7 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 public abstract class ListClass extends PropertyClass
 {
 
+
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
@@ -61,6 +62,7 @@ public abstract class ListClass extends PropertyClass
         setMultiSelect(false);
         setSize(1);
         setSeparator(" ");
+        setCache(false);
     }
 
     public ListClass(PropertyMetaClass wclass)
@@ -106,6 +108,16 @@ public abstract class ListClass extends PropertyClass
     public void setSize(int size)
     {
         setIntValue("size", size);
+    }
+
+    public boolean isCache()
+    {
+        return (getIntValue("cache") == 1);
+    }
+
+    public void setCache(boolean cache)
+    {
+        setIntValue("cache", cache ? 1 : 0);
     }
 
     public boolean isMultiSelect()

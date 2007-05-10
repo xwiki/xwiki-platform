@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.DateClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 
 public class DateMetaClass extends PropertyMetaClass {
 
@@ -48,6 +49,11 @@ public class DateMetaClass extends PropertyMetaClass {
     emptyistoday_class.setPrettyName("Empty Is Today");
     emptyistoday_class.setSize(5);
     emptyistoday_class.setNumberType("integer");
+
+    BooleanClass picker_class = new BooleanClass(this);
+    picker_class.setName("picker");
+    picker_class.setPrettyName("Picker");
+    picker_class.setDefaultValue(1);
 
     StringClass dateformat_class = new StringClass(this);
     dateformat_class.setName("dateFormat");

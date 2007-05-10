@@ -32,6 +32,7 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.link;
 import org.dom4j.Element;
 
 import java.text.ParseException;
@@ -47,10 +48,19 @@ public class DateClass  extends PropertyClass {
         setSize(20);
         setDateFormat("dd/MM/yyyy HH:mm:ss");
         setEmptyIsToday(1);
+        setPicker(1);
     }
 
     public DateClass() {
         this(null);
+    }
+
+    public int getPicker() {
+        return getIntValue("picker");
+    }
+
+    public void setPicker(int picker) {
+        setIntValue("picker", picker);
     }
 
     public int getSize() {
@@ -149,6 +159,12 @@ public class DateClass  extends PropertyClass {
         input.setID(prefix + name);
         input.setSize(getSize());
         buffer.append(input.toString());
+
+        link link = new link();
+        link.setHref("javascript:void()");
+        link.setOnClick("");
+        link.setTarget("?");
+        buffer.append(link.toString());
     }
 
     public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {

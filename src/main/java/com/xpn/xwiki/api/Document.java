@@ -1448,7 +1448,11 @@ public class Document extends Api
 
     private void saveDocument(String comment) throws XWikiException
     {
-        getXWikiContext().getWiki().saveDocument(getDoc(), olddoc, comment, getXWikiContext());
+        XWikiDocument doc = getDoc();
+        doc.setAuthor(context.getUser());
+        if (doc.isNew())
+            doc.setCreator(context.getUser());
+        getXWikiContext().getWiki().saveDocument(doc, olddoc, comment, getXWikiContext());
         olddoc = doc;
     }
 

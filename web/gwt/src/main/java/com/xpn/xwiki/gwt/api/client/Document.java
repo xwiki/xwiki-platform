@@ -63,6 +63,7 @@ public class Document implements IsSerializable {
     private XObject currentObj;
     private String fullName;
     private boolean editRight;
+    private boolean viewRight = true;
     private List attachments = new ArrayList();
     private String uploadURL;
     private String saveURL;
@@ -379,6 +380,14 @@ public class Document implements IsSerializable {
 
     public void setEditRight(boolean editRight) {
         this.editRight = editRight;
+    }
+
+    public boolean isViewRight() {
+        return viewRight;
+    }
+
+    public void setViewRight(boolean viewRight) {
+        this.viewRight = viewRight;
     }
 
     public List getAttachments() {

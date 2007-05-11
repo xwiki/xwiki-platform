@@ -27,6 +27,7 @@ public class User extends Document {
     private String first_name;
     private String last_name;
     private String email;
+    private boolean isAdmin;
 
 
     public String getFirstName() {
@@ -51,5 +52,13 @@ public class User extends Document {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

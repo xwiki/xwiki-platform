@@ -647,6 +647,9 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         user.setFirstName(xdoc.getStringValue("XWiki.XWikiUsers", "first_name"));
         user.setLastName(xdoc.getStringValue("XWiki.XWikiUsers", "last_name"));
         user.setEmail(xdoc.getStringValue("XWiki.XWikiUsers", "email"));
+
+        XWiki xwiki = context.getWiki();
+        user.setAdmin(xwiki.getRightService().hasAdminRights(context));
         return user;
     }
 

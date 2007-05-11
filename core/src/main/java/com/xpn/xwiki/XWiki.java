@@ -4090,7 +4090,25 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * @see #getExoService(String)
+     * @deprecated use {@link #getExoService(String)} instead
+     */
     public Object getService(String className) throws XWikiException
+    {
+        return getExoService(className);
+    }
+
+    /**
+     * Privileged API to access an eXo Platform service from the Wiki Engine
+     *
+     * @param className eXo classname to retrieve the service from
+     * @return A object representing the service or null if the user doesn't have programming
+     *         rights
+     * @throws XWikiException if the service cannot be loaded
+     * @since 1.1 Beta 1
+     */
+    public Object getExoService(String className) throws XWikiException
     {
         try {
             RootContainer manager = RootContainer.getInstance();
@@ -4105,7 +4123,25 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * @see #getExoPortalService(String)
+     * @deprecated use {@link #getExoPortalService(String)} instead
+     */
     public Object getPortalService(String className) throws XWikiException
+    {
+        return getExoPortalService(className);
+    }
+
+    /**
+     * Privileged API to access an eXo Platform Portal service from the Wiki Engine
+     *
+     * @param className eXo classname to retrieve the service from
+     * @return A object representing the service or null if the user doesn't have programming
+     *         rights
+     * @throws XWikiException if the service cannot be loaded
+     * @since 1.1 Beta 1
+     */
+    public Object getExoPortalService(String className) throws XWikiException
     {
         try {
             PortalContainer manager = PortalContainer.getInstance();

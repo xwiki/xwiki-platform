@@ -1580,31 +1580,61 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to access an eXo Platform service from the Wiki Engine
-     * 
-     * @param className eXo classname to retrieve the service from
-     * @return A object representing the service
-     * @throws XWikiException if the service cannot be loaded
+     * @see #getExoService(String)
+     * @deprecated use {@link #getExoService(String)} instead
      */
     public java.lang.Object getService(String className) throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.getService(className);
-        return null;
+        return getExoService(className);
     }
 
     /**
-     * Priviledged API to access an eXo Platform Portal service from the Wiki Engine
-     * 
+     * Privileged API to access an eXo Platform service from the Wiki Engine
+     *
      * @param className eXo classname to retrieve the service from
-     * @return A object representing the service
+     * @return A object representing the service or null if the user doesn't have programming
+     *         rights
      * @throws XWikiException if the service cannot be loaded
+     * @since 1.1 Beta 1
+     */
+    public java.lang.Object getExoService(String className) throws XWikiException
+    {
+        java.lang.Object service = null;
+
+        if (hasProgrammingRights()) {
+            service = xwiki.getExoService(className);
+        }
+
+        return service;
+    }
+
+    /**
+     * @see #getExoPortalService(String)
+     * @deprecated use {@link #getExoPortalService(String)} instead
      */
     public java.lang.Object getPortalService(String className) throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.getPortalService(className);
-        return null;
+        return getExoPortalService(className);
+    }
+
+    /**
+     * Privileged API to access an eXo Platform Portal service from the Wiki Engine
+     * 
+     * @param className eXo classname to retrieve the service from
+     * @return A object representing the service or null if the user doesn't have programming
+     *         rights
+     * @throws XWikiException if the service cannot be loaded
+     * @since 1.1 Beta 1
+     */
+    public java.lang.Object getExoPortalService(String className) throws XWikiException
+    {
+        java.lang.Object portalService = null;
+
+        if (hasProgrammingRights()) {
+            portalService = xwiki.getExoPortalService(className);
+        }
+
+        return portalService;
     }
 
     /**

@@ -23,6 +23,7 @@ package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -54,6 +55,48 @@ public class DOMUtils {
             getFirstElementByTagName(el, tagName);
         }
         return null;
+    }
+
+        public static Element getElementByClassName(Element parentEl, String style) {
+        for (int i = 0;  i < DOM.getChildCount(parentEl); i++){
+            Element el = DOM.getChild(parentEl, i);
+            if (isClassName(el, style))
+                return el;
+            el = getElementByClassName(el, style);
+            if (el != null)
+                return el;
+        }
+        return null;
+    }
+
+    public static boolean isClassName(Element elem, String style){
+        //algorithm from UIObject.setStyleName(...)
+
+        // Get the current style string.
+        String elStyle = DOM.getAttribute(elem, "className");
+        if (elStyle == null) {
+          return false;
+        }
+
+        int idx = elStyle.indexOf(style);
+
+        // Calculate matching index.
+        while (idx != -1) {
+          if (idx == 0 || elStyle.charAt(idx - 1) == ' ') {
+            int last = idx + style.length();
+            int lastPos = elStyle.length();
+            if ((last == lastPos)
+                || ((last < lastPos) && (elStyle.charAt(last) == ' '))) {
+              break;
+            }
+          }
+          idx = elStyle.indexOf(style, idx + 1);
+        }
+
+        if (idx != -1)
+            return true;
+        return false;
+
     }
 
 }

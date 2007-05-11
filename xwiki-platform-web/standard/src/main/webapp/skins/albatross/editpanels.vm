@@ -14,7 +14,7 @@
 #end
 </div>
 #if($editor == "wysiwyg")
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
     var panels = document.getElementById("editPanels");   
     if(document.getElementById("xwikisyntaxhelppanel"))

@@ -1431,7 +1431,6 @@ public class Document extends Api
     public void saveWithProgrammingRights() throws XWikiException
     {
         saveWithProgrammingRights("");
-
     }
 
     public void saveWithProgrammingRights(String comment) throws XWikiException
@@ -1450,8 +1449,9 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
         doc.setAuthor(context.getUser());
-        if (doc.isNew())
+        if (doc.isNew()) {
             doc.setCreator(context.getUser());
+        }
         getXWikiContext().getWiki().saveDocument(doc, olddoc, comment, getXWikiContext());
         olddoc = doc;
     }

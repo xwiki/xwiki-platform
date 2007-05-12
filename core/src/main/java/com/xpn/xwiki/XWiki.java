@@ -4103,8 +4103,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Privileged API to access an eXo Platform service from the Wiki Engine
      *
      * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming
-     *         rights
+     * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
      * @since 1.1 Beta 1
      */
@@ -4136,8 +4135,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
      *
      * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming
-     *         rights
+     * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
      * @since 1.1 Beta 1
      */

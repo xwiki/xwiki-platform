@@ -129,8 +129,30 @@ public class Attachment extends Api {
      * @return the content of the attachment
      * @throws XWikiException
      */
-    public byte[] getContent() throws XWikiException {
+    public byte[] getContent() throws XWikiException
+    {
+        return getContentAsBytes();
+    }
+
+    public byte[] getContentAsBytes() throws XWikiException
+    {
         return attachment.getContent(getXWikiContext());
+    }
+
+    public String getContentAsString()  throws XWikiException
+    {
+        // TODO: detect correct encoding for XML files?
+        return new String(getContentAsBytes());
+    }
+
+    public String getContentAsString(String charset)  throws XWikiException {
+        // TODO: detect correct encoding for XML files?
+        byte[] contentBytes = getContentAsBytes();
+        try {
+            return new String(contentBytes, charset);
+        } catch (UnsupportedEncodingException ex) {
+            return new String(contentBytes);
+        }
     }
 
     /**

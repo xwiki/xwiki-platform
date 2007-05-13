@@ -29,6 +29,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 

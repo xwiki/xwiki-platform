@@ -78,6 +78,7 @@ public interface XWikiService extends RemoteService {
     public void unlockDocument(String fullName) throws XWikiGWTException;
     public Boolean isLastDocumentVersion(String fullName, String version) throws XWikiGWTException;
 
+    public String login(String username, String password, boolean rememberme) throws XWikiGWTException;    
     public String getLoginURL() throws XWikiGWTException;
 
     public Boolean saveDocumentContent(String fullName, String content) throws XWikiGWTException;

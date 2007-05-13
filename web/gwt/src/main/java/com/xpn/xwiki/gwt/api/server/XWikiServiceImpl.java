@@ -64,21 +64,37 @@ import org.apache.commons.logging.LogFactory;
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
     private static final Log log = LogFactory.getLog(XWiki.class);
 
-    protected XWikiContext getXWikiContext() throws XWikiException {
-        XWikiRequest  request = new XWikiServletRequest(getThreadLocalRequest()); // use fake request
-        XWikiResponse response = new XWikiXMLRPCResponse(getThreadLocalResponse()); // use fake response
-        XWikiEngineContext engine;
+    XWikiEngineContext engine;
 
-        ServletContext sContext = null;
-        try {
-            sContext = getServletContext();
-        } catch (Exception ignore) { }
-        if (sContext != null) {
-            engine = new XWikiServletContext(sContext);
-        } else {
-            engine = new XWikiServletContext(new MockXWikiServletContext());
+    // Holding debug request and response objects
+    XWikiRequest request;
+    XWikiResponse response;
+
+    public XWikiServiceImpl() {
+        super();
+    }
+
+    public XWikiServiceImpl(XWikiRequest request, XWikiResponse response, XWikiEngineContext engine) {
+        this.request = request;
+        this.response = response;
+        this.engine = engine;
+    }
+
+    protected XWikiContext getXWikiContext() throws XWikiException {
+        if (this.engine==null) {
+            ServletContext sContext = null;
+            try {
+                sContext = getServletContext();
+            } catch (Exception ignore) { }
+            if (sContext != null) {
+                engine = new XWikiServletContext(sContext);
+            } else {
+                engine = new XWikiServletContext(new MockXWikiServletContext());
+            }
         }
 
+        XWikiRequest  request = (this.request!=null) ? this.request : new XWikiServletRequest(getThreadLocalRequest()); // use fake request
+        XWikiResponse response = (this.response!=null) ? this.response : new XWikiXMLRPCResponse(getThreadLocalResponse()); // use fake response
         XWikiContext context = Utils.prepareContext("", request, response, engine);
         context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
@@ -99,6 +115,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
         if (context.getDoc() == null)
             context.setDoc(new XWikiDocument("Fake", "Document"));
+
+        context.put("ajax", new Boolean(true));
         return context;
     }
 
@@ -595,6 +613,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    public String login(String username, String password, boolean rememberme) throws XWikiGWTException {
+         try {
+            XWikiContext context = getXWikiContext();
+            XWikiUser user = context.getWiki().getAuthService().checkAuth(username, password, rememberme ? "yes" : "no", context);
+            if (user==null)
+             return "XWiki.XWikiGuest";
+            else
+             return user.getUser();
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
     public boolean addComment(String docname, String message) throws XWikiGWTException {
         XWikiContext context = null;
         try {
@@ -887,8 +918,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
-            Properties properties = msg.getDocumentBundleProperties(translationPage, context);
-            return new Dictionary(properties);
+            Properties properties = (msg==null) ? null : msg.getDocumentBundleProperties(translationPage, context);
+            if (properties==null)
+             return new Dictionary();
+            else
+             return new Dictionary(properties);
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }

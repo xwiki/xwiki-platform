@@ -235,7 +235,7 @@ public class XWikiAuthServiceImpl implements XWikiAuthService
         SecurityRequestWrapper wrappedRequest =
             new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
         try {
-            if (auth.processLogin(username, password, rememberme, wrappedRequest, response,
+            if (!auth.processLogin(username, password, rememberme, wrappedRequest, response,
                 context)) {
                 return null;
             }

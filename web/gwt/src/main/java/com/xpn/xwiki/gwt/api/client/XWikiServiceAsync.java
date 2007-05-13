@@ -89,6 +89,8 @@ public interface XWikiServiceAsync {
 
     void isLastDocumentVersion(String fullName, String version, AsyncCallback async);
 
+    void login(String username, String password, boolean rememberme, AsyncCallback async);
+
     void getLoginURL(AsyncCallback async);
 
     void saveDocumentContent(String fullName, String content, AsyncCallback async);

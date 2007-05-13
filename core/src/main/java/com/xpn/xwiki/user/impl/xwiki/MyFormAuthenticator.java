@@ -147,7 +147,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 }
 
                 request.setUserPrincipal(principal);
-                if (!((Boolean)context.get("ajax")).booleanValue()) {
+                Boolean bAjax = (Boolean)context.get("ajax");
+                if ((bAjax==null)||(!bAjax.booleanValue())) {
                     String continueToURL = getContinueToURL(request);
                     // This is the url that the user was initially accessing before being prompted for login.
                     response.sendRedirect(response.encodeRedirectURL(continueToURL));

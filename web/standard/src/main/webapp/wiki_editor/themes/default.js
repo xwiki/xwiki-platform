@@ -41,7 +41,7 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 	return template;
 }
 
-WikiEditor.prototype.TOOLBAR_SPACER = '<img src="{$themeurl}/images/spacer.gif" width="1" height="15" class="mceSeparatorLine">';
+WikiEditor.prototype.TOOLBAR_SPACER = ' <img src="{$themeurl}/images/spacer.gif" width="1" height="15" class="mceSeparatorLine">';
 
 // TODO: Use a tile map so that only one image is needed for loading (optimization)
 WikiEditor.prototype.createButtonHTML = function(id, img, lang, cmd, ui, val, posTileMap) {

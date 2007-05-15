@@ -33,12 +33,12 @@ WikiEditor.prototype.initCorePlugin = function() {
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');
 
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
-	this.addInternalProcessor((/<\s*p\s*([^>]*)>\s*(.*?)\s*<\s*\/\s*p\s*>/i), 'convertParagraphInternal');
+	this.addInternalProcessor((/<p(.*?)>([\s\S]+?)<\/p>/i), 'convertParagraphInternal');
 
     this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\\r\n');
 
     this.addExternalProcessor((/\[(.*?)((>|\|)(.*?))?((>|\|)(.*?))?\]/i), 'convertLinkExternal');
-    this.addInternalProcessor((/<a\s*([^>]*)(class=\"wikiexternallink\"|class=\"wikilink\")\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
+    this.addInternalProcessor((/<a\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
 
     this.addExternalProcessor((/\{table\}([\s\S]+?)\{table\}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
@@ -97,12 +97,8 @@ WikiEditor.prototype.removeHtmlTags_Groovy = function(str) {
 //  This will remove some special Html tags to fix some bugs when switch between text and wysiwyg editor
 //  We will replace or remove this method in future when find out the better solutions.
 WikiEditor.prototype.removeSpecialHtmlTags = function(str) {
-    str = str.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
-    str = str.replace(/<p class="paragraph">\s*([\s\S]+?)<\/p>/g,'$1');
     str = str.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
     str = str.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
-    str = str.replace(/<\/?p[^>]*>/gi, "");
-    str = str.replace(/<br\s*\/>/g, '\\\\');
     return str;
 }
 
@@ -159,8 +155,8 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
     var href;
     var target;
     var separator = ">";
-    if( (txt = this.trimString(result[4])) != "") {
-        var att = this.readAttributes(result[1] + " " + result[3]);
+    if( (txt = this.trimString(result[2])) != "") {
+        var att = this.readAttributes(result[1]);
         if(att && att["id"]) {
             separator = "|";
         }
@@ -177,7 +173,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
         }
 
         } else {
-        str = result[4];
+        str = result[2];
     }
     return content.replace(regexp, str);
 }
@@ -186,36 +182,28 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
     var text = this.trimString(result[3]);
     var str = "";
     if (tinyMCE.isMSIE) str += "\r\n";
-    str += "{table}\r\n";
+    str += "{table}";
     var rows = text.split("<\/tr>");
-    for(var i=0; i< (rows.length - 1); i++) {
-        if( i == 0) rows[i] = this.trimString(rows[i].replace(/(.*?)<tr\s*([^>]*)>/g, ""));
-        else rows[i] = this.trimString(rows[i].replace(/<tr\s*([^>]*)>/g, ""));
-        var cols = rows[i].split("<\/td>");
-        for(var j=0; j< cols.length-1; j++) {
-            cols[j] = cols[j].replace(/<td\s*([^>]*)>/g, "");  // remove <td> tag
-            cols[j] = this.trimString(cols[j]);
-            if (cols[j].lastIndexOf("\\\\") == (cols[j].length - 2)) {
-                cols[j] = cols[j].substring(0, cols[j].lastIndexOf("\\\\"));
+    for(var i=0; i<(rows.length - 1); i++) {
+        var trow = "";
+        if (i == 0) trow = rows[0].replace(/(.*?)<tr(.*?)>/g, "");
+        else trow = rows[i].replace(/<tr(.*?)>/g, "")
+        var cols = trow.split("<\/td>");
+        for (var j=0; j<(cols.length-1); j++) {
+            var cell = this.trimString(cols[j].replace(/<td(.*?)>/g, ""));
+            if (cell.lastIndexOf("\\\\") == (cell.length-2)) {
+                cell = cell.substring(0, cell.lastIndexOf("\\\\"));
             }
-            var lines = this._getLines(cols[j]);
-            var colj = "";
-            if (lines.length == 1) colj = cols[j].replace(/<br \/>/g, "").replace(/\r\n/g, "");
-            else if (lines.length > 1)
-                for (var l=0; l < lines.length; l++)
-                    lines[l] = lines[l].replace(/<br \/>|\r|\n/g, "");
-                for (var k=0; k < lines.length; k++)
-                    if (lines[k] != "")
-                        if (k < (lines.length - 2)) colj += (lines[k] + "" + "\r\n");
-                        else if (k == (lines.length - 2))
-                            if (lines[k+1] != "")
-                                colj += lines[k] + "" + "\r\n" + lines[k+1];
-                            else colj += lines[k];
-            if (j != (cols.length - 2)) str += (colj + "|") ;
-            else str += (colj + "\r\n");
+            cell = cell.replace(/[\r\n]{3,}/g, "\\\\\r\n\\\\\r\n");
+            if (cell == "") cell = "&nbsp;"
+            if (j == 0) {
+                str += "\r\n" + cell;
+            } else {
+                str += "|" + cell;
+            }
         }
     }
-    str += "{table}";
+    str += "\r\n{table}";
     if (tinyMCE.isMSIE) str += "\r\n";
     return content.replace(regexp, str);
 }

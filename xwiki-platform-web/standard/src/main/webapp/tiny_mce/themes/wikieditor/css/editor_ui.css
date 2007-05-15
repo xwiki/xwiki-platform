@@ -12,15 +12,15 @@
 	height: 15px;
 }
 
-.mceSelectList {
-	font-family: 'MS Sans Serif', sans-serif, Verdana, Arial;
-	font-size: 7pt;
-	font-weight: normal;
-	margin-top: 3px;
-	padding: 0px;
-	display: inline;
-	vertical-align: top;
-	background-color: #F0F0EE
+select.mceSelectList {
+    background:#F0F0EE !important;
+    font-family:'MS Sans Serif',sans-serif,Verdana,Arial;
+    font-size:7pt !important;
+    font-weight:normal;
+    margin-top:3px;
+    padding:0px !important;
+    vertical-align:top;
+    border: 2px inset white !important;
 }
 
 .mceLabel, .mceLabelDisabled {

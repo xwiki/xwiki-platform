@@ -91,4 +91,10 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         typeInTinyMce("http://\\<yourserver\\>:8080/something");
         assertWikiTextGeneratedByTinyMCE("http://\\<yourserver\\>:8080/something");
     }
+
+    public void testHtmlElementIsRendered()
+    {
+        typeInTinyMce("<table><tr><td>hello</td></tr></table>");
+        assertWikiTextGeneratedByTinyMCE("<table><tr><td>hello</td></tr></table>");
+    }
 }

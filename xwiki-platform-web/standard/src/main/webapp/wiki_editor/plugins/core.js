@@ -21,7 +21,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(#+)\s+([^\r\n]+)$/im), 'convertListExternal');
-    this.addExternalProcessor((/^\s*(1+\.)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(1+)\.\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(\-+)\s+([^\r\n]+)$/im), 'convertListExternal');
 
     this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
@@ -852,7 +852,6 @@ WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, d
 	} else {
 		str += content;
 	}
-
 	return str;
 }
 

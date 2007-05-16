@@ -60,9 +60,19 @@ public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdmin
         clickLinkWithLocator("//img[@title='Unordered list']", false);
     }
 
+    public void clickTinyMceOrderedListButton()
+    {
+        clickLinkWithLocator("//img[@title='Ordered list']", false);
+    }
+
     public void clickTinyMceIndentButton()
     {
         clickLinkWithLocator("//img[@title='Indent']", false);
+    }
+
+    public void clickTinyMceOutdentButton()
+    {
+        clickLinkWithLocator("//img[@title='Outdent']", false);
     }
 
     public void assertWikiTextGeneratedByTinyMCE(String text)

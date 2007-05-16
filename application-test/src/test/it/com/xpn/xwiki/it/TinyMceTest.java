@@ -88,7 +88,7 @@ public class TinyMceTest extends AbstractTinyMceTestCase
 
     public void testEscapedHtmlElement()
     {
-        typeInTinyMce("http://<yourserver>:8080/something");
+        typeInTinyMce("http://\\<yourserver\\>:8080/something");
         assertWikiTextGeneratedByTinyMCE("http://\\<yourserver\\>:8080/something");
     }
 }

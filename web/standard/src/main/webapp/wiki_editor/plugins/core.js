@@ -20,8 +20,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
     this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
-    this.addExternalProcessor((/^\s*(#)\s+([^\r\n]+)$/im), 'convertListExternal');
-    this.addExternalProcessor((/^\s*(1\.)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(#+)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(1+\.)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(\-+)\s+([^\r\n]+)$/im), 'convertListExternal');
 
     this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
@@ -784,10 +784,10 @@ WikiEditor.prototype.convertListExternal = function(regexp, result, content) {
             str = this._convertRecursiveListExternal(regexp, subContent, 0, this.LIST_MINUS_CLASS_NAME);
 			break;
         case '#':
-            str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME);
+            str = this._convertRecursiveListExternal(regexp, subContent, 0, this.LIST_NUMERIC_CLASS_NAME);
 			break;
         case '1':
-            str = this._convertGenericListExternal(regexp, subContent, "ol", this.LIST_NUMERIC_CLASS_NAME_1);
+            str = this._convertRecursiveListExternal(regexp, subContent, 0, this.LIST_NUMERIC_CLASS_NAME);
             break;
     }
     return content.substring(0, result["index"]) + "\r\n" + str;
@@ -834,13 +834,14 @@ WikiEditor.prototype._convertGenericListExternal = function(regexp, content, tag
 
 WikiEditor.prototype._convertRecursiveListExternal = function(regexp, content, depth, classname) {
     var str = "";
+    var otag = (classname == this.LIST_NUMERIC_CLASS_NAME) ? "ol" : "ul";
     RegExp.lastIndex = 0;
 	var r = regexp.exec(content);
-    var currdepth = (r != null && ((r[1].charAt(0) == '*') || (r[1].charAt(0) == '-')) && r["index"]==0) ? r[1].length : 0; // number of "*", if no list element found on next line then list section is over
+    var currdepth = (r != null && ((r[1].charAt(0) == '*') || (r[1].charAt(0) == '-') || (r[1].charAt(0) == '#') || (r[1].charAt(0) == '1')) && r["index"]==0) ? r[1].length : 0; // number of "*", if no list element found on next line then list section is over
 	var lastPos = (currdepth > 0) ? r[0].length : 0;
 	var subContent = content.substring(lastPos, content.length);
     var depthdif = currdepth - depth;
-	var tag = (depthdif > 0) ? "<ul class=\"" + classname + "\">" : "<\/ul>";
+	var tag = (depthdif > 0) ? "<" + otag + " class=\"" + classname + "\">" : "<\/" + otag + ">";
 	for(var i=0; i < Math.abs(currdepth-depth);i++) {
 		str += tag + "\r\n";
 	}
@@ -1001,12 +1002,7 @@ WikiEditor.prototype._convertListInternal = function(content, lclass) {
                     str.replace(/<div>([\s\S]+?)<\/div>/g,'$1');
 					break;
 				case 'ol':
-					// Numeric list
-                    if ((lclass != null) && (lclass == "norder")) {
-                        str += "1. " + tstr + "\r\n";
-                    } else {
-                        str += "# " + tstr + "\r\n";
-                    }
+                    str += this.buildString("1", parseInt(attributes["wikieditorlistdepth"], 10)) + ". " + tstr + "\r\n";
                     break;
 			}
 		} else {

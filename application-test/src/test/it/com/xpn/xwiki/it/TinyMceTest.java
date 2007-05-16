@@ -98,8 +98,6 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         assertWikiTextGeneratedByTinyMCE("<table><tr><td>hello</td></tr></table>");
     }
 
-    /* Uncomment when http://jira.xwiki.org/jira/browse/XWIKI-1210 is fixed as it's currently
-       failing.
     public void testNestedNumberedList()
     {
         clickTinyMceOrderedListButton();
@@ -109,5 +107,5 @@ public class TinyMceTest extends AbstractTinyMceTestCase
         typeInTinyMce("level 2");
         
         assertWikiTextGeneratedByTinyMCE("1. level 1\n11. level 2");
-    }*/
+    }
 }

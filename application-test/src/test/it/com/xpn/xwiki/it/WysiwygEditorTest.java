@@ -20,16 +20,16 @@
 package com.xpn.xwiki.it;
 
 /**
- * Tests the Tiny MCE editor also known as the WYSIWYG editor.
+ * Tests the WYSIWYG editor.
  *
  * @version $Id: $
  */
-public class TinyMceTest extends AbstractTinyMceTestCase
+public class WysiwygEditorTest extends AbstractTinyMceTestCase
 {
     protected void setUp() throws Exception
     {
         super.setUp();
-        editInTinyMce("Test", "TestTinyMCE");
+        editInTinyMce("Test", "TestWysiwyg");
         clearTinyMceContent();
     }
 

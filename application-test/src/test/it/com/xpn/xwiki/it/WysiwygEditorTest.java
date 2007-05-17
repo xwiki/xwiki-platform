@@ -98,7 +98,7 @@ public class WysiwygEditorTest extends AbstractTinyMceTestCase
         assertWikiTextGeneratedByTinyMCE("<table><tr><td>hello</td></tr></table>");
     }
 
-    public void testNestedNumberedList()
+    public void testNestedOrderedList()
     {
         clickTinyMceOrderedListButton();
         typeInTinyMce("level 1");

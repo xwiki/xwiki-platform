@@ -24,4 +24,13 @@ public class WysiwygEditorFromWikiTest extends AbstractTinyMceTestCase
         clickLinkWithText("Wiki");
         assertEquals("1. level 1\n11. level 2", getFieldValue("content"));
     }
+
+    public void testAutomaticConversionFromHashSyntaxToNumberSyntaxForOrderedLists()
+    {
+        setFieldValue("content", "# item 1\n## item 2\n# item 3");
+        clickLinkWithText("WYSIWYG");
+        clickLinkWithText("Wiki");
+
+        assertEquals("1. item 1\n11. item 2\n1. item 3", getFieldValue("content"));
+    }
 }

@@ -387,7 +387,8 @@ WikiEditor.prototype.handleIndentButtons = function(editor_id, node, undo_index,
 
     var indent = this.core.getParentElement(node, "blockquote");
     var ul = this.core.getParentElement(node, "ul");
-    if (indent || ul) {
+    var ol = this.core.getParentElement(node, "ol");
+    if (indent || ul || ol) {
         tinyMCE.switchClass(editor_id + '_outdent', 'mceButtonNormal', false);
     }
 }
@@ -1062,6 +1063,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
 
 
 WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
+    if (this.trimString(result[3]) == "") {
+        return content.replace(regexp, result[3]);
+    }
     content = content.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     content = content.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
     content = content.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
@@ -1071,35 +1075,34 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
         var attributes = this.readAttributes(result[2]);
         str += "{style:type=" + type;
 
-        if (attributes && attributes["id"]) {
-            str += "|id=" + attributes["id"] ;
-        }
-
-        if (attributes && attributes["class"] && attributes["class"] != "stylemacro") {
-            str += "|class=" + attributes["class"] ;
-        }
-
-        if (attributes && attributes["name"]) {
-            str += "|name=" + attributes["name"] ;
-        }
-
-        if (attributes && attributes["style"]) {
-            var atts = attributes["style"].split(";");
-            for (var i=0; i < atts.length ; i++) {
-                var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
-                var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
-                var styleAtts = ["font-size", "font-family", "background-color", "color", "width", "height", "float", "border"];
-                for (var j=0 ; j < styleAtts.length; j++) {
-                    if (att == styleAtts[j]) {
-                        str += "|" + att + "=" + value;
-                        break;
+        if (attributes) {
+            if (attributes["id"]) {
+                str += "|id=" + attributes["id"] ;
+            }
+            if (attributes["class"] && attributes["class"] != "stylemacro") {
+                str += "|class=" + attributes["class"] ;
+            }
+            if (attributes["name"]) {
+                str += "|name=" + attributes["name"] ;
+            }
+            if (attributes["style"]) {
+                var atts = attributes["style"].split(";");
+                for (var i=0; i < atts.length ; i++) {
+                    var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
+                    var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
+                    var styleAtts = ["font-size", "font-family", "background-color", "color", "width", "height", "float", "border"];
+                    for (var j=0 ; j < styleAtts.length; j++) {
+                        if (att == styleAtts[j]) {
+                            str += "|" + att + "=" + value;
+                            break;
+                        }
                     }
-                }
-                if (att == "background-image") {
-                    var iconimage ;
-                    if (value.indexOf("url") >= 0) {
-                        iconimage = value.substring(value.indexOf("(") + 2, value.indexOf(")")-1);
-                        str += "|icon=" + iconimage;
+                    if (att == "background-image") {
+                        var iconimage ;
+                        if (value.indexOf("url") >= 0) {
+                            iconimage = value.substring(value.indexOf("(") + 2, value.indexOf(")")-1);
+                            str += "|icon=" + iconimage;
+                        }
                     }
                 }
             }

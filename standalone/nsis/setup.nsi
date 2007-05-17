@@ -12,7 +12,7 @@ InstType $(^UpdateInstType)
 
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.9
+!define VERSION 1.0
 !define COMPANY XWiki
 !define URL http://www.xwiki.org
 
@@ -95,7 +95,7 @@ InstallDir $PROGRAMFILES\XWiki
 CRCCheck on
 XPStyle on
 ShowInstDetails hide
-VIProductVersion 0.9.0.0
+VIProductVersion 1.0.0.0
 VIAddVersionKey /lang=${LANG_ENGLISH} ProductName XWiki
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey /lang=${LANG_ENGLISH} CompanyName "${COMPANY}"

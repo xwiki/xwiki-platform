@@ -21,8 +21,8 @@ package com.xpn.xwiki.it;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import junit.framework.TestCase;
 import org.openqa.selenium.server.SeleniumServer;
+import org.custommonkey.xmlunit.XMLTestCase;
 
 /**
  * Useful methods wrapping the Selenium API and making it even easier to user. All XWiki functional
@@ -30,7 +30,7 @@ import org.openqa.selenium.server.SeleniumServer;
  *
  * @version $Id: $ 
  */
-public abstract class AbstractSeleniumTestCase extends TestCase
+public abstract class AbstractSeleniumTestCase extends XMLTestCase
 {
     private static final String BASE_URL = "http://localhost:8080";
 
@@ -200,6 +200,11 @@ public abstract class AbstractSeleniumTestCase extends TestCase
         assertElementPresent("j_username");
         assertElementPresent("j_password");
         assertFalse(isChecked("rememberme"));
+    }
+
+    public String getFieldValue(String fieldName)
+    {
+        return getSelenium().getValue(fieldName);
     }
 
     public void setFieldValue(String fieldName, String value)

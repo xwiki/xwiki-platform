@@ -20,7 +20,7 @@
 package com.xpn.xwiki.it;
 
 /**
- * Tests the WYSIWYG editor.
+ * Tests the WYSIWYG editor (content edited in WYSIWYG mode).
  *
  * @version $Id: $
  */

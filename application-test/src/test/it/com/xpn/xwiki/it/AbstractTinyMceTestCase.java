@@ -80,4 +80,11 @@ public abstract class AbstractTinyMceTestCase extends AbstractAuthenticatedAdmin
         clickLinkWithText("Wiki");
         assertEquals(text, getSelenium().getValue("content"));
     }
+
+    public void assertTinyMceHTMLContentExists(String xpath) throws Exception
+    {
+        String html = getSelenium().getEval("this.browserbot.getCurrentWindow().tinyMCE."
+            + "getInstanceById('mce_editor_0').getDoc().body.innerHTML");
+        assertXpathExists(xpath, html);
+    }
 }

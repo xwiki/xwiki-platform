@@ -33,4 +33,13 @@ public class WysiwygEditorFromWikiTest extends AbstractTinyMceTestCase
 
         assertEquals("1. item 1\n11. item 2\n1. item 3", getFieldValue("content"));
     }
+
+    /* Uncomment when XWIKI-1238 is fixed
+    public void testHorizontalLineBeforeTableMacro()
+    {
+        setFieldValue("content", "----\n\n{table}\na | b\nc | d\n{table}");
+        clickLinkWithText("WYSIWYG");
+        clickLinkWithText("Wiki");
+        assertEquals("----\n\n{table}\na | b\nc | d\n{table}", getFieldValue("content"));
+    }*/
 }

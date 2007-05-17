@@ -75,6 +75,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addToolbarHandler('handleIndentButtons');
     this.addToolbarHandler('handleUndoButtons');
 	this.addToolbarHandler('handleTitlesList');
+    this.addToolbarHandler('handleStylesList');
 	this.addToolbarHandler('handleLinkButtons');
     this.addToolbarHandler('handleTableButtons');
 
@@ -378,6 +379,43 @@ WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, un
 			this._selectByValue(list, 0);
 		}
 	}
+}
+
+WikiEditor.prototype.handleStylesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
+    // Select font size
+    var selectElm = document.getElementById(editor_id + "_fontSizeSelect");
+    if (selectElm) {
+        var elm = tinyMCE.getParentElement(node);
+        if (elm) {
+            var size = tinyMCE.getAttrib(elm, "size");
+            if (size == '') {
+                var sizes = new Array('', '8px', '10px', '12px', '14px', '18px', '24px', '36px');
+                size = '' + elm.style.fontSize;
+                for (var i=0; i<sizes.length; i++) {
+                    if (('' + sizes[i]) == size) {
+                        size = i;
+                        break;
+                    }
+                }
+            }
+            if (!this._selectByValue(selectElm, size))
+                this._selectByValue(selectElm, "");
+        } else
+            this._selectByValue(selectElm, "0");
+    }
+    // Select font name
+    selectElm = document.getElementById(editor_id + "_fontNameSelect");
+    if (selectElm) {
+        var elm = tinyMCE.getParentElement(node);
+        if (elm) {
+            var family = tinyMCE.getAttrib(elm, "face");
+            if (family == '')
+                family = '' + elm.style.fontFamily;
+            if (!this._selectByValue(selectElm, family))
+                this._selectByValue(selectElm, "");
+        } else
+            this._selectByValue(selectElm, "");
+    }
 }
 
 WikiEditor.prototype.handleIndentButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {

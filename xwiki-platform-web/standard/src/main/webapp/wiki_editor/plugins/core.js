@@ -19,15 +19,15 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
+    this.addExternalProcessor((/^\s*----(\-)*\s*$/gim), '<hr class="line" \/>');
+	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
+
     this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(#+)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(1+)\.\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(\-+)\s+([^\r\n]+)$/im), 'convertListExternal');
 
     this.addInternalProcessor((/\s*<(ul|ol)\s*([^>]*)>/i), 'convertListInternal');
-    
-    this.addExternalProcessor((/^s*----(\-)*\s*$/gim), '<hr class="line" \/>');
-	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
 
     // Must remove the html tag format so it won't interfere with paragraph conversion
 	this.addExternalProcessor((/<%([\s\S]+?)%>/ig), '&lt;%$1%&gt;');

@@ -168,9 +168,6 @@
           </execution>
         </executions>
         <configuration>
-          <includes>
-            <include>**/WysiwygEditorFromWikiTest.*</include>
-          </includes>
           <systemProperties>
             <property>
               <name>browser</name>

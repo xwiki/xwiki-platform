@@ -168,6 +168,9 @@
           </execution>
         </executions>
         <configuration>
+          <includes>
+            <include>**/WysiwygEditorFromWikiTest.*</include>
+          </includes>
           <systemProperties>
             <property>
               <name>browser</name>
@@ -220,6 +223,57 @@
       <properties>
         <browser>*custom ${browserPath}</browser>
       </properties>
+    </profile>
+    <profile>
+      <!-- Test Admin features -->
+      <id>test-admin</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/LoginTest.*</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Test WYSIWYG editor features -->
+      <id>test-wysiwyg</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/WysiwygEditor*.*</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <!-- Test Wiki editor features -->
+      <id>test-wiki</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/WikiEditor*.*</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
   <repositories>

@@ -192,7 +192,7 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         var cols = trow.split("<\/td>");
         for (var j=0; j<(cols.length-1); j++) {
             var cell = this.trimString(cols[j].replace(/<td(.*?)>/g, ""));
-            if (cell.lastIndexOf("\\\\") == (cell.length-2)) {
+            if ((cell.lastIndexOf("\\\\") > 1) && (cell.lastIndexOf("\\\\") == (cell.length-2))) {
                 cell = cell.substring(0, cell.lastIndexOf("\\\\"));
             }
             cell = cell.replace(/[\r\n]{3,}/g, "\\\\\r\n\\\\\r\n");

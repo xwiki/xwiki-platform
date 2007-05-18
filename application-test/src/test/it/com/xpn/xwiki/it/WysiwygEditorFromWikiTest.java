@@ -41,4 +41,15 @@ public class WysiwygEditorFromWikiTest extends AbstractTinyMceTestCase
         clickLinkWithText("Wiki");
         assertEquals("----\n\n{table}\na | b\nc | d\n{table}", getFieldValue("content"));
     }
+
+    public void testBulletedLists() throws Exception
+    {
+        setFieldValue("content", "- item 1\n-- item 2\n- item 3");
+        clickLinkWithText("WYSIWYG");
+        assertTinyMceHTMLContentExists("ul/li[text()='item 1']");
+        assertTinyMceHTMLContentExists("ul/ul/li[text()='item 2']");
+        assertTinyMceHTMLContentExists("ul/li[text()='item 3']");
+        clickLinkWithText("Wiki");
+        assertEquals("- item 1\n-- item 2\n- item 3", getFieldValue("content"));
+    }
 }

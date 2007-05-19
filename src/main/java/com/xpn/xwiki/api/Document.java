@@ -448,7 +448,7 @@ public class Document extends Api
     }
 
     /**
-     * return thr URL of this document with the given action
+     * return the URL of this document with the given action
      */
     public String getURL(String action)
     {
@@ -456,7 +456,7 @@ public class Document extends Api
     }
 
     /**
-     * return thr URL of this document with the given action and queryString as parameters
+     * return the URL of this document with the given action and queryString as parameters
      */
     public String getURL(String action, String querystring)
     {

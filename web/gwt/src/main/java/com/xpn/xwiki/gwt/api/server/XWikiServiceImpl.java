@@ -753,6 +753,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setDefaultLanguage(xdoc.getDefaultLanguage());
         doc.setTranslation(xdoc.getTranslation());
         doc.setComment(xdoc.getComment());
+        List comments = xdoc.getComments();
+        doc.setCommentsNumber((comments==null) ? 0 : comments.size());
         doc.setUploadURL(xdoc.getExternalURL("upload", "ajax=1", context));  // "ajax=1"
         doc.setViewURL(xdoc.getExternalURL("view", context));
         try {
@@ -763,6 +765,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         doc.setHasElement(xdoc.getElements());
         try {
             doc.setEditRight(context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), xdoc.getFullName(), context));
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
+        }
+        try {
+            doc.setCommentRight(context.getWiki().getRightService().hasAccessLevel("comment", context.getUser(), xdoc.getFullName(), context));
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }

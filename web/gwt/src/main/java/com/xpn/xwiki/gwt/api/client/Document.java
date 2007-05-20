@@ -64,12 +64,14 @@ public class Document implements IsSerializable {
     private String fullName;
     private boolean editRight;
     private boolean viewRight = true;
+    private boolean commentRight = true;
     private List attachments = new ArrayList();
     private String uploadURL;
     private String saveURL;
     private String viewURL;
     private int hasElement;
     private String comment;
+    private int commentsnb;
 
     public Document() {
     }
@@ -374,7 +376,7 @@ public class Document implements IsSerializable {
         this.fullName = fullName;
     }
 
-    public boolean isEditRight() {
+    public boolean hasEditRight() {
         return editRight;
     }
 
@@ -382,12 +384,20 @@ public class Document implements IsSerializable {
         this.editRight = editRight;
     }
 
-    public boolean isViewRight() {
+    public boolean hasViewRight() {
         return viewRight;
     }
 
     public void setViewRight(boolean viewRight) {
         this.viewRight = viewRight;
+    }
+
+    public boolean hasCommentRight() {
+        return commentRight;
+    }
+
+    public void setCommentRight(boolean commentRight) {
+        this.commentRight = commentRight;
     }
 
     public List getAttachments() {
@@ -443,5 +453,13 @@ public class Document implements IsSerializable {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public int getCommentsNumber() {
+        return this.commentsnb;
+    }
+
+    public void setCommentsNumber(int commentsnb) {
+        this.commentsnb = commentsnb;
     }
 }

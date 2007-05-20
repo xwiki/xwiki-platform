@@ -869,7 +869,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return getDocumentContent(fullName, false, null);
     }
 
-    protected BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) {
+    protected BaseObject newBaseObject(BaseObject baseObject, XObject xObject, XWikiContext context) throws XWikiException {
+        if (baseObject==null) {
+            baseObject = (BaseObject) context.getWiki().getClass(xObject.getClassName(), context).newObject(context);
+            baseObject.setName(xObject.getName());
+            baseObject.setNumber(xObject.getNumber());
+        }
         Object[] propnames = xObject.getPropertyNames().toArray();
         for (int i = 0; i < propnames.length; i++) {
             String propname = (String) propnames[i];

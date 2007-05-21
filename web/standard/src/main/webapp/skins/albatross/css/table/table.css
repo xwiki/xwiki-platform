@@ -39,12 +39,20 @@
 
 /* Button to filter columns */
 .btnflt {
+ vertical-align: middle;
 }
 
 /* Filter input box */
 .flt {
  background-color:#f4f4f4;
  border:1px inset #ccc;
- margin:1px;
+ margin: 0px -3px;
  width:100%;
+ vertical-align: middle;
+}
+
+/* Filter input box when the filter is next to the filter button */
+.flt_s {
+ background-color:#f4f4f4;
+ vertical-align: middle;
 }

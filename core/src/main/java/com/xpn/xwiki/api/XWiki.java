@@ -519,8 +519,8 @@ public class XWiki extends Api
     /**
      * Return the URL of the static file provided by the current skin The file is first looked in
      * the skin active for the user, the space or the wiki. If the file does not exist in that skin,
-     * the file is looked up in the "parent skin" of the skin The file can be a CSS file or an image
-     * file
+     * the file is looked up in the "parent skin" of the skin. The file can be a CSS file, an image
+     * file, a javascript file, etc.
      * 
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @return URL to access this file
@@ -533,8 +533,8 @@ public class XWiki extends Api
     /**
      * Return the URL of the static file provided by the current skin The file is first looked in
      * the skin active for the user, the space or the wiki. If the file does not exist in that skin,
-     * the file is looked up in the "parent skin" of the skin The file can be a CSS file or an image
-     * file
+     * the file is looked up in the "parent skin" of the skin. The file can be a CSS file, an image
+     * file, a javascript file, etc.
      * 
      * @param filename Filename to be looked up in the skin (logo.gif, style.css)
      * @param forceSkinAction true to make sure that static files are retrieved through the skin
@@ -564,9 +564,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve the current skin for this request and user Each skin has a skin it is based
-     * on. If not the base skin is the xwiki.cfg parameter "xwiki.defaultbaseskin) If this parameter
-     * does not exist or is empty, the base skin is "albatross"
+     * API to retrieve the current skin for this request and user. Each skin has a skin it is based
+     * on. If not the base skin is the xwiki.cfg parameter "xwiki.defaultbaseskin". If this
+     * parameter does not exist or is empty, the base skin is "albatross".
      * 
      * @return The current baseskin for this request and user
      */
@@ -576,8 +576,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access the copyright for this space The copyright is read in the space preferences If
-     * it does not exist or is empty it is read from the XWiki preferences
+     * API to access the copyright for this space. The copyright is read in the space preferences.
+     * If it does not exist or is empty it is read from the XWiki preferences.
      * 
      * @return the text for the copyright
      */

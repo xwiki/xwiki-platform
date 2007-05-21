@@ -11,6 +11,9 @@
 @import "colorsblack.css";
 /*@import "ie.css";   masque temporairement : modif spécifique IE à réintéger*/
 
+/* Styles for custom hand written <table> tables */
+@import "css/table/table.css";
+
 .rightmenu a {
   margin-right : 2px;
   font-size: 100%;

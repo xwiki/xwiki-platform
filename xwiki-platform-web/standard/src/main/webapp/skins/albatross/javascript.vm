@@ -5,6 +5,7 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("xwiki.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("browserdetect.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("chwScripts.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("scripts/table/tablefilterNsort.js", true)"></script>
 
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
 <script type="text/javascript">

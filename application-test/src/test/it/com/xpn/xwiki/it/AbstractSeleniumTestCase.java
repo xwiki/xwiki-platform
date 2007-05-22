@@ -204,7 +204,11 @@ public abstract class AbstractSeleniumTestCase extends XMLTestCase
 
     public String getFieldValue(String fieldName)
     {
-        return getSelenium().getValue(fieldName);
+        // Note: We could use getSelenium().getvalue() here. However getValue() is stripping spaces
+        // and some of our tests verify that there are leading spaces/empty lines.
+        return getSelenium().getEval(
+            "selenium.browserbot.getCurrentWindow().document.getElementById(\"" + fieldName
+                + "\").value");
     }
 
     public void setFieldValue(String fieldName, String value)

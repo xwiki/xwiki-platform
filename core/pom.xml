@@ -219,6 +219,15 @@
       <version>0.93</version>
     </dependency>
 
+    <!-- Note: The POI POM seems invalid and generates warnings in the console. An issue has been raised:
+         http://jira.codehaus.org/browse/MEV-479. In the meantime we have placed POI in our
+         custom repo -->
+    <dependency>
+      <groupId>poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.0-alpha3</version>
+    </dependency>
+
     <!-- We need to create a JIRA issue on the Maven project to upload this artifact -->
     <!-- TODO: Check if this dependency is really required at runtime.
          Note: It is commented out as it makes the build fail when the unit tests are executed.
@@ -399,13 +408,6 @@
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>2.0.0</version>
-    </dependency>
-    <!-- Note: The POI POM seems invalid and generates warnings in the console. An issue has been raised:
-         http://jira.codehaus.org/browse/MEV-479 -->
-    <dependency>
-      <groupId>poi</groupId>
-      <artifactId>poi</artifactId>
-      <version>3.0-alpha3</version>
     </dependency>
     <dependency>
       <groupId>pdfbox</groupId>

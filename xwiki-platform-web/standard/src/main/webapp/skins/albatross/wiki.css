@@ -135,6 +135,12 @@
   background-color: #E5F0FE;
 }
 
+.wiki-table .table-head td{
+  font-weight: 100 !important;
+  font-size: 160% !important;
+
+}
+
 .wiki-table .table-odd {
   background-color: #fff;
 }

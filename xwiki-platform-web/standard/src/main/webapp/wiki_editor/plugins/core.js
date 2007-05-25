@@ -949,11 +949,17 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     }
 
     for (var i=0; i < rows.length; i ++) {
-        str += "<tr>";
+        if (i==0) {
+           str += "<tr class='table-head'>";
+        } else if ((i%2) == 1) {
+            str += "<tr class='table-odd'>";
+        } else {
+            str += "<tr class='table-even'>";
+        }
         var cols = rows[i].split("|");  // get cols
         for (var j=0; j < cols.length; j++) {
-            if ( i== 0) str += "<td style='background:#b6c5f2;font-weight:bold;'>";
-            else  str += "<td style='background:#FFFFFF'>";
+            if ( i== 0) str += "<td>";
+            else  str += "<td>";
             var linescol = cols[j].split("\\\\");
             if (linescol.length == 1) str += linescol[0];
             else if (linescol.length > 1)

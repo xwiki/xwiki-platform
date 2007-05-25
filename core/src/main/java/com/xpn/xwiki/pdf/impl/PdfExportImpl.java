@@ -22,11 +22,11 @@
 
 package com.xpn.xwiki.pdf.impl;
 
-import info.informatica.doc.dom4j.CSSStylableElement;
-import info.informatica.doc.dom4j.XHTMLDocument;
-import info.informatica.doc.dom4j.XHTMLDocumentFactory;
-import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
-import info.informatica.doc.xml.dtd.DefaultEntityResolver;
+//import info.informatica.doc.dom4j.CSSStylableElement;
+//import info.informatica.doc.dom4j.XHTMLDocument;
+//import info.informatica.doc.dom4j.XHTMLDocumentFactory;
+//import info.informatica.doc.style.css.dom.DOMCSSStyleSheet;
+//import info.informatica.doc.xml.dtd.DefaultEntityResolver;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -287,24 +287,24 @@ public class PdfExportImpl implements PdfExport {
         try {
             Reader re = new StringReader(new String(html));
             InputSource source = new InputSource(re);
-            SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
-            reader.setEntityResolver(new DefaultEntityResolver());
-            XHTMLDocument document = (XHTMLDocument) reader.read(source);
-
-            // Apply the style sheet
-            document.setDefaultStyleSheet(new DOMCSSStyleSheet(null, null));
-            document.getStyleSheet();
-            document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
-            applyInlineStyle(document.getRootElement());
-            OutputFormat outputFormat = new OutputFormat("", true);
-            if ((context == null) || (context.getWiki() == null)) {
-                outputFormat.setEncoding("UTF-8");
-            } else {
-                outputFormat.setEncoding(context.getWiki().getEncoding());
-            }
+//            SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
+//            reader.setEntityResolver(new DefaultEntityResolver());
+//            XHTMLDocument document = (XHTMLDocument) reader.read(source);
+//
+//            // Apply the style sheet
+//            document.setDefaultStyleSheet(new DOMCSSStyleSheet(null, null));
+//            document.getStyleSheet();
+//            document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
+//            applyInlineStyle(document.getRootElement());
+//            OutputFormat outputFormat = new OutputFormat("", true);
+//            if ((context == null) || (context.getWiki() == null)) {
+//                outputFormat.setEncoding("UTF-8");
+//            } else {
+//                outputFormat.setEncoding(context.getWiki().getEncoding());
+//            }
             StringWriter out = new StringWriter();
-            XMLWriter writer = new XMLWriter(out, outputFormat);
-            writer.write(document);
+//            XMLWriter writer = new XMLWriter(out, outputFormat);
+//            writer.write(document);
             String result = out.toString();
             // DEBUG OUTPUT
             System.out.println(result);
@@ -316,17 +316,17 @@ public class PdfExportImpl implements PdfExport {
     }
 
     private void applyInlineStyle(Element element) {
-        for (int i=0;i<element.nodeCount();i++) {
-            org.dom4j.Node node = element.node(i);
-            if (node instanceof CSSStylableElement) {
-                CSSStylableElement styleElement = (CSSStylableElement) node;
-                if (styleElement.getComputedStyle()!=null)
-                 styleElement.addAttribute("style", styleElement.getComputedStyle().getCssText());
-            }
-            if (node instanceof Element) {
-                applyInlineStyle((Element) node);
-            }      
-        }
+//        for (int i=0;i<element.nodeCount();i++) {
+//            org.dom4j.Node node = element.node(i);
+//            if (node instanceof CSSStylableElement) {
+//                CSSStylableElement styleElement = (CSSStylableElement) node;
+//                if (styleElement.getComputedStyle()!=null)
+//                 styleElement.addAttribute("style", styleElement.getComputedStyle().getCssText());
+//            }
+//            if (node instanceof Element) {
+//                applyInlineStyle((Element) node);
+//            }
+//        }
     }
 
     public String getFopxsl() {

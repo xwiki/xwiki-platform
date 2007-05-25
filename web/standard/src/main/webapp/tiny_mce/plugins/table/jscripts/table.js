@@ -118,14 +118,14 @@ function insertTable() {
                         html += "<tr>";
 
                         for (var x=0; x < cols; x++)
-                            html += '<td style=\"background:#b6c5f2;font-weight:bold;\">&nbsp;</td>';
+                            html += '<td>&nbsp;</td>';
 
                         html += "</tr>";
                     } else {
                         html += "<tr>";
 
                         for (var x=0; x < cols; x++)
-                            html += '<td  style=\"background:#FFFFFF\">&nbsp;</td>';
+                            html += '<td>&nbsp;</td>';
 
                         html += "</tr>";
                     }

@@ -508,7 +508,6 @@ var TinyMCE_TablePlugin = {
                         case "mceTableInsertRowBefore":
                             if (!trElm || !tdElm)
                                 return true;
-                            trElm.bgColor = "#b6c5f2";
                             var grid = getTableGrid(tableElm);
                             var cpos = getCellPos(grid, tdElm);
 
@@ -529,8 +528,6 @@ var TinyMCE_TablePlugin = {
 
                                         newTD.innerHTML = "&nbsp;";
                                         newTD.colSpan = tdElm.colSpan;
-                                        newTD.bgColor = "#b6c5f2";
-                                        newTD.style.cssText="font-weight:bold;";
                                         newTR.appendChild(newTD);
                                     } else
                                         tdElm.rowSpan = sd['rowspan'] + 1;

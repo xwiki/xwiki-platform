@@ -101,6 +101,12 @@ public class XWikiServletResponse implements XWikiResponse {
         response.addCookie(cookie);
     }
 
+    public void addCookie(String cookieName, String cookieValue, int age) {
+        Cookie cookie = new Cookie(cookieName, cookieValue);
+        cookie.setMaxAge(age);
+        response.addCookie(cookie);
+    }
+
     /**
      * Remove a cookie.
      *

@@ -506,6 +506,9 @@ html > body #actionmenu{
   border-width:0px 1px;  
   margin-right: -1px;
 }
+.topmenuentry strong{
+  font-size: 90%;
+}
 .submenu{
   display: block;
   width: 12em;

@@ -1,10 +1,10 @@
 #if($context.getMode()==0)## Visible only in a page
 <div id="actionmenu" class="layoutsubsection">
 <h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
-<div class="rightmenu"><a id="tmDoc" href='http://www.xwiki.org/xwiki/bin/view/Main/Documentation' onclick="openURL('http://www.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("documentation")</strong></a></div>
+<div class="rightmenu"><a id="tmDoc" href='http://www.xwiki.org/xwiki/bin/view/Main/Documentation' onclick="openURL('http://www.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("core.menu.documentation")</strong></a></div>
 <div class="leftmenu">
 ##
-## Edit menu
+## Edit mode
 ##
 #if($hasedit && !$isReadOnly)
 ## Check inline editing option
@@ -17,13 +17,13 @@
 ## Create menu
 ##
 ##if($hasedit)
-### #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("create") "tmCreate")
-##xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("create") "tmCreate")
-##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("createpage"))
-##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("createspace"))
-##submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("createblogpost"))
-##if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("createevent"))#end
-##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("createpanel"))#end
+### #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.create") "tmCreate")
+##xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create") "tmCreate")
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create.page"))
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("core.menu.create.space"))
+##submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("core.menu.create.blogpost"))
+##if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("core.menu.create.event"))#end
+##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("core.menu.create.panel"))#end
 ##xwikitopmenuentryend()
 ##end
 
@@ -31,42 +31,42 @@
 ## Edit menu
 ##
 #if($isAdvancedUser)
-#xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("edit") "tmEdit")
-#submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("editwiki"))
-#submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("editvisual"))
-#submenuitem($doc.getURL("inline", "$languageparams") $msg.get("editform"))
-#submenuitem($doc.getURL("edit", "editor=object") $msg.get("editobject"))
+#xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
+#submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("core.menu.edit.wiki"))
+#submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("core.menu.edit.visual"))
+#submenuitem($doc.getURL("inline", "$languageparams") $msg.get("core.menu.edit.form"))
+#submenuitem($doc.getURL("edit", "editor=object") $msg.get("core.menu.edit.object"))
 #if($hasadmin)
-#submenuitem($doc.getURL("edit", "editor=class") $msg.get("editclass"))
-#submenuitem($doc.getURL("edit", "editor=rights") $msg.get("editrights"))
+#submenuitem($doc.getURL("edit", "editor=class") $msg.get("core.menu.edit.class"))
+#submenuitem($doc.getURL("edit", "editor=rights") $msg.get("core.menu.edit.rights"))
 #end
 #xwikitopmenuentryend()
 #else ## !isAdvanced
-#xwikitopmenuentry($doc.getURL($editaction, $languageparams) $msg.get("edit") "tmEdit")
+#xwikitopmenuentry($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
 #end
 #end
 ##
 ## Show menu
 ##
 #if(!$doc.isNew())
-#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("show")  "tmShow")
+#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view")  "tmShow")
 #if($isAdvancedUser)
-#submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("viewcode"))
-## #submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("viewxml"))
-## #submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("viewattributes"))
+#submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view.code"))
+## #submenuitem($doc.getURL("view", "xpage=xml&amp;$docvariant") $msg.get("core.menu.view.xml"))
+## #submenuitem($doc.getURL("view", "viewer=attributes&amp;$docvariant") $msg.get("core.menu.view.attributes"))
 #end
-#submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("viewcomments"))
-#submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("viewattachments"))
-#submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("viewhistory"))
+#submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("core.menu.view.comments"))
+#submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("core.menu.view.attachments"))
+#submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("core.menu.view.history"))
 #xwikitopmenuentryend()
 #end ## isNew
 ##
 ## Print menu
 ##
 #if(!$doc.isNew())
-#xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("print") "tmPrint")
-#submenuitem($doc.getURL("pdf", $docvariant) $msg.get("pdf"))
-#submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("preview"))
+#xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("core.menu.print") "tmPrint")
+#submenuitem($doc.getURL("pdf", $docvariant) $msg.get("core.menu.print.pdf"))
+#submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("core.menu.print.preview"))
 #xwikitopmenuentryend()
 #end ## isNew
 ##
@@ -75,19 +75,19 @@
 ## TODO: Write me!
 ##
 ## #if($context.user != "XWiki.XWikiGuest")
-## #xwikitopmenuentry($doc.getURL("watch", "xredirect=${request.getRequestURL()}") $msg.get("watch") "tmWatch")
+## #xwikitopmenuentry($doc.getURL("watch", "xredirect=${request.getRequestURL()}") $msg.get("core.menu.watch") "tmWatch")
 ## #end
 ##
 ## Delete menu
 ##
 #if((!$doc.isNew()) && $hasadmin)
-#xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("delete") "tmDelete")
+#xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete") "tmDelete")
 #end
 ##
 ## Rename menu
 ##
 #if((!$doc.isNew()) && $hasedit)
-#xwikitopmenuentry($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("rename") "tmRename")
+#xwikitopmenuentry($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename") "tmRename")
 #end
 </div>
 </div>

@@ -64,9 +64,10 @@
 ## Print menu
 ##
 #if(!$doc.isNew())
-#xwikitopmenuentrystart($doc.getURL("pdf", $docvariant) $msg.get("core.menu.print") "tmPrint")
-#submenuitem($doc.getURL("pdf", $docvariant) $msg.get("core.menu.print.pdf"))
-#submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("core.menu.print.preview"))
+#xwikitopmenuentrystart($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("print") "tmPrint")
+#submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("preview"))
+#submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("pdf"))
+#submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("rtf"))
 #xwikitopmenuentryend()
 #end ## isNew
 ##

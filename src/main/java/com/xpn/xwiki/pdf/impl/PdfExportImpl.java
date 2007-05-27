@@ -52,6 +52,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -75,6 +77,8 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class PdfExportImpl implements PdfExport {
+    private static final Log log = LogFactory.getLog(PdfExportImpl.class);
+
     private Tidy tidy;
     private String xhtmlxsl = "xhtml2fo.xsl";
     private String fopxsl = "fop.xsl";
@@ -115,7 +119,8 @@ public class PdfExportImpl implements PdfExport {
         byte[] xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
         // DEBUG OUTPUT
-        System.out.println(new String(xmlfo));
+        if (log.isDebugEnabled())
+         log.debug(new String(xmlfo));
 
         exportXMLFO(xmlfo, out, type);
     }
@@ -129,7 +134,7 @@ public class PdfExportImpl implements PdfExport {
             // configure foUserAgent as desired
 
             // Construct fop with desired output format
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
+            Fop fop = fopFactory.newFop((type==PdfExportImpl.RTF) ? MimeConstants.MIME_RTF : MimeConstants.MIME_PDF, foUserAgent, out);
 
             // Setup JAXP using identity transformer
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -149,12 +154,14 @@ public class PdfExportImpl implements PdfExport {
             java.util.List pageSequences = foResults.getPageSequences();
             for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
                 PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
-                System.out.println("PageSequence "
+                if (log.isDebugEnabled())
+                    log.debug("PageSequence "
                         + (String.valueOf(pageSequenceResults.getID()).length() > 0
                                 ? pageSequenceResults.getID() : "<no id>")
                         + " generated " + pageSequenceResults.getPageCount() + " pages.");
             }
-            System.out.println("Generated " + foResults.getPageCount() + " pages in total.");
+            if (log.isDebugEnabled())
+                    log.debug("Generated " + foResults.getPageCount() + " pages in total.");
 
             /*
             // Reset the image cache otherwise it could be a security issue
@@ -205,7 +212,8 @@ public class PdfExportImpl implements PdfExport {
 
     public byte[] convertToStrictXHtml(byte[] input, XWikiContext context) {
 
-        // System.out.println(new String(input));
+        if (log.isDebugEnabled())
+            log.debug(new String(input));
 
         try {
             InputStream in = new ByteArrayInputStream(input);
@@ -307,7 +315,8 @@ public class PdfExportImpl implements PdfExport {
             writer.write(document);
             String result = out.toString();
             // DEBUG OUTPUT
-            System.out.println(result);
+            if (log.isDebugEnabled())
+                log.debug(result);
             return result.getBytes();
         } catch (Exception e ) {
             e.printStackTrace();

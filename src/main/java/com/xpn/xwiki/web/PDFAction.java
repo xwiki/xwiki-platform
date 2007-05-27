@@ -41,7 +41,7 @@ public class PDFAction extends XWikiAction {
          context.getResponse().setContentType("application/pdf");
          context.getResponse().addHeader("Content-disposition", "inline; filename=" + Utils.encode(doc.getSpace(), context) + "_" + Utils.encode(doc.getName(), context) + ".pdf");
 
-         pdfexport.exportToPDF(doc, context.getResponse().getOutputStream(), context);
+         pdfexport.export(doc, context.getResponse().getOutputStream(), PdfExportImpl.PDF, context);
         } catch (IOException e) {
            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,

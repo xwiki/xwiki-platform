@@ -48,7 +48,7 @@ input[type=text].flt, select.flt {
  background-image: url(icons/table/filter.gif);
  background-repeat: no-repeat;
  background-position: center left;
- border:1px inset #ccc;
+ border:1px solid #ccc;
  margin: 0px -3px;
  width:100%;
  vertical-align: middle;

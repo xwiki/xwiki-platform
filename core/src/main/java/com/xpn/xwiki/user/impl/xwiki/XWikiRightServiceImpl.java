@@ -94,7 +94,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             actionMap.put("register", "register");
             actionMap.put("redirect", "view");
             actionMap.put("admin", "admin");
-            actionMap.put("export", "admin");
+            actionMap.put("export", "view");
             actionMap.put("import", "admin");
             actionMap.put("unknown", "view");
         }

@@ -2816,7 +2816,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             protectUserPage(fullwikiname, userRights, doc, context);
 
-            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createduser"), context);
+            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"), context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(fullwikiname, context);
@@ -2847,7 +2847,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         memberobj.setStringValue("member", fullwikiname);
         allgroupdoc.addObject(gclass.getName(), memberobj);
         if (allgroupdoc.isNew()) {
-            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get("core.comment.addedusertogroup"), context);
+            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
         } else {
             getHibernateStore().saveXWikiObject(memberobj, context, true);
         }

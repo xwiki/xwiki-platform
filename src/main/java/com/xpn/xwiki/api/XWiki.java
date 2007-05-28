@@ -2743,4 +2743,34 @@ public class XWiki extends Api
         return context.getWiki().getAuthService().checkAuth(username, password, rememberme, context);
     }
 
+    /**
+     * Add a and b because velocity operations are not always working
+     * @param a
+     * @param b
+     * @return a+b
+     */
+    public int add(int a, int b) {
+        return a+b;
+    }
+
+    /**
+     * Add a and b because velocity operations are not working with longs
+     * @param a
+     * @param b
+     * @return a+b
+     */
+    public long add(long a, long b) {
+        return a+b;
+    }
+
+    /**
+     * Add a and b because velocity operations are not working with longs
+     * @param a
+     * @param b
+     * @return a+b
+     */
+    public String add(String a, String b) {
+        long c = Long.parseLong(a) + Long.parseLong(b);
+        return "" + c;
+    }
 }

@@ -420,7 +420,7 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 doc.addObject(bclass.getName(), bobj);
                 doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createduser"), context);
+                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"), context);
                 context.getWiki().setUserDefaultGroup(fullwikiname, context);
                 return true;
             }

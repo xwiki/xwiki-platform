@@ -46,7 +46,7 @@ public class ObjectRemoveAction extends XWikiAction {
         objects.set(classId, null);
         doc.addObjectsToRemove(object);
         doc.setAuthor(context.getUser());
-        xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.deleteobject"), context);
+        xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.deleteObject"), context);
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);

@@ -5,20 +5,38 @@
 <head>
 <title>
 $pdfdoc.use("XWiki.PDFClass")
+#set($pdfheader = $pdfdoc.display("title","rendered"))
+#if($pdfheader=="")
 #set($title = $pdfdoc.display("title", "rendered"))
 #if((!$title)||($title==""))
-#set( $title = $!xwiki.getWebPreference("title"))
-#if ( $title != "")
-$xwiki.parseContent($title)
-#else
-XWiki - $!doc.web - $!doc.displayTitle
-#end
+$!doc.web - $!doc.displayTitle
 #else
 $title
+#end
+#else
+$pdfheader
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
 </head>
 <body id="body" class="${context.action}body">
+<div class="pdfheader">
+$pdfdoc.use("XWiki.PDFClass")
+#set($pdfheader = $pdfdoc.display("header","rendered"))
+#if($pdfheader=="")
+#template("pdfheader.vm")
+#else
+$pdfheader
+#end
+</div>
+<div class="pdffooter">
+$pdfdoc.use("XWiki.PDFClass")
+#set($pdffooter = $pdfdoc.display("footer", "rendered"))
+#if($pdffooter=="")
+#template("pdffooter.vm")
+#else
+$pdffooter
+#end
+</div>
 <div id="xwikimaincontainer">
 <div id="xwikimaincontainerinner">

@@ -151,18 +151,19 @@ public class PdfExportImpl implements PdfExport {
 
             // Result processing
             FormattingResults foResults = fop.getResults();
-            java.util.List pageSequences = foResults.getPageSequences();
-            for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
-                PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
-                if (log.isDebugEnabled())
-                    log.debug("PageSequence "
-                        + (String.valueOf(pageSequenceResults.getID()).length() > 0
+            if (foResults!=null) {
+                java.util.List pageSequences = foResults.getPageSequences();
+                for (java.util.Iterator it = pageSequences.iterator(); it.hasNext();) {
+                    PageSequenceResults pageSequenceResults = (PageSequenceResults)it.next();
+                    if (log.isDebugEnabled())
+                        log.debug("PageSequence "
+                                + (String.valueOf(pageSequenceResults.getID()).length() > 0
                                 ? pageSequenceResults.getID() : "<no id>")
-                        + " generated " + pageSequenceResults.getPageCount() + " pages.");
-            }
-            if (log.isDebugEnabled())
+                                + " generated " + pageSequenceResults.getPageCount() + " pages.");
+                }
+                if (log.isDebugEnabled())
                     log.debug("Generated " + foResults.getPageCount() + " pages in total.");
-
+            }
             /*
             // Reset the image cache otherwise it could be a security issue
             // This should not be necessary anymore in 0.93

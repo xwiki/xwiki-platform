@@ -527,14 +527,14 @@
     <xsl:template match="html:body">
         <fo:page-sequence master-reference="all-pages">
             <fo:title>
-                <xsl:value-of select="/html:html/html:head/html:title"/>
+                <xsl:value-of select="/html:html/html:head/html:title[@class='pdftitle']"/>
             </fo:title>
             <fo:static-content flow-name="page-header">
                 <fo:block space-before.conditionality="retain"
                           space-before="{$page-header-margin}"
                           xsl:use-attribute-sets="page-header">
                     <xsl:if test="$title-print-in-header = 'true'">
-                        <xsl:value-of select="/html:html/html:head/html:title"/>
+                        <xsl:apply-templates select="/html:html/html:body/html:div[@class='pdfheader']" mode="pdfheader" />
                     </xsl:if>
                 </fo:block>
             </fo:static-content>
@@ -543,9 +543,7 @@
                           space-after="{$page-footer-margin}"
                           xsl:use-attribute-sets="page-footer">
                     <xsl:if test="$page-number-print-in-footer = 'true'">
-                        <xsl:text>- </xsl:text>
-                        <fo:page-number/>
-                        <xsl:text> -</xsl:text>
+                        <xsl:apply-templates  select="/html:html/html:body/html:div[@class='pdffooter']" mode="pdffooter" />
                     </xsl:if>
                 </fo:block>
             </fo:static-content>
@@ -556,6 +554,30 @@
                 </fo:block>
             </fo:flow>
         </fo:page-sequence>
+    </xsl:template>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" mode="pdfheader" priority="0">
+        <fo:block>
+            <xsl:call-template name="process-common-attributes"/>
+            <xsl:apply-templates/>
+        </fo:block>
+    </xsl:template>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" mode="pdffooter" priority="0">
+        <fo:block>
+            <xsl:call-template name="process-common-attributes"/>
+            <xsl:apply-templates/>
+        </fo:block>
+    </xsl:template>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdfheader']" priority="1">
+    </xsl:template>
+
+    <xsl:template match="/html:html/html:body/html:div[@class='pdffooter']" priority="1">
+    </xsl:template>
+
+    <xsl:template match="html:span[@class='page-number']">
+          <fo:page-number/>
     </xsl:template>
 
     <!--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-

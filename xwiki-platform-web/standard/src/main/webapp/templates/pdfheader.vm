@@ -1,3 +1,6 @@
-<div id="xwikibanner">
-<h3>$!headertitle</h3>
-</div>
+#set($title = $pdfdoc.display("title", "rendered"))
+#if((!$title)||($title==""))
+$!doc.web - $!doc.displayTitle
+#else
+$title
+#end

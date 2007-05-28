@@ -6,15 +6,37 @@
 #end
 $pdfdoc.use("XWiki.PDFClass")
 #template("pdfhtmlheader.vm")
-#set($pdfheader = $pdfdoc.display("header","rendered"))
-#if($pdfheader=="")
-#template("pdfheader.vm")
-#else
-$pdfheader
+#set($withPageBreaks = false)
+#if($request.pagebreaks=="1")
+#set($withPageBreaks = true)
 #end
+#if($request.pages)
+ #foreach($page in $request.getParameterValues("pages"))
+  #if($velocityCount!=0)
+   #pagebreak()
+  #end
+   #set($pageDoc = $xwiki.getDocument($page))
+   $pageDoc.getRenderedContent()
+   #if($request.includechilds)
+    #set($clevel = $xwiki.parseInt($request.includechilds))
+    #includeChilds($page  $withPageBreaks)
+   #elseif($request.includelinks)
+    #set($clevel = $xwiki.parseInt($request.includelinks))
+    #includeLinks($page $withPageBreaks)
+   #end
+ #end
+#else
 <div id="xwikicontent">
 $cdoc.getRenderedContent()
 </div>
+ #if($request.includechilds)
+  #set($clevel = $xwiki.parseInt($request.includechilds))
+  #includeChilds($cdoc.fullName $withPageBreaks)
+ #elseif($request.includelinks)
+  #set($clevel = $xwiki.parseInt($request.includelinks))
+  #includeLinks($cdoc.fullName $withPageBreaks)
+ #end
+#end
 #if ($request.get("comments")=="1")
 #template("comments2.vm")
 #end
@@ -28,10 +50,7 @@ $cdoc.getRenderedContent()
 #end
 </div>
 #end
-$pdfdoc.use("XWiki.PDFClass")
-#set($pdffooter = $pdfdoc.display("footer", "rendered"))
-#if($pdffooter=="")
-#template("pdffooter.vm")
-#else
-$pdffooter
-#end
+</div>
+</div>
+</body>
+</html>

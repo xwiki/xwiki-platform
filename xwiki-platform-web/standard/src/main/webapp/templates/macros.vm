@@ -664,3 +664,55 @@ $fn
 </div>
 #end
 #end
+
+## Macro to set a page break used in print, pdf and rtf mode
+#macro(pagebreak)
+<p style="page-break-before: always;" />
+#end
+
+## Macro to include childs of a page
+#set($clevel = 1)
+#macro(includeChilds $page)
+ #includeChilds($page false)
+#end
+## Macro to include childs at multiple levels
+#macro(includeChilds $page $withPageBreaks)
+ #if($clevel!=0)
+  #foreach($childDocName in $xwiki.searchDocuments("where doc.parent='$page' order by doc.creationDate"))
+    #set($childDoc = $xwiki.getDocument($childDocName))
+    #if(($childDoc)&&($childDoc.getSpace()!="Panels")&&($childDoc.getSpace()!="XWiki"))
+     #if($withPageBreaks)
+     #pagebreak()
+     #end
+     $childDoc.getRenderedContent()
+     #set($clevel = $xwiki.add($clevel,-1))
+     #includeChilds($childDocName $withPageBreaks)
+     #set($clevel = $xwiki.add($clevel,1))
+    #end
+  #end
+ #end
+#end
+
+## Macro to include childs of a page
+#macro(includeLinks $page)
+ #includeLinks($page false)
+#end
+## Macro to include childs at multiple levels
+#macro(includeLinks $page $withPageBreaks)
+ #if($clevel!=0)
+  #set($pageDoc = $xwiki.getDocument($page))
+  #foreach($child in $pageDoc.getLinks())
+    #set($childDocName = $child.getLink())
+    #set($childDoc = $xwiki.getDocument($childDocName))
+    #if(($childDoc)&&($childDoc.getSpace()!="Panels")&&($childDoc.getSpace()!="XWiki"))
+     #if($withPageBreaks)
+     #pagebreak()
+     #end
+     $childDoc.getRenderedContent()
+     #set($clevel = $xwiki.add($clevel,-1))
+     #includeLinks($childDocName $withPageBreaks)
+     #set($clevel = $xwiki.add($clevel,1))
+    #end
+  #end
+ #end
+#end

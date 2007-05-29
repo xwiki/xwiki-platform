@@ -30,7 +30,13 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.gwt.api.client.*;
+import com.xpn.xwiki.gwt.api.client.Attachment;
+import com.xpn.xwiki.gwt.api.client.Dictionary;
+import com.xpn.xwiki.gwt.api.client.Document;
+import com.xpn.xwiki.gwt.api.client.User;
+import com.xpn.xwiki.gwt.api.client.XObject;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
+import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -39,26 +45,24 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.xmlrpc.MockXWikiServletContext;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
@@ -125,6 +129,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         // let's make sure we are informed
         if (log.isErrorEnabled()) {
             log.error("Unhandled exception on the server", e);
+        }
+
+        if (e instanceof XWikiGWTException){
+            return (XWikiGWTException) e;
         }
 
         XWikiException exp;

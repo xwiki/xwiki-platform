@@ -52,6 +52,7 @@
     #end
   #end
   <div class="padded">
-    <span class="buttonwrapper"><input type="submit" value="$msg.get("core.rename.submit")"/></span>
+    <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms[0].action='$doc.getURL("view")'; if (document.forms[0].onsubmit) document.forms[0].onsubmit();"/></span>
+    <span class="buttonwrapper"><input class="button" type="submit" name="formactionrename" value="$msg.get("core.rename.submit")" onclick="document.forms[0].action='$doc.getURL("view", "xpage=rename&amp;step=2")'; if (document.forms[0].onsubmit) document.forms[0].onsubmit();"/></span>
   </div>
 </form>

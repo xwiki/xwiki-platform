@@ -1808,13 +1808,15 @@ TinyMCE_Engine.prototype = {
 				el.style.width = oldW;
 				el.style.height = oldH;
 
-				for (var y=0; y<el.rows.length; y++) {
-                    if (y == 0){
-                        el.rows[y].className = "table-head";
-                    }else if ((y%2) == 1) {
-                        el.rows[y].className = "table-odd";
-                    } else {
-                        el.rows[y].className = "table-even";
+                if (el.className == "wiki-table") {
+                    for (var y=0; y<el.rows.length; y++) {
+                        if (y == 0){
+                            el.rows[y].className = "table-head";
+                        }else if ((y%2) == 1) {
+                            el.rows[y].className = "table-odd";
+                        } else {
+                            el.rows[y].className = "table-even";
+                        }
                     }
                 }
 

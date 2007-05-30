@@ -696,10 +696,6 @@ var TinyMCE_TablePlugin = {
 
                                         newTD.innerHTML = "&nbsp;";
                                         newTD.rowSpan = tdElm.rowSpan;
-                                        if (y==0) {
-                                            newTD.bgColor = "#b6c5f2";
-                                            newTD.style.cssText="font-weight:bold;";
-                                        }
                                        tdElm.parentNode.insertBefore(newTD, tdElm);
                                     } else
                                         tdElm.colSpan++;
@@ -726,10 +722,6 @@ var TinyMCE_TablePlugin = {
 
 									newTD.innerHTML = "&nbsp;";
 									newTD.rowSpan = tdElm.rowSpan;
-                                     if (y==0) {
-                                        newTD.bgColor = "#b6c5f2";
-                                        newTD.style.cssText="font-weight:bold;";
-                                    }
                                     var nextTD = nextElm(tdElm, "TD");
 									if (nextTD == null)
 										tdElm.parentNode.appendChild(newTD);

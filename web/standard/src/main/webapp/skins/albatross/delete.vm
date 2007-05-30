@@ -9,5 +9,13 @@
 #end
 #xwikimessagebox($msg.get("delete") $msg.get("confirmdelete") $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
 </div>
+#set($links=$doc.getBacklinks())
+#if($links && $links.size() > 0)
+#warning ($msg.get("backlinkswarningdelete"))
+#foreach($docname in $links)
+#set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    <a href="$rdoc.getURL("view")">$rdoc.displayTitle</a>
+#end	
+#end
 <div class="clearfloats"></div>
 #template("endpage.vm")

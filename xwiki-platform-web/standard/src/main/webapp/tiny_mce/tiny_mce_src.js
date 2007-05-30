@@ -1808,17 +1808,17 @@ TinyMCE_Engine.prototype = {
 				el.style.width = oldW;
 				el.style.height = oldH;
 
-				for (var y=0; y<el.rows.length; y++) {
-					for (var x=0; x<el.rows[y].cells.length; x++) {
-						//var cn = tinyMCE.getVisualAidClass(tinyMCE.getAttrib(el.rows[y].cells[x], "class"), state && bo);
-						//tinyMCE.setAttrib(el.rows[y].cells[x], "class", cn);
-                        if (y != 0) {
-                            el.rows[y].cells[x].bgColor = "#FFFFFF";
-                            el.rows[y].cells[x].style.cssText="font-weight:none;"
+                if (el.className == "wiki-table") {
+                    for (var y=0; y<el.rows.length; y++) {
+                        if (y == 0){
+                            el.rows[y].className = "table-head";
+                        }else if ((y%2) == 1) {
+                            el.rows[y].className = "table-odd";
+                        } else {
+                            el.rows[y].className = "table-even";
                         }
-
                     }
-				}
+                }
 
 				break;
 

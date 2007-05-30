@@ -460,8 +460,8 @@ var TinyMCE_TablePlugin = {
 					var template = new Array();
 
 					template['file'] = '../../plugins/table/table.htm';
-					template['width'] = 350;
-					template['height'] = 230;
+					template['width'] = 400;
+					template['height'] = 250;
 
 					// Language specific width and height addons
 					template['width'] += tinyMCE.getLang('lang_table_table_delta_width', 0);
@@ -508,7 +508,6 @@ var TinyMCE_TablePlugin = {
                         case "mceTableInsertRowBefore":
                             if (!trElm || !tdElm)
                                 return true;
-                            trElm.bgColor = "#b6c5f2";
                             var grid = getTableGrid(tableElm);
                             var cpos = getCellPos(grid, tdElm);
 
@@ -529,8 +528,6 @@ var TinyMCE_TablePlugin = {
 
                                         newTD.innerHTML = "&nbsp;";
                                         newTD.colSpan = tdElm.colSpan;
-                                        newTD.bgColor = "#b6c5f2";
-                                        newTD.style.cssText="font-weight:bold;";
                                         newTR.appendChild(newTD);
                                     } else
                                         tdElm.rowSpan = sd['rowspan'] + 1;
@@ -699,10 +696,6 @@ var TinyMCE_TablePlugin = {
 
                                         newTD.innerHTML = "&nbsp;";
                                         newTD.rowSpan = tdElm.rowSpan;
-                                        if (y==0) {
-                                            newTD.bgColor = "#b6c5f2";
-                                            newTD.style.cssText="font-weight:bold;";
-                                        }
                                        tdElm.parentNode.insertBefore(newTD, tdElm);
                                     } else
                                         tdElm.colSpan++;
@@ -729,10 +722,6 @@ var TinyMCE_TablePlugin = {
 
 									newTD.innerHTML = "&nbsp;";
 									newTD.rowSpan = tdElm.rowSpan;
-                                     if (y==0) {
-                                        newTD.bgColor = "#b6c5f2";
-                                        newTD.style.cssText="font-weight:bold;";
-                                    }
                                     var nextTD = nextElm(tdElm, "TD");
 									if (nextTD == null)
 										tdElm.parentNode.appendChild(newTD);

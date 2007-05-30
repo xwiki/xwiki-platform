@@ -180,7 +180,7 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
 }
 
 WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
-    var text = this.trimString(result[3]);
+    var text = this.trimRNString(result[3]);
     var str = "";
     if (tinyMCE.isMSIE) str += "\r\n";
     str += "{table}";
@@ -191,7 +191,7 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         else trow = rows[i].replace(/<tr(.*?)>/g, "")
         var cols = trow.split("<\/td>");
         for (var j=0; j<(cols.length-1); j++) {
-            var cell = this.trimString(cols[j].replace(/<td(.*?)>/g, ""));
+            var cell = this.trimRNString(cols[j].replace(/<td(.*?)>/g, ""));
             if ((cell.lastIndexOf("\\\\") > 1) && (cell.lastIndexOf("\\\\") == (cell.length-2))) {
                 cell = cell.substring(0, cell.lastIndexOf("\\\\"));
             }
@@ -751,7 +751,7 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 	for(var i=0; i < lines.length; i++) {
 		//alert("line(" + i + "): " + lines[i]);
 		// Consume blank spaces
-		line = this.trimString(lines[i]);
+		line = lines[i];
 		var hh = this._hasHTML(line);
         var hbr = this._onlyHasBr(line);
         if(line != "" && (!hh || hbr)) {
@@ -921,13 +921,13 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 }
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
-    var text = this.trimString(result[1]);
+    var text = this.trimRNString(result[1]);
     var _lines = this._getLines(text);
     var str = "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
     var lines = new Array();
     var numColumns = 0;
     for (var i=0; i < _lines.length; i++) {
-        _lines[i] = this.trimString(_lines[i].replace(/\r|\n/g, ""));
+        _lines[i] = this.trimRNString(_lines[i]);
         _lines[i] = _lines[i].replace(/<\/?p[^>]*>/gi, "");
         if (_lines[i] != "") {
             lines[numColumns] = _lines[i];

@@ -503,5 +503,18 @@ WikiEditor.prototype._escapeText = function(str){
     }
     return newstr;
 }
+
+WikiEditor.prototype.trimRNString = function(str) {
+    str = str.replace(/(^(\r|\n))|((\r|\n)$)/gi, "");
+
+    if (str.lastIndexOf("\r") == (str.length - 1)) {
+       str = str.substring(0, str.length - 1);     
+    }
+    if (str.indexOf("\n") == 0) {
+        str = str.substring(1, str.length);
+    }
+
+    return str;
+}
 <!-- Initilization global variable and include core editor -->
 wikiEditor = new WikiEditor();

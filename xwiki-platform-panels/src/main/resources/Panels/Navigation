@@ -12,13 +12,14 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1165426047000</creationDate>
-<date>1166314279000</date>
-<contentUpdateDate>1169801141000</contentUpdateDate>
-<version>1.43</version>
+<date>1180519985000</date>
+<contentUpdateDate>1180519985000</contentUpdateDate>
+<version>1.76</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -38,6 +39,7 @@
 <multiSelect>1</multiSelect>
 <size>30</size>
 <separator> </separator>
+<cache>0</cache>
 <separators> ,|</separators>
 <values></values>
 <number>1</number>
@@ -70,6 +72,7 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
+<cache>0</cache>
 <separators> ,|</separators>
 <values>view|edit</values>
 <number>2</number>
@@ -84,6 +87,7 @@
 <multiSelect>0</multiSelect>
 <size>1</size>
 <separator> </separator>
+<cache>0</cache>
 <separators> ,|</separators>
 <values>Information|Navigation|Tools|Administration|Other</values>
 <number>5</number>
@@ -133,7 +137,7 @@
 <property>
 <content>#panelhiddenheader("Navigation")
 #set ($hiddenSpaces = ["XWiki", "Admin", "Panels"])
-#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.BlogRss","Main.Test", "Blog.Macros", "Main.TagsRss", "Main.Ouverture", "Main.WikiLaunch", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
+#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
 #set ($blackListedPages = ["WebPreferences"])
 &lt;div id="xwikinavcontainer"&gt;
 #set($spaces = $xwiki.spaces)
@@ -141,7 +145,7 @@
 #set($spacecount = 0)
 &lt;div id="xwikinav"&gt;
 #foreach($space in $spaces)
-#if (!$hiddenSpaces.contains($space))
+#if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
 #if ($doc.web == $space)
 #set ($spacecount = $i)
 #end
@@ -151,10 +155,10 @@
 &lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
 #set($hql = $xwiki.searchDocuments("doc.web='$space' order by doc.name"))
 #foreach($page in $hql)
-#if (!$hiddenPages.contains($page))
+#if (!$hiddenPages.contains($page) || ($hiddenPages.contains($page) &amp;&amp; $xwiki.hasAdminRights()))
 #set($dotIndex = $page.indexOf(".")+1)
 #set($pageName = $page.substring($dotIndex, $page.length()))
-#if (!$blackListedPages.contains($pageName))
+#if (!$blackListedPages.contains($pageName) || ($blackListedPages.contains($pageName) &amp;&amp; $xwiki.hasAdminRights()))
 #if ($doc.fullName == $page)
 - *$xwiki.getDocument($page).name*
 #else

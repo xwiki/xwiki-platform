@@ -60,5 +60,6 @@ input[type=text].flt_s, select.flt_s {
  background-image: url(icons/table/filter.gif);
  background-repeat: no-repeat;
  background-position: center left;
+ border:1px solid #ccc;
  vertical-align: middle;
 }

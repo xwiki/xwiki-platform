@@ -155,7 +155,10 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Step 6: Execute the tests -->
+      <!-- Step 6: Execute the tests.
+           Note: To execute a single test case run mvn install -Dtest=<test name>
+           For example: mvn install -Dtest=WysiwygEditorFromWikiTest
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>

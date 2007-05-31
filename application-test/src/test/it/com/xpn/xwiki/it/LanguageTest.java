@@ -46,11 +46,24 @@ public class LanguageTest extends AbstractAuthenticatedAdminTestCase
 
     public void testChangeLanguageInMonolingualModeUsingTheAdministrationPreference()
     {
+        open("/xwiki/bin/edit/Test/LanguageTest?editor=wiki");
+        setFieldValue("content", "context = ($context.language), doc = ($doc.language), "
+            + "default = ($doc.defaultLanguage), tdoc = ($tdoc.language), "
+            + "tdocdefault = ($tdoc.defaultLanguage)");
+        saveAndViewEdition();
+
+        assertEquals("context = (en), doc = (), default = (en), tdoc = (), tdocdefault = (en)",
+            getSelenium().getText("xwikicontent"));
+
         clickLinkWithLocator("headeradmin");
         getSelenium().type("XWiki.XWikiPreferences_0_default_language", "fr");
         saveAndViewEdition();
 
         assertEquals("Quitter la session", getSelenium().getText("headerlogout"));
+
+        open("/xwiki/bin/view/Test/LanguageTest");
+        assertEquals("context = (fr), doc = (), default = (en), tdoc = (), tdocdefault = (en)",
+            getSelenium().getText("xwikicontent"));
     }
 
     public void testVerifyPassingLanguageInRequestHasNotEffectInMonoligualMode()

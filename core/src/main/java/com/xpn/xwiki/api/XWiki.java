@@ -824,11 +824,14 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access the document language preference for the request Order of evaluation is:
-     * Language of the wiki in mono-lingual mode language request paramater language in context
-     * language user preference language in cookie language accepted by the navigator
-     * 
-     * @return the document language preference for the request
+     * First try to find the current language in use from the XWiki context. If none is used
+     * and if the wiki is not multilingual use the default language defined in the XWiki
+     * preferences. If the wiki is multilingual try to get the language passed in the request.
+     * If none was passed try to get it from a cookie. If no language cookie exists then use the
+     * user default language and barring that use the browser's "Accept-Language" header sent in
+     * HTTP request. If none is defined use the default language.
+     *
+     * @return the language to use
      */
     public String getLanguagePreference()
     {
@@ -836,9 +839,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Same API as getLanguagePreference() to get the document language preference
-     * 
-     * @return current language for the request
+     * @deprecated use {@link #getLanguagePreference()} instead
      */
     public String getDocLanguagePreference()
     {

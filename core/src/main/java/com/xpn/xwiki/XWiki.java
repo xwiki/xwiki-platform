@@ -129,7 +129,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
 import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
@@ -1553,7 +1552,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             XWikiDocument doc = getDocument("XWiki.XWikiPreferences", context);
             // First we try to get a translated preference object
             BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage(), true);
+                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
             String result = "";
 
             try {
@@ -1591,7 +1590,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // First we try to get a translated preference object
             BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "language", context.getLanguage(), true);
+                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
             String result = "";
             try {
                 result = object.getStringValue(prefname);
@@ -1650,30 +1649,49 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return getUserPreference(prefname, context);
     }
 
-    public String getLanguagePreference(XWikiContext context)
-    {
-        return getDocLanguagePreference(context);
-    }
-
+    /**
+     * @deprecated use {@link #getLanguagePreference(XWikiContext)} instead
+     */
     public String getDocLanguagePreference(XWikiContext context)
     {
-        // First we get the language from the request
-        String language;
-        String defaultLanguage = context.getWiki().getXWikiPreference("language", "", context);
+        return getLanguagePreference(context);
+    }
+
+    /**
+     * First try to find the current language in use from the XWiki context. If none is used
+     * and if the wiki is not multilingual use the default language defined in the XWiki
+     * preferences. If the wiki is multilingual try to get the language passed in the request.
+     * If none was passed try to get it from a cookie. If no language cookie exists then use the
+     * user default language and barring that use the browser's "Accept-Language" header sent in
+     * HTTP request. If none is defined use the default language.
+     *
+     * @return the language to use
+     */
+    public String getLanguagePreference(XWikiContext context)
+    {
+        // First we try to get the language from the XWiki Context. This is the current language
+        // being used.
+        String language = context.getLanguage();
+        if (language != null)
+            return language;
+
+        // Find out what is the default language from the XWiki preferences settings.
+        String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
         if (defaultLanguage == null || defaultLanguage.equals("")) {
             defaultLanguage = "en";
         }
 
-        language = context.getLanguage();
-        if (language != null)
-            return language;
-
+        // If the wiki is non multilingual then the language is the default language.
         if (!context.getWiki().isMultiLingual(context)) {
             language = defaultLanguage;
             context.setLanguage(language);
             return language;
         }
 
+        // As the wiki is multilingual try to find the language to use from the request by looking
+        // for a language parameter. If the language value is "default" use the default language
+        // from the XWiki preferences settings. Otherwise set a cookie to remember the language
+        // in use.
         try {
             language = context.getRequest().getParameter("language");
             if ((language != null) && (!language.equals(""))) {
@@ -1697,6 +1715,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } catch (Exception e) {
         }
 
+        // As no language parameter was passed in the request, try to get the language to use
+        // from a cookie.
         try {
             // First we get the language from the cookie
             language = getUserPreferenceFromCookie("language", context);
@@ -1753,7 +1773,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = context.getWiki().getXWikiPreference("language", "", context);
+            language = context.getWiki().getXWikiPreference("default_language", "", context);
             context.setLanguage(language);
             return language;
         }
@@ -1837,7 +1857,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         boolean setCookie = false;
 
         if (!context.getWiki().isMultiLingual(context)) {
-            language = context.getWiki().getXWikiPreference("language", "", context);
+            language = context.getWiki().getXWikiPreference("default_language", "", context);
             context.setInterfaceLanguage(language);
             return language;
         }
@@ -2223,7 +2243,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
 
         needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
-        needsUpdate |= bclass.addTextField("language", "Language", 5);
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
         needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
@@ -2935,7 +2954,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         if (context.get("msg") == null) {
             // String ilanguage = getInterfaceLanguagePreference(context);
-            String dlanguage = getDocLanguagePreference(context);
+            String dlanguage = getLanguagePreference(context);
             Locale locale = new Locale(dlanguage);
             context.put("locale", locale);
             if (context.getResponse() != null) {
@@ -4337,7 +4356,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 String language = getLanguagePreference(context);
                 formatSymbols = new DateFormatSymbols(new Locale(language));
             } catch (Exception e2) {
-                String language = getXWikiPreference("language", context);
+                String language = getXWikiPreference("default_language", context);
                 if ((language != null) && (!language.equals("")))
                     formatSymbols = new DateFormatSymbols(new Locale(language));
             }

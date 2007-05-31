@@ -28,7 +28,7 @@ document.forms.objectadd.submit();
 #set($class = $obj.xWikiClass)
 #set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
 #set($sectionitemsmap = $xwiki.hashMap)
-#set($sectionitemsmap.params = ["multilingual", "language" , "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
+#set($sectionitemsmap.params = ["multilingual", "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
 #set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])
 #set($sectionitemsmap.editing = ["editor", "editbox_width","editbox_height"])

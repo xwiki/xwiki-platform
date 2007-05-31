@@ -179,4 +179,13 @@ public class SearchResults
     {
         return getRelevantResults().size();
     }
+
+    /**
+     * @return total number of searchresults including unallowed items
+     */
+    public int getTotalHitcount()
+    {
+        return hits.length();
+    }
+
 }

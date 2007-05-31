@@ -97,6 +97,10 @@
             <column name="XWD_VALIDATION_SCRIPT" sql-type="clob"/>
         </property>
 
+        <property name="comment" type="string">
+            <column name="XWD_COMMENT" length="1023" />
+        </property>
+        
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiDocumentArchive" table="xwikidoc">
@@ -361,9 +365,6 @@
         </property>
         <property name="validationScript"  type="string">
             <column name="XWO_VALIDATION_SCRIPT" sql-type="clob" />
-        </property>
-        <property name="comment" type="string">
-            <column name="XWD_COMMENT" length="1023"/>
         </property>
     </class>
 

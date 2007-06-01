@@ -1687,6 +1687,17 @@ public class XWiki extends Api
     }
 
     /**
+     * API to generate a random string
+     *
+     * @param size Desired size of the string
+     * @return the generated string
+     */
+    public String generateRandomString(int size)
+    {
+        return xwiki.generateRandomString(size);
+    }
+
+    /**
      * API to Outpout an BufferedImage object into the response outputstream Once this function has
      * been called, not further action is possible Users should set $context.setFinished(true) to
      * avoid template output The image is outpout as image/jpeg

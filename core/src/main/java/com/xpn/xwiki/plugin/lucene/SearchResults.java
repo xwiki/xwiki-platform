@@ -158,10 +158,39 @@ public class SearchResults
     {
         final int listStartIndex = beginIndex - 1;
         final int listEndIndex = listStartIndex + items;
-        final List results = getRelevantResults();
-        final int resultcount = results.size();
-        return getRelevantResults().subList(listStartIndex,
-            listEndIndex < resultcount ? listEndIndex : resultcount);
+        int resultcount = 0;
+        List relResults = relevantResults;
+        if (relResults == null) {
+            relResults = new ArrayList();
+            final int hitcount = hits.length();
+            for (int i = 0; i < hitcount; i++) {
+                SearchResult result = null;
+                try {
+                    result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
+                    String pageName = null;
+                    if (result.isWikiContent()) {
+                        pageName = result.getWeb() + "." + result.getName();
+                    }
+                    if (result != null && result.isWikiContent() && xwiki.exists(pageName) &&
+                            xwiki.checkAccess(pageName, "view"))
+                    {
+                        if (resultcount>=listStartIndex) {
+                            relResults.add(result);
+                        }
+                        resultcount++;
+                        if (resultcount==listEndIndex)
+                            return relResults;
+                    }
+                } catch (Exception e) {
+                    LOG.error("error getting search result", e);
+                    e.printStackTrace();
+                }
+            }
+            return relResults;
+        } else {
+            return getRelevantResults().subList(listStartIndex,
+                    listEndIndex < resultcount ? listEndIndex : resultcount);
+        }
     }
 
     /**

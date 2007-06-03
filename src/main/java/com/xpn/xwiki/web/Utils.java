@@ -109,7 +109,11 @@ public class Utils {
                 // Set the content length to the numnber of bytes, not the
                 // string length, so as to handle multi-byte encodings
 
-                response.setContentLength(content.getBytes().length);
+                try {
+                    response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
             }
 
             try {

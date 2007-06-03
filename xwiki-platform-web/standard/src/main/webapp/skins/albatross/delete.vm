@@ -5,17 +5,23 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 #if($message)
-<div id="xwikimessage">$message</div>
+  <div id="xwikimessage">$message</div>
 #end
-#xwikimessagebox($msg.get("delete") $msg.get("confirmdelete") $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
-</div>
 #set($links=$doc.getBacklinks())
 #if($links && $links.size() > 0)
-#warning ($msg.get("backlinkswarningdelete"))
-#foreach($docname in $links)
-#set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    <a href="$rdoc.getURL("view")">$rdoc.displayTitle</a>
-#end	
+  #set($quote = '"')
+  #set ($fullmsg="</p><ul style=${quote}text-align: left;${quote}>")
+  #foreach($docname in $links)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($fullmsg = "${fullmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
+  #end
+  #set($fullmsg = "${fullmsg}</ul><p class=${quote}xwikimessage${quote}>")
+  #set($fullmsg=$msg.get("core.delete.backlinksWarning", [$fullmsg]))
+  #set($fullmsg="${fullmsg}</p><p class=${quote}xwikimessage${quote}>"+$msg.get("core.delete.confirmWithBacklinks"))
+  #xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+#else
+  #xwikimessagebox($msg.get("core.delete") $msg.get("core.delete.confirm") $doc.getURL("delete", "confirm=1&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
 #end
+</div>
 <div class="clearfloats"></div>
 #template("endpage.vm")

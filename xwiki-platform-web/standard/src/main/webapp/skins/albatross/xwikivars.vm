@@ -14,7 +14,7 @@
 #else
 #set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
 #end
-#set($parent ="<a href='$doc.getParentURL()'>${doc.parent.title}</a>")
+#set($parent ="<a href='$doc.getParentURL()'>${xwiki.getDocument($doc.parent).displayTitle}</a>")
 #if($tdoc)
 #set($headertitle = "<a href='$viewurl'>${tdoc.displayTitle}</a>")
 #else

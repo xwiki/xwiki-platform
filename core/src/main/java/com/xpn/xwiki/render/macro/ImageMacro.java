@@ -45,9 +45,9 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  *   floatleft, left, center, right, floatright</li>
  * <li>document: The document to which the file is attached. If missing, 
  *   the current document is used.</li>
- * <li>alt: The alt attribute of the link. If missing, title is used.
+ * <li>alt: The alt attribute of the image. If missing, title is used.
  *   If both are missing, use the filename.</li>
- * <li>title: The title attribute of the link. If missing, alt is used.
+ * <li>title: The title attribute of the image. If missing, alt is used.
  *   If both are missing, use the filename.</li>
  * <li>link: Also link to the image.</li>
  * <li>fromIncludingDoc: If present, when the current document is included using 
@@ -137,6 +137,18 @@ public class ImageMacro extends BaseLocaleMacro {
             doc = xcontext.getDoc();
         }
 
+        String downloadParams = "";
+        boolean heightSpecified = false;
+        boolean widthSpecified = false;
+        if ((!"none".equals(height)) && (height != null) && (!"".equals(height.trim()))) {
+            downloadParams += "height=" + height.trim();
+            heightSpecified = true;
+        }
+        if ((!"none".equals(width)) && (width != null) && (!"".equals(width.trim()))) {
+            downloadParams += "&amp;width=" + width.trim();
+            widthSpecified = true;
+        }
+
         // Create the img code
         StringBuffer str = new StringBuffer();
         if (halign != null && !halign.equals("none")){
@@ -150,13 +162,13 @@ public class ImageMacro extends BaseLocaleMacro {
         if (img.indexOf("tp://") != -1) {
             str.append(img);
         } else {
-            str.append(doc.getAttachmentURL(img, "download", xcontext));
+            str.append(doc.getAttachmentURL(img, "download", downloadParams, xcontext));
         }
         str.append("\" ");
-        if ((!"none".equals(height)) && (height != null) && (!"".equals(height.trim()))) {
+        if (heightSpecified) {
             str.append("height=\"" + height.trim() + "\" ");
         }
-        if ((!"none".equals(width)) && (width != null) && (!"".equals(width.trim()))) {
+        if (widthSpecified) {
             str.append("width=\"" + width.trim() + "\" ");
         }
         if ((!"none".equals(align)) && (align != null) && (!"".equals(align.trim()))) {

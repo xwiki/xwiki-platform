@@ -30,6 +30,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -136,7 +137,16 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         props.put("cache.persistence.class",
             "com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener");
-        props.put("cache.path", "tmp/imageCache");
+
+        File tempDir =
+            (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+        File imgTempDir = new File(tempDir, "img");
+        try {
+            imgTempDir.mkdirs();
+        } catch (Exception ex) {
+            LOG.warn("Cannot create temporary files", ex);
+        }
+        props.put("cache.path", imgTempDir.getAbsolutePath());
 
         try {
             imageCache = context.getWiki().getCacheService().newLocalCache(props, capacity);

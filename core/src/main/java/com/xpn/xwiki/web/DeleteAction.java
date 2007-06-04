@@ -50,16 +50,13 @@ public class DeleteAction extends XWikiAction
                 XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
                 xwiki.deleteDocument(tdoc, context);
             }
-            return true;
-        } else {
             String redirect = Utils.getRedirect(request, null);
-            if (redirect == null) {
-                return true;
-            } else {
+            if (redirect != null) {
                 sendRedirect(response, redirect);
                 return false;
             }
         }
+        return true;
     }
 
     public String render(XWikiContext context) throws XWikiException

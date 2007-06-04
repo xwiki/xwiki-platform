@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -35,9 +35,14 @@ public class DeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
+
         if (doc.isNew()) {
             return true;
         }
+
+        // If confirm=1 then delete the page. If not, the render action will go to the "delete"
+        // page so that the user can confirm. That "delete" page will then call the delete action
+        // again with confirm=1.
         String confirm = request.getParameter("confirm");
         if ((confirm != null) && (confirm.equals("1"))) {
             String language = xwiki.getLanguagePreference(context);
@@ -50,12 +55,16 @@ public class DeleteAction extends XWikiAction
                 XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
                 xwiki.deleteDocument(tdoc, context);
             }
+
+            // If a xredirect param is passed then redirect to the page specified instead of
+            // going to the default confirmation page.
             String redirect = Utils.getRedirect(request, null);
             if (redirect != null) {
                 sendRedirect(response, redirect);
                 return false;
             }
         }
+
         return true;
     }
 

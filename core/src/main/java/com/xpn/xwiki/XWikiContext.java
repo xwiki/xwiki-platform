@@ -24,16 +24,26 @@
 
 package com.xpn.xwiki;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.map.LRUMap;
+import org.apache.xmlrpc.server.XmlRpcServer;
+
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
-import org.apache.xmlrpc.server.XmlRpcServer;
-
-import java.net.URL;
-import java.util.*;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiForm;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class XWikiContext extends Hashtable {
 
@@ -65,11 +75,13 @@ public class XWikiContext extends Hashtable {
    private String wikiOwner;
    private XWikiDocument wikiServer;
    private int cacheDuration = 0;
+   private int classCacheSize = 20;
+   private int archiveCacheSize = 20;
 
    // Used to avoid recursive loading of documents if there are recursives usage of classes
-   private Map classCache = new HashMap();
-   // Used to avoir reloading archives in the same request
-   private Map archiveCache = new HashMap();
+   private Map classCache = new LRUMap(classCacheSize);
+   // Used to avoid reloading archives in the same request
+   private Map archiveCache = new LRUMap(archiveCacheSize);
 
    private List displayedFields = new ArrayList();
 

@@ -30,8 +30,8 @@
     <property name="statement_cache.size">2</property>
 
     <!-- Mapping files -->
-    <mapping resource="xwiki.hbm.xml"/>
-    <mapping resource="feeds.hbm.xml"/>
+    <mapping resource="${xwiki.db.hbm.xwiki}"/>
+    <mapping resource="${xwiki.db.hbm.feeds}"/>
 
   </session-factory>
 </hibernate-configuration>

@@ -19,6 +19,10 @@
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
 
+    <!-- Please refer to the installation guide on
+         http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
+         database -->
+
     <property name="connection.url">${xwiki.db.connection.url}</property>
     <property name="connection.username">${xwiki.db.connection.username}</property>
     <property name="connection.password">${xwiki.db.connection.password}</property>

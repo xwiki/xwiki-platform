@@ -17,8 +17,12 @@
         <property name="dbcp.ps.maxWait">120000</property>
         <property name="dbcp.ps.maxIdle">20</property>
 
-        <!-- Default MySQL configuration
-             Comment it to use for HSQLDB or Oracle -->
+        <!-- Please refer to the installation guide on
+             http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
+             database -->
+      
+        <!-- Default MySQL configuration.
+             Comment it to use any other database configuration below -->
         <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false</property>
         <property name="connection.username">xwiki</property>
         <property name="connection.password">xwiki</property>
@@ -27,15 +31,13 @@
         <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
         <property name="connection.pool_size">2</property>
         <property name="statement_cache.size">2</property>
-
-        <!-- Mapping files
-             Comment it to use for Oracle -->
         <mapping resource="xwiki.hbm.xml"/>
         <mapping resource="feeds.hbm.xml"/>
 
-        <!-- Uncomment if you want to use HSQLDB and comment the previous MySQL configuration
+        <!-- HSQLDB configuration.
+             Uncomment if you want to use HSQLDB and comment out other database configurations.
              Note that the database will be created automatically if it doesn't already exist.
-        <property name="connection.url">jdbc:hsqldb:file:/some/path/xwiki_db;shutdown=true</property>
+        <property name="connection.url">jdbc:hsqldb:file:/some/path/xwikidb;shutdown=true</property>
         <property name="connection.username">sa</property>
         <property name="connection.password"></property>
         <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
@@ -43,10 +45,12 @@
         <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
         <property name="connection.pool_size">2</property>
         <property name="statement_cache.size">2</property>
+        <mapping resource="xwiki.hbm.xml"/>
+        <mapping resource="feeds.hbm.xml"/>
         -->
 
-        <!-- Uncomment if you want to use Oracle and comment the previous MySQL configuration
-           Note that the database will be created automatically if it doesn't already exist.
+        <!-- Oracle configuration.
+             Uncomment if you want to use Oracle and comment out other database configurations.
         <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
         <property name="connection.username">xwiki</property>
         <property name="connection.password">xwiki</property>
@@ -55,11 +59,22 @@
         <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
         <property name="connection.pool_size">2</property>
         <property name="statement_cache.size">2</property>
-
         <mapping resource="xwiki.oracle.hbm.xml"/>
         <mapping resource="feeds.oracle.hbm.xml"/>
         -->
 
+        <!-- Derby configuration.
+             Uncomment if you want to use Derby and comment out other database configurations.
+             Note that the database will be created automatically if it doesn't already exist.
+        <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
+        <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+        <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
+        <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+        <property name="connection.pool_size">2</property>
+        <property name="statement_cache.size">2</property>
+        <mapping resource="xwiki.derby.hbm.xml"/>
+        <mapping resource="feeds.hbm.xml"/>
+        -->
 
     </session-factory>
 </hibernate-configuration>

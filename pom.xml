@@ -67,6 +67,7 @@
         <xwiki.db.connection.password></xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
         <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
+        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
       </properties>
     </profile>
     <profile>
@@ -86,6 +87,7 @@
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
         <xwiki.db.dialect>org.hibernate.dialect.MySQLDialect</xwiki.db.dialect>
+        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
       </properties>
     </profile>
     <profile>
@@ -105,6 +107,7 @@
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
         <xwiki.db.dialect>org.hibernate.dialect.PostgreSQLDialect</xwiki.db.dialect>
+        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
       </properties>
     </profile>
   </profiles>

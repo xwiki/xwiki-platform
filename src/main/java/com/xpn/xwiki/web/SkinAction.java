@@ -127,14 +127,14 @@ public class SkinAction extends XWikiAction
             }
 
             if (doc.getSpace().equals("skins")) {
-                String path = "skins/" + doc.getName() + "/" + filename;
+                String path = "/skins/" + doc.getName() + "/" + filename;
                 if (!context.getWiki().resourceExists(path)) {
                     log.info("Skin file '" + path + "' does not exist");
-                    path = "skins/" + context.getWiki().getBaseSkin(context) + "/" + filename;
+                    path = "/skins/" + context.getWiki().getBaseSkin(context) + "/" + filename;
                 }
                 if (!context.getWiki().resourceExists(path)) {
                     log.info("Skin file '" + path + "' does not exist");
-                    path = "skins/" + context.getWiki().getDefaultBaseSkin(context) + "/" + filename;
+                    path = "/skins/" + context.getWiki().getDefaultBaseSkin(context) + "/" + filename;
                 }
                 if (!context.getWiki().resourceExists(path)) {
                     log.info("Skin file '" + path + "' does not exist");

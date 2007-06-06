@@ -1359,7 +1359,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
-            String path = "skins/" + skin + "/" + filename;
+            String path = "/skins/" + skin + "/" + filename;
             if (resourceExists(path)) {
                 URL url;
 

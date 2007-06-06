@@ -19,23 +19,36 @@
  */
 package com.xpn.xwiki.it;
 
+import com.xpn.xwiki.it.framework.AbstractXWikiTestCase;
+import com.xpn.xwiki.it.framework.XWikiTestSuite;
+import com.xpn.xwiki.it.framework.AlbatrossSkinExecutor;
+import junit.framework.Test;
+
 /**
  * Verify the login and logout features of XWiki.
  *
  * @version $Id: $
  */
-public class LoginTest extends AbstractSeleniumTestCase
+public class LoginTest extends AbstractXWikiTestCase
 {
+    public static Test suite()
+    {
+        XWikiTestSuite suite = new XWikiTestSuite("Verify the login and logout features of XWiki");
+        suite.addTestSuite(LoginTest.class, AlbatrossSkinExecutor.class);
+        return suite;
+    }
+
     public void setUp() throws Exception
     {
         super.setUp();
+        open("/xwiki/bin/view/Main/");
 
         // Verify that the user isn't logged in
         if (isAuthenticated()) {
             logout();
         }
 
-        goToLoginPage();
+        clickLogin();
     }
 
     public void testLogAsAdmin()

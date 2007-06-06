@@ -19,20 +19,34 @@
  */
 package com.xpn.xwiki.it;
 
+import com.xpn.xwiki.it.framework.AbstractXWikiTestCase;
+import com.xpn.xwiki.it.framework.AlbatrossSkinExecutor;
+import com.xpn.xwiki.it.framework.XWikiTestSuite;
+import junit.framework.Test;
+
 /**
- * Test cases setup that logs in the user for test cases requiring the user to be logged in.
+ * Verify deletion of pages.
  *
  * @version $Id: $
  */
-public abstract class AbstractAuthenticatedTestCase extends AbstractSeleniumTestCase
+public class DeletePageTest extends AbstractXWikiTestCase
 {
-    protected void setUp() throws Exception
+    public static Test suite()
     {
-        super.setUp();
-        login(getUsername(), getPassword(), false);
+        XWikiTestSuite suite = new XWikiTestSuite("Verify deletion of pages");
+        suite.addTestSuite(DeletePageTest.class, AlbatrossSkinExecutor.class);
+        return suite;
     }
 
-    public abstract String getUsername();
+    public void testDeleteOkWhenConfirming()
+    {
+        loginAsAdmin();
+        open("/xwiki/bin/edit/Test/DeleteTest?editor=wiki");
+        setFieldValue("content", "some content");
+        clickEditSaveAndView();
+        clickDeletePage();
+        clickLinkWithLocator("//input[@value='yes']");
 
-    public abstract String getPassword();
+        assertTextPresent("The document has been deleted.");
+    }
 }

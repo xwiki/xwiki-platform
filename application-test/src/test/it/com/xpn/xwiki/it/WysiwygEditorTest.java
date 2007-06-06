@@ -19,93 +19,106 @@
  */
 package com.xpn.xwiki.it;
 
+import com.xpn.xwiki.it.framework.AbstractXWikiTestCase;
+import com.xpn.xwiki.it.framework.XWikiTestSuite;
+import com.xpn.xwiki.it.framework.AlbatrossSkinExecutor;
+import junit.framework.Test;
+
 /**
  * Tests the WYSIWYG editor (content edited in WYSIWYG mode).
  *
  * @version $Id: $
  */
-public class WysiwygEditorTest extends AbstractTinyMceTestCase
+public class WysiwygEditorTest extends AbstractXWikiTestCase
 {
+    public static Test suite()
+    {
+        XWikiTestSuite suite = new XWikiTestSuite("Tests the wiki editor");
+        suite.addTestSuite(WysiwygEditorTest.class, AlbatrossSkinExecutor.class);
+        return suite;
+    }
+
     protected void setUp() throws Exception
     {
         super.setUp();
-        editInTinyMce("Test", "TestWysiwyg");
-        clearTinyMceContent();
+        loginAsAdmin();
+        editInWysiwyg("Test", "TestWysiwyg");
+        clearWysiwygContent();
     }
 
     public void testSimpleList()
     {
-        typeInTinyMce("item1");
-        clickTinyMceUnorderedListButton();
-        typeEnterInTinyMce();
-        typeInTinyMce("item2");
-        typeEnterInTinyMce();
-        typeInTinyMce("item3");
+        typeInWysiwyg("item1");
+        clickWysiwygUnorderedListButton();
+        typeEnterInWysiwyg();
+        typeInWysiwyg("item2");
+        typeEnterInWysiwyg();
+        typeInWysiwyg("item3");
 
-        assertWikiTextGeneratedByTinyMCE("* item1\n* item2\n* item3");
+        assertWikiTextGeneratedByWysiwyg("* item1\n* item2\n* item3");
     }
 
     public void testIndentation()
     {
-        typeInTinyMce("Text");
-        typeEnterInTinyMce();
-        clickTinyMceIndentButton();
-        typeInTinyMce("some indented text");
+        typeInWysiwyg("Text");
+        typeEnterInWysiwyg();
+        clickWysiwygIndentButton();
+        typeInWysiwyg("some indented text");
 
-        assertWikiTextGeneratedByTinyMCE("Text\n<blockquote>\nsome indented text\n</blockquote>");
+        assertWikiTextGeneratedByWysiwyg("Text\n<blockquote>\nsome indented text\n</blockquote>");
     }
 
     public void testLineFeed()
     {
-        typeInTinyMce("Text");
-        typeEnterInTinyMce();
-        typeInTinyMce("Text");
+        typeInWysiwyg("Text");
+        typeEnterInWysiwyg();
+        typeInWysiwyg("Text");
 
-        assertWikiTextGeneratedByTinyMCE("Text\n\nText");
+        assertWikiTextGeneratedByWysiwyg("Text\n\nText");
     }
 
     public void testLineFeedWhenUsingShiftEnter()
     {
-        typeInTinyMce("Text");
-        typeShiftEnterInTinyMce();
-        typeInTinyMce("Text");
+        typeInWysiwyg("Text");
+        typeShiftEnterInWysiwyg();
+        typeInWysiwyg("Text");
 
-        assertWikiTextGeneratedByTinyMCE("Text\\\\\nText");
+        assertWikiTextGeneratedByWysiwyg("Text\\\\\nText");
     }
 
     public void testLineFeedBeforeAndAfterLists()
     {
-        typeInTinyMce("Text");
-        typeEnterInTinyMce();
-        typeInTinyMce("item");
-        clickTinyMceUnorderedListButton();
-        typeEnterInTinyMce();
-        clickTinyMceUnorderedListButton();
-        typeInTinyMce("Text");
+        typeInWysiwyg("Text");
+        typeEnterInWysiwyg();
+        typeInWysiwyg("item");
+        clickWysiwygUnorderedListButton();
+        typeEnterInWysiwyg();
+        clickWysiwygUnorderedListButton();
+        typeInWysiwyg("Text");
 
-        assertWikiTextGeneratedByTinyMCE("Text\n\n* item\n\nText");
+        assertWikiTextGeneratedByWysiwyg("Text\n\n* item\n\nText");
     }
 
     public void testEscapedHtmlElement()
     {
-        typeInTinyMce("http://\\<yourserver\\>:8080/something");
-        assertWikiTextGeneratedByTinyMCE("http://\\<yourserver\\>:8080/something");
+        typeInWysiwyg("http://\\<yourserver\\>:8080/something");
+        assertWikiTextGeneratedByWysiwyg("http://\\<yourserver\\>:8080/something");
     }
 
     public void testHtmlElementIsRendered()
     {
-        typeInTinyMce("<table><tr><td>hello</td></tr></table>");
-        assertWikiTextGeneratedByTinyMCE("<table><tr><td>hello</td></tr></table>");
+        typeInWysiwyg("<table><tr><td>hello</td></tr></table>");
+        assertWikiTextGeneratedByWysiwyg("<table><tr><td>hello</td></tr></table>");
     }
 
     public void testNestedOrderedList()
     {
-        clickTinyMceOrderedListButton();
-        typeInTinyMce("level 1");
-        typeEnterInTinyMce();
-        clickTinyMceIndentButton();
-        typeInTinyMce("level 2");
+        clickWysiwygOrderedListButton();
+        typeInWysiwyg("level 1");
+        typeEnterInWysiwyg();
+        clickWysiwygIndentButton();
+        typeInWysiwyg("level 2");
         
-        assertWikiTextGeneratedByTinyMCE("1. level 1\n11. level 2");
+        assertWikiTextGeneratedByWysiwyg("1. level 1\n11. level 2");
     }
 }

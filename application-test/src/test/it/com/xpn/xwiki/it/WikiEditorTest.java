@@ -19,18 +19,36 @@
  */
 package com.xpn.xwiki.it;
 
+import com.xpn.xwiki.it.framework.AbstractXWikiTestCase;
+import com.xpn.xwiki.it.framework.AlbatrossSkinExecutor;
+import com.xpn.xwiki.it.framework.XWikiTestSuite;
+import junit.framework.Test;
+
 /**
  * Tests the wiki editor.
  *
  * @version $Id: $
  */
-public class WikiEditorTest extends AbstractAuthenticatedAdminTestCase
+public class WikiEditorTest extends AbstractXWikiTestCase
 {
+    public static Test suite()
+    {
+        XWikiTestSuite suite = new XWikiTestSuite("Tests the wiki editor");
+        suite.addTestSuite(WikiEditorTest.class, AlbatrossSkinExecutor.class);
+        return suite;
+    }
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        loginAsAdmin();    
+    }
+
     public void testEmptyLineAndSpaceCharactersBeforeSectionTitleIsNotRemoved()
     {
         open("/xwiki/bin/edit/Test/WikiEdit?editor=wiki");
         setFieldValue("content", "\n  1.1 Section\n\ntext");
-        saveAndViewEdition();
+        clickEditSaveAndView();
         open("/xwiki/bin/edit/Test/WikiEdit?editor=wiki");
         assertEquals("\n  1.1 Section\n\ntext", getFieldValue("content"));
     }

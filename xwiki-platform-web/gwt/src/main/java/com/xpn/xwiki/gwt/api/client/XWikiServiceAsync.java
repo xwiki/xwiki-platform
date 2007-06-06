@@ -45,6 +45,10 @@ public interface XWikiServiceAsync {
 
     void getDocument(String fullName, boolean withObject, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent, AsyncCallback async);
 
+    void deleteDocument(String docName, AsyncCallback async);
+
+    void deleteDocuments(String sql, AsyncCallback async);
+
     void getUniquePageName(String space, AsyncCallback async);
 
     void getUniquePageName(String space, String pageName, AsyncCallback async);

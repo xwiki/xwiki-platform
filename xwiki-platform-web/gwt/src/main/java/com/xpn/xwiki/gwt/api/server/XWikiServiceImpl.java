@@ -210,6 +210,42 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
     }
 
+    public Boolean deleteDocument(String docName) throws XWikiGWTException {
+        try {
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("delete", context.getUser(), docName, context)) {
+                XWikiDocument doc = context.getWiki().getDocument(docName, context);
+                context.getWiki().deleteDocument(doc, context);
+                return Boolean.valueOf(true);
+            } else {
+                return Boolean.valueOf(false);
+            }
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
+    public int deleteDocuments(String sql) throws XWikiGWTException {
+        int nb =  0;
+        List newlist = new ArrayList();
+        try {
+            XWikiContext context = getXWikiContext();
+            List list = context.getWiki().getStore().searchDocumentsNames(sql, context);
+            if ((list==null)&&(list.size()==0))
+                return nb;
+            for (int i=0;i<list.size();i++) {
+                if (context.getWiki().getRightService().hasAccessLevel("delete", context.getUser(), (String) list.get(i), context)==true) {
+                    XWikiDocument doc = context.getWiki().getDocument((String) list.get(i), context);
+                    context.getWiki().deleteDocument(doc, context);
+                    nb++;
+                }
+            }
+            return nb;
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
     public User getUser() throws XWikiGWTException {
         try {
             return getUser(getXWikiContext().getUser());

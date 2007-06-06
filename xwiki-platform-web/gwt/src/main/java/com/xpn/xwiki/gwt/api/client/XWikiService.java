@@ -46,6 +46,9 @@ public interface XWikiService extends RemoteService {
 
     public Document getDocument(String fullName, boolean withObject, boolean viewDisplayers, boolean editDisplayers, boolean withRenderedContent) throws XWikiGWTException;
 
+    public Boolean deleteDocument(String docName) throws XWikiGWTException;
+    public int deleteDocuments(String sql) throws XWikiGWTException;
+
     public String getUniquePageName(String space) throws XWikiGWTException;
     public String getUniquePageName(String space, String pageName) throws XWikiGWTException;
     public Document getUniqueDocument(String space, String pageName) throws XWikiGWTException;

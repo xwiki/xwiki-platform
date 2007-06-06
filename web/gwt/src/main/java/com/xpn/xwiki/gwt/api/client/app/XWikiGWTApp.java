@@ -1,0 +1,89 @@
+package com.xpn.xwiki.gwt.api.client.app;
+
+import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
+
+/** Copyright 2006,XpertNet SARL,and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software;you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation;either version2.1of
+ * the License,or(at your option)any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY;without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software;if not,write to the Free
+ * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
+ * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
+ *
+ * @author ldubost
+ */
+
+
+public interface XWikiGWTApp {
+
+    /**
+     * Returns the translation page to load
+     * @return
+     */
+    public String getTranslationPage();
+
+    /**
+     * Provides a translation of a text string
+     * @param key
+     * @return  translated string
+     */
+    public String getTranslation(String key);
+
+    /**
+     * Retrieves an instance of an XWiki Remove Service
+     * @return
+     */
+    public XWikiServiceAsync getXWikiServiceInstance();
+
+    /**
+     * Retrieves a url path from the current skin
+     * @param file
+     * @return A loadable url pointing to the file in the current skin
+     */
+    public String getSkinFile(String file);
+
+    /**
+     * Launch the loading dialog. Each call to startLoading will add 1 to counter
+     * The dialog will be closed only if the same amount of calls to finishLoading is made
+     */
+    public void startLoading();
+
+    /**
+     * Close the loading dialog when the same amount of call to finishLoading are
+     * made than call to startLoading
+     */
+    public void finishLoading();
+
+    /**
+     *
+     * @param title
+     * @param message
+     */
+    public void showDialog(String title, String message);
+
+    /**
+     *
+     * @param message
+     */
+    public void showDialog(String message);
+
+
+    public void showError(Throwable caught);
+
+    public void showError(String text);
+
+    public void showError(String code, String text);
+
+    public String getCSSPrefix();
+}

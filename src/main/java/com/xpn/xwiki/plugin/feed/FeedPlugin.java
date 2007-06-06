@@ -104,6 +104,16 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         super.init(context);
         prepareCache(context);
         refreshPeriod = (int) context.getWiki().ParamAsLong("xwiki.plugins.feed.cacherefresh", 3600);
+        // Make sure we have this class
+        try {
+            getAggregatorURLClass(context);
+        } catch (XWikiException e) {
+        }
+        // Make sure we have this class
+        try {
+            getFeedEntryClass(context);
+        } catch (XWikiException e) {
+        }
     }
 
 
@@ -291,6 +301,22 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return total;
     }
 
+    public int updateFeedsInSpace(boolean fullContent, boolean oneDocPerEntry, boolean force, String space, XWikiContext context) throws XWikiException {
+        // Make sure we have this class
+        getAggregatorURLClass(context);
+
+        String sql = ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.web='" + space + "'";
+        int total = 0;
+        List feedDocList = context.getWiki().getStore().searchDocumentsNames(sql, context);
+        if (feedDocList!=null) {
+            for (int i=0;i<feedDocList.size();i++) {
+                String feedDocName = (String) feedDocList.get(i);
+                total += updateFeeds(feedDocName, fullContent, oneDocPerEntry, force, space, context);
+            }
+        }
+        return total;
+    }
+
     public int updateFeed(String feedname, String feedurl, boolean oneDocPerEntry, XWikiContext context) {
         return updateFeed(feedname, feedurl, false, oneDocPerEntry, context);
     }
@@ -401,6 +427,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             return bclass;
 
         bclass.setName("XWiki.AggregatorURLClass");
+        if (!"internal".equals(bclass.getCustomMapping())) {
+            needsUpdate = true;
+            bclass.setCustomMapping("internal");
+        }
 
         needsUpdate |= bclass.addTextField("name", "Name", 80);
         needsUpdate |= bclass.addTextField("url", "url", 80);
@@ -430,6 +460,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             return bclass;
 
         bclass.setName("XWiki.FeedEntryClass");
+        if (!"internal".equals(bclass.getCustomMapping())) {
+            needsUpdate = true;
+            bclass.setCustomMapping("internal");
+        }
 
         needsUpdate |= bclass.addTextField("title", "Title", 80);
         needsUpdate |= bclass.addTextField("author", "Author", 40);

@@ -103,6 +103,13 @@ public class FeedPluginApi extends Api {
          return -1;
     }
 
+    public int updateFeedsInSpace(boolean fullContent, boolean oneDocPerEntry, boolean force, String space) throws XWikiException {
+        if (hasProgrammingRights())
+         return plugin.updateFeedsInSpace(fullContent, oneDocPerEntry, force, space, getXWikiContext());
+        else
+         return -1;
+    }
+
     public int updateFeed(String feedname, String feedurl) {
         if (hasProgrammingRights())
             return plugin.updateFeed(feedname, feedurl, false, true, getXWikiContext());

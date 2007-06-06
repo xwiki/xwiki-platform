@@ -100,7 +100,7 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher {
         HttpClient client = new HttpClient();
         if (timeout!=0) {
          client.getParams().setSoTimeout(timeout);
-         client.getParams().setParameter("http.connection.timeout", "" + timeout);
+         client.getParams().setParameter("http.connection.timeout", new Integer(timeout));
         }
 
         System.setProperty("http.useragent", getUserAgent());

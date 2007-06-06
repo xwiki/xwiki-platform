@@ -181,7 +181,7 @@
 		xpp3-1.1.3.4-RC8_min.jar" />
 
     <fileset id="libs.gwt.fileset" dir="${lib.dir}"
-        includes="gwt-servlet-1.3.3.jar" />
+        includes="gwt-servlet-1.3.3.jar,gwttk-0.2.2.jar" />
 
     <fileset id="libs.servlet.fileset" dir="${lib.dir}"
         includes="servlet-api-2.4.jar" />

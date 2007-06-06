@@ -113,51 +113,10 @@
           <multiWindow>true</multiWindow>
         </configuration>
       </plugin>
-      <!-- Step 4: Start XWiki -->
-      <!-- TODO: Move in a profile for the different OSes -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <configuration>
-          <workingDirectory>${project.build.directory}/xwiki-application-${version}</workingDirectory>
-          <executable>sh</executable>
-          <arguments>
-            <argument>start_xwiki.sh</argument>
-          </arguments>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Step 5: Check that XWiki is started -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>check-xwiki-loaded</id>
-            <phase>integration-test</phase>
-            <configuration>
-              <tasks>
-                <waitfor>
-                  <http url="http://localhost:8080/xwiki/bin/view/Main/"/>
-                </waitfor>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Step 6: Execute the tests.
-           Note: To execute a single test case run mvn install -Dtest=<test name>
-           For example: mvn install -Dtest=WysiwygEditorFromWikiTest
+      <!-- Step 4: Start XWiki, Execute the tests and Stop XWiki
+           Note: To execute a single test case run mvn install -Dpattern=<test name>
+           For example: mvn install -Dpattern=DeletePageTest
+           For example: mvn install -Dpattern=.*Wysiwyg.*
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -171,37 +130,43 @@
           </execution>
         </executions>
         <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+          </includes>
           <systemProperties>
+            <property>
+              <name>pattern</name>
+              <value>${pattern}</value>
+            </property>
             <property>
               <name>browser</name>
               <value>${browser}</value>
             </property>
+            <property>
+              <name>xwikiExecutionDirectory</name>
+              <value>${basedir}/target/xwiki-application-${version}</value>
+            </property>
+            <!-- TODO: Move in a profile for the different OSes -->
+            <property>
+              <name>xwikiExecutionStartCommand</name>
+              <value>sh -f start_xwiki.sh</value>
+            </property>
+            <property>
+              <name>xwikiExecutionStopCommand</name>
+              <value>sh -f stop_xwiki.sh</value>
+            </property>
           </systemProperties>
         </configuration>
       </plugin>
-      <!-- Step 7: Stop XWiki -->
-      <!-- TODO: Move in a profile for the different OSes -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <configuration>
-          <workingDirectory>${project.build.directory}/xwiki-application-${version}</workingDirectory>
-          <executable>sh</executable>
-          <arguments>
-            <argument>stop_xwiki.sh</argument>
-          </arguments>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
+  <properties>
+    <!-- This is to allow users to override this property on the command line to choose what
+         test to run. For example to run only the DeletePageTest you would type:
+             mvn install -DPattern=DeletePageTest
+    -->    
+    <pattern>.*</pattern>
+  </properties>
   <profiles>
     <profile>
       <id>firefox</id>

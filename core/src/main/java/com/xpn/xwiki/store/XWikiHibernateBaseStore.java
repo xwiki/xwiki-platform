@@ -258,15 +258,15 @@ public class XWikiHibernateBaseStore {
                 "delete from xwikilongs where xwl_name like 'editbox_%'"
                 };
 
-            int nb = (schemaSQL==null) ? 0 : schemaSQL.length;
-            nb += addSQL.length;
+            int inb = (schemaSQL==null) ? 0 : schemaSQL.length;
+            int nb = inb + addSQL.length;
             String[] sql = new String[nb];
             if (schemaSQL!=null) {
-                for (int i=0;i<schemaSQL.length;i++)
+                for (int i=0;i<inb;i++)
                     sql[i] = schemaSQL[i];
             }
             for (int i=0;i<addSQL.length;i++)
-                sql[i + schemaSQL.length] = addSQL[i];
+                sql[i + inb] = addSQL[i];
 
             updateSchema(sql, context);
         } finally {

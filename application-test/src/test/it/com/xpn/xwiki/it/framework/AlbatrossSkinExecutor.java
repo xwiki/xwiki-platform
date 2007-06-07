@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.it.framework;
 
+/**
+ * Implementation of skin-related actions for the Albatross skin.
+ *
+ * @version $Id: $
+ */
 public class AlbatrossSkinExecutor implements SkinExecutor
 {
     private static final String WYSIWYG_LOCATOR_FOR_KEY_EVENTS = "mceSpanFonts";

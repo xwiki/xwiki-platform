@@ -24,6 +24,22 @@ import junit.framework.TestSuite;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+/**
+ * A JUnit TestSuite extension that understand Skin Executors and which can pass a defined Skin
+ * Executor to the underlying test it wraps. This is to let TestCases extending
+ * AbstractXWikiTestCase the ability to tell under what Skin Executors it should execute.
+ * For example to run the MyTestCase class under both an Albatross skin and a Dodo skin you would
+ * write:
+ * <pre><code>
+ * public static Test suite()
+ * {
+ *     XWikiTestSuite suite = new XWikiTestSuite("My Suite");
+ *     suite.addTestSuite(MyTestCase.class, AlbatrossSkinExecutor.class);
+ *     suite.addTestSuite(MyTestCase.class, DodoSkinExecutor.class);
+ *     return suite;
+ * }
+ * </code></pre>
+ */
 public class XWikiTestSuite extends TestSuite
 {
     public XWikiTestSuite(String name)

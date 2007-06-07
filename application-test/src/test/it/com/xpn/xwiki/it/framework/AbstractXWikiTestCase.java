@@ -24,6 +24,11 @@ import com.thoughtworks.selenium.Selenium;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.openqa.selenium.server.SeleniumServer;
 
+/**
+ * All XWiki Selenium tests must extend this class.
+ *
+ * @version $Id: $
+ */
 public class AbstractXWikiTestCase extends XMLTestCase implements SkinExecutor
 {
     private SkinExecutor skinExecutor;

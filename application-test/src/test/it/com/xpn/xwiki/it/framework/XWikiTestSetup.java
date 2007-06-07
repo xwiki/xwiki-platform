@@ -27,6 +27,23 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 
+/**
+ * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties.
+ * These properties are meant to be passed by the underlying build system. This class is meant
+ * to wrap a JUnit TestSuite. For example:
+ * <pre><code>
+ * public static Test suite()
+ * {
+ *     // Create some TestSuite object here
+ *     return new XWikiTestSetup(suite);
+ * }
+ * </code></pre>
+ *
+ * <p>Note: We could start XWiki using Java directly but we're using a script so that we can test
+ * the exact same script used by XWiki users who download the standalone distribution.</p>
+ *
+ * @version $Id: $ 
+ */
 public class XWikiTestSetup extends TestSetup
 {
     private static final String EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");

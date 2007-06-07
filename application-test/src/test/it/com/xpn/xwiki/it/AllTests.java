@@ -27,9 +27,16 @@ import java.lang.reflect.Method;
 
 import com.xpn.xwiki.it.framework.XWikiTestSetup;
 
+/**
+ * A class listing all the Selenium Functional tests to execute. We need such a class (rather than
+ * letting the JUnit Runner discover the different TestCases classes by itself) because we want
+ * to start/stop XWiki before and after the tests start (but only once).
+ *
+ * @version $Id: $ 
+ */
 public class AllTests extends TestCase
 {
-    private static final String PATTERN = System.getProperty("pattern", ".*");
+    private static final String PATTERN = ".*" + System.getProperty("pattern", "");
 
     public static Test suite() throws Exception
     {

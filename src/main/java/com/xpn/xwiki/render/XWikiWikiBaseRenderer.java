@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -157,8 +157,6 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context) {
         boolean insidePRE = false;
         boolean insideVERBATIM = false;
-        boolean insideTABLE = false;
-        boolean noAutoLink = false;
         Util util = context.getUtil();
         ListSubstitution ls = new ListSubstitution(util);
         XWiki xwiki = context.getWiki();
@@ -225,8 +223,11 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
                 }
             }
             if (line!=null) {
-            output.append(line);
-            output.append("\n");
+                output.append(line);
+                // Make sure not to add an extra new line at the end
+        	    if (tokens.hasMoreTokens()) {
+        	        output.append("\n");
+        	    }
             }
         }
         if (renderWiki)

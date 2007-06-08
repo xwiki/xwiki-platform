@@ -38,15 +38,32 @@ public class DeletePageTest extends AbstractXWikiTestCase
         return suite;
     }
 
-    public void testDeleteOkWhenConfirming()
+    protected void setUp() throws Exception
     {
+        super.setUp();
         loginAsAdmin();
+
         open("/xwiki/bin/edit/Test/DeleteTest?editor=wiki");
         setFieldValue("content", "some content");
         clickEditSaveAndView();
+    }
+
+    public void testDeleteOkWhenConfirming()
+    {
         clickDeletePage();
         clickLinkWithLocator("//input[@value='yes']");
 
         assertTextPresent("The document has been deleted.");
+    }
+
+    /**
+     * Verify that we can skip the delete result page if we pass a xredirect parameter to a page
+     * we want to be redirected to. Note that the confirm=1 parameter is also required as
+     * otherwise the redirect will have no effect. This is possibly a bug.
+     */
+    public void testDeletePageCanSkipConfirmationAndDoARedirect()
+    {
+        open("/xwiki/bin/delete/Test/DeleteTest?confirm=1&xredirect=/xwiki/bin/view/Main/");
+        assertPage("Main", "WebHome");
     }
 }

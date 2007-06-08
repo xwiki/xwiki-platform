@@ -88,9 +88,9 @@ public class AbstractXWikiTestCase extends TestCase implements SkinExecutor
         return getSelenium().getTitle();
     }
 
-    public void assertPage(String title)
+    public void assertPage(String space, String page)
     {
-        assertEquals(title, getTitle());
+        assertEquals("XWiki - " + space + " - " + page, getTitle());
     }
 
     public boolean isElementPresent(String locator)

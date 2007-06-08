@@ -34,16 +34,10 @@
   <packaging>pom</packaging>
   <description>The Standalone XWiki Application Functional Tests</description>
   <dependencies>
-    <dependency>
+    <dependency>  
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.1beta1</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.it.framework;
 
+import junit.framework.TestCase;
+
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 import org.custommonkey.xmlunit.XMLTestCase;
@@ -29,7 +31,7 @@ import org.openqa.selenium.server.SeleniumServer;
  *
  * @version $Id: $
  */
-public class AbstractXWikiTestCase extends XMLTestCase implements SkinExecutor
+public class AbstractXWikiTestCase extends TestCase implements SkinExecutor
 {
     private SkinExecutor skinExecutor;
 

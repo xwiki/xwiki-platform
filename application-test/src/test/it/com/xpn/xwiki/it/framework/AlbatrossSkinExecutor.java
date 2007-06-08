@@ -174,8 +174,8 @@ public class AlbatrossSkinExecutor implements SkinExecutor
 
     public void assertHTMLGeneratedByWysiwyg(String xpath) throws Exception
     {
-        String html = getTest().getSelenium().getEval("this.browserbot.getCurrentWindow().tinyMCE."
-            + "getInstanceById('mce_editor_0').getDoc().body.innerHTML");
-        getTest().assertXpathExists(xpath, html);
+        getTest().getSelenium().selectFrame("mce_editor_0");
+        getTest().assertTrue(getTest().getSelenium().isElementPresent("xpath=/html/body/"+xpath));
+        getTest().getSelenium().selectFrame("relative=top");
     }
 }

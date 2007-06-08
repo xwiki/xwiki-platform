@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
-import org.custommonkey.xmlunit.XMLTestCase;
 import org.openqa.selenium.server.SeleniumServer;
 
 /**

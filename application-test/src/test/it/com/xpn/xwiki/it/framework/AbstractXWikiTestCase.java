@@ -118,6 +118,11 @@ public class AbstractXWikiTestCase extends TestCase implements SkinExecutor
         assertTrue("[" + elementLocator + "] isn't present.", isElementPresent(elementLocator));
     }
 
+    public void assertElementNotPresent(String elementLocator)
+    {
+        assertFalse("[" + elementLocator + "] is present.", isElementPresent(elementLocator));
+    }
+
     public void waitPage()
     {
         waitPage(180000);

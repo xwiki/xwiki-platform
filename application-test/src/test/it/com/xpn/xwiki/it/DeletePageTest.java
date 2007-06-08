@@ -23,6 +23,7 @@ import com.xpn.xwiki.it.framework.AbstractXWikiTestCase;
 import com.xpn.xwiki.it.framework.AlbatrossSkinExecutor;
 import com.xpn.xwiki.it.framework.XWikiTestSuite;
 import junit.framework.Test;
+import junit.framework.AssertionFailedError;
 
 /**
  * Verify deletion of pages.
@@ -38,18 +39,9 @@ public class DeletePageTest extends AbstractXWikiTestCase
         return suite;
     }
 
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        loginAsAdmin();
-
-        open("/xwiki/bin/edit/Test/DeleteTest?editor=wiki");
-        setFieldValue("content", "some content");
-        clickEditSaveAndView();
-    }
-
     public void testDeleteOkWhenConfirming()
     {
+        logInAndCreatePageToBeDeleted();
         clickDeletePage();
         clickLinkWithLocator("//input[@value='yes']");
 
@@ -63,7 +55,40 @@ public class DeletePageTest extends AbstractXWikiTestCase
      */
     public void testDeletePageCanSkipConfirmationAndDoARedirect()
     {
+        logInAndCreatePageToBeDeleted();
         open("/xwiki/bin/delete/Test/DeleteTest?confirm=1&xredirect=/xwiki/bin/view/Main/");
         assertPage("Main", "WebHome");
+    }
+
+    public void testDeletePageIsImpossibleWhenNoDeleteRights()
+    {
+        open("/xwiki/bin/view/Main/");
+
+        // Ensure the user isn't logged in
+        if (isAuthenticated()) {
+            logout();
+        }
+
+        // Note: Ideally we should have tested for the non existence of the Delete button element.
+        // However, in order to isolate skin implementation from the test this would have required
+        // adding a new isDeleteButtonPresent() method to the Skin Executor API. This would have
+        // been a bit awkward as testing for the Delete button is only going to happen in this
+        // test case and thus there's no need to share it with all the oher tests. This is why I
+        // have chosen to reuse the existing clickDeletePage() method and test for an exception.
+        try {
+            clickDeletePage();
+            fail("Should have failed here as the Delete button shouldn't be present");
+        } catch (AssertionFailedError expected) {
+            assertTrue(expected.getMessage().endsWith("isn't present."));
+        }
+    }
+
+    private void logInAndCreatePageToBeDeleted()
+    {
+        loginAsAdmin();
+
+        open("/xwiki/bin/edit/Test/DeleteTest?editor=wiki");
+        setFieldValue("content", "some content");
+        clickEditSaveAndView();
     }
 }

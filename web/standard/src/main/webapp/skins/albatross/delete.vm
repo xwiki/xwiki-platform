@@ -8,6 +8,9 @@
   <div id="xwikimessage">$message</div>
 #end
 #set($links=$doc.getBacklinks())
+#if($request.xredirect)
+  #set($redirectparam = "&amp;xredirect=$request.xredirect")
+#end
 #if($links && $links.size() > 0)
   #set($quote = '"')
   #set ($fullmsg="</p><ul style=${quote}text-align: left;${quote}>")
@@ -18,9 +21,6 @@
   #set($fullmsg = "${fullmsg}</ul><p class=${quote}xwikimessage${quote}>")
   #set($fullmsg=$msg.get("core.delete.backlinksWarning", [$fullmsg]))
   #set($fullmsg="${fullmsg}</p><p class=${quote}xwikimessage${quote}>"+$msg.get("core.delete.confirmWithBacklinks"))
-  #if($request.xredirect)
-    #set($redirectparam = "&amp;xredirect=$request.xredirect")
-  #end
   #xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
 #else
   #xwikimessagebox($msg.get("core.delete") $msg.get("core.delete.confirm") $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))

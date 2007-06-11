@@ -437,10 +437,9 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         boolean allow = false;
         boolean allow_found = false;
         boolean deny_found = false;
-        String database = context.getDatabase();
-        XWikiDocument xwikimasterdoc;
-
         boolean isReadOnly = context.getWiki().isReadOnly();
+        String database = context.getDatabase();
+        XWikiDocument currentdoc = null;
 
         if (isReadOnly) {
 
@@ -458,48 +457,9 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                 return false;
         }
 
-        if (name.equals("XWiki.superadmin") || name.endsWith(":XWiki.superadmin")) {
-            logAllow(name, resourceKey, accessLevel, "super admin level");
-            return true;
-        }
-
-        try {
-            // The master user and programming rights are checked in the main wiki
-            context.setDatabase(context.getWiki().getDatabase());
-            xwikimasterdoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
-// Verify XWiki Master super user
-            try {
-                allow = checkRight(name, xwikimasterdoc, "admin", true, true, true, context);
-                if (allow) {
-                    logAllow(name, resourceKey, accessLevel, "master admin level");
-                    return true;
-                }
-            } catch (XWikiRightNotFoundException e) {
-            }
-
-// Verify XWiki programming right
-            if (accessLevel.equals("programming")) {
-                // Programming right can only been given if user is from main wiki
-                if (!name.startsWith(context.getWiki().getDatabase() + ":"))
-                    return false;
-
-                try {
-                    allow = checkRight(name, xwikimasterdoc, "programming", user, true, true, context);
-                    if (allow) {
-                        logAllow(name, resourceKey, accessLevel, "programming level");
-                        return true;
-                    } else {
-                        logDeny(name, resourceKey, accessLevel, "programming level");
-                        return false;
-                    }
-                } catch (XWikiRightNotFoundException e) {
-                }
-                logDeny(name, resourceKey, accessLevel, "programming level (no right found)");
-                return false;
-            }
-        } finally {
-            // The next rights are checked in the virtual wiki
-               context.setDatabase(database);
+        allow = isSuperAdminOrProgramming(name, resourceKey, accessLevel, user, context);
+        if ((allow==true)||(accessLevel.equals("programming"))) {
+            return allow;
         }
 
         try {
@@ -512,11 +472,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                 }
             }
 
-            XWikiDocument xwikidoc = null;
-            if (context.getDatabase().equals(context.getWiki().getDatabase()))
-                xwikidoc = xwikimasterdoc;
-            else
-                xwikidoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+            XWikiDocument xwikidoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
 
             // Verify XWiki register right
             if (accessLevel.equals("register")) {
@@ -535,43 +491,32 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                 return false;
             }
 
-            // Verify XWiki super user
-            try {
-                allow = checkRight(name, xwikidoc, "admin", user, true, true, context);
-                if (allow) {
-                    logAllow(name, resourceKey, accessLevel, "admin level");
-                    return true;
-                }
-            } catch (XWikiRightNotFoundException e) {
+            int maxRecursiveSpaceChecks = context.getWiki().getMaxRecursiveSpaceChecks(context);
+            boolean isSuperUser = isSuperUser(accessLevel, name, resourceKey, user, xwikidoc, maxRecursiveSpaceChecks, context);
+            if (isSuperUser) {
+                logAllow(name, resourceKey, accessLevel, "admin level");
+                return true;
             }
 
-// Verify Web super user
-            String web = Util.getWeb(resourceKey);
-            XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
-            try {
-                allow = checkRight(name, webdoc, "admin", user, true, true, context);
-                if (allow) {
-                    logAllow(name, resourceKey, accessLevel, "web admin level");
-                    return true;
+            // check has deny rights
+            if (hasDenyRights()) {
+                // First check if this document is denied to the specific user
+                resourceKey = Util.getName(resourceKey, context);
+                try {
+                    currentdoc = (currentdoc==null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
+                    deny = checkRight(name, currentdoc, accessLevel, user, false, false, context);
+                    deny_found = true;
+                    if (deny) {
+                        logDeny(name, resourceKey, accessLevel, "document level");
+                        return false;
+                    }
+                } catch (XWikiRightNotFoundException e) {
                 }
-            } catch (XWikiRightNotFoundException e) {
-            }
-
-            // First check if this document is denied to the specific user
-            resourceKey = Util.getName(resourceKey, context);
-            XWikiDocument doc = context.getWiki().getDocument(resourceKey, context);
-            try {
-                deny = checkRight(name, doc, accessLevel, user, false, false, context);
-                deny_found = true;
-                if (deny) {
-                    logDeny(name, resourceKey, accessLevel, "document level");
-                    return false;
-                }
-            } catch (XWikiRightNotFoundException e) {
             }
 
             try {
-                allow = checkRight(name, doc, accessLevel, user, true, false, context);
+                currentdoc = (currentdoc==null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
+                allow = checkRight(name, currentdoc, accessLevel, user, true, false, context);
                 allow_found = true;
                 if (allow) {
                     logAllow(name, resourceKey, accessLevel, "document level");
@@ -580,44 +525,72 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             } catch (XWikiRightNotFoundException e) {
             }
 
-// Check if this document is denied/allowed
-// through the web WebPreferences Global Rights
-            try {
-                deny = checkRight(name, webdoc, accessLevel, user, false, true, context);
-                deny_found = true;
-                if (deny) {
-                    logDeny(name, resourceKey, accessLevel, "web level");
-                    return false;
+            // Check if this document is denied/allowed
+            // through the web WebPreferences Global Rights
+
+            String web = Util.getWeb(resourceKey);
+            ArrayList spacesChecked = new ArrayList();
+            int recursiveSpaceChecks = 0;
+            while ((web!=null)&&(recursiveSpaceChecks<=maxRecursiveSpaceChecks)) {
+                // Add one to the recursive space checks
+                recursiveSpaceChecks++;
+                // add to list of spaces already checked
+                spacesChecked.add(web);
+                XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
+                if (!webdoc.isNew()) {
+                    if (hasDenyRights()) {
+                        try {
+                            deny = checkRight(name, webdoc, accessLevel, user, false, true, context);
+                            deny_found = true;
+                            if (deny) {
+                                logDeny(name, resourceKey, accessLevel, "web level");
+                                return false;
+                            }
+                        } catch (XWikiRightNotFoundException e) {
+                        }
+                    }
+
+                    // If a right was found at the previous level
+                    // then we cannot check the web rights anymore
+                    if (!allow_found) {
+                        try {
+                            allow = checkRight(name, webdoc, accessLevel, user, true, true, context);
+                            allow_found = true;
+                            if (allow) {
+                                logAllow(name, resourceKey, accessLevel, "web level");
+                                return true;
+                            }
+                        } catch (XWikiRightNotFoundException e) {
+                        }
+                    }
+
+                    // find the parent web to check rights on it
+                    web = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
+                    if ((web==null)||(web.trim().equals(""))||spacesChecked.contains(web)) {
+                        // no parent space or space already checked (recursive loop). let's finish the loop
+                        web = null;
+                    }
+                } else {
+                    // let's finish the loop
+                    web = null;
                 }
-            } catch (XWikiRightNotFoundException e) {
             }
 
-            // If a right was found at the document level
-            // then we cannot check the web rights anymore
-            if (!allow_found) {
+            // Check if this document is denied/allowed
+            // through the XWiki.XWikiPreferences Global Rights
+            if (hasDenyRights()) {
                 try {
-                    allow = checkRight(name, webdoc, accessLevel, user, true, true, context);
-                    allow_found = true;
-                    if (allow) {
-                        logAllow(name, resourceKey, accessLevel, "web level");
-                        return true;
+                    deny = checkRight(name, xwikidoc, accessLevel, user, false, true, context);
+                    deny_found = true;
+                    if (deny) {
+                        logDeny(name, resourceKey, accessLevel, "xwiki level");
+                        return false;
                     }
                 } catch (XWikiRightNotFoundException e) {
                 }
             }
-// Check if this document is denied/allowed
-// through the XWiki.XWikiPreferences Global Rights
-            try {
-                deny = checkRight(name, xwikidoc, accessLevel, user, false, true, context);
-                deny_found = true;
-                if (deny) {
-                    logDeny(name, resourceKey, accessLevel, "xwiki level");
-                    return false;
-                }
-            } catch (XWikiRightNotFoundException e) {
-            }
 
-            // If a right was found at the document or web level 
+            // If a right was found at the document or web level
             // then we cannot check the web rights anymore
             if (!allow_found) {
                 try {
@@ -655,6 +628,105 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         finally {
             context.setDatabase(database);
         }
+    }
+
+    private boolean hasDenyRights() {
+        return true;
+    }
+
+    private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user, XWikiContext context) throws XWikiException {
+        String database = context.getDatabase();
+        boolean allow;
+        if (name.equals("XWiki.superadmin") || name.endsWith(":XWiki.superadmin")) {
+            logAllow(name, resourceKey, accessLevel, "super admin level");
+            return true;
+        }
+
+        try {
+            // The master user and programming rights are checked in the main wiki
+            context.setDatabase(context.getWiki().getDatabase());
+            XWikiDocument xwikimasterdoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
+// Verify XWiki Master super user
+            try {
+                allow = checkRight(name, xwikimasterdoc, "admin", true, true, true, context);
+                if (allow) {
+                    logAllow(name, resourceKey, accessLevel, "master admin level");
+                    return true;
+                }
+            } catch (XWikiRightNotFoundException e) {
+            }
+
+// Verify XWiki programming right
+            if (accessLevel.equals("programming")) {
+                // Programming right can only been given if user is from main wiki
+                if (!name.startsWith(context.getWiki().getDatabase() + ":"))
+                    return false;
+
+                try {
+                    allow = checkRight(name, xwikimasterdoc, "programming", user, true, true, context);
+                    if (allow) {
+                        logAllow(name, resourceKey, accessLevel, "programming level");
+                        return true;
+                    } else {
+                        logDeny(name, resourceKey, accessLevel, "programming level");
+                        return false;
+                    }
+                } catch (XWikiRightNotFoundException e) {
+                }
+                logDeny(name, resourceKey, accessLevel, "programming level (no right found)");
+                return false;
+            }
+        } finally {
+            // The next rights are checked in the virtual wiki
+            context.setDatabase(database);
+        }
+
+        return false;
+    }
+
+    private boolean isSuperUser(String accessLevel, String name, String resourceKey, boolean user, XWikiDocument xwikidoc, int maxRecursiveSpaceChecks, XWikiContext context) throws XWikiException {
+       boolean allow;
+
+        // Verify XWiki super user
+        try {
+            allow = checkRight(name, xwikidoc, "admin", user, true, true, context);
+            if (allow) {
+                logAllow(name, resourceKey, accessLevel, "admin level");
+                return true;
+            }
+        } catch (XWikiRightNotFoundException e) {
+        }
+
+        // Verify Web super user
+        String web = Util.getWeb(resourceKey);
+        ArrayList spacesChecked = new ArrayList();
+        int recursiveSpaceChecks = 0;
+        while ((web!=null)&&(recursiveSpaceChecks<=maxRecursiveSpaceChecks)) {
+            // Add one to the recursive space checks
+            recursiveSpaceChecks++;
+            // add to list of spaces already checked
+            spacesChecked.add(web);
+            XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
+            if (!webdoc.isNew()) {
+                try {
+                    allow = checkRight(name, webdoc, "admin", user, true, true, context);
+                    if (allow) {
+                        logAllow(name, resourceKey, accessLevel, "web admin level");
+                        return true;
+                    }
+                } catch (XWikiRightNotFoundException e) {
+                }
+                // find the parent web to check rights on it
+                web = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
+                if ((web==null)||(web.trim().equals(""))||spacesChecked.contains(web)) {
+                    // no parent space or space already checked (recursive loop). let's finish the loop
+                    web = null;
+                }
+            } else {
+                web = null;
+            }
+        }
+        return false;
     }
 
     public boolean hasProgrammingRights(XWikiContext context) {

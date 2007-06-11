@@ -2242,6 +2242,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             bclass.setCustomMapping("internal");
         }
 
+        needsUpdate |= bclass.addTextField("parent", "Parent Space", 30);
         needsUpdate |= bclass.addBooleanField("multilingual", "Multi-Lingual", "yesno");
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
         needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
@@ -5354,5 +5355,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullName, context);
         return doc.getExternalAttachmentURL(filename, "download", context);
+    }
+
+    public int getMaxRecursiveSpaceChecks(XWikiContext context) {
+        int max = getXWikiPreferenceAsInt("rights_maxrecursivespacechecks", -1, context);
+        if (max==-1)
+            return (int) ParamAsLong("xwiki.rights.maxrecursivespacechecks", 0);
+        else
+            return max;
     }
 }

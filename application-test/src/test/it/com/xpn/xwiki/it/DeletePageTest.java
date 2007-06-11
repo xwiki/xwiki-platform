@@ -41,7 +41,7 @@ public class DeletePageTest extends AbstractXWikiTestCase
 
     public void testDeleteOkWhenConfirming()
     {
-        logInAndCreatePageToBeDeleted();
+        logInAndCreatePageToBeDeleted("DeleteTest");
         clickDeletePage();
         clickLinkWithLocator("//input[@value='yes']");
 
@@ -49,15 +49,41 @@ public class DeletePageTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Verify that we can skip the delete result page if we pass a xredirect parameter to a page
-     * we want to be redirected to. Note that the confirm=1 parameter is also required as
-     * otherwise the redirect will have no effect. This is possibly a bug.
+     * Verify that we can delete a page without showing the confirmation dialog box and that we
+     * can redirect to any page we want when the delete is done.
      */
     public void testDeletePageCanSkipConfirmationAndDoARedirect()
     {
-        logInAndCreatePageToBeDeleted();
+        logInAndCreatePageToBeDeleted("DeleteTest");
         open("/xwiki/bin/delete/Test/DeleteTest?confirm=1&xredirect=/xwiki/bin/view/Main/");
         assertPage("Main", "WebHome");
+    }
+
+    /**
+     * Verify that we can skip the default delete result page and instead redirect to any page we
+     * want.
+     */
+    public void testDeletePageCanDoRedirect()
+    {
+        logInAndCreatePageToBeDeleted("DeleteTest");
+        open("/xwiki/bin/delete/Test/DeleteTest?xredirect=/xwiki/bin/view/Main/");
+        clickLinkWithLocator("//input[@value='yes']");
+        assertPage("Main", "WebHome");
+    }
+
+    /**
+     * Verify that hitting cancel on the delete confirmation dialog box goes back to the page being
+     * deleted.
+     */
+    public void testDeletePageGoesToOriginalPageWhenCancelled()
+    {
+        logInAndCreatePageToBeDeleted("DeleteTestNoDelete");
+        // Note: We call the page with a unique name as we're not going to delete it and it should
+        // not interefere with others tests. We could always remove the DeleteTest page before any
+        // test but it would take longer.
+        open("/xwiki/bin/delete/Test/DeleteTestNoDelete");
+        clickLinkWithLocator("//input[@value='no']");
+        assertPage("Test", "DeleteTestNoDelete");
     }
 
     public void testDeletePageIsImpossibleWhenNoDeleteRights()
@@ -83,11 +109,11 @@ public class DeletePageTest extends AbstractXWikiTestCase
         }
     }
 
-    private void logInAndCreatePageToBeDeleted()
+    private void logInAndCreatePageToBeDeleted(String pageName)
     {
         loginAsAdmin();
 
-        open("/xwiki/bin/edit/Test/DeleteTest?editor=wiki");
+        open("/xwiki/bin/edit/Test/" + pageName + "?editor=wiki");
         setFieldValue("content", "some content");
         clickEditSaveAndView();
     }

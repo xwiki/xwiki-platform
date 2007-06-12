@@ -22,11 +22,13 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 
     str += this.TOOLBAR_SPACER + this.getTableToolbar() + this.TOOLBAR_SPACER + this.getTableRowToolbar() +
            this.TOOLBAR_SPACER + this.getTableColToolbar() + this.TOOLBAR_SPACER + this.getLinkToolbar();
+    str += this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls();
+
     if (this.isPluginLoaded("attachments")) {
         str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
 	}
     if (this.isPluginLoaded("macros")) {
-        str += this.TOOLBAR_SPACER + this.getMacrosToolbar();
+        str +=  this.getMacrosToolbar();
     }
     str += '</td></tr>\
 			<tr><td align="center">\

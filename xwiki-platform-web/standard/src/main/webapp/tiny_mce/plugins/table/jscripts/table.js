@@ -115,14 +115,18 @@ function insertTable() {
 
                 for (var y=0; y < rows; y++) {
                     if (y == 0 ) {
-                        html += "<tr>";
+                        html += "<tr class=\"table-head\">";
 
                         for (var x=0; x < cols; x++)
                             html += '<td>&nbsp;</td>';
 
                         html += "</tr>";
                     } else {
-                        html += "<tr>";
+                        if ((y%2) == 1) {
+                             html += "<tr class=\"table-odd\">";
+                        } else {
+                             html += "<tr class=\"table-even\">";
+                        }
 
                         for (var x=0; x < cols; x++)
                             html += '<td>&nbsp;</td>';

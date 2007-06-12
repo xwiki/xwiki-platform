@@ -78,7 +78,7 @@ public class XWikiMessageTool
     /**
      * The encoding used for storing unicode characters as bytes.
      */
-    private static final String BYTE_ENCODING = "UTF-8";
+    public static final String BYTE_ENCODING = "UTF-8";
 
     /**
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get

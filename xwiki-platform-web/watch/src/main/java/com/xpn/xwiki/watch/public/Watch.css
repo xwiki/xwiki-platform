@@ -1,0 +1,728 @@
+html {
+overflow-y:scroll;
+}
+
+.watch-main {
+    width: 100%;
+    float: left;
+    margin-top:0px;
+}
+
+div#contentcolumn, div.main {
+	background-image: url(watch-bg.png) ;
+}
+div.main {
+  margin-top:-30px;
+  padding: 0;
+  background-color: transparent;
+  background-position: top right;
+  background-repeat: repeat-y;
+}
+html>body div.main {
+*margin-top: 0;
+}
+
+div#contentcolumn {
+  background-color: transparent;
+  background-position: top left;
+  background-repeat: repeat-y;
+}
+
+img.watch-feedtree-logo-icon {
+	width: 16px;
+	height: 16px;
+}
+
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group TITLEBAR */
+
+.watch-titlebar {
+    width: 100%;
+    float: left;
+}
+.watch-titlebar-title,.watch-titlebar-refresh, .watch-actionbar {
+     float: left;
+}
+
+
+.watch-search-text,.watch-search-box,.watch-search-button {
+    float: left;
+}
+
+.watch-search {
+    float: right;
+    width: 200px;
+}
+div.watch-titlebar {
+	Height: 50px;
+	background-color: #868C94;
+	padding-left: 1.2em;
+}
+img.watch-titlebar-refresh {
+	margin: 13px;
+}
+.watch-search {
+    float: right;
+    width: auto;
+    color:  #fff;
+	font-size:  1.1em;
+	padding-top: 15px;
+	margin-right: 1.2em;
+}
+div.watch-search-text {
+	padding: 3px 10px;
+}
+button.watch-search-button {
+	background-color: #868C94;
+	border:  none;
+	color:  #fff;
+	font-size:  1.1em;
+}
+#Watch div.watch-main div.watch-titlebar div.watch-titlebar-title {
+	color: #fff;
+	font-size: 1.1em;
+	padding-top: 17px;
+}
+
+/* @end */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group ACTIONBAR */
+
+.watch-actionbar {
+    float: left;
+    width: 100%;
+  background: #808080;
+  height: 40px;
+  border: 0px solid #ccc;
+  color: #fff;
+}
+.watch-actionbar-title {
+     float: left;
+}
+
+.watch-actionbar-pressreview, .watch-actionbar-analysis, .watch-actionbar-showhidereadarticles {
+  border-left: 3px solid #fff;
+  padding-left: 5px;
+  cursor: pointer;
+}
+
+.watch-actionbar-title {
+    float: left;
+}
+.watch-imagetext {
+    float: right;
+    width: 150px;
+}
+
+.watch-imagetext-image {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.watch-imagetext-image, .watch-imagetext-text {
+    float: left;
+}
+
+.watch-actionbar-pressreview, .watch-actionbar-analysis, .watch-actionbar-showhidereadarticles {
+    width: 150px;
+    float: right;
+}
+.watch-actionbar-title {
+  margin: 10px;
+}
+
+/* @end */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group FEEDS */
+
+.watch-feedtree {
+    float: left;
+    clear: left;
+    width: 200px;
+    border-right: 1px solid #cccccc;
+}
+.watch-feedtree-image {
+    float: right;
+}
+
+.watch-feedtree-groups {
+    float: left;
+    clear: both;
+}
+.watch-feedtree{
+	background-color: #868C94;
+}
+.watch-feedtree-title {
+    float: left;
+    height: 40px;
+    border-bottom: none;
+    background-color: #43464A;
+    color: #FFF;
+    width:  200px;
+    font-size: 1.8em;
+    line-height: 40px;
+    text-indent: 10px;
+    padding: 0 ;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+.watch-feedtree-image {
+    float: right;
+    padding: 11px;
+    margin-top: -40px;
+}
+div.watch-feedtree-groups div table {
+	font-size: 0.9em;
+	margin: 0 5px;
+}
+img.watch-feedtree-logo-icon {
+	margin-right: 5px;
+}
+div.watch-feedtree-groups div table a{
+	color: #fff;
+	text-decoration: none;
+	line-height: 16px;
+}
+
+span.gwt-TreeItem-selected div.watch-feedtree-link a{
+	font-weight: bold;
+	color: #ceff7e;
+	text-decoration: underline;
+	}
+
+
+div.watch-feedtree-groups div span div table {
+	font-size: 0.9em;
+	margin: 0 5px;
+	width: 180px;
+}
+div.watch-feedtree-link {
+	display:  inline;
+}
+div.watch-feedtree-link a{
+	display:  inline;
+	white-space: normal;
+}
+
+#Watch div.watch-main div.watch-feedtree div.watch-feedtree-groups div span div table tbody tr td  {
+	white-space: normal;
+}
+
+
+
+
+/* @end */
+
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group ARTICLES */
+
+
+
+.watch-navbar {
+ clear: both;
+ padding: 8px 0 5px 0;
+  text-align: center;
+
+}
+.watch-navbar div{
+  display: inline;
+  margin: 5px 20px;
+}
+.watch-navbar div a{
+text-decoration: none;
+text-transform: uppercase;
+color: #000;
+font-weight: bold;
+}
+
+.watch-articlelist {
+    float: left;
+}
+.watch-article {
+    width: 100%;
+    float: left;
+}
+.watch-article-logo {
+  float: left;
+  padding-left: 3px;
+  margin-right:-20px
+}
+.watch-article-titlebar, .watch-article-titlebar-bis {
+	position: relative;
+  border: 0px;
+  overflow: auto;
+  margin: 4px 10px 0;
+  padding: 5px;
+}
+.watch-article-read div.watch-article-titlebar {
+	background: #fff9d8;
+}
+.watch-article-unread div.watch-article-titlebar {
+	  background: #E5F2FF;
+}
+.watch-article-titleline{
+	float: left;
+	margin: 0 50px 0 10px;
+}
+ div.watch-article-titleline a {
+	font-weight: bold;
+	text-decoration: none;
+}
+.watch-article-unread div.watch-article-titleline a {
+	color: #000;
+}
+.watch-article-read div.watch-article-titleline a {
+	color: #555;
+}
+
+div.watch-article-actions {
+	position: absolute;
+	right:  7px;
+	top:  5px;
+}
+div.watch-article-actions img{
+	margin-left: 10px;
+}
+img.watch-article-action-trash {
+	width:  16px;
+	height: 16px;
+}
+
+div.watch-article-feedname {
+	clear: both;
+	float: left;
+	font-size: 0.9em;
+	color:  #888;
+	margin-right: 10px;
+}
+div.watch-article-date {
+	float: left;
+	font-size: 0.9em;
+	color:  #888;
+	margin-right: 10px;
+}
+.watch-article-titleline {
+	margin-left: 0px;
+}
+.watch-article-titleline div{
+	display: inline;
+	margin-left: 25px;
+}
+
+
+img.watch-article-title-extlink {
+	margin-left: 5px;
+}
+.watch-article-titlebar-bis {}
+.watch-article-contentzone {
+  background: #Fff;
+  margin: -1px 0px 10px;
+  border: 0px solid #B2D8FF;
+  border-top: 0;
+  padding: 5px;
+}
+.watch-article-tags, .watch-article-comments {
+  background: #fdffef;
+  padding: 0 5px;
+  margin: 0 5px;
+}
+
+div.watch-article-content {
+	margin: 0 5px 1.5em  5px;
+}
+
+.watch-article-comments-content  {
+}
+
+div.watch-article-comment {
+	padding:5px ;
+	margin: 2px -5px;
+	font-size: 0.9em;
+	  background-color: #fff;
+}
+div.watch-article-comments {
+		background-color: #fdffef;
+	  border: 1px solid #ccc;
+	  color: #555;
+}
+
+
+div.watch-article-tags-text, div.watch-article-comments-title-text {
+	display:  inline;
+	margin-left: 10px;
+}
+
+
+.watch-article-comment-author {
+  float: left;
+  font-weight: bold;
+
+}
+.watch-article-comment-date {
+	float:  left;
+	font-weight: bold;
+  	text-transform: lowercase;
+  	margin-left: 10px;
+}
+
+/* @end */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group FILTER */
+
+.watch-filterbar {
+    float: right;
+    width: 200px;
+    background-color: #868c94;
+}
+
+div.watch-filter-title-text {
+	float: left;
+	height:  40px;
+    border-left: 0px solid #CCC;
+    background-color: #43464A;
+    color: #FFF;
+    width:  200px;
+    font-size: 1.8em;
+    line-height: 40px;
+    text-indent: 10px;
+    padding: 0 ;
+    font-weight: normal;
+    text-transform: uppercase;
+}
+div.watch-filter-init {
+	clear: both;
+	text-align: center;
+	padding: 1.5em 0;
+}
+
+div.watch-filter-seeonly-title, div.watch-filter-keywords-title, div.watch-filter-tagcloud-title {
+	padding: 3px 0 0 10px;
+	font-weight: bold;
+	border-bottom: 1px solid #000;
+	margin-bottom: 0.5em;
+}
+
+
+div.watch-filter-filter span.gwt-CheckBox {
+	padding-left: 10px;
+	color: #fff;
+}
+
+div.watch-filter-filter, div.watch-keywords, div.watch-tagcloud {
+	margin:0 0 1.5em 0;
+}
+
+div.watch-filter-init-text {
+	color: #fff;
+	text-decoration: underline;
+}
+ div.watch-keyword-link{
+	padding: 0 10px;
+}
+div.watch-tagscloud{
+	float: left;
+}
+div.watch-tagscloud-9, div.watch-tagscloud-10, div.watch-tagscloud-11, div.watch-tagscloud-12, div.watch-tagscloud-13, div.watch-tagscloud-14, div.watch-tagscloud-15 {
+	float: left;
+}
+
+div.watch-tagscloud-9 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  0.9em;}
+div.watch-tagscloud-10 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1em;}
+div.watch-tagscloud-11 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.1em;}
+div.watch-tagscloud-12 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.2em;}
+div.watch-tagscloud-13 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.3em;}
+div.watch-tagscloud-14 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.4em;}
+div.watch-tagscloud-15 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.5em;}
+
+
+ div.watch-keyword-link a, div.watch-tagscloud a{
+	color: #fff;
+	text-decoration: none;
+line-height:15px;
+}
+
+/* @end */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* @group ADMIN */
+
+
+.watch-addfeed-buttons button,.watch-configtype-buttons button {
+    background: #EBEBEB;
+    border: 1px solid #999;
+    width: 180px;
+    font: 12px Arial;
+    color: #666699;
+    text-align: left;
+    padding: 10px 5px 10px 5px;
+    white-space: normal;
+    overflow: visible;
+    display: block;
+    max-width: 180px;
+}
+
+.tk-ModalDialog {
+	position: relative;
+    border: 3px solid black;
+    background-color: white;
+    padding: 0px;
+ 	width:  400px;
+ 	overflow: hidden;
+}
+
+.tk-ModalDialog .Caption {
+    text-align: center;
+    width: 100%;
+    font-family: sans-serif;
+    font-size: 90%;
+    font-weight: bold;
+    background-color: #43464a;
+    color: #fff;
+    padding: 3px;
+    margin: 1px;
+    cursor: default;
+}
+
+.tk-ModalDialog table {
+	width: 400px;
+}
+
+
+
+.watch-next,.watch-close,.watch-finish  {
+    background: #aaf;
+    color: #000;
+    border: 1px solid #99f;
+}
+.watch-cancel,.watch-back {
+    background: #DCDCDC;
+    border: 1px solid #A5A5A5;
+    color: #3F3F3F;
+    margin-right: 2px;
+}
+.watch-addfeed-help,.watch-configtype-help {
+	float: right;
+    width: 200px;
+    text-align: center;
+}
+div.commentadd-invitation,
+div.tagsadd-invitation
+div.standardfeed-invitation,
+div.configtype-invitation,
+div.addfeed-invitation,
+div.standard-invitation,
+div.addkeyword-invitation,
+div.addgroup-invitation,
+div.loadingstatus-invitation,
+div.googleblog-invitation,
+div.googlenews-invitation,
+div.feedster-invitation,
+div.technoratitag-invitation,
+div.pressreview-invitation,
+div.analysis-invitation,
+div.chooseaction-invitation
+ {
+	text-align: center;
+	font-size: 1.3em;
+	font-weight: bold;
+	padding: 10px;
+	color: #999;
+}
+
+
+
+
+
+
+div.watch-configtype-buttons, div.watch-addfeed-buttons {
+	float: left;
+    width: 200px;
+}
+
+#body div.tk-ModalDialog.watch-analysis div.tagline  {
+	padding: 10px;
+}
+
+
+img.watch-configtype-help-content-image {
+	width: 180px ;
+	height:  75px;
+}
+
+
+button.gwt-Button{
+	font-weight: bold;
+	text-align: center;
+	color: #000;
+	background-color: #fff9d8;
+	border: 1px solid #ddd;
+	padding: 7px;
+	margin: 5px;
+}
+
+
+div.tk-GlassPanel.tk-ModalDialog-glassPanel {
+	background: #000;
+	filter:alpha(opacity=25);
+	-moz-opacity:0.25;
+	opacity:0.25;
+}
+button.gwt-Button:hover{
+	font-weight: bold;
+	color: #000;
+	background-color: #d6e4ff;
+	border: 1px solid #ddd;
+	padding: 7px;
+	margin: 5px;
+}
+textarea.watch-commentadd-comment,
+input.watch-tagsadd-tags,
+input.watch-standardfeed-feedname,
+input.watch-standardfeed-feedurl,
+input.watch-standard-feedname,
+input.watch-standard-feedurl ,
+input.watch-googlenews-feedname,
+input.watch-googlenews-query ,
+input.watch-addkeyword-keyword,
+input.watch-addgroup-group ,
+input.watch-googleblog-feedname,
+input.watch-googleblog-query,
+input.watch-technoratitag-feedname ,
+input.watch-technoratitag-query,
+input.watch-feedster-feedname ,
+input.watch-feedster-query
+{
+	width: 380px;
+	margin: 0 10px;
+}
+select.gwt-ListBox
+{
+	width: 380px;
+	padding: 3px 5px;
+	margin: 0 10px;
+}
+div.comment-label,
+div.tags-label,
+div.pressreview-html,
+div.keyword-label,
+div.groups-label ,
+div.group-label,
+div.feedname-label,
+div.feedurl-label,
+div.query-label
+{
+	margin: 10px 10px 0 10px;
+}
+div.watch-commentadd-actions,
+div.watch-tagsadd-actions,
+.watch-standardfeed-actions,
+div.watch-configtype-actions,
+div.watch-addfeed-actions,
+div.watch-googlenews-actions,
+div.watch-addkeyword-actions,
+div.watch-addgroup-actions,
+div.watch-loadingstatus-actions,
+div.watch-standard-actions,
+div.watch-googleblog-actions,
+div.watch-pressreview-actions,
+div.watch-analysis-actions
+ {
+	clear: both;
+	padding-top:  25px;
+}
+
+.tk-ModalDialog .watch-cancel, .tk-ModalDialog .watch-back {
+	float: left;
+	background-color: #ff991b;
+	color:  #fff;
+	border: 2px solid #000;
+
+}
+.tk-ModalDialog .watch-cancel:hover, .tk-ModalDialog .watch-back:hover {
+	float: left;
+	background-color: #ffba1a;
+	color:  #fff;
+	border: 2px solid #000;
+
+}
+.tk-ModalDialog .watch-next
+ {
+	float: right;
+	background-color: #caf117;
+	color:  #000;
+	border: 2px solid #000;
+}
+.tk-ModalDialog .watch-next:hover
+ {
+	float: right;
+	background-color: #d7ff23;
+	color:  #000;
+	border: 2px solid #000;
+}
+
+
+
+.watch-chooseaction-help-content-text,
+.watch-chooseaction-help-content-description,
+.watch-addfeed-help-content-text,
+.watch-addfeed-help-content-description,
+.watch-configtype-help-content-text,
+.watch-configtype-help-content-description
+{
+    padding: 10px;
+    line-height: 140%;
+    color: #999;
+}
+
+
+div.tk-ModalDialog.watch-analysis, div.tk-ModalDialog.watch-pressreview  {
+	width: 800px;
+}
+div.tk-ModalDialog.watch-analysis  table, div.tk-ModalDialog.watch-pressreview table {
+	width: 800px;
+}
+
+div.tk-ModalDialog.watch-commentadd  {
+	width: 424px;
+}
+
+
+
+/* @end */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ------------------------------------------------------- */
+/* ancien Style attache */
+
+
+/* flix */
+
+#xwikidata, .about {
+  display: none;
+}
+.watch-imagetext-text {
+  width: 115px;
+  padding: 0 5px;
+  font-size: 0.9em;
+  line-height: 40px;
+}
+
+
+

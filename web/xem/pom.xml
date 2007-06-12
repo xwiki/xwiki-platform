@@ -30,6 +30,7 @@
   </parent>
   <artifactId>xwiki-web-xem</artifactId>
   <name>XWiki Web - XEM</name>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>The XEM WAR</description>
   <dependencies>

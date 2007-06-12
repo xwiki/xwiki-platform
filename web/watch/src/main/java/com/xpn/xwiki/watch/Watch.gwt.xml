@@ -1,0 +1,11 @@
+
+<module>
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.xpn.xwiki.gwt.api.Api"/>
+    <inherits name="com.google.gwt.i18n.I18N"/>
+    <inherits name="org.gwtwidgets.WidgetLibrary"/>
+    <inherits name="com.google.gwt.http.HTTP"/>
+    <inherits name="com.google.gwt.junit.JUnit"/>
+
+    <entry-point class='com.xpn.xwiki.watch.client.Watch'/>
+</module>

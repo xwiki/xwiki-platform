@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.xpn.xwiki</groupId>
       <artifactId>xwiki-web-standard</artifactId>
-      <version>${version}</version>
+      <version>1.1-SNAPSHOT</version>
       <type>war</type>
       <classifier>${xwiki.db}</classifier>
     </dependency>

@@ -1001,7 +1001,16 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
-            Properties properties = (msg==null) ? null : msg.getDocumentBundleProperties(msg.getDocumentBundle(translationPage));
+            Properties encproperties = (msg==null) ? null : msg.getDocumentBundleProperties(msg.getDocumentBundle(translationPage));
+            Properties properties = new Properties();
+            // Let's convert properties from internal encoding to xwiki encoding
+            Iterator it = encproperties.keySet().iterator();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                String value = encproperties.getProperty(key);
+                String newvalue = new String(value.getBytes(), XWikiMessageTool.BYTE_ENCODING);
+                properties.setProperty(key, newvalue);
+            }
             if (properties==null)
              return new Dictionary();
             else

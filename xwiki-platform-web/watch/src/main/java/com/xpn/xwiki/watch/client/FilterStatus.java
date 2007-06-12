@@ -26,15 +26,18 @@ public class FilterStatus {
     private int total;
     private String query;
 
-    public FilterStatus() {};
+    public FilterStatus() {
+        reset();        
+    };
 
     public FilterStatus(Watch watch) {
+        this();
         this.watch = watch;
     }
 
     public void reset() {
         flagged = 0;
-        trashed = 0;
+        trashed = -1;
         read = 0;
         tags = new ArrayList();
         keyword = null;

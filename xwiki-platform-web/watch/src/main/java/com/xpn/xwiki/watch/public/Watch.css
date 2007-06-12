@@ -724,5 +724,11 @@ div.tk-ModalDialog.watch-commentadd  {
   line-height: 40px;
 }
 
+div.watch-tagscloud-active a, div.watch-keyword-link-active a{
+font-weight: bold;
+	color: #ceff7e;
+color: orange;
+	text-decoration: underline;
+}
 
 

@@ -65,7 +65,8 @@ public class AddKeywordDialog extends WatchDialog {
     protected boolean updateData() {
         keyword = keywordTextBox.getText();
         int selectedIndex = (groupListBox==null) ? -1 : groupListBox.getSelectedIndex();
-        if (selectedIndex!=-1)
+        // If the All item is selected set no group
+        if (selectedIndex>0)
          group = groupListBox.getItemText(selectedIndex);
 
         if (keyword.equals("")) {
@@ -101,16 +102,23 @@ public class AddKeywordDialog extends WatchDialog {
         groupListBox.setMultipleSelect(false);
         Map groupMap = ((Watch)app).getConfig().getGroups();
         Iterator it = groupMap.keySet().iterator();
+        boolean selected = false;
+        String all = ((Watch)app).getTranslation("all");
+        groupListBox.addItem("all", all);
         while (it.hasNext()) {
             String groupname = (String) it.next();
-            String all = ((Watch)app).getTranslation("all");
             if (!groupname.equals(all)) {
                 String grouptitle = (String) groupMap.get(groupname);
                 groupListBox.addItem(groupname, grouptitle);
                 if (group.equals(groupname)) {
+                    selected = true;
                     groupListBox.setItemSelected(groupListBox.getItemCount(), true);
                 }
             }
+        }
+        // we need to select the first item (All) if none is selected
+        if (selected==false) {
+            groupListBox.setItemSelected(0, true);
         }
         groupsPanel.add(groupListBox);
         return groupsPanel;

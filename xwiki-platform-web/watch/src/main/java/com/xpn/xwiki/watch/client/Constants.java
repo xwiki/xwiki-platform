@@ -60,7 +60,7 @@ public class Constants {
     public static final String IMAGE_HIDE_READ = "show-read.png";
     public static final String IMAGE_SHOW_READ = "hide-read.png";
     public static final String IMAGE_CONFIG = "config.png";
-    public static final String IMAGE_REFRESH = "refreshData.png";
+    public static final String IMAGE_REFRESH = "refresh.png";
     public static final String IMAGE_MORE = "more.png";
     public static final String IMAGE_FLAG_ON = "news-flag2.png";
     public static final String IMAGE_FLAG_OFF = "news-noflag2.png";

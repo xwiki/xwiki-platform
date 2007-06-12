@@ -4,6 +4,7 @@ import com.xpn.xwiki.gwt.api.client.Dictionary;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.core.client.GWT;
 
 /** Copyright 2006,XpertNet SARL,and individual contributors as indicated
  * by the contributors.txt.
@@ -75,14 +76,18 @@ public class Translator {
         String oStr = getTranslation(key);
 
         for (int i = 0; i<args.length; i++){
-            oStr = oStr.replaceAll("{"+i+"}", args[i]);
+            if (GWT.isScript()) {
+                oStr = oStr.replaceAll("\\{"+i+"\\}", args[i]);
+            }
+            else
+                oStr = oStr.replaceAll("{"+i+"}", args[i]);
         }
 
         return oStr;
     }
 
     public void init() {
-        app.getXWikiServiceInstance().getTranslation(app.getTranslationPage(), "en_US", new XWikiAsyncCallback(app) {
+        app.getXWikiServiceInstance().getTranslation(app.getTranslationPage(), app.getLocale(), new XWikiAsyncCallback(app) {
             public void onSuccess(Object result) {
                 super.onSuccess(result);
                 dictionary = (Dictionary) result;

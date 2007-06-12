@@ -24,6 +24,7 @@
 package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 
 import java.util.List;
 import java.util.Map;
@@ -113,6 +114,10 @@ public interface XWikiServiceAsync {
 
     void customQuery(String queryPage, int nb, int start, AsyncCallback async);
 
+    void customQuery(String queryPage, Map params, AsyncCallback async);
+
+    void customQuery(String queryPage, Map params, int nb, int start, AsyncCallback async);
+
     void getDocumentContent(String fullName, AsyncCallback async);
 
     void getDocumentContent(String fullName, boolean rendered, AsyncCallback async);
@@ -122,4 +127,5 @@ public interface XWikiServiceAsync {
     void logJSError(Map infos, AsyncCallback async);
 
     void getTranslation(String translationPage, String local, AsyncCallback async);
+
 }

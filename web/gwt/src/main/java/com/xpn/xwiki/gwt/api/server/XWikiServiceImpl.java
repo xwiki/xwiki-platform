@@ -27,6 +27,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
@@ -37,10 +38,9 @@ import com.xpn.xwiki.gwt.api.client.User;
 import com.xpn.xwiki.gwt.api.client.XObject;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.gwt.api.client.XWikiService;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
@@ -355,7 +355,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
                 XWikiDocument oldDoc = (XWikiDocument) doc.clone();
-                doc.setListValue(className, propertyname, value);
+                BaseClass bclass = context.getWiki().getClass(className, context);
+                ListClass lclass = (ListClass) ((bclass==null) ? null : bclass.get(propertyname));
+                BaseProperty prop = lclass.fromValue(value);
+                doc.setProperty(className, propertyname, prop);
                 context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
@@ -691,15 +694,39 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     }
 
     public List customQuery(String queryPage) throws XWikiGWTException {
-        return customQuery(queryPage, 0, 0);
+        return customQuery(queryPage, null, 0, 0);
+    }
+
+    public List customQuery(String queryPage, Map params) throws XWikiGWTException {
+        return customQuery(queryPage, params, 0, 0);
     }
 
     public List customQuery(String queryPage, int nb, int start) throws XWikiGWTException {
+        return customQuery(queryPage, null, nb, start);
+    }
+    public List customQuery(String queryPage, Map params, int nb, int start) throws XWikiGWTException {
         List newlist = new ArrayList();
         try {
             XWikiContext context = getXWikiContext();
             XWikiDocument queryDoc = context.getWiki().getDocument(queryPage, context);
             if (context.getWiki().getRightService().hasProgrammingRights(queryDoc, context)) {
+                if (params!=null) {
+                    XWikiRequestWrapper srw = new XWikiRequestWrapper(context.getRequest());
+                    Iterator it = params.keySet().iterator();
+                    while (it.hasNext()) {
+                        String key = (String) it.next();
+                        Object value = params.get(key);
+                        if (key instanceof String) {
+                            // we clean params so that they cannot close a string
+                            params.put(key, ((String)value).replaceAll("'", ""));
+                        } else {
+                            params.remove(key);
+                        }
+                    }
+                    srw.setParameterMap(params);
+                    context.setRequest(srw);
+
+                }
                 List list = context.getWiki().getStore().search(queryDoc.getRenderedContent(context), nb, start, context);
                 for (int i=0;i<list.size();i++) {
                     Object[] item = (Object[]) list.get(i);
@@ -970,11 +997,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                // + "stacktrace" + infos.get("stacktrace"));
     }
 
-    public Dictionary getTranslation(String translationPage, String local) throws XWikiGWTException {
+    public Dictionary getTranslation(String translationPage, String locale) throws XWikiGWTException {
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
-            Properties properties = (msg==null) ? null : msg.getDocumentBundleProperties(translationPage, context);
+            Properties properties = (msg==null) ? null : msg.getDocumentBundleProperties(msg.getDocumentBundle(translationPage));
             if (properties==null)
              return new Dictionary();
             else
@@ -983,6 +1010,4 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             throw getXWikiGWTException(e);
         }
     }
-
-
 }

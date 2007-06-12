@@ -233,7 +233,7 @@ public class XWikiMessageTool
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
-    private XWikiDocument getDocumentBundle(String documentName)
+    public XWikiDocument getDocumentBundle(String documentName)
     {
         XWikiDocument docBundle;
 
@@ -285,7 +285,7 @@ public class XWikiMessageTool
      * @return the properties object corresponding to the docBundle. A translated version
      *         of the document for the current Locale is looked for.
      */
-    private Properties getDocumentBundleProperties(XWikiDocument docBundle)
+    public Properties getDocumentBundleProperties(XWikiDocument docBundle)
     {
         Properties props = new Properties();
         String content = docBundle.getContent();

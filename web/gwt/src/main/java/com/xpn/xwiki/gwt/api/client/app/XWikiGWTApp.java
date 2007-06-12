@@ -86,4 +86,6 @@ public interface XWikiGWTApp {
     public void showError(String code, String text);
 
     public String getCSSPrefix();
+
+    public String getLocale();
 }

@@ -186,7 +186,7 @@ public class XWikiRequestWrapper implements XWikiRequest {
     }
 
     public String get(String name) {
-        return request.get(name);
+        return getParameter(name);
     }
 
     public String getParameter(String name) {

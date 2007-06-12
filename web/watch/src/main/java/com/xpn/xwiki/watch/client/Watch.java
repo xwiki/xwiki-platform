@@ -19,6 +19,7 @@ import com.google.gwt.core.client.GWT;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -88,6 +89,18 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
 
     public UserInterface getUserInterface() {
         return userInterface;
+    }
+
+    public void startServerLoading() {
+        Map map = filterStatus.getMap();
+        map.put("space", getWatchSpace());
+        map.put("confirm", "1");
+        getXWikiServiceInstance().getDocumentContent(Constants.PAGE_LOADING_STATUS, true, map, new AsyncCallback() {
+            public void onFailure(Throwable throwable) {
+            }
+            public void onSuccess(Object object) {
+            }
+        });
     }
 
     /**
@@ -179,6 +192,8 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
                 refreshTagCloud();
                 refreshKeywords();
                 refreshArticleList();
+                // Make sure server has started loading feeds
+                startServerLoading();
                 userInterface.resizeWindow();
             }
         });
@@ -334,8 +349,9 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
         fstatus.setRead(0);
         fstatus.setStart(0);
         fstatus.setTags(new ArrayList());
-        fstatus.setTrashed(0);
+        fstatus.setTrashed(-1);
         refreshArticleList();
+        userInterface.resetSelections();        
     }
 
     public void refreshOnActivateKeyword(Keyword keyword) {
@@ -501,7 +517,7 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
 
     public void refreshOnNotShowOnlyTrashedArticles() {
         FilterStatus fstatus = getFilterStatus();
-        fstatus.setTrashed(0);
+        fstatus.setTrashed(-1);
         fstatus.setStart(0);
         refreshArticleList();
     }

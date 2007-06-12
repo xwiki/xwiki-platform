@@ -53,8 +53,8 @@ public class TitleBarWidget extends WatchWidget {
         searchWidget = new SearchWidget(watch);
         searchWidget.init();
         refreshImage = new Image(watch.getSkinFile(Constants.IMAGE_REFRESH));
-        refreshImage.setStyleName(watch.getStyleName("titlebar", "refreshData"));
-        refreshImage.setTitle(watch.getTranslation("refreshData"));
+        refreshImage.setStyleName(watch.getStyleName("titlebar", "refresh"));
+        refreshImage.setTitle(watch.getTranslation("refresh"));
         refreshImage.addClickListener(new ClickListener() {
             public void onClick(Widget widget) {
                 watch.refreshArticleList();

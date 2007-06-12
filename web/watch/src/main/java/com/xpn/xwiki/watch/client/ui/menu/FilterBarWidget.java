@@ -143,8 +143,7 @@ public class FilterBarWidget  extends WatchWidget {
         textHTML.setStyleName(watch.getStyleName("filter", "init-text"));
         textHTML.addClickListener(new ClickListener() {
             public void onClick(Widget widget) {
-                watch.refreshOnResetFilter();
-                resetSelections();
+                watch.refreshOnResetFilter();                
             }
         });
         p.add(textHTML);

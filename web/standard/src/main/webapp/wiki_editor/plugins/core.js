@@ -19,8 +19,8 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
-    this.addExternalProcessor((/^\s*----(\-)*\s*$/gim), '<hr class="line" \/>');
-	this.addInternalProcessor((/<hr[^>]*>/gi), '----');
+    this.addExternalProcessor((/----(-*)/i), 'convertHRExternal');
+	this.addInternalProcessor((/<hr(.*?)>/i), 'convertHRInternal');
 
     this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(#+)\s+([^\r\n]+)$/im), 'convertListExternal');
@@ -77,6 +77,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 	this.addToolbarHandler('handleTitlesList');
     this.addToolbarHandler('handleStylesList');
 	this.addToolbarHandler('handleLinkButtons');
+    this.addToolbarHandler('handleHorizontalRuleButtons');
     this.addToolbarHandler('handleTableButtons');
 
     // Add Comands and Fix Commands(workarounds)
@@ -346,6 +347,13 @@ WikiEditor.prototype._cleanBR = function(node) {
 	}
 }
 
+WikiEditor.prototype.handleHorizontalRuleButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
+   tinyMCE.switchClass(editor_id + '_hr', 'mceButtonNormal');
+   if (node.nodeName == "HR") {
+       tinyMCE.switchClass(editor_id + '_hr', 'mceButtonSelected');
+   }
+}
+
 WikiEditor.prototype.handleLinkButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	// Reset
 	tinyMCE.switchClass(editor_id + '_link', 'mceButtonDisabled', true);
@@ -591,6 +599,16 @@ WikiEditor.prototype.getLinkControls = function(button_name) {
 	return str;
 }
 
+WikiEditor.prototype.getHorizontalruleControls = function() {
+    var str = this.createButtonHTML('hr', 'hr.gif', 'lang_theme_hr_desc', 'inserthorizontalrule');    
+    return str;
+}
+
+WikiEditor.prototype.getRemoveformatControls = function() {
+    var str = this.createButtonHTML('removeformat', 'removeformat.gif', 'lang_theme_removeformat_desc', 'removeformat');
+    return str;
+}
+
 WikiEditor.prototype.getTableToolbar = function() {
 	return this.getTableControls("table");
 }
@@ -793,8 +811,8 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 	if(insideP) {
 		str += '<\/p>\r\n';
 	}
-	//alert(str);
-	return str;
+    str = str.replace(/<p\s*(.*?)>\s*<\/p>/g,'');
+    return str;
 }
 
 WikiEditor.prototype._getLines = function(content) {
@@ -831,7 +849,7 @@ WikiEditor.prototype.LIST_NUMERIC_CLASS_NAME_1 = "norder";
 
 WikiEditor.prototype.convertListExternal = function(regexp, result, content) {
     var subContent = content.substring(result["index"], content.length);
-    subContent = this._convertNewLine2BrInList(subContent);
+    //subContent = this._convertNewLine2BrInList(subContent);
     var str = "";
     switch (result[1].charAt(0)) {
 		case '*':
@@ -859,7 +877,7 @@ WikiEditor.prototype._convertNewLine2BrInList = function(content) {
             var j = 1;
             if (((i+j) <= lines.length)) {
                 while (((i+j) < lines.length) && ((lines[i+j].charAt(0) != '*') && (lines[i+j].charAt(0) != '#') && ((lines[i+j].charAt(0) != '1'))) && this.trimString(lines[i+j]) != "") {
-                    tempContent += lines[i+j];
+                    tempContent += "\r\n" + lines[i+j];
                     j++;
                 }
             }
@@ -1236,5 +1254,33 @@ WikiEditor.prototype.convertCodeMacroInternal = function(regexp, result, content
     if (this.core.isMSIE) str += "\r\n";
     str += "{code}";
     if (this.core.isMSIE) str = "\r\n" + str + "\r\n";
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertHRExternal = function(regexp, result, content) {
+    var str = "";
+    var count = 0;
+    if (result[1] && result[1] != "") {
+        count = result[1].toString().length;
+    }
+    if (count > 0) {
+        str = "<hr class=\"line\" name=\"" + count + "\"\/>"
+    } else {
+        str = "<hr class=\"line\"\/>"
+    }
+    return content.replace(regexp, str);
+}
+
+WikiEditor.prototype.convertHRInternal = function(regexp, result, content) {
+    var str = "----";
+    var atts = this.readAttributes(result[1]);
+    if (atts && atts["name"])  {
+        str += this.buildString("-", atts["name"]);
+    }
+    if (this.core.isMSIE) {
+        str += "\r\n";
+    } else if (result[1] == null || result[1] == "" || this.trimString(result[1].toString()) == "/") {
+        str += "\n";
+    }
     return content.replace(regexp, str);
 }

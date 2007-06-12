@@ -288,19 +288,25 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * @param value
      */
     public void setListValue(String name, List value) {
-        ListProperty property = new StringListProperty();
+        ListProperty property = (ListProperty) safeget(name);
+        if (property==null)
+         property = new StringListProperty();
         property.setValue(value);
         safeput(name, property);
     }
 
     public void setStringListValue(String name, List value) {
-        ListProperty property = new StringListProperty();
+        ListProperty property = (ListProperty) safeget(name);
+        if (property==null)
+         property = new StringListProperty();
         property.setValue(value);
         safeput(name, property);
     }
 
     public void setDBStringListValue(String name, List value) {
-        ListProperty property = new DBStringListProperty();
+        ListProperty property = (ListProperty) safeget(name);
+        if (property==null)
+         property = new DBStringListProperty();
         property.setValue(value);
         safeput(name, property);
     }

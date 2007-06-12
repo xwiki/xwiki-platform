@@ -2707,6 +2707,19 @@ public class XWikiDocument
         return null;
     }
 
+    public void setProperty(String className, String fieldName, BaseProperty value)
+    {
+        BaseObject bobject = getObject(className);
+        if (bobject == null) {
+            bobject = new BaseObject();
+            addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.safeput(fieldName, value);              
+        setContentDirty(true);
+    }
+
     public int getIntValue(String className, String fieldName)
     {
         BaseObject obj = getObject(className, 0);
@@ -2806,6 +2819,11 @@ public class XWikiDocument
         return object.getListValue(fieldName);
     }
 
+    /**
+     * @deprecated use setStringListValue or setDBStringListProperty
+     * @param name
+     * @param value
+     */
     public void setListValue(String className, String fieldName, List value)
     {
         BaseObject bobject = getObject(className);
@@ -2816,6 +2834,40 @@ public class XWikiDocument
         bobject.setName(getFullName());
         bobject.setClassName(className);
         bobject.setListValue(fieldName, value);
+        setContentDirty(true);
+    }
+
+    /**
+     * @param name
+     * @param value
+     */
+    public void setStringListValue(String className, String fieldName, List value)
+    {
+        BaseObject bobject = getObject(className);
+        if (bobject == null) {
+            bobject = new BaseObject();
+            addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.setStringListValue(fieldName, value);
+        setContentDirty(true);
+    }
+
+    /**
+     * @param name
+     * @param value
+     */
+    public void setDBStringListValue(String className, String fieldName, List value)
+    {
+        BaseObject bobject = getObject(className);
+        if (bobject == null) {
+            bobject = new BaseObject();
+            addObject(className, bobject);
+        }
+        bobject.setName(getFullName());
+        bobject.setClassName(className);
+        bobject.setDBStringListValue(fieldName, value);
         setContentDirty(true);
     }
 

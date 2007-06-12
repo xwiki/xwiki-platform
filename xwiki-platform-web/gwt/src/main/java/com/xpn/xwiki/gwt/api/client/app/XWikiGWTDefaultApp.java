@@ -4,10 +4,11 @@ import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.core.client.GWT;
 
 /**
  * Copyright 2006,XpertNet SARL,and individual contributors as indicated
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.Window;
 public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp {
     protected Translator translator;
     protected LoadingDialog loadingDialog;
+    protected XWikiServiceAsync serviceInstance;
 
 
     public XWikiGWTDefaultApp() {
@@ -136,8 +138,18 @@ public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWi
      * @return
      */
     public XWikiServiceAsync getXWikiServiceInstance() {
-        return XWikiService.App.getInstance();
+        if (serviceInstance == null) {
+            serviceInstance = (XWikiServiceAsync) GWT.create(XWikiService.class);
+            String defaultXWikiService;
+            if (GWT.isScript())
+                defaultXWikiService = XWikiGWTAppConstants.XWIKI_DEFAULT_BASE_URL + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
+            else
+                defaultXWikiService = GWT.getModuleBaseURL() + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
+            ((ServiceDefTarget) serviceInstance).setServiceEntryPoint(getParam("xwikiservice" , defaultXWikiService));
+        }
+        return serviceInstance;
     }
+
 
     /**
      * Constructs a skin file URL
@@ -275,4 +287,7 @@ public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWi
     }
 
 
+    public String getLocale() {
+        return getParam("locale", XWikiGWTAppConstants.XWIKI_DEFAULT_LOCALE);
+    }
 }

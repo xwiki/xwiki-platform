@@ -95,6 +95,9 @@ public interface XWikiService extends RemoteService {
 
     public List customQuery(String queryPage) throws XWikiGWTException;
     public List customQuery(String queryPage, int nb, int start) throws XWikiGWTException;
+    public List customQuery(String queryPage, Map params) throws XWikiGWTException;
+    public List customQuery(String queryPage, Map params, int nb, int start) throws XWikiGWTException;
+
     public String getDocumentContent(String fullName) throws XWikiGWTException;
     public String getDocumentContent(String fullName, boolean rendered) throws XWikiGWTException;
     public String getDocumentContent(String fullName, boolean rendered, Map params) throws XWikiGWTException;

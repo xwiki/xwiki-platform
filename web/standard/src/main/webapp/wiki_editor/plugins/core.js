@@ -373,24 +373,6 @@ WikiEditor.prototype.handleLinkButtons = function(editor_id, node, undo_index, u
 
 WikiEditor.prototype.handleTableButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
     tinyMCE.switchClass(editor_id + '_table', 'mceButtonNormal', false);
-
-    var tableEl = this.core.getParentElement(node, "table");
-    var tdEl = this.core.getParentElement(node, "td");
-
-    if (tableEl) {
-        for (var y=0; y<tableEl.rows.length; y++) {
-            for (var x=0; x<tableEl.rows[y].cells.length; x++) {
-                if ((y%2) == 1) {
-                    tableEl.rows[y].cells[x].style.backgroundColor = "#fff";
-                } else {
-                    tableEl.rows[y].cells[x].style.backgroundColor = "transparent";
-                }
-            }
-        }
-    }
-    if (tableEl && tdEl) {
-        tdEl.style.backgroundColor = "#bdd0e9";
-    }
 }
 
 WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {

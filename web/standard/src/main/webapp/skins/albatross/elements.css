@@ -96,8 +96,7 @@ dd {}
 
 /* Section 11: Tables */
 table {
-  border-spacing: 0px;
-  border-collapse: collapse;
+
 }
 caption {
   margin: auto;

@@ -113,19 +113,14 @@
   text-align:left;
   border: 20px solid #E5F0FE !important;
   background-color: #E5F0FE;
-  border-collapse: collapse;
 }
 
 .wiki-table td {
-  border: 0px solid #5b5b5b;
-  border-width: 0px;
-  border-style: inset;
   padding: 8px;
   text-align:left;
 }
 
 .wiki-table th {
-  border: 0px solid;
   border-width: 0px;
   border-style: inset;
   text-align: left;

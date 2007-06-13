@@ -1817,6 +1817,16 @@ TinyMCE_Engine.prototype = {
                         } else {
                             el.rows[y].className = "table-even";
                         }
+
+                        for (var x=0; x<el.rows[y].cells.length; x++) {
+                            el.rows[y].cells[x].style.border = "1px solid #bdd0e9";
+                            if (y != 0) {
+                                el.rows[y].cells[x].style.borderTopWidth = "0px"; 
+                            }
+                            if (x != 0) {
+                                el.rows[y].cells[x].style.borderLeftWidth = "0px"; 
+                            }
+                        }
                     }
                 }
 

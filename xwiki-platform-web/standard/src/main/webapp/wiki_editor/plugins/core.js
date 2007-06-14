@@ -1016,7 +1016,11 @@ WikiEditor.prototype.convertListInternal = function(regexp, result, content) {
 	if(bounds && bounds["start"] > -1) {
         str = this._convertListInternal(content.substring(bounds["start"], bounds["end"]), lclass);
         newContent = content.substring(0, bounds["start"]) + "\r\n";
-        newContent += str + "\r\n" + content.substring(bounds["end"], content.length);
+        var afterContent = content.substring(bounds["end"], content.length)
+        if (!this.core.isMSIE && afterContent.substring(0,6)) {
+            afterContent = afterContent.substring(6, afterContent.length);
+        }
+        newContent += str + "\r\n" + afterContent;
         return newContent;
 	}
     return content;

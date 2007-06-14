@@ -113,6 +113,25 @@
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
     </profile>
+    <profile>
+      <id>derby</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.derby</groupId>
+          <artifactId>derby</artifactId>
+          <version>10.2.2.0</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <xwiki.db>derby</xwiki.db>
+        <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
+        <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
+        <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
+        <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
+        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+      </properties>
+    </profile>
   </profiles>
   <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need
        to define it here because if com.xpn.xwiki:xwiki is not in the local repository we want to

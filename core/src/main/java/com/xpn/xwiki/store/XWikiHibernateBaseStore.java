@@ -561,23 +561,26 @@ public class XWikiHibernateBaseStore {
      * Adding a connection to the Monitor module
      * @param connection
      * @param context
+     * @todo This function is temporarily deactivated because of an error that causes memory leaks.
      */
     private void addConnection(Connection connection, XWikiContext context) {
-        if (connection!=null)
+/*        if (connection!=null)
             connections.put(connection, new ConnectionMonitor(connection, context));
-    }
+*/    }
 
     /**
      * Remove a connection to the Monitor module
      * @param connection
+     * @todo This function is temporarily deactivated because of an error that causes memory leaks.
      */
     private void removeConnection(Connection connection) {
-        try {
+//        connection.equals(connection) = false for some strange reasons.
+/*        try {
             if (connection!=null)
                 connections.remove(connection);
         } catch (Exception e) {
         }
-    }
+*/    }
 
     /**
      * Ends a transaction

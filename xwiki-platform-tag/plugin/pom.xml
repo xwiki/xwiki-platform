@@ -44,6 +44,7 @@
   <modules>
     <module>adwords</module>
     <module>alexa</module>
+    <module>exoplatform</module>
     <module>multiwiki</module>
   </modules>
   <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need

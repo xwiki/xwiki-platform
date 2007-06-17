@@ -1,0 +1,62 @@
+<!--
+ *
+ * Copyright 2007, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.plugin</groupId>
+    <artifactId>xwiki-plugins</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-plugin-exoplatform</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <name>XWiki Plugins - eXo Platform</name>
+  <packaging>jar</packaging>
+  <description>XWiki eXo Platform Plugin</description>
+  <dependencies>
+
+    <dependency>
+      <groupId>com.xpn.xwiki</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>1.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>exo</groupId>
+      <artifactId>exoplatform.services.jcr.impl</artifactId>
+      <version>1.0</version>
+      <!-- Exclude Castor as it seems Exo JCR implementation is looking for verion 0.9.5 which
+           isn't in the local repo. Not sure why it needs that and it seems we don't need it
+           for what we do for now. -->
+      <exclusions>
+        <exclusion>
+          <groupId>castor</groupId>
+          <artifactId>castor</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+
+</project>
+        

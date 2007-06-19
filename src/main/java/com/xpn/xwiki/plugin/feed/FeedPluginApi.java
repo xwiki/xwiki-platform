@@ -24,6 +24,7 @@
 package com.xpn.xwiki.plugin.feed;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
@@ -103,9 +104,9 @@ public class FeedPluginApi extends Api {
          return -1;
     }
 
-    public int updateFeedsInSpace(boolean fullContent, boolean oneDocPerEntry, boolean force, String space) throws XWikiException {
+    public int updateFeedsInSpace(String space, boolean fullContent, boolean force) throws XWikiException {
         if (hasProgrammingRights())
-         return plugin.updateFeedsInSpace(fullContent, oneDocPerEntry, force, space, getXWikiContext());
+         return plugin.updateFeedsInSpace(space, fullContent, true, force, getXWikiContext());
         else
          return -1;
     }
@@ -143,6 +144,27 @@ public class FeedPluginApi extends Api {
          return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, space, getXWikiContext());
         else
          return -1;
+    }
+
+    public boolean startUpdateFeedsInSpace(String space, int scheduleTimer)  throws XWikiException {
+        return plugin.startUpdateFeedsInSpace(space, false, scheduleTimer, context);
+    }
+
+    public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer)  throws XWikiException {
+        return plugin.startUpdateFeedsInSpace(space, fullContent, scheduleTimer, context);
+    }
+
+    public void stopUpdateFeedsInSpace(String space)  throws XWikiException {
+        plugin.stopUpdateFeedsInSpace(space, context);
+    }
+
+
+    public UpdateThread getUpdateThread(String space) {
+        return plugin.getUpdateThread(space);
+    }
+
+    public Collection getActiveUpdateThreads() {
+        return plugin.getActiveUpdateThreads();
     }
 
 }
